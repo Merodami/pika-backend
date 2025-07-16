@@ -150,3 +150,12 @@ export const FILE_STORAGE_SERVICE_HOST = getEnvVariable(
   String,
   '0.0.0.0',
 )
+
+// Translation service configuration
+export const DEFAULT_LANGUAGE = getEnvVariable(
+  'DEFAULT_LANGUAGE',
+  String,
+  'es',
+)
+
+export const SUPPORTED_LANGUAGES = ['es', 'en', 'gn'] as const

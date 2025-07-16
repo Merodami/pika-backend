@@ -8,7 +8,6 @@ export interface CreateSubscriptionPlanDTO {
   currency?: string
   interval: BillingIntervalType
   intervalCount?: number
-  creditsAmount: number
   trialPeriodDays?: number
   features: string[]
   isActive?: boolean
@@ -19,7 +18,6 @@ export interface UpdateSubscriptionPlanDTO {
   name?: string
   description?: string
   price?: number
-  creditsAmount?: number
   features?: string[]
   isActive?: boolean
   metadata?: Record<string, any>
@@ -33,7 +31,6 @@ export interface SubscriptionPlanDTO {
   currency: string
   interval: string
   intervalCount: number
-  creditsAmount: number
   trialPeriodDays?: number
   features: string[]
   isActive: boolean

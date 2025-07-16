@@ -400,7 +400,6 @@ export class SubscriptionService implements ISubscriptionService {
           planName: plan.name,
           price: `$${(plan.price / 100).toFixed(2)}`,
           interval: plan.interval,
-          creditsAmount: plan.creditsAmount.toString(),
           features: plan.features.join(', '),
           nextBillingDate: subscription.currentPeriodEnd
             ? new Date(subscription.currentPeriodEnd).toLocaleDateString()

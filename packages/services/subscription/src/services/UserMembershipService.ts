@@ -63,7 +63,6 @@ export class UserMembershipService implements IUserMembershipService {
               cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
             }
           : undefined,
-        creditBalance: undefined, // Credits removed - no credit tables in database
       }
 
       return membershipStatus

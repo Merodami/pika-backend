@@ -26,6 +26,7 @@ export {
   requirePermissions,
   requireRoles,
 } from './infrastructure/express/middleware/auth.js'
+export { createLanguageMiddleware } from './infrastructure/express/middleware/language.js'
 export { errorMiddleware } from './infrastructure/express/middleware/errorHandler.js'
 export {
   idempotencyMiddleware,

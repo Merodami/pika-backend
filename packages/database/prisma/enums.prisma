@@ -64,7 +64,7 @@ enum NotificationStatus {
   FAILED
   READ
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum NotificationType {
@@ -73,7 +73,7 @@ enum NotificationType {
   PUSH
   IN_APP
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum CommunicationMethod {
@@ -82,7 +82,7 @@ enum CommunicationMethod {
   PUSH
   IN_APP
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum SubscriptionStatus {

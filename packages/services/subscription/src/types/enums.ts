@@ -26,9 +26,3 @@ export enum StripeWebhookEvent {
   INVOICE_PAYMENT_FAILED = 'invoice.payment_failed',
 }
 
-export enum CreditProcessingStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-}
