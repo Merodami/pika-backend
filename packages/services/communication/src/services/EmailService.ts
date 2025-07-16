@@ -3,11 +3,11 @@ import type {
     BulkEmailDTO,
     CommunicationLogDomain,
     SendEmailDTO,
-} from '@pikadk'
-import type { ICacheService } from '@pikaedis'
-import { Cache } from '@pikaedis'
-import { ErrorFactory, logger } from '@pikahared'
-import type { EmailTemplateId, PaginatedResult } from '@pikaypes'
+} from '@pika/sdk'
+import type { ICacheService } from '@pika/redis'
+import { Cache } from '@pika/redis'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { EmailTemplateId, PaginatedResult } from '@pika/types'
 import Handlebars from 'handlebars'
 import { nth } from 'lodash-es'
 

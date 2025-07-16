@@ -1,7 +1,7 @@
 // Import Zod schemas from the api package
 import * as publicSchemas from '@pika/api/public'
-import { validateBody } from '@pika
-import { logger } from '@pika
+import { validateBody } from '@pika/http'
+import { logger } from '@pika/shared'
 import { Router } from 'express'
 
 /**

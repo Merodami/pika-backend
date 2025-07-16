@@ -4,7 +4,7 @@ import {
   LOCAL_AUTH_URL,
   NODE_ENV,
 } from '@pika/environment'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 
 import { IdentityProviderOptions } from '../domain/interfaces/IdentityProvider.js'
 import { IdentityProviderRegistry } from '../infrastructure/IdentityProviderRegistry.js'

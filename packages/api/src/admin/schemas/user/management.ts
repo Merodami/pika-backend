@@ -200,9 +200,7 @@ export const UserActivityLog = z.object({
   category: z.enum([
     'AUTH',
     'PROFILE',
-    'BOOKING',
     'PAYMENT',
-    'SOCIAL',
     'OTHER',
   ]),
   details: z.record(z.any()).optional(),
@@ -268,13 +266,10 @@ export const AdminCreateUserRequest = openapi(
     lastName: z.string().min(1).max(50),
     phoneNumber: z.string().min(1),
     dateOfBirth: z.string(),
-    role: UserRole.default('MEMBER'),
+    role: UserRole.default('USER'),
     status: UserStatus.default('UNCONFIRMED'),
     appVersion: z.string().optional(),
     alias: z.string().optional(),
-    // For PROFESSIONAL role
-    description: z.string().optional(),
-    specialties: z.array(z.string()).optional(),
   }),
   {
     description: 'Create a new user (admin only)',

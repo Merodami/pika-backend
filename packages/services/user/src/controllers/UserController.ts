@@ -13,16 +13,16 @@ import type {
   GetUserByIdQuery,
   RegisterRequest,
   UpdateProfileRequest,
-} from '@pikaublic'
+} from '@pika/api/public'
 import {
   PAGINATION_DEFAULT_LIMIT,
   REDIS_DEFAULT_TTL,
-} from '@pikaonment'
-import { getValidatedQuery, RequestContext } from '@pika
-import { adaptMulterFile } from '@pika
-import { Cache, httpRequestKeyGenerator } from '@pika'
-import { UserMapper } from '@pika
-import { ErrorFactory } from '@pikad'
+} from '@pika/environment'
+import { getValidatedQuery, RequestContext } from '@pika/http'
+import { adaptMulterFile } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { UserMapper } from '@pika/sdk'
+import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 import { get } from 'lodash-es'
 

@@ -7,9 +7,9 @@ import type {
 import type {
   UnifiedResendVerificationRequest,
   UnifiedVerificationRequest,
-} from '@pikaublic'
-import { adaptMulterFile, RequestContext } from '@pika
-import { ErrorFactory } from '@pikad'
+} from '@pika/api/public'
+import { adaptMulterFile, RequestContext } from '@pika/http'
+import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IUserService } from '../services/UserService.js'
@@ -77,7 +77,7 @@ export class AdminUserController {
           totalBookings: 0,
           totalSpent: 0,
           creditsBalance: 0,
-          friendsCount: user.friends?.length || 0,
+          friendsCount: 0,
           followersCount: 0,
           reportsCount: 0,
         },
@@ -85,8 +85,8 @@ export class AdminUserController {
         suspensionReason: undefined,
         suspendedAt: undefined,
         suspendedBy: undefined,
-        description: user.professional?.description,
-        specialties: user.professional?.specialties,
+        description: undefined,
+        specialties: undefined,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
@@ -212,7 +212,7 @@ export class AdminUserController {
           totalBookings: 0, // TODO: Implement booking stats
           totalSpent: 0, // TODO: Implement spending stats
           creditsBalance: 0, // TODO: Implement credits
-          friendsCount: user.friends?.length || 0,
+          friendsCount: 0,
           followersCount: 0, // TODO: Implement followers
           reportsCount: 0, // TODO: Implement reports
         },
@@ -220,8 +220,8 @@ export class AdminUserController {
         suspensionReason: undefined,
         suspendedAt: undefined,
         suspendedBy: undefined,
-        description: user.professional?.description,
-        specialties: user.professional?.specialties,
+        description: undefined,
+        specialties: undefined,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
@@ -296,7 +296,7 @@ export class AdminUserController {
           totalBookings: 0,
           totalSpent: 0,
           creditsBalance: 0,
-          friendsCount: updatedUser.friends?.length || 0,
+          friendsCount: 0, // friends feature removed
           followersCount: 0,
           reportsCount: 0,
         },
@@ -304,8 +304,8 @@ export class AdminUserController {
         suspensionReason: undefined,
         suspendedAt: undefined,
         suspendedBy: undefined,
-        description: updatedUser.professional?.description,
-        specialties: updatedUser.professional?.specialties,
+        description: undefined, // professional feature removed
+        specialties: undefined, // professional feature removed
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt,
       }

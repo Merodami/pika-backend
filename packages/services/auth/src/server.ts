@@ -1,10 +1,10 @@
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import type { ICacheService } from '@pika
+import type { ICacheService } from '@pika/redis'
 import {
   CommunicationServiceClient,
   logger,
   UserServiceClient,
-} from '@pika
+} from '@pika/shared'
 
 import { createAuthRouter } from './routes/AuthRoutes.js'
 

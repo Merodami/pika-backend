@@ -5,7 +5,6 @@
 
 import type { UserRoleType, UserStatusType } from '@pika/types'
 
-import type { FriendDomain } from './social.js'
 
 // ============= User Domain =============
 
@@ -25,46 +24,11 @@ export interface UserDomain {
   createdAt: Date
   updatedAt: Date
   deletedAt?: Date | null
-  // Gym platform specific fields
-  dateOfBirth?: Date | null // Renamed from dob for consistency
-  alias?: string | null
-  appVersion?: string | null
-  activeMembership: boolean
-  guests: string[]
+  // Additional fields
+  dateOfBirth?: Date | null
   stripeUserId?: string | null
-  // Relations
-  professional?: ProfessionalDomain | null
-  parq?: ParqDomain | null
-  friends?: FriendDomain[]
 }
 
-// ============= Professional Domain =============
-
-export interface ProfessionalDomain {
-  id: string
-  userId: string
-  description: string
-  specialties: string[]
-  favoriteGyms: string[]
-  createdAt: Date
-  updatedAt: Date
-}
-
-// ============= PARQ Domain =============
-
-export interface ParqDomain {
-  id: string
-  userId: string
-  medicalClearance: boolean
-  existingInjuries: boolean
-  symptomsCheck: boolean
-  doctorConsultation: boolean
-  experienceLevel: boolean
-  properTechnique: boolean
-  gymEtiquette: boolean
-  createdAt: Date
-  updatedAt: Date
-}
 
 // ============= Address Domain =============
 
@@ -100,3 +64,4 @@ export interface PaymentMethodDomain {
   createdAt: Date
   updatedAt: Date
 }
+

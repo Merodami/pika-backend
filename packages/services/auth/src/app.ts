@@ -1,11 +1,11 @@
 import { AUTH_SERVICE_PORT } from '@pika/environment'
-import { startServer } from '@pika
-import { type ICacheService,initializeCache } from '@pika
+import { startServer } from '@pika/http'
+import { type ICacheService,initializeCache } from '@pika/redis'
 import {
   CommunicationServiceClient,
   logger,
   UserServiceClient,
-} from '@pika
+} from '@pika/shared'
 
 import { createAuthServer } from './server.js'
 

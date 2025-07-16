@@ -19,7 +19,6 @@ export type TemplateType = z.infer<typeof TemplateType>
 
 export const TemplateCategory = z.enum([
   'AUTH',
-  'BOOKING',
   'PAYMENT',
   'REMINDER',
   'NOTIFICATION',

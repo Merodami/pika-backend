@@ -1,8 +1,8 @@
 import type { ICacheService } from '@pika/redis'
-import type { TemplateDomain } from '@pikadk'
-import { TemplateMapper } from '@pikadk'
-import { ErrorFactory, logger } from '@pikahared'
-import type { PaginatedResult } from '@pikaypes'
+import type { TemplateDomain } from '@pika/sdk'
+import { TemplateMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface CreateTemplateInput {

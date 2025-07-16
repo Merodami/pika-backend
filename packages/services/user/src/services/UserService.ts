@@ -3,20 +3,20 @@ import {
   API_PREFIX,
   REDIS_DEFAULT_TTL,
 } from '@pika/environment'
-import { Cache, ICacheService } from '@pika'
-import { type UserDomain } from '@pika
+import { Cache, ICacheService } from '@pika/redis'
+import { type UserDomain } from '@pika/sdk'
 import {
   CommunicationServiceClient,
   ErrorFactory,
   FileStoragePort,
   isUuidV4,
   logger,
-} from '@pikad'
+} from '@pika/shared'
 import {
   EmailTemplateId,
   type PaginatedResult,
   VerificationType,
-} from '@pika'
+} from '@pika/types'
 import bcrypt from 'bcrypt'
 import { randomInt } from 'crypto'
 
@@ -265,17 +265,7 @@ export class UserService implements IUserService {
         }
       }
 
-      // Check alias uniqueness if changing
-      if (data.alias && data.alias !== existing.alias) {
-        const aliasExists = await this.repository.findByEmail(data.alias)
-
-        if (aliasExists) {
-          throw ErrorFactory.businessRuleViolation(
-            'Alias already in use',
-            'Alias must be unique',
-          )
-        }
-      }
+      // Alias feature removed
 
       const user = await this.repository.update(id, data)
 
@@ -368,8 +358,8 @@ export class UserService implements IUserService {
         throw ErrorFactory.resourceNotFound('User', userId)
       }
 
-      // Return the guests array which stores friend emails
-      return user.guests || []
+      // Guests feature removed
+      return []
     } catch (error) {
       logger.error('Failed to get user friends', { error, userId })
       throw ErrorFactory.fromError(error)

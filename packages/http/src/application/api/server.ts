@@ -6,7 +6,7 @@ import {
   RATE_LIMIT_MAX,
   SERVICE_HOST,
 } from '@pika/environment'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import compression from 'compression'
 import cors from 'cors'
 import express, { Express } from 'express'

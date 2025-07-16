@@ -5,6 +5,7 @@ export const TEST_BUSINESS_ID = getEnvVariable(
   String,
   '20b1abc9-4b63-46d1-b390-34f4dcbcb145',
 )
+
 export const TEST_USER_ID = getEnvVariable(
   'TEST_USER_ID',
   String,

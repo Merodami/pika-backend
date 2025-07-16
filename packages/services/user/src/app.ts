@@ -1,9 +1,9 @@
 // Import the necessary dependencies
 import { PrismaClient } from '@prisma/client'
 import { USER_SERVICE_PORT } from '@pika/environment'
-import { startServer } from '@pika
-import { initializeCache } from '@pika'
-import { FileStoragePort, logger, StorageServiceClient } from '@pikad'
+import { startServer } from '@pika/http'
+import { initializeCache } from '@pika/redis'
+import { FileStoragePort, logger, StorageServiceClient } from '@pika/shared'
 
 // Import the server creation function
 import { createUserServer } from './server.js'

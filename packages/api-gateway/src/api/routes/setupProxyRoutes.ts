@@ -2,15 +2,12 @@ import {
   AUTH_API_URL,
   COMMUNICATION_API_URL,
   FILE_STORAGE_API_URL,
-  GYM_API_URL,
   PAYMENT_API_URL,
-  SESSION_API_URL,
-  SOCIAL_API_URL,
   SUBSCRIPTION_API_URL,
   SUPPORT_API_URL,
   USER_API_URL,
 } from '@pika/environment'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import type { Express } from 'express'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 
@@ -81,16 +78,6 @@ const services: ServiceConfig[] = [
     upstream: USER_API_URL,
   },
   {
-    name: 'admin/gyms',
-    prefix: '/api/v1/admin/gyms',
-    upstream: GYM_API_URL,
-  },
-  {
-    name: 'admin/sessions',
-    prefix: '/api/v1/admin/sessions',
-    upstream: SESSION_API_URL,
-  },
-  {
     name: 'admin/payments',
     prefix: '/api/v1/admin/payments',
     upstream: PAYMENT_API_URL,
@@ -111,29 +98,9 @@ const services: ServiceConfig[] = [
     upstream: SUPPORT_API_URL,
   },
   {
-    name: 'admin/social',
-    prefix: '/api/v1/admin/social',
-    upstream: SOCIAL_API_URL,
-  },
-  {
     name: 'admin/files',
     prefix: '/api/v1/admin/files',
     upstream: FILE_STORAGE_API_URL,
-  },
-  {
-    name: 'gyms',
-    prefix: '/api/v1/gyms',
-    upstream: GYM_API_URL,
-  },
-  {
-    name: 'sessions',
-    prefix: '/api/v1/sessions',
-    upstream: SESSION_API_URL,
-  },
-  {
-    name: 'bookings',
-    prefix: '/api/v1/bookings',
-    upstream: SESSION_API_URL,
   },
   {
     name: 'payments',
@@ -174,16 +141,6 @@ const services: ServiceConfig[] = [
     name: 'support',
     prefix: '/api/v1/support',
     upstream: SUPPORT_API_URL,
-  },
-  {
-    name: 'social',
-    prefix: '/api/v1/social',
-    upstream: SOCIAL_API_URL,
-  },
-  {
-    name: 'friends',
-    prefix: '/api/v1/friends',
-    upstream: SOCIAL_API_URL,
   },
   {
     name: 'files',

@@ -9,14 +9,14 @@ import {
   JWT_ISSUER,
   JWT_REFRESH_EXPIRY,
   JWT_SECRET,
-} from '@pikant'
-import type { ICacheService } from '@pika
+} from '@pika/environment'
+import type { ICacheService } from '@pika/redis'
 import {
   CommunicationServiceClient,
   ErrorFactory,
   UserServiceClient,
-} from '@pika
-import { UserRole } from '@pika
+} from '@pika/shared'
+import { UserRole } from '@pika/types'
 
 import { UserServiceClientAdapter } from '../adapters/UserServiceClientAdapter.js'
 

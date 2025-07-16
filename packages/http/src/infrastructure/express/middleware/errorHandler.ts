@@ -1,5 +1,5 @@
 import { NODE_ENV } from '@pika/environment'
-import { BaseError, createErrorHandler, ErrorFactory } from '@pika
+import { BaseError, createErrorHandler, ErrorFactory } from '@pika/shared'
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express'
 import { get, set } from 'lodash-es'
 

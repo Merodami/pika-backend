@@ -5,12 +5,12 @@ import type {
     TestTemplateRequest,
     UpdateTemplateRequest,
 } from '@pika/api/public'
-import type { CreateTemplateDTO, UpdateTemplateDTO } from '@pikadk'
-import { TemplateMapper } from '@pikadk'
-import { Cache, httpRequestKeyGenerator } from '@pikaedis'
-import { ErrorFactory, logger } from '@pikahared'
-import { REDIS_DEFAULT_TTL } from '@pikanvironment'
-import { getValidatedQuery } from '@pikattp'
+import type { CreateTemplateDTO, UpdateTemplateDTO } from '@pika/sdk'
+import { TemplateMapper } from '@pika/sdk'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { ErrorFactory, logger } from '@pika/shared'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { getValidatedQuery } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { TemplateSearchParams } from '../repositories/TemplateRepository.js'

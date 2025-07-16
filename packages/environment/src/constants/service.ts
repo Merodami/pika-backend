@@ -46,48 +46,6 @@ export const AUTH_SERVICE_HOST = getEnvVariable(
   '0.0.0.0',
 )
 
-// Gym service name
-export const GYM_SERVICE_NAME = getEnvVariable(
-  'GYM_SERVICE_NAME',
-  String,
-  'gym_service',
-)
-
-// Gym service port
-export const GYM_SERVICE_PORT = getEnvVariable(
-  'GYM_SERVICE_PORT',
-  parseNumber,
-  5503,
-)
-
-// Gym service host
-export const GYM_SERVICE_HOST = getEnvVariable(
-  'GYM_SERVICE_HOST',
-  String,
-  '0.0.0.0',
-)
-
-// Session service name
-export const SESSION_SERVICE_NAME = getEnvVariable(
-  'SESSION_SERVICE_NAME',
-  String,
-  'session_service',
-)
-
-// Session service port
-export const SESSION_SERVICE_PORT = getEnvVariable(
-  'SESSION_SERVICE_PORT',
-  parseNumber,
-  5504,
-)
-
-// Session service host
-export const SESSION_SERVICE_HOST = getEnvVariable(
-  'SESSION_SERVICE_HOST',
-  String,
-  '0.0.0.0',
-)
-
 // Payment service name
 export const PAYMENT_SERVICE_NAME = getEnvVariable(
   'PAYMENT_SERVICE_NAME',
@@ -168,27 +126,6 @@ export const SUPPORT_SERVICE_PORT = getEnvVariable(
 // Support service host
 export const SUPPORT_SERVICE_HOST = getEnvVariable(
   'SUPPORT_SERVICE_HOST',
-  String,
-  '0.0.0.0',
-)
-
-// Social service name
-export const SOCIAL_SERVICE_NAME = getEnvVariable(
-  'SOCIAL_SERVICE_NAME',
-  String,
-  'social_service',
-)
-
-// Social service port
-export const SOCIAL_SERVICE_PORT = getEnvVariable(
-  'SOCIAL_SERVICE_PORT',
-  parseNumber,
-  5509,
-)
-
-// Social service host
-export const SOCIAL_SERVICE_HOST = getEnvVariable(
-  'SOCIAL_SERVICE_HOST',
   String,
   '0.0.0.0',
 )

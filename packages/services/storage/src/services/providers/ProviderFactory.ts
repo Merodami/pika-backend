@@ -3,7 +3,7 @@ import {
     STORAGE_PROVIDER_FALLBACK,
     STORAGE_PROVIDER_PRIMARY,
 } from '@pika/environment'
-import { logger } from '@pikad'
+import { logger } from '@pika/shared'
 
 import { AwsS3Provider } from './AwsS3Provider.js'
 import { ConsoleStorageProvider } from './ConsoleStorageProvider.js'

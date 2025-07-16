@@ -1,5 +1,5 @@
 import { ErrorFactory } from '@pika/shared'
-import { UserRole } from '@pika
+import { UserRole } from '@pika/types'
 import type { Request } from 'express'
 
 /**
@@ -79,17 +79,10 @@ export class RequestContext {
   }
 
   /**
-   * Check if the user is a professional
+   * Check if the user is a regular user (not admin)
    */
-  static isProfessional(context: UserContext): boolean {
-    return context.role === UserRole.PROFESSIONAL
-  }
-
-  /**
-   * Check if the user is a member
-   */
-  static isMember(context: UserContext): boolean {
-    return context.role === UserRole.MEMBER
+  static isUser(context: UserContext): boolean {
+    return context.role === UserRole.USER
   }
 
   /**

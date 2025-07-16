@@ -1,8 +1,8 @@
 import type { ICacheService } from '@pika/redis'
-import type { CommunicationLogDomain } from '@pikadk'
-import { CommunicationLogMapper } from '@pikadk'
-import { ErrorFactory, logger } from '@pikahared'
-import type { PaginatedResult } from '@pikaypes'
+import type { CommunicationLogDomain } from '@pika/sdk'
+import { CommunicationLogMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface CreateCommunicationLogInput {

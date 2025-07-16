@@ -1,12 +1,9 @@
 import type { UserRoleType, UserStatusType } from '@pika/types'
-import { UserRole, UserStatus } from '@pika
+import { UserRole, UserStatus } from '@pika/types'
 
-import type { FriendDomain } from '../domain/social.js'
 import type {
   AddressDomain,
-  ParqDomain,
   PaymentMethodDomain,
-  ProfessionalDomain,
   UserDomain,
 } from '../domain/user.js'
 import type { AddressDTO, PaymentMethodDTO, UserDTO } from '../dto/user.dto.js'
@@ -31,64 +28,11 @@ export interface UserDocument {
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt?: Date | null
-  // Gym platform specific fields
+  // Additional fields
   dateOfBirth?: Date | null
-  alias?: string | null
-  appVersion?: string | null
-  activeMembership: boolean
-  guests: string[]
   stripeUserId?: string | null
-  // Relations
-  professional?: ProfessionalDocument | null
-  parq?: ParqDocument | null
-  friends?: FriendDocument[]
 }
 
-/**
- * Interface for professional document
- */
-export interface ProfessionalDocument {
-  id: string
-  userId: string
-  description: string
-  specialties: string[]
-  favoriteGyms: string[]
-  createdAt: Date
-  updatedAt: Date
-}
-
-/**
- * Interface for PARQ document
- */
-export interface ParqDocument {
-  id: string
-  userId: string
-  medicalClearance: boolean
-  existingInjuries: boolean
-  symptomsCheck: boolean
-  doctorConsultation: boolean
-  experienceLevel: boolean
-  properTechnique: boolean
-  gymEtiquette: boolean
-  createdAt: Date
-  updatedAt: Date
-}
-
-/**
- * Interface for friend document
- */
-export interface FriendDocument {
-  id: string
-  userId: string
-  email: string
-  name?: string | null
-  avatarUrl?: string | null
-  type: 'FRIEND' | 'CLIENT'
-  invitedAt: Date
-  referredUserId?: string | null
-  createdAt: Date
-  updatedAt: Date
-}
 
 /**
  * Interface for address document
@@ -170,23 +114,13 @@ export class UserMapper {
           ? doc.deletedAt
           : new Date(doc.deletedAt)
         : undefined,
-      // Gym platform specific fields
+      // Additional fields
       dateOfBirth: doc.dateOfBirth
         ? doc.dateOfBirth instanceof Date
           ? doc.dateOfBirth
           : new Date(doc.dateOfBirth)
         : undefined,
-      alias: doc.alias,
-      appVersion: doc.appVersion,
-      activeMembership: doc.activeMembership || false,
-      guests: doc.guests || [],
       stripeUserId: doc.stripeUserId,
-      // Relations
-      professional: doc.professional
-        ? this.mapProfessionalFromDocument(doc.professional)
-        : undefined,
-      parq: doc.parq ? this.mapParqFromDocument(doc.parq) : undefined,
-      friends: doc.friends?.map((friend) => this.mapFriendFromDocument(friend)),
     }
   }
 
@@ -219,19 +153,9 @@ export class UserMapper {
       lastLoginAt: formatDate(domain.lastLoginAt),
       createdAt: formatDate(domain.createdAt) || new Date().toISOString(),
       updatedAt: formatDate(domain.updatedAt) || new Date().toISOString(),
-      // Gym platform specific fields
+      // Additional fields
       dateOfBirth: formatDate(domain.dateOfBirth),
-      alias: domain.alias || undefined,
-      appVersion: domain.appVersion || undefined,
-      activeMembership: domain.activeMembership,
-      guests: domain.guests,
       stripeUserId: domain.stripeUserId || undefined,
-      // Relations
-      professional: domain.professional
-        ? this.mapProfessionalToDTO(domain.professional)
-        : undefined,
-      parq: domain.parq ? this.mapParqToDTO(domain.parq) : undefined,
-      friends: domain.friends?.map((friend) => this.mapFriendToDTO(friend)),
     }
   }
 
@@ -254,12 +178,8 @@ export class UserMapper {
       lastLoginAt: dto.lastLoginAt ? new Date(dto.lastLoginAt) : null,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),
-      // Gym platform specific fields
+      // Additional fields
       dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
-      alias: dto.alias || null,
-      appVersion: dto.appVersion || null,
-      activeMembership: dto.activeMembership || false,
-      guests: dto.guests || [],
       stripeUserId: dto.stripeUserId || null,
     }
   }
@@ -351,122 +271,6 @@ export class UserMapper {
     }
   }
 
-  /**
-   * Maps professional document to domain
-   */
-  static mapProfessionalFromDocument(
-    doc: ProfessionalDocument,
-  ): ProfessionalDomain {
-    return {
-      id: doc.id,
-      userId: doc.userId,
-      description: doc.description,
-      specialties: doc.specialties,
-      favoriteGyms: doc.favoriteGyms,
-      createdAt:
-        doc.createdAt instanceof Date ? doc.createdAt : new Date(doc.createdAt),
-      updatedAt:
-        doc.updatedAt instanceof Date ? doc.updatedAt : new Date(doc.updatedAt),
-    }
-  }
-
-  /**
-   * Maps professional domain to DTO
-   */
-  static mapProfessionalToDTO(domain: ProfessionalDomain): any {
-    return {
-      id: domain.id,
-      userId: domain.userId,
-      description: domain.description,
-      specialties: domain.specialties,
-      favoriteGyms: domain.favoriteGyms,
-      createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt.toISOString(),
-    }
-  }
-
-  /**
-   * Maps PARQ document to domain
-   */
-  static mapParqFromDocument(doc: ParqDocument): ParqDomain {
-    return {
-      id: doc.id,
-      userId: doc.userId,
-      medicalClearance: doc.medicalClearance,
-      existingInjuries: doc.existingInjuries,
-      symptomsCheck: doc.symptomsCheck,
-      doctorConsultation: doc.doctorConsultation,
-      experienceLevel: doc.experienceLevel,
-      properTechnique: doc.properTechnique,
-      gymEtiquette: doc.gymEtiquette,
-      createdAt:
-        doc.createdAt instanceof Date ? doc.createdAt : new Date(doc.createdAt),
-      updatedAt:
-        doc.updatedAt instanceof Date ? doc.updatedAt : new Date(doc.updatedAt),
-    }
-  }
-
-  /**
-   * Maps PARQ domain to DTO
-   */
-  static mapParqToDTO(domain: ParqDomain): any {
-    return {
-      id: domain.id,
-      userId: domain.userId,
-      medicalClearance: domain.medicalClearance,
-      existingInjuries: domain.existingInjuries,
-      symptomsCheck: domain.symptomsCheck,
-      doctorConsultation: domain.doctorConsultation,
-      experienceLevel: domain.experienceLevel,
-      properTechnique: domain.properTechnique,
-      gymEtiquette: domain.gymEtiquette,
-      createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt.toISOString(),
-    }
-  }
-
-  /**
-   * Maps friend document to domain
-   */
-  static mapFriendFromDocument(doc: FriendDocument): FriendDomain {
-    return {
-      id: doc.id,
-      userId: doc.userId,
-      email: doc.email,
-      name: doc.name,
-      avatarUrl: doc.avatarUrl,
-      type: doc.type,
-      status: 'ACCEPTED', // Default status for existing friends
-      message: null,
-      userName: undefined,
-      referredUserName: undefined,
-      invitedAt:
-        doc.invitedAt instanceof Date ? doc.invitedAt : new Date(doc.invitedAt),
-      referredUserId: doc.referredUserId || '',
-      createdAt:
-        doc.createdAt instanceof Date ? doc.createdAt : new Date(doc.createdAt),
-      updatedAt:
-        doc.updatedAt instanceof Date ? doc.updatedAt : new Date(doc.updatedAt),
-    }
-  }
-
-  /**
-   * Maps friend domain to DTO
-   */
-  static mapFriendToDTO(domain: FriendDomain): any {
-    return {
-      id: domain.id,
-      userId: domain.userId,
-      email: domain.email,
-      name: domain.name || undefined,
-      avatarUrl: domain.avatarUrl || undefined,
-      type: domain.type,
-      invitedAt: domain.invitedAt.toISOString(),
-      referredUserId: domain.referredUserId || undefined,
-      createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt.toISOString(),
-    }
-  }
 
   /**
    * Maps role string to enum
@@ -475,16 +279,10 @@ export class UserMapper {
     switch (role) {
       case UserRole.ADMIN:
         return UserRole.ADMIN
-      case UserRole.MEMBER:
-        return UserRole.MEMBER
-      case UserRole.PROFESSIONAL:
-        return UserRole.PROFESSIONAL
-      case UserRole.THERAPIST:
-        return UserRole.THERAPIST
-      case UserRole.CONTENT_CREATOR:
-        return UserRole.CONTENT_CREATOR
+      case UserRole.USER:
+        return UserRole.USER
       default:
-        return UserRole.MEMBER
+        return UserRole.USER
     }
   }
 
@@ -530,20 +328,13 @@ export class UserMapper {
    * Maps domain role to DTO role (API compatible)
    */
   private static mapRoleToDTO(role: string): any {
-    // Return the role as-is since we support all role types
     switch (role) {
       case UserRole.ADMIN:
         return UserRole.ADMIN
-      case UserRole.MEMBER:
-        return UserRole.MEMBER
-      case UserRole.PROFESSIONAL:
-        return UserRole.PROFESSIONAL
-      case UserRole.THERAPIST:
-        return UserRole.THERAPIST
-      case UserRole.CONTENT_CREATOR:
-        return UserRole.CONTENT_CREATOR
+      case UserRole.USER:
+        return UserRole.USER
       default:
-        return role
+        return UserRole.USER
     }
   }
 

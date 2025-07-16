@@ -1,9 +1,6 @@
 enum UserRole {
   ADMIN
-  MEMBER
-  PROFESSIONAL
-  THERAPIST
-  CONTENT_CREATOR
+  USER
 
   @@schema("identity")
 }
@@ -26,113 +23,6 @@ enum AuditAction {
   STATUS_CHANGE
 
   @@schema("audit")
-}
-
-enum FriendOrClientType {
-  FRIEND
-  CLIENT
-
-  @@schema("users")
-}
-
-enum FriendStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
-  BLOCKED
-
-  @@schema("users")
-}
-
-enum ActivityType {
-  SESSION_BOOKED
-  SESSION_COMPLETED
-  SESSION_REVIEWED
-  FRIEND_ADDED
-  USER_FOLLOWED
-  GYM_VISITED
-  ACHIEVEMENT_EARNED
-  PROFILE_UPDATED
-  ENTITY_LIKED
-  ENTITY_SHARED
-  ENTITY_COMMENTED
-  ENTITY_BOOKMARKED
-
-  @@schema("social")
-}
-
-enum PrivacyLevel {
-  PUBLIC
-  FRIENDS
-  FOLLOWERS
-  PRIVATE
-
-  @@schema("social")
-}
-
-enum InteractionType {
-  LIKE
-  COMMENT
-  SHARE
-  BOOKMARK
-
-  @@schema("social")
-}
-
-enum StuffType {
-  EQUIPMENT
-  AMENITY
-  FEATURE
-
-  @@schema("gyms")
-}
-
-enum WeekDay {
-  SUNDAY
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-
-  @@schema("gyms")
-}
-
-enum GymStatus {
-  ACTIVE
-  INACTIVE
-  MAINTENANCE
-  COMING_SOON
-
-  @@schema("gyms")
-}
-
-enum GymVerificationStatus {
-  PENDING
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  SUSPENDED
-
-  @@schema("gyms")
-}
-
-enum GymTier {
-  BASIC
-  STANDARD
-  PREMIUM
-  ENTERPRISE
-
-  @@schema("gyms")
-}
-
-enum GymSubscriptionStatus {
-  ACTIVE
-  EXPIRED
-  CANCELLED
-
-  @@schema("gyms")
 }
 
 enum ProblemStatus {
@@ -161,9 +51,6 @@ enum ProblemType {
   BILLING
   TECHNICAL
   ACCOUNT
-  BOOKING
-  GYM_ISSUE
-  TRAINER_ISSUE
   GENERAL
   BUG_REPORT
   FEATURE_REQUEST
@@ -171,62 +58,58 @@ enum ProblemType {
   @@schema("support")
 }
 
-enum SessionStatus {
-  UPCOMING
-  PENDING_APPROVAL
-  PAYMENT_PENDING
-  COMPLETED
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+  READ
+
+  @@schema("public")
+}
+
+enum NotificationType {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+
+  @@schema("public")
+}
+
+enum CommunicationMethod {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+
+  @@schema("public")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
   CANCELLED
-  DECLINED
+  EXPIRED
+  TRIALING
+  PAST_DUE
+  UNPAID
 
-  @@schema("sessions")
+  @@schema("payments")
 }
 
-enum SessionPurpose {
-  WORKING
-  WORKOUT
-  CONTENT
+enum FileType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  AUDIO
+  OTHER
 
-  @@schema("sessions")
+  @@schema("files")
 }
 
-enum TeamSize {
-  CREATOR
-  BRAND
-  ENTERPRISE
+enum StorageProvider {
+  AWS_S3
+  LOCAL
+  MINIO
 
-  @@schema("sessions")
-}
-
-enum InviteeStatus {
-  PENDING
-  CONFIRMED
-  DECLINED
-
-  @@schema("sessions")
-}
-
-enum InvitationStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
-
-  @@schema("sessions")
-}
-
-enum WaitingListStatus {
-  WAITING
-  ACCEPTED
-  DECLINED
-  LEFT
-
-  @@schema("sessions")
-}
-
-enum SessionRating {
-  SAD
-  NEUTRAL
-  HAPPY
-
-  @@schema("sessions")
+  @@schema("files")
 }

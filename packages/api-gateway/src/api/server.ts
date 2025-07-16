@@ -6,15 +6,15 @@ import {
   CACHE_DISABLED,
   JWT_SECRET,
   NODE_ENV,
-} from '@pikant'
+} from '@pika/environment'
 import {
   authMiddleware,
   createExpressServer,
   errorMiddleware,
   startServer,
-} from '@pika
-import { RedisService } from '@pika
-import { logger } from '@pika
+} from '@pika/http'
+import { RedisService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import type { Application, Express } from 'express'
 
 import { loadConfig } from '../config/gateway.js'

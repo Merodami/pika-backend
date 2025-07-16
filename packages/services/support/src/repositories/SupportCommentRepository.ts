@@ -1,9 +1,9 @@
 import type { PrismaClient } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
-import type { SupportCommentDomain } from '@pika
-import { SupportCommentMapper } from '@pika
-import { ErrorFactory, toPrismaInclude } from '@pikad'
-import type { ParsedIncludes } from '@pika'
+import type { SupportCommentDomain } from '@pika/sdk'
+import { SupportCommentMapper } from '@pika/sdk'
+import { ErrorFactory, toPrismaInclude } from '@pika/shared'
+import type { ParsedIncludes } from '@pika/types'
 
 export interface CreateSupportCommentInput {
   problemId: string

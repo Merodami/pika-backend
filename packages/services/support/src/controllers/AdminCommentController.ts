@@ -3,17 +3,17 @@ import {
     AdminCommentsByProblemQuery,
     AdminGetAllCommentsQuery,
 } from '@pika/api/admin'
-import { SupportCommentMapper } from '@pikadk'
-import { Cache, httpRequestKeyGenerator } from '@pikaedis'
-import { parseIncludeParam } from '@pikahared'
-import { REDIS_DEFAULT_TTL } from '@pikanvironment'
+import { SupportCommentMapper } from '@pika/sdk'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { parseIncludeParam } from '@pika/shared'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type {
-    Crea@pikartCommentRequest,
-    ProblemIdForCommentsParam,@pika
-    SupportCommentIdParam,@pika
-    UpdateSupportCommentRequest,@pika
-} from '@pikapi/public'@pika
-import { getValidatedQuery, Request@pika } from '@pikattp'
+    CreateSupportCommentRequest,
+    ProblemIdForCommentsParam,
+    SupportCommentIdParam,
+    UpdateSupportCommentRequest,
+} from '@pika/api/public'
+import { getValidatedQuery, RequestContext } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IAdminSupportCommentService } from '../services/AdminSupportCommentService.js'

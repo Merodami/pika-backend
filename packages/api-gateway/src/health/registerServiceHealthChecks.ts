@@ -2,16 +2,13 @@ import {
   AUTH_API_URL,
   COMMUNICATION_API_URL,
   FILE_STORAGE_API_URL,
-  GYM_API_URL,
   PAYMENT_API_URL,
-  SESSION_API_URL,
-  SOCIAL_API_URL,
   SUBSCRIPTION_API_URL,
   SUPPORT_API_URL,
   USER_API_URL,
 } from '@pika/environment'
-import type { HealthCheckConfig } from '@pika
-import { logger } from '@pika
+import type { HealthCheckConfig } from '@pika/http'
+import { logger } from '@pika/shared'
 
 /**
  * Register health checks for all services
@@ -40,14 +37,6 @@ export async function registerServiceHealthChecks(
       url: USER_API_URL,
     },
     {
-      name: 'gym',
-      url: GYM_API_URL,
-    },
-    {
-      name: 'session',
-      url: SESSION_API_URL,
-    },
-    {
       name: 'payment',
       url: PAYMENT_API_URL,
     },
@@ -62,10 +51,6 @@ export async function registerServiceHealthChecks(
     {
       name: 'support',
       url: SUPPORT_API_URL,
-    },
-    {
-      name: 'social',
-      url: SOCIAL_API_URL,
     },
     {
       name: 'file-storage',

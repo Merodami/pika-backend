@@ -1,6 +1,6 @@
 import { FRONTEND_URL } from '@pika/environment'
-import { logger } from '@pikahared'
-import { EmailTemplateId, TemplateCategory } from '@pikaypes'
+import { logger } from '@pika/shared'
+import { EmailTemplateId, TemplateCategory } from '@pika/types'
 import fs from 'fs/promises'
 import Handlebars from 'handlebars'
 import { get, has } from 'lodash-es'

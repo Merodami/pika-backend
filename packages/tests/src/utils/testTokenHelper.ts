@@ -1,5 +1,5 @@
 import { JWT_SECRET } from '@pika/environment'
-import { UserStatus } from '@pika
+import { UserStatus } from '@pika/types'
 import jwt from 'jsonwebtoken'
 
 /**

@@ -3,12 +3,12 @@ import type {
     CreateProblemDTO,
     ProblemDomain,
     UpdateProblemDTO,
-} from '@pikadk'
-import { ProblemMapper } from '@pikadk'
-import type { ICacheService } from '@pikaedis'
-import { Cache, httpRequestKeyGenerator } from '@pikaedis'
-import { ErrorFactory, logger } from '@pikahared'
-import type { ParsedIncludes } from '@pikaypes'
+} from '@pika/sdk'
+import { ProblemMapper } from '@pika/sdk'
+import type { ICacheService } from '@pika/redis'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { ParsedIncludes } from '@pika/types'
 
 import type {
     CreateProblemInput,

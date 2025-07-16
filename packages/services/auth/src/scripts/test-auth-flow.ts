@@ -189,14 +189,14 @@ async function testAuthFlow() {
 
     // Test token validation directly
     try {
-      const { JwtTokenService } = await import('@pika
+      const { JwtTokenService } = await import('@pika/auth')
       const {
         JWT_SECRET,
         JWT_ACCESS_EXPIRY,
         JWT_REFRESH_EXPIRY,
         JWT_ISSUER,
         JWT_AUDIENCE,
-      } = await import('@pikant')
+      } = await import('@pika/environment')
 
       const jwtService = new JwtTokenService(
         JWT_SECRET,

@@ -10,7 +10,7 @@ import {
   UpdateUserStatusRequest,
   UserIdParam,
 } from '@pika/api/admin'
-import { GetUserByIdQuery, UpdateProfileRequest } from '@pikaublic'
+import { GetUserByIdQuery, UpdateProfileRequest } from '@pika/api/public'
 import {
   createMulterMiddleware,
   requireAdmin,
@@ -18,9 +18,9 @@ import {
   validateBody,
   validateParams,
   validateQuery,
-} from '@pika
-import { ICacheService } from '@pika'
-import { CommunicationServiceClient, FileStoragePort } from '@pikad'
+} from '@pika/http'
+import { ICacheService } from '@pika/redis'
+import { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
 import { Router } from 'express'
 
 import { UserController } from '../controllers/UserController.js'

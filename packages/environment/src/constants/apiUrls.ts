@@ -13,18 +13,6 @@ export const AUTH_API_URL = getEnvVariable(
   'http://localhost:5502',
 )
 
-export const GYM_API_URL = getEnvVariable(
-  'GYM_API_URL',
-  String,
-  'http://localhost:5503',
-)
-
-export const SESSION_API_URL = getEnvVariable(
-  'SESSION_API_URL',
-  String,
-  'http://localhost:5504',
-)
-
 export const PAYMENT_API_URL = getEnvVariable(
   'PAYMENT_API_URL',
   String,
@@ -47,12 +35,6 @@ export const SUPPORT_API_URL = getEnvVariable(
   'SUPPORT_API_URL',
   String,
   'http://localhost:5508',
-)
-
-export const SOCIAL_API_URL = getEnvVariable(
-  'SOCIAL_API_URL',
-  String,
-  'http://localhost:5509',
 )
 
 export const FILE_STORAGE_API_URL = getEnvVariable(

@@ -6,7 +6,7 @@ import type {
     SendTransactionalEmailRequest,
     SendTransactionalEmailResponse,
 } from '@pika/api/internal'
-import { ErrorFactory, logger } from '@pikahared'
+import { ErrorFactory, logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 import { set } from 'lodash-es'
 

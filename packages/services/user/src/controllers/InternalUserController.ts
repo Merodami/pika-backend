@@ -11,7 +11,7 @@ import type {
     ValidatePasswordResetTokenRequest,
     VerifyEmailRequest,
 } from '@pika/api/internal'
-import { ErrorFactory } from '@pikad'
+import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IInternalUserService } from '../services/InternalUserService.js'

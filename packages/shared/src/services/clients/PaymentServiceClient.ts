@@ -4,10 +4,10 @@ import type {
   ProcessInternalRefundRequest,
   ProcessInternalRefundResponse,
 } from '@pika/api/internal'
-import { PAYMENT_API_URL } from '@pikant'
+import { PAYMENT_API_URL } from '@pika/environment'
 // TODO: Fix circular dependency - move domain types to shared or separate package
 // import type { CreditsDomain } from '@pika
-import type { BillingIntervalType, ServiceContext } from '@pika
+import type { BillingIntervalType, ServiceContext } from '@pika/types'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 

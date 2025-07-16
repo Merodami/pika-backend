@@ -18,11 +18,11 @@
     }
   },
   "dependencies": {
-    "@pikarkspace:^",
-    "@pikant": "workspace:^",
-    "@pikaorkspace:^",
-    "@pikaworkspace:^",
-    "@pika"workspace:^",
+    "@pika/auth": "workspace:^",
+    "@pika/environment": "workspace:^",
+    "@pika/http": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/types": "workspace:^",
     "express": "^5.1.0",
     "http-proxy-middleware": "^3.0.5",
     "zod": "^3.25.76",

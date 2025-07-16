@@ -12,7 +12,7 @@ import {
   validateBody,
   validateParams,
   validateQuery,
-} from '@pika
+} from '@pika/http'
 import { Router } from 'express'
 
 import { ProductController } from '../controllers/ProductController.js'

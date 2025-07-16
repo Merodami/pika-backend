@@ -4,11 +4,11 @@ import type {
     SendBulkEmailRequest,
     SendEmailRequest,
 } from '@pika/api/public'
-import { CommunicationLogMapper } from '@pikadk'
-import { Cache, httpRequestKeyGenerator } from '@pikaedis'
-import { logger } from '@pikahared'
-import { REDIS_DEFAULT_TTL } from '@pikanvironment'
-import { getValidatedQuery, RequestContext } from '@pikattp'
+import { CommunicationLogMapper } from '@pika/sdk'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { logger } from '@pika/shared'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { getValidatedQuery, RequestContext } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { CommunicationLogSearchParams } from '../repositories/CommunicationLogRepository.js'

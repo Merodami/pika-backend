@@ -1,30 +1,28 @@
 import type { PrismaClient } from '@prisma/client'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import type { ICacheService } from '@pika'
-import { Cache } from '@pika'
+import type { ICacheService } from '@pika/redis'
+import { Cache } from '@pika/redis'
 import type {
   CreateSubscriptionDTO,
   CreateSubscriptionFromWebhookDTO,
-  CreditsDomain,
   SubscriptionDomain,
   SubscriptionPlanDomain,
   SubscriptionWithPlanDomain,
   UpdateSubscriptionDTO,
-} from '@pika
+} from '@pika/sdk'
 import {
   CommunicationServiceClient,
   ErrorFactory,
   isUuidV4,
   logger,
-} from '@pikad'
-import type { PaginatedResult } from '@pika'
-import type { IPlanRepository } from '@subscription/repositories/PlanRepository.js'
+} from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
+import type { IPlanRepository } from '../repositories/PlanRepository.js'
 import type {
   ISubscriptionRepository,
   SubscriptionSearchParams,
-} from '@subscription/repositories/SubscriptionRepository.js'
-import type { ICreditProcessingService } from '@subscription/services/CreditProcessingService.js'
-import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
+} from '../repositories/SubscriptionRepository.js'
+import { CACHE_TTL_MULTIPLIERS } from '../types/constants.js'
 
 export interface ISubscriptionService {
   createSubscription(
@@ -51,10 +49,7 @@ export interface ISubscriptionService {
   createSubscriptionFromWebhook(
     data: CreateSubscriptionFromWebhookDTO,
   ): Promise<SubscriptionDomain>
-  // Credit processing
-  processSubscriptionCredits(
-    subscriptionId: string,
-  ): Promise<{ subscription: SubscriptionDomain; credits: CreditsDomain }>
+  // Removed credit processing methods - no credit tables in database
   processAllActiveSubscriptions(): Promise<number>
 }
 
@@ -63,7 +58,6 @@ export class SubscriptionService implements ISubscriptionService {
     private readonly prisma: PrismaClient,
     private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly planRepository: IPlanRepository,
-    private readonly creditProcessingService: ICreditProcessingService,
     private readonly cache: ICacheService,
     private readonly communicationClient?: CommunicationServiceClient,
   ) {}
@@ -104,19 +98,13 @@ export class SubscriptionService implements ISubscriptionService {
       const subscription = await this.subscriptionRepository.create({
         userId,
         planId: plan.id,
-        status: 'PENDING', // Will be updated by webhook
+        status: 'UNPAID' as any, // Will be updated by webhook
         stripeCustomerId: data.stripeCustomerId,
         trialEnd: data.trialEnd,
         metadata: data.metadata,
       })
 
-      // Process initial credits if active
-      if (subscription.status === 'ACTIVE') {
-        await this.creditProcessingService.processSubscriptionCredits(
-          subscription,
-          plan.creditsAmount,
-        )
-      }
+      // Credits processing removed - no credit tables in database
 
       // Clear user subscription cache
       await this.clearUserSubscriptionCache(userId)
@@ -198,7 +186,7 @@ export class SubscriptionService implements ISubscriptionService {
 
     const updatedSubscription = await this.subscriptionRepository.update(
       id,
-      data,
+      data as any,
     )
 
     // Clear subscription cache
@@ -226,7 +214,7 @@ export class SubscriptionService implements ISubscriptionService {
     const updatedSubscription = await this.subscriptionRepository.update(id, {
       cancelAtPeriodEnd,
       cancelledAt: cancelAtPeriodEnd ? undefined : new Date(),
-      status: cancelAtPeriodEnd ? subscription.status : 'CANCELED',
+      status: cancelAtPeriodEnd ? subscription.status : 'CANCELLED' as any,
     })
 
     // Clear subscription cache
@@ -289,7 +277,7 @@ export class SubscriptionService implements ISubscriptionService {
       const subscription = await this.subscriptionRepository.create({
         userId: data.userId,
         planId: data.planId,
-        status: data.status,
+        status: data.status as any,
         currentPeriodStart: data.currentPeriodStart,
         currentPeriodEnd: data.currentPeriodEnd,
         trialEnd: data.trialEnd,
@@ -297,13 +285,7 @@ export class SubscriptionService implements ISubscriptionService {
         stripeCustomerId: data.stripeCustomerId,
       })
 
-      // Process initial credits if active
-      if (subscription.status === 'ACTIVE') {
-        await this.creditProcessingService.processSubscriptionCredits(
-          subscription,
-          plan.creditsAmount,
-        )
-      }
+      // Credits processing removed - no credit tables in database
 
       // Clear user subscription cache
       await this.clearUserSubscriptionCache(data.userId)
@@ -329,9 +311,10 @@ export class SubscriptionService implements ISubscriptionService {
     }
   }
 
+  // Credit processing method removed - no credit tables in database
   async processSubscriptionCredits(
     subscriptionId: string,
-  ): Promise<{ subscription: SubscriptionDomain; credits: CreditsDomain }> {
+  ): Promise<never> {
     logger.info('Processing subscription credits', { subscriptionId })
 
     const subscription =
@@ -348,25 +331,11 @@ export class SubscriptionService implements ISubscriptionService {
       )
     }
 
-    if (!this.creditProcessingService.shouldProcessCredits(subscription)) {
-      throw ErrorFactory.businessRuleViolation(
-        'Credits already processed',
-        'Credits have already been processed for this billing period',
-      )
-    }
-
-    const result =
-      await this.creditProcessingService.processSubscriptionCredits(
-        subscription,
-        subscription.plan.creditsAmount,
-      )
-
-    logger.info('Successfully processed subscription credits', {
-      subscriptionId,
-      creditsAdded: subscription.plan.creditsAmount,
-    })
-
-    return result
+    // Credits processing removed - no credit tables in database
+    throw ErrorFactory.businessRuleViolation(
+      'Credits not supported',
+      'Credit processing is not available in this system',
+    )
   }
 
   async processAllActiveSubscriptions(): Promise<number> {
@@ -379,18 +348,8 @@ export class SubscriptionService implements ISubscriptionService {
 
     for (const subscription of activeSubscriptions) {
       try {
-        if (this.creditProcessingService.shouldProcessCredits(subscription)) {
-          const subscriptionWithPlan =
-            await this.subscriptionRepository.findByIdWithPlan(subscription.id)
-
-          if (subscriptionWithPlan?.plan) {
-            await this.creditProcessingService.processSubscriptionCredits(
-              subscription,
-              subscriptionWithPlan.plan.creditsAmount,
-            )
-            processedCount++
-          }
-        }
+        // Credits processing removed - no credit tables in database
+        // Skip credit processing for this subscription
       } catch (error) {
         logger.error('Failed to process subscription', {
           subscriptionId: subscription.id,
@@ -477,7 +436,7 @@ export class SubscriptionService implements ISubscriptionService {
         userId: userId as any,
         templateKey: 'SUBSCRIPTION_EXPIRED',
         variables: {
-          planType: subscription.planType,
+          planType: 'Standard', // planType field removed
           cancelAtPeriodEnd: cancelAtPeriodEnd.toString(),
           endDate: subscription.currentPeriodEnd
             ? new Date(subscription.currentPeriodEnd).toLocaleDateString()

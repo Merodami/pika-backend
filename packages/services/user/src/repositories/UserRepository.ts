@@ -1,9 +1,9 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import { ICacheService } from '@pika'
-import { type UserDomain, UserMapper } from '@pika
-import { ErrorFactory, logger } from '@pikad'
-import type { PaginatedResult } from '@pika'
+import { ICacheService } from '@pika/redis'
+import { type UserDomain, UserMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 
 export interface UserSearchParams {
   email?: string
@@ -118,11 +118,7 @@ export class UserRepository implements IUserRepository {
           orderBy,
           skip: (page - 1) * limit,
           take: limit,
-          include: {
-            professional: true,
-            parq: true,
-            friends: true,
-          },
+          // Removed includes for non-existent relations
         }),
         this.prisma.user.count({ where }),
       ])
@@ -209,10 +205,7 @@ export class UserRepository implements IUserRepository {
           email: email.toLowerCase(),
           deletedAt: null,
         },
-        include: {
-          professional: true,
-          parq: true,
-        },
+        // Removed includes for non-existent relations
       })
 
       return user ? UserMapper.fromDocument(user) : null
@@ -238,10 +231,7 @@ export class UserRepository implements IUserRepository {
           phoneNumber: phone,
           deletedAt: null,
         },
-        include: {
-          professional: true,
-          parq: true,
-        },
+        // Removed includes for non-existent relations
       })
 
       return user ? UserMapper.fromDocument(user) : null
@@ -269,10 +259,7 @@ export class UserRepository implements IUserRepository {
           },
           deletedAt: null,
         },
-        include: {
-          professional: true,
-          parq: true,
-        },
+        // Removed includes for non-existent relations
       })
 
       return user ? UserMapper.fromDocument(user) : null
@@ -318,10 +305,7 @@ export class UserRepository implements IUserRepository {
                 }
               : undefined,
         },
-        include: {
-          professional: true,
-          parq: true,
-        },
+        // Removed includes for non-existent relations
       })
 
       return UserMapper.fromDocument(user)
@@ -360,10 +344,7 @@ export class UserRepository implements IUserRepository {
           ...data,
           updatedAt: new Date(),
         },
-        include: {
-          professional: true,
-          parq: true,
-        },
+        // Removed includes for non-existent relations
       })
 
       return UserMapper.fromDocument(user)
@@ -430,10 +411,7 @@ export class UserRepository implements IUserRepository {
           status: status as any,
           updatedAt: new Date(),
         },
-        include: {
-          professional: true,
-          parq: true,
-        },
+        // Removed includes for non-existent relations
       })
 
       return UserMapper.fromDocument(user)

@@ -1,5 +1,5 @@
 import { STRIPE_MOCK_HOST } from '@pika/environment'
-import { ErrorFactory, logger } from '@pikad'
+import { ErrorFactory, logger } from '@pika/shared'
 import Stripe from 'stripe'
 
 import { createStripeInstance } from '../config/stripe.config.js'

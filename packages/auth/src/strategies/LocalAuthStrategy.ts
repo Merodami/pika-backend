@@ -3,9 +3,9 @@ import {
   API_PREFIX,
   FRONTEND_URL,
 } from '@pika/environment'
-import { ICacheService } from '@pika
-import { CommunicationServiceClient, logger } from '@pika
-import { EmailTemplateId, UserRole, UserStatus } from '@pika
+import { ICacheService } from '@pika/redis'
+import { CommunicationServiceClient, logger } from '@pika/shared'
+import { EmailTemplateId, UserRole, UserStatus } from '@pika/types'
 
 import { JwtTokenService } from '../services/JwtTokenService.js'
 import { PasswordSecurityService } from '../services/PasswordSecurityService.js'
@@ -55,8 +55,6 @@ export interface CreateUserData {
   lastName: string
   phoneNumber?: string
   dateOfBirth?: string
-  description?: string
-  specialties?: string[]
   acceptTerms: boolean
   marketingConsent?: boolean
   role: UserRole
@@ -227,8 +225,6 @@ export class LocalAuthStrategy implements AuthStrategy {
         lastName: data.lastName.trim(),
         phoneNumber: data.phoneNumber?.trim(),
         dateOfBirth: data.dateOfBirth,
-        description: data.description?.trim(),
-        specialties: data.specialties,
         acceptTerms: data.acceptTerms,
         marketingConsent: data.marketingConsent,
         role: data.role,
@@ -424,15 +420,7 @@ export class LocalAuthStrategy implements AuthStrategy {
       errors.push('Valid user role is required')
     }
 
-    // PROFESSIONAL role specific validation
-    if (data.role === UserRole.PROFESSIONAL) {
-      if (!data.description || data.description.trim().length === 0) {
-        errors.push('Description is required for professional users')
-      }
-      if (!data.specialties || data.specialties.length === 0) {
-        errors.push('At least one specialty is required for professional users')
-      }
-    }
+    // Role-specific validation removed as PROFESSIONAL role no longer exists
 
     // Legal compliance validation
     if (!data.acceptTerms) {

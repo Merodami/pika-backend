@@ -1,7 +1,7 @@
 import { SUPPORT_SERVICE_PORT } from '@pika/environment'
-import { type ICacheService, initializeCache } from '@pikaedis'
-import { logger } from '@pikahared'
-import { startServer } from '@pikattp'
+import { type ICacheService, initializeCache } from '@pika/redis'
+import { logger } from '@pika/shared'
+import { startServer } from '@pika/http'
 import { PrismaClient } from '@prisma/client'
 
 import { createSupportServer } from './server.js'

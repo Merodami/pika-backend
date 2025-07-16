@@ -1,13 +1,13 @@
 import { NODE_ENV, REDIS_DEFAULT_TTL } from '@pika/environment'
-import type { ICacheService } from '@pika'
-import { Cache } from '@pika'
+import type { ICacheService } from '@pika/redis'
+import { Cache } from '@pika/redis'
 import type {
   BatchUploadDTO,
   FileStorageLogDomain,
   UploadFileDTO,
-} from '@pika
-import { ErrorFactory, logger } from '@pikad'
-import type { PaginatedResult } from '@pika'
+} from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
 import type {

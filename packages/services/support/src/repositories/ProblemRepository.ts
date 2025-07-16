@@ -1,16 +1,16 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
-import type { ProblemDomain } from '@pika
-import { ProblemMapper } from '@pika
-import { ErrorFactory, toPrismaInclude } from '@pikad'
+import type { ProblemDomain } from '@pika/sdk'
+import { ProblemMapper } from '@pika/sdk'
+import { ErrorFactory, toPrismaInclude } from '@pika/shared'
 import type {
   PaginatedResult,
   ParsedIncludes,
   ProblemPriorityType,
   ProblemStatusType,
   ProblemTypeType,
-} from '@pika'
-import { ProblemPriority, ProblemStatus, ProblemType } from '@pika'
+} from '@pika/types'
+import { ProblemPriority, ProblemStatus, ProblemType } from '@pika/types'
 import { get } from 'lodash-es'
 
 import type { SearchParams } from '../types/search.js'

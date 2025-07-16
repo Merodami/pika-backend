@@ -5,9 +5,9 @@ import {
   JWT_REFRESH_TOKEN_EXPIRY,
   JWT_SECRET,
 } from '@pika/environment'
-import { ICacheService } from '@pika
-import { logger } from '@pika
-import { UserRole, UserStatus } from '@pika
+import { ICacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
+import { UserRole, UserStatus } from '@pika/types'
 import jwt from 'jsonwebtoken'
 
 export interface User {

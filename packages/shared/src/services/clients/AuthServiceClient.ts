@@ -15,7 +15,7 @@ import type {
   ValidateTokenRequest,
   VerifyAccountRequest,
 } from '@pika/api/internal'
-import type { ServiceContext } from '@pika
+import type { ServiceContext } from '@pika/types'
 
 import {
   BaseServiceClient,

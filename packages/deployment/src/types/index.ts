@@ -22,12 +22,9 @@ export interface ServiceDependencies {
 export interface ServiceClients {
   auth?: any
   user?: any
-  gym?: any
-  session?: any
   payment?: any
   subscription?: any
   communication?: any
-  social?: any
   support?: any
   storage?: any
   fileStorage?: any

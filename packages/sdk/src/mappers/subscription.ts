@@ -19,9 +19,6 @@ export interface SubscriptionPlanDocument {
   metadata: any // Prisma returns JsonValue which we convert in mapper
   stripeProductId: string | null
   stripePriceId: string | null
-  membershipType: string | null
-  membershipPackage: string | null
-  gymAccessTimes: any // Prisma returns JsonValue which we convert in mapper
   createdAt: Date
   updatedAt: Date
   // Relations
@@ -36,9 +33,7 @@ export interface SubscriptionDocument {
   id: string
   userId: string
   planId: string | null
-  planType: string
   status: string
-  billingInterval: string
   currentPeriodStart: Date | null
   currentPeriodEnd: Date | null
   trialEnd: Date | null
@@ -49,7 +44,6 @@ export interface SubscriptionDocument {
   startDate: Date | null
   endDate: Date | null
   cancelledAt: Date | null
-  lastProcessedAt: Date | null
   createdAt: Date
   updatedAt: Date
   // Relations
@@ -86,10 +80,6 @@ export class SubscriptionPlanMapper {
       metadata: doc.metadata || undefined,
       stripeProductId: doc.stripeProductId || undefined,
       stripePriceId: doc.stripePriceId || undefined,
-      // Gym-specific membership fields
-      membershipType: doc.membershipType || undefined,
-      membershipPackage: doc.membershipPackage || undefined,
-      gymAccessTimes: doc.gymAccessTimes || undefined,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     }
@@ -111,10 +101,6 @@ export class SubscriptionPlanMapper {
       metadata: domain.metadata,
       stripeProductId: domain.stripeProductId,
       stripePriceId: domain.stripePriceId,
-      // Gym-specific membership fields
-      membershipType: domain.membershipType,
-      membershipPackage: domain.membershipPackage,
-      gymAccessTimes: domain.gymAccessTimes,
       createdAt: domain.createdAt.toISOString(),
       updatedAt: domain.updatedAt.toISOString(),
     }
@@ -136,10 +122,6 @@ export class SubscriptionPlanMapper {
       metadata: dto.metadata,
       stripeProductId: dto.stripeProductId,
       stripePriceId: dto.stripePriceId,
-      // Gym-specific membership fields
-      membershipType: dto.membershipType,
-      membershipPackage: dto.membershipPackage,
-      gymAccessTimes: dto.gymAccessTimes,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),
     }
@@ -152,9 +134,7 @@ export class SubscriptionMapper {
       id: doc.id,
       userId: doc.userId,
       planId: doc.planId || undefined,
-      planType: doc.planType,
       status: doc.status,
-      billingInterval: doc.billingInterval,
       currentPeriodStart: doc.currentPeriodStart || undefined,
       currentPeriodEnd: doc.currentPeriodEnd || undefined,
       trialEnd: doc.trialEnd || undefined,
@@ -164,7 +144,6 @@ export class SubscriptionMapper {
       stripePriceId: doc.stripePriceId || undefined,
       startDate: doc.startDate || undefined,
       endDate: doc.endDate || undefined,
-      lastProcessedAt: doc.lastProcessedAt || undefined,
       cancelledAt: doc.cancelledAt || undefined,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -176,9 +155,7 @@ export class SubscriptionMapper {
       id: domain.id,
       userId: domain.userId,
       planId: domain.planId,
-      planType: domain.planType,
       status: domain.status,
-      billingInterval: domain.billingInterval,
       currentPeriodStart: domain.currentPeriodStart?.toISOString(),
       currentPeriodEnd: domain.currentPeriodEnd?.toISOString(),
       trialEnd: domain.trialEnd?.toISOString(),
@@ -188,7 +165,6 @@ export class SubscriptionMapper {
       stripePriceId: domain.stripePriceId,
       startDate: domain.startDate?.toISOString(),
       endDate: domain.endDate?.toISOString(),
-      lastProcessedAt: domain.lastProcessedAt?.toISOString(),
       cancelledAt: domain.cancelledAt?.toISOString(),
       createdAt: domain.createdAt.toISOString(),
       updatedAt: domain.updatedAt.toISOString(),
@@ -200,9 +176,7 @@ export class SubscriptionMapper {
       id: dto.id,
       userId: dto.userId,
       planId: dto.planId,
-      planType: dto.planType,
       status: dto.status,
-      billingInterval: dto.billingInterval,
       currentPeriodStart: dto.currentPeriodStart
         ? new Date(dto.currentPeriodStart)
         : undefined,
@@ -216,9 +190,6 @@ export class SubscriptionMapper {
       stripePriceId: dto.stripePriceId,
       startDate: dto.startDate ? new Date(dto.startDate) : undefined,
       endDate: dto.endDate ? new Date(dto.endDate) : undefined,
-      lastProcessedAt: dto.lastProcessedAt
-        ? new Date(dto.lastProcessedAt)
-        : undefined,
       cancelledAt: dto.cancelledAt ? new Date(dto.cancelledAt) : undefined,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),

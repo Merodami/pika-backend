@@ -3,10 +3,10 @@ import type {
     CreateNotificationDTO,
     NotificationDomain,
     UpdateNotificationDTO,
-} from '@pikadk'
-import { Cache } from '@pikaedis'
-import { ErrorFactory, logger } from '@pikahared'
-import type { PaginatedResult } from '@pikaypes'
+} from '@pika/sdk'
+import { Cache } from '@pika/redis'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 
 import type {
     INotificationRepository,

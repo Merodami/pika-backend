@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { logger } from '@pika/shared'
-import { User, UserRole } from '@pika
+import { User, UserRole } from '@pika/types'
 
 import { mapUserToDomain } from '../mappers/userMapper.js'
 

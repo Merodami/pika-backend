@@ -13,13 +13,13 @@
  * vi.doMock('@pika/shared', setupSharedMock())
  *
  * // Then import modules that use shared
- * import { logger } from '@pika
+ * import { logger } from '@pika/shared'
  * ```
  */
 export function setupSharedMock() {
   return async () => {
     // Use the real module implementation
-    const module = await import('@pika
+    const module = await import('@pika/shared')
 
     // Only mock the logger to prevent console output during tests
     return {

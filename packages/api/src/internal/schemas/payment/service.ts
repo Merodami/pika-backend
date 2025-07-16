@@ -21,7 +21,6 @@ export const ProcessInternalPaymentRequest = openapi(
     amount: Money,
     currency: z.string().length(3).default('USD'),
     type: z.enum([
-      'BOOKING',
       'CREDIT_PURCHASE',
       'SUBSCRIPTION',
       'REFUND',

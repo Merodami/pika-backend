@@ -6,10 +6,10 @@ import type {
     TicketIdParam,
     UpdateTicketStatusRequest,
 } from '@pika/api/admin'
-import type { ProblemDomain } from '@pika@pika
-import { ErrorFactory, parseInclude@pika from '@pikahared'
-import { ADMIN_PROBLEM_RELATIONS } f@pikaikapi/admin'
-import { getValidatedQuery } from '@pikattp'@pika
+import type { ProblemDomain } from '@pika/sdk'
+import { ErrorFactory, parseIncludeParam } from '@pika/shared'
+import { ADMIN_PROBLEM_RELATIONS } from '@pika/api/admin'
+import { getValidatedQuery } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IProblemService } from '../services/ProblemService.js'

@@ -1,20 +1,19 @@
 import type {
-  ProcessSubscriptionCreditsRequest,
   SubscriptionIdParam,
 } from '@pika/api/admin'
-import type { AdminGetSubscriptionsQuery } from '@pikadmin'
+import type { AdminGetSubscriptionsQuery } from '@pika/api/admin'
 import type {
   CancelSubscriptionRequest,
   CreateSubscriptionRequest,
   UpdateSubscriptionRequest,
-} from '@pikaublic'
-import { REDIS_DEFAULT_TTL } from '@pikaonment'
-import { getValidatedQuery, RequestContext } from '@pika
-import { Cache, httpRequestKeyGenerator } from '@pika'
-import { SubscriptionMapper } from '@pika
-import { logger } from '@pikad'
-import type { SubscriptionSearchParams } from '@subscription/repositories/SubscriptionRepository.js'
-import type { ISubscriptionService } from '@subscription/services/SubscriptionService.js'
+} from '@pika/api/public'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { getValidatedQuery, RequestContext } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { SubscriptionMapper } from '@pika/sdk'
+import { logger } from '@pika/shared'
+import type { SubscriptionSearchParams } from '../repositories/SubscriptionRepository.js'
+import type { ISubscriptionService } from '../services/SubscriptionService.js'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -30,7 +29,6 @@ export class SubscriptionController {
     this.updateSubscription = this.updateSubscription.bind(this)
     this.cancelSubscription = this.cancelSubscription.bind(this)
     this.reactivateSubscription = this.reactivateSubscription.bind(this)
-    this.processSubscriptionCredits = this.processSubscriptionCredits.bind(this)
   }
 
   /**
@@ -83,7 +81,7 @@ export class SubscriptionController {
       const params: SubscriptionSearchParams = {
         page: query.page,
         limit: query.limit,
-        status: query.status,
+        status: query.status as any,
         userId: query.userId,
         planId: query.planId,
         cancelAtPeriodEnd: query.cancelAtPeriodEnd,
@@ -241,40 +239,5 @@ export class SubscriptionController {
     }
   }
 
-  /**
-   * POST /subscriptions/:id/process-credits
-   * Process subscription credits
-   */
-  async processSubscriptionCredits(
-    request: Request<
-      SubscriptionIdParam,
-      {},
-      ProcessSubscriptionCreditsRequest
-    >,
-    response: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    try {
-      const { id } = request.params
-
-      logger.info('Processing subscription credits', { subscriptionId: id })
-
-      const result =
-        await this.subscriptionService.processSubscriptionCredits(id)
-
-      // Calculate credits added from the subscription plan
-      const creditsAdded = result.subscription.planId
-        ? (await this.subscriptionService.getSubscriptionById(id)).plan
-            ?.creditsAmount || 0
-        : 0
-
-      response.json({
-        subscription: SubscriptionMapper.toDTO(result.subscription),
-        creditsAdded,
-        newBalance: result.credits.amountSub + result.credits.amountDemand,
-      })
-    } catch (error) {
-      next(error)
-    }
-  }
+  // Credit processing method removed - no credit tables in database
 }

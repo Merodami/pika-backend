@@ -1,6 +1,6 @@
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import type { ICacheService } from '@pikaedis'
-import { logger } from '@pikahared'
+import type { ICacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
 import { createAdminCommentRouter } from './routes/AdminCommentRoutes.js'

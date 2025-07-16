@@ -1,9 +1,8 @@
 import { STRIPE_WEBHOOK_SECRET } from '@pika/environment'
-import { ErrorFactory, logger, SubscriptionServiceClient } from '@pika
+import { ErrorFactory, logger, SubscriptionServiceClient } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 import Stripe from 'stripe'
 
-import type { IMembershipService } from '../services/MembershipService.js'
 import type { IStripeService } from '../services/StripeService.js'
 
 /**
@@ -14,7 +13,6 @@ export class WebhookController {
 
   constructor(
     private readonly stripeService: IStripeService,
-    private readonly membershipService: IMembershipService,
   ) {
     // Bind all methods to preserve 'this' context
     this.handleStripeWebhook = this.handleStripeWebhook.bind(this)
@@ -84,10 +82,7 @@ export class WebhookController {
         id: event.id,
       })
 
-      // First, let the MembershipService handle the webhook for local database updates
-      await this.membershipService.handleStripeWebhook(event)
-
-      // Then, handle subscription service integration
+      // Handle subscription service integration
       switch (event.type) {
         case 'customer.subscription.created':
           await this.handleSubscriptionCreated(
@@ -279,11 +274,7 @@ export class WebhookController {
       return
     }
 
-    // Process subscription credits
-    await this.subscriptionClient.processSubscriptionCredits({
-      subscriptionId: subscription.id,
-      creditsAmount: subscription.plan?.creditsAmount || 0,
-    })
+    // Credit processing removed - no credit tables in database
 
     // Update user membership to active
     await this.subscriptionClient.updateUserMembership({
@@ -294,7 +285,6 @@ export class WebhookController {
     logger.info('Successfully processed invoice payment success', {
       invoiceId: invoice.id,
       subscriptionId: subscription.id,
-      creditsAdded: subscription.plan?.creditsAmount || 0,
     })
   }
 

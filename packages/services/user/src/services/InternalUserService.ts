@@ -1,7 +1,8 @@
-import { ICacheService, UserRole, UserStatus } from '@pika'
+import { ICacheService } from '@pika/redis'
+import { UserRole, UserStatus } from '@pika/types'
 import type { Email, UserId } from '@pika/api'
-import { ErrorFactory, logger } from '@pikad'
-import type { UserAuthData } from '@pikanternal'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { UserAuthData } from '@pika/api/internal'
 import { randomBytes } from 'crypto'
 
 import type { IUserRepository } from '../repositories/UserRepository.js'

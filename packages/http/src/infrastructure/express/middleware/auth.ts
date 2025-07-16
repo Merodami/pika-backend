@@ -8,13 +8,13 @@ import {
   JWT_REFRESH_EXPIRY,
   NODE_ENV,
   SKIP_AUTH,
-} from '@pikant'
+} from '@pika/environment'
 import {
   logger,
   NotAuthenticatedError,
   NotAuthorizedError,
-} from '@pika
-import { UserRole } from '@pika
+} from '@pika/shared'
+import { UserRole } from '@pika/types'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import { ApiTokenOptions } from '../../../domain/types/server.js'
@@ -46,7 +46,7 @@ function mapRoleToPermissions(role: UserRole): string[] {
         'payments:admin',
         'payments:manage_all',
       ]
-    case UserRole.MEMBER:
+    case UserRole.USER:
       return [
         // Basic user permissions
         'users:read_own',
@@ -58,31 +58,6 @@ function mapRoleToPermissions(role: UserRole): string[] {
         // Payment permissions
         'payments:own',
         'payments:purchase',
-        // Member specific
-        'bookings:create',
-        'bookings:view_own',
-        'sessions:book',
-      ]
-    case UserRole.PROFESSIONAL:
-      return [
-        // Professional extends member permissions
-        'users:read_own',
-        'users:update_own',
-        // Credits permissions (enhanced for professionals)
-        'credits:view_own',
-        'credits:use_own',
-        'credits:transfer_own',
-        'credits:professional_rates',
-        // Payment permissions
-        'payments:own',
-        'payments:purchase',
-        'payments:professional',
-        // Professional specific
-        'sessions:conduct',
-        'sessions:manage_own',
-        'clients:view_assigned',
-        'content:create',
-        'analytics:view_own',
       ]
     default:
       return []
@@ -350,41 +325,22 @@ export function requireAdmin(): RequestHandler {
 }
 
 /**
- * Require member role (includes professional)
+ * Require user role
  */
-export function requireMember(): RequestHandler {
+export function requireUser(): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new NotAuthenticatedError('Authentication required'))
     }
 
-    if (
-      req.user.role !== UserRole.MEMBER &&
-      req.user.role !== UserRole.PROFESSIONAL
-    ) {
-      return next(new NotAuthorizedError('Member access required'))
+    if (req.user.role !== UserRole.USER) {
+      return next(new NotAuthorizedError('User access required'))
     }
 
     next()
   }
 }
 
-/**
- * Require professional role
- */
-export function requireProfessional(): RequestHandler {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      return next(new NotAuthenticatedError('Authentication required'))
-    }
-
-    if (req.user.role !== UserRole.PROFESSIONAL) {
-      return next(new NotAuthorizedError('Professional access required'))
-    }
-
-    next()
-  }
-}
 
 /**
  * Require specific roles (any of the provided roles)

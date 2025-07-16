@@ -1,10 +1,10 @@
 import { createAuthServer } from '@pika/auth-service'
-import { createCommunicationServer } from '@pikanication'
-import { createPaymentServer } from '@pikant'
-import { createStorageServer } from '@pikage'
-import { createSubscriptionServer } from '@pikaription'
-import { createSupportServer } from '@pikart'
-import { createUserServer } from '@pika
+import { createCommunicationServer } from '@pika/communication'
+import { createPaymentServer } from '@pika/payment'
+import { createStorageServer } from '@pika/storage'
+import { createSubscriptionServer } from '@pika/subscription'
+import { createSupportServer } from '@pika/support'
+import { createUserServer } from '@pika/user'
 
 import type { ServiceDefinition, ServiceDependencies } from '../types/index.js'
 
@@ -83,7 +83,7 @@ export function getServiceDefinitions(): ServiceDefinition[] {
           cacheService: deps.cache,
           emailConfig: {
             region: 'us-east-1',
-            fromEmail: process.env.EMAIL_FROM || 'noreply@pika
+            fromEmail: process.env.EMAIL_FROM || 'noreply@pika.com',
             fromName: 'Pika',
           },
         })

@@ -8,9 +8,9 @@ import {
   TokenRequest,
   VerifyEmailRequest,
 } from '@pika/api/public'
-import { requireAuth, validateBody, validateParams } from '@pika
-import type { ICacheService } from '@pika
-import { CommunicationServiceClient, UserServiceClient } from '@pika
+import { requireAuth, validateBody, validateParams } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { CommunicationServiceClient, UserServiceClient } from '@pika/shared'
 import { Router } from 'express'
 
 import { AuthController } from '../controllers/AuthController.js'

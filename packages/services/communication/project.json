@@ -2,15 +2,15 @@
   "name": "@pika/communication",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "implicitDependencies": [
-    "@pikapi",
-    "@pikauth",
-    "@pikahared",
-    "@pikaatabase",
-    "@pikaypes",
-    "@pikaests",
-    "@pikadk",
-    "@pikattp",
-    "@pikaedis"
+    "@pika/api",
+    "@pika/auth",
+    "@pika/shared",
+    "@pika/database",
+    "@pika/types",
+    "@pika/tests",
+    "@pika/sdk",
+    "@pika/http",
+    "@pika/redis"
   ],
   "targets": {
     "typecheck": {

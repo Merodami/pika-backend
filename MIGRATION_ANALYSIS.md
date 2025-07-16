@@ -3,6 +3,59 @@
 ## Overview
 This document provides a comprehensive analysis and migration strategy for transitioning from the old Pika architecture (located in `/pika` folder) to the new modern microservices architecture (formerly Solo60, now renamed to Pika).
 
+## Current Migration Status (Updated 2025-01-16)
+
+### Completed Migration Tasks ✅
+1. **UserRole Enum Simplification**
+   - Reduced from 5 roles (ADMIN, MEMBER, PROFESSIONAL, THERAPIST, CONTENT_CREATOR) to 2 roles (ADMIN, USER)
+   - Updated across all packages: types, API schemas, authentication middleware, services
+   - Removed gym-related user properties (specialties, description)
+
+2. **ProblemType Enum Cleanup**
+   - Removed gym-related problem types: BOOKING, GYM_ISSUE, TRAINER_ISSUE
+   - Updated to focus on core platform issues: BILLING, TECHNICAL, ACCOUNT, GENERAL, BUG_REPORT, FEATURE_REQUEST
+
+3. **API Gateway Cleanup**
+   - Removed gym-related service routes (gym, session, social, booking, friends)
+   - Removed health check configurations for gym services
+   - Updated proxy route configurations
+
+4. **API Schema Updates**
+   - Updated common enums to remove gym-related types
+   - Fixed payment service schemas (removed BOOKING payment type)
+   - Updated communication service schemas (removed BOOKING notifications)
+   - Updated subscription service schemas (removed SESSION_BOOKING usage)
+   - Updated admin user management schemas
+
+5. **Service Import Corrections**
+   - Fixed corrupted import statements across multiple services
+   - Communication service: ✅ Building successfully
+   - Support service: ✅ Building successfully
+   - Auth service: ✅ Building successfully
+   - API Gateway: ✅ Building successfully
+   - Storage service: ✅ Building successfully
+   - Payment service: ✅ Fixed imports and role checks
+
+### In Progress 🔄
+1. **Database Schema Dependencies**
+   - User service: 🔄 Fixing references to removed properties (friends, professional)
+   - Subscription service: 🔄 Removing gym-related fields (membershipType, membershipPackage, gymAccessTimes)
+   - Payment service: 🔄 Fixing transaction service database references
+
+### Priority Recommendations
+Given the extensive scope of import fixes required, recommend focusing on:
+1. **Critical Services**: Complete user, storage, and payment service import fixes first
+2. **Database Schema Migration**: Subscription service requires database schema changes to remove gym-specific fields
+3. **Incremental Deployment**: Core services (auth, support, communication, API gateway) are ready for testing
+
+### Architectural Impact
+The migration has successfully removed gym-specific functionality while maintaining the core platform architecture. The new simplified user role system and problem categorization align with a more general-purpose platform approach.
+
+### Technical Debt Identified
+- **Import Corruption**: Widespread search-and-replace issue affected multiple services
+- **Database Schema Dependencies**: Some services have gym-specific fields that need schema migration
+- **Service Interdependencies**: Some services rely on gym-specific functionality that needs redesign
+
 ## Table of Contents
 1. [Deep Architecture Analysis](#deep-architecture-analysis)
 2. [Technology Stack Comparison](#technology-stack-comparison)

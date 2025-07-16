@@ -2,8 +2,6 @@ import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import type {
     CreditProcessingStatus,
-    MembershipPackage,
-    MembershipType,
     SubscriptionInterval,
     SubscriptionStatus,
 } from '@subscription/types/enums.js'
@@ -16,22 +14,8 @@ export interface SubscriptionServiceConfig {
 
 // Plan configuration interfaces
 export interface PlanConfiguration {
-  membershipType: MembershipType
-  membershipPackage: MembershipPackage
   creditsAmount: number
   features: string[]
-  gymAccessTimes?: GymAccessTimes
-}
-
-export interface GymAccessTimes {
-  weekdays?: TimeSlot
-  weekends?: TimeSlot
-  holidays?: TimeSlot
-}
-
-export interface TimeSlot {
-  start: string // HH:MM format
-  end: string // HH:MM format
 }
 
 // Credit processing interfaces
@@ -84,9 +68,7 @@ export interface PlanCreationData {
   creditsAmount: number
   trialPeriodDays?: number
   features: string[]
-  membershipType?: MembershipType
-  membershipPackage?: MembershipPackage
-  gymAccessTimes?: GymAccessTimes
+  // Removed gym-related properties
   metadata?: Record<string, any>
 }
 
@@ -97,9 +79,6 @@ export interface PlanUpdateData {
   creditsAmount?: number
   features?: string[]
   isActive?: boolean
-  membershipType?: MembershipType
-  membershipPackage?: MembershipPackage
-  gymAccessTimes?: GymAccessTimes
   metadata?: Record<string, any>
 }
 
@@ -119,8 +98,7 @@ export interface PlanSearchParams {
   page?: number
   limit?: number
   isActive?: boolean
-  membershipType?: MembershipType
-  membershipPackage?: MembershipPackage
+  // Removed gym-related properties
   interval?: SubscriptionInterval
 }
 
@@ -132,8 +110,7 @@ export interface UserMembershipStatus {
     status: SubscriptionStatus
     planId: string
     planName: string
-    membershipType?: MembershipType
-    membershipPackage?: MembershipPackage
+    // Removed gym-related properties
     currentPeriodEnd?: Date
     cancelAtPeriodEnd: boolean
   }

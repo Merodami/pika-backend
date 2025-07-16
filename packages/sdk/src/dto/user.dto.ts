@@ -3,7 +3,6 @@
  * These represent the API contract for user-related endpoints
  */
 
-import type { FriendDTO } from './social.dto.js'
 
 // ============= Address DTO =============
 
@@ -40,35 +39,6 @@ export interface PaymentMethodDTO {
   updatedAt: string
 }
 
-// ============= Professional DTO =============
-
-export interface ProfessionalDTO {
-  id: string
-  userId: string
-  description: string
-  specialties: string[]
-  favoriteGyms: string[]
-  createdAt: string
-  updatedAt: string
-}
-
-// ============= PARQ DTO =============
-
-export interface ParqDTO {
-  id: string
-  userId: string
-  medicalClearance: boolean
-  existingInjuries: boolean
-  symptomsCheck: boolean
-  doctorConsultation: boolean
-  experienceLevel: boolean
-  properTechnique: boolean
-  gymEtiquette: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-// Friend DTO is defined in social.dto.ts to avoid duplication
 
 // ============= User DTO =============
 
@@ -86,17 +56,9 @@ export interface UserDTO {
   lastLoginAt?: string
   createdAt: string
   updatedAt: string
-  // Gym platform specific fields
+  // Additional fields
   dateOfBirth?: string
-  alias?: string
-  appVersion?: string
-  activeMembership: boolean
-  guests: string[]
   stripeUserId?: string
-  // Relations
-  professional?: ProfessionalDTO
-  parq?: ParqDTO
-  friends?: FriendDTO[]
 }
 
 // ============= Create/Update DTOs =============
@@ -107,7 +69,6 @@ export interface CreateUserDTO {
   lastName: string
   phoneNumber?: string
   dateOfBirth?: string
-  alias?: string
 }
 
 export interface UpdateUserDTO {
@@ -116,8 +77,6 @@ export interface UpdateUserDTO {
   phoneNumber?: string
   avatarUrl?: string
   dateOfBirth?: string
-  alias?: string
-  appVersion?: string
 }
 
 export interface CreateAddressDTO {

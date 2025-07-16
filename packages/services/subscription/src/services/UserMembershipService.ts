@@ -1,12 +1,10 @@
-import type { ICacheService } from '@pika'
-import { Cache } from '@pika'
+import type { ICacheService } from '@pika/redis'
+import { Cache } from '@pika/redis'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { ErrorFactory, logger } from '@pikad'
+import { ErrorFactory, logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
 import {
-    MembershipPackage,
-    MembershipType,
     SubscriptionStatus,
 } from '@subscription/types/enums.js'
 import type { UserMembershipStatus } from '@subscription/types/interfaces.js'
@@ -37,7 +35,7 @@ export class UserMembershipService implements IUserMembershipService {
         where: {
           userId,
           status: {
-            in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
+            in: ['ACTIVE', 'TRIALING'],
           },
         },
         include: {
@@ -48,10 +46,8 @@ export class UserMembershipService implements IUserMembershipService {
         },
       })
 
-      // Get user's credit balance
-      const credits = await this.prisma.credits.findUnique({
-        where: { userId },
-      })
+      // Credits removed - no credit tables in database
+      const credits = null
 
       const hasActiveSubscription = !!subscription
 
@@ -62,23 +58,12 @@ export class UserMembershipService implements IUserMembershipService {
               id: subscription.id,
               status: subscription.status as SubscriptionStatus,
               planId: subscription.planId || '',
-              planName: subscription.plan?.name || subscription.planType,
-              membershipType: subscription.plan
-                ?.membershipType as MembershipType,
-              membershipPackage: subscription.plan?.membershipPackage as
-                | MembershipPackage
-                | undefined,
+              planName: subscription.plan?.name || 'Unknown Plan',
               currentPeriodEnd: subscription.currentPeriodEnd || undefined,
               cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
             }
           : undefined,
-        creditBalance: credits
-          ? {
-              total: credits.amountDemand + credits.amountSub,
-              demand: credits.amountDemand,
-              subscription: credits.amountSub,
-            }
-          : undefined,
+        creditBalance: undefined, // Credits removed - no credit tables in database
       }
 
       return membershipStatus
@@ -110,24 +95,16 @@ export class UserMembershipService implements IUserMembershipService {
     const { subscription } = membershipStatus
 
     // Check if subscription is active
+    const status = subscription.status as string
     if (
-      subscription.status !== SubscriptionStatus.ACTIVE &&
-      subscription.status !== SubscriptionStatus.TRIALING
+      status !== 'ACTIVE' &&
+      status !== 'TRIALING'
     ) {
       return false
     }
 
-    // Full access members can always access
-    if (subscription.membershipType === MembershipType.FULL_ACCESS) {
-      return true
-    }
-
-    // For off-peak members, check time restrictions
-    if (subscription.membershipType === MembershipType.OFF_PEAK) {
-      return this.isWithinOffPeakHours(accessTime)
-    }
-
-    return false
+    // Active subscription means access is granted
+    return true
   }
 
   async updateUserActiveMembership(
@@ -137,10 +114,8 @@ export class UserMembershipService implements IUserMembershipService {
     logger.info('Updating user active membership status', { userId, isActive })
 
     try {
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: { activeMembership: isActive },
-      })
+      // User membership status is tracked by subscription status
+      // No need to update user table as activeMembership field doesn't exist
 
       // Clear cache
       await this.clearUserMembershipCache(userId)
@@ -150,23 +125,6 @@ export class UserMembershipService implements IUserMembershipService {
       logger.error('Failed to update user active membership', { userId, error })
       throw ErrorFactory.fromError(error)
     }
-  }
-
-  private isWithinOffPeakHours(accessTime: Date): boolean {
-    const dayOfWeek = accessTime.getDay() // 0 = Sunday, 6 = Saturday
-    const hours = accessTime.getHours()
-    const minutes = accessTime.getMinutes()
-    const currentTime = hours * 60 + minutes // Convert to minutes
-
-    // Weekend access (Saturday and Sunday)
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      // 8am - 8pm (480 minutes to 1200 minutes)
-      return currentTime >= 480 && currentTime <= 1200
-    }
-
-    // Weekday access (Monday - Friday)
-    // 9am - 4pm (540 minutes to 960 minutes)
-    return currentTime >= 540 && currentTime <= 960
   }
 
   private async clearUserMembershipCache(userId: string): Promise<void> {

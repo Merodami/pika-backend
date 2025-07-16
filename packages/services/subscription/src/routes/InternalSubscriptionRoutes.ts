@@ -7,14 +7,13 @@ import {
   SubscriptionByUserIdParam,
   UpdateSubscriptionFromPaymentRequest,
 } from '@pika/api/internal'
-import { requireServiceAuth, validateBody, validateParams } from '@pika
-import type { ICacheService } from '@pika'
-import { CommunicationServiceClient } from '@pikad'
-import { InternalSubscriptionController } from '@subscription/controllers/InternalSubscriptionController.js'
-import { PlanRepository } from '@subscription/repositories/PlanRepository.js'
-import { SubscriptionRepository } from '@subscription/repositories/SubscriptionRepository.js'
-import { CreditProcessingService } from '@subscription/services/CreditProcessingService.js'
-import { SubscriptionService } from '@subscription/services/SubscriptionService.js'
+import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { CommunicationServiceClient } from '@pika/shared'
+import { InternalSubscriptionController } from '../controllers/InternalSubscriptionController.js'
+import { PlanRepository } from '../repositories/PlanRepository.js'
+import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
+import { SubscriptionService } from '../services/SubscriptionService.js'
 import { Router } from 'express'
 
 export function createInternalSubscriptionRouter(
@@ -32,16 +31,10 @@ export function createInternalSubscriptionRouter(
 
   // Initialize services
   const communicationClient = new CommunicationServiceClient()
-  const creditProcessingService = new CreditProcessingService(
-    prisma,
-    cache,
-    communicationClient,
-  )
   const subscriptionService = new SubscriptionService(
     prisma,
     subscriptionRepository,
     planRepository,
-    creditProcessingService,
     cache,
     communicationClient,
   )

@@ -3,9 +3,9 @@ import type {
     CreateSupportCommentDTO,
     SupportCommentDomain,
     UpdateSupportCommentDTO,
-} from '@pikadk'
-import { SupportCommentMapper } from '@pikadk'
-import { ErrorFactory, logger } from '@pikahared'
+} from '@pika/sdk'
+import { SupportCommentMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
 
 import type {
     CreateSupportCommentInput,

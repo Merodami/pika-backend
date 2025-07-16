@@ -3,7 +3,7 @@ import type {
   ProblemStatusType,
   ProblemTypeType,
 } from '@pika/types'
-import { ProblemPriority, ProblemStatus, ProblemType } from '@pika
+import { ProblemPriority, ProblemStatus, ProblemType } from '@pika/types'
 
 import type { ProblemDomain } from '../domain/problem.js'
 import type {

@@ -1,5 +1,5 @@
 import { SERVICE_API_KEY } from '@pika/environment'
-import { logger, NotAuthenticatedError } from '@pika
+import { logger, NotAuthenticatedError } from '@pika/shared'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
 /**

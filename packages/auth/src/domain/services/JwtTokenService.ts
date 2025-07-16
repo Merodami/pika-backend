@@ -5,7 +5,7 @@ import {
   JWT_REFRESH_EXPIRY,
   JWT_REFRESH_SECRET,
 } from '@pika/environment'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import jwt, { SignOptions } from 'jsonwebtoken'
 
 export interface JwtTokenPayload {

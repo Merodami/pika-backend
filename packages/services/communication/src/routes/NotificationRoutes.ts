@@ -4,14 +4,14 @@ import {
     NotificationSearchParams,
     UpdateNotificationStatusRequest,
 } from '@pika/api/public'
-import type { ICacheService } from '@pikaedis'
+import type { ICacheService } from '@pika/redis'
 import {
     requireAdmin,
     requireAuth,
     validateBody,
     validateParams,
     validateQuery,
-} from '@pikattp'
+} from '@pika/http'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 

@@ -4,13 +4,13 @@ import type {
   SubscriptionPlanQueryParams,
   UpdateSubscriptionPlanRequest,
 } from '@pika/api/public'
-import { REDIS_DEFAULT_TTL } from '@pikaonment'
-import { getValidatedQuery } from '@pika
-import { Cache, httpRequestKeyGenerator } from '@pika'
-import { SubscriptionPlanMapper } from '@pika
-import { logger } from '@pikad'
-import type { PlanSearchParams } from '@subscription/repositories/PlanRepository.js'
-import type { IPlanService } from '@subscription/services/PlanService.js'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { getValidatedQuery } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { SubscriptionPlanMapper } from '@pika/sdk'
+import { logger } from '@pika/shared'
+import type { PlanSearchParams } from '../repositories/PlanRepository.js'
+import type { IPlanService } from '../services/PlanService.js'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -75,8 +75,7 @@ export class PlanController {
         isActive: query.isActive,
         interval: query.interval,
         search: undefined, // Not in API schema
-        membershipType: query.membershipType,
-        membershipPackage: query.membershipPackage,
+        // Removed gym-related properties
       }
 
       logger.info('Getting subscription plans', { params })

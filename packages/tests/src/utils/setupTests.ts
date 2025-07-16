@@ -38,7 +38,7 @@ vi.mock('@pika/api', async (importOriginal) => {
 })
 
 // Mock Redis module with Cache decorator
-vi.mock('@pika) => {
+vi.mock('@pika/redis', async (importOriginal) => {
   // Create a simple in-memory cache for tests
   const cache = new Map()
 
@@ -103,7 +103,7 @@ vi.mock('@pika) => {
 })
 
 // Mock shared module
-vi.mock('@pika() => {
+vi.mock('@pika/shared', async (importOriginal) => {
   // Create a BaseError class for the mock
   class BaseError extends Error {
     context: any

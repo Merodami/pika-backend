@@ -1,5 +1,5 @@
 import { SUBSCRIPTION_API_URL } from '@pika/environment'
-import type { ServiceContext } from '@pika
+import type { ServiceContext } from '@pika/types'
 
 // TODO: Fix circular dependency - move domain types to shared or separate package
 // import type { SubscriptionDomain, SubscriptionWithPlanDomain } from '@pika

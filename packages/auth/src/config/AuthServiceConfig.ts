@@ -7,7 +7,7 @@ import {
   JWT_REFRESH_TOKEN_EXPIRY,
   JWT_SECRET,
 } from '@pika/environment'
-import { UserRole, UserStatus } from '@pika
+import { UserRole, UserStatus } from '@pika/types'
 
 import { AuthController } from '../api/controllers/AuthController.js'
 import { LoginUseCase } from '../application/use_cases/LoginUseCase.js'

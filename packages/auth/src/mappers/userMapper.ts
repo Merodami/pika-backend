@@ -56,16 +56,10 @@ function mapUserRole(role: any): UserRole {
   switch (role) {
     case 'ADMIN':
       return UserRole.ADMIN
-    case 'MEMBER':
-      return UserRole.MEMBER
-    case 'PROFESSIONAL':
-      return UserRole.PROFESSIONAL
-    case 'THERAPIST':
-      return UserRole.THERAPIST
-    case 'CONTENT_CREATOR':
-      return UserRole.CONTENT_CREATOR
+    case 'USER':
+      return UserRole.USER
     default:
-      return UserRole.MEMBER // Default fallback - changed from ADMIN
+      return UserRole.USER // Default fallback
   }
 }
 

@@ -1,5 +1,5 @@
 import type { ICacheService } from '@pika/redis'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import type {

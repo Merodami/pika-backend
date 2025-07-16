@@ -3,7 +3,7 @@
 // Load environment variables first
 import '@pika/environment'
 
-import { SERVICE_API_KEY } from '@pikant'
+import { SERVICE_API_KEY } from '@pika/environment'
 import axios, { AxiosError } from 'axios'
 
 // Service URLs

@@ -14,7 +14,7 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
     password: '$2b$10$9Erjm5.hmByB.mD99PAvb.0fJF38j2JZSVNHHjE4vY.cRdHdOovzW', // Password123!
     firstName: 'Test',
     lastName: 'User',
-    role: 'MEMBER',
+    role: 'USER',
     status: 'ACTIVE',
     emailVerified: true,
     phoneNumber: '+1234567890',

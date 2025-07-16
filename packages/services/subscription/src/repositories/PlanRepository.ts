@@ -1,10 +1,10 @@
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
-import type { SubscriptionPlanDomain } from '@pika
-import { SubscriptionPlanMapper } from '@pika
-import { ErrorFactory, logger } from '@pikad'
-import type { BillingIntervalType, PaginatedResult } from '@pika'
+import type { SubscriptionPlanDomain } from '@pika/sdk'
+import { SubscriptionPlanMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { BillingIntervalType, PaginatedResult } from '@pika/types'
 
 export interface CreatePlanInput {
   name: string
@@ -20,9 +20,6 @@ export interface CreatePlanInput {
   metadata?: any
   stripeProductId?: string
   stripePriceId?: string
-  membershipType?: string
-  membershipPackage?: string
-  gymAccessTimes?: any
 }
 
 export interface UpdatePlanInput {
@@ -41,8 +38,6 @@ export interface PlanSearchParams {
   isActive?: boolean
   interval?: string
   search?: string
-  membershipType?: string
-  membershipPackage?: string
 }
 
 export interface IPlanRepository {
@@ -85,9 +80,6 @@ export class PlanRepository implements IPlanRepository {
           metadata: data.metadata,
           stripeProductId: data.stripeProductId,
           stripePriceId: data.stripePriceId,
-          membershipType: data.membershipType,
-          membershipPackage: data.membershipPackage,
-          gymAccessTimes: data.gymAccessTimes,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -146,8 +138,6 @@ export class PlanRepository implements IPlanRepository {
       isActive,
       interval,
       search,
-      membershipType,
-      membershipPackage,
     } = params
 
     const skip = (page - 1) * limit
@@ -155,8 +145,6 @@ export class PlanRepository implements IPlanRepository {
     const where: Prisma.SubscriptionPlanWhereInput = {
       ...(isActive !== undefined && { isActive }),
       ...(interval && { interval }),
-      ...(membershipType && { membershipType }),
-      ...(membershipPackage && { membershipPackage }),
       ...(search && {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },

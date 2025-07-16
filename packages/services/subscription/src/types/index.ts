@@ -15,5 +15,5 @@ export type {
     ServiceContext,
     UserRole,
     UserRoleType
-} from '@pika'
+} from '@pika/types'
 

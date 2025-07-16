@@ -8,8 +8,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@pikant": "workspace:^",
-    "@pikaworkspace:^"
+    "@pika/environment": "workspace:^",
+    "@pika/types": "workspace:^"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",

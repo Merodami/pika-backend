@@ -14,13 +14,13 @@ async function main() {
   const args = process.argv.slice(2)
   const email = args[0]
   const password = args[1] || 'Test123!'
-  const role = (args[2] as UserRole) || UserRole.MEMBER
+  const role = (args[2] as UserRole) || UserRole.USER
 
   if (!email) {
     console.log('Usage: yarn user:create <email> [password] [role]')
     console.log('Example: yarn user:create test@example.com Test123! ADMIN')
     console.log(
-      'Roles: ADMIN, MEMBER, PROFESSIONAL, THERAPIST, CONTENT_CREATOR',
+      'Roles: ADMIN, USER',
     )
     process.exit(1)
   }
@@ -51,7 +51,6 @@ async function main() {
         role,
         status: UserStatus.ACTIVE,
         emailVerified: true,
-        alias: `user${Math.floor(100000 + Math.random() * 900000)}`,
       },
     })
 

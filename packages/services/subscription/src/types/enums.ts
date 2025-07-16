@@ -5,7 +5,7 @@
 export {
     BillingInterval as SubscriptionInterval,
     SubscriptionStatus
-} from '@pika';
+} from '@pika/types';
 
 export enum MembershipType {
   FULL_ACCESS = 'FULL_ACCESS',

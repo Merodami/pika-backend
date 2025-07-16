@@ -24,7 +24,6 @@ export const InternalCreditOperationRequest = openapi(
       'SUBSCRIPTION_GRANT',
       'PURCHASE',
       'REFUND',
-      'BOOKING',
       'CANCELLATION',
       'MANUAL_ADJUSTMENT',
       'PROMOTION',

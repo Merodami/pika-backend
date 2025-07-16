@@ -192,11 +192,7 @@ async function seedSubscriptionPlans() {
           creditsAmount: planData.creditsAmount,
           trialPeriodDays: planData.trialPeriodDays,
           features: [...planData.features],
-          membershipType: planData.membershipType,
-          membershipPackage: planData.membershipPackage,
-          gymAccessTimes: planData.gymAccessTimes
-            ? JSON.parse(JSON.stringify(planData.gymAccessTimes))
-            : null,
+          // Removed gym-related properties
           stripeProductId: planData.stripeProductId,
           stripePriceId: planData.stripePriceId,
           isActive: planData.isActive,
@@ -221,16 +217,7 @@ async function seedSubscriptionPlans() {
     console.log(`  Total subscription plans: ${totalPlans}`)
     console.log(`  Active plans: ${activePlans}`)
 
-    // Display plans by type
-    const offPeakCount = await prisma.subscriptionPlan.count({
-      where: { membershipType: MembershipType.OFF_PEAK },
-    })
-    const fullAccessCount = await prisma.subscriptionPlan.count({
-      where: { membershipType: MembershipType.FULL_ACCESS },
-    })
-
-    console.log(`  Off-Peak plans: ${offPeakCount}`)
-    console.log(`  Full Access plans: ${fullAccessCount}`)
+    // Removed gym-related statistics
 
     console.log('\n✅ Subscription plans seeded successfully!')
   } catch (error) {

@@ -2,15 +2,15 @@
   "name": "@pika/storage",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "implicitDependencies": [
-    "@pika
-    "@pika,
-    "@pikad",
-    "@pikaase",
-    "@pika",
-    "@pika",
-    "@pika
-    "@pika,
-    "@pika"
+    "@pika/api",
+    "@pika/auth",
+    "@pika/shared",
+    "@pika/database",
+    "@pika/types",
+    "@pika/tests",
+    "@pika/sdk",
+    "@pika/http",
+    "@pika/redis"
   ],
   "targets": {
     "typecheck": {

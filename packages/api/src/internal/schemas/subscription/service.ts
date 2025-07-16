@@ -370,7 +370,6 @@ export const ProcessSubscriptionUsageRequest = openapi(
     userId: UserId,
     subscriptionId: UUID,
     usageType: z.enum([
-      'SESSION_BOOKING',
       'FEATURE_ACCESS',
       'CREDIT_DEDUCTION',
     ]),

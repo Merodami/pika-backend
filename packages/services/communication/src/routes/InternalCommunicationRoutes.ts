@@ -3,8 +3,8 @@ import {
     SendSystemNotificationRequest,
     SendTransactionalEmailRequest,
 } from '@pika/api/internal'
-import type { ICacheService } from '@pikaedis'
-import { requireServiceAuth, validateBody } from '@pikattp'
+import type { ICacheService } from '@pika/redis'
+import { requireServiceAuth, validateBody } from '@pika/http'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 

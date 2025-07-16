@@ -1,5 +1,5 @@
 import { LOCAL_AUTH_URL, NODE_ENV } from '@pika/environment'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import axios from 'axios'
 
 import {

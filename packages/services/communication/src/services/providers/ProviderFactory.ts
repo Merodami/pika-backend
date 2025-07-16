@@ -8,7 +8,7 @@ import {
     SMS_PROVIDER_PRIMARY,
     USE_LOCALSTACK,
 } from '@pika/environment'
-import { logger } from '@pikahared'
+import { logger } from '@pika/shared'
 
 import { AwsSesProvider } from './AwsSesProvider.js'
 import { AwsSnsProvider } from './AwsSnsProvider.js'

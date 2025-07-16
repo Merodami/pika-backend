@@ -4,10 +4,10 @@ import type {
   SupportCommentIdParam,
   UpdateSupportCommentRequest,
 } from '@pika/api/public'
-import { REDIS_DEFAULT_TTL } from '@pikaonment'
-import { RequestContext } from '@pika
-import { Cache, httpRequestKeyGenerator } from '@pika'
-import { SupportCommentMapper } from '@pika
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { RequestContext } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { SupportCommentMapper } from '@pika/sdk'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { ISupportCommentService } from '../services/SupportCommentService.js'

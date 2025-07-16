@@ -5,7 +5,7 @@ import { MockEmailProvider, MockSmsProvider } from './test-setup.js'
 // Unmock modules that might interfere with real server setup for integration tests
 vi.unmock('@pika/http') // Ensures real createExpressServer is used
 vi.unmock('@pikapi') // Ensures real schemas from @p@pika are used
-vi.unmock('@pikaedis') // Ensures real cache decorators from @p@pikais are used
+vi.unmock('@pika/redis') // Ensures real cache decorators from @p@pikais are used
 
 // Remove the mock for @pikapi since it's causing issues
 // The vi.unmock above should be sufficient
@@ -32,7 +32,7 @@ vi.mock('@communication/services/providers/ProviderFactory.js', async () => {
   }
 })
 
-import { MemoryCacheService } from '@pikaedis'
+import { MemoryCacheService } from '@pika/redis'
 import {
     AuthenticatedRequestClient,
     createE2EAuthHelper,

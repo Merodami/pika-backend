@@ -1,7 +1,8 @@
 import type { Email, UserId } from '@pika/api/public'
-import type { CreateUserData, UserService, UserServiceUser } from '@pika
-import { UserServiceClient } from '@pika
-import { UserRole, UserStatus } from '@pika
+import { UserServiceClient } from '@pika/shared'
+import { UserRole, UserStatus } from '@pika/types'
+
+import type { CreateUserData, UserService, UserServiceUser } from '@pika/auth'
 
 /**
  * Adapter that implements UserService interface using UserServiceClient
@@ -38,8 +39,6 @@ export class UserServiceClientAdapter implements UserService {
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
-      description: data.description,
-      specialties: data.specialties,
       acceptTerms: data.acceptTerms,
       marketingConsent: data.marketingConsent,
       role: data.role as any,

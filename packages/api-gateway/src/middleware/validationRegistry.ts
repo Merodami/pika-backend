@@ -1,5 +1,5 @@
 import { validateRequest } from '@pika/http'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import { Router } from 'express'
 import { z } from 'zod'
 

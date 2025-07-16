@@ -1,6 +1,6 @@
-import type { ICacheService } from '@pika'
+import type { ICacheService } from '@pika/redis'
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import { logger } from '@pikad'
+import { logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
 import { createFileRouter } from './routes/FileRoutes.js'

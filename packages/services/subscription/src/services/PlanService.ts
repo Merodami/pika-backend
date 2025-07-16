@@ -1,22 +1,22 @@
 import type { ICacheService } from '@pika/redis'
-import { Cache } from '@pika'
+import { Cache } from '@pika/redis'
 import type {
   CreateSubscriptionPlanDTO,
   SubscriptionPlanDomain,
   UpdateSubscriptionPlanDTO,
-} from '@pika
+} from '@pika/sdk'
 import {
   ErrorFactory,
   isUuidV4,
   logger,
   PaymentServiceClient,
-} from '@pikad'
-import type { BillingIntervalType, PaginatedResult } from '@pika'
-import { BillingInterval } from '@pika'
+} from '@pika/shared'
+import type { BillingIntervalType, PaginatedResult } from '@pika/types'
+import { BillingInterval } from '@pika/types'
 import type {
   IPlanRepository,
   PlanSearchParams,
-} from '@subscription/repositories/PlanRepository.js'
+} from '../repositories/PlanRepository.js'
 
 export interface IPlanService {
   createPlan(data: CreateSubscriptionPlanDTO): Promise<SubscriptionPlanDomain>

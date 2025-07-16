@@ -1,28 +1,26 @@
 import type { PrismaClient } from '@prisma/client'
 import {
   AdminGetSubscriptionsQuery,
-  ProcessSubscriptionCreditsRequest,
   SubscriptionIdParam,
 } from '@pika/api/admin'
 import {
   CancelSubscriptionRequest,
   CreateSubscriptionRequest,
   UpdateSubscriptionRequest,
-} from '@pikaublic'
+} from '@pika/api/public'
 import {
   requireAdmin,
   requireAuth,
   validateBody,
   validateParams,
   validateQuery,
-} from '@pika
-import type { ICacheService } from '@pika'
-import { CommunicationServiceClient } from '@pikad'
-import { SubscriptionController } from '@subscription/controllers/SubscriptionController.js'
-import { PlanRepository } from '@subscription/repositories/PlanRepository.js'
-import { SubscriptionRepository } from '@subscription/repositories/SubscriptionRepository.js'
-import { CreditProcessingService } from '@subscription/services/CreditProcessingService.js'
-import { SubscriptionService } from '@subscription/services/SubscriptionService.js'
+} from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { CommunicationServiceClient } from '@pika/shared'
+import { SubscriptionController } from '../controllers/SubscriptionController.js'
+import { PlanRepository } from '../repositories/PlanRepository.js'
+import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
+import { SubscriptionService } from '../services/SubscriptionService.js'
 import { Router } from 'express'
 
 export function createSubscriptionRouter(
@@ -37,16 +35,10 @@ export function createSubscriptionRouter(
 
   // Initialize services
   const communicationClient = new CommunicationServiceClient()
-  const creditProcessingService = new CreditProcessingService(
-    prisma,
-    cache,
-    communicationClient,
-  )
   const subscriptionService = new SubscriptionService(
     prisma,
     subscriptionRepository,
     planRepository,
-    creditProcessingService,
     cache,
     communicationClient,
   )
@@ -94,14 +86,7 @@ export function createSubscriptionRouter(
     controller.reactivateSubscription,
   )
 
-  // Credit processing route
-  router.post(
-    '/:id/process-credits',
-    requireAdmin(),
-    validateParams(SubscriptionIdParam),
-    validateBody(ProcessSubscriptionCreditsRequest),
-    controller.processSubscriptionCredits,
-  )
+  // Credit processing route removed - no credit tables in database
 
   // Admin routes
   router.get(

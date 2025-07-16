@@ -8,10 +8,7 @@
  */
 export enum UserRole {
   ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER',
-  PROFESSIONAL = 'PROFESSIONAL',
-  THERAPIST = 'THERAPIST',
-  CONTENT_CREATOR = 'CONTENT_CREATOR',
+  USER = 'USER',
 }
 
 /**
@@ -105,21 +102,6 @@ export enum CommunicationChannel {
  */
 export type CommunicationChannelType = `${CommunicationChannel}`
 
-/**
- * Gym operational status
- * Must match Prisma schema definitions
- */
-export enum GymStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  MAINTENANCE = 'MAINTENANCE',
-  COMING_SOON = 'COMING_SOON',
-}
-
-/**
- * Type definition for gym status - use this for type annotations
- */
-export type GymStatusType = `${GymStatus}`
 
 /**
  * User verification types for unified verification system
@@ -197,9 +179,6 @@ export enum ProblemType {
   BILLING = 'BILLING',
   TECHNICAL = 'TECHNICAL',
   ACCOUNT = 'ACCOUNT',
-  BOOKING = 'BOOKING',
-  GYM_ISSUE = 'GYM_ISSUE',
-  TRAINER_ISSUE = 'TRAINER_ISSUE',
   GENERAL = 'GENERAL',
   BUG_REPORT = 'BUG_REPORT',
   FEATURE_REQUEST = 'FEATURE_REQUEST',

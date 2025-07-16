@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
+    "@pika/environment": "workspace:^",
+    "@pika/types": "workspace:^",
     "@prisma/client": "^6.11.1",
-    "@pikant": "workspace:^",
-    "@pika"workspace:^",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0"
   },

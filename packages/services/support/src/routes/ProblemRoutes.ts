@@ -1,6 +1,6 @@
 import { CreateSupportProblemRequest } from '@pika/api/public'
-import type { ICacheService } from '@pikaedis'
-import { requireAuth, validateBody } from '@pikattp'
+import type { ICacheService } from '@pika/redis'
+import { requireAuth, validateBody } from '@pika/http'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 

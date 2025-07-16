@@ -4,8 +4,8 @@ import {
     SupportCommentIdParam,
     UpdateSupportCommentRequest,
 } from '@pika/api/public'
-import type { ICacheService } from '@pikaedis'
-import { requireAuth, validateBody, validateParams } from '@pikattp'
+import type { ICacheService } from '@pika/redis'
+import { requireAuth, validateBody, validateParams } from '@pika/http'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 

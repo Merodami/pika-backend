@@ -5,8 +5,8 @@ import type {
   SendTransactionalEmailRequest,
   SendTransactionalEmailResponse,
 } from '@pika/api/internal'
-import { COMMUNICATION_API_URL } from '@pikant'
-import type { ServiceContext } from '@pika
+import { COMMUNICATION_API_URL } from '@pika/environment'
+import type { ServiceContext } from '@pika/types'
 
 // TODO: Fix circular dependency - move DTOs to shared or separate package
 // import type { SendEmailDTO } from '@pika

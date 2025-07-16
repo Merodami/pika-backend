@@ -10,12 +10,12 @@ import {
   validateBody,
   validateParams,
   validateQuery,
-} from '@pika
-import type { ICacheService } from '@pika'
-import { PaymentServiceClient } from '@pikad'
-import { PlanController } from '@subscription/controllers/PlanController.js'
-import { PlanRepository } from '@subscription/repositories/PlanRepository.js'
-import { PlanService } from '@subscription/services/PlanService.js'
+} from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { PaymentServiceClient } from '@pika/shared'
+import { PlanController } from '../controllers/PlanController.js'
+import { PlanRepository } from '../repositories/PlanRepository.js'
+import { PlanService } from '../services/PlanService.js'
 import { Router } from 'express'
 
 export function createPlanRouter(

@@ -2,15 +2,15 @@ import {
     AdminTicketQueryParams,
     AdminUpdateProblemRequest,
 } from '@pika/api/admin'
-import type { ICacheService } from '@pikaedis'
-import { ProblemIdParam } from '@pikapi/public'
+import type { ICacheService } from '@pika/redis'
+import { ProblemIdParam } from '@pika/api/public'
 import {
     requireAdmin,
     requireAuth,
     validateBody,
     validateParams,
     validateQuery,
-} from '@pikattp'
+} from '@pika/http'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 

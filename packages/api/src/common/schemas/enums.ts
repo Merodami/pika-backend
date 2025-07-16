@@ -13,10 +13,7 @@ import { openapi } from '../utils/openapi.js'
  */
 export const UserRole = z.enum([
   'ADMIN',
-  'MEMBER',
-  'PROFESSIONAL',
-  'THERAPIST',
-  'CONTENT_CREATOR',
+  'USER',
 ])
 
 export type UserRole = z.infer<typeof UserRole>
@@ -137,9 +134,6 @@ export const TicketType = z.enum([
   'BILLING',
   'TECHNICAL',
   'ACCOUNT',
-  'BOOKING',
-  'GYM_ISSUE',
-  'TRAINER_ISSUE',
   'GENERAL',
   'BUG_REPORT',
   'FEATURE_REQUEST',
@@ -164,7 +158,7 @@ export type ProblemSortBy = z.infer<typeof ProblemSortBy>
  */
 export const UserRoleSchema = openapi(UserRole, {
   description: 'User role in the system',
-  example: 'MEMBER',
+  example: 'USER',
 })
 
 /**

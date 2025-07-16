@@ -18,15 +18,6 @@ export * from './schemas/user/profile.js'
 export * from './schemas/user/queries.js'
 export * from './schemas/user/verification.js'
 
-// Gym
-export * from './schemas/gym/gym.js'
-
-// Session
-export * from './schemas/session/booking.js'
-export * from './schemas/session/invitee.js'
-export * from './schemas/session/parameters.js'
-export * from './schemas/session/session.js'
-export * from './schemas/session/waitingList.js'
 
 // Payment
 export * from './schemas/payment/credit.js'
@@ -53,13 +44,6 @@ export * from './schemas/support/index.js'
 // Storage
 export * from './schemas/storage/file.js'
 
-// Social
-export * from './schemas/social/activity.js'
-export * from './schemas/social/discovery.js'
-export * from './schemas/social/follow.js'
-export * from './schemas/social/friend.js'
-export * from './schemas/social/interaction.js'
-export * from './schemas/social/session.js'
 
 // Other
 export * from './schemas/induction/index.js'

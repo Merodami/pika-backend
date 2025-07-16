@@ -1,7 +1,7 @@
 import { PrismaClient, User } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
-import { ErrorFactory } from '@pika
-import { UserRole, UserStatus } from '@pika
+import { ErrorFactory } from '@pika/shared'
+import { UserRole, UserStatus } from '@pika/types'
 import crypto from 'crypto'
 
 export interface IUserRepository {

@@ -8,22 +8,22 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@pika "workspace:^",
-    "@pika: "workspace:^",
-    "@pikaase": "workspace:^",
-    "@pikaonment": "workspace:^",
-    "@pika: "workspace:^",
-    "@pika": "workspace:^",
-    "@pika "workspace:^",
-    "@pikad": "workspace:^",
-    "@pika": "workspace:^",
+    "@pika/api": "workspace:^",
+    "@pika/auth": "workspace:^",
+    "@pika/database": "workspace:^",
+    "@pika/environment": "workspace:^",
+    "@pika/http": "workspace:^",
+    "@pika/redis": "workspace:^",
+    "@pika/sdk": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/types": "workspace:^",
     "express": "^5.1.0",
     "jose": "^6.0.11",
     "pino": "^9.7.0",
     "zod": "^4.0.5"
   },
   "devDependencies": {
-    "@pika": "workspace:^"
+    "@pika/tests": "workspace:^"
   },
   "depcheck": {
     "ignoreDirs": [

@@ -1,7 +1,7 @@
-import { type ICacheService, initializeCache } from '@pika'
+import { type ICacheService, initializeCache } from '@pika/redis'
 import { createGatewayWithServices } from '@pika/api-gateway'
-import { logger } from '@pikad'
-import { CACHE_DISABLED } from '@pikaonment'
+import { logger } from '@pika/shared'
+import { CACHE_DISABLED } from '@pika/environment'
 import { PrismaClient } from '@prisma/client'
 import {
     type Application,
@@ -197,12 +197,9 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
     const gatewayRoutes = [
       { path: '/api/v1/auth', target: '/auth' },
       { path: '/api/v1/users', target: '/users' },
-      { path: '/api/v1/gyms', target: '/gyms' },
-      { path: '/api/v1/sessions', target: '/sessions' },
       { path: '/api/v1/payments', target: '/payments' },
       { path: '/api/v1/subscriptions', target: '/subscriptions' },
       { path: '/api/v1/communications', target: '/communications' },
-      { path: '/api/v1/social', target: '/social' },
       { path: '/api/v1/support', target: '/support' },
       { path: '/api/v1/storage', target: '/storage' },
     ]

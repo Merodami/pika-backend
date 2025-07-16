@@ -13,7 +13,7 @@ import {
   AWS_S3_REGION,
   AWS_S3_SECRET_ACCESS_KEY,
 } from '@pika/environment'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 
 export interface S3TestConfig {
   endpoint?: string

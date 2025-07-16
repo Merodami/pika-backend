@@ -1,6 +1,5 @@
 import {
     CommunicationServiceClient,
-    GymServiceClient,
     PaymentServiceClient,
     SubscriptionServiceClient,
     UserServiceClient,
@@ -27,7 +26,6 @@ export function createServiceClients(
 
   return {
     user: createClient<UserServiceClient>(UserServiceClient, 'user'),
-    gym: createClient<GymServiceClient>(GymServiceClient, 'gym'),
     payment: createClient<PaymentServiceClient>(
       PaymentServiceClient,
       'payment',

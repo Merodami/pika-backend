@@ -3,18 +3,18 @@ import { UpdateAdminProfileRequest, UserIdParam } from '@pika/api/admin'
 import {
   UnifiedResendVerificationRequest,
   UnifiedVerificationRequest,
-} from '@pikaublic'
+} from '@pika/api/public'
 import {
   requireAdmin,
   requireAuth,
   validateBody,
   validateParams,
-} from '@pika
-import type { ICacheService } from '@pika'
+} from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type {
   CommunicationServiceClient,
   FileStoragePort,
-} from '@pikad'
+} from '@pika/shared'
 import { Router } from 'express'
 import multer from 'multer'
 

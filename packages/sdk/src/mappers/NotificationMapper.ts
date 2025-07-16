@@ -28,7 +28,7 @@ export class NotificationMapper {
   static fromDocument(doc: NotificationDocument): NotificationDomain {
     return {
       id: doc.id,
-      subToken: doc.user?.appVersion || undefined, // Mapping to available field
+      subToken: undefined, // appVersion field removed
       userId: doc.userId,
       type: doc.type,
       title: doc.title,

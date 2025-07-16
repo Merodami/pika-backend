@@ -8,11 +8,11 @@ import {
   TokenRequest,
   VerifyEmailRequest,
 } from '@pika/api/public'
-import { RequestContext } from '@pika
-import { Cache, httpRequestKeyGenerator } from '@pika
-import { UserMapper } from '@pika
-import { ErrorFactory } from '@pika
-import { UserRole } from '@pika
+import { RequestContext } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { UserMapper } from '@pika/sdk'
+import { ErrorFactory } from '@pika/shared'
+import { UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import { AuthMapper } from '../mappers/AuthMapper.js'
@@ -457,7 +457,7 @@ export class AuthController {
           'payments:admin',
           'payments:manage_all',
         ]
-      case UserRole.MEMBER:
+      case UserRole.USER:
         return [
           'users:read',
           'users:write:own',

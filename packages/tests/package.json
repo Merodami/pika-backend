@@ -12,8 +12,8 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@pikaworkspace:^",
-    "@pika"workspace:^",
+    "@pika/database": "workspace:^",
+    "@pika/types": "workspace:^",
     "@types/supertest": "^6.0.3",
     "node-fetch": "^3.3.2",
     "stripe": "^18.3.0",

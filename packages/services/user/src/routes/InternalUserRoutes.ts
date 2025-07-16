@@ -12,8 +12,8 @@ import {
   ValidatePasswordResetTokenRequest,
   VerifyEmailRequest,
 } from '@pika/api/internal'
-import { requireServiceAuth, validateBody, validateParams } from '@pika
-import { ICacheService } from '@pika'
+import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
+import { ICacheService } from '@pika/redis'
 import { Router } from 'express'
 
 import { InternalUserController } from '../controllers/InternalUserController.js'

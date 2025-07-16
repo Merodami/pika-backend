@@ -2,12 +2,12 @@ import type {
   AdminTicketQueryParams,
   AdminUpdateProblemRequest,
 } from '@pika/api/admin'
-import type { ProblemIdParam } from '@pikaublic'
-import { REDIS_DEFAULT_TTL } from '@pikaonment'
-import { getValidatedQuery } from '@pika
-import { Cache, httpRequestKeyGenerator } from '@pika'
-import { ProblemMapper } from '@pika
-import { ErrorFactory } from '@pikad'
+import type { ProblemIdParam } from '@pika/api/public'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { getValidatedQuery } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { ProblemMapper } from '@pika/sdk'
+import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IProblemService } from '../services/ProblemService.js'

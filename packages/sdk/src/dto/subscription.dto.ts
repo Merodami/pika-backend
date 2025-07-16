@@ -13,10 +13,6 @@ export interface CreateSubscriptionPlanDTO {
   features: string[]
   isActive?: boolean
   metadata?: Record<string, any>
-  // Gym-specific membership fields
-  membershipType?: string // "FULL_ACCESS" | "OFF_PEAK" | null for non-gym plans
-  membershipPackage?: string // "LIMITED" | "STANDARD" | "UNLIMITED" | null
-  gymAccessTimes?: Record<string, any> // Time restrictions for OFF_PEAK access
 }
 
 export interface UpdateSubscriptionPlanDTO {
@@ -27,10 +23,6 @@ export interface UpdateSubscriptionPlanDTO {
   features?: string[]
   isActive?: boolean
   metadata?: Record<string, any>
-  // Gym-specific membership fields
-  membershipType?: string
-  membershipPackage?: string
-  gymAccessTimes?: Record<string, any>
 }
 
 export interface SubscriptionPlanDTO {
@@ -48,10 +40,6 @@ export interface SubscriptionPlanDTO {
   metadata?: Record<string, any>
   stripeProductId?: string
   stripePriceId?: string
-  // Gym-specific membership fields
-  membershipType?: string
-  membershipPackage?: string
-  gymAccessTimes?: Record<string, any>
   createdAt: string
   updatedAt: string
 }
@@ -91,9 +79,7 @@ export interface SubscriptionDTO {
   id: string
   userId: string
   planId?: string
-  planType: string
   status: string
-  billingInterval: string
   currentPeriodStart?: string
   currentPeriodEnd?: string
   trialEnd?: string
@@ -103,7 +89,6 @@ export interface SubscriptionDTO {
   stripePriceId?: string
   startDate?: string
   endDate?: string
-  lastProcessedAt?: string
   cancelledAt?: string
   createdAt: string
   updatedAt: string

@@ -113,8 +113,8 @@ export class AuthMapper {
       lastName: user.lastName,
       profilePicture: user.avatarUrl,
       role:
-        user.role === 'ADMIN' || user.role === 'PROFESSIONAL'
-          ? 'TRAINER'
+        user.role === 'ADMIN'
+          ? 'ADMIN'
           : 'USER',
     }
   }

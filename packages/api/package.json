@@ -31,9 +31,9 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@pika/environment": "workspace:^",
+    "@pika/types": "workspace:^",
     "@sinclair/typebox": "^0.34.37",
-    "@pikanvironment": "workspace:^",
-    "@pikaypes": "workspace:^",
     "fs-extra": "^11.3.0",
     "lodash-es": "^4.17.21",
     "tsc-alias": "^1.8.16",

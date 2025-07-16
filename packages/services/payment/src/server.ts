@@ -1,15 +1,11 @@
 import type { PrismaClient } from '@prisma/client'
 import { PAYMENT_SERVICE_PORT } from '@pika/environment'
-import { createExpressServer, errorMiddleware } from '@pika
-import type { ICacheService } from '@pika'
-import { logger } from '@pikad'
+import { createExpressServer, errorMiddleware } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import type Stripe from 'stripe'
 
-import { createCreditPackRouter } from './routes/CreditPackRoutes.js'
-import { createCreditsRouter } from './routes/CreditsRoutes.js'
-import { createMembershipRouter } from './routes/MembershipRoutes.js'
 import { createProductRouter } from './routes/ProductRoutes.js'
-import { createPromoCodeRouter } from './routes/PromoCodeRoutes.js'
 import { createWebhookRouter } from './routes/WebhookRoutes.js'
 import { ProductService } from './services/ProductService.js'
 import { StripeService } from './services/StripeService.js'
@@ -82,23 +78,6 @@ export async function createPaymentServer(config: ServerConfig) {
   })
 
   // Mount routes
-  app.use('/credits', createCreditsRouter(config.prisma, config.cacheService))
-  app.use(
-    '/credit-packs',
-    createCreditPackRouter(config.prisma, config.cacheService),
-  )
-  app.use(
-    '/promo-codes',
-    createPromoCodeRouter(config.prisma, config.cacheService),
-  )
-  app.use(
-    '/memberships',
-    createMembershipRouter(
-      config.prisma,
-      config.cacheService,
-      config.stripeInstance,
-    ),
-  )
   app.use(
     '/webhooks',
     createWebhookRouter(

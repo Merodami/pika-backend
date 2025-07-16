@@ -28,14 +28,6 @@
       "destination": "/api"
     },
     {
-      "source": "/gyms/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/sessions/:path*",
-      "destination": "/api"
-    },
-    {
       "source": "/payments/:path*",
       "destination": "/api"
     },
@@ -45,10 +37,6 @@
     },
     {
       "source": "/communications/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/social/:path*",
       "destination": "/api"
     },
     {

@@ -7,8 +7,8 @@ import {
   getCriticalDependencies,
   HealthCheckDependency,
   logger,
-} from '@pika
-import { ErrorCode, getDefaultMessageForError } from '@pika
+} from '@pika/shared'
+import { ErrorCode, getDefaultMessageForError } from '@pika/types'
 import type { Express, RequestHandler } from 'express'
 
 import { ServiceHealthCheckOptions } from '../../domain/types/healthCheck.js'

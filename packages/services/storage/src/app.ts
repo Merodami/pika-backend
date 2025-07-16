@@ -7,9 +7,9 @@ import {
   AWS_S3_SECRET_ACCESS_KEY,
   FILE_STORAGE_SERVICE_PORT,
 } from '@pika/environment'
-import { startServer } from '@pika
-import { type ICacheService,initializeCache } from '@pika'
-import { logger } from '@pikad'
+import { startServer } from '@pika/http'
+import { type ICacheService, initializeCache } from '@pika/redis'
+import { logger } from '@pika/shared'
 
 import { createStorageServer } from './server.js'
 

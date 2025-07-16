@@ -4,10 +4,10 @@ import type {
     SendSubscriptionNotificationRequest,
     UpdateSubscriptionFromPaymentRequest,
 } from '@pika/api/internal'
-import type { CommunicationServiceClient } from '@pikad'
-import { ErrorFactory, logger } from '@pikad'
-import type { ISubscriptionRepository } from '@subscription/repositories/SubscriptionRepository.js'
-import type { ISubscriptionService } from '@subscription/services/SubscriptionService.js'
+import type { CommunicationServiceClient } from '@pika/shared'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { ISubscriptionRepository } from '../repositories/SubscriptionRepository.js'
+import type { ISubscriptionService } from '../services/SubscriptionService.js'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -259,7 +259,7 @@ export class InternalSubscriptionController {
           id: sub.id,
           userId: sub.userId,
           planId: sub.planId,
-          planName: sub.planType,
+          planName: 'Unknown Plan', // planType field removed
           status: sub.status,
           currentPeriodStart: sub.currentPeriodStart,
           currentPeriodEnd: sub.currentPeriodEnd,

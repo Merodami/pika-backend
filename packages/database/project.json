@@ -3,7 +3,7 @@
   "root": "packages/database",
   "sourceRoot": "packages/database/src",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["@pika@p@p@p@p@pikapik@pik@pik@pika
+  "implicitDependencies": ["@pika/environment", "@pika/types"],
   "targets": {
     "typecheck": {
       "executor": "nx:run-commands",

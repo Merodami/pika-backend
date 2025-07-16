@@ -5,8 +5,8 @@ import {
   PAGINATION_DEFAULT_LIMIT,
   PAGINATION_MAX_LIMIT,
 } from '@pika/environment'
-import { logger } from '@pika
-import { PaginationMetadata } from '@pika
+import { logger } from '@pika/shared'
+import { PaginationMetadata } from '@pika/types'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
 declare global {

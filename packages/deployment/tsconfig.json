@@ -15,12 +15,9 @@
     { "path": "../api-gateway" },
     { "path": "../services/auth" },
     { "path": "../services/user" },
-    { "path": "../services/gym" },
-    { "path": "../services/session" },
     { "path": "../services/payment" },
     { "path": "../services/subscription" },
     { "path": "../services/communication" },
-    { "path": "../services/social" },
     { "path": "../services/support" },
     { "path": "../services/storage" }
   ]

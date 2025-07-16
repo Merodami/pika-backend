@@ -2,7 +2,6 @@ import {
   AUTH_API_URL,
   COMMUNICATION_API_URL,
   FILE_STORAGE_API_URL,
-  GYM_API_URL,
   HEALTH_CHECK_MEMORY_THRESHOLD,
   PAYMENT_API_URL,
   PG_DATABASE,
@@ -11,13 +10,11 @@ import {
   REDIS_DEFAULT_TTL,
   REDIS_HOST,
   REDIS_PORT,
-  SESSION_API_URL,
-  SOCIAL_API_URL,
   SUBSCRIPTION_API_URL,
   SUPPORT_API_URL,
   USER_API_URL,
 } from '@pika/environment'
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import type { Request, Response } from 'express'
 
 interface ServiceHealthCheck {
@@ -28,13 +25,10 @@ interface ServiceHealthCheck {
 const services: ServiceHealthCheck[] = [
   { name: 'auth', url: AUTH_API_URL },
   { name: 'user', url: USER_API_URL },
-  { name: 'gym', url: GYM_API_URL },
-  { name: 'session', url: SESSION_API_URL },
   { name: 'payment', url: PAYMENT_API_URL },
   { name: 'subscription', url: SUBSCRIPTION_API_URL },
   { name: 'communication', url: COMMUNICATION_API_URL },
   { name: 'support', url: SUPPORT_API_URL },
-  { name: 'social', url: SOCIAL_API_URL },
   { name: 'file-storage', url: FILE_STORAGE_API_URL },
 ]
 

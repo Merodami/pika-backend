@@ -8,12 +8,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
+    "@pika/database": "workspace:^",
+    "@pika/environment": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/types": "workspace:^",
     "@prisma/client": "^6.11.1",
-    "@pikant": "workspace:^",
-    "@pikaworkspace:^",
-    "@pikarkspace:^",
-    "@pika"workspace:^",
-    "@pikaworkspace:^",
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^6.0.0",
     "jsonwebtoken": "^9.0.2"

@@ -21,10 +21,9 @@ export {
   authMiddleware,
   requireAdmin,
   requireAuth,
-  requireMember,
+  requireUser,
   requireOwnership,
   requirePermissions,
-  requireProfessional,
   requireRoles,
 } from './infrastructure/express/middleware/auth.js'
 export { errorMiddleware } from './infrastructure/express/middleware/errorHandler.js'

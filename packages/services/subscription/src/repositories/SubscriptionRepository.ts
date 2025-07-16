@@ -1,18 +1,18 @@
-import type { Prisma, PrismaClient } from '@prisma/client'
+import type { Prisma, PrismaClient, SubscriptionStatus } from '@prisma/client'
 import { Prisma as PrismaErrors } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
 import type {
   SubscriptionDomain,
   SubscriptionWithPlanDomain,
-} from '@pika
-import { SubscriptionMapper, SubscriptionWithPlanMapper } from '@pika
-import { ErrorFactory, logger } from '@pikad'
-import type { PaginatedResult } from '@pika'
+} from '@pika/sdk'
+import { SubscriptionMapper, SubscriptionWithPlanMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 
 export interface CreateSubscriptionInput {
   userId: string
   planId: string
-  status: string
+  status: SubscriptionStatus
   currentPeriodStart?: Date
   currentPeriodEnd?: Date
   trialEnd?: Date
@@ -23,7 +23,7 @@ export interface CreateSubscriptionInput {
 }
 
 export interface UpdateSubscriptionInput {
-  status?: string
+  status?: SubscriptionStatus
   currentPeriodStart?: Date
   currentPeriodEnd?: Date
   trialEnd?: Date
@@ -36,7 +36,7 @@ export interface UpdateSubscriptionInput {
 export interface SubscriptionSearchParams {
   page?: number
   limit?: number
-  status?: string
+  status?: SubscriptionStatus
   userId?: string
   planId?: string
   cancelAtPeriodEnd?: boolean

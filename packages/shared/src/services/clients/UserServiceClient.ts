@@ -9,12 +9,12 @@ import type {
   ValidatePasswordResetTokenRequest,
   VerifyEmailRequest,
 } from '@pika/api/internal'
-import { USER_API_URL } from '@pikant'
+import { USER_API_URL } from '@pika/environment'
 import type {
   ServiceContext,
   UserRoleType,
   UserStatusType,
-} from '@pika
+} from '@pika/types'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 

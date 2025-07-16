@@ -14,10 +14,6 @@ export interface SubscriptionPlanDomain {
   metadata?: Record<string, any>
   stripeProductId?: string
   stripePriceId?: string
-  // Gym-specific membership fields
-  membershipType?: string // "FULL_ACCESS" | "OFF_PEAK" | null for non-gym plans
-  membershipPackage?: string // "LIMITED" | "STANDARD" | "UNLIMITED" | null
-  gymAccessTimes?: Record<string, any> // Time restrictions for OFF_PEAK access
   createdAt: Date
   updatedAt: Date
 }
@@ -27,9 +23,7 @@ export interface SubscriptionDomain {
   id: string
   userId: string
   planId?: string
-  planType: string // Keep for backward compatibility
   status: string
-  billingInterval: string // Keep for backward compatibility
   currentPeriodStart?: Date
   currentPeriodEnd?: Date
   trialEnd?: Date
@@ -39,7 +33,6 @@ export interface SubscriptionDomain {
   stripePriceId?: string
   startDate?: Date
   endDate?: Date
-  lastProcessedAt?: Date
   cancelledAt?: Date
   createdAt: Date
   updatedAt: Date

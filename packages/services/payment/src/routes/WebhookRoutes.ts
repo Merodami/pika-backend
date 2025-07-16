@@ -4,8 +4,6 @@ import express, { Router } from 'express'
 import type Stripe from 'stripe'
 
 import { WebhookController } from '../controllers/WebhookController.js'
-import { MembershipRepository } from '../repositories/MembershipRepository.js'
-import { MembershipService } from '../services/MembershipService.js'
 import { StripeService } from '../services/StripeService.js'
 
 export function createWebhookRouter(
@@ -17,17 +15,10 @@ export function createWebhookRouter(
 
   // Initialize services
   const stripeService = new StripeService(stripeInstance)
-  const membershipRepository = new MembershipRepository(prisma, cache)
-  const membershipService = new MembershipService(
-    membershipRepository,
-    stripeService,
-    cache,
-  )
 
   // Initialize controller
   const webhookController = new WebhookController(
     stripeService,
-    membershipService,
   )
 
   // Modern industry standard: Raw body parsing for webhook signature verification

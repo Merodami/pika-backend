@@ -13,9 +13,9 @@ import {
   validateBody,
   validateParams,
   validateQuery,
-} from '@pika
-import type { ICacheService } from '@pika'
-import { ErrorFactory } from '@pikad'
+} from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { ErrorFactory } from '@pika/shared'
 import { NextFunction, Request, Response, Router } from 'express'
 import multer from 'multer'
 

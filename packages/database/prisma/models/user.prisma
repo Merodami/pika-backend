@@ -9,7 +9,7 @@ model User {
   phoneNumber       String?           @map("phone_number") @db.VarChar(50)
   phoneVerified     Boolean           @default(false) @map("phone_verified")
   avatarUrl         String?           @map("avatar_url") @db.VarChar(1000)
-  role              UserRole          @default(ADMIN)
+  role              UserRole          @default(USER)
   status            UserStatus        @default(ACTIVE)
   lastLoginAt       DateTime?         @map("last_login_at") @db.Timestamptz(6)
   createdAt         DateTime?         @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -32,10 +32,6 @@ model User {
   securityEvents    SecurityEvent[]
   
   // Payment relations
-  credits           Credits?
-  creditsHistory    CreditsHistory[]
-  promoCodeUsages   PromoCodeUsage[]
-  membership        Membership?
   subscriptions     Subscription[]
   
   // Communication relations

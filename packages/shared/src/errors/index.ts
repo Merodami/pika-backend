@@ -14,7 +14,7 @@ export * from './InfrastructureErrors.js'
 export * from './ApplicationErrors.js'
 
 // Error handler factory
-import { ErrorCode } from '@pika
+import { ErrorCode } from '@pika/types'
 
 import { logger } from '../infrastructure/logger/index.js'
 import {

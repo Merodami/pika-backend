@@ -1,5 +1,5 @@
 import { logger } from '@pika/shared'
-import { UserRole } from '@pika
+import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import { get } from 'lodash-es'
 import supertest from 'supertest'
@@ -48,7 +48,7 @@ export class E2EAuthHelper {
       password: 'TestUser123!',
       firstName: 'Test',
       lastName: 'User',
-      role: UserRole.MEMBER,
+      role: UserRole.USER,
       phoneNumber: '+1234567891',
     },
     MEMBER: {
@@ -56,7 +56,7 @@ export class E2EAuthHelper {
       password: 'TestMember123!',
       firstName: 'Test',
       lastName: 'Member',
-      role: UserRole.MEMBER,
+      role: UserRole.USER,
       phoneNumber: '+1234567892',
     },
     PROFESSIONAL: {
@@ -64,7 +64,7 @@ export class E2EAuthHelper {
       password: 'TestProfessional123!',
       firstName: 'Test',
       lastName: 'Professional',
-      role: UserRole.PROFESSIONAL,
+      role: UserRole.USER,
       phoneNumber: '+1234567893',
     },
   }

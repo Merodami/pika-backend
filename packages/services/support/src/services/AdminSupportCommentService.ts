@@ -3,10 +3,10 @@ import type {
     CreateSupportCommentDTO,
     SupportCommentDomain,
     UpdateSupportCommentDTO,
-} from '@pikadk'
-import { SupportCommentMapper } from '@pikadk'
-import { ErrorFactory, logger } from '@pikahared'
-import type { ParsedIncludes } from '@pikaypes'
+} from '@pika/sdk'
+import { SupportCommentMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { ParsedIncludes } from '@pika/types'
 
 import type {
     CreateSupportCommentInput,

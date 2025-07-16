@@ -7,8 +7,8 @@ import {
   ProductIdParam,
   UpdateProductRequest,
 } from '@pika/api/public'
-import { getValidatedQuery } from '@pika
-import { logger } from '@pika
+import { getValidatedQuery } from '@pika/http'
+import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IProductService } from '../services/ProductService.js'

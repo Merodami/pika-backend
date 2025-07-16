@@ -3,7 +3,7 @@ import {
     MAILHOG_SMTP_PORT,
     MAILHOG_UI_PORT,
 } from '@pika/environment'
-import { logger } from '@pikahared'
+import { logger } from '@pika/shared'
 import { get, isEmpty } from 'lodash-es'
 import nodemailer, { type SentMessageInfo, type Transporter } from 'nodemailer'
 
