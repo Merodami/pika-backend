@@ -1,0 +1,22 @@
+{
+  "name": "@pika/types",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Shared TypeScript type definitions and enums for Pika platform",
+  "author": "Pika",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pika/pika.git",
+    "directory": "packages/types"
+  },
+  "homepage": "https://github.com/pikaipikae/main/packages/types",
+  "bugs": {
+    "url": "https://github.com/pikaipikaues"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "name": "@pika/storage",
+  "version": "0.0.0",
+  "private": true,
+  "description": "File Storage Service for Pika Platform",
+  "author": "Pika",
+  "type": "module",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.844.0",
+    "@aws-sdk/s3-request-presigner": "^3.844.0",
+    "@prisma/client": "^6.11.1",
+    "@pika "workspace:^",
+    "@pika: "workspace:^",
+    "@pikaase": "workspace:^",
+    "@pikaonment": "workspace:^",
+    "@pika: "workspace:^",
+    "@pika": "workspace:^",
+    "@pika "workspace:^",
+    "@pikad": "workspace:^",
+    "@pika": "workspace:^",
+    "@pika": "workspace:^",
+    "bullmq": "^5.56.4",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "lodash-es": "^4.17.21",
+    "mime-types": "^3.0.1",
+    "multer": "^2.0.1",
+    "sharp": "^0.34.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^3.0.1",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.0.13",
+    "@types/supertest": "^6.0.3",
+    "@types/uuid": "^10.0.0",
+    "he": "^1.2.0",
+    "io-ts-types": "^0.5.19",
+    "supertest": "^7.1.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "depcheck": {
+    "ignore": [
+      "nx",
+      "ts-node",
+      "tsconfig-paths"
+    ],
+    "parsers": {
+      "**/*.ts": "typescript"
+    },
+    "detectors": [
+      "requireCallExpression",
+      "importDeclaration",
+      "typescriptImportEqualsDeclaration"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pika/pika.git",
+    "directory": "packages/services/storage"
+  },
+  "homepage": "https://github.com/pikaipikae/main/packages/services/storage",
+  "bugs": {
+    "url": "https://github.com/pikaipikaues"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "@pika/subscription",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Membership and subscription management for Pika platform",
+  "author": "Pika",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@pika "workspace:^",
+    "@pika: "workspace:^",
+    "@pikaase": "workspace:^",
+    "@pikaonment": "workspace:^",
+    "@pika: "workspace:^",
+    "@pika": "workspace:^",
+    "@pika "workspace:^",
+    "@pikad": "workspace:^",
+    "@pika": "workspace:^",
+    "express": "^5.1.0",
+    "jose": "^6.0.11",
+    "pino": "^9.7.0",
+    "zod": "^4.0.5"
+  },
+  "devDependencies": {
+    "@pika": "workspace:^"
+  },
+  "depcheck": {
+    "ignoreDirs": [
+      "test",
+      "dist"
+    ],
+    "ignorePatterns": [
+      "*.test.ts",
+      "*.spec.ts",
+      "*.it.ts"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pika/pika.git",
+    "directory": "packages/services/subscription"
+  },
+  "homepage": "https://github.com/pikaipikae/main/packages/services/subscription",
+  "bugs": {
+    "url": "https://github.com/pikaipikaues"
+  }
+}

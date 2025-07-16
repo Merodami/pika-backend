@@ -1,0 +1,503 @@
+import type { PrismaClient } from '@prisma/client'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import type { ICacheService } from '@pika'
+import { Cache } from '@pika'
+import type {
+  CreateSubscriptionDTO,
+  CreateSubscriptionFromWebhookDTO,
+  CreditsDomain,
+  SubscriptionDomain,
+  SubscriptionPlanDomain,
+  SubscriptionWithPlanDomain,
+  UpdateSubscriptionDTO,
+} from '@pika
+import {
+  CommunicationServiceClient,
+  ErrorFactory,
+  isUuidV4,
+  logger,
+} from '@pikad'
+import type { PaginatedResult } from '@pika'
+import type { IPlanRepository } from '@subscription/repositories/PlanRepository.js'
+import type {
+  ISubscriptionRepository,
+  SubscriptionSearchParams,
+} from '@subscription/repositories/SubscriptionRepository.js'
+import type { ICreditProcessingService } from '@subscription/services/CreditProcessingService.js'
+import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
+
+export interface ISubscriptionService {
+  createSubscription(
+    userId: string,
+    data: CreateSubscriptionDTO,
+  ): Promise<SubscriptionDomain>
+  getSubscriptionById(id: string): Promise<SubscriptionWithPlanDomain>
+  getUserActiveSubscription(
+    userId: string,
+  ): Promise<SubscriptionWithPlanDomain | null>
+  getAllSubscriptions(
+    params: SubscriptionSearchParams,
+  ): Promise<PaginatedResult<SubscriptionDomain>>
+  updateSubscription(
+    id: string,
+    data: UpdateSubscriptionDTO,
+  ): Promise<SubscriptionDomain>
+  cancelSubscription(
+    id: string,
+    cancelAtPeriodEnd: boolean,
+  ): Promise<SubscriptionDomain>
+  reactivateSubscription(id: string): Promise<SubscriptionDomain>
+  // Webhook-driven subscription creation
+  createSubscriptionFromWebhook(
+    data: CreateSubscriptionFromWebhookDTO,
+  ): Promise<SubscriptionDomain>
+  // Credit processing
+  processSubscriptionCredits(
+    subscriptionId: string,
+  ): Promise<{ subscription: SubscriptionDomain; credits: CreditsDomain }>
+  processAllActiveSubscriptions(): Promise<number>
+}
+
+export class SubscriptionService implements ISubscriptionService {
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly planRepository: IPlanRepository,
+    private readonly creditProcessingService: ICreditProcessingService,
+    private readonly cache: ICacheService,
+    private readonly communicationClient?: CommunicationServiceClient,
+  ) {}
+
+  async createSubscription(
+    userId: string,
+    data: CreateSubscriptionDTO,
+  ): Promise<SubscriptionDomain> {
+    logger.info('Creating subscription', { userId, planId: data.planId })
+
+    // Check if user already has an active subscription
+    const existingSubscription =
+      await this.subscriptionRepository.findByUserId(userId)
+
+    if (existingSubscription) {
+      throw ErrorFactory.businessRuleViolation(
+        'User already has an active subscription',
+        'Only one active subscription per user is allowed',
+      )
+    }
+
+    // Get the plan details
+    const plan = await this.planRepository.findById(data.planId)
+
+    if (!plan) {
+      throw ErrorFactory.resourceNotFound('SubscriptionPlan', data.planId)
+    }
+
+    if (!plan.isActive) {
+      throw ErrorFactory.businessRuleViolation(
+        'Plan is not active',
+        'Cannot subscribe to an inactive plan',
+      )
+    }
+
+    try {
+      // Create subscription record (user-initiated subscription creation)
+      const subscription = await this.subscriptionRepository.create({
+        userId,
+        planId: plan.id,
+        status: 'PENDING', // Will be updated by webhook
+        stripeCustomerId: data.stripeCustomerId,
+        trialEnd: data.trialEnd,
+        metadata: data.metadata,
+      })
+
+      // Process initial credits if active
+      if (subscription.status === 'ACTIVE') {
+        await this.creditProcessingService.processSubscriptionCredits(
+          subscription,
+          plan.creditsAmount,
+        )
+      }
+
+      // Clear user subscription cache
+      await this.clearUserSubscriptionCache(userId)
+
+      // Send welcome email notification
+      if (this.communicationClient && subscription.status === 'ACTIVE') {
+        await this.sendSubscriptionCreatedEmail(userId, subscription, plan)
+      }
+
+      return subscription
+    } catch (error) {
+      logger.error('Failed to create subscription', { userId, error })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL * CACHE_TTL_MULTIPLIERS.SUBSCRIPTION,
+    prefix: 'subscription',
+  })
+  async getSubscriptionById(id: string): Promise<SubscriptionWithPlanDomain> {
+    // Validate UUID format
+    if (!isUuidV4(id)) {
+      throw ErrorFactory.badRequest('Invalid subscription ID format')
+    }
+
+    const subscription = await this.subscriptionRepository.findByIdWithPlan(id)
+
+    if (!subscription) {
+      throw ErrorFactory.resourceNotFound('Subscription', id)
+    }
+
+    return subscription
+  }
+
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL * CACHE_TTL_MULTIPLIERS.USER_SUBSCRIPTION,
+    prefix: 'user-subscription',
+  })
+  async getUserActiveSubscription(
+    userId: string,
+  ): Promise<SubscriptionWithPlanDomain | null> {
+    return this.subscriptionRepository.findByUserIdWithPlan(userId)
+  }
+
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL * CACHE_TTL_MULTIPLIERS.SUBSCRIPTIONS_LIST,
+    prefix: 'subscriptions',
+  })
+  async getAllSubscriptions(
+    params: SubscriptionSearchParams,
+  ): Promise<PaginatedResult<SubscriptionDomain>> {
+    return this.subscriptionRepository.findAll(params)
+  }
+
+  async updateSubscription(
+    id: string,
+    data: UpdateSubscriptionDTO,
+  ): Promise<SubscriptionDomain> {
+    logger.info('Updating subscription', { id })
+
+    const subscription = await this.getSubscriptionById(id)
+
+    // Validate plan change if provided
+    if (data.planId && data.planId !== subscription.planId) {
+      const plan = await this.planRepository.findById(data.planId)
+
+      if (!plan) {
+        throw ErrorFactory.resourceNotFound('SubscriptionPlan', data.planId)
+      }
+
+      if (!plan.isActive) {
+        throw ErrorFactory.businessRuleViolation(
+          'Plan is not active',
+          'Cannot change to an inactive plan',
+        )
+      }
+    }
+
+    const updatedSubscription = await this.subscriptionRepository.update(
+      id,
+      data,
+    )
+
+    // Clear subscription cache
+    await this.clearSubscriptionCache(id, updatedSubscription.userId)
+
+    return updatedSubscription
+  }
+
+  async cancelSubscription(
+    id: string,
+    cancelAtPeriodEnd: boolean = true,
+  ): Promise<SubscriptionDomain> {
+    logger.info('Cancelling subscription', { id, cancelAtPeriodEnd })
+
+    const subscription = await this.getSubscriptionById(id)
+
+    if (subscription.status === 'CANCELED') {
+      throw ErrorFactory.businessRuleViolation(
+        'Subscription already cancelled',
+        'This subscription is already cancelled',
+      )
+    }
+
+    // Update subscription record (Stripe cancellation handled by Payment Service)
+    const updatedSubscription = await this.subscriptionRepository.update(id, {
+      cancelAtPeriodEnd,
+      cancelledAt: cancelAtPeriodEnd ? undefined : new Date(),
+      status: cancelAtPeriodEnd ? subscription.status : 'CANCELED',
+    })
+
+    // Clear subscription cache
+    await this.clearSubscriptionCache(id, updatedSubscription.userId)
+
+    // Send cancellation notification
+    if (this.communicationClient) {
+      await this.sendSubscriptionCancelledEmail(
+        updatedSubscription.userId,
+        updatedSubscription,
+        cancelAtPeriodEnd,
+      )
+    }
+
+    return updatedSubscription
+  }
+
+  async reactivateSubscription(id: string): Promise<SubscriptionDomain> {
+    logger.info('Reactivating subscription', { id })
+
+    const subscription = await this.getSubscriptionById(id)
+
+    if (!subscription.cancelAtPeriodEnd) {
+      throw ErrorFactory.businessRuleViolation(
+        'Subscription not scheduled for cancellation',
+        'This subscription is not scheduled for cancellation',
+      )
+    }
+
+    // Update subscription record (Stripe reactivation handled by Payment Service)
+    const updatedSubscription = await this.subscriptionRepository.update(id, {
+      cancelAtPeriodEnd: false,
+      cancelledAt: undefined,
+    })
+
+    // Clear subscription cache
+    await this.clearSubscriptionCache(id, updatedSubscription.userId)
+
+    return updatedSubscription
+  }
+
+  async createSubscriptionFromWebhook(
+    data: CreateSubscriptionFromWebhookDTO,
+  ): Promise<SubscriptionDomain> {
+    logger.info('Creating subscription from webhook', {
+      userId: data.userId,
+      planId: data.planId,
+      stripeSubscriptionId: data.stripeSubscriptionId,
+    })
+
+    // Get the plan details
+    const plan = await this.planRepository.findById(data.planId)
+
+    if (!plan) {
+      throw ErrorFactory.resourceNotFound('SubscriptionPlan', data.planId)
+    }
+
+    try {
+      // Create subscription record from webhook data
+      const subscription = await this.subscriptionRepository.create({
+        userId: data.userId,
+        planId: data.planId,
+        status: data.status,
+        currentPeriodStart: data.currentPeriodStart,
+        currentPeriodEnd: data.currentPeriodEnd,
+        trialEnd: data.trialEnd,
+        stripeSubscriptionId: data.stripeSubscriptionId,
+        stripeCustomerId: data.stripeCustomerId,
+      })
+
+      // Process initial credits if active
+      if (subscription.status === 'ACTIVE') {
+        await this.creditProcessingService.processSubscriptionCredits(
+          subscription,
+          plan.creditsAmount,
+        )
+      }
+
+      // Clear user subscription cache
+      await this.clearUserSubscriptionCache(data.userId)
+
+      logger.info('Successfully created subscription from webhook', {
+        subscriptionId: subscription.id,
+        userId: data.userId,
+        planId: data.planId,
+      })
+
+      // Send welcome email notification
+      if (this.communicationClient && subscription.status === 'ACTIVE') {
+        await this.sendSubscriptionCreatedEmail(data.userId, subscription, plan)
+      }
+
+      return subscription
+    } catch (error) {
+      logger.error('Failed to create subscription from webhook', {
+        userId: data.userId,
+        error,
+      })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  async processSubscriptionCredits(
+    subscriptionId: string,
+  ): Promise<{ subscription: SubscriptionDomain; credits: CreditsDomain }> {
+    logger.info('Processing subscription credits', { subscriptionId })
+
+    const subscription =
+      await this.subscriptionRepository.findByIdWithPlan(subscriptionId)
+
+    if (!subscription) {
+      throw ErrorFactory.resourceNotFound('Subscription', subscriptionId)
+    }
+
+    if (!subscription.plan) {
+      throw ErrorFactory.businessRuleViolation(
+        'Subscription has no plan',
+        'Cannot process credits for subscription without a plan',
+      )
+    }
+
+    if (!this.creditProcessingService.shouldProcessCredits(subscription)) {
+      throw ErrorFactory.businessRuleViolation(
+        'Credits already processed',
+        'Credits have already been processed for this billing period',
+      )
+    }
+
+    const result =
+      await this.creditProcessingService.processSubscriptionCredits(
+        subscription,
+        subscription.plan.creditsAmount,
+      )
+
+    logger.info('Successfully processed subscription credits', {
+      subscriptionId,
+      creditsAdded: subscription.plan.creditsAmount,
+    })
+
+    return result
+  }
+
+  async processAllActiveSubscriptions(): Promise<number> {
+    logger.info('Processing all active subscriptions')
+
+    const activeSubscriptions =
+      await this.subscriptionRepository.findAllActive()
+
+    let processedCount = 0
+
+    for (const subscription of activeSubscriptions) {
+      try {
+        if (this.creditProcessingService.shouldProcessCredits(subscription)) {
+          const subscriptionWithPlan =
+            await this.subscriptionRepository.findByIdWithPlan(subscription.id)
+
+          if (subscriptionWithPlan?.plan) {
+            await this.creditProcessingService.processSubscriptionCredits(
+              subscription,
+              subscriptionWithPlan.plan.creditsAmount,
+            )
+            processedCount++
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to process subscription', {
+          subscriptionId: subscription.id,
+          error,
+        })
+      }
+    }
+
+    logger.info('Completed processing active subscriptions', { processedCount })
+
+    return processedCount
+  }
+
+  private async clearSubscriptionCache(
+    subscriptionId: string,
+    userId: string,
+  ): Promise<void> {
+    try {
+      await this.cache.del(`subscription:${subscriptionId}`)
+      await this.cache.del(`user-subscription:${userId}`)
+      await this.cache.delPattern('subscriptions:*')
+    } catch (error) {
+      logger.error('Failed to clear subscription cache', error)
+    }
+  }
+
+  private async clearUserSubscriptionCache(userId: string): Promise<void> {
+    try {
+      await this.cache.del(`user-subscription:${userId}`)
+      await this.cache.delPattern('subscriptions:*')
+    } catch (error) {
+      logger.error('Failed to clear user subscription cache', error)
+    }
+  }
+
+  private async sendSubscriptionCreatedEmail(
+    userId: string,
+    subscription: SubscriptionDomain,
+    plan: SubscriptionPlanDomain,
+  ): Promise<void> {
+    if (!this.communicationClient) return
+
+    try {
+      await this.communicationClient.sendTransactionalEmail({
+        userId: userId as any,
+        templateKey: 'SUBSCRIPTION_ACTIVATED',
+        variables: {
+          planName: plan.name,
+          price: `$${(plan.price / 100).toFixed(2)}`,
+          interval: plan.interval,
+          creditsAmount: plan.creditsAmount.toString(),
+          features: plan.features.join(', '),
+          nextBillingDate: subscription.currentPeriodEnd
+            ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
+            : 'N/A',
+        },
+        trackOpens: true,
+        trackClicks: true,
+      })
+
+      logger.info('Subscription created email sent', {
+        userId,
+        subscriptionId: subscription.id,
+      })
+    } catch (error) {
+      logger.error('Failed to send subscription created email', {
+        userId,
+        subscriptionId: subscription.id,
+        error,
+      })
+      // Don't throw - email failure shouldn't break subscription creation
+    }
+  }
+
+  private async sendSubscriptionCancelledEmail(
+    userId: string,
+    subscription: SubscriptionDomain,
+    cancelAtPeriodEnd: boolean,
+  ): Promise<void> {
+    if (!this.communicationClient) return
+
+    try {
+      await this.communicationClient.sendTransactionalEmail({
+        userId: userId as any,
+        templateKey: 'SUBSCRIPTION_EXPIRED',
+        variables: {
+          planType: subscription.planType,
+          cancelAtPeriodEnd: cancelAtPeriodEnd.toString(),
+          endDate: subscription.currentPeriodEnd
+            ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
+            : 'Immediately',
+        },
+        trackOpens: true,
+        trackClicks: true,
+      })
+
+      logger.info('Subscription cancelled email sent', {
+        userId,
+        subscriptionId: subscription.id,
+      })
+    } catch (error) {
+      logger.error('Failed to send subscription cancelled email', {
+        userId,
+        subscriptionId: subscription.id,
+        error,
+      })
+      // Don't throw - email failure shouldn't break subscription cancellation
+    }
+  }
+}

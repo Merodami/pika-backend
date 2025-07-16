@@ -1,0 +1,68 @@
+/// Subscription models
+model SubscriptionPlan {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String   @unique
+  description      String?
+  price            Float    // Price per billing period
+  currency         String   @default("usd")
+  interval         String   // "day" | "week" | "month" | "year"
+  intervalCount    Int      @default(1) @map("interval_count")
+  creditsAmount    Int      @map("credits_amount") // Credits granted per billing period
+  trialPeriodDays  Int?     @map("trial_period_days")
+  features         String[] // Array of feature descriptions
+  isActive         Boolean  @default(true) @map("is_active")
+  metadata         Json?    // Additional configuration
+  stripeProductId  String?  @unique @map("stripe_product_id")
+  stripePriceId    String?  @unique @map("stripe_price_id")
+  // Gym-specific membership fields
+  membershipType   String?  @map("membership_type") // "FULL_ACCESS" | "OFF_PEAK" | null for non-gym plans
+  membershipPackage String? @map("membership_package") // "LIMITED" | "STANDARD" | "UNLIMITED" | null
+  gymAccessTimes   Json?    @map("gym_access_times") // Time restrictions for OFF_PEAK access
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+
+  // Relations
+  subscriptions Subscription[]
+
+  @@index([isActive])
+  @@index([interval])
+  @@index([membershipType])
+  @@index([membershipPackage])
+  @@map("subscription_plans")
+  @@schema("payments")
+}
+
+// Update existing Subscription model to add relation to plan
+model Subscription {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId               String    @map("user_id") @db.Uuid
+  planId               String?   @map("plan_id") @db.Uuid // New field
+  planType             String    @default("basic") @map("plan_type") // Keep for backward compatibility
+  status               String    @default("active") // "active" | "trialing" | "past_due" | "canceled" | "unpaid"
+  billingInterval      String    @default("monthly") @map("billing_interval") // Keep for backward compatibility
+  currentPeriodStart   DateTime? @map("current_period_start") @db.Timestamptz(6)
+  currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
+  trialEnd             DateTime? @map("trial_end") @db.Timestamptz(6)
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  stripeSubscriptionId String?   @unique @map("stripe_subscription_id")
+  stripePriceId        String?   @map("stripe_price_id")
+  startDate            DateTime? @map("start_date") @db.Timestamptz(6)
+  endDate              DateTime? @map("end_date") @db.Timestamptz(6)
+  cancelledAt          DateTime? @map("cancelled_at") @db.Timestamptz(6)
+  lastProcessedAt      DateTime? @map("last_processed_at") @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+
+  // Relations
+  user User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan? @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([stripeSubscriptionId])
+  @@index([planType])
+  @@index([planId])
+  @@map("subscriptions")
+  @@schema("payments")
+}

@@ -1,0 +1,59 @@
+{
+  "name": "@pika/api-gateway",
+  "version": "0.0.0",
+  "private": true,
+  "description": "API Gateway with rate limiting and common middleware for services",
+  "author": "Pika",
+  "type": "module",
+  "main": "dist/api/server.js",
+  "types": "dist/api/server.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/api/server.js",
+      "types": "./dist/api/server.d.ts"
+    },
+    "./server": {
+      "import": "./dist/api/server.js",
+      "types": "./dist/api/server.d.ts"
+    }
+  },
+  "dependencies": {
+    "@pikarkspace:^",
+    "@pikant": "workspace:^",
+    "@pikaorkspace:^",
+    "@pikaworkspace:^",
+    "@pika"workspace:^",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5",
+    "zod": "^3.25.76",
+    "zod-validation-error": "^3.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.13",
+    "typescript": "^5.8.3"
+  },
+  "depcheck": {
+    "ignore": [
+      "nx",
+      "ts-node",
+      "tsconfig-paths"
+    ],
+    "parsers": {
+      "**/*.ts": "typescript"
+    },
+    "detectors": [
+      "requireCallExpression",
+      "importDeclaration",
+      "typescriptImportEqualsDeclaration"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pika/pika.git",
+    "directory": "packages/api-gateway"
+  },
+  "homepage": "https://github.com/pikaipikae/main/packages/api-gateway",
+  "bugs": {
+    "url": "https://github.com/pikaipikaues"
+  }
+}

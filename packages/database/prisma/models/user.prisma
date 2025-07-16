@@ -1,0 +1,57 @@
+/// Users
+model User {
+  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email             String            @unique
+  emailVerified     Boolean           @default(false) @map("email_verified")
+  password          String?
+  firstName         String            @map("first_name") @db.VarChar(100)
+  lastName          String            @map("last_name") @db.VarChar(100)
+  phoneNumber       String?           @map("phone_number") @db.VarChar(50)
+  phoneVerified     Boolean           @default(false) @map("phone_verified")
+  avatarUrl         String?           @map("avatar_url") @db.VarChar(1000)
+  role              UserRole          @default(ADMIN)
+  status            UserStatus        @default(ACTIVE)
+  lastLoginAt       DateTime?         @map("last_login_at") @db.Timestamptz(6)
+  createdAt         DateTime?         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime?         @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  deletedAt         DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  
+  // Additional fields
+  dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
+  stripeUserId      String?           @map("stripe_user_id") @db.VarChar(255)
+
+  // Relations
+  addresses         Address[]
+  problems          Problem[]
+  
+  // Enhanced authentication relations
+  identities        UserIdentity?
+  authMethods       UserAuthMethod[]
+  devices           UserDevice[]
+  mfaSettings       UserMfaSettings?
+  securityEvents    SecurityEvent[]
+  
+  // Payment relations
+  credits           Credits?
+  creditsHistory    CreditsHistory[]
+  promoCodeUsages   PromoCodeUsage[]
+  membership        Membership?
+  subscriptions     Subscription[]
+  
+  // Communication relations
+  notifications     Notification[]
+  communicationLogs CommunicationLog[]
+  
+  // File Storage relations
+  fileStorageLogs   FileStorageLog[]
+  
+  // Support relations
+  supportComments   SupportComment[]
+  assignedProblems  Problem[]         @relation("AssignedProblems")
+
+  @@index([email])
+  @@index([phoneNumber])
+  @@index([deletedAt])
+  @@map("users")
+  @@schema("users")
+}

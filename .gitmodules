@@ -1,0 +1,3 @@
+[submodule "api-microservices-sdk"]
+	path = api-microservices-sdk
+	url = git@github.com:pika-sixty/api-microservices-sdk.git

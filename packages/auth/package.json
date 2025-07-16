@@ -1,0 +1,34 @@
+{
+  "name": "@pika/auth",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Authentication utilities and JWT management for Pika platform",
+  "author": "Pika",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "@pikant": "workspace:^",
+    "@pikaworkspace:^",
+    "@pikarkspace:^",
+    "@pika"workspace:^",
+    "@pikaworkspace:^",
+    "@types/bcrypt": "^5.0.2",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pika/pika.git",
+    "directory": "packages/auth"
+  },
+  "homepage": "https://github.com/pikaipikae/main/packages/auth",
+  "bugs": {
+    "url": "https://github.com/pikaipikaues"
+  }
+}

@@ -1,0 +1,459 @@
+import '../../../types/express.js'
+
+import { JwtTokenService, TokenValidationResult } from '@pika/auth'
+import {
+  JWT_ACCESS_EXPIRY,
+  JWT_AUDIENCE,
+  JWT_ISSUER,
+  JWT_REFRESH_EXPIRY,
+  NODE_ENV,
+  SKIP_AUTH,
+} from '@pikant'
+import {
+  logger,
+  NotAuthenticatedError,
+  NotAuthorizedError,
+} from '@pika
+import { UserRole } from '@pika
+import { NextFunction, Request, RequestHandler, Response } from 'express'
+
+import { ApiTokenOptions } from '../../../domain/types/server.js'
+
+/**
+ * Map user roles to permissions for RBAC
+ */
+function mapRoleToPermissions(role: UserRole): string[] {
+  switch (role) {
+    case UserRole.ADMIN:
+      return [
+        // User management
+        'users:read',
+        'users:write',
+        'users:delete',
+        // Service management
+        'services:read',
+        'services:write',
+        'services:delete',
+        // Admin specific
+        'admin:dashboard',
+        'admin:settings',
+        'admin:users',
+        'admin:system',
+        // Credits management
+        'credits:admin',
+        'credits:manage_all',
+        // Payment management
+        'payments:admin',
+        'payments:manage_all',
+      ]
+    case UserRole.MEMBER:
+      return [
+        // Basic user permissions
+        'users:read_own',
+        'users:update_own',
+        // Credits permissions
+        'credits:view_own',
+        'credits:use_own',
+        'credits:transfer_own',
+        // Payment permissions
+        'payments:own',
+        'payments:purchase',
+        // Member specific
+        'bookings:create',
+        'bookings:view_own',
+        'sessions:book',
+      ]
+    case UserRole.PROFESSIONAL:
+      return [
+        // Professional extends member permissions
+        'users:read_own',
+        'users:update_own',
+        // Credits permissions (enhanced for professionals)
+        'credits:view_own',
+        'credits:use_own',
+        'credits:transfer_own',
+        'credits:professional_rates',
+        // Payment permissions
+        'payments:own',
+        'payments:purchase',
+        'payments:professional',
+        // Professional specific
+        'sessions:conduct',
+        'sessions:manage_own',
+        'clients:view_assigned',
+        'content:create',
+        'analytics:view_own',
+      ]
+    default:
+      return []
+  }
+}
+
+/**
+ * Enhanced API token authentication middleware for Express.
+ * Delegates JWT token validation to @pikaice (single source of truth).
+ * Provides correlation IDs, security headers, and standardized user context.
+ */
+export function authMiddleware(options: ApiTokenOptions): RequestHandler {
+  const { secret, headerName = 'Authorization', excludePaths = [] } = options
+
+  // Initialize JWT service from @pikagle source of truth)
+  const jwtService = new JwtTokenService(
+    secret,
+    JWT_ACCESS_EXPIRY,
+    JWT_REFRESH_EXPIRY,
+    JWT_ISSUER,
+    JWT_AUDIENCE,
+    options.cacheService, // Optional Redis service for token blacklisting
+  )
+
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Add correlation ID for request tracing
+      addCorrelationId(req)
+
+      // Skip authentication for testing when explicitly requested
+      if (NODE_ENV === 'test' && SKIP_AUTH === true) {
+        addSecurityHeaders(res)
+
+        return next()
+      }
+
+      // Skip authentication for excluded paths
+      // Check both req.path and req.originalUrl for compatibility
+      const pathExcluded = isExcludedPath(req.path, excludePaths)
+      const originalUrlExcluded = isExcludedPath(req.originalUrl, excludePaths)
+
+      if (pathExcluded || originalUrlExcluded) {
+        addSecurityHeaders(res)
+
+        return next()
+      }
+
+      // Skip JWT authentication if this is a service-to-service request
+      const serviceApiKey = req.headers['x-api-key'] as string
+      const serviceName = req.headers['x-service-name'] as string
+
+      if (serviceApiKey && serviceName) {
+        addSecurityHeaders(res)
+
+        return next()
+      }
+
+      // Extract and validate authorization header
+      const authHeader = req.headers[headerName.toLowerCase()]
+
+      if (!authHeader || typeof authHeader !== 'string') {
+        logger.warn('Missing authorization header', {
+          correlationId: req.correlationId,
+          url: req.url,
+          method: req.method,
+        })
+
+        throw new NotAuthenticatedError(
+          'Authentication required. Please provide a valid Bearer token.',
+          {
+            source: 'authMiddleware',
+            correlationId: req.correlationId,
+          },
+        )
+      }
+
+      // Validate Bearer token format
+      const token = extractBearerToken(authHeader)
+
+      if (!token) {
+        logger.warn('Invalid authorization header format', {
+          correlationId: req.correlationId,
+          authHeader: authHeader.substring(0, 20) + '...', // Log partial header for debugging
+        })
+
+        throw new NotAuthenticatedError(
+          'Invalid token format. Please provide a valid Bearer token.',
+          {
+            source: 'authMiddleware',
+            correlationId: req.correlationId,
+          },
+        )
+      }
+
+      // Delegate token verification to @pikaice (single source of truth)
+      const validation: TokenValidationResult = await jwtService.verifyToken(
+        token,
+        'access',
+      )
+
+      if (!validation.isValid || !validation.payload) {
+        logger.warn('Token validation failed', {
+          correlationId: req.correlationId,
+          error: validation.error,
+        })
+
+        throw new NotAuthenticatedError(
+          validation.error || 'Invalid token. Please sign in again.',
+          {
+            source: 'authMiddleware',
+            correlationId: req.correlationId,
+          },
+        )
+      }
+
+      const { payload } = validation
+
+      // Map role to permissions for RBAC
+      const permissions = mapRoleToPermissions(payload.role)
+
+      // Create user context matching Express Request.user interface
+      const user = {
+        id: payload.userId,
+        email: payload.email,
+        role: payload.role,
+        type: payload.role?.toUpperCase(),
+        permissions,
+        sessionId: undefined, // Will be added when session management is implemented
+        issuedAt: payload.iat ? new Date(payload.iat * 1000) : undefined,
+        expiresAt: payload.exp ? new Date(payload.exp * 1000) : undefined,
+      }
+
+      // Attach user context to request
+      req.user = user
+
+      // Add user context headers for downstream services
+      addUserContextHeaders(req, user)
+
+      logger.debug('Authentication successful', {
+        correlationId: req.correlationId,
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      })
+
+      // Add security headers
+      addSecurityHeaders(res)
+
+      // Add correlation ID to response headers
+      if (req.correlationId) {
+        res.setHeader('X-Correlation-ID', req.correlationId)
+      }
+
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+}
+
+/**
+ * Check if the current path should be excluded from authentication
+ */
+function isExcludedPath(url: string, excludePaths: string[]): boolean {
+  return excludePaths.some((pattern) => {
+    const exactMatch = pattern === url
+    const wildcardMatch =
+      pattern.endsWith('*') && url.startsWith(pattern.slice(0, -1))
+
+    return exactMatch || wildcardMatch
+  })
+}
+
+/**
+ * Extract Bearer token from Authorization header
+ */
+function extractBearerToken(authHeader: string): string | null {
+  const [scheme, token] = authHeader.split(' ')
+
+  if (scheme !== 'Bearer' || !token) {
+    return null
+  }
+
+  return token
+}
+
+/**
+ * Add correlation ID for request tracing
+ */
+function addCorrelationId(request: Request): void {
+  // Use existing correlation ID from headers or generate new one
+  const correlationId =
+    (request.headers['x-correlation-id'] as string) ||
+    `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+
+  request.correlationId = correlationId
+}
+
+/**
+ * Add user context headers for downstream services
+ */
+function addUserContextHeaders(
+  request: Request,
+  user: NonNullable<Request['user']>,
+): void {
+  // Add user context headers that backend services can use
+  request.headers['x-user-id'] = user.id
+  request.headers['x-user-email'] = user.email
+  request.headers['x-user-role'] = user.role
+
+  if (user.sessionId) {
+    request.headers['x-session-id'] = user.sessionId
+  }
+
+  if (request.correlationId) {
+    request.headers['x-correlation-id'] = request.correlationId
+  }
+}
+
+/**
+ * Add security headers to response
+ */
+function addSecurityHeaders(reply: Response): void {
+  reply.setHeader('X-Content-Type-Options', 'nosniff')
+  reply.setHeader('X-Frame-Options', 'DENY')
+  reply.setHeader('X-XSS-Protection', '1; mode=block')
+  reply.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+  reply.setHeader(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=()',
+  )
+}
+
+/**
+ * Authorization helper functions for route protection
+ */
+
+/**
+ * Require any authenticated user
+ */
+export function requireAuth(): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+    next()
+  }
+}
+
+/**
+ * Require admin role
+ */
+export function requireAdmin(): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    if (req.user.role !== UserRole.ADMIN) {
+      return next(new NotAuthorizedError('Admin access required'))
+    }
+
+    next()
+  }
+}
+
+/**
+ * Require member role (includes professional)
+ */
+export function requireMember(): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    if (
+      req.user.role !== UserRole.MEMBER &&
+      req.user.role !== UserRole.PROFESSIONAL
+    ) {
+      return next(new NotAuthorizedError('Member access required'))
+    }
+
+    next()
+  }
+}
+
+/**
+ * Require professional role
+ */
+export function requireProfessional(): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    if (req.user.role !== UserRole.PROFESSIONAL) {
+      return next(new NotAuthorizedError('Professional access required'))
+    }
+
+    next()
+  }
+}
+
+/**
+ * Require specific roles (any of the provided roles)
+ */
+export function requireRoles(...roles: UserRole[]): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new NotAuthorizedError(
+          `Access denied. Required roles: ${roles.join(', ')}`,
+        ),
+      )
+    }
+
+    next()
+  }
+}
+
+/**
+ * Require user to own the resource (check userId parameter matches authenticated user)
+ */
+export function requireOwnership(): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    const userId = req.params.userId || req.params.id
+
+    if (!userId) {
+      return next(new NotAuthorizedError('User ID parameter is required'))
+    }
+
+    if (req.user.id !== userId && req.user.role !== UserRole.ADMIN) {
+      return next(
+        new NotAuthorizedError('You can only access your own resources'),
+      )
+    }
+
+    next()
+  }
+}
+
+/**
+ * Require specific permissions
+ */
+export function requirePermissions(...permissions: string[]): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    const userPermissions = req.user.permissions || []
+    const hasAllPermissions = permissions.every((permission) =>
+      userPermissions.includes(permission),
+    )
+
+    if (!hasAllPermissions) {
+      return next(
+        new NotAuthorizedError(
+          `Missing required permissions: ${permissions.join(', ')}`,
+        ),
+      )
+    }
+
+    next()
+  }
+}

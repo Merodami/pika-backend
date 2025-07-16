@@ -1,0 +1,474 @@
+import {
+  ChangePasswordRequest,
+  ForgotPasswordRequest,
+  IntrospectRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+  RevokeTokenRequest,
+  TokenRequest,
+  VerifyEmailRequest,
+} from '@pika/api/public'
+import { RequestContext } from '@pika
+import { Cache, httpRequestKeyGenerator } from '@pika
+import { UserMapper } from '@pika
+import { ErrorFactory } from '@pika
+import { UserRole } from '@pika
+import type { NextFunction, Request, Response } from 'express'
+
+import { AuthMapper } from '../mappers/AuthMapper.js'
+import type { IAuthService } from '../services/AuthService.js'
+
+/**
+ * Handles authentication-related operations
+ */
+export class AuthController {
+  constructor(private readonly authService: IAuthService) {
+    // Bind all methods to preserve 'this' context
+    this.register = this.register.bind(this)
+    this.forgotPassword = this.forgotPassword.bind(this)
+    this.resetPassword = this.resetPassword.bind(this)
+    this.verifyEmail = this.verifyEmail.bind(this)
+    this.resendVerificationEmail = this.resendVerificationEmail.bind(this)
+    this.changePassword = this.changePassword.bind(this)
+    // OAuth endpoints
+    this.token = this.token.bind(this)
+    this.introspect = this.introspect.bind(this)
+    this.revoke = this.revoke.bind(this)
+    this.userinfo = this.userinfo.bind(this)
+  }
+
+  /**
+   * POST /auth/register
+   * Register new user account
+   */
+  async register(
+    request: Request<{}, {}, RegisterRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const {
+        email,
+        password,
+        firstName,
+        lastName,
+        phoneNumber,
+        role,
+        dateOfBirth,
+        description,
+        specialties,
+        acceptTerms,
+        marketingConsent,
+      } = request.body
+
+      const result = await this.authService.register({
+        email,
+        password,
+        firstName,
+        lastName,
+        phoneNumber,
+        role: role as UserRole, // Cast API role to UserRole enum
+        dateOfBirth,
+        description,
+        specialties,
+        acceptTerms,
+        marketingConsent,
+      })
+
+      // If email verification is required, return success message without tokens
+      if (!result.accessToken || !result.refreshToken) {
+        response.status(201).json({
+          message:
+            result.message ||
+            'Registration successful. Please check your email to verify your account.',
+          user: UserMapper.toDTO(result.user),
+        })
+      } else {
+        const dto = AuthMapper.toAuthResponse(
+          result.user,
+          result.accessToken,
+          result.refreshToken,
+        )
+
+        response.status(201).json(dto)
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /auth/forgot-password
+   * Send password reset email
+   */
+  async forgotPassword(
+    request: Request<{}, {}, ForgotPasswordRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { email } = request.body
+
+      const result = await this.authService.forgotPassword(email)
+
+      response.json({
+        message:
+          result.message ||
+          'If an account exists with this email, a password reset link has been sent.',
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /auth/reset-password
+   * Reset password with token
+   */
+  async resetPassword(
+    request: Request<{}, {}, ResetPasswordRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { token, newPassword } = request.body
+
+      const result = await this.authService.resetPassword(token, newPassword)
+
+      if (!result.success) {
+        throw ErrorFactory.badRequest(
+          result.message || 'Failed to reset password',
+        )
+      }
+
+      response.json({
+        message: result.message || 'Password reset successfully',
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /auth/verify-email/:token
+   * Verify email with token
+   */
+  async verifyEmail(
+    request: Request<VerifyEmailRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { token } = request.params
+
+      const result = await this.authService.verifyEmail(token)
+
+      if (!result.success) {
+        throw ErrorFactory.badRequest('Invalid or expired verification token')
+      }
+
+      response.json({
+        message: 'Email verified successfully',
+        userId: result.userId,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /auth/resend-verification
+   * Resend email verification
+   */
+  async resendVerificationEmail(
+    request: Request<{}, {}, ForgotPasswordRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { email } = request.body
+
+      const result = await this.authService.resendVerificationEmail(email)
+
+      response.json({
+        message:
+          result.message ||
+          'If an account exists with this email, a verification link has been sent.',
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /auth/change-password
+   * Change user password
+   */
+  async changePassword(
+    request: Request<{}, {}, ChangePasswordRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { currentPassword, newPassword } = request.body
+
+      // Get user from request context (set by auth middleware)
+      const context = RequestContext.getContext(request)
+      const userId = context.userId
+
+      const result = await this.authService.changePassword(
+        userId,
+        currentPassword,
+        newPassword,
+      )
+
+      if (!result.success) {
+        throw ErrorFactory.badRequest('Failed to change password')
+      }
+
+      response.json({
+        message: 'Password changed successfully',
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  // ============= OAuth 2.0 Compatible Endpoints =============
+
+  /**
+   * POST /auth/token
+   * OAuth 2.0 compatible token endpoint
+   */
+  async token(
+    request: Request<{}, {}, TokenRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { grantType } = request.body
+
+      if (grantType === 'password') {
+        const { username, password } = request.body
+        const result = await this.authService.login(username, password)
+
+        // Transform to OAuth response format
+        const oauthResponse = {
+          accessToken: result.accessToken,
+          tokenType: 'Bearer' as const,
+          expiresIn: 900, // 15 minutes
+          refreshToken: result.refreshToken,
+          scope: 'read write',
+          user: AuthMapper.toUserResponse(result.user),
+        }
+
+        response.json(oauthResponse)
+      } else if (grantType === 'refreshToken') {
+        const { refreshToken } = request.body
+        const result = await this.authService.refreshToken(refreshToken)
+
+        const oauthResponse = {
+          accessToken: result.accessToken,
+          tokenType: 'Bearer' as const,
+          expiresIn: 900, // 15 minutes
+          refreshToken: result.refreshToken,
+          scope: 'read write',
+        }
+
+        response.json(oauthResponse)
+      } else {
+        throw ErrorFactory.badRequest('Unsupported grant type')
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /auth/introspect
+   * Validate and get information about a token
+   */
+  async introspect(
+    request: Request<{}, {}, IntrospectRequest>,
+    response: Response,
+  ): Promise<void> {
+    try {
+      const { token } = request.body
+
+      const result = await this.authService.introspectToken(token)
+
+      if (!result.valid) {
+        response.json({ active: false })
+
+        return
+      }
+
+      response.json({
+        active: true,
+        scope: 'read write',
+        username: result.payload?.email,
+        tokenType: 'Bearer' as const,
+        exp: result.payload?.exp,
+        iat: result.payload?.iat,
+        sub: result.payload?.userId,
+        userId: result.payload?.userId,
+        userEmail: result.payload?.email,
+        userRole: result.payload?.role,
+      })
+    } catch {
+      // For introspection, always return active: false for invalid tokens
+      response.json({ active: false })
+    }
+  }
+
+  /**
+   * POST /auth/revoke
+   * Revoke a token
+   */
+  async revoke(
+    request: Request<{}, {}, RevokeTokenRequest>,
+    response: Response,
+  ): Promise<void> {
+    try {
+      const { token, allDevices } = request.body
+
+      if (allDevices) {
+        // For allDevices, we need to extract userId from the token itself
+        // since auth middleware is bypassed for /auth/* endpoints
+        const introspection = await this.authService.introspectToken(token)
+
+        if (introspection.valid && introspection.payload) {
+          await this.authService.logout(introspection.payload.userId, token)
+
+          response.json({
+            success: true,
+            message: 'All tokens revoked successfully',
+          })
+        } else {
+          // Even if token is invalid, return success per OAuth spec
+          // But still honor the allDevices flag for consistent messaging
+          response.json({
+            success: true,
+            message: 'All tokens revoked successfully',
+          })
+        }
+      } else {
+        // Revoke specific token
+        await this.authService.revokeToken(token)
+
+        response.json({
+          success: true,
+          message: 'Token revoked successfully',
+        })
+      }
+    } catch {
+      // For revocation, always return success (OAuth 2.0 spec)
+      response.json({
+        success: true,
+        message: 'Token revoked successfully',
+      })
+    }
+  }
+
+  /**
+   * GET /auth/userinfo
+   * Get user information from access token
+   */
+  @Cache({
+    ttl: 300, // 5 minutes for user info
+    prefix: 'userinfo',
+    keyGenerator: httpRequestKeyGenerator,
+  })
+  async userinfo(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      // Extract token from Authorization header
+      const authHeader = request.headers.authorization
+
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        throw ErrorFactory.unauthorized(
+          'Missing or invalid authorization header',
+        )
+      }
+
+      const token = authHeader.substring(7) // Remove 'Bearer ' prefix
+
+      // Validate the token
+      const introspection = await this.authService.introspectToken(token)
+
+      if (!introspection.valid || !introspection.payload) {
+        throw ErrorFactory.unauthorized('Invalid or expired token')
+      }
+
+      const userId = introspection.payload.userId
+      const user = await this.authService.getUserInfo(userId)
+
+      // Get permissions based on user role
+      const permissions = this.mapRoleToPermissions(user.role)
+
+      const userInfo = {
+        id: user.id,
+        email: user.email,
+        emailVerified: user.emailVerified,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        fullName: `${user.firstName} ${user.lastName}`,
+        profilePicture: user.profilePicture,
+        role: user.role,
+        permissions,
+        locale: user.language || 'en-US',
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      }
+
+      response.json(userInfo)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Map user roles to permissions for RBAC
+   */
+  private mapRoleToPermissions(role: UserRole): string[] {
+    switch (role) {
+      case UserRole.ADMIN:
+        return [
+          // User management
+          'users:read',
+          'users:write',
+          'users:delete',
+          // Service management
+          'services:read',
+          'services:write',
+          'services:delete',
+          // Admin specific
+          'admin:dashboard',
+          'admin:settings',
+          'admin:users',
+          'admin:system',
+          // Credits management
+          'credits:admin',
+          'credits:manage_all',
+          // Payment management
+          'payments:admin',
+          'payments:manage_all',
+        ]
+      case UserRole.MEMBER:
+        return [
+          'users:read',
+          'users:write:own',
+          'services:read',
+          'credits:read:own',
+          'credits:write:own',
+          'payments:read:own',
+          'payments:write:own',
+        ]
+      default:
+        return ['users:read:own']
+    }
+  }
+}

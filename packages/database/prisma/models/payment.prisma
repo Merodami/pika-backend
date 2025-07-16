@@ -1,0 +1,119 @@
+/// Payment and Credits models
+model Credits {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  amountDemand Int     @default(0) @map("amount_demand") // On-demand credits
+  amountSub   Int     @default(0) @map("amount_sub")    // Subscription credits (deprecated)
+  userId      String   @unique @map("user_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+
+  // Relations
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  history CreditsHistory[]
+
+  @@map("credits")
+  @@schema("payments")
+}
+
+model CreditsHistory {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  creditsId   String   @map("credits_id") @db.Uuid
+  amount      Int      // Amount of credits (positive for increase, negative for decrease)
+  description String   // Description of the operation
+  operation   String   // "increase" | "decreased"
+  type        String   @default("demand") // "demand" | "subscription"
+  transactionId String? @map("transaction_id") // External payment/transaction reference
+  date        DateTime @default(now()) @db.Timestamptz(6)
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credits Credits @relation(fields: [creditsId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([creditsId])
+  @@index([date])
+  @@map("credits_history")
+  @@schema("payments")
+}
+
+model CreditsPack {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type      String    // Package type/name
+  amount    Int       // Number of credits in pack
+  frequency Int       // Usage frequency/validity
+  price     Float     // Price in currency (pounds/dollars)
+  active    Boolean   @default(true) // Whether pack is available for purchase
+  createdBy String    @map("created_by") @db.Uuid // Admin who created it
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @map("updated_at") @db.Timestamptz(6) @updatedAt
+
+  @@index([active])
+  @@map("credits_packs")
+  @@schema("payments")
+}
+
+model PromoCode {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code           String    @unique // The actual promo code
+  discount       Int       // Discount percentage (0-100)
+  active         Boolean   @default(true)
+  allowedTimes   Int       @map("allowed_times") // Total usage limit
+  amountAvailable Int      @map("amount_available") // Remaining usage count
+  expirationDate DateTime  @map("expiration_date") @db.Timestamptz(6)
+  createdBy      String    @map("created_by") @db.Uuid // Admin who created it
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  cancelledAt    DateTime? @map("cancelled_at") @db.Timestamptz(6)
+
+  // Relations
+  usages PromoCodeUsage[]
+
+  @@index([code])
+  @@index([active])
+  @@index([expirationDate])
+  @@map("promo_codes")
+  @@schema("payments")
+}
+
+model PromoCodeUsage {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  promoCodeId String   @map("promo_code_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  transactionId String? @map("transaction_id") // Reference to payment transaction
+  usedAt      DateTime @default(now()) @map("used_at") @db.Timestamptz(6)
+
+  // Relations
+  promoCode PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([promoCodeId])
+  @@index([userId])
+  @@map("promo_code_usages")
+  @@schema("payments")
+}
+
+model Membership {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                String    @unique @map("user_id") @db.Uuid
+  stripeCustomerId      String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId  String?   @map("stripe_subscription_id")
+  active                Boolean   @default(true)
+  subscriptionStatus    String    @default("inactive") @map("subscription_status") // "active" | "inactive" | "cancelled" | "past_due" | "unpaid"
+  planType              String    @default("basic") @map("plan_type") // "basic" | "premium" | "professional"
+  subscriptionStartDate DateTime? @map("subscription_start_date") @db.Timestamptz(6)
+  subscriptionEndDate   DateTime? @map("subscription_end_date") @db.Timestamptz(6)
+  lastPaymentDate       DateTime? @map("last_payment_date") @db.Timestamptz(6)
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+  @@index([subscriptionStatus])
+  @@map("memberships")
+  @@schema("payments")
+}
+

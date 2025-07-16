@@ -1,0 +1,47 @@
+{
+  "name": "@pika/deployment",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./adapters": "./dist/adapters/index.js",
+    "./vercel": "./dist/adapters/vercel/index.js",
+    "./aws": "./dist/adapters/aws/index.js"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc && tsc-alias",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pikaateway": "workspace:^",
+    "@pika: "workspace:^",
+    "@pikaservice": "workspace:^",
+    "@pikanication": "workspace:^",
+    "@pikaonment": "workspace:^",
+    "@pika "workspace:^",
+    "@pika: "workspace:^",
+    "@pikant": "workspace:^",
+    "@pikaon": "workspace:^",
+    "@pikad": "workspace:^",
+    "@pikal": "workspace:^",
+    "@pikage": "workspace:^",
+    "@pikaription": "workspace:^",
+    "@pikart": "workspace:^",
+    "@pika": "workspace:^",
+    "@pika: "workspace:^",
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5",
+    "pino": "^9.7.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.13",
+    "@vitest/ui": "^3.2.4",
+    "rimraf": "^6.0.1",
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.8.3",
+    "vitest-mock-extended": "^3.1.0"
+  }
+}
