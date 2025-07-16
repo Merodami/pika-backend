@@ -2,8 +2,8 @@ import { vi } from 'vitest'
 
 // Unmock modules that might interfere with real server setup for integration tests
 vi.unmock('@pika/http')
-vi.unmock('@pika
-vi.unmock('@pika')
+vi.unmock('@pika/api')
+vi.unmock('@pika/redis')
 
 import {
   CreateBucketCommand,

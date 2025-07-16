@@ -20,12 +20,7 @@ export const ProcessInternalPaymentRequest = openapi(
     toGymId: GymId.optional(),
     amount: Money,
     currency: z.string().length(3).default('USD'),
-    type: z.enum([
-      'CREDIT_PURCHASE',
-      'SUBSCRIPTION',
-      'REFUND',
-      'TRANSFER',
-    ]),
+    type: z.enum(['CREDIT_PURCHASE', 'SUBSCRIPTION', 'REFUND', 'TRANSFER']),
     referenceId: z.string(),
     referenceType: z.string(),
     description: z.string(),

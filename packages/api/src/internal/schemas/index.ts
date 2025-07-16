@@ -12,10 +12,6 @@ export * from './payment/index.js'
 // Communication service operations
 export * from './communication/index.js'
 
-
-// Credit operations
-export * from './credit/index.js'
-
 // Service discovery operations
 export * from './discovery/index.js'
 

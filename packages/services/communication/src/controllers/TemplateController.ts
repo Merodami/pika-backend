@@ -1,9 +1,9 @@
 import type {
-    TemplateSearchParams as ApiTemplateSearchParams,
-    CreateTemplateRequest,
-    TemplateIdParam,
-    TestTemplateRequest,
-    UpdateTemplateRequest,
+  TemplateSearchParams as ApiTemplateSearchParams,
+  CreateTemplateRequest,
+  TemplateIdParam,
+  TestTemplateRequest,
+  UpdateTemplateRequest,
 } from '@pika/api/public'
 import type { CreateTemplateDTO, UpdateTemplateDTO } from '@pika/sdk'
 import { TemplateMapper } from '@pika/sdk'

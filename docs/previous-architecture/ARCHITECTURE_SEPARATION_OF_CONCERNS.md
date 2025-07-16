@@ -397,11 +397,11 @@ Clean architecture isn't just about organizing code—it's about creating mainta
 
 ## Quick Reference
 
-| Package            | Can Import                                | Cannot Import                                       |
-| ------------------ | ----------------------------------------- | --------------------------------------------------- |
-| `@pika | `@p@p@p@p@p@pika              | `@prisma/client`, services, `@pik@pik@pik@pik@pik@pika
-| `@pika | `@p@p@p@p@p@pikaik@pik@pik@pikaient`, `@pika/@pikae@pika @pika @pika@pika
-| `@pika | Nothing                                   | Everything                                          |
-| Controllers        | `@pika@p@p@p@p@pika Other services, repositories, `@prisma/client`      |
-| Services           | `@pikaown repository          | Other services directly, `@p@p@p@p@p@pika
-| Repositories       | `@prisma/client`, `@pika      | Services, controllers, `@p@p@p@p@p@pika |
+| Package      | Can Import                                                                | Cannot Import                                          |
+| ------------ | ------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `@pika       | `@p@p@p@p@p@pika                                                          | `@prisma/client`, services, `@pik@pik@pik@pik@pik@pika |
+| `@pika       | `@p@p@p@p@p@pikaik@pik@pik@pikaient`, `@pika/@pikae@pika @pika @pika@pika |
+| `@pika       | Nothing                                                                   | Everything                                             |
+| Controllers  | `@pika@p@p@p@p@pika Other services, repositories, `@prisma/client`        |
+| Services     | `@pikaown repository                                                      | Other services directly, `@p@p@p@p@p@pika              |
+| Repositories | `@prisma/client`, `@pika                                                  | Services, controllers, `@p@p@p@p@p@pika                |

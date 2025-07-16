@@ -187,10 +187,10 @@ yarn vitest packages/services/gym
 
 ### Infrastructure Services
 
-| Service    | Port | Credentials                |
-| ---------- | ---- | -------------------------- |
-| PostgreSQL | 6436 | `postgres:postgres@pika|
-| Redis      | 7381 | No authentication (dev)    |
+| Service    | Port | Credentials             |
+| ---------- | ---- | ----------------------- |
+| PostgreSQL | 6436 | `postgres:postgres@pika |
+| Redis      | 7381 | No authentication (dev) |
 
 ---
 

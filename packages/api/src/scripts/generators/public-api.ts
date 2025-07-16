@@ -116,7 +116,6 @@ export function registerPublicAPI(registry: SimpleZodRegistry): void {
     communicationNotificationSchemas.UnregisterPushTokenRequest,
   )
 
-
   // ============= Payment Schemas =============
   registry.registerSchema(
     'CreditBalanceResponse',
@@ -149,7 +148,6 @@ export function registerPublicAPI(registry: SimpleZodRegistry): void {
     webhookSchemas.StripeWebhookEvent,
   )
   registry.registerSchema('WebhookResponse', webhookSchemas.WebhookResponse)
-
 
   // ============= Stuff Schemas =============
   registry.registerSchema(

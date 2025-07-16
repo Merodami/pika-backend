@@ -1,10 +1,7 @@
 import type { Prisma, PrismaClient, SubscriptionStatus } from '@prisma/client'
 import { Prisma as PrismaErrors } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
-import type {
-  SubscriptionDomain,
-  SubscriptionWithPlanDomain,
-} from '@pika/sdk'
+import type { SubscriptionDomain, SubscriptionWithPlanDomain } from '@pika/sdk'
 import { SubscriptionMapper, SubscriptionWithPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'

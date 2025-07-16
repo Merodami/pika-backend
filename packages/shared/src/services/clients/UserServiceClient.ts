@@ -10,11 +10,7 @@ import type {
   VerifyEmailRequest,
 } from '@pika/api/internal'
 import { USER_API_URL } from '@pika/environment'
-import type {
-  ServiceContext,
-  UserRoleType,
-  UserStatusType,
-} from '@pika/types'
+import type { ServiceContext, UserRoleType, UserStatusType } from '@pika/types'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 

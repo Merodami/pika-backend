@@ -11,9 +11,7 @@ import type { IStripeService } from '../services/StripeService.js'
 export class WebhookController {
   private subscriptionClient: SubscriptionServiceClient
 
-  constructor(
-    private readonly stripeService: IStripeService,
-  ) {
+  constructor(private readonly stripeService: IStripeService) {
     // Bind all methods to preserve 'this' context
     this.handleStripeWebhook = this.handleStripeWebhook.bind(this)
     this.subscriptionClient = new SubscriptionServiceClient()

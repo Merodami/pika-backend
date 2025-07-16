@@ -5,6 +5,7 @@
 ### 1. Service Structure and Architecture
 
 The old Category service follows a CQRS pattern with:
+
 - **Read side**: Separate controllers, use cases, repositories for queries
 - **Write side**: Separate controllers, use cases, repositories for commands
 - **Domain-Driven Design**: Rich domain entities with business logic
@@ -13,6 +14,7 @@ The old Category service follows a CQRS pattern with:
 ### 2. Core Features and Business Logic
 
 **Entity Properties:**
+
 - `id`: UUID primary key
 - `name`: Multilingual text (JSON) supporting es/en/gn languages
 - `description`: Multilingual text (JSON)
@@ -23,6 +25,7 @@ The old Category service follows a CQRS pattern with:
 - `createdAt`, `updatedAt`, `deletedAt`: Timestamps
 
 **Business Rules:**
+
 - Root categories have `parentId = null`
 - Categories support hierarchical structure with parent-child relationships
 - Categories must be active to be visible in public APIs
@@ -31,10 +34,12 @@ The old Category service follows a CQRS pattern with:
 ### 3. API Endpoints
 
 **Public API:**
+
 - `GET /categories` - List active categories with filters
 - `GET /categories/:id` - Get single category
 
 **Admin API:**
+
 - `GET /admin/categories` - List all categories (including inactive)
 - `GET /admin/categories/:id` - Get single category with full details
 - `POST /admin/categories` - Create new category
@@ -42,6 +47,7 @@ The old Category service follows a CQRS pattern with:
 - `DELETE /admin/categories/:id` - Delete category
 
 **Internal API:**
+
 - `GET /internal/categories/by-ids` - Batch fetch categories by IDs
 - `GET /internal/categories/validate` - Validate category exists and is active
 
@@ -50,6 +56,7 @@ The old Category service follows a CQRS pattern with:
 ## Phase 1: Project Setup
 
 ### Step 1: Create Service Structure
+
 ```bash
 packages/services/category/
 ├── package.json
@@ -90,6 +97,7 @@ packages/services/category/
 ### Step 2: Package Configuration
 
 **package.json:**
+
 ```json
 {
   "name": "@pika/category-service",
@@ -133,6 +141,7 @@ packages/services/category/
 ## Phase 2: API Schema Creation
 
 ### Step 1: Create Public API Schemas
+
 Location: `/packages/api/src/public/schemas/category/index.ts`
 
 ```typescript
@@ -150,16 +159,16 @@ export const CategoryResponse = z.object({
   isActive: z.boolean(),
   sortOrder: z.number().int(),
   createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime()
+  updatedAt: z.string().datetime(),
 })
 
 export const CategoryWithChildrenResponse = CategoryResponse.extend({
-  children: z.array(CategoryResponse).optional()
+  children: z.array(CategoryResponse).optional(),
 })
 
 export const CategoryListResponse = z.object({
   data: z.array(CategoryResponse),
-  pagination: paginationResponseSchema
+  pagination: paginationResponseSchema,
 })
 
 // Query parameters
@@ -167,11 +176,11 @@ export const CategoryQueryParams = paginationRequestSchema.extend({
   parentId: z.string().uuid().optional(),
   isActive: z.coerce.boolean().optional(),
   search: z.string().optional(),
-  includeChildren: z.coerce.boolean().optional()
+  includeChildren: z.coerce.boolean().optional(),
 })
 
 export const CategoryByIdParams = z.object({
-  id: z.string().uuid()
+  id: z.string().uuid(),
 })
 
 // Export types
@@ -182,6 +191,7 @@ export type CategoryQueryParams = z.infer<typeof CategoryQueryParams>
 ```
 
 ### Step 2: Create Admin API Schemas
+
 Location: `/packages/api/src/admin/schemas/category/index.ts`
 
 ```typescript
@@ -196,31 +206,33 @@ export const CreateCategoryRequest = z.object({
   icon: z.string().optional(),
   parentId: z.string().uuid().optional(),
   isActive: z.boolean().default(true),
-  sortOrder: z.number().int().default(0)
+  sortOrder: z.number().int().default(0),
 })
 
 export const UpdateCategoryRequest = CreateCategoryRequest.partial()
 
 export const BulkUpdateCategoriesRequest = z.object({
-  categories: z.array(z.object({
-    id: z.string().uuid(),
-    updates: UpdateCategoryRequest
-  }))
+  categories: z.array(
+    z.object({
+      id: z.string().uuid(),
+      updates: UpdateCategoryRequest,
+    }),
+  ),
 })
 
 // Reuse public schemas with admin extensions
 export const AdminCategoryResponse = CategoryResponse.extend({
-  deletedAt: z.string().datetime().nullable()
+  deletedAt: z.string().datetime().nullable(),
 })
 
 export const AdminCategoryListResponse = z.object({
   data: z.array(AdminCategoryResponse),
-  pagination: paginationResponseSchema
+  pagination: paginationResponseSchema,
 })
 
 // Admin-specific query params
 export const AdminCategoryQueryParams = CategoryQueryParams.extend({
-  includeDeleted: z.coerce.boolean().optional()
+  includeDeleted: z.coerce.boolean().optional(),
 })
 
 // Export types
@@ -230,6 +242,7 @@ export type AdminCategoryResponse = z.infer<typeof AdminCategoryResponse>
 ```
 
 ### Step 3: Create Internal API Schemas
+
 Location: `/packages/api/src/internal/schemas/category/service.ts`
 
 ```typescript
@@ -238,31 +251,31 @@ import { CategoryResponse } from '../../../public/schemas/category/index.js'
 
 // Batch operations
 export const GetCategoriesByIdsRequest = z.object({
-  categoryIds: z.array(z.string().uuid()).min(1).max(100)
+  categoryIds: z.array(z.string().uuid()).min(1).max(100),
 })
 
 export const GetCategoriesByIdsResponse = z.object({
-  categories: z.array(CategoryResponse)
+  categories: z.array(CategoryResponse),
 })
 
 // Validation
 export const ValidateCategoryRequest = z.object({
-  categoryId: z.string().uuid()
+  categoryId: z.string().uuid(),
 })
 
 export const ValidateCategoryResponse = z.object({
   valid: z.boolean(),
   category: CategoryResponse.optional(),
-  reason: z.string().optional()
+  reason: z.string().optional(),
 })
 
 // Hierarchy operations
 export const GetCategoryHierarchyRequest = z.object({
-  categoryId: z.string().uuid()
+  categoryId: z.string().uuid(),
 })
 
 export const GetCategoryHierarchyResponse = z.object({
-  hierarchy: z.array(CategoryResponse)
+  hierarchy: z.array(CategoryResponse),
 })
 
 // Export types
@@ -273,6 +286,7 @@ export type ValidateCategoryResponse = z.infer<typeof ValidateCategoryResponse>
 ## Phase 3: Core Implementation
 
 ### Step 1: Domain Types
+
 Location: `/packages/services/category/src/types/domain.ts`
 
 ```typescript
@@ -303,6 +317,7 @@ export interface CategoryHierarchy {
 ```
 
 ### Step 2: Search Parameters
+
 Location: `/packages/services/category/src/types/search.ts`
 
 ```typescript
@@ -327,15 +342,12 @@ export interface CategoryFilters {
 ```
 
 ### Step 3: Mapper Implementation
+
 Location: `/packages/services/category/src/mappers/CategoryMapper.ts`
 
 ```typescript
 import type { Category } from '@pika/database'
-import type { 
-  CategoryResponse, 
-  CreateCategoryRequest,
-  UpdateCategoryRequest 
-} from '@pika/api'
+import type { CategoryResponse, CreateCategoryRequest, UpdateCategoryRequest } from '@pika/api'
 import type { CategoryDomain, CategoryWithChildren } from '../types/domain.js'
 import type { MultilingualText } from '@pika/types'
 
@@ -352,7 +364,7 @@ export class CategoryMapper {
       sortOrder: dbCategory.sortOrder,
       createdAt: dbCategory.createdAt,
       updatedAt: dbCategory.updatedAt,
-      deletedAt: dbCategory.deletedAt
+      deletedAt: dbCategory.deletedAt,
     }
   }
 
@@ -367,7 +379,7 @@ export class CategoryMapper {
       isActive: domain.isActive,
       sortOrder: domain.sortOrder,
       createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt.toISOString()
+      updatedAt: domain.updatedAt.toISOString(),
     }
   }
 
@@ -379,50 +391,51 @@ export class CategoryMapper {
       icon: request.icon || null,
       parentId: request.parentId || null,
       isActive: request.isActive ?? true,
-      sortOrder: request.sortOrder ?? 0
+      sortOrder: request.sortOrder ?? 0,
     }
   }
 
   // API Request to Domain (for update)
   static fromUpdateRequest(request: UpdateCategoryRequest): Partial<CategoryDomain> {
     const updates: Partial<CategoryDomain> = {}
-    
+
     if (request.name !== undefined) updates.name = request.name
     if (request.description !== undefined) updates.description = request.description
     if (request.icon !== undefined) updates.icon = request.icon
     if (request.parentId !== undefined) updates.parentId = request.parentId
     if (request.isActive !== undefined) updates.isActive = request.isActive
     if (request.sortOrder !== undefined) updates.sortOrder = request.sortOrder
-    
+
     return updates
   }
 
   // Domain with children to Response
   static toResponseWithChildren(domain: CategoryWithChildren): CategoryResponse & { children?: CategoryResponse[] } {
     const response = this.toResponse(domain)
-    
+
     if (domain.children) {
       return {
         ...response,
-        children: domain.children.map(child => this.toResponse(child))
+        children: domain.children.map((child) => this.toResponse(child)),
       }
     }
-    
+
     return response
   }
 
   // Array transformations
   static toDomainArray(dbCategories: Category[]): CategoryDomain[] {
-    return dbCategories.map(cat => this.toDomain(cat))
+    return dbCategories.map((cat) => this.toDomain(cat))
   }
 
   static toResponseArray(domains: CategoryDomain[]): CategoryResponse[] {
-    return domains.map(domain => this.toResponse(domain))
+    return domains.map((domain) => this.toResponse(domain))
   }
 }
 ```
 
 ### Step 4: Repository Implementation
+
 Location: `/packages/services/category/src/repositories/CategoryRepository.ts`
 
 ```typescript
@@ -450,17 +463,11 @@ export interface ICategoryRepository {
 export class CategoryRepository implements ICategoryRepository {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly cache?: ICacheService
+    private readonly cache?: ICacheService,
   ) {}
 
   async findAll(params: CategorySearchParams): Promise<PaginatedResult<CategoryDomain>> {
-    const {
-      page = 1,
-      limit = 20,
-      sortBy = 'sortOrder',
-      sortOrder = 'asc',
-      ...filters
-    } = params
+    const { page = 1, limit = 20, sortBy = 'sortOrder', sortOrder = 'asc', ...filters } = params
 
     const where = this.buildWhereClause(filters)
     const orderBy = this.buildOrderBy(sortBy, sortOrder)
@@ -473,7 +480,7 @@ export class CategoryRepository implements ICategoryRepository {
       where,
       orderBy,
       skip: (page - 1) * limit,
-      take: limit
+      take: limit,
     })
 
     const data = CategoryMapper.toDomainArray(categories)
@@ -484,17 +491,17 @@ export class CategoryRepository implements ICategoryRepository {
         data.map(async (category) => {
           const children = await this.findByParentId(category.id)
           return { ...category, children }
-        })
+        }),
       )
-      
+
       return {
         data: categoriesWithChildren,
         pagination: {
           page,
           limit,
           total,
-          totalPages: Math.ceil(total / limit)
-        }
+          totalPages: Math.ceil(total / limit),
+        },
       }
     }
 
@@ -504,14 +511,14 @@ export class CategoryRepository implements ICategoryRepository {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     }
   }
 
   async findById(id: string): Promise<CategoryDomain | null> {
     const category = await this.prisma.category.findUnique({
-      where: { id }
+      where: { id },
     })
 
     return category ? CategoryMapper.toDomain(category) : null
@@ -519,7 +526,7 @@ export class CategoryRepository implements ICategoryRepository {
 
   async findByIds(ids: string[]): Promise<CategoryDomain[]> {
     const categories = await this.prisma.category.findMany({
-      where: { id: { in: ids } }
+      where: { id: { in: ids } },
     })
 
     return CategoryMapper.toDomainArray(categories)
@@ -528,7 +535,7 @@ export class CategoryRepository implements ICategoryRepository {
   async findByParentId(parentId: string | null): Promise<CategoryDomain[]> {
     const categories = await this.prisma.category.findMany({
       where: { parentId },
-      orderBy: { sortOrder: 'asc' }
+      orderBy: { sortOrder: 'asc' },
     })
 
     return CategoryMapper.toDomainArray(categories)
@@ -543,8 +550,8 @@ export class CategoryRepository implements ICategoryRepository {
           icon: data.icon,
           parentId: data.parentId,
           isActive: data.isActive,
-          sortOrder: data.sortOrder
-        }
+          sortOrder: data.sortOrder,
+        },
       })
 
       return CategoryMapper.toDomain(category)
@@ -565,7 +572,7 @@ export class CategoryRepository implements ICategoryRepository {
 
       const category = await this.prisma.category.update({
         where: { id },
-        data: updateData
+        data: updateData,
       })
 
       return CategoryMapper.toDomain(category)
@@ -586,7 +593,7 @@ export class CategoryRepository implements ICategoryRepository {
     try {
       await this.prisma.category.update({
         where: { id },
-        data: { deletedAt: new Date() }
+        data: { deletedAt: new Date() },
       })
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -600,14 +607,14 @@ export class CategoryRepository implements ICategoryRepository {
 
   async exists(id: string): Promise<boolean> {
     const count = await this.prisma.category.count({
-      where: { id, deletedAt: null }
+      where: { id, deletedAt: null },
     })
     return count > 0
   }
 
   async hasChildren(id: string): Promise<boolean> {
     const count = await this.prisma.category.count({
-      where: { parentId: id, deletedAt: null }
+      where: { parentId: id, deletedAt: null },
     })
     return count > 0
   }
@@ -619,7 +626,7 @@ export class CategoryRepository implements ICategoryRepository {
     while (currentId) {
       const category = await this.findById(currentId)
       if (!category) break
-      
+
       ancestors.unshift(category)
       currentId = category.parentId
     }
@@ -647,31 +654,28 @@ export class CategoryRepository implements ICategoryRepository {
         {
           name: {
             path: ['en'],
-            string_contains: filters.search
-          }
+            string_contains: filters.search,
+          },
         },
         {
           name: {
             path: ['es'],
-            string_contains: filters.search
-          }
+            string_contains: filters.search,
+          },
         },
         {
           name: {
             path: ['gn'],
-            string_contains: filters.search
-          }
-        }
+            string_contains: filters.search,
+          },
+        },
       ]
     }
 
     return where
   }
 
-  private buildOrderBy(
-    sortBy: string,
-    sortOrder: 'asc' | 'desc'
-  ): Prisma.CategoryOrderByWithRelationInput {
+  private buildOrderBy(sortBy: string, sortOrder: 'asc' | 'desc'): Prisma.CategoryOrderByWithRelationInput {
     const orderBy: Prisma.CategoryOrderByWithRelationInput = {}
 
     switch (sortBy) {
@@ -697,6 +701,7 @@ export class CategoryRepository implements ICategoryRepository {
 ```
 
 ### Step 5: Service Implementation
+
 Location: `/packages/services/category/src/services/CategoryService.ts`
 
 ```typescript
@@ -721,7 +726,7 @@ export interface ICategoryService {
 export class CategoryService implements ICategoryService {
   constructor(
     private readonly categoryRepository: ICategoryRepository,
-    private readonly cacheService: ICacheService
+    private readonly cacheService: ICacheService,
   ) {}
 
   async getCategories(params: CategorySearchParams): Promise<PaginatedResult<CategoryDomain>> {
@@ -729,7 +734,7 @@ export class CategoryService implements ICategoryService {
     const publicParams = {
       ...params,
       isActive: params.isActive ?? true,
-      includeDeleted: false
+      includeDeleted: false,
     }
 
     return this.categoryRepository.findAll(publicParams)
@@ -737,7 +742,7 @@ export class CategoryService implements ICategoryService {
 
   async getCategoryById(id: string, includeChildren = false): Promise<CategoryDomain | null> {
     const category = await this.categoryRepository.findById(id)
-    
+
     if (!category) {
       return null
     }
@@ -762,9 +767,7 @@ export class CategoryService implements ICategoryService {
     return this.categoryRepository.findByIds(ids)
   }
 
-  async createCategory(
-    data: Omit<CategoryDomain, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
-  ): Promise<CategoryDomain> {
+  async createCategory(data: Omit<CategoryDomain, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>): Promise<CategoryDomain> {
     // Validate parent category if provided
     if (data.parentId) {
       const parentExists = await this.categoryRepository.exists(data.parentId)
@@ -810,7 +813,7 @@ export class CategoryService implements ICategoryService {
 
         // Check if this would create a circular hierarchy
         const parentAncestors = await this.categoryRepository.getAncestors(data.parentId)
-        if (parentAncestors.some(ancestor => ancestor.id === id)) {
+        if (parentAncestors.some((ancestor) => ancestor.id === id)) {
           throw ErrorFactory.badRequest('This change would create a circular hierarchy')
         }
       }
@@ -837,10 +840,7 @@ export class CategoryService implements ICategoryService {
     // Check if category has children
     const hasChildren = await this.categoryRepository.hasChildren(id)
     if (hasChildren) {
-      throw ErrorFactory.conflict(
-        'Cannot delete category with child categories',
-        'Delete or reassign child categories first'
-      )
+      throw ErrorFactory.conflict('Cannot delete category with child categories', 'Delete or reassign child categories first')
     }
 
     // TODO: Check if category has associated providers or vouchers
@@ -851,7 +851,7 @@ export class CategoryService implements ICategoryService {
 
   async validateCategory(id: string): Promise<{ valid: boolean; reason?: string }> {
     const category = await this.categoryRepository.findById(id)
-    
+
     if (!category) {
       return { valid: false, reason: 'Category not found' }
     }
@@ -874,10 +874,10 @@ export class CategoryService implements ICategoryService {
     }
 
     const ancestors = await this.categoryRepository.getAncestors(id)
-    
+
     return {
       category,
-      ancestors: ancestors.slice(0, -1) // Remove the category itself from ancestors
+      ancestors: ancestors.slice(0, -1), // Remove the category itself from ancestors
     }
   }
 
@@ -887,12 +887,10 @@ export class CategoryService implements ICategoryService {
     }
 
     const languages = ['en', 'es', 'gn']
-    const hasAtLeastOneLanguage = languages.some(lang => text[lang] && typeof text[lang] === 'string')
-    
+    const hasAtLeastOneLanguage = languages.some((lang) => text[lang] && typeof text[lang] === 'string')
+
     if (!hasAtLeastOneLanguage) {
-      throw ErrorFactory.badRequest(
-        `${fieldName} must have at least one language (en, es, or gn)`
-      )
+      throw ErrorFactory.badRequest(`${fieldName} must have at least one language (en, es, or gn)`)
     }
   }
 }
@@ -901,6 +899,7 @@ export class CategoryService implements ICategoryService {
 ### Step 6: Controller Implementations
 
 **CategoryController.ts:**
+
 ```typescript
 import type { Request, Response, NextFunction } from 'express'
 import type { ICategoryService } from '../services/CategoryService.js'
@@ -914,11 +913,7 @@ export class CategoryController {
     this.getCategoryById = this.getCategoryById.bind(this)
   }
 
-  async getCategories(
-    request: Request<{}, {}, {}, CategoryQueryParams>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategories(request: Request<{}, {}, {}, CategoryQueryParams>, response: Response, next: NextFunction): Promise<void> {
     try {
       const params = {
         page: request.query.page || 1,
@@ -926,14 +921,14 @@ export class CategoryController {
         parentId: request.query.parentId,
         isActive: request.query.isActive,
         search: request.query.search,
-        includeChildren: request.query.includeChildren
+        includeChildren: request.query.includeChildren,
       }
 
       const result = await this.categoryService.getCategories(params)
-      
+
       const dtoResult = {
         data: result.data.map(CategoryMapper.toResponse),
-        pagination: result.pagination
+        pagination: result.pagination,
       }
 
       response.json(dtoResult)
@@ -942,24 +937,18 @@ export class CategoryController {
     }
   }
 
-  async getCategoryById(
-    request: Request<CategoryByIdParams>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryById(request: Request<CategoryByIdParams>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
       const includeChildren = request.query.includeChildren === 'true'
 
       const category = await this.categoryService.getCategoryById(id, includeChildren)
-      
+
       if (!category) {
         return next(ErrorFactory.notFound('Category', id))
       }
 
-      const dto = includeChildren && 'children' in category
-        ? CategoryMapper.toResponseWithChildren(category as CategoryWithChildren)
-        : CategoryMapper.toResponse(category)
+      const dto = includeChildren && 'children' in category ? CategoryMapper.toResponseWithChildren(category as CategoryWithChildren) : CategoryMapper.toResponse(category)
 
       response.json(dto)
     } catch (error) {
@@ -970,15 +959,11 @@ export class CategoryController {
 ```
 
 **AdminCategoryController.ts:**
+
 ```typescript
 import type { Request, Response, NextFunction } from 'express'
 import type { ICategoryService } from '../services/CategoryService.js'
-import type { 
-  CreateCategoryRequest, 
-  UpdateCategoryRequest,
-  AdminCategoryQueryParams,
-  CategoryByIdParams
-} from '@pika/api/admin'
+import type { CreateCategoryRequest, UpdateCategoryRequest, AdminCategoryQueryParams, CategoryByIdParams } from '@pika/api/admin'
 import { CategoryMapper } from '../mappers/CategoryMapper.js'
 import { ErrorFactory } from '@pika/shared'
 
@@ -991,11 +976,7 @@ export class AdminCategoryController {
     this.deleteCategory = this.deleteCategory.bind(this)
   }
 
-  async getCategories(
-    request: Request<{}, {}, {}, AdminCategoryQueryParams>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategories(request: Request<{}, {}, {}, AdminCategoryQueryParams>, response: Response, next: NextFunction): Promise<void> {
     try {
       const params = {
         page: request.query.page || 1,
@@ -1004,14 +985,14 @@ export class AdminCategoryController {
         isActive: request.query.isActive,
         search: request.query.search,
         includeChildren: request.query.includeChildren,
-        includeDeleted: request.query.includeDeleted
+        includeDeleted: request.query.includeDeleted,
       }
 
       const result = await this.categoryService.getCategories(params)
-      
+
       const dtoResult = {
         data: result.data.map(CategoryMapper.toResponse),
-        pagination: result.pagination
+        pagination: result.pagination,
       }
 
       response.json(dtoResult)
@@ -1020,15 +1001,11 @@ export class AdminCategoryController {
     }
   }
 
-  async getCategoryById(
-    request: Request<CategoryByIdParams>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryById(request: Request<CategoryByIdParams>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
       const category = await this.categoryService.getCategoryById(id, true)
-      
+
       if (!category) {
         return next(ErrorFactory.notFound('Category', id))
       }
@@ -1039,48 +1016,36 @@ export class AdminCategoryController {
     }
   }
 
-  async createCategory(
-    request: Request<{}, {}, CreateCategoryRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async createCategory(request: Request<{}, {}, CreateCategoryRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const categoryData = CategoryMapper.fromCreateRequest(request.body)
       const category = await this.categoryService.createCategory(categoryData)
-      
+
       response.status(201).json(CategoryMapper.toResponse(category))
     } catch (error) {
       next(error)
     }
   }
 
-  async updateCategory(
-    request: Request<CategoryByIdParams, {}, UpdateCategoryRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async updateCategory(request: Request<CategoryByIdParams, {}, UpdateCategoryRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
       const updates = CategoryMapper.fromUpdateRequest(request.body)
-      
+
       const category = await this.categoryService.updateCategory(id, updates)
-      
+
       response.json(CategoryMapper.toResponse(category))
     } catch (error) {
       next(error)
     }
   }
 
-  async deleteCategory(
-    request: Request<CategoryByIdParams>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async deleteCategory(request: Request<CategoryByIdParams>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
-      
+
       await this.categoryService.deleteCategory(id)
-      
+
       response.status(204).send()
     } catch (error) {
       next(error)
@@ -1090,14 +1055,11 @@ export class AdminCategoryController {
 ```
 
 **InternalCategoryController.ts:**
+
 ```typescript
 import type { Request, Response, NextFunction } from 'express'
 import type { ICategoryService } from '../services/CategoryService.js'
-import type { 
-  GetCategoriesByIdsRequest,
-  ValidateCategoryRequest,
-  GetCategoryHierarchyRequest 
-} from '@pika/api/internal'
+import type { GetCategoriesByIdsRequest, ValidateCategoryRequest, GetCategoryHierarchyRequest } from '@pika/api/internal'
 import { CategoryMapper } from '../mappers/CategoryMapper.js'
 
 export class InternalCategoryController {
@@ -1107,59 +1069,45 @@ export class InternalCategoryController {
     this.getCategoryHierarchy = this.getCategoryHierarchy.bind(this)
   }
 
-  async getCategoriesByIds(
-    request: Request<{}, {}, GetCategoriesByIdsRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoriesByIds(request: Request<{}, {}, GetCategoriesByIdsRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { categoryIds } = request.body
-      
+
       const categories = await this.categoryService.getCategoriesByIds(categoryIds)
-      
+
       response.json({
-        categories: CategoryMapper.toResponseArray(categories)
+        categories: CategoryMapper.toResponseArray(categories),
       })
     } catch (error) {
       next(error)
     }
   }
 
-  async validateCategory(
-    request: Request<{}, {}, ValidateCategoryRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async validateCategory(request: Request<{}, {}, ValidateCategoryRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { categoryId } = request.body
-      
+
       const validation = await this.categoryService.validateCategory(categoryId)
-      const category = validation.valid 
-        ? await this.categoryService.getCategoryById(categoryId)
-        : null
-      
+      const category = validation.valid ? await this.categoryService.getCategoryById(categoryId) : null
+
       response.json({
         valid: validation.valid,
         category: category ? CategoryMapper.toResponse(category) : undefined,
-        reason: validation.reason
+        reason: validation.reason,
       })
     } catch (error) {
       next(error)
     }
   }
 
-  async getCategoryHierarchy(
-    request: Request<{}, {}, GetCategoryHierarchyRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryHierarchy(request: Request<{}, {}, GetCategoryHierarchyRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { categoryId } = request.body
-      
+
       const hierarchy = await this.categoryService.getCategoryHierarchy(categoryId)
-      
+
       response.json({
-        hierarchy: CategoryMapper.toResponseArray(hierarchy.ancestors.concat(hierarchy.category))
+        hierarchy: CategoryMapper.toResponseArray(hierarchy.ancestors.concat(hierarchy.category)),
       })
     } catch (error) {
       next(error)
@@ -1173,121 +1121,68 @@ export class InternalCategoryController {
 ### Step 1: Route Definitions
 
 **CategoryRoutes.ts:**
+
 ```typescript
 import { Router } from 'express'
 import type { CategoryController } from '../controllers/CategoryController.js'
 import { validateQuery, validateParams } from '@pika/shared'
 import { CategoryQueryParams, CategoryByIdParams } from '@pika/api/public'
 
-export function createCategoryRoutes(
-  categoryController: CategoryController
-): Router {
+export function createCategoryRoutes(categoryController: CategoryController): Router {
   const router = Router()
 
-  router.get(
-    '/',
-    validateQuery(CategoryQueryParams),
-    categoryController.getCategories
-  )
+  router.get('/', validateQuery(CategoryQueryParams), categoryController.getCategories)
 
-  router.get(
-    '/:id',
-    validateParams(CategoryByIdParams),
-    categoryController.getCategoryById
-  )
+  router.get('/:id', validateParams(CategoryByIdParams), categoryController.getCategoryById)
 
   return router
 }
 ```
 
 **AdminCategoryRoutes.ts:**
+
 ```typescript
 import { Router } from 'express'
 import type { AdminCategoryController } from '../controllers/AdminCategoryController.js'
 import { validateQuery, validateParams, validateBody, requireAdmin } from '@pika/shared'
-import { 
-  AdminCategoryQueryParams, 
-  CategoryByIdParams,
-  CreateCategoryRequest,
-  UpdateCategoryRequest 
-} from '@pika/api/admin'
+import { AdminCategoryQueryParams, CategoryByIdParams, CreateCategoryRequest, UpdateCategoryRequest } from '@pika/api/admin'
 
-export function createAdminCategoryRoutes(
-  adminCategoryController: AdminCategoryController
-): Router {
+export function createAdminCategoryRoutes(adminCategoryController: AdminCategoryController): Router {
   const router = Router()
 
   // All admin routes require admin authentication
   router.use(requireAdmin())
 
-  router.get(
-    '/',
-    validateQuery(AdminCategoryQueryParams),
-    adminCategoryController.getCategories
-  )
+  router.get('/', validateQuery(AdminCategoryQueryParams), adminCategoryController.getCategories)
 
-  router.get(
-    '/:id',
-    validateParams(CategoryByIdParams),
-    adminCategoryController.getCategoryById
-  )
+  router.get('/:id', validateParams(CategoryByIdParams), adminCategoryController.getCategoryById)
 
-  router.post(
-    '/',
-    validateBody(CreateCategoryRequest),
-    adminCategoryController.createCategory
-  )
+  router.post('/', validateBody(CreateCategoryRequest), adminCategoryController.createCategory)
 
-  router.put(
-    '/:id',
-    validateParams(CategoryByIdParams),
-    validateBody(UpdateCategoryRequest),
-    adminCategoryController.updateCategory
-  )
+  router.put('/:id', validateParams(CategoryByIdParams), validateBody(UpdateCategoryRequest), adminCategoryController.updateCategory)
 
-  router.delete(
-    '/:id',
-    validateParams(CategoryByIdParams),
-    adminCategoryController.deleteCategory
-  )
+  router.delete('/:id', validateParams(CategoryByIdParams), adminCategoryController.deleteCategory)
 
   return router
 }
 ```
 
 **InternalCategoryRoutes.ts:**
+
 ```typescript
 import { Router } from 'express'
 import type { InternalCategoryController } from '../controllers/InternalCategoryController.js'
 import { validateBody } from '@pika/shared'
-import { 
-  GetCategoriesByIdsRequest,
-  ValidateCategoryRequest,
-  GetCategoryHierarchyRequest 
-} from '@pika/api/internal'
+import { GetCategoriesByIdsRequest, ValidateCategoryRequest, GetCategoryHierarchyRequest } from '@pika/api/internal'
 
-export function createInternalCategoryRoutes(
-  internalCategoryController: InternalCategoryController
-): Router {
+export function createInternalCategoryRoutes(internalCategoryController: InternalCategoryController): Router {
   const router = Router()
 
-  router.post(
-    '/by-ids',
-    validateBody(GetCategoriesByIdsRequest),
-    internalCategoryController.getCategoriesByIds
-  )
+  router.post('/by-ids', validateBody(GetCategoriesByIdsRequest), internalCategoryController.getCategoriesByIds)
 
-  router.post(
-    '/validate',
-    validateBody(ValidateCategoryRequest),
-    internalCategoryController.validateCategory
-  )
+  router.post('/validate', validateBody(ValidateCategoryRequest), internalCategoryController.validateCategory)
 
-  router.post(
-    '/hierarchy',
-    validateBody(GetCategoryHierarchyRequest),
-    internalCategoryController.getCategoryHierarchy
-  )
+  router.post('/hierarchy', validateBody(GetCategoryHierarchyRequest), internalCategoryController.getCategoryHierarchy)
 
   return router
 }
@@ -1296,6 +1191,7 @@ export function createInternalCategoryRoutes(
 ### Step 2: App Configuration
 
 **app.ts:**
+
 ```typescript
 import type { PrismaClient } from '@pika/database'
 import type { ICacheService } from '@pika/redis'
@@ -1321,7 +1217,7 @@ export async function createCategoryServer(dependencies: CategoryServerDependenc
   // Create service instances
   const categoryRepository = new CategoryRepository(prisma, cacheService)
   const categoryService = new CategoryService(categoryRepository, cacheService)
-  
+
   // Create controllers
   const categoryController = new CategoryController(categoryService)
   const adminCategoryController = new AdminCategoryController(categoryService)
@@ -1336,18 +1232,18 @@ export async function createCategoryServer(dependencies: CategoryServerDependenc
       excludePaths: [
         '/health',
         '/metrics',
-        '/categories' // Public category listing doesn't require auth
-      ]
+        '/categories', // Public category listing doesn't require auth
+      ],
     },
     cacheOptions: {
       enabled: true,
-      defaultTTL: 3600
+      defaultTTL: 3600,
     },
     idempotencyOptions: {
       enabled: true,
       methods: ['POST', 'PUT', 'PATCH'],
-      excludeRoutes: ['/health', '/metrics']
-    }
+      excludeRoutes: ['/health', '/metrics'],
+    },
   })
 
   // Register routes
@@ -1360,6 +1256,7 @@ export async function createCategoryServer(dependencies: CategoryServerDependenc
 ```
 
 **server.ts:**
+
 ```typescript
 import { createPrismaClient } from '@pika/database'
 import { createCacheService } from '@pika/redis'
@@ -1376,12 +1273,12 @@ export async function startCategoryServer() {
     const prisma = createPrismaClient()
     const cacheService = createCacheService({
       keyPrefix: 'category:',
-      defaultTTL: 3600
+      defaultTTL: 3600,
     })
 
     // Create and start server
     const app = await createCategoryServer({ prisma, cacheService })
-    
+
     const server = app.listen(config.port, () => {
       logger.info(`Category service started on port ${config.port}`)
     })
@@ -1405,6 +1302,7 @@ export async function startCategoryServer() {
 ```
 
 **index.ts:**
+
 ```typescript
 import { startCategoryServer } from './server.js'
 
@@ -1424,6 +1322,7 @@ export type { CategorySearchParams, CategoryFilters } from './types/search.js'
 ## Phase 5: Testing
 
 ### Integration Test Example
+
 Location: `/packages/services/category/test/integration/category.test.ts`
 
 ```typescript
@@ -1442,14 +1341,14 @@ describe('Category Service Integration Tests', () => {
   beforeEach(async () => {
     testDb = await createTestDatabase()
     const cacheService = new MemoryCacheService()
-    
+
     const server = await createCategoryServer({
       prisma: testDb.prisma,
-      cacheService
+      cacheService,
     })
-    
+
     app = server
-    
+
     // Create test user and get auth token
     const { token } = await createTestUser(testDb.prisma)
     authToken = token
@@ -1468,20 +1367,18 @@ describe('Category Service Integration Tests', () => {
             name: { en: 'Food', es: 'Comida' },
             description: { en: 'Food category' },
             isActive: true,
-            sortOrder: 1
+            sortOrder: 1,
           },
           {
             name: { en: 'Technology', es: 'Tecnología' },
             description: { en: 'Tech category' },
             isActive: true,
-            sortOrder: 2
-          }
-        ]
+            sortOrder: 2,
+          },
+        ],
       })
 
-      const response = await supertest(app)
-        .get('/categories')
-        .expect(200)
+      const response = await supertest(app).get('/categories').expect(200)
 
       expect(response.body).toHaveProperty('data')
       expect(response.body).toHaveProperty('pagination')
@@ -1493,22 +1390,19 @@ describe('Category Service Integration Tests', () => {
       const parent = await testDb.prisma.category.create({
         data: {
           name: { en: 'Parent' },
-          isActive: true
-        }
+          isActive: true,
+        },
       })
 
       await testDb.prisma.category.create({
         data: {
           name: { en: 'Child' },
           parentId: parent.id,
-          isActive: true
-        }
+          isActive: true,
+        },
       })
 
-      const response = await supertest(app)
-        .get('/categories')
-        .query({ parentId: parent.id })
-        .expect(200)
+      const response = await supertest(app).get('/categories').query({ parentId: parent.id }).expect(200)
 
       expect(response.body.data).toHaveLength(1)
       expect(response.body.data[0].name.en).toBe('Child')
@@ -1518,22 +1412,19 @@ describe('Category Service Integration Tests', () => {
       const parent = await testDb.prisma.category.create({
         data: {
           name: { en: 'Parent' },
-          isActive: true
-        }
+          isActive: true,
+        },
       })
 
       await testDb.prisma.category.create({
         data: {
           name: { en: 'Child' },
           parentId: parent.id,
-          isActive: true
-        }
+          isActive: true,
+        },
       })
 
-      const response = await supertest(app)
-        .get(`/categories/${parent.id}`)
-        .query({ includeChildren: true })
-        .expect(200)
+      const response = await supertest(app).get(`/categories/${parent.id}`).query({ includeChildren: true }).expect(200)
 
       expect(response.body.children).toBeDefined()
       expect(response.body.children).toHaveLength(1)
@@ -1546,14 +1437,10 @@ describe('Category Service Integration Tests', () => {
         name: { en: 'New Category', es: 'Nueva Categoría' },
         description: { en: 'Test description' },
         isActive: true,
-        sortOrder: 1
+        sortOrder: 1,
       }
 
-      const response = await supertest(app)
-        .post('/admin/categories')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send(categoryData)
-        .expect(201)
+      const response = await supertest(app).post('/admin/categories').set('Authorization', `Bearer ${authToken}`).send(categoryData).expect(201)
 
       expect(response.body).toHaveProperty('id')
       expect(response.body.name).toEqual(categoryData.name)
@@ -1563,14 +1450,10 @@ describe('Category Service Integration Tests', () => {
     it('should validate parent category exists', async () => {
       const categoryData = {
         name: { en: 'Child Category' },
-        parentId: '00000000-0000-0000-0000-000000000000'
+        parentId: '00000000-0000-0000-0000-000000000000',
       }
 
-      await supertest(app)
-        .post('/admin/categories')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send(categoryData)
-        .expect(400)
+      await supertest(app).post('/admin/categories').set('Authorization', `Bearer ${authToken}`).send(categoryData).expect(400)
     })
   })
 
@@ -1579,79 +1462,65 @@ describe('Category Service Integration Tests', () => {
       const category = await testDb.prisma.category.create({
         data: {
           name: { en: 'Original' },
-          isActive: true
-        }
+          isActive: true,
+        },
       })
 
       const updates = {
-        name: { en: 'Updated', es: 'Actualizado' }
+        name: { en: 'Updated', es: 'Actualizado' },
       }
 
-      const response = await supertest(app)
-        .put(`/admin/categories/${category.id}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send(updates)
-        .expect(200)
+      const response = await supertest(app).put(`/admin/categories/${category.id}`).set('Authorization', `Bearer ${authToken}`).send(updates).expect(200)
 
       expect(response.body.name).toEqual(updates.name)
     })
 
     it('should prevent circular hierarchy', async () => {
       const parent = await testDb.prisma.category.create({
-        data: { name: { en: 'Parent' } }
+        data: { name: { en: 'Parent' } },
       })
 
       const child = await testDb.prisma.category.create({
-        data: { 
+        data: {
           name: { en: 'Child' },
-          parentId: parent.id
-        }
+          parentId: parent.id,
+        },
       })
 
       // Try to make parent a child of its own child
-      await supertest(app)
-        .put(`/admin/categories/${parent.id}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ parentId: child.id })
-        .expect(400)
+      await supertest(app).put(`/admin/categories/${parent.id}`).set('Authorization', `Bearer ${authToken}`).send({ parentId: child.id }).expect(400)
     })
   })
 
   describe('DELETE /admin/categories/:id', () => {
     it('should soft delete a category', async () => {
       const category = await testDb.prisma.category.create({
-        data: { name: { en: 'To Delete' } }
+        data: { name: { en: 'To Delete' } },
       })
 
-      await supertest(app)
-        .delete(`/admin/categories/${category.id}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(204)
+      await supertest(app).delete(`/admin/categories/${category.id}`).set('Authorization', `Bearer ${authToken}`).expect(204)
 
       // Verify soft delete
       const deleted = await testDb.prisma.category.findUnique({
-        where: { id: category.id }
+        where: { id: category.id },
       })
-      
+
       expect(deleted?.deletedAt).not.toBeNull()
     })
 
     it('should prevent deletion of categories with children', async () => {
       const parent = await testDb.prisma.category.create({
-        data: { name: { en: 'Parent' } }
+        data: { name: { en: 'Parent' } },
       })
 
       await testDb.prisma.category.create({
-        data: { 
+        data: {
           name: { en: 'Child' },
-          parentId: parent.id
-        }
+          parentId: parent.id,
+        },
       })
 
-      await supertest(app)
-        .delete(`/admin/categories/${parent.id}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(409)
+      await supertest(app).delete(`/admin/categories/${parent.id}`).set('Authorization', `Bearer ${authToken}`).expect(409)
     })
   })
 })
@@ -1660,6 +1529,7 @@ describe('Category Service Integration Tests', () => {
 ## Phase 6: Project Configuration
 
 ### NX Project Configuration
+
 Location: `/packages/services/category/project.json`
 
 ```json
@@ -1717,6 +1587,7 @@ Location: `/packages/services/category/project.json`
 ```
 
 ### Environment Configuration
+
 Add to `/packages/environment/src/constants/service.ts`:
 
 ```typescript

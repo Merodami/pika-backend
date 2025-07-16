@@ -1,9 +1,19 @@
 import { type PrismaClient } from '@prisma/client'
-import type { Language, Translation, UserLanguagePreference } from '@prisma/client'
+import type {
+  Language,
+  Translation,
+  UserLanguagePreference,
+} from '@prisma/client'
 
 export interface ITranslationRepository {
-  findByKeyAndLanguage(key: string, languageCode: string): Promise<Translation | null>
-  findByKeysAndLanguage(keys: string[], languageCode: string): Promise<Translation[]>
+  findByKeyAndLanguage(
+    key: string,
+    languageCode: string,
+  ): Promise<Translation | null>
+  findByKeysAndLanguage(
+    keys: string[],
+    languageCode: string,
+  ): Promise<Translation[]>
   create(data: {
     key: string
     value: string
@@ -16,14 +26,22 @@ export interface ITranslationRepository {
   findLanguageByCode(code: string): Promise<Language | null>
   findActiveLanguages(): Promise<Language[]>
   findDefaultLanguage(): Promise<Language | null>
-  findUserLanguagePreference(userId: string): Promise<UserLanguagePreference | null>
-  setUserLanguagePreference(userId: string, languageCode: string): Promise<UserLanguagePreference>
+  findUserLanguagePreference(
+    userId: string,
+  ): Promise<UserLanguagePreference | null>
+  setUserLanguagePreference(
+    userId: string,
+    languageCode: string,
+  ): Promise<UserLanguagePreference>
 }
 
 export class TranslationRepository implements ITranslationRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findByKeyAndLanguage(key: string, languageCode: string): Promise<Translation | null> {
+  async findByKeyAndLanguage(
+    key: string,
+    languageCode: string,
+  ): Promise<Translation | null> {
     return this.prisma.translation.findUnique({
       where: {
         key_languageCode: {
@@ -34,7 +52,10 @@ export class TranslationRepository implements ITranslationRepository {
     })
   }
 
-  async findByKeysAndLanguage(keys: string[], languageCode: string): Promise<Translation[]> {
+  async findByKeysAndLanguage(
+    keys: string[],
+    languageCode: string,
+  ): Promise<Translation[]> {
     return this.prisma.translation.findMany({
       where: {
         key: {
@@ -89,14 +110,19 @@ export class TranslationRepository implements ITranslationRepository {
     })
   }
 
-  async findUserLanguagePreference(userId: string): Promise<UserLanguagePreference | null> {
+  async findUserLanguagePreference(
+    userId: string,
+  ): Promise<UserLanguagePreference | null> {
     return this.prisma.userLanguagePreference.findUnique({
       where: { userId },
       include: { language: true },
     })
   }
 
-  async setUserLanguagePreference(userId: string, languageCode: string): Promise<UserLanguagePreference> {
+  async setUserLanguagePreference(
+    userId: string,
+    languageCode: string,
+  ): Promise<UserLanguagePreference> {
     return this.prisma.userLanguagePreference.upsert({
       where: { userId },
       create: {

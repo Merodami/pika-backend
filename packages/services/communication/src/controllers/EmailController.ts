@@ -1,8 +1,8 @@
 import type {
-    CommunicationLogSearchParams as ApiCommunicationLogSearchParams,
-    CommunicationLogIdParam,
-    SendBulkEmailRequest,
-    SendEmailRequest,
+  CommunicationLogSearchParams as ApiCommunicationLogSearchParams,
+  CommunicationLogIdParam,
+  SendBulkEmailRequest,
+  SendEmailRequest,
 } from '@pika/api/public'
 import { CommunicationLogMapper } from '@pika/sdk'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -13,9 +13,9 @@ import type { NextFunction, Request, Response } from 'express'
 
 import type { CommunicationLogSearchParams } from '../repositories/CommunicationLogRepository.js'
 import type {
-    BulkEmailInput,
-    IEmailService,
-    SendEmailInput,
+  BulkEmailInput,
+  IEmailService,
+  SendEmailInput,
 } from '../services/EmailService.js'
 
 export interface IEmailController {

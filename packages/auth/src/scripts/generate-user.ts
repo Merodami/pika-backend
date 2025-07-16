@@ -19,9 +19,7 @@ async function main() {
   if (!email) {
     console.log('Usage: yarn user:create <email> [password] [role]')
     console.log('Example: yarn user:create test@example.com Test123! ADMIN')
-    console.log(
-      'Roles: ADMIN, USER',
-    )
+    console.log('Roles: ADMIN, USER')
     process.exit(1)
   }
 

@@ -234,7 +234,7 @@ In Vercel deployment, services communicate internally. No need to configure serv
 | Variable             | Description      | Example               |
 | -------------------- | ---------------- | --------------------- |
 | `STORAGE_TYPE`       | Storage provider | `s3`, `blob`, `minio` |
-| `STORAGE_BUCKET`     | Bucket name      | `pikatorage`      |
+| `STORAGE_BUCKET`     | Bucket name      | `pikatorage`          |
 | `STORAGE_ACCESS_KEY` | S3 access key    | From AWS/provider     |
 | `STORAGE_SECRET_KEY` | S3 secret key    | From AWS/provider     |
 

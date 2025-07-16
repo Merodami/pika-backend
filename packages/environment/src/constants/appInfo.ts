@@ -1,11 +1,7 @@
 import { getEnvVariable } from '../getEnvVariable.js'
 import { parseString } from '../parsers.js'
 
-export const APP_NAME = getEnvVariable(
-  'APP_NAME',
-  String,
-  'Pika Gym Platform',
-)
+export const APP_NAME = getEnvVariable('APP_NAME', String, 'Pika Gym Platform')
 export const BASE_URL = getEnvVariable(
   'BASE_URL',
   String,

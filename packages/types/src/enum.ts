@@ -102,7 +102,6 @@ export enum CommunicationChannel {
  */
 export type CommunicationChannelType = `${CommunicationChannel}`
 
-
 /**
  * User verification types for unified verification system
  * Used for email, phone, and account confirmation verification

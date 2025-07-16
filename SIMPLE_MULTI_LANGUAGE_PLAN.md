@@ -8,12 +8,14 @@ A pragmatic, battle-tested hybrid approach to implementing multi-language suppor
 
 ## Architecture Decision
 
-**Hybrid Approach**: 
+**Hybrid Approach**:
+
 - **Frontend**: Static UI translations (buttons, labels, navigation)
 - **Backend**: Dynamic content (gym names, descriptions, emails, notifications)
 - **Shared**: Single database for backend translations + Redis caching layer
 
 **Why This Works**:
+
 - Best of both worlds: Fast UI, dynamic content
 - Frontend can update UI text without API calls
 - Backend handles user-generated content and emails
@@ -34,7 +36,7 @@ model Language {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   translations Translation[]
   userPreferences UserLanguagePreference[]
 }
@@ -48,9 +50,9 @@ model Translation {
   service     String?  // Which service owns this (optional)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   language    Language @relation(fields: [languageCode], references: [code])
-  
+
   @@unique([key, languageCode])
   @@index([key, languageCode])
   @@index([service, key])
@@ -62,9 +64,9 @@ model UserLanguagePreference {
   languageCode String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   language    Language @relation(fields: [languageCode], references: [code])
-  
+
   @@index([userId])
 }
 ```
@@ -100,7 +102,7 @@ export class TranslationService implements ITranslationService {
   constructor(
     private readonly repository: TranslationRepository,
     private readonly cache: TranslationCache,
-    private readonly defaultLanguage: string = 'en'
+    private readonly defaultLanguage: string = 'en',
   ) {}
 
   async get(key: string, language: string, fallback?: string): Promise<string> {
@@ -143,7 +145,7 @@ export class TranslationService implements ITranslationService {
     // Fetch uncached from database
     if (uncachedKeys.length > 0) {
       const translations = await this.repository.findByKeysAndLanguage(uncachedKeys, language)
-      
+
       for (const trans of translations) {
         results[trans.key] = trans.value
         await this.cache.set(trans.key, language, trans.value)
@@ -234,17 +236,16 @@ export function createLanguageMiddleware(translationService: ITranslationService
   return (req: Request, res: Response, next: NextFunction) => {
     // Detect and set language
     const language = translationService.detectLanguage(req)
-    
+
     // Add to request object
     req.language = language
-    
+
     // Add translation helper to response locals
-    res.locals.t = (key: string, fallback?: string) => 
-      translationService.get(key, language, fallback)
-    
+    res.locals.t = (key: string, fallback?: string) => translationService.get(key, language, fallback)
+
     // Set Content-Language header
     res.setHeader('Content-Language', language)
-    
+
     next()
   }
 }
@@ -259,7 +260,7 @@ Each service can integrate translations seamlessly:
 export class GymService {
   constructor(
     private readonly repository: IGymRepository,
-    private readonly translationService: ITranslationService
+    private readonly translationService: ITranslationService,
   ) {}
 
   async getGym(id: string, language: string): Promise<GymDTO> {
@@ -267,15 +268,9 @@ export class GymService {
     if (!gym) throw new Error('Gym not found')
 
     // Get dynamic translations
-    const translationKeys = [
-      `gym.name.${id}`,
-      `gym.description.${id}`
-    ]
-    
-    const translations = await this.translationService.getBulk(
-      translationKeys, 
-      language
-    )
+    const translationKeys = [`gym.name.${id}`, `gym.description.${id}`]
+
+    const translations = await this.translationService.getBulk(translationKeys, language)
 
     return {
       id: gym.id,
@@ -298,15 +293,10 @@ The Communication Service can send fully localized emails:
 export class EmailService {
   constructor(
     private readonly translationService: ITranslationService,
-    private readonly templateService: TemplateService
+    private readonly templateService: TemplateService,
   ) {}
 
-  async sendEmail(
-    template: string, 
-    recipient: string, 
-    data: Record<string, any>, 
-    language: string
-  ): Promise<void> {
+  async sendEmail(template: string, recipient: string, data: Record<string, any>, language: string): Promise<void> {
     // Get email translations based on template
     const translationKeys = this.getTranslationKeysForTemplate(template)
     const translations = await this.translationService.getBulk(translationKeys, language)
@@ -320,8 +310,8 @@ export class EmailService {
       subject: localizedData.subject,
       html: await this.templateService.render(template, localizedData),
       headers: {
-        'Content-Language': language
-      }
+        'Content-Language': language,
+      },
     })
   }
 }
@@ -339,17 +329,17 @@ export class TranslationController {
 
   async setTranslation(req: Request, res: Response): Promise<void> {
     const { key, language, value } = req.body
-    
+
     await this.translationService.set(key, language, value)
-    
+
     res.json({ success: true })
   }
 
   async getTranslations(req: Request, res: Response): Promise<void> {
     const { keys, language } = req.body
-    
+
     const translations = await this.translationService.getBulk(keys, language)
-    
+
     res.json({ translations })
   }
 }
@@ -358,24 +348,28 @@ export class TranslationController {
 ## Migration Strategy
 
 ### Phase 1: Setup (Week 1)
+
 - [ ] Create database migrations
 - [ ] Implement TranslationService in shared package
 - [ ] Add language middleware to HTTP package
 - [ ] Set up Redis caching layer
 
 ### Phase 2: Core Integration (Week 2)
+
 - [ ] Add language detection to API Gateway
 - [ ] Integrate with User service (preferences)
 - [ ] Create admin endpoints for translation management
 - [ ] Build translation management UI (simple)
 
 ### Phase 3: Service Migration (Week 3-4)
+
 - [ ] Migrate Gym service translations
 - [ ] Migrate Session service translations
 - [ ] Migrate Communication service (emails)
 - [ ] Update SDK response types
 
 ### Phase 4: Data Migration (Week 5)
+
 - [ ] Analyze old translation system
 - [ ] Create migration scripts
 - [ ] Run migration in staging
@@ -384,6 +378,7 @@ export class TranslationController {
 ## Translation Key Conventions
 
 ### Frontend Translations (Handled by Frontend App)
+
 ```javascript
 // Frontend i18n files (e.g., en.json, es.json, he.json)
 {
@@ -408,6 +403,7 @@ export class TranslationController {
 ```
 
 ### Backend Translations (Stored in Database)
+
 ```
 # Dynamic content translations
 gym.name.{id} = "Gym specific name"
@@ -435,6 +431,7 @@ sms.booking.confirmed = "Booking confirmed at {gymName} on {date}"
 ## API Examples
 
 ### Setting User Language Preference
+
 ```http
 POST /api/users/language
 Authorization: Bearer {token}
@@ -446,6 +443,7 @@ Content-Type: application/json
 ```
 
 ### Getting Localized Content
+
 ```http
 GET /api/gyms/123
 Accept-Language: he
@@ -460,6 +458,7 @@ Response:
 ```
 
 ### Bulk Translation Fetch (Frontend)
+
 ```http
 POST /api/translations/bulk
 Content-Type: application/json
@@ -494,10 +493,10 @@ Key metrics to track:
 
 ```typescript
 // Track missing translations
-logger.warn('Missing translation', { 
-  key, 
-  language, 
-  service: 'gym-service' 
+logger.warn('Missing translation', {
+  key,
+  language,
+  service: 'gym-service',
 })
 
 // Track cache performance

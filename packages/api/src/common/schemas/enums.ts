@@ -11,10 +11,7 @@ import { openapi } from '../utils/openapi.js'
 /**
  * User roles - matches database UserRole enum exactly
  */
-export const UserRole = z.enum([
-  'ADMIN',
-  'USER',
-])
+export const UserRole = z.enum(['ADMIN', 'USER'])
 
 export type UserRole = z.infer<typeof UserRole>
 
@@ -150,6 +147,19 @@ export const ProblemSortBy = z.enum([
   'STATUS',
 ])
 export type ProblemSortBy = z.infer<typeof ProblemSortBy>
+
+// ============= Category Enums =============
+
+/**
+ * Category sort fields - shared across public and admin APIs
+ */
+export const CategorySortBy = z.enum([
+  'NAME',
+  'SORT_ORDER',
+  'CREATED_AT',
+  'UPDATED_AT',
+])
+export type CategorySortBy = z.infer<typeof CategorySortBy>
 
 // ============= OpenAPI Documentation =============
 

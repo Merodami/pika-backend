@@ -4,10 +4,10 @@ import { logger } from '@pika/shared'
 import { CACHE_DISABLED } from '@pika/environment'
 import { PrismaClient } from '@prisma/client'
 import {
-    type Application,
-    type NextFunction,
-    type Request,
-    type Response,
+  type Application,
+  type NextFunction,
+  type Request,
+  type Response,
 } from 'express'
 
 import { createServiceClients } from '../../services/clients.js'

@@ -1,7 +1,7 @@
 import {
-    SendEmailRequest,
-    SendSystemNotificationRequest,
-    SendTransactionalEmailRequest,
+  SendEmailRequest,
+  SendSystemNotificationRequest,
+  SendTransactionalEmailRequest,
 } from '@pika/api/internal'
 import type { ICacheService } from '@pika/redis'
 import { requireServiceAuth, validateBody } from '@pika/http'

@@ -1,7 +1,7 @@
 import {
-    NODE_ENV,
-    STORAGE_PROVIDER_FALLBACK,
-    STORAGE_PROVIDER_PRIMARY,
+  NODE_ENV,
+  STORAGE_PROVIDER_FALLBACK,
+  STORAGE_PROVIDER_PRIMARY,
 } from '@pika/environment'
 import { logger } from '@pika/shared'
 

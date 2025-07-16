@@ -25,12 +25,7 @@ export const SendSystemNotificationRequest = openapi(
     // Content
     title: z.string().max(255),
     message: z.string(),
-    category: z.enum([
-      'SYSTEM',
-      'SECURITY',
-      'BILLING',
-      'MARKETING',
-    ]),
+    category: z.enum(['SYSTEM', 'SECURITY', 'BILLING', 'MARKETING']),
     priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).default('NORMAL'),
 
     // Channels

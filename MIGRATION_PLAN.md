@@ -1,6 +1,7 @@
 # Pika Backend Migration Analysis
 
 ## Overview
+
 This document provides a comprehensive analysis and migration strategy for transitioning from the old Pika architecture (located in `/pika` folder) to the new modern microservices architecture (formerly Solo60, now renamed to Pika).
 
 ## Current Migration Status (Updated 2025-01-16)
@@ -8,6 +9,7 @@ This document provides a comprehensive analysis and migration strategy for trans
 ### 🎉 MAJOR MILESTONE: Gym Feature Removal Complete ✅
 
 ### Completed Migration Tasks ✅
+
 1. **UserRole Enum Simplification**
    - Reduced from 5 roles (ADMIN, MEMBER, PROFESSIONAL, THERAPIST, CONTENT_CREATOR) to 2 roles (ADMIN, USER)
    - Updated across all packages: types, API schemas, authentication middleware, services
@@ -79,6 +81,7 @@ This document provides a comprehensive analysis and migration strategy for trans
 With all services now building successfully, the following areas are ready for improvement:
 
 #### 1. **Database Schema Cleanup** 🗄️
+
 - **Priority**: High
 - **Effort**: 1-2 weeks
 - **Tasks**:
@@ -89,6 +92,7 @@ With all services now building successfully, the following areas are ready for i
   - [ ] Verify all foreign key constraints are properly handled
 
 #### 2. **API Documentation & SDK Update** 📚
+
 - **Priority**: High
 - **Effort**: 3-5 days
 - **Tasks**:
@@ -99,6 +103,7 @@ With all services now building successfully, the following areas are ready for i
   - [ ] Test SDK generation pipeline with cleaned schemas
 
 #### 3. **Test Suite Cleanup** 🧪
+
 - **Priority**: Medium
 - **Effort**: 1 week
 - **Tasks**:
@@ -109,6 +114,7 @@ With all services now building successfully, the following areas are ready for i
   - [ ] Update test setup utilities to remove gym-related configurations
 
 #### 4. **Code Quality Improvements** 🔧
+
 - **Priority**: Medium
 - **Effort**: 3-5 days
 - **Tasks**:
@@ -119,6 +125,7 @@ With all services now building successfully, the following areas are ready for i
   - [ ] Add proper TypeScript strict mode compliance
 
 #### 5. **Environment & Configuration Cleanup** ⚙️
+
 - **Priority**: Low
 - **Effort**: 1-2 days
 - **Tasks**:
@@ -129,6 +136,7 @@ With all services now building successfully, the following areas are ready for i
   - [ ] Clean up package.json scripts
 
 #### 6. **Documentation Updates** 📖
+
 - **Priority**: Low
 - **Effort**: 2-3 days
 - **Tasks**:
@@ -139,6 +147,7 @@ With all services now building successfully, the following areas are ready for i
   - [ ] Create migration guide for future reference
 
 #### 7. **Performance Optimization** ⚡
+
 - **Priority**: Future
 - **Effort**: 1-2 weeks
 - **Tasks**:
@@ -156,14 +165,17 @@ With all services now building successfully, the following areas are ready for i
 4. **Code Quality Improvements** - Important for maintainability
 
 ### Architectural Impact
+
 The migration has successfully removed gym-specific functionality while maintaining the core platform architecture. The new simplified user role system and problem categorization align with a more general-purpose platform approach.
 
 ### Technical Debt Identified
+
 - **Import Corruption**: Widespread search-and-replace issue affected multiple services
 - **Database Schema Dependencies**: Some services have gym-specific fields that need schema migration
 - **Service Interdependencies**: Some services rely on gym-specific functionality that needs redesign
 
 ## Table of Contents
+
 1. [Deep Architecture Analysis](#deep-architecture-analysis)
 2. [Technology Stack Comparison](#technology-stack-comparison)
 3. [Service-by-Service Breakdown](#service-by-service-breakdown)
@@ -177,6 +189,7 @@ The migration has successfully removed gym-specific functionality while maintain
 ### Old Pika Architecture (`/pika`)
 
 #### Architectural Patterns
+
 1. **CQRS (Command Query Responsibility Segregation)**
    - Separate read/write models in voucher service
    - Command handlers for business operations
@@ -197,6 +210,7 @@ The migration has successfully removed gym-specific functionality while maintain
 #### Service Implementation Details
 
 **Voucher Service (Most Complex)**:
+
 ```
 /voucher/
 ├── read/
@@ -212,6 +226,7 @@ The migration has successfully removed gym-specific functionality while maintain
 ```
 
 **Key Use Cases Identified**:
+
 - CreateVoucherCommandHandler
 - ClaimVoucherCommandHandler
 - RedeemVoucherCommandHandler
@@ -220,6 +235,7 @@ The migration has successfully removed gym-specific functionality while maintain
 - UpdateVoucherStateCommandHandler
 
 **Provider Service**:
+
 - File upload handling with multer
 - Image processing capabilities
 - Category associations
@@ -227,6 +243,7 @@ The migration has successfully removed gym-specific functionality while maintain
 - Verification workflow
 
 **Communication Stack**:
+
 - Messaging: Real-time chat between customers/providers
 - Notification: Push notifications via Firebase FCM
 - Communication: Attempted consolidation (incomplete)
@@ -234,6 +251,7 @@ The migration has successfully removed gym-specific functionality while maintain
 #### Database Schema Analysis
 
 **Key Tables**:
+
 - users (with roles: customer, provider, admin)
 - providers (business profiles)
 - vouchers (multilingual content, spatial data)
@@ -245,6 +263,7 @@ The migration has successfully removed gym-specific functionality while maintain
 - fraud_detection_logs
 
 **Notable Features**:
+
 - JSONB for multilingual content
 - Geography types for location queries
 - Soft deletes throughout
@@ -252,6 +271,7 @@ The migration has successfully removed gym-specific functionality while maintain
 - Optimistic locking (version fields)
 
 #### Authentication & Security
+
 - **Firebase Auth**: Primary authentication
 - **JWT Tokens**: Platform tokens with RS256
 - **Token Exchange**: Firebase → Platform JWT
@@ -260,6 +280,7 @@ The migration has successfully removed gym-specific functionality while maintain
 - **Rate Limiting**: Per-endpoint configuration
 
 #### External Integrations
+
 - **Firebase**: Auth, FCM, Realtime Database
 - **AWS**: S3 (planned), SES (email)
 - **Elasticsearch**: Search functionality
@@ -269,6 +290,7 @@ The migration has successfully removed gym-specific functionality while maintain
 ### New Architecture (Current Codebase)
 
 #### Architectural Patterns
+
 1. **Clean Architecture**
    - Controller → Service → Repository
    - Clear dependency rules
@@ -289,6 +311,7 @@ The migration has successfully removed gym-specific functionality while maintain
 #### Service Implementation Pattern
 
 **Standard Service Structure**:
+
 ```
 /service-name/
 ├── controllers/         # HTTP request handlers
@@ -301,6 +324,7 @@ The migration has successfully removed gym-specific functionality while maintain
 ```
 
 **Controller Pattern**:
+
 ```typescript
 export class ServiceController {
   constructor(private readonly service: IService) {
@@ -345,6 +369,7 @@ export class ServiceController {
 #### Service Communication Pattern
 
 **BaseServiceClient Implementation**:
+
 ```typescript
 export class BaseServiceClient {
   // Retry logic with exponential backoff
@@ -355,6 +380,7 @@ export class BaseServiceClient {
 ```
 
 **Service Clients**:
+
 - UserServiceClient
 - PaymentServiceClient
 - CommunicationServiceClient
@@ -365,6 +391,7 @@ export class BaseServiceClient {
 #### Validation & Type Safety
 
 **Zod Schema Pattern**:
+
 ```typescript
 // Schema definition
 export const CreateVoucherRequest = z.object({
@@ -385,6 +412,7 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 #### Caching Strategy
 
 **Two-Tier Caching**:
+
 1. **Redis Cache Service**
    - Centralized caching
    - TTL management
@@ -412,12 +440,14 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 #### Deployment Architecture
 
 **Vercel Deployment (Production)**:
+
 - Single function deployment
 - All services embedded
 - Shared database connections
 - Optimized for cold starts
 
 **Local Development**:
+
 - Services run independently
 - Docker compose for infrastructure
 - Hot reload with tsx
@@ -425,22 +455,22 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 
 ## Technology Stack Comparison
 
-| Component | Old Pika | New Architecture | Decision |
-|-----------|----------|------------------|----------|
-| **Runtime** | Node.js 22.x | Node.js 22.x | ✅ Keep |
-| **Language** | TypeScript 5.8 | TypeScript 5.8 | ✅ Keep |
-| **HTTP Framework** | Fastify 5.x | Express 4.x | ⚠️ Evaluate |
-| **Validation** | TypeBox | Zod | ✅ Use Zod |
-| **Database** | PostgreSQL 16 | PostgreSQL 16 | ✅ Keep |
-| **ORM** | Prisma 6.9 | Prisma 6.9 | ✅ Keep |
-| **Cache** | Redis 7.x | Redis 7.x | ✅ Keep |
-| **Auth** | Firebase + JWT | JWT | ⚠️ Merge approach |
-| **Real-time** | Firebase | - | 📝 Add later |
-| **File Storage** | Local + S3 | S3 + MinIO | ✅ Use new |
-| **Email** | Multiple providers | AWS SES + Resend | ✅ Use new |
-| **API Docs** | OpenAPI | OpenAPI | ✅ Keep |
-| **Testing** | Vitest | Vitest | ✅ Keep |
-| **Build** | NX + Yarn | NX + Yarn | ✅ Keep |
+| Component          | Old Pika           | New Architecture | Decision          |
+| ------------------ | ------------------ | ---------------- | ----------------- |
+| **Runtime**        | Node.js 22.x       | Node.js 22.x     | ✅ Keep           |
+| **Language**       | TypeScript 5.8     | TypeScript 5.8   | ✅ Keep           |
+| **HTTP Framework** | Fastify 5.x        | Express 4.x      | ⚠️ Evaluate       |
+| **Validation**     | TypeBox            | Zod              | ✅ Use Zod        |
+| **Database**       | PostgreSQL 16      | PostgreSQL 16    | ✅ Keep           |
+| **ORM**            | Prisma 6.9         | Prisma 6.9       | ✅ Keep           |
+| **Cache**          | Redis 7.x          | Redis 7.x        | ✅ Keep           |
+| **Auth**           | Firebase + JWT     | JWT              | ⚠️ Merge approach |
+| **Real-time**      | Firebase           | -                | 📝 Add later      |
+| **File Storage**   | Local + S3         | S3 + MinIO       | ✅ Use new        |
+| **Email**          | Multiple providers | AWS SES + Resend | ✅ Use new        |
+| **API Docs**       | OpenAPI            | OpenAPI          | ✅ Keep           |
+| **Testing**        | Vitest             | Vitest           | ✅ Keep           |
+| **Build**          | NX + Yarn          | NX + Yarn        | ✅ Keep           |
 
 ## Service-by-Service Breakdown
 
@@ -523,6 +553,7 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 ## Migration Strategy
 
 ### Phase 1: Foundation (Week 1-2)
+
 1. **Clean up codebase**
    - Remove gym, session, social services
    - Update all @solo60 references to @pika
@@ -543,12 +574,14 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 ### Phase 2: Core Services (Week 3-5)
 
 #### Voucher Service Migration
+
 1. **Simplify Architecture**
    - Convert CQRS to Clean Architecture
    - Merge read/write into single flow
    - Keep domain logic
 
 2. **Create Structure**
+
    ```
    /services/voucher/
    ├── controllers/
@@ -574,6 +607,7 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
    - Internal: Validation, stock checks
 
 #### Provider Service Migration
+
 1. **Merge with Reviews**
    - Single service for provider domain
    - Shared repository
@@ -702,43 +736,51 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 ## Implementation Roadmap
 
 ### Week 1-2: Foundation
+
 - [ ] Remove domain-specific services
 - [ ] Fix build issues from renaming
 - [ ] Database schema migration
 - [ ] Environment setup
 
 ### Week 3-4: Voucher Service
+
 - [ ] Create service structure
 - [ ] Migrate business logic
 - [ ] Implement controllers
 - [ ] Add validation
 
 ### Week 5: Provider Service
+
 - [ ] Merge with reviews
 - [ ] Implement verification
 - [ ] Add availability
 
 ### Week 6: Category & Campaign
+
 - [ ] Category hierarchy
 - [ ] Campaign rules
 - [ ] Voucher generation
 
 ### Week 7: Integration
+
 - [ ] Firebase auth
 - [ ] Service communication
 - [ ] End-to-end flows
 
 ### Week 8: Testing
+
 - [ ] Unit tests
 - [ ] Integration tests
 - [ ] Performance tests
 
 ### Week 9: Documentation
+
 - [ ] API documentation
 - [ ] SDK generation
 - [ ] Deployment guide
 
 ### Week 10: Deployment
+
 - [ ] Vercel configuration
 - [ ] Production setup
 - [ ] Monitoring
@@ -746,6 +788,7 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 ## Risk Assessment
 
 ### High Risk
+
 1. **Data Migration**
    - Complex schema changes
    - Multilingual content
@@ -757,6 +800,7 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
    - Mitigation: Clear boundaries, dependency injection
 
 ### Medium Risk
+
 1. **Performance**
    - CQRS to Clean Architecture
    - N+1 queries
@@ -768,6 +812,7 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
    - Mitigation: Phased approach
 
 ### Low Risk
+
 1. **Team Learning**
    - New patterns
    - Different structure
@@ -775,18 +820,19 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 
 ## Service Consolidation Decision Matrix
 
-| Old Services | New Service | Rationale |
-|-------------|-------------|-----------|
-| Voucher + Redemption | Voucher | Same bounded context |
-| Provider + Review | Provider | Reviews belong to providers |
-| Messaging + Notification | Communication | Already consolidated in new |
-| Category | Category | Keep separate (cross-cutting) |
-| Campaign | Campaign | Distinct business logic |
-| PDF Generator | Utility or embed | Evaluate usage |
+| Old Services             | New Service      | Rationale                     |
+| ------------------------ | ---------------- | ----------------------------- |
+| Voucher + Redemption     | Voucher          | Same bounded context          |
+| Provider + Review        | Provider         | Reviews belong to providers   |
+| Messaging + Notification | Communication    | Already consolidated in new   |
+| Category                 | Category         | Keep separate (cross-cutting) |
+| Campaign                 | Campaign         | Distinct business logic       |
+| PDF Generator            | Utility or embed | Evaluate usage                |
 
 ## Migration Checklist
 
 ### Per-Service Checklist
+
 - [ ] Analyze old service implementation
 - [ ] Design new service structure
 - [ ] Create database migrations
@@ -802,6 +848,7 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 - [ ] Deploy and test
 
 ### Global Checklist
+
 - [ ] Update CLAUDE.md
 - [ ] Fix package references
 - [ ] Update environment variables
@@ -829,5 +876,6 @@ router.post('/', validateBody(CreateVoucherRequest), controller.create)
 4. **Firebase Timeline**: Phase 4, after core migration
 
 ---
-*Last Updated: [Current Date]*
-*Status: Ready for Implementation*
+
+_Last Updated: [Current Date]_
+_Status: Ready for Implementation_

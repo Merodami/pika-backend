@@ -14,10 +14,7 @@ import type {
   RegisterRequest,
   UpdateProfileRequest,
 } from '@pika/api/public'
-import {
-  PAGINATION_DEFAULT_LIMIT,
-  REDIS_DEFAULT_TTL,
-} from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'

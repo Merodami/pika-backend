@@ -35,27 +35,27 @@ export default defineConfig({
       '@pikaession': resolve(__dirname, './packages/services/session/src'),
       '@pikaubscription': resolve(
         __dirname,
-        './packages/services/subscription/src'
+        './packages/services/subscription/src',
       ),
       '@pikaayment': resolve(__dirname, './packages/services/payment/src'),
       '@pikaommunication': resolve(
         __dirname,
-        './packages/services/communication/src'
+        './packages/services/communication/src',
       ),
       '@communication': resolve(
         __dirname,
-        './packages/services/communication/src'
+        './packages/services/communication/src',
       ),
       '@pikaupport': resolve(__dirname, './packages/services/support/src'),
       '@pikaile-storage': resolve(
         __dirname,
-        './packages/services/file-storage/src'
+        './packages/services/file-storage/src',
       ),
       '@pikaocial': resolve(__dirname, './packages/services/social/src'),
       // Service-specific aliases
       '@subscription': resolve(
         __dirname,
-        './packages/services/subscription/src'
+        './packages/services/subscription/src',
       ),
       '@social': resolve(__dirname, './packages/services/social/src'),
     },

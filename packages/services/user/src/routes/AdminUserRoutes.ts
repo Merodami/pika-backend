@@ -11,10 +11,7 @@ import {
   validateParams,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import type {
-  CommunicationServiceClient,
-  FileStoragePort,
-} from '@pika/shared'
+import type { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
 import { Router } from 'express'
 import multer from 'multer'
 

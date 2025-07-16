@@ -1,16 +1,16 @@
 import type {
-    BulkEmailParams,
-    BulkEmailResult,
-    EmailParams,
-    EmailProvider,
-    EmailResult,
+  BulkEmailParams,
+  BulkEmailResult,
+  EmailParams,
+  EmailProvider,
+  EmailResult,
 } from '@communication/services/providers/EmailProvider.js'
 import type {
-    BulkSmsParams,
-    BulkSmsResult,
-    SmsParams,
-    SmsProvider,
-    SmsResult,
+  BulkSmsParams,
+  BulkSmsResult,
+  SmsParams,
+  SmsProvider,
+  SmsResult,
 } from '@communication/services/providers/SmsProvider.js'
 import { logger } from '@pika/shared'
 

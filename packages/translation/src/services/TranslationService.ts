@@ -6,7 +6,13 @@ import type { ITranslationCache } from './TranslationCache.js'
 export interface ITranslationService {
   get(key: string, language: string, fallback?: string): Promise<string>
   getBulk(keys: string[], language: string): Promise<Record<string, string>>
-  set(key: string, language: string, value: string, context?: string, service?: string): Promise<void>
+  set(
+    key: string,
+    language: string,
+    value: string,
+    context?: string,
+    service?: string,
+  ): Promise<void>
   detectLanguage(request: Request): Promise<string>
   getUserLanguage(userId: string): Promise<string>
   setUserLanguage(userId: string, languageCode: string): Promise<void>
@@ -16,7 +22,7 @@ export class TranslationService implements ITranslationService {
   constructor(
     private readonly repository: ITranslationRepository,
     private readonly cache: ITranslationCache,
-    private readonly defaultLanguage: string = DEFAULT_LANGUAGE
+    private readonly defaultLanguage: string = DEFAULT_LANGUAGE,
   ) {}
 
   async get(key: string, language: string, fallback?: string): Promise<string> {
@@ -25,7 +31,10 @@ export class TranslationService implements ITranslationService {
     if (cached) return cached
 
     // 2. Check database
-    const translation = await this.repository.findByKeyAndLanguage(key, language)
+    const translation = await this.repository.findByKeyAndLanguage(
+      key,
+      language,
+    )
     if (translation) {
       await this.cache.set(key, language, translation.value)
       return translation.value
@@ -41,7 +50,10 @@ export class TranslationService implements ITranslationService {
     return fallback || key
   }
 
-  async getBulk(keys: string[], language: string): Promise<Record<string, string>> {
+  async getBulk(
+    keys: string[],
+    language: string,
+  ): Promise<Record<string, string>> {
     const results: Record<string, string> = {}
     const uncachedKeys: string[] = []
 
@@ -57,8 +69,11 @@ export class TranslationService implements ITranslationService {
 
     // Fetch uncached from database
     if (uncachedKeys.length > 0) {
-      const translations = await this.repository.findByKeysAndLanguage(uncachedKeys, language)
-      
+      const translations = await this.repository.findByKeysAndLanguage(
+        uncachedKeys,
+        language,
+      )
+
       for (const trans of translations) {
         results[trans.key] = trans.value
         await this.cache.set(trans.key, language, trans.value)
@@ -81,14 +96,26 @@ export class TranslationService implements ITranslationService {
     return results
   }
 
-  async set(key: string, language: string, value: string, context?: string, service?: string): Promise<void> {
+  async set(
+    key: string,
+    language: string,
+    value: string,
+    context?: string,
+    service?: string,
+  ): Promise<void> {
     // Create or update translation
     const existing = await this.repository.findByKeyAndLanguage(key, language)
-    
+
     if (existing) {
       await this.repository.update(existing.id, { value, context, service })
     } else {
-      await this.repository.create({ key, value, languageCode: language, context, service })
+      await this.repository.create({
+        key,
+        value,
+        languageCode: language,
+        context,
+        service,
+      })
     }
 
     // Update cache
@@ -98,13 +125,13 @@ export class TranslationService implements ITranslationService {
   async detectLanguage(request: Request): Promise<string> {
     // 1. Check user preference header
     const userLang = request.headers['x-user-language'] as string
-    if (userLang && await this.isValidLanguage(userLang)) {
+    if (userLang && (await this.isValidLanguage(userLang))) {
       return userLang
     }
 
     // 2. Check query parameter
     const queryLang = request.query.lang as string
-    if (queryLang && await this.isValidLanguage(queryLang)) {
+    if (queryLang && (await this.isValidLanguage(queryLang))) {
       return queryLang
     }
 
@@ -112,7 +139,7 @@ export class TranslationService implements ITranslationService {
     const acceptLang = request.headers['accept-language']
     if (acceptLang) {
       const preferredLang = this.parseAcceptLanguage(acceptLang)
-      if (preferredLang && await this.isValidLanguage(preferredLang)) {
+      if (preferredLang && (await this.isValidLanguage(preferredLang))) {
         return preferredLang
       }
     }

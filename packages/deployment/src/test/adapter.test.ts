@@ -18,7 +18,7 @@ vi.mock('@pikanication', () => ({
     testHarness.serviceFactory.createCommunicationServer(),
 }))
 
-vi.mock('@pika () => ({
+vi.mock('@pika/gym', () => ({
   createGymServer: () => testHarness.serviceFactory.createGymServer(),
 }))
 
@@ -43,16 +43,16 @@ vi.mock('@pikaription', () => ({
     testHarness.serviceFactory.createSubscriptionServer(),
 }))
 
-vi.mock('@pikart', () => ({
+vi.mock('@pika/support', () => ({
   createSupportServer: () => testHarness.serviceFactory.createSupportServer(),
 }))
 
-vi.mock('@pika, () => ({
+vi.mock('@pika/user', () => ({
   createUserServer: () => testHarness.serviceFactory.createUserServer(),
 }))
 
 // Mock shared service clients
-vi.mock('@pikad', () => ({
+vi.mock('@pika/shared', () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),

@@ -1,8 +1,8 @@
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import type {
-    SubscriptionInterval,
-    SubscriptionStatus,
+  SubscriptionInterval,
+  SubscriptionStatus,
 } from '@subscription/types/enums.js'
 
 // Service configuration interfaces

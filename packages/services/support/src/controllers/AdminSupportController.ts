@@ -1,10 +1,10 @@
 import type {
-    AdminTicketDetailResponse,
-    AdminTicketListResponse,
-    AdminTicketQueryParams,
-    AssignTicketRequest,
-    TicketIdParam,
-    UpdateTicketStatusRequest,
+  AdminTicketDetailResponse,
+  AdminTicketListResponse,
+  AdminTicketQueryParams,
+  AssignTicketRequest,
+  TicketIdParam,
+  UpdateTicketStatusRequest,
 } from '@pika/api/admin'
 import type { ProblemDomain } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'

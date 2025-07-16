@@ -129,13 +129,7 @@ export class PlanRepository implements IPlanRepository {
   async findAll(
     params: PlanSearchParams,
   ): Promise<PaginatedResult<SubscriptionPlanDomain>> {
-    const {
-      page = 1,
-      limit = 20,
-      isActive,
-      interval,
-      search,
-    } = params
+    const { page = 1, limit = 20, isActive, interval, search } = params
 
     const skip = (page - 1) * limit
 

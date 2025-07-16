@@ -14,18 +14,18 @@ config({ path: pathJoin(__currentDirname, '../../../../.env.local') })
 
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import {
-    API_GATEWAY_BASE_URL,
-    AUTH_SERVICE_PORT,
-    COMMUNICATION_SERVICE_PORT,
-    FILE_STORAGE_SERVICE_PORT,
-    GYM_SERVICE_PORT,
-    PAYMENT_SERVICE_PORT,
-    SERVICE_HOST,
-    SESSION_SERVICE_PORT,
-    SOCIAL_SERVICE_PORT,
-    SUBSCRIPTION_SERVICE_PORT,
-    SUPPORT_SERVICE_PORT,
-    USER_SERVICE_PORT,
+  API_GATEWAY_BASE_URL,
+  AUTH_SERVICE_PORT,
+  COMMUNICATION_SERVICE_PORT,
+  FILE_STORAGE_SERVICE_PORT,
+  GYM_SERVICE_PORT,
+  PAYMENT_SERVICE_PORT,
+  SERVICE_HOST,
+  SESSION_SERVICE_PORT,
+  SOCIAL_SERVICE_PORT,
+  SUBSCRIPTION_SERVICE_PORT,
+  SUPPORT_SERVICE_PORT,
+  USER_SERVICE_PORT,
 } from '@pika/environment'
 import { mkdirSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'

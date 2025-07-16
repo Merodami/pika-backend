@@ -2,10 +2,10 @@ import { ErrorCode } from '@pika/types'
 import { get } from 'lodash-es'
 
 import {
-    BaseError,
-    ErrorContext,
-    ErrorDomain,
-    ErrorSeverity,
+  BaseError,
+  ErrorContext,
+  ErrorDomain,
+  ErrorSeverity,
 } from './ErrorBase.js'
 
 /**

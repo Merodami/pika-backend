@@ -9,11 +9,7 @@ import {
   NODE_ENV,
   SKIP_AUTH,
 } from '@pika/environment'
-import {
-  logger,
-  NotAuthenticatedError,
-  NotAuthorizedError,
-} from '@pika/shared'
+import { logger, NotAuthenticatedError, NotAuthorizedError } from '@pika/shared'
 import { UserRole } from '@pika/types'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
@@ -340,7 +336,6 @@ export function requireUser(): RequestHandler {
     next()
   }
 }
-
 
 /**
  * Require specific roles (any of the provided roles)

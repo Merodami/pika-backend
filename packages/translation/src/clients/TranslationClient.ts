@@ -7,11 +7,20 @@ export class TranslationClient {
     return this.translationService.get(key, language, fallback)
   }
 
-  async getBulk(keys: string[], language: string): Promise<Record<string, string>> {
+  async getBulk(
+    keys: string[],
+    language: string,
+  ): Promise<Record<string, string>> {
     return this.translationService.getBulk(keys, language)
   }
 
-  async set(key: string, language: string, value: string, context?: string, service?: string): Promise<void> {
+  async set(
+    key: string,
+    language: string,
+    value: string,
+    context?: string,
+    service?: string,
+  ): Promise<void> {
     return this.translationService.set(key, language, value, context, service)
   }
 

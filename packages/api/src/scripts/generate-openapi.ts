@@ -20,9 +20,9 @@ import { fileURLToPath } from 'url'
 import { createRegistry } from '../common/registry/base.js'
 import { ErrorResponse } from '../common/schemas/responses.js'
 import {
-    apiKeyAuth,
-    bearerAuth,
-    documentRoute,
+  apiKeyAuth,
+  bearerAuth,
+  documentRoute,
 } from '../common/utils/openapi.js'
 // Import schemas
 import * as authSchemas from '../public/schemas/auth/login.js'

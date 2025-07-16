@@ -1,15 +1,15 @@
 import type {
-    CreateEmailVerificationTokenRequest,
-    CreatePasswordResetTokenRequest,
-    CreateUserRequest,
-    EmailParam,
-    PhoneParam,
-    UpdateLastLoginRequest,
-    UpdatePasswordRequest,
-    UserIdParam,
-    ValidateEmailVerificationTokenRequest,
-    ValidatePasswordResetTokenRequest,
-    VerifyEmailRequest,
+  CreateEmailVerificationTokenRequest,
+  CreatePasswordResetTokenRequest,
+  CreateUserRequest,
+  EmailParam,
+  PhoneParam,
+  UpdateLastLoginRequest,
+  UpdatePasswordRequest,
+  UserIdParam,
+  ValidateEmailVerificationTokenRequest,
+  ValidatePasswordResetTokenRequest,
+  VerifyEmailRequest,
 } from '@pika/api/internal'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'

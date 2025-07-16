@@ -7,9 +7,9 @@
 
 import { PrismaClient } from '@prisma/client'
 import { AUTH_SERVICE_PORT } from '@pika/environment'
-import { startServer } from '@pika
-import { MemoryCacheService } from '@pika
-import { logger } from '@pika
+import { startServer } from '@pika/http'
+import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 
 import { createAuthServer } from './src/server.js'
 

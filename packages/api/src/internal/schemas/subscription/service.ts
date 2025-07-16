@@ -369,10 +369,7 @@ export const ProcessSubscriptionUsageRequest = openapi(
   z.object({
     userId: UserId,
     subscriptionId: UUID,
-    usageType: z.enum([
-      'FEATURE_ACCESS',
-      'CREDIT_DEDUCTION',
-    ]),
+    usageType: z.enum(['FEATURE_ACCESS', 'CREDIT_DEDUCTION']),
     amount: z.number().positive().optional(),
     metadata: z.record(z.any()).optional(),
   }),

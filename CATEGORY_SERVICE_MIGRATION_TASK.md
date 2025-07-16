@@ -3,12 +3,14 @@
 ## Current Project Status
 
 ### Completed Tasks
+
 1. ✅ All `@solo60` references have been renamed to `@pika`
 2. ✅ `/pika` folder has been added to all ignore files
 3. ✅ Domain-specific services (gym, session, social) have been removed
 4. ✅ Comprehensive migration analysis completed (see MIGRATION_ANALYSIS.md)
 
 ### Project Context
+
 - **Old Architecture**: Located in `/pika` folder - uses CQRS, TypeBox, complex patterns
 - **New Architecture**: Main codebase - uses Clean Architecture, Zod, simplified patterns
 - We are migrating business logic from old to new while following the new architecture patterns
@@ -16,10 +18,13 @@
 ## Your Task: Migrate Category Service
 
 ### Overview
+
 Migrate the Category service from the old Pika architecture (`/pika/packages/services/category`) to the new architecture, following the established patterns and structure.
 
 ### Source Analysis
+
 The old Category service in `/pika/packages/services/category` includes:
+
 - Hierarchical categories (parent-child relationships)
 - Multilingual support (name and description in multiple languages)
 - Active/inactive status
@@ -27,7 +32,9 @@ The old Category service in `/pika/packages/services/category` includes:
 - Sorting capabilities
 
 ### Database Schema
+
 The category table (from `/pika/packages/database/prisma/models/category.prisma`):
+
 ```prisma
 model Category {
   id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
@@ -42,7 +49,7 @@ model Category {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
-  
+
   providers   Provider[]
   vouchers    Voucher[]
 }
@@ -51,6 +58,7 @@ model Category {
 ## New Architecture Pattern (MUST FOLLOW)
 
 ### 1. Service Structure
+
 Create the following structure under `/packages/services/category/`:
 
 ```
@@ -85,18 +93,21 @@ Create the following structure under `/packages/services/category/`:
 We follow a **three-tier API design**:
 
 #### Public API (`/api/public/schemas/category/`)
+
 - Customer-facing endpoints
 - Read operations (browse categories)
 - No authentication required for listing
 - Limited fields exposed
 
 #### Admin API (`/api/admin/schemas/category/`)
+
 - Full CRUD operations
 - All fields accessible
 - Requires admin authentication
 - Bulk operations
 
 #### Internal API (`/api/internal/schemas/category/`)
+
 - Service-to-service communication
 - No rate limiting
 - API key authentication
@@ -105,6 +116,7 @@ We follow a **three-tier API design**:
 ### 3. Implementation Patterns
 
 #### Controller Pattern
+
 ```typescript
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {
@@ -113,11 +125,7 @@ export class CategoryController {
     this.getCategoryById = this.getCategoryById.bind(this)
   }
 
-  async getCategories(
-    request: Request<{}, {}, {}, CategoryQueryParams>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategories(request: Request<{}, {}, {}, CategoryQueryParams>, response: Response, next: NextFunction): Promise<void> {
     try {
       const params = {
         page: Number(request.query.page) || 1,
@@ -128,11 +136,11 @@ export class CategoryController {
       }
 
       const result = await this.categoryService.getCategories(params)
-      
+
       // IMPORTANT: Use mapper for data transformation
       const dtoResult = {
         data: result.data.map(CategoryMapper.toDTO),
-        pagination: result.pagination
+        pagination: result.pagination,
       }
 
       response.json(dtoResult)
@@ -144,11 +152,12 @@ export class CategoryController {
 ```
 
 #### Service Pattern
+
 ```typescript
 export class CategoryService {
   constructor(
     private readonly categoryRepository: CategoryRepository,
-    private readonly cacheService: ICacheService
+    private readonly cacheService: ICacheService,
   ) {}
 
   async getCategories(params: CategorySearchParams): Promise<PaginatedResult<CategoryDomain>> {
@@ -161,11 +170,12 @@ export class CategoryService {
 ```
 
 #### Repository Pattern
+
 ```typescript
 export class CategoryRepository {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly cache?: ICacheService
+    private readonly cache?: ICacheService,
   ) {}
 
   async findAll(params: CategorySearchParams): Promise<PaginatedResult<Category>> {
@@ -176,6 +186,7 @@ export class CategoryRepository {
 ```
 
 #### Mapper Pattern (REQUIRED)
+
 ```typescript
 export class CategoryMapper {
   // Database → Domain
@@ -189,7 +200,7 @@ export class CategoryMapper {
       isActive: dbCategory.isActive,
       sortOrder: dbCategory.sortOrder,
       createdAt: dbCategory.createdAt,
-      updatedAt: dbCategory.updatedAt
+      updatedAt: dbCategory.updatedAt,
     }
   }
 
@@ -202,7 +213,7 @@ export class CategoryMapper {
       icon: domain.icon,
       parentId: domain.parentId,
       isActive: domain.isActive,
-      sortOrder: domain.sortOrder
+      sortOrder: domain.sortOrder,
     }
   }
 }
@@ -213,6 +224,7 @@ export class CategoryMapper {
 Create schemas in `/packages/api/src/`:
 
 #### Public Schemas (`/public/schemas/category/index.ts`)
+
 ```typescript
 import { z } from 'zod'
 import { paginationSchema, multilingualTextField } from '../../common/schemas'
@@ -224,12 +236,12 @@ export const CategoryResponse = z.object({
   icon: z.string().nullable(),
   parentId: z.string().uuid().nullable(),
   isActive: z.boolean(),
-  sortOrder: z.number()
+  sortOrder: z.number(),
 })
 
 export const CategoryListResponse = z.object({
   data: z.array(CategoryResponse),
-  pagination: paginationSchema
+  pagination: paginationSchema,
 })
 
 export const CategoryQueryParams = z.object({
@@ -237,11 +249,12 @@ export const CategoryQueryParams = z.object({
   limit: z.coerce.number().min(1).max(100).default(20),
   parentId: z.string().uuid().optional(),
   isActive: z.coerce.boolean().optional(),
-  search: z.string().optional()
+  search: z.string().optional(),
 })
 ```
 
 #### Admin Schemas (`/admin/schemas/category/index.ts`)
+
 ```typescript
 export const CreateCategoryRequest = z.object({
   name: multilingualTextField,
@@ -249,7 +262,7 @@ export const CreateCategoryRequest = z.object({
   icon: z.string().optional(),
   parentId: z.string().uuid().optional(),
   isActive: z.boolean().default(true),
-  sortOrder: z.number().default(0)
+  sortOrder: z.number().default(0),
 })
 
 export const UpdateCategoryRequest = CreateCategoryRequest.partial()
@@ -258,56 +271,30 @@ export const UpdateCategoryRequest = CreateCategoryRequest.partial()
 ### 5. Route Setup
 
 #### Public Routes
+
 ```typescript
-export function createCategoryRoutes(
-  categoryController: CategoryController
-): Router {
+export function createCategoryRoutes(categoryController: CategoryController): Router {
   const router = Router()
 
-  router.get(
-    '/',
-    validateQuery(CategoryQueryParams),
-    categoryController.getCategories
-  )
+  router.get('/', validateQuery(CategoryQueryParams), categoryController.getCategories)
 
-  router.get(
-    '/:id',
-    validateParams(z.object({ id: z.string().uuid() })),
-    categoryController.getCategoryById
-  )
+  router.get('/:id', validateParams(z.object({ id: z.string().uuid() })), categoryController.getCategoryById)
 
   return router
 }
 ```
 
 #### Admin Routes
+
 ```typescript
-export function createAdminCategoryRoutes(
-  adminCategoryController: AdminCategoryController
-): Router {
+export function createAdminCategoryRoutes(adminCategoryController: AdminCategoryController): Router {
   const router = Router()
 
-  router.post(
-    '/',
-    requireAdmin(),
-    validateBody(CreateCategoryRequest),
-    adminCategoryController.createCategory
-  )
+  router.post('/', requireAdmin(), validateBody(CreateCategoryRequest), adminCategoryController.createCategory)
 
-  router.put(
-    '/:id',
-    requireAdmin(),
-    validateParams(z.object({ id: z.string().uuid() })),
-    validateBody(UpdateCategoryRequest),
-    adminCategoryController.updateCategory
-  )
+  router.put('/:id', requireAdmin(), validateParams(z.object({ id: z.string().uuid() })), validateBody(UpdateCategoryRequest), adminCategoryController.updateCategory)
 
-  router.delete(
-    '/:id',
-    requireAdmin(),
-    validateParams(z.object({ id: z.string().uuid() })),
-    adminCategoryController.deleteCategory
-  )
+  router.delete('/:id', requireAdmin(), validateParams(z.object({ id: z.string().uuid() })), adminCategoryController.deleteCategory)
 
   return router
 }
@@ -316,14 +303,12 @@ export function createAdminCategoryRoutes(
 ### 6. Dependency Injection
 
 In `app.ts`:
+
 ```typescript
-export async function createCategoryServer(dependencies: {
-  prisma: PrismaClient
-  cacheService: ICacheService
-}) {
+export async function createCategoryServer(dependencies: { prisma: PrismaClient; cacheService: ICacheService }) {
   const app = await createExpressServer({
     serviceName: 'category',
-    dependencies
+    dependencies,
   })
 
   // Create instances
@@ -343,7 +328,9 @@ export async function createCategoryServer(dependencies: {
 ## Important Patterns to Follow
 
 ### 1. Error Handling
+
 Use the `ErrorFactory` from `@pika/shared`:
+
 ```typescript
 import { ErrorFactory } from '@pika/shared'
 
@@ -352,19 +339,25 @@ throw ErrorFactory.badRequest('Parent category cannot be the same as the categor
 ```
 
 ### 2. Validation
+
 Always validate inputs using Zod middleware:
+
 ```typescript
 import { validateBody, validateQuery, validateParams } from '@pika/shared'
 ```
 
 ### 3. Authentication
+
 Use authentication helpers:
+
 ```typescript
 import { requireAuth, requireAdmin } from '@pika/auth'
 ```
 
 ### 4. Caching
+
 Use the cache decorator for read operations:
+
 ```typescript
 import { Cache } from '@pika/redis'
 
@@ -373,6 +366,7 @@ async getCategories() { }
 ```
 
 ### 5. Types Organization
+
 - **Domain Types**: Internal representation of data
 - **DTO Types**: External API representation
 - **Database Types**: Prisma generated types
@@ -380,6 +374,7 @@ async getCategories() { }
 ## Testing Requirements
 
 Create integration tests in `/packages/services/category/test/integration/`:
+
 ```typescript
 describe('Category Service', () => {
   let app: Application
@@ -389,7 +384,7 @@ describe('Category Service', () => {
     testDb = await createTestDatabase()
     app = await createCategoryServer({
       prisma: testDb.prisma,
-      cacheService: new MemoryCacheService()
+      cacheService: new MemoryCacheService(),
     })
   })
 
@@ -404,6 +399,7 @@ describe('Category Service', () => {
 ## Multilingual Support
 
 Categories support multilingual content. Example:
+
 ```json
 {
   "name": {
@@ -456,6 +452,7 @@ Always preserve multilingual fields when transforming data.
 ## Questions or Blockers?
 
 If you encounter any issues:
+
 1. Check the existing services (auth, user, communication) for patterns
 2. Refer to CLAUDE.md for architecture guidelines
 3. The other Claude instance is handling cleanup tasks in parallel

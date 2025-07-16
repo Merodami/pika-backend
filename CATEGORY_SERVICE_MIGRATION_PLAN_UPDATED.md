@@ -1,33 +1,39 @@
 # Category Service Migration Plan (Updated)
 
 ## Overview
+
 This is the updated migration plan for the Category Service, incorporating all architectural patterns and best practices from the documentation review.
 
 ## Key Architecture Principles to Follow
 
 ### 1. Clean Architecture & Separation of Concerns
+
 - **Controllers** → Handle HTTP concerns only (extract params, call service, return response)
 - **Services** → Business logic, validation, orchestration (NO database queries, NO API types)
 - **Repositories** → Data access and persistence only
 - **Mappers** → Data transformation between layers (Database ↔ Domain ↔ DTO)
 
 ### 2. Import Rules (CRITICAL)
+
 - **Controllers CAN import**: `@pika/api`, `@pika/sdk`, service interfaces
 - **Services CAN import**: `@pika/shared` (for service clients), repository interfaces, domain types
 - **Repositories CAN import**: `@prisma/client`, `@pika/database`
 - **NEVER**: Import API types in services, import Prisma in controllers, cross-service direct imports
 
 ### 3. Validation Pattern
+
 - Use Zod schemas from `@pika/api` with validation middleware
 - Use `createSearchSchema` and `createByIdQuerySchema` utilities for consistency
 - Never manually parse schemas in controllers - let middleware handle it
 
 ### 4. Relation Handling Pattern
+
 - Use `include` parameter pattern (JSON:API spec) for optional relations
 - Return complete objects when included, not just ID/name pairs
 - Support hierarchical categories with parent/children relations
 
 ### 5. Type Safety
+
 - Use proper Request generics: `Request<Params, {}, Body, Query>`
 - Never use type assertions or `unknown` casts
 - Let validation middleware ensure runtime safety
@@ -37,12 +43,14 @@ This is the updated migration plan for the Category Service, incorporating all a
 ### Phase 1: API Schema Creation (Zod)
 
 #### 1.1 Common Schema Utilities
+
 ```typescript
 // Use existing utilities from @pika/api/common
 import { createSearchSchema, createByIdQuerySchema, multilingualTextField } from '@pika/api/common'
 ```
 
 #### 1.2 Public API Schema (`/packages/api/src/public/schemas/category/index.ts`)
+
 ```typescript
 import { z } from 'zod'
 import { createSearchSchema, createByIdQuerySchema, multilingualTextField } from '../../common/schemas/index.js'
@@ -64,7 +72,7 @@ export const CategoryResponse = z.object({
   updatedAt: z.string().datetime(),
   // Include pattern for complete objects
   parent: z.lazy(() => CategoryResponse).optional(),
-  children: z.array(z.lazy(() => CategoryResponse)).optional()
+  children: z.array(z.lazy(() => CategoryResponse)).optional(),
 })
 
 // Search schema using utility
@@ -76,8 +84,8 @@ export const SearchCategoriesRequest = createSearchSchema({
     parentId: z.string().uuid().optional(),
     isActive: z.coerce.boolean().optional(),
     search: z.string().optional(),
-    level: z.number().int().min(1).optional()
-  }
+    level: z.number().int().min(1).optional(),
+  },
 })
 
 // By ID query schema
@@ -85,13 +93,13 @@ export const GetCategoryByIdQuery = createByIdQuerySchema(CATEGORY_RELATIONS)
 
 // ID parameter
 export const CategoryIdParam = z.object({
-  id: z.string().uuid()
+  id: z.string().uuid(),
 })
 
 // List response
 export const CategoryListResponse = z.object({
   data: z.array(CategoryResponse),
-  pagination: paginationResponseSchema
+  pagination: paginationResponseSchema,
 })
 
 // Export types
@@ -101,6 +109,7 @@ export type GetCategoryByIdQuery = z.infer<typeof GetCategoryByIdQuery>
 ```
 
 #### 1.3 Admin API Schema (`/packages/api/src/admin/schemas/category/management.ts`)
+
 ```typescript
 import { z } from 'zod'
 import { multilingualTextField } from '../../../common/schemas/fields.js'
@@ -113,14 +122,14 @@ export const CreateCategoryRequest = z.object({
   icon: z.string().optional(),
   parentId: z.string().uuid().optional(),
   isActive: z.boolean().default(true),
-  sortOrder: z.number().int().default(0)
+  sortOrder: z.number().int().default(0),
 })
 
 export const UpdateCategoryRequest = CreateCategoryRequest.partial()
 
 // Admin response includes soft delete info
 export const AdminCategoryResponse = CategoryResponse.extend({
-  deletedAt: z.string().datetime().nullable()
+  deletedAt: z.string().datetime().nullable(),
 })
 
 // Admin can see deleted categories
@@ -132,21 +141,23 @@ export const AdminSearchCategoriesRequest = createSearchSchema({
     parentId: z.string().uuid().optional(),
     isActive: z.coerce.boolean().optional(),
     search: z.string().optional(),
-    includeDeleted: z.coerce.boolean().optional()
-  }
+    includeDeleted: z.coerce.boolean().optional(),
+  },
 })
 
 export const AdminCategoryListResponse = z.object({
   data: z.array(AdminCategoryResponse),
-  pagination: paginationResponseSchema
+  pagination: paginationResponseSchema,
 })
 
 // Bulk operations
 export const BulkUpdateCategoriesRequest = z.object({
-  updates: z.array(z.object({
-    id: z.string().uuid(),
-    data: UpdateCategoryRequest
-  }))
+  updates: z.array(
+    z.object({
+      id: z.string().uuid(),
+      data: UpdateCategoryRequest,
+    }),
+  ),
 })
 
 // Export types
@@ -156,48 +167,49 @@ export type AdminCategoryResponse = z.infer<typeof AdminCategoryResponse>
 ```
 
 #### 1.4 Internal API Schema (`/packages/api/src/internal/schemas/category/service.ts`)
+
 ```typescript
 import { z } from 'zod'
 import { CategoryResponse } from '../../../public/schemas/category/index.js'
 
 // Batch operations
 export const GetCategoriesByIdsRequest = z.object({
-  categoryIds: z.array(z.string().uuid()).min(1).max(100)
+  categoryIds: z.array(z.string().uuid()).min(1).max(100),
 })
 
 export const GetCategoriesByIdsResponse = z.object({
-  categories: z.array(CategoryResponse)
+  categories: z.array(CategoryResponse),
 })
 
 // Validation
 export const ValidateCategoryRequest = z.object({
   categoryId: z.string().uuid(),
-  checkActive: z.boolean().default(true)
+  checkActive: z.boolean().default(true),
 })
 
 export const ValidateCategoryResponse = z.object({
   valid: z.boolean(),
   category: CategoryResponse.optional(),
-  reason: z.string().optional()
+  reason: z.string().optional(),
 })
 
 // Hierarchy operations
 export const GetCategoryPathRequest = z.object({
-  categoryId: z.string().uuid()
+  categoryId: z.string().uuid(),
 })
 
 export const GetCategoryPathResponse = z.object({
-  path: z.array(CategoryResponse)
+  path: z.array(CategoryResponse),
 })
 
 // Tree operations
 export const GetCategoryTreeRequest = z.object({
   rootId: z.string().uuid().optional(),
-  maxDepth: z.number().int().min(1).max(10).default(5)
+  maxDepth: z.number().int().min(1).max(10).default(5),
 })
 
 export const GetCategoryTreeResponse = z.object({
-  tree: z.array(CategoryResponse)
+  tree: z.array(CategoryResponse),
 })
 
 // Export types
@@ -208,6 +220,7 @@ export type ValidateCategoryResponse = z.infer<typeof ValidateCategoryResponse>
 ### Phase 2: Service Structure Creation
 
 #### 2.1 Create Directory Structure
+
 ```bash
 mkdir -p packages/services/category/{src/{controllers,services,repositories,routes,mappers,types,utils},test/integration}
 ```
@@ -215,6 +228,7 @@ mkdir -p packages/services/category/{src/{controllers,services,repositories,rout
 #### 2.2 Package Configuration
 
 **package.json:**
+
 ```json
 {
   "name": "@pika/category-service",
@@ -259,6 +273,7 @@ mkdir -p packages/services/category/{src/{controllers,services,repositories,rout
 ```
 
 **tsconfig.json:**
+
 ```json
 {
   "extends": "../../../tsconfig.base.json",
@@ -273,6 +288,7 @@ mkdir -p packages/services/category/{src/{controllers,services,repositories,rout
 ```
 
 **project.json:**
+
 ```json
 {
   "name": "@pika/category-service",
@@ -330,6 +346,7 @@ mkdir -p packages/services/category/{src/{controllers,services,repositories,rout
 ### Phase 3: Core Implementation
 
 #### 3.1 Domain Types (`/types/domain.ts`)
+
 ```typescript
 import type { Category } from '@pika/database'
 import type { MultilingualText } from '@pika/types'
@@ -362,6 +379,7 @@ export interface CategoryTree {
 ```
 
 #### 3.2 Search Types (`/types/search.ts`)
+
 ```typescript
 import type { ParsedIncludes } from '@pika/shared'
 
@@ -388,13 +406,10 @@ export interface CategoryFilters {
 ```
 
 #### 3.3 Mapper Implementation (`/mappers/CategoryMapper.ts`)
+
 ```typescript
 import type { Category, Prisma } from '@pika/database'
-import type { 
-  CategoryResponse, 
-  CreateCategoryRequest,
-  UpdateCategoryRequest 
-} from '@pika/api'
+import type { CategoryResponse, CreateCategoryRequest, UpdateCategoryRequest } from '@pika/api'
 import type { CategoryDomain } from '../types/domain.js'
 import type { MultilingualText } from '@pika/types'
 
@@ -416,7 +431,7 @@ export class CategoryMapper {
       sortOrder: dbCategory.sortOrder,
       createdAt: dbCategory.createdAt,
       updatedAt: dbCategory.updatedAt,
-      deletedAt: dbCategory.deletedAt
+      deletedAt: dbCategory.deletedAt,
     }
 
     // Map relations if present
@@ -425,7 +440,7 @@ export class CategoryMapper {
     }
 
     if (dbCategory.children) {
-      domain.children = dbCategory.children.map(child => this.toDomain(child))
+      domain.children = dbCategory.children.map((child) => this.toDomain(child))
     }
 
     return domain
@@ -442,7 +457,7 @@ export class CategoryMapper {
       isActive: domain.isActive,
       sortOrder: domain.sortOrder,
       createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt.toISOString()
+      updatedAt: domain.updatedAt.toISOString(),
     }
 
     // Include relations if present
@@ -451,7 +466,7 @@ export class CategoryMapper {
     }
 
     if (domain.children) {
-      response.children = domain.children.map(child => this.toResponse(child))
+      response.children = domain.children.map((child) => this.toResponse(child))
     }
 
     return response
@@ -465,36 +480,37 @@ export class CategoryMapper {
       icon: request.icon || null,
       parentId: request.parentId || null,
       isActive: request.isActive ?? true,
-      sortOrder: request.sortOrder ?? 0
+      sortOrder: request.sortOrder ?? 0,
     }
   }
 
   // API Request to Domain (for update)
   static fromUpdateRequest(request: UpdateCategoryRequest): Partial<CategoryDomain> {
     const updates: Partial<CategoryDomain> = {}
-    
+
     if (request.name !== undefined) updates.name = request.name
     if (request.description !== undefined) updates.description = request.description
     if (request.icon !== undefined) updates.icon = request.icon
     if (request.parentId !== undefined) updates.parentId = request.parentId
     if (request.isActive !== undefined) updates.isActive = request.isActive
     if (request.sortOrder !== undefined) updates.sortOrder = request.sortOrder
-    
+
     return updates
   }
 
   // Array transformations
   static toDomainArray(dbCategories: CategoryWithRelations[]): CategoryDomain[] {
-    return dbCategories.map(cat => this.toDomain(cat))
+    return dbCategories.map((cat) => this.toDomain(cat))
   }
 
   static toResponseArray(domains: CategoryDomain[]): CategoryResponse[] {
-    return domains.map(domain => this.toResponse(domain))
+    return domains.map((domain) => this.toResponse(domain))
   }
 }
 ```
 
 #### 3.4 Repository Implementation (`/repositories/CategoryRepository.ts`)
+
 ```typescript
 import type { PrismaClient, Prisma } from '@pika/database'
 import type { ICacheService } from '@pika/redis'
@@ -522,18 +538,11 @@ export interface ICategoryRepository {
 export class CategoryRepository implements ICategoryRepository {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly cache?: ICacheService
+    private readonly cache?: ICacheService,
   ) {}
 
   async findAll(params: CategorySearchParams): Promise<PaginatedResult<CategoryDomain>> {
-    const {
-      page = 1,
-      limit = 20,
-      sortBy = 'sortOrder',
-      sortOrder = 'asc',
-      parsedIncludes,
-      ...filters
-    } = params
+    const { page = 1, limit = 20, sortBy = 'sortOrder', sortOrder = 'asc', parsedIncludes, ...filters } = params
 
     const where = this.buildWhereClause(filters)
     const orderBy = this.buildOrderBy(sortBy, sortOrder)
@@ -548,7 +557,7 @@ export class CategoryRepository implements ICategoryRepository {
       orderBy,
       skip: (page - 1) * limit,
       take: limit,
-      include
+      include,
     })
 
     const data = CategoryMapper.toDomainArray(categories)
@@ -559,8 +568,8 @@ export class CategoryRepository implements ICategoryRepository {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     }
   }
 
@@ -569,7 +578,7 @@ export class CategoryRepository implements ICategoryRepository {
 
     const category = await this.prisma.category.findUnique({
       where: { id },
-      include
+      include,
     })
 
     return category ? CategoryMapper.toDomain(category) : null
@@ -577,10 +586,10 @@ export class CategoryRepository implements ICategoryRepository {
 
   async findByIds(ids: string[]): Promise<CategoryDomain[]> {
     const categories = await this.prisma.category.findMany({
-      where: { 
+      where: {
         id: { in: ids },
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     })
 
     return CategoryMapper.toDomainArray(categories)
@@ -588,12 +597,12 @@ export class CategoryRepository implements ICategoryRepository {
 
   async findByParentId(parentId: string | null): Promise<CategoryDomain[]> {
     const categories = await this.prisma.category.findMany({
-      where: { 
+      where: {
         parentId,
         deletedAt: null,
-        isActive: true
+        isActive: true,
       },
-      orderBy: { sortOrder: 'asc' }
+      orderBy: { sortOrder: 'asc' },
     })
 
     return CategoryMapper.toDomainArray(categories)
@@ -608,8 +617,8 @@ export class CategoryRepository implements ICategoryRepository {
           icon: data.icon,
           parentId: data.parentId,
           isActive: data.isActive,
-          sortOrder: data.sortOrder
-        }
+          sortOrder: data.sortOrder,
+        },
       })
 
       // Clear cache
@@ -635,7 +644,7 @@ export class CategoryRepository implements ICategoryRepository {
 
       const category = await this.prisma.category.update({
         where: { id },
-        data: updateData
+        data: updateData,
       })
 
       // Clear cache
@@ -661,7 +670,7 @@ export class CategoryRepository implements ICategoryRepository {
     try {
       await this.prisma.category.update({
         where: { id },
-        data: { deletedAt: new Date() }
+        data: { deletedAt: new Date() },
       })
 
       // Clear cache
@@ -680,14 +689,14 @@ export class CategoryRepository implements ICategoryRepository {
 
   async exists(id: string): Promise<boolean> {
     const count = await this.prisma.category.count({
-      where: { id, deletedAt: null }
+      where: { id, deletedAt: null },
     })
     return count > 0
   }
 
   async hasChildren(id: string): Promise<boolean> {
     const count = await this.prisma.category.count({
-      where: { parentId: id, deletedAt: null }
+      where: { parentId: id, deletedAt: null },
     })
     return count > 0
   }
@@ -699,7 +708,7 @@ export class CategoryRepository implements ICategoryRepository {
     while (currentId) {
       const category = await this.findById(currentId)
       if (!category) break
-      
+
       ancestors.unshift(category)
       currentId = category.parentId
     }
@@ -738,31 +747,28 @@ export class CategoryRepository implements ICategoryRepository {
         {
           name: {
             path: ['en'],
-            string_contains: filters.search
-          }
+            string_contains: filters.search,
+          },
         },
         {
           name: {
             path: ['es'],
-            string_contains: filters.search
-          }
+            string_contains: filters.search,
+          },
         },
         {
           name: {
             path: ['gn'],
-            string_contains: filters.search
-          }
-        }
+            string_contains: filters.search,
+          },
+        },
       ]
     }
 
     return where
   }
 
-  private buildOrderBy(
-    sortBy: string,
-    sortOrder: 'asc' | 'desc'
-  ): Prisma.CategoryOrderByWithRelationInput {
+  private buildOrderBy(sortBy: string, sortOrder: 'asc' | 'desc'): Prisma.CategoryOrderByWithRelationInput {
     const orderBy: Prisma.CategoryOrderByWithRelationInput = {}
 
     switch (sortBy) {
@@ -799,7 +805,7 @@ export class CategoryRepository implements ICategoryRepository {
     if (parsedIncludes.children) {
       include.children = {
         where: { deletedAt: null, isActive: true },
-        orderBy: { sortOrder: 'asc' }
+        orderBy: { sortOrder: 'asc' },
       }
     }
 
@@ -809,6 +815,7 @@ export class CategoryRepository implements ICategoryRepository {
 ```
 
 #### 3.5 Service Implementation (`/services/CategoryService.ts`)
+
 ```typescript
 import type { ICategoryRepository } from '../repositories/CategoryRepository.js'
 import type { ICacheService } from '@pika/redis'
@@ -832,7 +839,7 @@ export interface ICategoryService {
 export class CategoryService implements ICategoryService {
   constructor(
     private readonly categoryRepository: ICategoryRepository,
-    private readonly cacheService: ICacheService
+    private readonly cacheService: ICacheService,
   ) {}
 
   async getCategories(params: CategorySearchParams): Promise<PaginatedResult<CategoryDomain>> {
@@ -840,7 +847,7 @@ export class CategoryService implements ICategoryService {
     const publicParams = {
       ...params,
       isActive: params.isActive ?? true,
-      includeDeleted: params.includeDeleted ?? false
+      includeDeleted: params.includeDeleted ?? false,
     }
 
     return this.categoryRepository.findAll(publicParams)
@@ -848,7 +855,7 @@ export class CategoryService implements ICategoryService {
 
   async getCategoryById(id: string, parsedIncludes?: ParsedIncludes): Promise<CategoryDomain | null> {
     const cacheKey = `category:${id}:${JSON.stringify(parsedIncludes || {})}`
-    
+
     // Try cache first
     const cached = await this.cacheService.get<CategoryDomain>(cacheKey)
     if (cached) {
@@ -856,7 +863,7 @@ export class CategoryService implements ICategoryService {
     }
 
     const category = await this.categoryRepository.findById(id, parsedIncludes)
-    
+
     if (category && category.isActive && !category.deletedAt) {
       // Cache for 1 hour
       await this.cacheService.set(cacheKey, category, 3600)
@@ -880,9 +887,7 @@ export class CategoryService implements ICategoryService {
     return this.categoryRepository.findByIds(uniqueIds)
   }
 
-  async createCategory(
-    data: Omit<CategoryDomain, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
-  ): Promise<CategoryDomain> {
+  async createCategory(data: Omit<CategoryDomain, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>): Promise<CategoryDomain> {
     // Validate parent category if provided
     if (data.parentId) {
       const parentExists = await this.categoryRepository.exists(data.parentId)
@@ -929,7 +934,7 @@ export class CategoryService implements ICategoryService {
 
         // Check if this would create a circular hierarchy
         const parentAncestors = await this.categoryRepository.getAncestors(data.parentId)
-        if (parentAncestors.some(ancestor => ancestor.id === id)) {
+        if (parentAncestors.some((ancestor) => ancestor.id === id)) {
           throw ErrorFactory.badRequest('This change would create a circular hierarchy')
         }
 
@@ -961,10 +966,7 @@ export class CategoryService implements ICategoryService {
     // Check if category has children
     const hasChildren = await this.categoryRepository.hasChildren(id)
     if (hasChildren) {
-      throw ErrorFactory.conflict(
-        'Cannot delete category with child categories',
-        'Delete or reassign child categories first'
-      )
+      throw ErrorFactory.conflict('Cannot delete category with child categories', 'Delete or reassign child categories first')
     }
 
     // TODO: Check if category has associated providers or vouchers
@@ -976,7 +978,7 @@ export class CategoryService implements ICategoryService {
 
   async validateCategory(id: string, checkActive: boolean = true): Promise<{ valid: boolean; category?: CategoryDomain; reason?: string }> {
     const category = await this.categoryRepository.findById(id)
-    
+
     if (!category) {
       return { valid: false, reason: 'Category not found' }
     }
@@ -999,10 +1001,10 @@ export class CategoryService implements ICategoryService {
     }
 
     const ancestors = await this.categoryRepository.getAncestors(id)
-    
+
     return {
       category,
-      ancestors: ancestors.slice(0, -1) // Remove the category itself from ancestors
+      ancestors: ancestors.slice(0, -1), // Remove the category itself from ancestors
     }
   }
 
@@ -1016,20 +1018,16 @@ export class CategoryService implements ICategoryService {
     }
 
     const languages = ['en', 'es', 'gn']
-    const hasAtLeastOneLanguage = languages.some(lang => text[lang] && typeof text[lang] === 'string')
-    
+    const hasAtLeastOneLanguage = languages.some((lang) => text[lang] && typeof text[lang] === 'string')
+
     if (!hasAtLeastOneLanguage) {
-      throw ErrorFactory.badRequest(
-        `${fieldName} must have at least one language (en, es, or gn)`
-      )
+      throw ErrorFactory.badRequest(`${fieldName} must have at least one language (en, es, or gn)`)
     }
 
     // Check each provided language has non-empty string
     for (const lang of languages) {
       if (text[lang] !== undefined && (typeof text[lang] !== 'string' || text[lang].trim() === '')) {
-        throw ErrorFactory.badRequest(
-          `${fieldName}.${lang} must be a non-empty string if provided`
-        )
+        throw ErrorFactory.badRequest(`${fieldName}.${lang} must be a non-empty string if provided`)
       }
     }
   }
@@ -1039,15 +1037,11 @@ export class CategoryService implements ICategoryService {
 ### Phase 4: Controller Implementations
 
 #### 4.1 Public Controller (`/controllers/CategoryController.ts`)
+
 ```typescript
 import type { Request, Response, NextFunction } from 'express'
 import type { ICategoryService } from '../services/CategoryService.js'
-import type { 
-  SearchCategoriesRequest, 
-  GetCategoryByIdQuery,
-  CategoryIdParam,
-  CATEGORY_RELATIONS
-} from '@pika/api/public'
+import type { SearchCategoriesRequest, GetCategoryByIdQuery, CategoryIdParam, CATEGORY_RELATIONS } from '@pika/api/public'
 import { CategoryMapper } from '../mappers/CategoryMapper.js'
 import { parseIncludeParam, getValidatedQuery } from '@pika/shared'
 import { ErrorFactory } from '@pika/shared'
@@ -1059,18 +1053,12 @@ export class CategoryController {
     this.getCategoryById = this.getCategoryById.bind(this)
   }
 
-  async getCategories(
-    request: Request<{}, {}, {}, SearchCategoriesRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategories(request: Request<{}, {}, {}, SearchCategoriesRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const query = getValidatedQuery<SearchCategoriesRequest>(request)
-      
+
       // Parse include parameter
-      const parsedIncludes = query.include
-        ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[])
-        : {}
+      const parsedIncludes = query.include ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[]) : {}
 
       const params = {
         page: query.page || 1,
@@ -1081,14 +1069,14 @@ export class CategoryController {
         isActive: query.isActive,
         search: query.search,
         level: query.level,
-        parsedIncludes
+        parsedIncludes,
       }
 
       const result = await this.categoryService.getCategories(params)
-      
+
       const dtoResult = {
         data: result.data.map(CategoryMapper.toResponse),
-        pagination: result.pagination
+        pagination: result.pagination,
       }
 
       response.json(dtoResult)
@@ -1097,22 +1085,16 @@ export class CategoryController {
     }
   }
 
-  async getCategoryById(
-    request: Request<CategoryIdParam, {}, {}, GetCategoryByIdQuery>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryById(request: Request<CategoryIdParam, {}, {}, GetCategoryByIdQuery>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
       const query = getValidatedQuery<GetCategoryByIdQuery>(request)
-      
+
       // Parse include parameter
-      const parsedIncludes = query.include
-        ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[])
-        : {}
+      const parsedIncludes = query.include ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[]) : {}
 
       const category = await this.categoryService.getCategoryById(id, parsedIncludes)
-      
+
       if (!category) {
         return next(ErrorFactory.notFound('Category', id))
       }
@@ -1128,18 +1110,11 @@ export class CategoryController {
 ```
 
 #### 4.2 Admin Controller (`/controllers/AdminCategoryController.ts`)
+
 ```typescript
 import type { Request, Response, NextFunction } from 'express'
 import type { ICategoryService } from '../services/CategoryService.js'
-import type { 
-  CreateCategoryRequest, 
-  UpdateCategoryRequest,
-  AdminSearchCategoriesRequest,
-  BulkUpdateCategoriesRequest,
-  CategoryIdParam,
-  GetCategoryByIdQuery,
-  CATEGORY_RELATIONS
-} from '@pika/api/admin'
+import type { CreateCategoryRequest, UpdateCategoryRequest, AdminSearchCategoriesRequest, BulkUpdateCategoriesRequest, CategoryIdParam, GetCategoryByIdQuery, CATEGORY_RELATIONS } from '@pika/api/admin'
 import { CategoryMapper } from '../mappers/CategoryMapper.js'
 import { parseIncludeParam, getValidatedQuery } from '@pika/shared'
 import { ErrorFactory } from '@pika/shared'
@@ -1154,18 +1129,12 @@ export class AdminCategoryController {
     this.bulkUpdateCategories = this.bulkUpdateCategories.bind(this)
   }
 
-  async getCategories(
-    request: Request<{}, {}, {}, AdminSearchCategoriesRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategories(request: Request<{}, {}, {}, AdminSearchCategoriesRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const query = getValidatedQuery<AdminSearchCategoriesRequest>(request)
-      
+
       // Parse include parameter
-      const parsedIncludes = query.include
-        ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[])
-        : {}
+      const parsedIncludes = query.include ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[]) : {}
 
       const params = {
         page: query.page || 1,
@@ -1176,14 +1145,14 @@ export class AdminCategoryController {
         isActive: query.isActive,
         search: query.search,
         includeDeleted: query.includeDeleted,
-        parsedIncludes
+        parsedIncludes,
       }
 
       const result = await this.categoryService.getCategories(params)
-      
+
       const dtoResult = {
         data: result.data.map(CategoryMapper.toResponse),
-        pagination: result.pagination
+        pagination: result.pagination,
       }
 
       response.json(dtoResult)
@@ -1192,22 +1161,16 @@ export class AdminCategoryController {
     }
   }
 
-  async getCategoryById(
-    request: Request<CategoryIdParam, {}, {}, GetCategoryByIdQuery>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryById(request: Request<CategoryIdParam, {}, {}, GetCategoryByIdQuery>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
       const query = getValidatedQuery<GetCategoryByIdQuery>(request)
-      
+
       // Parse include parameter
-      const parsedIncludes = query.include
-        ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[])
-        : {}
+      const parsedIncludes = query.include ? parseIncludeParam(query.include, CATEGORY_RELATIONS as unknown as string[]) : {}
 
       const category = await this.categoryService.getCategoryById(id, parsedIncludes)
-      
+
       if (!category) {
         return next(ErrorFactory.notFound('Category', id))
       }
@@ -1218,62 +1181,46 @@ export class AdminCategoryController {
     }
   }
 
-  async createCategory(
-    request: Request<{}, {}, CreateCategoryRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async createCategory(request: Request<{}, {}, CreateCategoryRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const categoryData = CategoryMapper.fromCreateRequest(request.body)
       const category = await this.categoryService.createCategory(categoryData)
-      
+
       response.status(201).json(CategoryMapper.toResponse(category))
     } catch (error) {
       next(error)
     }
   }
 
-  async updateCategory(
-    request: Request<CategoryIdParam, {}, UpdateCategoryRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async updateCategory(request: Request<CategoryIdParam, {}, UpdateCategoryRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
       const updates = CategoryMapper.fromUpdateRequest(request.body)
-      
+
       const category = await this.categoryService.updateCategory(id, updates)
-      
+
       response.json(CategoryMapper.toResponse(category))
     } catch (error) {
       next(error)
     }
   }
 
-  async deleteCategory(
-    request: Request<CategoryIdParam>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async deleteCategory(request: Request<CategoryIdParam>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = request.params
-      
+
       await this.categoryService.deleteCategory(id)
-      
+
       response.status(204).send()
     } catch (error) {
       next(error)
     }
   }
 
-  async bulkUpdateCategories(
-    request: Request<{}, {}, BulkUpdateCategoriesRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async bulkUpdateCategories(request: Request<{}, {}, BulkUpdateCategoriesRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { updates } = request.body
-      
+
       const results = await Promise.all(
         updates.map(async ({ id, data }) => {
           try {
@@ -1283,9 +1230,9 @@ export class AdminCategoryController {
           } catch (error) {
             return { id, success: false, error: error.message }
           }
-        })
+        }),
       )
-      
+
       response.json({ results })
     } catch (error) {
       next(error)
@@ -1295,15 +1242,11 @@ export class AdminCategoryController {
 ```
 
 #### 4.3 Internal Controller (`/controllers/InternalCategoryController.ts`)
+
 ```typescript
 import type { Request, Response, NextFunction } from 'express'
 import type { ICategoryService } from '../services/CategoryService.js'
-import type { 
-  GetCategoriesByIdsRequest,
-  ValidateCategoryRequest,
-  GetCategoryPathRequest,
-  GetCategoryTreeRequest
-} from '@pika/api/internal'
+import type { GetCategoriesByIdsRequest, ValidateCategoryRequest, GetCategoryPathRequest, GetCategoryTreeRequest } from '@pika/api/internal'
 import { CategoryMapper } from '../mappers/CategoryMapper.js'
 
 export class InternalCategoryController {
@@ -1314,82 +1257,66 @@ export class InternalCategoryController {
     this.getCategoryTree = this.getCategoryTree.bind(this)
   }
 
-  async getCategoriesByIds(
-    request: Request<{}, {}, GetCategoriesByIdsRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoriesByIds(request: Request<{}, {}, GetCategoriesByIdsRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { categoryIds } = request.body
-      
+
       const categories = await this.categoryService.getCategoriesByIds(categoryIds)
-      
+
       response.json({
-        categories: CategoryMapper.toResponseArray(categories)
+        categories: CategoryMapper.toResponseArray(categories),
       })
     } catch (error) {
       next(error)
     }
   }
 
-  async validateCategory(
-    request: Request<{}, {}, ValidateCategoryRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async validateCategory(request: Request<{}, {}, ValidateCategoryRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { categoryId, checkActive } = request.body
-      
+
       const validation = await this.categoryService.validateCategory(categoryId, checkActive)
-      
+
       response.json({
         valid: validation.valid,
         category: validation.category ? CategoryMapper.toResponse(validation.category) : undefined,
-        reason: validation.reason
+        reason: validation.reason,
       })
     } catch (error) {
       next(error)
     }
   }
 
-  async getCategoryPath(
-    request: Request<{}, {}, GetCategoryPathRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryPath(request: Request<{}, {}, GetCategoryPathRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { categoryId } = request.body
-      
+
       const path = await this.categoryService.getCategoryPath(categoryId)
-      
+
       response.json({
-        path: CategoryMapper.toResponseArray(path.ancestors.concat(path.category))
+        path: CategoryMapper.toResponseArray(path.ancestors.concat(path.category)),
       })
     } catch (error) {
       next(error)
     }
   }
 
-  async getCategoryTree(
-    request: Request<{}, {}, GetCategoryTreeRequest>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getCategoryTree(request: Request<{}, {}, GetCategoryTreeRequest>, response: Response, next: NextFunction): Promise<void> {
     try {
       const { rootId, maxDepth } = request.body
-      
+
       const tree = await this.categoryService.getCategoryTree(rootId, maxDepth)
-      
+
       // Transform tree structure to response format
       const transformTree = (nodes: CategoryTree[]): any[] => {
-        return nodes.map(node => ({
+        return nodes.map((node) => ({
           ...CategoryMapper.toResponse(node.category),
-          children: transformTree(node.children)
+          children: transformTree(node.children),
         }))
       }
-      
+
       response.json({
-        tree: transformTree(tree)
+        tree: transformTree(tree),
       })
     } catch (error) {
       next(error)
@@ -1403,145 +1330,78 @@ export class InternalCategoryController {
 #### 5.1 Route Definitions
 
 **CategoryRoutes.ts:**
+
 ```typescript
 import { Router } from 'express'
 import type { CategoryController } from '../controllers/CategoryController.js'
 import { validateQuery, validateParams } from '@pika/http'
 import { SearchCategoriesRequest, GetCategoryByIdQuery, CategoryIdParam } from '@pika/api/public'
 
-export function createCategoryRoutes(
-  categoryController: CategoryController
-): Router {
+export function createCategoryRoutes(categoryController: CategoryController): Router {
   const router = Router()
 
-  router.get(
-    '/',
-    validateQuery(SearchCategoriesRequest),
-    categoryController.getCategories
-  )
+  router.get('/', validateQuery(SearchCategoriesRequest), categoryController.getCategories)
 
-  router.get(
-    '/:id',
-    validateParams(CategoryIdParam),
-    validateQuery(GetCategoryByIdQuery),
-    categoryController.getCategoryById
-  )
+  router.get('/:id', validateParams(CategoryIdParam), validateQuery(GetCategoryByIdQuery), categoryController.getCategoryById)
 
   return router
 }
 ```
 
 **AdminCategoryRoutes.ts:**
+
 ```typescript
 import { Router } from 'express'
 import type { AdminCategoryController } from '../controllers/AdminCategoryController.js'
 import { validateQuery, validateParams, validateBody } from '@pika/http'
-import { 
-  AdminSearchCategoriesRequest, 
-  CategoryIdParam,
-  GetCategoryByIdQuery,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-  BulkUpdateCategoriesRequest
-} from '@pika/api/admin'
+import { AdminSearchCategoriesRequest, CategoryIdParam, GetCategoryByIdQuery, CreateCategoryRequest, UpdateCategoryRequest, BulkUpdateCategoriesRequest } from '@pika/api/admin'
 
-export function createAdminCategoryRoutes(
-  adminCategoryController: AdminCategoryController
-): Router {
+export function createAdminCategoryRoutes(adminCategoryController: AdminCategoryController): Router {
   const router = Router()
 
-  router.get(
-    '/',
-    validateQuery(AdminSearchCategoriesRequest),
-    adminCategoryController.getCategories
-  )
+  router.get('/', validateQuery(AdminSearchCategoriesRequest), adminCategoryController.getCategories)
 
-  router.get(
-    '/:id',
-    validateParams(CategoryIdParam),
-    validateQuery(GetCategoryByIdQuery),
-    adminCategoryController.getCategoryById
-  )
+  router.get('/:id', validateParams(CategoryIdParam), validateQuery(GetCategoryByIdQuery), adminCategoryController.getCategoryById)
 
-  router.post(
-    '/',
-    validateBody(CreateCategoryRequest),
-    adminCategoryController.createCategory
-  )
+  router.post('/', validateBody(CreateCategoryRequest), adminCategoryController.createCategory)
 
-  router.put(
-    '/:id',
-    validateParams(CategoryIdParam),
-    validateBody(UpdateCategoryRequest),
-    adminCategoryController.updateCategory
-  )
+  router.put('/:id', validateParams(CategoryIdParam), validateBody(UpdateCategoryRequest), adminCategoryController.updateCategory)
 
-  router.delete(
-    '/:id',
-    validateParams(CategoryIdParam),
-    adminCategoryController.deleteCategory
-  )
+  router.delete('/:id', validateParams(CategoryIdParam), adminCategoryController.deleteCategory)
 
-  router.post(
-    '/bulk-update',
-    validateBody(BulkUpdateCategoriesRequest),
-    adminCategoryController.bulkUpdateCategories
-  )
+  router.post('/bulk-update', validateBody(BulkUpdateCategoriesRequest), adminCategoryController.bulkUpdateCategories)
 
   return router
 }
 ```
 
 **InternalCategoryRoutes.ts:**
+
 ```typescript
 import { Router } from 'express'
 import type { InternalCategoryController } from '../controllers/InternalCategoryController.js'
 import { validateBody } from '@pika/http'
-import { 
-  GetCategoriesByIdsRequest,
-  ValidateCategoryRequest,
-  GetCategoryPathRequest,
-  GetCategoryTreeRequest
-} from '@pika/api/internal'
+import { GetCategoriesByIdsRequest, ValidateCategoryRequest, GetCategoryPathRequest, GetCategoryTreeRequest } from '@pika/api/internal'
 
-export function createInternalCategoryRoutes(
-  internalCategoryController: InternalCategoryController
-): Router {
+export function createInternalCategoryRoutes(internalCategoryController: InternalCategoryController): Router {
   const router = Router()
 
-  router.post(
-    '/by-ids',
-    validateBody(GetCategoriesByIdsRequest),
-    internalCategoryController.getCategoriesByIds
-  )
+  router.post('/by-ids', validateBody(GetCategoriesByIdsRequest), internalCategoryController.getCategoriesByIds)
 
-  router.post(
-    '/validate',
-    validateBody(ValidateCategoryRequest),
-    internalCategoryController.validateCategory
-  )
+  router.post('/validate', validateBody(ValidateCategoryRequest), internalCategoryController.validateCategory)
 
-  router.post(
-    '/path',
-    validateBody(GetCategoryPathRequest),
-    internalCategoryController.getCategoryPath
-  )
+  router.post('/path', validateBody(GetCategoryPathRequest), internalCategoryController.getCategoryPath)
 
-  router.post(
-    '/tree',
-    validateBody(GetCategoryTreeRequest),
-    internalCategoryController.getCategoryTree
-  )
+  router.post('/tree', validateBody(GetCategoryTreeRequest), internalCategoryController.getCategoryTree)
 
   return router
 }
 ```
 
 #### 5.2 App Configuration (app.ts)
+
 ```typescript
-import {
-  CATEGORY_SERVICE_PORT,
-} from '@pika/environment'
+import { CATEGORY_SERVICE_PORT } from '@pika/environment'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import { logger } from '@pika/shared'
 import { startServer } from '@pika/http'
@@ -1587,10 +1447,7 @@ export async function startService(): Promise<void> {
         logger.info('Category service shutdown complete')
       },
       onUnhandledRejection: (reason) => {
-        logger.error(
-          'Unhandled Promise Rejection in Category service:',
-          reason,
-        )
+        logger.error('Unhandled Promise Rejection in Category service:', reason)
       },
     })
   } catch (error) {
@@ -1606,6 +1463,7 @@ export async function startService(): Promise<void> {
 ```
 
 #### 5.3 Server Configuration (server.ts)
+
 ```typescript
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
@@ -1682,29 +1540,20 @@ export async function createCategoryServer(config: ServerConfig) {
   // Create service instances
   const categoryRepository = new CategoryRepository(config.prisma, config.cacheService)
   const categoryService = new CategoryService(categoryRepository, config.cacheService)
-  
+
   // Create controllers
   const categoryController = new CategoryController(categoryService)
   const adminCategoryController = new AdminCategoryController(categoryService)
   const internalCategoryController = new InternalCategoryController(categoryService)
 
   // Mount public routes
-  app.use(
-    '/categories',
-    createCategoryRoutes(categoryController)
-  )
+  app.use('/categories', createCategoryRoutes(categoryController))
 
   // Mount admin routes
-  app.use(
-    '/admin/categories',
-    createAdminCategoryRoutes(adminCategoryController)
-  )
+  app.use('/admin/categories', createAdminCategoryRoutes(adminCategoryController))
 
   // Mount internal routes for service-to-service communication
-  app.use(
-    '/internal/categories',
-    createInternalCategoryRoutes(internalCategoryController)
-  )
+  app.use('/internal/categories', createInternalCategoryRoutes(internalCategoryController))
 
   // Register error middleware AFTER all routes (Express requirement)
   app.use(errorMiddleware(app.locals.errorMiddlewareConfig || {}))
@@ -1714,6 +1563,7 @@ export async function createCategoryServer(config: ServerConfig) {
 ```
 
 #### 5.4 Index File (index.ts)
+
 ```typescript
 import { startService } from './app.js'
 
@@ -1734,15 +1584,19 @@ export { CategoryMapper } from './mappers/CategoryMapper.js'
 ### Phase 6: Additional Configurations
 
 #### 6.1 Environment Variables
+
 Add to `/packages/environment/src/constants/service.ts`:
+
 ```typescript
 export const CATEGORY_SERVICE_PORT = parseInt(process.env.CATEGORY_SERVICE_PORT || '5025', 10)
 ```
 
 #### 6.2 Update nx.json
+
 Add category service to the projects list.
 
 #### 6.3 API Documentation Registration
+
 Update `/packages/api/src/scripts/generators/public-api.ts`, `/admin-api.ts`, and `/internal-api.ts` to include category schemas and routes.
 
 ### Phase 7: Testing Strategy

@@ -1,10 +1,10 @@
 import { ErrorCode } from '@pika/types'
 
 import {
-    BaseError,
-    ErrorContext,
-    ErrorDomain,
-    ErrorSeverity,
+  BaseError,
+  ErrorContext,
+  ErrorDomain,
+  ErrorSeverity,
 } from './ErrorBase.js'
 
 /**

@@ -33,7 +33,6 @@ export interface UserDocument {
   stripeUserId?: string | null
 }
 
-
 /**
  * Interface for address document
  */
@@ -270,7 +269,6 @@ export class UserMapper {
       updatedAt: domain.updatedAt.toISOString(),
     }
   }
-
 
   /**
    * Maps role string to enum

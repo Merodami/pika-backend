@@ -7,8 +7,8 @@
 import { logger } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 import {
-    PostgreSqlContainer,
-    StartedPostgreSqlContainer,
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql'
 import fs from 'fs'
 import path from 'path'

@@ -179,7 +179,7 @@ Validation errors return HTTP 400 with consistent format:
 
 ## Best Practices
 
-1. **Always use schemas from @pikaon't define validation schemas in services
+1. \*\*Always use schemas from @pikaon't define validation schemas in services
 2. **Import from the correct API scope** - Use `/public`, `/admin`, or `/internal`
 3. **Use branded types** - Prefer `UserId` over `string` for type safety
 4. **Let middleware handle validation** - Don't call `parse()` manually in controllers

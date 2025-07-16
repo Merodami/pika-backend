@@ -1,17 +1,17 @@
 import {
-    ADMIN_COMMENT_RELATIONS,
-    AdminCommentsByProblemQuery,
-    AdminGetAllCommentsQuery,
+  ADMIN_COMMENT_RELATIONS,
+  AdminCommentsByProblemQuery,
+  AdminGetAllCommentsQuery,
 } from '@pika/api/admin'
 import { SupportCommentMapper } from '@pika/sdk'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { parseIncludeParam } from '@pika/shared'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type {
-    CreateSupportCommentRequest,
-    ProblemIdForCommentsParam,
-    SupportCommentIdParam,
-    UpdateSupportCommentRequest,
+  CreateSupportCommentRequest,
+  ProblemIdForCommentsParam,
+  SupportCommentIdParam,
+  UpdateSupportCommentRequest,
 } from '@pika/api/public'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
