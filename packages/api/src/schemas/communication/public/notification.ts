@@ -42,7 +42,7 @@ export const Notification = openapi(
       .describe('Whether the notification has been read'),
     readAt: DateTime.optional(),
     metadata: z
-      .record(z.any())
+      .record(z.string(), z.any())
       .optional()
       .describe('Additional metadata for the notification'),
 
@@ -86,7 +86,7 @@ export const CreateNotificationRequest = openapi(
     category: z.string().optional(),
     actionUrl: z.string().url().optional(),
     imageUrl: z.string().url().optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     expiresAt: DateTime.optional(),
   }),
   {
@@ -132,7 +132,7 @@ export type BatchCreateNotificationsRequest = z.infer<
 export const UpdateNotificationStatusRequest = openapi(
   z.object({
     isRead: z.boolean().optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Update notification status',

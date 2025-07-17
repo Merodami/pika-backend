@@ -17,43 +17,43 @@ import { openapi } from '../../../common/utils/openapi.js'
 /**
  * Admin category response (includes all fields for management)
  */
-export const AdminCategoryResponse = openapi(
-  z.lazy(() =>
-    withTimestamps({
-      id: UUID,
-      nameKey: z
-        .string()
-        .max(255)
-        .describe('Translation key for category name'),
-      descriptionKey: z
-        .string()
-        .max(255)
-        .optional()
-        .describe('Translation key for category description'),
-      icon: z.string().max(255).optional().describe('Category icon identifier'),
-      parentId: UUID.optional().describe(
-        'Parent category ID for hierarchical structure',
-      ),
-      isActive: z
-        .boolean()
-        .default(true)
-        .describe('Whether category is active'),
-      sortOrder: z.number().int().default(0).describe('Sort order for display'),
-      createdBy: UserId.describe('User who created the category'),
-      updatedBy: UserId.optional().describe(
-        'User who last updated the category',
-      ),
-      children: z
-        .array(AdminCategoryResponse)
-        .optional()
-        .describe('Child categories for hierarchical display'),
-    }),
+export const AdminCategoryResponse = withTimestamps({
+  id: UUID,
+  nameKey: z
+    .string()
+    .max(255)
+    .describe('Translation key for category name'),
+  descriptionKey: z
+    .string()
+    .max(255)
+    .optional()
+    .describe('Translation key for category description'),
+  icon: z.string().max(255).optional().describe('Category icon identifier'),
+  parentId: UUID.optional().describe(
+    'Parent category ID for hierarchical structure',
   ),
-  {
-    description: 'Category information for admin management with hierarchical structure',
-    ref: 'AdminCategoryResponse',
-  },
-)
+  isActive: z
+    .boolean()
+    .default(true)
+    .describe('Whether category is active'),
+  sortOrder: z.number().int().default(0).describe('Sort order for display'),
+  createdBy: UserId.describe('User who created the category'),
+  updatedBy: UserId.optional().describe(
+    'User who last updated the category',
+  ),
+  children: z
+    .array(z.object({}))
+    .optional()
+    .describe('Child categories for hierarchical display')
+    .openapi({
+      type: 'array',
+      items: {
+        $ref: '#/components/schemas/AdminCategoryResponse'
+      }
+    }),
+}).openapi('AdminCategoryResponse', {
+  description: 'Category information for admin management with hierarchical structure',
+})
 
 export type AdminCategoryResponse = z.infer<typeof AdminCategoryResponse>
 

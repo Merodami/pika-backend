@@ -8,7 +8,7 @@ import { z } from 'zod'
 // Helper to create branded types
 export const brand = <T extends z.ZodTypeAny, B extends string>(
   schema: T,
-): z.ZodBranded<T, B> => schema.brand<B>()
+) => schema.brand<B>()
 
 // ============= ID Types =============
 

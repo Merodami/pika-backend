@@ -43,10 +43,9 @@ export const RegisterRequest = openapi(
     phoneNumber: PhoneNumber.optional(),
     dateOfBirth: z.string().datetime().optional().describe('Date of birth'),
     acceptTerms: z
-      .literal(true, {
-        errorMap: () => ({
-          message: 'You must accept the terms and conditions',
-        }),
+      .literal(true)
+      .refine((value) => value === true, {
+        message: 'You must accept the terms and conditions',
       })
       .describe('User must accept terms and conditions'),
     marketingConsent: z

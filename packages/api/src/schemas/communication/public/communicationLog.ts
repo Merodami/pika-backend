@@ -70,7 +70,7 @@ export const CommunicationLog = openapi(
     cost: z.number().nonnegative().optional().describe('Cost in cents'),
 
     // Additional data
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     tags: z.array(z.string()).default([]),
   }),
   {
@@ -102,7 +102,7 @@ export const CreateCommunicationLogRequest = openapi(
     referenceId: z.string().optional(),
     referenceType: z.string().optional(),
     provider: z.string().optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     tags: z.array(z.string()).optional(),
   }),
   {
@@ -129,7 +129,7 @@ export const UpdateCommunicationStatusRequest = openapi(
     errorCode: z.string().optional(),
     errorMessage: z.string().optional(),
     bounceType: BounceType.optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Update communication status',
@@ -280,7 +280,7 @@ export const CommunicationAnalyticsResponse = openapi(
     costs: z
       .object({
         total: z.number().nonnegative(),
-        byChannel: z.record(z.number().nonnegative()),
+        byChannel: z.record(z.string(), z.number().nonnegative()),
       })
       .optional(),
   }),

@@ -51,7 +51,7 @@ export const SubscriptionPlan = openapi(
       .optional()
       .describe('Number of trial days'),
     features: z.array(z.string()).describe('Array of feature descriptions'),
-    metadata: z.record(z.any()).optional().describe('Additional configuration'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Additional configuration'),
     stripeProductId: z.string().optional().describe('Stripe product ID'),
     stripePriceId: z.string().optional().describe('Stripe price ID'),
   }).merge(activeStatus),
@@ -77,7 +77,7 @@ export const CreateSubscriptionPlanRequest = openapi(
     intervalCount: z.number().int().positive().default(1),
     trialPeriodDays: z.number().int().nonnegative().optional(),
     features: z.array(z.string()),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     stripeProductId: z.string().optional(),
     stripePriceId: z.string().optional(),
   }),
@@ -103,7 +103,7 @@ export const UpdateSubscriptionPlanRequest = openapi(
     trialPeriodDays: z.number().int().nonnegative().optional(),
     features: z.array(z.string()).optional(),
     isActive: z.boolean().optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     stripePriceId: z.string().optional(),
   }),
   {

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
-import { FileType, FileStatus, StorageProvider } from '../common/index.js'
+import { FileType, FileStatus, StorageProvider, HealthStatus } from '../common/index.js'
 
 /**
  * Internal storage service schemas for service-to-service communication
@@ -14,9 +14,13 @@ import { FileType, FileStatus, StorageProvider } from '../common/index.js'
 export const StorageServiceHealthCheck = openapi(
   z.object({
     service: z.literal('storage'),
-    status: z.enum(['healthy', 'degraded', 'unhealthy']),
+    status: HealthStatus,
     timestamp: z.string().datetime(),
-    providersStatus: z.record(StorageProvider, z.enum(['healthy', 'degraded', 'unhealthy'])),
+    providersStatus: z.object(
+      Object.fromEntries(
+        StorageProvider.options.map(key => [key, HealthStatus.optional()])
+      )
+    ),
     totalFiles: z.number().int().nonnegative(),
     totalStorageUsed: z.number().int().nonnegative().describe('Total storage in bytes'),
     diskSpaceRemaining: z.number().int().nonnegative().optional().describe('For local storage'),
@@ -41,7 +45,7 @@ export const InternalCreateFileRequest = openapi(
     bucketName: z.string().optional(),
     region: z.string().optional(),
     isPublic: z.boolean().default(false),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
   }),
   {
     description: 'Internal file creation request',
@@ -63,7 +67,7 @@ export const InternalFileResponse = openapi(
     bucketName: z.string().optional(),
     region: z.string().optional(),
     isPublic: z.boolean(),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
     uploadedAt: DateTime.optional(),
     createdAt: DateTime,
     updatedAt: DateTime,
@@ -127,8 +131,16 @@ export const UserFileSummaryResponse = openapi(
     userId: UserId,
     totalFiles: z.number().int().nonnegative(),
     totalSize: z.number().int().nonnegative().describe('Total size in bytes'),
-    filesByType: z.record(FileType, z.number().int().nonnegative()),
-    filesByStatus: z.record(FileStatus, z.number().int().nonnegative()),
+    filesByType: z.object(
+      Object.fromEntries(
+        FileType.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
+    filesByStatus: z.object(
+      Object.fromEntries(
+        FileStatus.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
     oldestFile: DateTime.optional(),
     newestFile: DateTime.optional(),
   }),

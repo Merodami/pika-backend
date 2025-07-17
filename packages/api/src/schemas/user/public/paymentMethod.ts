@@ -96,7 +96,7 @@ export const PaymentMethod = openapi(
       .optional(),
 
     // Metadata
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'User payment method',

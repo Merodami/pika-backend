@@ -45,3 +45,6 @@ export type AllowedMimeTypes = z.infer<typeof AllowedMimeTypes>
 
 export const FileSortBy = z.enum(['uploadedAt', 'fileSize', 'fileName'])
 export type FileSortBy = z.infer<typeof FileSortBy>
+
+export const HealthStatus = z.enum(['healthy', 'degraded', 'unhealthy'])
+export type HealthStatus = z.infer<typeof HealthStatus>

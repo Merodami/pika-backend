@@ -79,7 +79,7 @@ export const ServiceInstance = openapi(
     healthCheckUrl: z.string().url().optional(),
 
     // Metadata
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
     tags: z.array(z.string()).default([]),
 
     // Performance metrics
@@ -131,7 +131,7 @@ export const RegisterServiceRequest = openapi(
     healthCheckInterval: z.number().int().positive().default(30),
 
     // Metadata
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
     tags: z.array(z.string()).default([]),
 
     // Registration settings
@@ -347,7 +347,7 @@ export const ServiceConfigResponse = openapi(
   z.object({
     serviceName: z.string(),
     environment: EnvironmentType,
-    configuration: z.record(z.any()),
+    configuration: z.record(z.string(), z.any()),
     lastUpdated: DateTime,
     version: z.string(),
   }),

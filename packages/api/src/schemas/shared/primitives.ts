@@ -303,13 +303,17 @@ export function stringEnum<T extends readonly [string, ...string[]]>(
     description?: string
   },
 ) {
-  return z
-    .enum(values, {
-      errorMap: () => ({
-        message: options?.message || `Must be one of: ${values.join(', ')}`,
-      }),
-    })
-    .describe(options?.description || '')
+  const enumSchema = z.enum(values)
+  
+  if (options?.message) {
+    return enumSchema
+      .refine((val) => values.includes(val as T[number]), {
+        message: options.message,
+      })
+      .describe(options?.description || '')
+  }
+  
+  return enumSchema.describe(options?.description || '')
 }
 
 /**
@@ -319,9 +323,7 @@ export function trimmedString(options?: {
   minLength?: number
   maxLength?: number
   pattern?: RegExp
-}):
-  | z.ZodEffects<z.ZodString, string, string>
-  | z.ZodPipeline<z.ZodEffects<z.ZodString, string, string>, z.ZodString> {
+}) {
   let schema: any = z.string().transform((str) => str.trim())
 
   if (options?.minLength) {

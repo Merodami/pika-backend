@@ -37,7 +37,7 @@ export const TokenValidationResponse = openapi(
     roles: z.array(z.string()),
     permissions: z.array(z.string()),
     expiresAt: DateTime.optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Token validation result',
@@ -178,7 +178,7 @@ export const CreateServiceSessionRequest = openapi(
     userId: UserId,
     serviceName: z.string(),
     expiresIn: z.number().int().positive().default(3600),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Create a service-to-service session',

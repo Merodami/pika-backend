@@ -79,7 +79,7 @@ export const AdminTransactionDetailResponse = openapi(
     refundedAmount: Money.optional(),
 
     // Metadata
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     ipAddress: z.string().optional(),
     userAgent: z.string().optional(),
   }),
@@ -143,11 +143,23 @@ export const FinancialSummary = openapi(
     totalFees: Money,
     netRevenue: Money,
 
-    // By type
-    revenueByType: z.record(TransactionType, Money),
+    // By type - using programmatic z.object to avoid z.partialRecord RecordTransformer bug
+    revenueByType: z.object(
+      Object.fromEntries(
+        TransactionType.options.map(key => [key, Money.optional()])
+      )
+    ).openapi({
+      description: 'Revenue by transaction type (all keys optional)',
+    }),
 
-    // By payment method
-    revenueByPaymentMethod: z.record(PaymentMethod, Money),
+    // By payment method - using programmatic z.object to avoid z.partialRecord RecordTransformer bug
+    revenueByPaymentMethod: z.object(
+      Object.fromEntries(
+        PaymentMethod.options.map(key => [key, Money.optional()])
+      )
+    ).openapi({
+      description: 'Revenue by payment method (all keys optional)',
+    }),
 
     // Counts
     transactionCount: z.number().int().nonnegative(),
@@ -328,7 +340,7 @@ export const AdminPromoCodeDetail = openapi(
     isActive: z.boolean().default(true),
 
     // Stats
-    totalDiscountGiven: Money.default(0),
+    totalDiscountGiven: Money.optional(),
 
     // Admin
     createdBy: UserId,
@@ -462,7 +474,7 @@ export const AdminSubscriptionPlanDetail = openapi(
     // Stats
     activeSubscriptions: z.number().int().nonnegative().default(0),
     totalSubscriptions: z.number().int().nonnegative().default(0),
-    monthlyRevenue: Money.default(0),
+    monthlyRevenue: Money.optional(),
 
     // Admin
     createdBy: UserId,

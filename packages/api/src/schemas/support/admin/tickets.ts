@@ -226,9 +226,21 @@ export const SupportMetrics = openapi(
       .describe('Average resolution time in hours'),
 
     // Status breakdown
-    ticketsByStatus: z.record(TicketStatus, z.number().int().nonnegative()),
-    ticketsByPriority: z.record(TicketPriority, z.number().int().nonnegative()),
-    ticketsByType: z.record(TicketType, z.number().int().nonnegative()),
+    ticketsByStatus: z.object(
+      Object.fromEntries(
+        TicketStatus.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
+    ticketsByPriority: z.object(
+      Object.fromEntries(
+        TicketPriority.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
+    ticketsByType: z.object(
+      Object.fromEntries(
+        TicketType.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
 
     // Agent performance
     agentStats: z

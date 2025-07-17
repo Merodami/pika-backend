@@ -79,6 +79,16 @@ export class ZodRegistry {
    * Register an API route
    */
   registerRoute(config: RouteConfig): void {
+    // Debug logging
+    if ((config as any).request?.body?.content) {
+      const content = (config as any).request.body.content
+      for (const [contentType, contentConfig] of Object.entries(content)) {
+        if (!contentConfig || !(contentConfig as any).schema) {
+          console.error(`ERROR: Route ${config.method} ${config.path} has undefined schema for ${contentType} request body`)
+          console.error('Content config:', contentConfig)
+        }
+      }
+    }
     this.registry.registerPath(config)
   }
 
@@ -217,8 +227,8 @@ export class ZodRegistry {
       throw new Error(`Cannot create reference to schema '${name}' - not found`)
     }
 
-    // Return a lazy schema that references the registered component
-    return z.lazy(() => schema)
+    // Return the schema directly - it should already be registered with OpenAPI
+    return schema
   }
 
   /**

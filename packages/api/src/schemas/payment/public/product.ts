@@ -24,7 +24,7 @@ export const Product = openapi(
     name: z.string().min(1).max(250),
     description: z.string().max(1000).optional(),
     active: z.boolean().default(true),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
     type: ProductType.optional(),
   }),
   {
@@ -48,7 +48,7 @@ export const Price = openapi(
     interval: PriceInterval.optional(),
     intervalCount: z.number().int().positive().optional(),
     active: z.boolean().default(true),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
   }),
   {
     description: 'Price information',
@@ -66,7 +66,7 @@ export const CreateProductRequest = openapi(
   z.object({
     name: z.string().min(1).max(250),
     description: z.string().max(1000).optional(),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
   }),
   {
     description: 'Create a new product',
@@ -85,7 +85,7 @@ export const UpdateProductRequest = openapi(
     name: z.string().min(1).max(250).optional(),
     description: z.string().max(1000).optional(),
     active: z.boolean().optional(),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
   }),
   {
     description: 'Update product information',

@@ -84,7 +84,7 @@ export const CreateSubscriptionRequest = openapi(
     planId: UUID,
     stripeCustomerId: z.string().optional(),
     trialEnd: DateTime.optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Create a new subscription',
@@ -109,7 +109,7 @@ export const UpdateSubscriptionRequest = openapi(
     trialEnd: DateTime.optional(),
     cancelAtPeriodEnd: z.boolean().optional(),
     cancelledAt: DateTime.optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Update a subscription',
@@ -230,7 +230,7 @@ export const SubscriptionUsage = openapi(
     subscriptionId: UUID,
     periodStart: DateTime,
     periodEnd: DateTime,
-    usageByCategory: z.record(z.number().int().nonnegative()).optional(),
+    usageByCategory: z.record(z.string(), z.number().int().nonnegative()).optional(),
   }),
   {
     description: 'Subscription usage information',

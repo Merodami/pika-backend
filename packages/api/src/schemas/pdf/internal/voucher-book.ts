@@ -31,7 +31,7 @@ export const InternalVoucherBookResponse = openapi(
     backImageUrl: z.string().url().optional().describe('Back cover image URL'),
     pdfUrl: z.string().url().optional().describe('Generated PDF URL'),
     pdfGeneratedAt: z.string().datetime().optional().describe('PDF generation timestamp'),
-    metadata: z.record(z.any()).optional().describe('Book metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Book metadata'),
     createdBy: UserId.describe('Creator user ID'),
     updatedBy: UserId.optional().describe('Last updater user ID'),
     // Internal processing fields
@@ -110,7 +110,7 @@ export const InternalBookWithRelationsResponse = openapi(
         id: UUID,
         pageNumber: z.number().int().min(1).describe('Page number'),
         layoutType: PageLayoutType.describe('Layout type'),
-        metadata: z.record(z.any()).optional().describe('Page metadata'),
+        metadata: z.record(z.string(), z.any()).optional().describe('Page metadata'),
         placements: z.array(
           z.object({
             id: UUID,
@@ -123,7 +123,7 @@ export const InternalBookWithRelationsResponse = openapi(
             shortCode: z.string().max(20).optional().describe('Short code'),
             title: z.string().max(255).optional().describe('Title'),
             description: z.string().optional().describe('Description'),
-            metadata: z.record(z.any()).optional().describe('Placement metadata'),
+            metadata: z.record(z.string(), z.any()).optional().describe('Placement metadata'),
             createdBy: UserId.describe('Creator user ID'),
             updatedBy: UserId.optional().describe('Last updater user ID'),
             createdAt: z.string().datetime().describe('Creation timestamp'),

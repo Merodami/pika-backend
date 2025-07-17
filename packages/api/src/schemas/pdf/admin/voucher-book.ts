@@ -32,7 +32,7 @@ export const AdminVoucherBookResponse = openapi(
     backImageUrl: z.string().url().optional().describe('URL of the back cover image'),
     pdfUrl: z.string().url().optional().describe('URL of the generated PDF'),
     pdfGeneratedAt: z.string().datetime().optional().describe('When the PDF was generated'),
-    metadata: z.record(z.any()).optional().describe('Additional book metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Additional book metadata'),
     createdBy: UserId.describe('User who created the book'),
     updatedBy: UserId.optional().describe('User who last updated the book'),
     // Admin-specific fields
@@ -62,7 +62,7 @@ export const CreateVoucherBookRequest = openapi(
     totalPages: z.number().int().min(1).max(100).default(24).describe('Total number of pages'),
     coverImageUrl: z.string().url().optional().describe('URL of the cover image'),
     backImageUrl: z.string().url().optional().describe('URL of the back cover image'),
-    metadata: z.record(z.any()).optional().describe('Additional book metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Additional book metadata'),
   }),
   {
     description: 'Create a new voucher book',
@@ -84,7 +84,7 @@ export const UpdateVoucherBookRequest = openapi(
     totalPages: z.number().int().min(1).max(100).optional().describe('Total number of pages'),
     coverImageUrl: z.string().url().optional().describe('URL of the cover image'),
     backImageUrl: z.string().url().optional().describe('URL of the back cover image'),
-    metadata: z.record(z.any()).optional().describe('Additional book metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Additional book metadata'),
   }),
   {
     description: 'Update voucher book information',
@@ -208,7 +208,7 @@ export const BulkVoucherBookOperationRequest = openapi(
   z.object({
     bookIds: z.array(UUID).min(1).max(100).describe('Voucher book IDs to operate on'),
     operation: z.enum(['publish', 'archive', 'generate_pdf', 'delete']).describe('Operation to perform'),
-    options: z.record(z.any()).optional().describe('Operation-specific options'),
+    options: z.record(z.string(), z.any()).optional().describe('Operation-specific options'),
   }),
   {
     description: 'Bulk operation on multiple voucher books',

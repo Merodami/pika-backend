@@ -64,7 +64,11 @@ export const UserTicketSummaryResponse = openapi(
     resolvedTickets: z.number().int().nonnegative(),
     averageResolutionTime: z.number().optional().describe('In hours'),
     lastTicketDate: z.string().datetime().optional(),
-    ticketsByCategory: z.record(TicketCategory, z.number().int().nonnegative()),
+    ticketsByCategory: z.object(
+      Object.fromEntries(
+        TicketCategory.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
   }),
   {
     description: 'User ticket summary',
@@ -83,7 +87,7 @@ export const BulkCreateTicketsRequest = openapi(
         description: z.string(),
         category: TicketCategory,
         priority: TicketPriority.default('MEDIUM'),
-        metadata: z.record(z.unknown()).optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
       }),
     ).min(1).max(100),
   }),
@@ -157,9 +161,21 @@ export const TicketAnalyticsResponse = openapi(
       firstContactResolutionRate: z.number().min(0).max(100),
     }),
     distribution: z.object({
-      byPriority: z.record(TicketPriority, z.number().int().nonnegative()),
-      byCategory: z.record(TicketCategory, z.number().int().nonnegative()),
-      byStatus: z.record(TicketStatus, z.number().int().nonnegative()),
+      byPriority: z.object(
+        Object.fromEntries(
+          TicketPriority.options.map(key => [key, z.number().int().nonnegative().optional()])
+        )
+      ),
+      byCategory: z.object(
+        Object.fromEntries(
+          TicketCategory.options.map(key => [key, z.number().int().nonnegative().optional()])
+        )
+      ),
+      byStatus: z.object(
+        Object.fromEntries(
+          TicketStatus.options.map(key => [key, z.number().int().nonnegative().optional()])
+        )
+      ),
     }),
   }),
   {

@@ -32,7 +32,7 @@ export const ProcessInternalPaymentRequest = openapi(
     referenceId: z.string(),
     referenceType: z.string(),
     description: z.string(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
 
     // Payment method
     paymentMethodId: z.string().optional(),
@@ -88,7 +88,7 @@ export const ProcessInternalRefundRequest = openapi(
     reason: RefundReason,
     description: z.string(),
     initiatedBy: RefundInitiator,
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Process internal refund',
@@ -178,7 +178,7 @@ export const ProcessPayoutRequest = openapi(
     currency: z.string().length(3).default('usd'),
     description: z.string(),
     bankAccountId: z.string().optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Process payout to business',
@@ -239,7 +239,7 @@ export const TransactionDetailsResponse = openapi(
     businessId: UUID.optional(),
     createdAt: DateTime,
     completedAt: DateTime.optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Transaction details',

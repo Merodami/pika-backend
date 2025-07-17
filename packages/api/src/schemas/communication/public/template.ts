@@ -62,7 +62,7 @@ export const Template = openapi(
 
     // Metadata
     tags: z.array(z.string()).default([]),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
 
     // Usage stats
     usageCount: z.number().int().nonnegative().default(0),
@@ -104,7 +104,7 @@ export const CreateTemplateRequest = openapi(
     locale: z.string().length(5).default('en-US'),
     priority: EmailPriority.default('normal'),
     tags: z.array(z.string()).optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Create a new communication template',
@@ -138,7 +138,7 @@ export const UpdateTemplateRequest = openapi(
       .optional(),
     priority: EmailPriority.optional(),
     tags: z.array(z.string()).optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     isActive: z.boolean().optional(),
   }),
   {
@@ -174,7 +174,7 @@ export type CloneTemplateRequest = z.infer<typeof CloneTemplateRequest>
 export const TestTemplateRequest = openapi(
   z.object({
     templateId: UUID.describe('Template ID to validate'),
-    variables: z.record(z.any()).describe('Test variables for the template'),
+    variables: z.record(z.string(), z.any()).describe('Test variables for the template'),
     recipient: z.string().optional().describe('Test recipient (email/phone)'),
   }),
   {

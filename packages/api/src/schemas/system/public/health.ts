@@ -161,9 +161,9 @@ export type HealthCheckResponse = z.infer<typeof HealthCheckResponse>
 export const APIDocsResponse = openapi(
   z.object({
     openapi: z.string(),
-    info: z.record(z.any()),
-    paths: z.record(z.any()),
-    components: z.record(z.any()),
+    info: z.record(z.string(), z.any()),
+    paths: z.record(z.string(), z.any()),
+    components: z.record(z.string(), z.any()),
   }),
   {
     description: 'OpenAPI documentation',

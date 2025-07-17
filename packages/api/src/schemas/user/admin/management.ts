@@ -198,7 +198,7 @@ export const UserActivityLog = z.object({
   userId: UserId,
   action: z.string(),
   category: z.enum(['AUTH', 'PROFILE', 'PAYMENT', 'OTHER']),
-  details: z.record(z.any()).optional(),
+  details: z.record(z.string(), z.any()).optional(),
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
   timestamp: DateTime,

@@ -131,7 +131,7 @@ export const UpdateUserCreditsRequest = openapi(
     amount: z.number().int(),
     operation: z.enum(['ADD', 'SUBTRACT', 'SET']),
     reason: z.string(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Update user credit balance',

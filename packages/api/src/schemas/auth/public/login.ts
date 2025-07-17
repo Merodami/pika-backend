@@ -100,7 +100,7 @@ export const SessionInfoResponse = z.object({
   deviceType: DeviceType.optional(),
   browser: z.string().optional(),
   os: z.string().optional(),
-  ip: z.string().ip().optional(),
+  ip: z.string().optional(),
   location: z
     .object({
       city: z.string().optional(),

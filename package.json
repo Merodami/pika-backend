@@ -56,7 +56,7 @@
     "generate": "yarn generate:api && yarn generate:docs",
     "generate:api": "yarn generate:openapi && yarn generate:sdk",
     "generate:openapi": "cd packages/api && yarn generate:openapi && cd ../.. && nx run @pikapi:build",
-    "generate:sdk": "[ -d api-microservices-sdk ] && (cd api-microservices-sdk && npm run generate) || echo 'Frontend SDK directory not found - skipping (OK in CI)'",
+    "generate:sdk": "cd frontend/dashboard && npx openapi-typescript-codegen --input ../../packages/api/generated/openapi/all-apis.json --output lib/api/generated --client axios --useOptions --useUnionTypes",
     "generate:docs": "cd packages/api && yarn generate:docs",
     "git-hooks-prepare": "husky install",
     "open:docs": "nx run @pikapi:open-docs",

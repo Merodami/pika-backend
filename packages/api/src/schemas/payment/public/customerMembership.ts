@@ -43,7 +43,7 @@ export const CreateMembershipSubscriptionRequest = openapi(
       .min(0)
       .optional()
       .describe('Trial period in days'),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
   }),
   {
     description: 'Create a subscription for an existing membership',

@@ -61,11 +61,11 @@ export const SendEmailRequest = openapi(
         .optional()
         .describe('Template ID to use for the email'),
       templateParams: z
-        .record(z.any())
+        .record(z.string(), z.any())
         .optional()
         .describe('Parameters to pass to the template'),
       variables: z
-        .record(z.any())
+        .record(z.string(), z.any())
         .optional()
         .describe('Variables for template rendering'),
 
@@ -93,7 +93,7 @@ export const SendEmailRequest = openapi(
       trackOpens: z.boolean().default(true),
       trackClicks: z.boolean().default(true),
       metadata: z
-        .record(z.any())
+        .record(z.string(), z.any())
         .optional()
         .describe('Additional metadata for tracking'),
 
@@ -101,7 +101,7 @@ export const SendEmailRequest = openapi(
       scheduledAt: DateTime.optional().describe('When to send the email'),
 
       // Headers
-      headers: z.record(z.string()).optional().describe('Custom email headers'),
+      headers: z.record(z.string(), z.string()).optional().describe('Custom email headers'),
     })
     .refine(
       (data) =>
@@ -139,10 +139,10 @@ export type SendEmailResponse = z.infer<typeof SendEmailResponse>
  */
 export const BulkEmailRecipient = EmailRecipient.extend({
   variables: z
-    .record(z.any())
+    .record(z.string(), z.any())
     .optional()
     .describe('Recipient-specific template variables'),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 })
 export type BulkEmailRecipient = z.infer<typeof BulkEmailRecipient>
 
@@ -156,7 +156,7 @@ export const SendBulkEmailRequest = openapi(
     templateId: z.string().describe('Template ID for bulk emails'),
 
     // Global variables (can be overridden per recipient)
-    globalVariables: z.record(z.any()).optional(),
+    globalVariables: z.record(z.string(), z.any()).optional(),
 
     // Options
     priority: EmailPriority.default('normal'),
@@ -240,7 +240,7 @@ export const EmailRecord = withTimestamps({
   bounceType: BounceType.optional(),
 
   // Metadata
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 })
 
 export type EmailRecord = z.infer<typeof EmailRecord>

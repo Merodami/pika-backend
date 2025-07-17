@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import type { ZodRegistry } from '@api/common/registry/base.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import { successResponse as MessageResponse } from '@api/schemas/shared/responses.js'
+import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as internalAuthSchemas from '@api/schemas/auth/internal/service.js'
 import * as internalCommunicationSchemas from '@api/schemas/communication/internal/service.js'
 import * as internalDiscoverySchemas from '@api/schemas/discovery/internal/service.js'
@@ -709,35 +709,8 @@ function registerInternalRoutes(registry: ZodRegistry): void {
     },
   })
 
-  registry.registerRoute({
-    method: 'patch',
-    path: '/users/{id}',
-    summary: 'Update user internally',
-    tags: ['User Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: internalUserSchemas.UpdateUserRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'User updated',
-        content: {
-          'application/json': {
-            schema: internalUserSchemas.InternalUserData,
-          },
-        },
-      },
-    },
-  })
+  // Note: PATCH /users/{id} route removed - UpdateUserRequest schema doesn't exist in internal user schemas
+  // This route should be re-added once the proper schema is defined
 
   // Subscription Service Internal Routes
 

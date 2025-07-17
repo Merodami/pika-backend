@@ -232,8 +232,9 @@ export const DeleteAccountRequest = openapi(
       .optional()
       .describe('Optional reason for account deletion'),
     confirmDeletion: z
-      .literal(true, {
-        errorMap: () => ({ message: 'Must confirm deletion' }),
+      .literal(true)
+      .refine((val) => val === true, {
+        message: 'Must confirm deletion',
       })
       .describe('Must be true to confirm deletion'),
   }),

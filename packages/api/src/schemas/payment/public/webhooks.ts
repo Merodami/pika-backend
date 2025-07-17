@@ -37,7 +37,7 @@ export const StripePaymentIntent = z.object({
   amount: z.number().int().positive(),
   currency: z.string().length(3),
   customer: z.string().nullable(),
-  metadata: z.record(z.string()).default({}),
+  metadata: z.record(z.string(), z.string()).default({}),
   status: z.enum([
     'requires_payment_method',
     'requires_confirmation',
@@ -69,7 +69,7 @@ export const StripeSubscription = z.object({
   ]),
   current_period_start: z.number().int(),
   current_period_end: z.number().int(),
-  metadata: z.record(z.string()).default({}),
+  metadata: z.record(z.string(), z.string()).default({}),
 })
 export type StripeSubscription = z.infer<typeof StripeSubscription>
 
@@ -84,7 +84,7 @@ export const StripeCheckoutSession = z.object({
   subscription: z.string().nullable(),
   amount_total: z.number().int().nullable(),
   currency: z.string().length(3).nullable(),
-  metadata: z.record(z.string()).default({}),
+  metadata: z.record(z.string(), z.string()).default({}),
   payment_status: z.enum(['paid', 'unpaid', 'no_payment_required']),
 })
 export type StripeCheckoutSession = z.infer<typeof StripeCheckoutSession>
@@ -101,7 +101,7 @@ export const StripeInvoice = z.object({
   amount_due: z.number().int(),
   currency: z.string().length(3),
   status: z.enum(['draft', 'open', 'paid', 'uncollectible', 'void']),
-  metadata: z.record(z.string()).default({}),
+  metadata: z.record(z.string(), z.string()).default({}),
 })
 export type StripeInvoice = z.infer<typeof StripeInvoice>
 

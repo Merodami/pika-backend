@@ -50,16 +50,21 @@ const BaseCategoryResponse = openapi(
 
 /**
  * Public category response with optional children
+ * Note: Using manual $ref for recursive structure as z.lazy() is not supported in zod-to-openapi
  */
-export const CategoryResponse: z.ZodType<any> = BaseCategoryResponse.extend({
+export const CategoryResponse = BaseCategoryResponse.extend({
   children: z
-    .array(z.lazy(() => CategoryResponse))
+    .array(BaseCategoryResponse)
     .optional()
     .describe('Child categories for hierarchical display')
-    .openapi({ type: 'array', items: { $ref: '#/components/schemas/CategoryResponse' } }),
-}).openapi({
+    .openapi({
+      type: 'array',
+      items: {
+        $ref: '#/components/schemas/CategoryResponse'
+      }
+    }),
+}).openapi('CategoryResponse', {
   description: 'Category information with hierarchical structure',
-  ref: 'CategoryResponse',
 })
 
 export type CategoryResponse = z.infer<typeof CategoryResponse>

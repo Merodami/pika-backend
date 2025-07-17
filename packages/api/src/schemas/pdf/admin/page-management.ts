@@ -22,7 +22,7 @@ export const AdminVoucherBookPageResponse = openapi(
     bookId: UUID.describe('Parent voucher book ID'),
     pageNumber: z.number().int().min(1).describe('Page number within the book'),
     layoutType: PageLayoutType.describe('Layout type for the page'),
-    metadata: z.record(z.any()).optional().describe('Page-specific metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Page-specific metadata'),
     // Admin-specific fields
     placementCount: z.number().int().nonnegative().describe('Number of placements on this page'),
     spacesUsed: z.number().int().min(0).max(8).describe('Number of spaces currently used'),
@@ -43,7 +43,7 @@ export const UpsertPageRequest = openapi(
   z.object({
     pageNumber: z.number().int().min(1).describe('Page number within the book'),
     layoutType: PageLayoutType.describe('Layout type for the page'),
-    metadata: z.record(z.any()).optional().describe('Page-specific metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Page-specific metadata'),
   }),
   {
     description: 'Create or update a page',
@@ -70,7 +70,7 @@ export const AdminAdPlacementResponse = openapi(
     shortCode: z.string().max(20).optional().describe('Human-readable code'),
     title: z.string().max(255).optional().describe('Content title'),
     description: z.string().optional().describe('Content description'),
-    metadata: z.record(z.any()).optional().describe('Placement metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Placement metadata'),
     createdBy: UserId.describe('User who created the placement'),
     updatedBy: UserId.optional().describe('User who last updated the placement'),
     // Admin-specific fields
@@ -99,7 +99,7 @@ export const CreateAdPlacementRequest = openapi(
     shortCode: z.string().max(20).optional().describe('Human-readable code'),
     title: z.string().max(255).optional().describe('Content title'),
     description: z.string().optional().describe('Content description'),
-    metadata: z.record(z.any()).optional().describe('Placement metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Placement metadata'),
   }),
   {
     description: 'Create a new ad placement',
@@ -121,7 +121,7 @@ export const UpdateAdPlacementRequest = openapi(
     shortCode: z.string().max(20).optional().describe('Human-readable code'),
     title: z.string().max(255).optional().describe('Content title'),
     description: z.string().optional().describe('Content description'),
-    metadata: z.record(z.any()).optional().describe('Placement metadata'),
+    metadata: z.record(z.string(), z.any()).optional().describe('Placement metadata'),
     isActive: z.boolean().optional().describe('Whether placement is active'),
   }),
   {
@@ -184,7 +184,7 @@ export const BulkPlacementOperationRequest = openapi(
   z.object({
     placementIds: z.array(UUID).min(1).max(50).describe('Placement IDs to operate on'),
     operation: z.enum(['activate', 'deactivate', 'delete', 'move']).describe('Operation to perform'),
-    options: z.record(z.any()).optional().describe('Operation-specific options'),
+    options: z.record(z.string(), z.any()).optional().describe('Operation-specific options'),
   }),
   {
     description: 'Bulk operation on multiple placements',

@@ -45,12 +45,12 @@ export const SendSystemNotificationRequest = openapi(
 
     // Template
     templateId: z.string().optional(),
-    templateVariables: z.record(z.any()).optional(),
+    templateVariables: z.record(z.string(), z.any()).optional(),
 
     // Options
     actionUrl: z.string().url().optional(),
     expiresAt: DateTime.optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Send system notification',
@@ -68,12 +68,10 @@ export const SendSystemNotificationResponse = openapi(
   z.object({
     notificationId: UUID,
     recipientCount: z.number().int().nonnegative(),
-    channels: z.record(
-      z.object({
-        sent: z.number().int().nonnegative(),
-        failed: z.number().int().nonnegative(),
-      }),
-    ),
+    channels: z.record(z.string(), z.object({
+      sent: z.number().int().nonnegative(),
+      failed: z.number().int().nonnegative(),
+    })),
     timestamp: DateTime,
   }),
   {
@@ -94,7 +92,7 @@ export const SendTransactionalEmailRequest = openapi(
   z.object({
     userId: UserId,
     templateKey: TemplateKey,
-    variables: z.record(z.any()),
+    variables: z.record(z.string(), z.any()),
 
     // Override options
     subject: z.string().optional().describe('Override template subject'),
@@ -153,7 +151,7 @@ export const SendSMSRequest = openapi(
     phoneNumber: z.string().optional().describe('Override user phone'),
     message: z.string().max(160),
     type: MessageType,
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Send SMS message',
@@ -192,7 +190,7 @@ export const SendPushNotificationRequest = openapi(
     // Push specific
     badge: z.number().int().nonnegative().optional(),
     sound: z.string().optional(),
-    data: z.record(z.any()).optional(),
+    data: z.record(z.string(), z.any()).optional(),
 
     // iOS specific
     subtitle: z.string().optional(),
@@ -274,11 +272,11 @@ export const UserCommunicationPreferencesResponse = openapi(
     // Channel preferences
     email: z.object({
       enabled: z.boolean(),
-      categories: z.record(z.boolean()),
+      categories: z.record(z.string(), z.boolean()),
     }),
     push: z.object({
       enabled: z.boolean(),
-      categories: z.record(z.boolean()),
+      categories: z.record(z.string(), z.boolean()),
       tokens: z.array(
         z.object({
           token: z.string(),
@@ -289,7 +287,7 @@ export const UserCommunicationPreferencesResponse = openapi(
     }),
     sms: z.object({
       enabled: z.boolean(),
-      categories: z.record(z.boolean()),
+      categories: z.record(z.string(), z.boolean()),
       phoneNumber: z.string().optional(),
     }),
 
@@ -325,7 +323,7 @@ export const SendEmailRequest = openapi(
     to: EmailAddress,
     subject: z.string().optional().describe('Optional when using templateId'),
     templateId: z.string().optional(),
-    templateParams: z.record(z.any()).optional(),
+    templateParams: z.record(z.string(), z.any()).optional(),
     body: z.string().optional(),
     isHtml: z.boolean().default(false),
     replyTo: EmailAddress.optional(),
@@ -363,7 +361,7 @@ export const BulkEmailRequest = openapi(
     recipients: z.array(
       z.object({
         to: EmailAddress,
-        variables: z.record(z.any()).optional(),
+        variables: z.record(z.string(), z.any()).optional(),
       }),
     ),
   }),
@@ -400,7 +398,7 @@ export const CreateNotificationRequest = openapi(
     title: z.string(),
     content: z.string(),
     type: InAppNotificationType,
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Create in-app notification',
@@ -446,7 +444,7 @@ export const BatchUpdateNotificationStatusRequest = openapi(
             'FAILED',
           ]),
           timestamp: DateTime,
-          metadata: z.record(z.any()).optional(),
+          metadata: z.record(z.string(), z.any()).optional(),
         }),
       )
       .min(1)

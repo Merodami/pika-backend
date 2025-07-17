@@ -72,6 +72,7 @@ export const MessageResponse = z
     message: z.string().describe('Success message'),
   })
   .describe('Simple message response')
+  .openapi('MessageResponse')
 
 export type MessageResponse = z.infer<typeof MessageResponse>
 
@@ -109,7 +110,7 @@ export function createdResponse<T extends z.ZodTypeAny>(
         .object({
           self: z.string().url().describe('URL to access the created resource'),
           related: z
-            .record(z.string().url())
+            .record(z.string(), z.string().url())
             .optional()
             .describe('Related resource URLs'),
         })
@@ -223,7 +224,7 @@ export const HealthCheckResponse = z
     version: z.string().describe('Service version'),
     uptime: z.number().int().nonnegative().describe('Uptime in seconds'),
     checks: z
-      .record(ServiceHealthCheck)
+      .record(z.string(), ServiceHealthCheck)
       .optional()
       .describe('Individual health checks'),
   })

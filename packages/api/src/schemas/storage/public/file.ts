@@ -33,7 +33,7 @@ export const FileStorageLog = openapi(
     region: z.string().optional(),
     uploadedAt: DateTime.optional(),
     deletedAt: DateTime.optional(),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
     error: z.string().optional(),
   }),
   {

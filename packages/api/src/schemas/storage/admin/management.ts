@@ -36,7 +36,7 @@ export const AdminFileDetailResponse = openapi(
     region: z.string().optional(),
     uploadedAt: DateTime.optional(),
     deletedAt: DateTime.optional(),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
     error: z.string().optional(),
     isPublic: z.boolean().default(false),
     downloadCount: z.number().int().nonnegative().default(0),
@@ -85,7 +85,7 @@ export const AdminUpdateFileRequest = openapi(
     fileName: z.string().optional(),
     status: FileStatus.optional(),
     isPublic: z.boolean().optional(),
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
   }),
   {
     description: 'Admin update file details',
@@ -137,10 +137,26 @@ export const StorageAnalyticsResponse = openapi(
     newFiles: z.number().int().nonnegative(),
     deletedFiles: z.number().int().nonnegative(),
     averageFileSize: z.number().optional().describe('Average size in bytes'),
-    filesByType: z.record(FileType, z.number().int().nonnegative()),
-    filesByStatus: z.record(FileStatus, z.number().int().nonnegative()),
-    filesByProvider: z.record(StorageProvider, z.number().int().nonnegative()),
-    storageByProvider: z.record(StorageProvider, z.number().int().nonnegative()),
+    filesByType: z.object(
+      Object.fromEntries(
+        FileType.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
+    filesByStatus: z.object(
+      Object.fromEntries(
+        FileStatus.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
+    filesByProvider: z.object(
+      Object.fromEntries(
+        StorageProvider.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
+    storageByProvider: z.object(
+      Object.fromEntries(
+        StorageProvider.options.map(key => [key, z.number().int().nonnegative().optional()])
+      )
+    ),
     topUsers: z.array(
       z.object({
         userId: UserId,

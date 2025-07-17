@@ -69,7 +69,7 @@ export const UpdateSubscriptionFromPaymentRequest = openapi(
     currentPeriodEnd: DateTime.optional(),
     canceledAt: DateTime.optional(),
     cancelAtPeriodEnd: z.boolean().optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Update subscription from payment service',
@@ -312,7 +312,7 @@ export const ProcessSubscriptionUsageRequest = openapi(
     subscriptionId: UUID,
     usageType: UsageType,
     amount: z.number().positive().optional(),
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Process subscription usage',
@@ -350,7 +350,7 @@ export const CreateStripeSubscriptionRequest = openapi(
     status: z.string(),
     currentPeriodStart: DateTime,
     currentPeriodEnd: DateTime,
-    metadata: z.record(z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
     description: 'Create subscription from Stripe',

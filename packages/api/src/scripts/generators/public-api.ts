@@ -3,13 +3,14 @@ import { z } from 'zod'
 import type { ZodRegistry } from '@api/common/registry/base.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import { successResponse as MessageResponse } from '@api/schemas/shared/responses.js'
+import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
 import * as communicationNotificationSchemas from '@api/schemas/communication/public/notification.js'
 import * as webhookSchemas from '@api/schemas/payment/public/webhooks.js'
+import * as paymentHeaderSchemas from '@api/schemas/payment/public/headers.js'
 import * as subscriptionSchemas from '@api/schemas/subscription/public/index.js'
 import * as subscriptionPlanSchemas from '@api/schemas/subscription/public/index.js'
 import * as supportCommentSchemas from '@api/schemas/support/public/comment.js'
@@ -720,9 +721,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     description:
       'Endpoint for receiving Stripe webhook events. Uses signature verification instead of JWT authentication.',
     request: {
-      headers: z.object({
-        'stripe-signature': z.string().describe('Stripe webhook signature'),
-      }),
+      headers: paymentHeaderSchemas.StripeWebhookHeaders,
       body: {
         content: {
           'application/json': {
@@ -850,9 +849,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
         description: 'List of comments',
         content: {
           'application/json': {
-            schema: z.object({
-              data: z.array(supportCommentSchemas.SupportCommentResponse),
-            }),
+            schema: supportCommentSchemas.SupportCommentListResponse,
           },
         },
       },
@@ -887,7 +884,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
     request: {
-      params: supportCommentSchemas.SupportCommentIdParam,
+      params: supportParameterSchemas.SupportCommentIdParam,
       body: {
         content: {
           'application/json': {

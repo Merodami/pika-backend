@@ -129,7 +129,7 @@ export type Distance = z.infer<typeof Distance>
 /**
  * Location result with distance from search point
  */
-export function locationWithDistance<T extends z.AnyZodObject>(schema: T) {
+export function locationWithDistance<T extends z.ZodObject<any>>(schema: T) {
   return schema.extend({
     distance: Distance.optional().describe('Distance from search center'),
   })
