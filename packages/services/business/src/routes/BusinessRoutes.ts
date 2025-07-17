@@ -1,0 +1,94 @@
+import type { PrismaClient } from '@prisma/client'
+import {
+  BusinessIdParam,
+  CreateBusinessRequest,
+  GetBusinessByIdQuery,
+  PublicBusinessQueryParams,
+  UpdateBusinessRequest,
+  UserIdParam,
+} from '@pika/api/public'
+import {
+  requireAuth,
+  requireBusinessRole,
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { TranslationServiceClient } from '@pika/shared'
+import { Router } from 'express'
+
+import { BusinessController } from '../controllers/BusinessController.js'
+import { BusinessRepository } from '../repositories/BusinessRepository.js'
+import { BusinessService } from '../services/BusinessService.js'
+
+/**
+ * Creates public business routes
+ */
+export function createBusinessRoutes(
+  prisma: PrismaClient,
+  cache: ICacheService,
+  translationServiceClient?: TranslationServiceClient,
+): Router {
+  const router = Router()
+
+  // Initialize dependencies
+  const repository = new BusinessRepository(prisma, cache)
+  const translationService = translationServiceClient || new TranslationServiceClient()
+  const service = new BusinessService(repository, translationService, cache)
+  const controller = new BusinessController(service)
+
+  // Public routes (no auth required)
+  // GET /businesses - List all active businesses
+  router.get(
+    '/',
+    validateQuery(PublicBusinessQueryParams),
+    controller.getAllBusinesses
+  )
+
+  // GET /businesses/:id - Get business by ID
+  router.get(
+    '/:id',
+    validateParams(BusinessIdParam),
+    validateQuery(GetBusinessByIdQuery),
+    controller.getBusinessById
+  )
+
+  // GET /businesses/user/:id - Get business by user ID
+  router.get(
+    '/user/:id',
+    validateParams(UserIdParam),
+    validateQuery(GetBusinessByIdQuery),
+    controller.getBusinessByUserId
+  )
+
+  // Business owner routes (require auth and business role)
+  // GET /businesses/me - Get current user's business
+  router.get(
+    '/me',
+    requireAuth(),
+    requireBusinessRole(),
+    validateQuery(GetBusinessByIdQuery),
+    controller.getMyBusiness
+  )
+
+  // POST /businesses/me - Create business for current user
+  router.post(
+    '/me',
+    requireAuth(),
+    requireBusinessRole(),
+    validateBody(CreateBusinessRequest),
+    controller.createMyBusiness
+  )
+
+  // PUT /businesses/me - Update current user's business
+  router.put(
+    '/me',
+    requireAuth(),
+    requireBusinessRole(),
+    validateBody(UpdateBusinessRequest),
+    controller.updateMyBusiness
+  )
+
+  return router
+}

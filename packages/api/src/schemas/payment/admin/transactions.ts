@@ -1,49 +1,36 @@
 import { z } from 'zod'
 
-import { GymId, Money, UserId } from '../../shared/branded.js'
+import { Money, UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import { SearchParams, DateRangeParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  TransactionType,
+  TransactionStatus,
+  PaymentMethod,
+  TransactionSortBy,
+  PromoCodeType,
+  PromoCodeStatus,
+  AdminRefundReason,
+  AdjustmentType,
+  AdjustmentReason,
+  PayoutAction,
+  PayoutStatus,
+  PriceInterval,
+  Currency,
+  ReportType,
+  ReportPeriod,
+  ReportGroupBy,
+  ReportFormat,
+  DisputeStatus,
+  DisputeAction,
+} from '../common/enums.js'
 
 /**
  * Admin payment and transaction schemas
  */
-
-// ============= Enums =============
-
-export const TransactionType = z.enum([
-  'PAYMENT',
-  'REFUND',
-  'TRANSFER',
-  'PAYOUT',
-  'ADJUSTMENT',
-  'FEE',
-  'SUBSCRIPTION',
-  'CREDIT_PURCHASE',
-])
-export type TransactionType = z.infer<typeof TransactionType>
-
-export const TransactionStatus = z.enum([
-  'PENDING',
-  'PROCESSING',
-  'COMPLETED',
-  'FAILED',
-  'CANCELLED',
-  'REFUNDED',
-  'DISPUTED',
-])
-export type TransactionStatus = z.infer<typeof TransactionStatus>
-
-export const PaymentMethod = z.enum([
-  'CARD',
-  'BANK_TRANSFER',
-  'WALLET',
-  'CREDIT',
-  'CASH',
-  'OTHER',
-])
-export type PaymentMethod = z.infer<typeof PaymentMethod>
 
 // ============= Transaction Details =============
 
@@ -66,10 +53,8 @@ export const AdminTransactionDetailResponse = openapi(
     // Parties
     userId: UserId.optional(),
     userName: z.string().optional(),
-    gymId: GymId.optional(),
-    gymName: z.string().optional(),
-    trainerId: UserId.optional(),
-    trainerName: z.string().optional(),
+    businessId: UUID.optional(),
+    businessName: z.string().optional(),
 
     // Payment details
     paymentMethod: PaymentMethod,
@@ -88,9 +73,7 @@ export const AdminTransactionDetailResponse = openapi(
     failureCode: z.string().optional(),
 
     // Dispute/Refund
-    disputeStatus: z
-      .enum(['WARNING', 'NEEDS_RESPONSE', 'UNDER_REVIEW', 'WON', 'LOST'])
-      .optional(),
+    disputeStatus: DisputeStatus.optional(),
     disputeReason: z.string().optional(),
     refundReason: z.string().optional(),
     refundedAmount: Money.optional(),
@@ -114,24 +97,17 @@ export type AdminTransactionDetailResponse = z.infer<
 /**
  * Admin transaction search parameters
  */
-export const AdminTransactionQueryParams = z.object({
+export const AdminTransactionQueryParams = SearchParams.merge(DateRangeParams).extend({
   type: TransactionType.optional(),
   status: TransactionStatus.optional(),
   paymentMethod: PaymentMethod.optional(),
   userId: UserId.optional(),
-  gymId: GymId.optional(),
-  trainerId: UserId.optional(),
+  businessId: UUID.optional(),
   stripePaymentIntentId: z.string().optional(),
   minAmount: z.number().nonnegative().optional(),
   maxAmount: z.number().nonnegative().optional(),
   currency: z.string().length(3).optional(),
   hasDispute: z.boolean().optional(),
-  fromDate: DateTime.optional(),
-  toDate: DateTime.optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sort: z.enum(['CREATED_AT', 'AMOUNT', 'PROCESSED_AT']).default('CREATED_AT'),
-  order: z.enum(['ASC', 'DESC']).default('DESC'),
 })
 
 export type AdminTransactionQueryParams = z.infer<
@@ -183,11 +159,11 @@ export const FinancialSummary = openapi(
     averageTransactionAmount: Money,
 
     // Top performers
-    topGyms: z
+    topBusinesses: z
       .array(
         z.object({
-          gymId: GymId,
-          gymName: z.string(),
+          businessId: UUID,
+          businessName: z.string(),
           revenue: Money,
           transactionCount: z.number().int().nonnegative(),
         }),
@@ -220,7 +196,7 @@ export type FinancialSummary = z.infer<typeof FinancialSummary>
 export const RefundTransactionRequest = openapi(
   z.object({
     amount: Money.optional().describe('Partial refund amount'),
-    reason: z.enum(['DUPLICATE', 'FRAUDULENT', 'CUSTOMER_REQUEST', 'OTHER']),
+    reason: AdminRefundReason,
     description: z.string().max(500),
     notifyUser: z.boolean().default(true),
   }),
@@ -238,8 +214,8 @@ export const ManualAdjustmentRequest = openapi(
   z.object({
     userId: UserId,
     amount: Money,
-    type: z.enum(['CREDIT', 'DEBIT']),
-    reason: z.enum(['COMPENSATION', 'CORRECTION', 'PROMOTIONAL', 'OTHER']),
+    type: AdjustmentType,
+    reason: AdjustmentReason,
     description: z.string().max(500),
     notifyUser: z.boolean().default(true),
   }),
@@ -257,16 +233,10 @@ export type ManualAdjustmentRequest = z.infer<typeof ManualAdjustmentRequest>
  */
 export const PayoutDetail = z.object({
   id: UUID,
-  gymId: GymId,
+  businessId: UUID,
   amount: Money,
   currency: z.string().length(3),
-  status: z.enum([
-    'SCHEDULED',
-    'PROCESSING',
-    'COMPLETED',
-    'FAILED',
-    'CANCELLED',
-  ]),
+  status: PayoutStatus,
   scheduledFor: DateTime,
   processedAt: DateTime.optional(),
   bankAccountId: z.string().optional(),
@@ -289,7 +259,7 @@ export type PayoutListResponse = z.infer<typeof PayoutListResponse>
 export const ProcessPayoutRequest = openapi(
   z.object({
     payoutIds: z.array(UUID).min(1).max(100),
-    action: z.enum(['APPROVE', 'REJECT', 'DELAY']),
+    action: PayoutAction,
     reason: z.string().max(500).optional(),
     delayUntil: DateTime.optional(),
   }),
@@ -307,7 +277,7 @@ export type ProcessPayoutRequest = z.infer<typeof ProcessPayoutRequest>
  */
 export const UpdateDisputeRequest = openapi(
   z.object({
-    status: z.enum(['ACCEPT', 'CHALLENGE']),
+    status: DisputeAction,
     evidence: z
       .array(
         z.object({
@@ -335,7 +305,7 @@ export const AdminPromoCodeDetail = openapi(
   withTimestamps({
     id: UUID,
     code: z.string().toUpperCase(),
-    type: z.enum(['PERCENTAGE', 'FIXED_AMOUNT', 'FREE_CREDITS']),
+    type: PromoCodeType,
     value: z.number().positive(),
     description: z.string().optional(),
 
@@ -350,7 +320,7 @@ export const AdminPromoCodeDetail = openapi(
 
     // Conditions
     minPurchaseAmount: Money.optional(),
-    applicableToGyms: z.array(GymId).optional(),
+    applicableToBusinesses: z.array(UUID).optional(),
     applicableToUserTiers: z.array(z.string()).optional(),
     firstTimeOnly: z.boolean().default(false),
 
@@ -377,7 +347,7 @@ export type AdminPromoCodeDetail = z.infer<typeof AdminPromoCodeDetail>
 export const CreatePromoCodeRequest = openapi(
   z.object({
     code: z.string().min(3).max(20).toUpperCase(),
-    type: z.enum(['PERCENTAGE', 'FIXED_AMOUNT', 'FREE_CREDITS']),
+    type: PromoCodeType,
     value: z.number().positive(),
     description: z.string().max(500).optional(),
 
@@ -391,7 +361,7 @@ export const CreatePromoCodeRequest = openapi(
 
     // Conditions
     minPurchaseAmount: Money.optional(),
-    applicableToGyms: z.array(GymId).optional(),
+    applicableToBusinesses: z.array(UUID).optional(),
     applicableToUserTiers: z.array(z.string()).optional(),
     firstTimeOnly: z.boolean().default(false),
 
@@ -422,7 +392,7 @@ export const UpdatePromoCodeRequest = openapi(
 
     // Conditions
     minPurchaseAmount: Money.optional(),
-    applicableToGyms: z.array(GymId).optional(),
+    applicableToBusinesses: z.array(UUID).optional(),
     applicableToUserTiers: z.array(z.string()).optional(),
     firstTimeOnly: z.boolean().optional(),
 
@@ -442,20 +412,13 @@ export type UpdatePromoCodeRequest = z.infer<typeof UpdatePromoCodeRequest>
 /**
  * Promo code search parameters
  */
-export const PromoCodeSearchParams = z.object({
-  search: z.string().optional().describe('Search in code or description'),
-  type: z.enum(['PERCENTAGE', 'FIXED_AMOUNT', 'FREE_CREDITS']).optional(),
+export const PromoCodeSearchParams = SearchParams.extend({
+  type: PromoCodeType.optional(),
   isActive: z.boolean().optional(),
-  hasExpired: z.boolean().optional(),
+  status: PromoCodeStatus.optional(),
   createdBy: UserId.optional(),
   createdFrom: DateTime.optional(),
   createdTo: DateTime.optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sort: z
-    .enum(['CODE', 'CREATED_AT', 'USED_COUNT', 'VALID_UNTIL'])
-    .default('CREATED_AT'),
-  order: z.enum(['ASC', 'DESC']).default('DESC'),
 })
 
 export type PromoCodeSearchParams = z.infer<typeof PromoCodeSearchParams>
@@ -480,19 +443,13 @@ export const AdminSubscriptionPlanDetail = openapi(
 
     // Pricing
     price: Money,
-    currency: z.string().length(3).default('USD'),
-    billingInterval: z.enum(['MONTH', 'YEAR']),
+    currency: Currency.default('usd'),
+    billingInterval: PriceInterval,
     trialPeriodDays: z.number().int().nonnegative().default(0),
 
-    // Features
-    features: z.array(z.string()),
-    creditAllowance: z.number().int().nonnegative().optional(),
-    gymAccessLevel: z.enum(['BASIC', 'PREMIUM', 'UNLIMITED']),
 
     // Limits
-    maxGymsPerMonth: z.number().int().positive().optional(),
-    maxSessionsPerMonth: z.number().int().positive().optional(),
-    maxTrainersAccess: z.number().int().positive().optional(),
+    maxUsagePerMonth: z.number().int().positive().optional(),
 
     // Status
     isActive: z.boolean().default(true),
@@ -530,19 +487,13 @@ export const CreateSubscriptionPlanRequest = openapi(
 
     // Pricing
     price: Money,
-    currency: z.string().length(3).default('USD'),
-    billingInterval: z.enum(['MONTH', 'YEAR']),
+    currency: Currency.default('usd'),
+    billingInterval: PriceInterval,
     trialPeriodDays: z.number().int().nonnegative().default(0),
 
-    // Features
-    features: z.array(z.string()),
-    creditAllowance: z.number().int().nonnegative().optional(),
-    gymAccessLevel: z.enum(['BASIC', 'PREMIUM', 'UNLIMITED']),
 
     // Limits
-    maxGymsPerMonth: z.number().int().positive().optional(),
-    maxSessionsPerMonth: z.number().int().positive().optional(),
-    maxTrainersAccess: z.number().int().positive().optional(),
+    maxUsagePerMonth: z.number().int().positive().optional(),
 
     // Status
     isActive: z.boolean().default(true),
@@ -568,15 +519,9 @@ export const UpdateSubscriptionPlanRequest = openapi(
     name: z.string().min(1).max(100).optional(),
     description: z.string().max(1000).optional(),
 
-    // Features (price cannot be changed)
-    features: z.array(z.string()).optional(),
-    creditAllowance: z.number().int().nonnegative().optional(),
-    gymAccessLevel: z.enum(['BASIC', 'PREMIUM', 'UNLIMITED']).optional(),
 
     // Limits
-    maxGymsPerMonth: z.number().int().positive().optional(),
-    maxSessionsPerMonth: z.number().int().positive().optional(),
-    maxTrainersAccess: z.number().int().positive().optional(),
+    maxUsagePerMonth: z.number().int().positive().optional(),
 
     // Status
     isActive: z.boolean().optional(),
@@ -597,21 +542,13 @@ export type UpdateSubscriptionPlanRequest = z.infer<
 /**
  * Subscription plan search parameters
  */
-export const SubscriptionPlanSearchParams = z.object({
-  search: z.string().optional().describe('Search in name or description'),
-  billingInterval: z.enum(['MONTH', 'YEAR']).optional(),
-  gymAccessLevel: z.enum(['BASIC', 'PREMIUM', 'UNLIMITED']).optional(),
+export const SubscriptionPlanSearchParams = SearchParams.extend({
+  billingInterval: PriceInterval.optional(),
   isActive: z.boolean().optional(),
   isPublic: z.boolean().optional(),
   minPrice: z.number().nonnegative().optional(),
   maxPrice: z.number().nonnegative().optional(),
   createdBy: UserId.optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sort: z
-    .enum(['NAME', 'PRICE', 'CREATED_AT', 'ACTIVE_SUBSCRIPTIONS'])
-    .default('CREATED_AT'),
-  order: z.enum(['ASC', 'DESC']).default('DESC'),
 })
 
 export type SubscriptionPlanSearchParams = z.infer<
@@ -635,19 +572,13 @@ export type SubscriptionPlanListResponse = z.infer<
  * Financial report request
  */
 export const FinancialReportRequest = z.object({
-  reportType: z.enum([
-    'REVENUE',
-    'TRANSACTIONS',
-    'PAYOUTS',
-    'DISPUTES',
-    'SUMMARY',
-  ]),
-  period: z.enum(['7d', '30d', '90d', '1y', 'custom']),
+  reportType: ReportType,
+  period: ReportPeriod,
   startDate: DateTime.optional(),
   endDate: DateTime.optional(),
-  groupBy: z.enum(['DAY', 'WEEK', 'MONTH']).optional(),
+  groupBy: ReportGroupBy.optional(),
   includeDetails: z.boolean().default(false),
-  format: z.enum(['JSON', 'CSV', 'PDF']).default('JSON'),
+  format: ReportFormat.default('json'),
 })
 
 export type FinancialReportRequest = z.infer<typeof FinancialReportRequest>
@@ -657,13 +588,7 @@ export type FinancialReportRequest = z.infer<typeof FinancialReportRequest>
  */
 export const FinancialReportResponse = openapi(
   z.object({
-    reportType: z.enum([
-      'REVENUE',
-      'TRANSACTIONS',
-      'PAYOUTS',
-      'DISPUTES',
-      'SUMMARY',
-    ]),
+    reportType: ReportType,
     period: z.object({
       start: DateTime,
       end: DateTime,

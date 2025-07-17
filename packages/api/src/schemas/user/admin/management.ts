@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-import { Email, UserId } from '../../shared/branded.js'
-import { UserRole, UserStatus } from '../../shared/enums.js'
-import { withTimestamps } from '../../shared/metadata.js'
-import { DateTime, UUID } from '../../shared/primitives.js'
-import { paginatedResponse } from '../../shared/responses.js'
+import { Email, UserId } from '../../../common/schemas/branded.js'
+import { UserRole, UserStatus } from '../../../common/schemas/enums.js'
+import { withTimestamps } from '../../../common/schemas/metadata.js'
+import { DateTime, UUID } from '../../../common/schemas/primitives.js'
+import { paginatedResponse } from '../../../common/schemas/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**
@@ -261,7 +261,7 @@ export const AdminCreateUserRequest = openapi(
     lastName: z.string().min(1).max(50),
     phoneNumber: z.string().min(1),
     dateOfBirth: z.string(),
-    role: UserRole.default('USER'),
+    role: UserRole.default(UserRole.enum.CUSTOMER),
     status: UserStatus.default('UNCONFIRMED'),
     appVersion: z.string().optional(),
     alias: z.string().optional(),

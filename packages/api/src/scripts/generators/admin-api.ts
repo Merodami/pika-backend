@@ -9,8 +9,10 @@ import * as adminSessionBookingStatsSchemas from '../../admin/schemas/session/bo
 import * as adminSessionSchemas from '../../admin/schemas/session/management.js'
 import * as adminSupportSchemas from '../../admin/schemas/support/tickets.js'
 import * as adminUserSchemas from '../../admin/schemas/user/index.js'
+import * as adminPdfSchemas from '../../admin/schemas/pdf/management.js'
 import type { SimpleZodRegistry } from '../../common/registry/simple.js'
 import { UserId } from '../../common/schemas/branded.js'
+import * as pdfParameters from '../../common/schemas/pdf/parameters.js'
 import { DateTime, UUID } from '../../common/schemas/primitives.js'
 import {
   ErrorResponse,
@@ -376,6 +378,55 @@ export function registerAdminAPI(registry: SimpleZodRegistry): void {
     adminUserSchemas.BulkUserActionRequest,
   )
   registry.registerSchema('UserIdParam', adminUserSchemas.UserIdParam)
+
+  // ============= PDF/Voucher Book Management Schemas =============
+  registry.registerSchema(
+    'AdminVoucherBookResponse',
+    adminPdfSchemas.AdminVoucherBookResponse,
+  )
+  registry.registerSchema(
+    'AdminVoucherBookListResponse',
+    adminPdfSchemas.AdminVoucherBookListResponse,
+  )
+  registry.registerSchema(
+    'CreateVoucherBookRequest',
+    adminPdfSchemas.CreateVoucherBookRequest,
+  )
+  registry.registerSchema(
+    'UpdateVoucherBookRequest',
+    adminPdfSchemas.UpdateVoucherBookRequest,
+  )
+  registry.registerSchema(
+    'UpdateVoucherBookStatusRequest',
+    adminPdfSchemas.UpdateVoucherBookStatusRequest,
+  )
+  registry.registerSchema(
+    'GeneratePDFRequest',
+    adminPdfSchemas.GeneratePDFRequest,
+  )
+  registry.registerSchema(
+    'GeneratePDFResponse',
+    adminPdfSchemas.GeneratePDFResponse,
+  )
+  registry.registerSchema(
+    'BulkArchiveVoucherBooksRequest',
+    adminPdfSchemas.BulkArchiveVoucherBooksRequest,
+  )
+  registry.registerSchema(
+    'AdminVoucherBookQueryParams',
+    adminPdfSchemas.AdminVoucherBookQueryParams,
+  )
+  registry.registerSchema(
+    'VoucherBookStatsQueryParams',
+    adminPdfSchemas.VoucherBookStatsQueryParams,
+  )
+  registry.registerSchema(
+    'VoucherBookStatisticsResponse',
+    adminPdfSchemas.VoucherBookStatisticsResponse,
+  )
+  
+  // PDF parameter schemas
+  registry.registerSchema('VoucherBookIdParam', pdfParameters.VoucherBookIdParam)
 
   // User Verification Schemas (Admin)
   registry.registerSchema(

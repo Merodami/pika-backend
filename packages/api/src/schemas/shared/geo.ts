@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { openapi } from '../utils/openapi.js'
+import { openapi } from '../../common/utils/openapi.js'
 
 /**
  * Geographic schemas for location-based features

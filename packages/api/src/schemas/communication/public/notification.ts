@@ -4,28 +4,19 @@ import { UserId } from '../../../common/schemas/branded.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { DateTime, UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  NotificationType,
+  NotificationStatus,
+  NotificationPriority,
+  NotificationSortBy,
+  DevicePlatform,
+} from '../common/enums.js'
 
 /**
  * Notification schemas for public API
  */
-
-// ============= Enums =============
-
-export const NotificationType = z.enum(['EMAIL', 'IN_APP', 'SMS', 'PUSH'])
-export type NotificationType = z.infer<typeof NotificationType>
-
-export const NotificationStatus = z.enum([
-  'PENDING',
-  'SENT',
-  'DELIVERED',
-  'FAILED',
-  'READ',
-])
-export type NotificationStatus = z.infer<typeof NotificationStatus>
-
-export const NotificationPriority = z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT'])
-export type NotificationPriority = z.infer<typeof NotificationPriority>
 
 // ============= Notification Schema =============
 
@@ -193,7 +184,7 @@ export type MarkAllAsReadResponse = z.infer<typeof MarkAllAsReadResponse>
 /**
  * Notification search parameters
  */
-export const NotificationSearchParams = z.object({
+export const NotificationSearchParams = SearchParams.extend({
   type: NotificationType.optional(),
   status: NotificationStatus.optional(),
   priority: NotificationPriority.optional(),
@@ -202,10 +193,7 @@ export const NotificationSearchParams = z.object({
   category: z.string().optional(),
   fromDate: DateTime.optional(),
   toDate: DateTime.optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sort: z.enum(['CREATED_AT', 'PRIORITY', 'EXPIRES_AT']).default('CREATED_AT'),
-  order: z.enum(['ASC', 'DESC']).default('DESC'),
+  sortBy: NotificationSortBy.default('createdAt'),
 })
 
 export type NotificationSearchParams = z.infer<typeof NotificationSearchParams>
@@ -281,7 +269,7 @@ export type UpdateNotificationPreferencesRequest = z.infer<
 export const RegisterPushTokenRequest = openapi(
   z.object({
     token: z.string().min(1),
-    platform: z.enum(['IOS', 'ANDROID', 'WEB']),
+    platform: DevicePlatform,
     deviceId: z.string().optional(),
     deviceName: z.string().optional(),
   }),

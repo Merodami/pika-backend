@@ -151,6 +151,48 @@ export const FILE_STORAGE_SERVICE_HOST = getEnvVariable(
   '0.0.0.0',
 )
 
+// Business service name
+export const BUSINESS_SERVICE_NAME = getEnvVariable(
+  'BUSINESS_SERVICE_NAME',
+  String,
+  'business_service',
+)
+
+// Business service port
+export const BUSINESS_SERVICE_PORT = getEnvVariable(
+  'BUSINESS_SERVICE_PORT',
+  parseNumber,
+  5511,
+)
+
+// Business service host
+export const BUSINESS_SERVICE_HOST = getEnvVariable(
+  'BUSINESS_SERVICE_HOST',
+  String,
+  '0.0.0.0',
+)
+
+// Category service name
+export const CATEGORY_SERVICE_NAME = getEnvVariable(
+  'CATEGORY_SERVICE_NAME',
+  String,
+  'category_service',
+)
+
+// Category service port
+export const CATEGORY_SERVICE_PORT = getEnvVariable(
+  'CATEGORY_SERVICE_PORT',
+  parseNumber,
+  5512,
+)
+
+// Category service host
+export const CATEGORY_SERVICE_HOST = getEnvVariable(
+  'CATEGORY_SERVICE_HOST',
+  String,
+  '0.0.0.0',
+)
+
 // Translation service configuration
 export const DEFAULT_LANGUAGE = getEnvVariable('DEFAULT_LANGUAGE', String, 'es')
 

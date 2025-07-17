@@ -6,6 +6,7 @@ import { UUID } from '../../../common/schemas/primitives.js'
 import { createSearchSchema } from '../../../common/schemas/query.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { SupportCommentIdParam, ProblemIdForCommentsParam } from '../common/index.js'
 
 /**
  * Public support comment schemas
@@ -63,17 +64,9 @@ export type SupportCommentListResponse = z.infer<
 
 // ============= Parameters =============
 
-export const SupportCommentIdParam = z.object({
-  id: UUID.describe('Comment ID'),
-})
-export type SupportCommentIdParam = z.infer<typeof SupportCommentIdParam>
+// SupportCommentIdParam is now imported from common/parameters.ts
 
-export const ProblemIdForCommentsParam = z.object({
-  problemId: UUID.describe('Problem ID for comments'),
-})
-export type ProblemIdForCommentsParam = z.infer<
-  typeof ProblemIdForCommentsParam
->
+// ProblemIdForCommentsParam is now imported from common/parameters.ts
 
 // Sort fields for comments
 const COMMENT_SORT_FIELDS = ['CREATED_AT', 'UPDATED_AT'] as const

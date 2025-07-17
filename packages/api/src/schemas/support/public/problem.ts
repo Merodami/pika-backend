@@ -12,6 +12,7 @@ import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { DateTime, UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { ProblemIdParam } from '../common/index.js'
 
 /**
  * Public support problem schemas
@@ -82,10 +83,7 @@ export type SupportProblemListResponse = z.infer<
 
 // ============= Parameters =============
 
-export const ProblemIdParam = z.object({
-  id: UUID.describe('Problem ID'),
-})
-export type ProblemIdParam = z.infer<typeof ProblemIdParam>
+// ProblemIdParam is now imported from common/parameters.ts
 
 // Search schema for public problems
 export const SupportProblemSearchParams = z.object({
@@ -96,7 +94,7 @@ export const SupportProblemSearchParams = z.object({
   page: z.number().int().positive().default(1),
   limit: z.number().int().positive().max(100).default(20),
   sortBy: ProblemSortBy.default('CREATED_AT'),
-  sortOrder: SortOrder.default('DESC'),
+  sortOrder: SortOrder.default(SortOrder.enum.desc),
 })
 export type SupportProblemSearchParams = z.infer<
   typeof SupportProblemSearchParams

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
+import { TokenType, GrantType } from './enums.js'
 
 /**
  * Common auth patterns and validators shared across all auth tiers
@@ -38,42 +39,10 @@ export const NameSchema = z
 export type NameSchema = z.infer<typeof NameSchema>
 
 // ============= Auth User Roles =============
-
-/**
- * Complete user role enum used across all auth contexts
- */
-export const AuthUserRole = z.enum([
-  'SUPER_ADMIN',
-  'ADMIN', 
-  'INSTRUCTOR',
-  'MEMBER',
-  'PROFESSIONAL'
-])
-
-export type AuthUserRole = z.infer<typeof AuthUserRole>
-
-/**
- * Public-facing user roles (excludes admin roles)
- */
-export const PublicUserRole = AuthUserRole.exclude(['SUPER_ADMIN', 'ADMIN'])
-
-export type PublicUserRole = z.infer<typeof PublicUserRole>
+// User roles are now imported from @pika/api/shared/enums.js
 
 // ============= Token Types =============
-
-/**
- * Token type enum for OAuth and auth operations
- */
-export const TokenType = z.enum(['accessToken', 'refreshToken'])
-
-export type TokenType = z.infer<typeof TokenType>
-
-/**
- * OAuth grant types
- */
-export const GrantType = z.enum(['password', 'refreshToken'])
-
-export type GrantType = z.infer<typeof GrantType>
+// Token types and grant types are now imported from ./enums.js
 
 // ============= Common Auth Responses =============
 

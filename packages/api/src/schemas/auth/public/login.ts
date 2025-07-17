@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 import { Email, JWTToken, UserId } from '../../shared/branded.js'
+import { UserRole } from '../../shared/enums.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { OAuthProvider, DeviceType } from '../common/enums.js'
 
 /**
  * Public API authentication schemas
@@ -47,9 +49,7 @@ export const AuthUserResponse = openapi(
     firstName: z.string(),
     lastName: z.string(),
     profilePicture: z.string().url().optional(),
-    role: z
-      .enum(['USER', 'TRAINER'])
-      .describe('User role (admin role excluded from public API)'),
+    role: UserRole.describe('User role'),
   }),
   {
     description: 'Basic user information for authentication context',
@@ -66,13 +66,7 @@ export type AuthUserResponse = z.infer<typeof AuthUserResponse>
 // Note: Email verification schemas are in register.ts
 
 // ============= OAuth =============
-
-/**
- * OAuth provider enum
- */
-export const OAuthProvider = z.enum(['GOOGLE', 'FACEBOOK', 'APPLE'])
-
-export type OAuthProvider = z.infer<typeof OAuthProvider>
+// OAuth provider enum is now imported from ../common/enums.js
 
 /**
  * OAuth callback request
@@ -103,7 +97,7 @@ export type LinkOAuthAccountRequest = z.infer<typeof LinkOAuthAccountRequest>
 export const SessionInfoResponse = z.object({
   id: z.string().uuid(),
   deviceName: z.string().optional(),
-  deviceType: z.enum(['MOBILE', 'TABLET', 'DESKTOP', 'OTHER']).optional(),
+  deviceType: DeviceType.optional(),
   browser: z.string().optional(),
   os: z.string().optional(),
   ip: z.string().ip().optional(),

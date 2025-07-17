@@ -4,38 +4,21 @@ import { UserId } from '../../../common/schemas/branded.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { DateTime, UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { SearchParams, DateRangeParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  CommunicationChannel,
+  CommunicationStatus,
+  CommunicationDirection,
+  CommunicationGroupBy,
+  BounceType,
+  EmailEvent,
+  CommunicationLogSortBy,
+} from '../common/enums.js'
 
 /**
  * Communication log schemas for public API
  */
-
-// ============= Enums =============
-
-export const CommunicationChannel = z.enum([
-  'EMAIL',
-  'SMS',
-  'PUSH',
-  'IN_APP',
-  'WEBHOOK',
-])
-export type CommunicationChannel = z.infer<typeof CommunicationChannel>
-
-export const CommunicationStatus = z.enum([
-  'PENDING',
-  'PROCESSING',
-  'SENT',
-  'DELIVERED',
-  'FAILED',
-  'BOUNCED',
-  'OPENED',
-  'CLICKED',
-  'UNSUBSCRIBED',
-])
-export type CommunicationStatus = z.infer<typeof CommunicationStatus>
-
-export const CommunicationDirection = z.enum(['INBOUND', 'OUTBOUND'])
-export type CommunicationDirection = z.infer<typeof CommunicationDirection>
 
 // ============= Communication Log =============
 
@@ -76,7 +59,7 @@ export const CommunicationLog = openapi(
     // Error information
     errorCode: z.string().optional(),
     errorMessage: z.string().optional(),
-    bounceType: z.enum(['soft', 'hard']).optional(),
+    bounceType: BounceType.optional(),
 
     // Metrics
     openCount: z.number().int().nonnegative().default(0),
@@ -145,7 +128,7 @@ export const UpdateCommunicationStatusRequest = openapi(
     failedAt: DateTime.optional(),
     errorCode: z.string().optional(),
     errorMessage: z.string().optional(),
-    bounceType: z.enum(['soft', 'hard']).optional(),
+    bounceType: BounceType.optional(),
     metadata: z.record(z.any()).optional(),
   }),
   {
@@ -165,14 +148,7 @@ export type UpdateCommunicationStatusRequest = z.infer<
 export const TrackCommunicationEventRequest = openapi(
   z.object({
     messageId: z.string(),
-    event: z.enum([
-      'delivered',
-      'opened',
-      'clicked',
-      'bounced',
-      'failed',
-      'unsubscribed',
-    ]),
+    event: EmailEvent,
     timestamp: DateTime,
 
     // Event details
@@ -183,7 +159,7 @@ export const TrackCommunicationEventRequest = openapi(
     // Error details
     errorCode: z.string().optional(),
     errorMessage: z.string().optional(),
-    bounceType: z.enum(['soft', 'hard']).optional(),
+    bounceType: BounceType.optional(),
   }),
   {
     description: 'Track a communication event',
@@ -218,8 +194,7 @@ export const CommunicationLogSearchParams = z.object({
   hasFailed: z.boolean().optional(),
   page: z.number().int().positive().default(1),
   limit: z.number().int().positive().max(100).default(20),
-  sort: z.enum(['createdAt', 'sentAt', 'deliveredAt']).default('createdAt'),
-  order: z.enum(['asc', 'desc']).default('desc'),
+  sortBy: CommunicationLogSortBy.default('createdAt'),
 })
 
 export type CommunicationLogSearchParams = z.infer<
@@ -244,7 +219,7 @@ export const CommunicationAnalyticsRequest = z.object({
   channel: CommunicationChannel.optional(),
   fromDate: DateTime,
   toDate: DateTime,
-  groupBy: z.enum(['day', 'week', 'month']).default('day'),
+  groupBy: CommunicationGroupBy.default('day'),
   userId: UserId.optional(),
   templateId: UUID.optional(),
   provider: z.string().optional(),

@@ -1,12 +1,11 @@
+import { VerificationType } from '@pika/types'
 import { z } from 'zod'
-
-import { VerificationType } from '../common/enums.js'
 
 /**
  * Unified verification request schema
  */
 export const UnifiedVerificationRequest = z.object({
-  type: VerificationType,
+  type: z.nativeEnum(VerificationType),
   token: z.string().optional(),
   code: z.string().length(6).optional(),
   userId: z.string().uuid().optional(),
@@ -22,7 +21,7 @@ export type UnifiedVerificationRequest = z.infer<
  * Unified resend verification request schema
  */
 export const UnifiedResendVerificationRequest = z.object({
-  type: VerificationType,
+  type: z.enum([VerificationType.EMAIL, VerificationType.PHONE]),
   userId: z.string().uuid().optional(),
   email: z.string().email().optional(),
   phoneNumber: z.string().optional(),

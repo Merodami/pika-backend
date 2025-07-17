@@ -5,26 +5,13 @@ import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { DateTime, UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { FileType, FileStatus, StorageProvider, AllowedMimeTypes, FileSortBy, FileIdParam, FileHistoryIdParam } from '../common/index.js'
 
 /**
  * File storage schemas for public API
  */
 
-// ============= Enums =============
-
-export const FileType = z.enum(['IMAGE', 'VIDEO', 'DOCUMENT', 'AUDIO', 'OTHER'])
-export type FileType = z.infer<typeof FileType>
-
-export const FileStatus = z.enum(['PENDING', 'UPLOADED', 'FAILED', 'DELETED'])
-export type FileStatus = z.infer<typeof FileStatus>
-
-export const StorageProvider = z.enum([
-  'AWS_S3',
-  'GOOGLE_CLOUD',
-  'AZURE',
-  'LOCAL',
-])
-export type StorageProvider = z.infer<typeof StorageProvider>
+// Enums are now imported from common/
 
 // ============= File Schema =============
 
@@ -136,9 +123,7 @@ export const GetFileHistoryQuery = openapi(
     toDate: DateTime.optional(),
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(20),
-    sortBy: z
-      .enum(['uploadedAt', 'fileSize', 'fileName'])
-      .default('uploadedAt'),
+    sortBy: FileSortBy.default('uploadedAt'),
     sortOrder: z.enum(['asc', 'desc']).default('desc'),
   }),
   {
@@ -155,66 +140,11 @@ export const FileHistoryResponse = paginatedResponse(FileStorageLog)
 
 export type FileHistoryResponse = z.infer<typeof FileHistoryResponse>
 
-// ============= Path Parameters =============
-
-/**
- * File ID parameter
- */
-export const FileIdParam = openapi(
-  z.object({
-    fileId: UUID,
-  }),
-  {
-    description: 'File ID path parameter',
-  },
-)
-
-export type FileIdParam = z.infer<typeof FileIdParam>
-
-/**
- * File history ID parameter
- */
-export const FileHistoryIdParam = openapi(
-  z.object({
-    id: UUID,
-  }),
-  {
-    description: 'File history ID path parameter',
-  },
-)
-
-export type FileHistoryIdParam = z.infer<typeof FileHistoryIdParam>
+// Path parameters are now imported from common/
 
 // ============= Upload Validation =============
 
-/**
- * Allowed MIME types for upload
- */
-export const AllowedMimeTypes = z.enum([
-  // Images
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml',
-  // Documents
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  // Videos
-  'video/mp4',
-  'video/mpeg',
-  'video/quicktime',
-  'video/x-msvideo',
-  // Audio
-  'audio/mpeg',
-  'audio/wav',
-  'audio/ogg',
-])
-
-export type AllowedMimeTypes = z.infer<typeof AllowedMimeTypes>
+// AllowedMimeTypes is now imported from common/
 
 /**
  * File upload metadata

@@ -96,7 +96,7 @@ export const SupportProblemSearchParams = z.object({
   page: z.number().int().positive().default(1),
   limit: z.number().int().positive().max(100).default(20),
   sortBy: ProblemSortBy.default('CREATED_AT'),
-  sortOrder: SortOrder.default('DESC'),
+  sortOrder: SortOrder.default(SortOrder.enum.desc),
 })
 export type SupportProblemSearchParams = z.infer<
   typeof SupportProblemSearchParams

@@ -46,3 +46,108 @@ export const VerificationType = z.enum([
 ])
 
 export type VerificationType = z.infer<typeof VerificationType>
+
+export const AccountFlag = z.enum([
+  'verified',
+  'premium',
+  'suspicious',
+  'reported',
+  'vip',
+])
+
+export type AccountFlag = z.infer<typeof AccountFlag>
+
+export const AdminUserSortBy = z.enum([
+  'createdAt',
+  'lastLoginAt',
+  'totalSpent',
+  'email',
+])
+
+export type AdminUserSortBy = z.infer<typeof AdminUserSortBy>
+
+export const SortOrder = z.enum([
+  'asc',
+  'desc',
+])
+
+export type SortOrder = z.infer<typeof SortOrder>
+
+export const AdminNoteCategory = z.enum([
+  'general',
+  'security',
+  'support',
+  'billing',
+])
+
+export type AdminNoteCategory = z.infer<typeof AdminNoteCategory>
+
+export const UserActivityCategory = z.enum([
+  'auth',
+  'profile',
+  'payment',
+  'other',
+])
+
+export type UserActivityCategory = z.infer<typeof UserActivityCategory>
+
+// ============= Profile Enums =============
+
+export const ImageFormat = z.enum([
+  'jpeg',
+  'png',
+  'webp',
+])
+
+export type ImageFormat = z.infer<typeof ImageFormat>
+
+export const Theme = z.enum([
+  'light',
+  'dark',
+  'system',
+])
+
+export type Theme = z.infer<typeof Theme>
+
+export const ProfileVisibility = z.enum([
+  'public',
+  'private',
+])
+
+export type ProfileVisibility = z.infer<typeof ProfileVisibility>
+
+// ============= Internal Service Enums =============
+
+export const InternalVerificationType = z.enum([
+  'email',
+  'phone',
+  'identity',
+])
+
+export type InternalVerificationType = z.infer<typeof InternalVerificationType>
+
+export const VerificationLevel = z.enum([
+  'none',
+  'email',
+  'phone',
+  'full',
+])
+
+export type VerificationLevel = z.infer<typeof VerificationLevel>
+
+export const CreditOperation = z.enum([
+  'add',
+  'subtract',
+  'set',
+])
+
+export type CreditOperation = z.infer<typeof CreditOperation>
+
+export const PermissionAction = z.enum([
+  'read',
+  'create',
+  'update',
+  'delete',
+])
+
+export type PermissionAction = z.infer<typeof PermissionAction>

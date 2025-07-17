@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { openapi } from '../utils/openapi.js'
+import { openapi } from '../../common/utils/openapi.js'
 
 /**
  * Shared enum schemas for consistent use across all API schemas
@@ -269,7 +269,7 @@ export type VoucherBookSortBy = z.infer<typeof VoucherBookSortBy>
  */
 export const UserRoleSchema = openapi(UserRole, {
   description: 'User role in the system',
-  example: 'USER',
+  example: UserRole.enum.CUSTOMER,
 })
 
 /**

@@ -1,8 +1,17 @@
 import { z } from 'zod'
 
-import { GymId, Money, UserId } from '../../shared/branded.js'
+import { Money, UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  InternalTransactionType,
+  TransactionStatus,
+  RefundReason,
+  RefundInitiator,
+  PaymentMethodType,
+  PayoutStatus,
+  EntityType,
+} from '../common/enums.js'
 
 /**
  * Internal payment service schemas for service-to-service communication
@@ -17,17 +26,15 @@ export const ProcessInternalPaymentRequest = openapi(
   z.object({
     fromUserId: UserId,
     toUserId: UserId.optional(),
-    toGymId: GymId.optional(),
     amount: Money,
     currency: z.string().length(3).default('USD'),
-    type: z.enum(['CREDIT_PURCHASE', 'SUBSCRIPTION', 'REFUND', 'TRANSFER']),
+    type: InternalTransactionType,
     referenceId: z.string(),
     referenceType: z.string(),
     description: z.string(),
     metadata: z.record(z.any()).optional(),
 
     // Payment method
-    useCredits: z.boolean().default(false),
     paymentMethodId: z.string().optional(),
   }),
   {
@@ -45,7 +52,7 @@ export type ProcessInternalPaymentRequest = z.infer<
 export const ProcessInternalPaymentResponse = openapi(
   z.object({
     transactionId: UUID,
-    status: z.enum(['SUCCESS', 'PENDING', 'FAILED']),
+    status: TransactionStatus,
     amount: Money,
     currency: z.string().length(3),
 
@@ -53,9 +60,6 @@ export const ProcessInternalPaymentResponse = openapi(
     stripePaymentIntentId: z.string().optional(),
     stripeChargeId: z.string().optional(),
 
-    // Credit details
-    creditsUsed: z.number().int().nonnegative().optional(),
-    remainingCredits: z.number().int().nonnegative().optional(),
 
     // Error details
     errorCode: z.string().optional(),
@@ -81,9 +85,9 @@ export const ProcessInternalRefundRequest = openapi(
   z.object({
     originalTransactionId: UUID,
     amount: Money.optional().describe('Partial refund amount'),
-    reason: z.enum(['CANCELLATION', 'SERVICE_ISSUE', 'DUPLICATE', 'OTHER']),
+    reason: RefundReason,
     description: z.string(),
-    initiatedBy: z.enum(['USER', 'SYSTEM', 'ADMIN']),
+    initiatedBy: RefundInitiator,
     metadata: z.record(z.any()).optional(),
   }),
   {
@@ -102,13 +106,12 @@ export const ProcessInternalRefundResponse = openapi(
   z.object({
     refundId: UUID,
     originalTransactionId: UUID,
-    status: z.enum(['SUCCESS', 'PENDING', 'FAILED']),
+    status: TransactionStatus,
     amount: Money,
     currency: z.string().length(3),
 
     // Refund details
     stripeRefundId: z.string().optional(),
-    creditsRefunded: z.number().int().nonnegative().optional(),
 
     timestamp: DateTime,
   }),
@@ -147,7 +150,7 @@ export type ValidatePaymentMethodRequest = z.infer<
 export const ValidatePaymentMethodResponse = openapi(
   z.object({
     valid: z.boolean(),
-    type: z.enum(['CARD', 'BANK', 'WALLET']).optional(),
+    type: PaymentMethodType.optional(),
     last4: z.string().optional(),
     expiryMonth: z.number().int().min(1).max(12).optional(),
     expiryYear: z.number().int().optional(),
@@ -170,7 +173,7 @@ export type ValidatePaymentMethodResponse = z.infer<
  */
 export const ProcessPayoutRequest = openapi(
   z.object({
-    gymId: GymId,
+    businessId: UUID,
     amount: Money,
     currency: z.string().length(3).default('USD'),
     description: z.string(),
@@ -178,7 +181,7 @@ export const ProcessPayoutRequest = openapi(
     metadata: z.record(z.any()).optional(),
   }),
   {
-    description: 'Process payout to gym',
+    description: 'Process payout to business',
   },
 )
 
@@ -190,7 +193,7 @@ export type ProcessPayoutRequest = z.infer<typeof ProcessPayoutRequest>
 export const ProcessPayoutResponse = openapi(
   z.object({
     payoutId: UUID,
-    status: z.enum(['SCHEDULED', 'PROCESSING', 'COMPLETED', 'FAILED']),
+    status: PayoutStatus,
     amount: Money,
     currency: z.string().length(3),
     scheduledDate: DateTime,
@@ -233,7 +236,7 @@ export const TransactionDetailsResponse = openapi(
     amount: Money,
     currency: z.string().length(3),
     userId: UserId.optional(),
-    gymId: GymId.optional(),
+    businessId: UUID.optional(),
     createdAt: DateTime,
     completedAt: DateTime.optional(),
     metadata: z.record(z.any()).optional(),
@@ -254,7 +257,7 @@ export type TransactionDetailsResponse = z.infer<
  */
 export const GetBalanceRequest = openapi(
   z.object({
-    entityType: z.enum(['USER', 'GYM']),
+    entityType: EntityType,
     entityId: z.string(),
   }),
   {
@@ -277,8 +280,6 @@ export const BalanceResponse = openapi(
     pendingBalance: Money,
     currency: z.string().length(3),
 
-    // Credits (for users)
-    credits: z.number().int().nonnegative().optional(),
 
     // Last updated
     lastUpdated: DateTime,

@@ -10,7 +10,8 @@
     "@pika/tests",
     "@pika/sdk",
     "@pika/http",
-    "@pika/redis"
+    "@pika/redis",
+    "@pika/environment"
   ],
   "targets": {
     "typecheck": {
@@ -31,6 +32,13 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "vitest",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:integration": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run src/test/integration",
         "cwd": "{projectRoot}"
       }
     },
@@ -60,7 +68,7 @@
     "local": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "sleep 5 && tsx --watch ./src/index.ts",
+        "command": "sleep 5 && tsx --watch ./src/app.ts",
         "cwd": "{projectRoot}"
       }
     },

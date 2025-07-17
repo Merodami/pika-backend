@@ -4,28 +4,19 @@ import { Email as EmailAddress } from '../../../common/schemas/branded.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { DateTime, UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { SearchParams, DateRangeParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  EmailStatus,
+  EmailPriority,
+  BounceType,
+  EmailEvent,
+  EmailSortBy,
+} from '../common/enums.js'
 
 /**
  * Email communication schemas for public API
  */
-
-// ============= Enums =============
-
-export const EmailStatus = z.enum([
-  'PENDING',
-  'QUEUED',
-  'SENT',
-  'DELIVERED',
-  'BOUNCED',
-  'FAILED',
-  'OPENED',
-  'CLICKED',
-])
-export type EmailStatus = z.infer<typeof EmailStatus>
-
-export const EmailPriority = z.enum(['LOW', 'NORMAL', 'HIGH'])
-export type EmailPriority = z.infer<typeof EmailPriority>
 
 // ============= Email Components =============
 
@@ -246,7 +237,7 @@ export const EmailRecord = withTimestamps({
   // Error info
   failedAt: DateTime.optional(),
   failureReason: z.string().optional(),
-  bounceType: z.enum(['SOFT', 'HARD']).optional(),
+  bounceType: BounceType.optional(),
 
   // Metadata
   metadata: z.record(z.any()).optional(),
@@ -257,21 +248,14 @@ export type EmailRecord = z.infer<typeof EmailRecord>
 /**
  * Email search parameters
  */
-export const EmailSearchParams = z.object({
+export const EmailSearchParams = SearchParams.merge(DateRangeParams).extend({
   to: EmailAddress.optional(),
   subject: z.string().optional(),
   status: EmailStatus.optional(),
   templateId: z.string().optional(),
-  fromDate: DateTime.optional(),
-  toDate: DateTime.optional(),
   hasOpened: z.boolean().optional(),
   hasClicked: z.boolean().optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sort: z
-    .enum(['SENT_AT', 'DELIVERED_AT', 'OPENED_AT', 'SUBJECT'])
-    .default('SENT_AT'),
-  order: z.enum(['ASC', 'DESC']).default('DESC'),
+  sortBy: EmailSortBy.default('createdAt'),
 })
 
 export type EmailSearchParams = z.infer<typeof EmailSearchParams>
@@ -290,21 +274,13 @@ export type EmailHistoryResponse = z.infer<typeof EmailHistoryResponse>
  */
 export const EmailEvent = z.object({
   messageId: z.string(),
-  event: z.enum([
-    'SENT',
-    'DELIVERED',
-    'OPENED',
-    'CLICKED',
-    'BOUNCED',
-    'FAILED',
-    'UNSUBSCRIBED',
-  ]),
+  event: EmailEvent,
   timestamp: DateTime,
   recipient: EmailAddress,
 
   // Event-specific data
   url: z.string().url().optional().describe('For click events'),
-  bounceType: z.enum(['SOFT', 'HARD']).optional(),
+  bounceType: BounceType.optional(),
   failureReason: z.string().optional(),
   userAgent: z.string().optional().describe('For open/click events'),
   ipAddress: z.string().optional(),

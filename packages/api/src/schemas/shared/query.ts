@@ -20,7 +20,7 @@ export function createSortParams<T extends readonly string[]>(
     sortBy: z
       .enum(sortFields as unknown as [string, ...string[]])
       .default(defaultField),
-    sortOrder: SortOrder.default('DESC'),
+    sortOrder: SortOrder.default(SortOrder.enum.desc),
   })
 }
 

@@ -6,23 +6,13 @@ import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { SubscriptionPlan } from './subscriptionPlan.js'
+import { SubscriptionStatusEnum } from '../common/index.js'
 
 /**
  * Subscription schemas for public API
  */
 
-// ============= Enums =============
-
-export const SubscriptionStatusEnum = z.enum([
-  'ACTIVE',
-  'CANCELED',
-  'INCOMPLETE',
-  'INCOMPLETE_EXPIRED',
-  'PAST_DUE',
-  'TRIALING',
-  'UNPAID',
-])
-export type SubscriptionStatus = z.infer<typeof SubscriptionStatusEnum>
+// Enums are now imported from common/
 
 // ============= Subscription =============
 

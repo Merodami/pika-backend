@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
-import { UserId } from '../../shared/branded.js'
+import { UserId } from '../../../common/schemas/branded.js'
 import {
   Address as AddressBase,
   GeoPoint,
-} from '../../shared/geo.js'
-import { withTimestamps } from '../../shared/metadata.js'
-import { UUID } from '../../shared/primitives.js'
+} from '../../../common/schemas/geo.js'
+import { withTimestamps } from '../../../common/schemas/metadata.js'
+import { UUID } from '../../../common/schemas/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

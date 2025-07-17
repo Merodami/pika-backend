@@ -3,6 +3,12 @@
 // User management
 export * from './user/index.js'
 
+// Category management
+export * from './category/index.js'
+
+// PDF management
+export * from './pdf/index.js'
+
 // Subscription management
 export * from './subscription/index.js'
 

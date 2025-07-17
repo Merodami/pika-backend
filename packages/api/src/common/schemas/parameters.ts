@@ -8,22 +8,6 @@ import { openapi } from '../utils/openapi.js'
  * Shared parameter schemas used across all API tiers (public, admin, internal)
  */
 
-// ============= Category Parameters =============
-
-/**
- * Category ID path parameter
- */
-export const CategoryIdParam = openapi(
-  z.object({
-    id: UUID,
-  }),
-  {
-    description: 'Category ID path parameter',
-  },
-)
-
-export type CategoryIdParam = z.infer<typeof CategoryIdParam>
-
 // ============= User Parameters =============
 
 /**
@@ -53,6 +37,64 @@ export const EmailParam = openapi(
 )
 
 export type EmailParam = z.infer<typeof EmailParam>
+
+// ============= PDF Service Parameters =============
+
+/**
+ * Voucher book ID path parameter
+ */
+export const VoucherBookIdParam = openapi(
+  z.object({
+    id: UUID,
+  }),
+  {
+    description: 'Voucher book ID path parameter',
+  },
+)
+
+export type VoucherBookIdParam = z.infer<typeof VoucherBookIdParam>
+
+/**
+ * Ad placement ID path parameter
+ */
+export const AdPlacementIdParam = openapi(
+  z.object({
+    id: UUID,
+  }),
+  {
+    description: 'Ad placement ID path parameter',
+  },
+)
+
+export type AdPlacementIdParam = z.infer<typeof AdPlacementIdParam>
+
+/**
+ * Book distribution ID path parameter
+ */
+export const BookDistributionIdParam = openapi(
+  z.object({
+    id: UUID,
+  }),
+  {
+    description: 'Book distribution ID path parameter',
+  },
+)
+
+export type BookDistributionIdParam = z.infer<typeof BookDistributionIdParam>
+
+/**
+ * Voucher book page ID path parameter
+ */
+export const VoucherBookPageIdParam = openapi(
+  z.object({
+    id: UUID,
+  }),
+  {
+    description: 'Voucher book page ID path parameter',
+  },
+)
+
+export type VoucherBookPageIdParam = z.infer<typeof VoucherBookPageIdParam>
 
 // ============= Generic Parameters =============
 

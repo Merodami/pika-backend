@@ -41,13 +41,7 @@ export const RegisterRequest = openapi(
         'Last name can only contain letters, spaces, hyphens, and apostrophes',
       ),
     phoneNumber: PhoneNumber.optional(),
-    dateOfBirth: z.string().datetime().describe('Date of birth (required)'),
-    role: z
-      .enum(['MEMBER', 'PROFESSIONAL'])
-      .default('MEMBER')
-      .describe('User role'),
-    description: z.string().max(500).optional().describe('Bio or description'),
-    specialties: z.array(z.string()).optional().describe('Trainer specialties'),
+    dateOfBirth: z.string().datetime().optional().describe('Date of birth'),
     acceptTerms: z
       .literal(true, {
         errorMap: () => ({
@@ -69,8 +63,6 @@ export const RegisterRequest = openapi(
       firstName: 'John',
       lastName: 'Doe',
       phoneNumber: '+1234567890' as any,
-      dateOfBirth: '1990-01-01T00:00:00Z',
-      role: 'MEMBER',
       acceptTerms: true,
       marketingConsent: true,
     },

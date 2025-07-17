@@ -1,8 +1,10 @@
 import { z } from 'zod'
 
 import { Email, JWTToken, UserId } from '../../shared/branded.js'
+import { UserRole } from '../../shared/enums.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { AuthUserResponse } from './login.js'
+import { GrantType, OAuthError, TokenType } from '../common/enums.js'
 
 /**
  * OAuth 2.0 compatible schemas with camelCase naming
@@ -10,10 +12,7 @@ import { AuthUserResponse } from './login.js'
  */
 
 // ============= Grant Types =============
-
-export const GrantType = z.enum(['password', 'refreshToken'])
-
-export type GrantType = z.infer<typeof GrantType>
+// Grant types are now imported from ../common/enums.js
 
 // ============= Token Request =============
 
@@ -102,8 +101,7 @@ export type TokenResponse = z.infer<typeof TokenResponse>
 export const IntrospectRequest = openapi(
   z.object({
     token: JWTToken.describe('Token to validate'),
-    tokenTypeHint: z
-      .enum(['accessToken', 'refreshToken'])
+    tokenTypeHint: TokenType
       .optional()
       .describe('Hint about token type'),
   }),
@@ -129,9 +127,7 @@ export const IntrospectResponse = openapi(
     // Custom fields
     userId: UserId.optional().describe('User ID'),
     userEmail: Email.optional().describe('User email'),
-    userRole: z
-      .enum(['SUPER_ADMIN', 'ADMIN', 'INSTRUCTOR', 'MEMBER'])
-      .optional(),
+    userRole: UserRole.optional(),
   }),
   {
     description: 'Token introspection response',
@@ -145,7 +141,7 @@ export const IntrospectResponse = openapi(
       sub: '123e4567-e89b-12d3-a456-426614174000' as any,
       userId: '123e4567-e89b-12d3-a456-426614174000' as any,
       userEmail: 'user@example.com' as any,
-      userRole: 'MEMBER',
+      userRole: 'CUSTOMER',
     },
   },
 )
@@ -160,8 +156,7 @@ export type IntrospectResponse = z.infer<typeof IntrospectResponse>
 export const RevokeTokenRequest = openapi(
   z.object({
     token: JWTToken.describe('Token to revoke'),
-    tokenTypeHint: z
-      .enum(['accessToken', 'refreshToken'])
+    tokenTypeHint: TokenType
       .optional()
       .describe('Hint about token type'),
     allDevices: z
@@ -207,7 +202,7 @@ export const UserInfoResponse = openapi(
     lastName: z.string(),
     fullName: z.string().optional().describe('Combined first and last name'),
     profilePicture: z.string().url().optional(),
-    role: z.enum(['SUPER_ADMIN', 'ADMIN', 'INSTRUCTOR', 'MEMBER']),
+    role: UserRole,
     permissions: z.array(z.string()).optional().describe('User permissions'),
     locale: z.string().optional().describe('User locale'),
     createdAt: z.string().datetime().optional(),
@@ -222,7 +217,7 @@ export const UserInfoResponse = openapi(
       firstName: 'John',
       lastName: 'Doe',
       fullName: 'John Doe',
-      role: 'MEMBER',
+      role: 'CUSTOMER',
       permissions: ['read', 'write'],
       locale: 'en-US',
       createdAt: '2024-01-01T00:00:00Z',
@@ -240,16 +235,7 @@ export type UserInfoResponse = z.infer<typeof UserInfoResponse>
  */
 export const OAuthErrorResponse = openapi(
   z.object({
-    error: z.enum([
-      'invalidRequest',
-      'invalidClient',
-      'invalidGrant',
-      'unauthorizedClient',
-      'unsupportedGrantType',
-      'invalidScope',
-      'serverError',
-      'temporarilyUnavailable',
-    ]),
+    error: OAuthError,
     errorDescription: z
       .string()
       .optional()

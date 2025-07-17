@@ -76,7 +76,7 @@ export const CommunicationLog = openapi(
     // Error information
     errorCode: z.string().optional(),
     errorMessage: z.string().optional(),
-    bounceType: z.enum(['soft', 'hard']).optional(),
+    bounceType: BounceType.optional(),
 
     // Metrics
     openCount: z.number().int().nonnegative().default(0),
@@ -145,7 +145,7 @@ export const UpdateCommunicationStatusRequest = openapi(
     failedAt: DateTime.optional(),
     errorCode: z.string().optional(),
     errorMessage: z.string().optional(),
-    bounceType: z.enum(['soft', 'hard']).optional(),
+    bounceType: BounceType.optional(),
     metadata: z.record(z.any()).optional(),
   }),
   {
@@ -183,7 +183,7 @@ export const TrackCommunicationEventRequest = openapi(
     // Error details
     errorCode: z.string().optional(),
     errorMessage: z.string().optional(),
-    bounceType: z.enum(['soft', 'hard']).optional(),
+    bounceType: BounceType.optional(),
   }),
   {
     description: 'Track a communication event',

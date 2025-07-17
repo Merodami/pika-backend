@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { Email, UserId } from './branded.js'
 import { UUID } from './primitives.js'
-import { openapi } from '../utils/openapi.js'
+import { openapi } from '../../common/utils/openapi.js'
 
 /**
  * Shared parameter schemas used across all API tiers (public, admin, internal)

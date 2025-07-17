@@ -27,8 +27,8 @@ src/schemas/
 │   │   ├── service.ts
 │   │   └── index.ts
 │   ├── common/
-│   │   ├── parameters.ts    # CategoryIdParam
-│   │   ├── enums.ts        # Category-specific enums
+│   │   ├── parameters.ts    # CategoryIdParam, shared params
+│   │   ├── enums.ts        # Category-specific enums (REQUIRED)
 │   │   └── types.ts        # Shared category types
 │   └── index.ts            # Re-exports all tiers
 ├── user/
@@ -109,3 +109,61 @@ This allows existing imports to continue working while new code uses the service
 ## Decision
 
 Approved for future implementation. Continue with current structure for category service, then migrate to service-first organization.
+
+## Current Implementation Status
+
+### Completed Services (Following New Pattern)
+
+1. **Category Service** ✅ - PERFECT TEMPLATE
+   - Centralized enums in `common/enums.ts`
+   - Uses `SearchParams` from shared pagination
+   - Clean separation of admin/public/internal
+   - No domain-specific features
+
+2. **User Service** ✅
+   - Deep cleaned - removed all gym/professional features
+   - Centralized enums (UserRole, UserStatus, etc.)
+   - Removed: address.ts, paymentMethod.ts, parq.ts, professional.ts
+   - Follows Category template pattern
+
+3. **Auth Service** ✅
+   - Centralized enums (TokenType, OAuthProvider)
+   - Removed gym-specific roles
+   - Clean structure following template
+
+4. **Payment Service** ✅
+   - Removed all credit/gym features
+   - Centralized all enums (30+ enums moved to common/enums.ts)
+   - Uses standardized `SearchParams` and `DateRangeParams`
+   - Replaced gym references with business references
+   - All enum values in camelCase
+
+### Pattern Requirements
+
+1. **Mandatory Structure**:
+   ```
+   service/
+   ├── admin/
+   ├── public/
+   ├── internal/
+   └── common/
+       ├── enums.ts      # REQUIRED - All service enums
+       ├── parameters.ts # REQUIRED - Shared params (IDs, etc.)
+       └── types.ts      # Optional - Complex shared types
+   ```
+
+2. **Enum Standardization**:
+   - ALL enums must be in `common/enums.ts`
+   - No inline `z.enum()` definitions
+   - Use camelCase for enum values
+   - Export both schema and type
+
+3. **Pagination**:
+   - Use `SearchParams` from `shared/pagination.js`
+   - Extend with service-specific filters
+   - Use `paginatedResponse` from `shared/responses.js`
+
+4. **Domain Cleanup**:
+   - Remove ALL gym/fitness specific features
+   - Remove credit/points systems
+   - Keep only core business logic

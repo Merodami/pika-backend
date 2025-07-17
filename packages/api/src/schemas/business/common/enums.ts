@@ -25,3 +25,17 @@ export type BusinessStatusFilter = z.infer<typeof BusinessStatusFilter>
 export const BUSINESS_RELATIONS = ['user', 'category'] as const
 
 export type BusinessRelations = (typeof BUSINESS_RELATIONS)[number]
+
+// Admin-specific sort fields
+export const AdminBusinessSortBy = z.enum([
+  'businessName',
+  'avgRating',
+  'verified',
+  'active',
+  'createdAt',
+  'updatedAt',
+  'userId',
+  'categoryId',
+])
+
+export type AdminBusinessSortBy = z.infer<typeof AdminBusinessSortBy>

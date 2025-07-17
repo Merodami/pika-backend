@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
-import { VoucherBookStatus, VoucherBookType, VoucherBookSortBy, SortOrder } from '../../../common/schemas/enums.js'
+import { VoucherBookStatus, VoucherBookType, VoucherBookSortBy } from '../../../common/schemas/enums.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { SearchParams } from '../../../common/schemas/pagination.js'
 import { UUID } from '../../../common/schemas/primitives.js'
@@ -56,15 +55,6 @@ export const VoucherBookQueryParams = SearchParams.extend({
 
 export type VoucherBookQueryParams = z.infer<typeof VoucherBookQueryParams>
 
-/**
- * Voucher book path parameters
- */
-export const VoucherBookPathParams = z.object({
-  id: UUID.describe('Voucher book ID'),
-})
-
-export type VoucherBookPathParams = z.infer<typeof VoucherBookPathParams>
-
 // ============= Response Types =============
 
 /**
@@ -89,15 +79,6 @@ export const VoucherBookDetailResponse = openapi(
 export type VoucherBookDetailResponse = z.infer<typeof VoucherBookDetailResponse>
 
 // ============= PDF Download =============
-
-/**
- * PDF download parameters
- */
-export const PdfDownloadParams = z.object({
-  id: UUID.describe('Voucher book ID'),
-})
-
-export type PdfDownloadParams = z.infer<typeof PdfDownloadParams>
 
 /**
  * PDF download response

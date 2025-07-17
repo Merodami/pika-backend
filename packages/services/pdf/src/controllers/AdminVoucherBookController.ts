@@ -1,0 +1,285 @@
+import type {
+  AdminVoucherBookQueryParams,
+  CreateVoucherBookRequest,
+  UpdateVoucherBookRequest,
+  UpdateVoucherBookStatusRequest,
+  GeneratePDFRequest,
+  BulkArchiveVoucherBooksRequest,
+  VoucherBookStatsQueryParams,
+} from '@pika/api/admin'
+import type { VoucherBookIdParam } from '@pika/api/common'
+import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { getValidatedQuery, getValidatedBody, RequestContext } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { VoucherBookMapper } from '../mappers/VoucherBookMapper.js'
+import type { NextFunction, Request, Response } from 'express'
+
+import type { IAdminVoucherBookService } from '../services/AdminVoucherBookService.js'
+
+/**
+ * Handles admin voucher book management operations
+ */
+export class AdminVoucherBookController {
+  constructor(private readonly voucherBookService: IAdminVoucherBookService) {
+    // Bind methods to preserve 'this' context
+    this.getAllVoucherBooks = this.getAllVoucherBooks.bind(this)
+    this.getVoucherBookById = this.getVoucherBookById.bind(this)
+    this.createVoucherBook = this.createVoucherBook.bind(this)
+    this.updateVoucherBook = this.updateVoucherBook.bind(this)
+    this.deleteVoucherBook = this.deleteVoucherBook.bind(this)
+    this.updateVoucherBookStatus = this.updateVoucherBookStatus.bind(this)
+    this.generatePDF = this.generatePDF.bind(this)
+    this.bulkArchiveVoucherBooks = this.bulkArchiveVoucherBooks.bind(this)
+    this.getVoucherBookStatistics = this.getVoucherBookStatistics.bind(this)
+  }
+
+  /**
+   * GET /admin/voucher-books
+   * Get all voucher books with admin filters and pagination
+   */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'admin:voucher-books',
+    keyGenerator: httpRequestKeyGenerator,
+    condition: (result) => result && result.data && Array.isArray(result.data),
+  })
+  async getAllVoucherBooks(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const query = getValidatedQuery<AdminVoucherBookQueryParams>(req)
+
+      // Map API query to service params
+      const params = {
+        search: query.search,
+        bookType: query.bookType,
+        status: query.status,
+        year: query.year,
+        month: query.month,
+        createdBy: query.createdBy,
+        page: query.page || 1,
+        limit: query.limit || PAGINATION_DEFAULT_LIMIT,
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder,
+      }
+
+      const result = await this.voucherBookService.getAllVoucherBooks(params)
+
+      // Use mapper for proper response transformation
+      const response = VoucherBookMapper.toAdminListResponse(result)
+      res.json(response)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /admin/voucher-books/:id
+   * Get voucher book by ID with full details
+   */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'admin:voucher-book',
+    keyGenerator: httpRequestKeyGenerator,
+  })
+  async getVoucherBookById(
+    req: Request<VoucherBookIdParam>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id } = req.params
+
+      const voucherBook = await this.voucherBookService.getVoucherBookById(id)
+
+      // Convert to DTO using mapper
+      res.json(VoucherBookMapper.toDTO(voucherBook))
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/voucher-books
+   * Create new voucher book
+   */
+  async createVoucherBook(
+    req: Request<{}, {}, CreateVoucherBookRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const data = getValidatedBody<CreateVoucherBookRequest>(req)
+
+      const createData = VoucherBookMapper.fromCreateDTO(data, context.userId)
+
+      const voucherBook = await this.voucherBookService.createVoucherBook(createData)
+
+      // Convert to DTO using mapper
+      const dto = VoucherBookMapper.toDTO(voucherBook)
+
+      res.status(201).json(dto)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PATCH /admin/voucher-books/:id
+   * Update voucher book information
+   */
+  async updateVoucherBook(
+    req: Request<VoucherBookIdParam, {}, UpdateVoucherBookRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const { id } = req.params
+      const data = getValidatedBody<UpdateVoucherBookRequest>(req)
+
+      const updateData = VoucherBookMapper.fromUpdateDTO(data, context.userId)
+
+      const voucherBook = await this.voucherBookService.updateVoucherBook(id, updateData)
+
+      // Convert to DTO using mapper
+      res.json(VoucherBookMapper.toDTO(voucherBook))
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * DELETE /admin/voucher-books/:id
+   * Delete voucher book (soft delete)
+   */
+  async deleteVoucherBook(
+    req: Request<VoucherBookIdParam>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id } = req.params
+
+      await this.voucherBookService.deleteVoucherBook(id)
+
+      res.status(204).send()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/voucher-books/:id/status
+   * Update voucher book status
+   */
+  async updateVoucherBookStatus(
+    req: Request<VoucherBookIdParam, {}, UpdateVoucherBookStatusRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const { id } = req.params
+      const { status } = getValidatedBody<UpdateVoucherBookStatusRequest>(req)
+
+      const voucherBook = await this.voucherBookService.updateVoucherBookStatus(
+        id,
+        status,
+        context.userId
+      )
+
+      // Convert to DTO using mapper
+      res.json(VoucherBookMapper.toDTO(voucherBook))
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/voucher-books/:id/generate-pdf
+   * Generate PDF for voucher book
+   */
+  async generatePDF(
+    req: Request<VoucherBookIdParam, {}, GeneratePDFRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const { id } = req.params
+      const { regenerate } = getValidatedBody<GeneratePDFRequest>(req)
+
+      const result = await this.voucherBookService.generatePDF(id, context.userId, regenerate)
+
+      // Use mapper for proper response transformation
+      const response = VoucherBookMapper.toGeneratePDFResponse(result, regenerate)
+      res.json(response)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/voucher-books/bulk-archive
+   * Bulk archive voucher books (efficient bulk operation)
+   */
+  async bulkArchiveVoucherBooks(
+    req: Request<{}, {}, BulkArchiveVoucherBooksRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const { voucherBookIds } = getValidatedBody<BulkArchiveVoucherBooksRequest>(req)
+
+      // Use efficient bulk operation instead of Promise.all
+      const result = await this.voucherBookService.bulkArchiveVoucherBooks(
+        voucherBookIds,
+        context.userId
+      )
+
+      // Use mapper for proper response transformation
+      const response = VoucherBookMapper.toBulkOperationResponse({
+        processedCount: result.processedCount,
+        operation: 'archived',
+      })
+      res.json(response)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /admin/voucher-books/statistics
+   * Get voucher book statistics
+   */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'admin:voucher-books:stats',
+    keyGenerator: httpRequestKeyGenerator,
+  })
+  async getVoucherBookStatistics(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const query = getValidatedQuery<VoucherBookStatsQueryParams>(req)
+
+      const stats = await this.voucherBookService.getVoucherBookStatistics(
+        query.year,
+        query.month
+      )
+
+      // Use mapper for proper response transformation
+      const response = VoucherBookMapper.toStatisticsResponse(stats)
+      res.json(response)
+    } catch (error) {
+      next(error)
+    }
+  }
+}

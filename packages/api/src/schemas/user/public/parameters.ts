@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { UUID } from '../../shared/primitives.js'
+import { UUID } from '../../../common/schemas/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

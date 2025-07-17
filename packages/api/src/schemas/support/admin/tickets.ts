@@ -13,7 +13,7 @@ import { DateTime, UUID } from '../../../common/schemas/primitives.js'
 import { createIncludeParam } from '../../../common/schemas/query.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
-import { AdminTicketSortBy } from './enums.js'
+import { AdminTicketSortBy, TicketIdParam } from '../common/index.js'
 
 /**
  * Admin support ticket management schemas
@@ -84,7 +84,7 @@ export const AdminTicketQueryParams = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   sortBy: AdminTicketSortBy.default('CREATED_AT'),
-  sortOrder: SortOrder.default('DESC'),
+  sortOrder: SortOrder.default(SortOrder.enum.desc),
   ...createIncludeParam(ADMIN_PROBLEM_RELATIONS).shape,
 })
 
@@ -329,8 +329,7 @@ export const AgentPerformanceResponse = openapi(
 
 export type AgentPerformanceResponse = z.infer<typeof AgentPerformanceResponse>
 
-export const TicketIdParam = z.object({ id: UUID })
-export type TicketIdParam = z.infer<typeof TicketIdParam>
+// TicketIdParam is now imported from common/parameters.ts
 
 // ============= Admin Comment Query Schemas =============
 
@@ -342,7 +341,7 @@ export const AdminGetAllCommentsQuery = openapi(
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(20),
     sortBy: TimestampSortBy.default('CREATED_AT'),
-    sortOrder: SortOrder.default('DESC'),
+    sortOrder: SortOrder.default(SortOrder.enum.desc),
     search: z.string().optional(),
     problemId: z.string().optional(),
     isInternal: z.coerce.boolean().optional(),

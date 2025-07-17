@@ -2,7 +2,6 @@
  * Public payment schemas
  */
 
-export * from './credit.js'
 export * from './customerMembership.js'
 export * from './membership.js'
 export * from './product.js'

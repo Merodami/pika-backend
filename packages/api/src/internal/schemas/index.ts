@@ -21,5 +21,8 @@ export * from './subscription/index.js'
 // Category service operations
 export * from './category/index.js'
 
+// Business service operations
+export * from './business/index.js'
+
 // Health check was already created
 export * from './health.js'

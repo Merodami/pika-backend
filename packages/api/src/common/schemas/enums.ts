@@ -246,7 +246,7 @@ export type VoucherBookSortBy = z.infer<typeof VoucherBookSortBy>
  */
 export const UserRoleSchema = openapi(UserRole, {
   description: 'User role in the system',
-  example: 'USER',
+  example: UserRole.enum.CUSTOMER,
 })
 
 /**

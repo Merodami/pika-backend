@@ -1,5 +1,5 @@
 import type { UserRoleType, UserStatusType } from '@pika/types'
-import { UserRole, UserStatus } from '@pika/types'
+import { UserRole, UserStatus, mapUserRole, mapUserStatus } from '@pika/types'
 
 import type {
   AddressDomain,
@@ -93,8 +93,8 @@ export class UserMapper {
       phoneNumber: doc.phoneNumber,
       phoneVerified: doc.phoneVerified,
       avatarUrl: doc.avatarUrl,
-      role: this.mapRole(doc.role),
-      status: this.mapStatus(doc.status),
+      role: mapUserRole(doc.role),
+      status: mapUserStatus(doc.status),
       lastLoginAt: doc.lastLoginAt,
       createdAt:
         doc.createdAt instanceof Date
@@ -172,8 +172,8 @@ export class UserMapper {
       phoneNumber: dto.phoneNumber || null,
       phoneVerified: dto.phoneVerified,
       avatarUrl: dto.avatarUrl || null,
-      role: this.mapRole(dto.role),
-      status: this.mapStatus(dto.status),
+      role: mapUserRole(dto.role),
+      status: mapUserStatus(dto.status),
       lastLoginAt: dto.lastLoginAt ? new Date(dto.lastLoginAt) : null,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),
@@ -270,37 +270,7 @@ export class UserMapper {
     }
   }
 
-  /**
-   * Maps role string to enum
-   */
-  private static mapRole(role: string): UserRoleType {
-    switch (role) {
-      case UserRole.ADMIN:
-        return UserRole.ADMIN
-      case UserRole.USER:
-        return UserRole.USER
-      default:
-        return UserRole.USER
-    }
-  }
-
-  /**
-   * Maps status string to enum
-   */
-  private static mapStatus(status: string): UserStatusType {
-    switch (status) {
-      case UserStatus.ACTIVE:
-        return UserStatus.ACTIVE
-      case UserStatus.INACTIVE:
-        return UserStatus.INACTIVE
-      case UserStatus.BANNED:
-        return UserStatus.BANNED
-      case UserStatus.UNCONFIRMED:
-        return UserStatus.UNCONFIRMED
-      default:
-        return UserStatus.ACTIVE
-    }
-  }
+  // Role and status mapping functions are now imported from @pika/types
 
   /**
    * Maps payment type string to enum
@@ -329,10 +299,12 @@ export class UserMapper {
     switch (role) {
       case UserRole.ADMIN:
         return UserRole.ADMIN
-      case UserRole.USER:
-        return UserRole.USER
+      case UserRole.CUSTOMER:
+        return UserRole.CUSTOMER
+      case UserRole.BUSINESS:
+        return UserRole.BUSINESS
       default:
-        return UserRole.USER
+        return UserRole.CUSTOMER
     }
   }
 

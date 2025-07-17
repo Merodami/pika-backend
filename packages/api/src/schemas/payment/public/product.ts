@@ -4,27 +4,14 @@ import { Money } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { ProductType, PriceInterval, Currency } from '../common/enums.js'
 
 /**
  * Product schemas for payment service
  */
 
 // ============= Enums =============
-
-export const ProductType = z.enum([
-  'CREDIT_PACK',
-  'MEMBERSHIP',
-  'SESSION',
-  'MERCHANDISE',
-  'OTHER',
-])
-export type ProductType = z.infer<typeof ProductType>
-
-export const PriceInterval = z.enum(['day', 'week', 'month', 'year'])
-export type PriceInterval = z.infer<typeof PriceInterval>
-
-export const Currency = z.enum(['USD', 'EUR', 'GBP'])
-export type Currency = z.infer<typeof Currency>
+// Enums are now imported from ../common/enums.js
 
 // ============= Product Schema =============
 

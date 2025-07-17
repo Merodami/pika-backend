@@ -5,27 +5,14 @@ import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { MembershipStatus, PlanType, MembershipAction } from '../common/enums.js'
 
 /**
  * Membership schemas for public API
  */
 
 // ============= Enums =============
-
-export const MembershipStatus = z.enum([
-  'ACTIVE',
-  'PAST_DUE',
-  'CANCELED',
-  'INCOMPLETE',
-  'INCOMPLETE_EXPIRED',
-  'TRIALING',
-  'UNPAID',
-  'PAUSED',
-])
-export type MembershipStatus = z.infer<typeof MembershipStatus>
-
-export const PlanType = z.enum(['BASIC', 'PREMIUM', 'ELITE', 'CUSTOM'])
-export type PlanType = z.infer<typeof PlanType>
+// Enums are now imported from ../common/enums.js
 
 // ============= Membership Schema =============
 
@@ -267,14 +254,7 @@ export type MembershipBenefitsResponse = z.infer<
 export const MembershipHistoryEntry = z.object({
   id: UUID,
   membershipId: UUID,
-  action: z.enum([
-    'CREATED',
-    'UPGRADED',
-    'DOWNGRADED',
-    'CANCELLED',
-    'REACTIVATED',
-    'EXPIRED',
-  ]),
+  action: MembershipAction,
   fromPlan: PlanType.optional(),
   toPlan: PlanType.optional(),
   reason: z.string().optional(),

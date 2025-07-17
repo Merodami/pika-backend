@@ -261,7 +261,7 @@ export const AdminCreateUserRequest = openapi(
     lastName: z.string().min(1).max(50),
     phoneNumber: z.string().min(1),
     dateOfBirth: z.string(),
-    role: UserRole.default('USER'),
+    role: UserRole.default(UserRole.enum.CUSTOMER),
     status: UserStatus.default('UNCONFIRMED'),
     appVersion: z.string().optional(),
     alias: z.string().optional(),

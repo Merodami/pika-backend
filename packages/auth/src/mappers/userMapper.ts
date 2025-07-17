@@ -1,4 +1,4 @@
-import { User, UserRole, UserStatus } from '@pika/types'
+import { User, UserRole, UserStatus, mapUserRole, mapUserStatus } from '@pika/types'
 
 /**
  * Document type that matches the Prisma User schema
@@ -48,36 +48,4 @@ export function mapUserToDomain(userDoc: UserDocument): User {
   }
 }
 
-/**
- * Maps Prisma's UserRole enum string to our application's UserRole enum
- */
-function mapUserRole(role: any): UserRole {
-  // The role from Prisma is a string, we need to map it to our enum
-  switch (role) {
-    case 'ADMIN':
-      return UserRole.ADMIN
-    case 'USER':
-      return UserRole.USER
-    default:
-      return UserRole.USER // Default fallback
-  }
-}
-
-/**
- * Maps Prisma's UserStatus enum string to our application's UserStatus enum
- */
-function mapUserStatus(status: any): UserStatus {
-  // The status from Prisma is a string, we need to map it to our enum
-  switch (status) {
-    case 'ACTIVE':
-      return UserStatus.ACTIVE
-    case 'INACTIVE':
-      return UserStatus.INACTIVE
-    case 'BANNED':
-      return UserStatus.BANNED
-    case 'UNCONFIRMED':
-      return UserStatus.UNCONFIRMED
-    default:
-      return UserStatus.ACTIVE // Default fallback
-  }
-}
+// Role and status mapping functions are now imported from @pika/types
