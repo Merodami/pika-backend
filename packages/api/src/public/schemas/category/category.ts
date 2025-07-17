@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { UserId } from '../../../common/schemas/branded.js'
 import { CategorySortBy, SortOrder } from '../../../common/schemas/enums.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
+import { PaginationParams, SearchParams } from '../../../common/schemas/pagination.js'
+import { CategoryIdParam } from '../../../common/schemas/parameters.js'
 import { UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
@@ -60,17 +62,31 @@ export type CategoryResponse = z.infer<typeof CategoryResponse>
 /**
  * Category search/filter parameters
  */
-export const CategorySearchParams = z.object({
-  search: z.string().optional().describe('Search in category name/description'),
+export const CategoryQueryParams = SearchParams.extend({
   parentId: UUID.optional().describe('Filter by parent category'),
   isActive: z.boolean().optional().describe('Filter by active status'),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sortBy: CategorySortBy.default('SORT_ORDER'),
-  sortOrder: SortOrder.default('ASC'),
+  sortBy: CategorySortBy.default('sortOrder'),
 })
 
-export type CategorySearchParams = z.infer<typeof CategorySearchParams>
+export type CategoryQueryParams = z.infer<typeof CategoryQueryParams>
+
+/**
+ * Category hierarchy query parameters
+ */
+export const CategoryHierarchyQuery = z.object({
+  rootId: UUID.optional().describe('Root category ID for partial hierarchy'),
+})
+
+export type CategoryHierarchyQuery = z.infer<typeof CategoryHierarchyQuery>
+
+/**
+ * Category path parameters
+ */
+export const CategoryPathParams = z.object({
+  id: UUID.describe('Category ID'),
+})
+
+export type CategoryPathParams = z.infer<typeof CategoryPathParams>
 
 // ============= Response Types =============
 
@@ -82,27 +98,30 @@ export const CategoryListResponse = paginatedResponse(CategoryResponse)
 export type CategoryListResponse = z.infer<typeof CategoryListResponse>
 
 /**
- * Category tree response (hierarchical structure)
+ * Category hierarchy response
  */
-export const CategoryTreeResponse = openapi(
+export const CategoryHierarchyResponse = openapi(
   z.object({
-    categories: z.array(CategoryResponse),
-    totalCount: z.number().int().nonnegative(),
+    data: z.array(CategoryResponse),
   }),
   {
     description: 'Hierarchical category tree structure',
   },
 )
 
-export type CategoryTreeResponse = z.infer<typeof CategoryTreeResponse>
-
-// ============= Parameters =============
+export type CategoryHierarchyResponse = z.infer<typeof CategoryHierarchyResponse>
 
 /**
- * Category ID parameter
+ * Category path response
  */
-export const CategoryIdParam = z.object({
-  id: UUID.describe('Category ID'),
-})
+export const CategoryPathResponse = openapi(
+  z.object({
+    data: z.array(CategoryResponse),
+  }),
+  {
+    description: 'Category path from root to specified category',
+  },
+)
 
-export type CategoryIdParam = z.infer<typeof CategoryIdParam>
+export type CategoryPathResponse = z.infer<typeof CategoryPathResponse>
+

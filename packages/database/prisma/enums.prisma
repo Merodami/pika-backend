@@ -1,6 +1,7 @@
 enum UserRole {
   ADMIN
-  USER
+  CUSTOMER
+  BUSINESS
 
   @@schema("identity")
 }
@@ -110,6 +111,52 @@ enum StorageProvider {
   AWS_S3
   LOCAL
   MINIO
+
+  @@schema("files")
+}
+
+enum VoucherBookStatus {
+  DRAFT
+  READY_FOR_PRINT
+  PUBLISHED
+  ARCHIVED
+
+  @@schema("files")
+}
+
+enum VoucherBookType {
+  MONTHLY
+  SPECIAL_EDITION
+  REGIONAL
+  SEASONAL
+  PROMOTIONAL
+
+  @@schema("files")
+}
+
+enum PageLayoutType {
+  STANDARD      // 8 spaces (2x4 grid)
+  MIXED         // Mixed ad sizes
+  FULL_PAGE     // Single full-page ad
+  CUSTOM        // Custom layout
+
+  @@schema("files")
+}
+
+enum AdSize {
+  SINGLE        // 1/8 page (1 space)
+  QUARTER       // 1/4 page (2 spaces)
+  HALF          // 1/2 page (4 spaces)
+  FULL          // Full page (8 spaces)
+
+  @@schema("files")
+}
+
+enum ContentType {
+  VOUCHER       // Business voucher with QR code
+  IMAGE         // Static image content
+  AD            // Advertisement content
+  SPONSORED     // Sponsored content
 
   @@schema("files")
 }

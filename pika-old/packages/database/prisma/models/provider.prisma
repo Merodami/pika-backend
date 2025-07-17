@@ -1,0 +1,31 @@
+
+/// Service provider profiles
+model Provider {
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String          @unique @map("user_id") @db.Uuid
+  businessName        Json            @map("business_name") // JSONB for multilingual names
+  businessDescription Json            @map("business_description") // JSONB for multilingual descriptions
+  categoryId          String          @map("category_id") @db.Uuid
+  verified            Boolean         @default(false)
+  active              Boolean         @default(true)
+  avgRating           Decimal?        @map("avg_rating") @db.Decimal(3, 2) @default(0)
+  createdAt           DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime?       @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  deletedAt         DateTime?         @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  user                User            @relation(fields: [userId], references: [id])
+  category            Category        @relation(fields: [categoryId], references: [id])
+  availability        Availability[]
+  vouchers            Voucher[]
+  reviews             Review[]
+  adPlacements        AdPlacement[]
+  fraudCases          FraudCase[]
+  campaigns           Campaign[]
+  voucherBooks        VoucherBook[]
+  
+  @@index([categoryId])
+  @@index([verified, active])
+  @@map("providers")
+  @@schema("marketplace")
+}

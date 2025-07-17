@@ -1,0 +1,21 @@
+// Payments
+model Payment {
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paymentMethodId     String?         @map("payment_method_id") @db.Uuid
+  amount              Decimal         @db.Decimal(10, 2)
+  currency            String          @default("PYG") @db.VarChar(3)
+  status              PaymentStatus   @default(PENDING)
+  externalReference   String?         @map("external_reference") @db.VarChar(255)
+  processorResponse   Json?           @map("processor_response")
+  createdAt           DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime?       @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  completedAt         DateTime?       @map("completed_at") @db.Timestamptz(6)
+
+  // Relations
+  paymentMethod       PaymentMethod?  @relation(fields: [paymentMethodId], references: [id])
+
+  @@index([status])
+  @@index([externalReference])
+  @@map("payments")
+  @@schema("payments")
+}

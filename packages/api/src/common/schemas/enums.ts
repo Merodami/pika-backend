@@ -11,7 +11,7 @@ import { openapi } from '../utils/openapi.js'
 /**
  * User roles - matches database UserRole enum exactly
  */
-export const UserRole = z.enum(['ADMIN', 'USER'])
+export const UserRole = z.enum(['ADMIN', 'CUSTOMER', 'BUSINESS'])
 
 export type UserRole = z.infer<typeof UserRole>
 
@@ -87,7 +87,7 @@ export type SessionWaitingListStatus = z.infer<typeof SessionWaitingListStatus>
 /**
  * Sort order - used across all sortable endpoints
  */
-export const SortOrder = z.enum(['ASC', 'DESC'])
+export const SortOrder = z.enum(['asc', 'desc'])
 export type SortOrder = z.infer<typeof SortOrder>
 
 /**
@@ -154,12 +154,90 @@ export type ProblemSortBy = z.infer<typeof ProblemSortBy>
  * Category sort fields - shared across public and admin APIs
  */
 export const CategorySortBy = z.enum([
-  'NAME',
-  'SORT_ORDER',
-  'CREATED_AT',
-  'UPDATED_AT',
+  'name',
+  'sortOrder',
+  'createdAt',
+  'updatedAt',
 ])
 export type CategorySortBy = z.infer<typeof CategorySortBy>
+
+// ============= PDF Service Enums =============
+
+/**
+ * Voucher book status - matches database VoucherBookStatus enum exactly
+ */
+export const VoucherBookStatus = z.enum([
+  'DRAFT',
+  'READY_FOR_PRINT',
+  'PUBLISHED',
+  'ARCHIVED',
+])
+
+export type VoucherBookStatus = z.infer<typeof VoucherBookStatus>
+
+/**
+ * Voucher book type - matches database VoucherBookType enum exactly
+ */
+export const VoucherBookType = z.enum([
+  'MONTHLY',
+  'SPECIAL_EDITION',
+  'REGIONAL',
+  'SEASONAL',
+  'PROMOTIONAL',
+])
+
+export type VoucherBookType = z.infer<typeof VoucherBookType>
+
+/**
+ * Page layout type - matches database PageLayoutType enum exactly
+ */
+export const PageLayoutType = z.enum([
+  'STANDARD',
+  'MIXED',
+  'FULL_PAGE',
+  'CUSTOM',
+])
+
+export type PageLayoutType = z.infer<typeof PageLayoutType>
+
+/**
+ * Ad size - matches database AdSize enum exactly
+ */
+export const AdSize = z.enum([
+  'SINGLE',
+  'QUARTER',
+  'HALF',
+  'FULL',
+])
+
+export type AdSize = z.infer<typeof AdSize>
+
+/**
+ * Content type - matches database ContentType enum exactly
+ */
+export const ContentType = z.enum([
+  'VOUCHER',
+  'IMAGE',
+  'AD',
+  'SPONSORED',
+])
+
+export type ContentType = z.infer<typeof ContentType>
+
+/**
+ * Voucher book sorting options
+ */
+export const VoucherBookSortBy = z.enum([
+  'createdAt',
+  'updatedAt',
+  'title',
+  'year',
+  'month',
+  'status',
+  'publishedAt',
+])
+
+export type VoucherBookSortBy = z.infer<typeof VoucherBookSortBy>
 
 // ============= OpenAPI Documentation =============
 

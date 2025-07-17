@@ -1,0 +1,1375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pika Real-time Messaging Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .panel {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2 {
+        color: #333;
+      }
+      .message-list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px 0;
+        background-color: #f9f9f9;
+      }
+      .message {
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 4px;
+        background-color: #e3f2fd;
+      }
+      .message.sent {
+        background-color: #c8e6c9;
+        text-align: right;
+      }
+      .notification {
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 4px;
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+      }
+      input,
+      textarea,
+      button,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        border: none;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+      .status.connected {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .status.disconnected {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .timestamp {
+        font-size: 0.8em;
+        color: #666;
+      }
+      .api-info {
+        background-color: #e7f3ff;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Pika Real-time Messaging Test</h1>
+
+    <div class="api-info">
+      <strong>API Base URL:</strong>
+      <span id="apiUrl">http://localhost:3000</span><br />
+      <strong>Using:</strong> Your actual backend services with Firebase
+      Emulator
+    </div>
+
+    <div class="status" id="connectionStatus">Initializing...</div>
+    <div id="errorMessage" class="error" style="display: none"></div>
+
+    <!-- Demo Notification Creation -->
+    <div
+      class="section"
+      style="
+        background-color: #e8f5e8;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+      "
+    >
+      <h3>🔔 Demo Notification Creation</h3>
+      <p>Create demo notifications to test real-time functionality:</p>
+      <div style="margin: 10px 0">
+        <button
+          onclick="createDemoNotification('MESSAGE_RECEIVED')"
+          class="button"
+          style="width: auto; margin: 5px"
+        >
+          📨 Create Message Notification
+        </button>
+        <button
+          onclick="createDemoNotification('REDEMPTION_CREATED')"
+          class="button"
+          style="width: auto; margin: 5px"
+        >
+          📅 Create Redemption Notification
+        </button>
+        <button
+          onclick="createDemoNotification('VOUCHER_CREATED')"
+          class="button"
+          style="width: auto; margin: 5px"
+        >
+          📅 Create Voucher Notification
+        </button>
+        <button
+          onclick="createDemoNotification('SYSTEM_ANNOUNCEMENT')"
+          class="button"
+          style="width: auto; margin: 5px"
+        >
+          📢 Create System Announcement
+        </button>
+      </div>
+      <div style="margin: 10px 0">
+        <button
+          onclick="createRandomNotification()"
+          class="button"
+          style="width: auto; margin: 5px"
+        >
+          🎲 Create Random Notification
+        </button>
+        <button
+          onclick="createMultipleNotifications()"
+          class="button"
+          style="width: auto; margin: 5px"
+        >
+          🔥 Create 3 Demo Notifications
+        </button>
+      </div>
+      <div style="margin-top: 10px; font-size: 0.9em; color: #666">
+        <strong>Current Firebase User:</strong>
+        <span id="currentFirebaseUserId">Not authenticated</span>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- User 1 Panel -->
+      <div class="panel">
+        <h2>User 1 (Customer)</h2>
+        <div>
+          <label>Auth Token:</label>
+          <select id="user1Token">
+            <option value="internal">Internal User (from .env)</option>
+            <option value="custom">Custom Token</option>
+          </select>
+          <input
+            type="text"
+            id="user1CustomToken"
+            placeholder="Paste JWT token here"
+            style="display: none"
+          />
+        </div>
+
+        <h3>Active Conversation</h3>
+        <div id="user1ActiveConversation">No conversation selected</div>
+
+        <h3>My Conversations (API)</h3>
+        <button onclick="loadConversations('user1')">
+          Refresh Conversations
+        </button>
+        <div id="user1Conversations" class="message-list"></div>
+
+        <h3>Messages (Real-time)</h3>
+        <div id="user1Messages" class="message-list"></div>
+
+        <h3>Send Message</h3>
+        <textarea
+          id="user1MessageInput"
+          placeholder="Type your message..."
+        ></textarea>
+        <button onclick="sendMessage('user1')">Send via API</button>
+
+        <h3>Notifications (Real-time)</h3>
+        <div id="user1Notifications" class="message-list"></div>
+      </div>
+
+      <!-- User 2 Panel -->
+      <div class="panel">
+        <h2>User 2 (Provider)</h2>
+        <div>
+          <label>User ID for new conversation:</label>
+          <input type="text" id="user2Id" placeholder="Enter User ID (UUID)" />
+        </div>
+
+        <h3>Active Conversation</h3>
+        <div id="user2ActiveConversation">No conversation selected</div>
+
+        <h3>Create Conversation</h3>
+        <button onclick="createConversationViaAPI()">Create via API</button>
+
+        <h3>Messages (Real-time)</h3>
+        <div id="user2Messages" class="message-list"></div>
+
+        <h3>API Response Log</h3>
+        <div id="apiLog" class="message-list"></div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+      // Configuration - can be overridden via URL params
+      const urlParams = new URLSearchParams(window.location.search)
+      const API_BASE_URL = urlParams.get('api') || 'http://localhost:8000'
+      const FIREBASE_PROJECT = urlParams.get('project') || 'pika-demo'
+      const FIREBASE_HOST = urlParams.get('firebase_host') || 'localhost'
+      const FIREBASE_PORT = urlParams.get('firebase_port') || '8080'
+      const INTERNAL_TOKEN =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJpbnRlcm5hbCIsImVtYWlsIjoiaW50ZXJuYWxAYXBwLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzQzMzg2NDU4LCJleHAiOjE3NzQ5NDQwNTh9.8NrrgnNflWNf3TlRv2YQlrPH7akQPFYRBBFJvc8dW0I'
+
+      // Update API info display
+      document.getElementById('apiUrl').textContent = API_BASE_URL
+
+      // Firebase configuration for direct Firestore access (read-only)
+      const firebaseConfig = {
+        apiKey: 'fake-api-key-for-emulator',
+        authDomain: `${FIREBASE_PROJECT}.firebaseapp.com`,
+        projectId: FIREBASE_PROJECT,
+      }
+
+      // Initialize Firebase
+      let db, auth
+
+      async function initializeFirebase() {
+        try {
+          firebase.initializeApp(firebaseConfig)
+          auth = firebase.auth()
+          db = firebase.firestore()
+
+          // Connect to emulator if not production
+          if (FIREBASE_HOST === 'localhost') {
+            console.log(
+              `Attempting to connect to Firebase Emulator at ${FIREBASE_HOST}:${FIREBASE_PORT}`,
+            )
+            auth.useEmulator(`http://${FIREBASE_HOST}:9099`)
+            db.useEmulator(FIREBASE_HOST, parseInt(FIREBASE_PORT))
+            console.log(
+              `Successfully connected to Firebase Emulator at ${FIREBASE_HOST}:${FIREBASE_PORT}`,
+            )
+          }
+
+          // Authenticate with the JWT token by creating a custom token user
+          await authenticateUser()
+
+          return true
+        } catch (error) {
+          console.error('Failed to initialize Firebase:', error)
+          showError(`Firebase initialization failed: ${error.message}`)
+          updateConnectionStatus(false)
+          return false
+        }
+      }
+
+      async function authenticateUser() {
+        try {
+          console.log(
+            'Authenticating user with Firebase Auth using backend user ID...',
+          )
+
+          // For now, we'll simulate a custom token by signing in with a predetermined UID
+          // In production, your backend would generate this custom token
+
+          // Try to get a custom token from your backend (if endpoint exists)
+          // Otherwise, fall back to using the backend user ID directly
+
+          try {
+            console.log('Getting Firebase custom token from backend...')
+
+            // Get custom token from backend (corrected endpoint URL and request body)
+            const response = await fetch(
+              `${API_BASE_URL}/api/v1/auth/firebase-token`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${getInternalToken()}`,
+                },
+                body: JSON.stringify({
+                  purpose: 'messaging',
+                  expiresIn: 3600,
+                }),
+              },
+            )
+
+            if (!response.ok) {
+              const errorData = await response.json()
+              throw new Error(
+                `Failed to get Firebase token: ${response.status} - ${errorData.error?.message || 'Unknown error'}`,
+              )
+            }
+
+            const data = await response.json()
+            console.log('Got custom token from backend', {
+              expiresAt: data.expiresAt,
+              claims: data.claims,
+            })
+
+            // Sign in with custom token
+            await auth.signInWithCustomToken(data.customToken)
+
+            console.log('Successfully authenticated with Firebase')
+            console.log('Firebase UID:', auth.currentUser?.uid)
+            console.log('Custom claims:', auth.currentUser?.claims)
+
+            // Store user IDs
+            firebaseUserId = auth.currentUser?.uid
+            currentUserId = auth.currentUser?.uid // Now they match!
+          } catch (customTokenError) {
+            console.log(
+              'Custom token not available, using fallback authentication',
+            )
+            console.log(
+              'Note: This means Firebase UID will not match backend user ID',
+            )
+
+            // Fallback: Use email/password with deterministic credentials based on user ID
+            const email = `${currentUserId}@test.local`
+            const password = 'testpassword123'
+
+            try {
+              await auth.signInWithEmailAndPassword(email, password)
+            } catch (signInError) {
+              if (signInError.code === 'auth/user-not-found') {
+                console.log(
+                  'Creating test user for backend user ID:',
+                  currentUserId,
+                )
+                await auth.createUserWithEmailAndPassword(email, password)
+              } else {
+                throw signInError
+              }
+            }
+          }
+
+          console.log('Successfully authenticated with Firebase Auth')
+          console.log('Firebase UID:', auth.currentUser?.uid)
+          console.log('Backend User ID:', currentUserId)
+          console.log('Email:', auth.currentUser?.email)
+
+          // Store the Firebase Auth UID
+          firebaseUserId = auth.currentUser?.uid
+        } catch (error) {
+          console.error('Authentication failed:', error)
+          throw error
+        }
+      }
+
+      function getInternalToken() {
+        return INTERNAL_TOKEN
+      }
+
+      // Global state
+      let currentConversationId = null
+      let currentUserId = 'internal' // From the JWT token - for API calls
+      let firebaseUserId = null // Firebase Auth UID - for Firestore listeners
+      let unsubscribeFunctions = [] // Track active listeners for cleanup
+      let connectionHeartbeat = null // Track connection heartbeat
+
+      // Token caching for performance
+      let cachedFirebaseToken = null
+      let tokenExpirationTime = null
+      const TOKEN_REFRESH_BUFFER = 5 * 60 * 1000 // Refresh 5 minutes before expiry
+
+      // Helper functions
+      function showError(message) {
+        const errorEl = document.getElementById('errorMessage')
+        errorEl.textContent = message
+        errorEl.style.display = 'block'
+        setTimeout(() => {
+          errorEl.style.display = 'none'
+        }, 5000)
+      }
+
+      function getAuthToken() {
+        const tokenSelect = document.getElementById('user1Token')
+        if (tokenSelect.value === 'custom') {
+          return (
+            document.getElementById('user1CustomToken').value || INTERNAL_TOKEN
+          )
+        }
+        return INTERNAL_TOKEN
+      }
+
+      // Smart Firebase token caching
+      async function getFirebaseTokenWithCaching() {
+        const now = Date.now()
+
+        // Check if we have a valid cached token
+        if (
+          cachedFirebaseToken &&
+          tokenExpirationTime &&
+          now < tokenExpirationTime - TOKEN_REFRESH_BUFFER
+        ) {
+          console.log(
+            'Using cached Firebase token (expires in',
+            Math.round((tokenExpirationTime - now) / 1000 / 60),
+            'minutes)',
+          )
+          return cachedFirebaseToken
+        }
+
+        console.log('Fetching new Firebase token...')
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/api/v1/auth/firebase-token`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getInternalToken()}`,
+              },
+              body: JSON.stringify({
+                purpose: 'messaging',
+                expiresIn: 3600,
+              }),
+            },
+          )
+
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(
+              `Failed to get Firebase token: ${response.status} - ${errorData.error?.message || 'Unknown error'}`,
+            )
+          }
+
+          const data = await response.json()
+
+          // Cache the token and expiration time
+          cachedFirebaseToken = data.customToken
+          tokenExpirationTime = new Date(data.expiresAt).getTime()
+
+          console.log('Got fresh Firebase token', {
+            expiresAt: data.expiresAt,
+            claims: data.claims,
+            cacheUntil: new Date(
+              tokenExpirationTime - TOKEN_REFRESH_BUFFER,
+            ).toISOString(),
+          })
+
+          return cachedFirebaseToken
+        } catch (error) {
+          console.error('Failed to get Firebase token:', error)
+          throw error
+        }
+      }
+
+      function logApiCall(method, endpoint, response) {
+        const logEl = document.getElementById('apiLog')
+        const entry = document.createElement('div')
+        entry.className = 'message'
+        entry.innerHTML = `
+                <strong>${method} ${endpoint}</strong><br>
+                Status: ${response.status || 'N/A'}<br>
+                <pre>${JSON.stringify(response.data || response, null, 2)}</pre>
+                <span class="timestamp">${new Date().toLocaleTimeString()}</span>
+            `
+        logEl.insertBefore(entry, logEl.firstChild)
+      }
+
+      // API Calls to your backend
+      async function createConversationViaAPI() {
+        const user2Id = document.getElementById('user2Id').value
+        if (!user2Id) {
+          showError('Please enter User 2 ID')
+          return
+        }
+
+        try {
+          console.log('🔄 Creating conversation via API...')
+          const response = await fetch(`${API_BASE_URL}/api/v1/conversations`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${getAuthToken()}`,
+            },
+            body: JSON.stringify({
+              participantIds: [currentUserId, user2Id],
+              context: {
+                type: 'GENERAL',
+                id: generateUUID(),
+                metadata: {},
+              },
+            }),
+          })
+
+          const data = await response.json()
+          logApiCall('POST', '/api/v1/conversations', {
+            status: response.status,
+            data,
+          })
+
+          if (response.ok) {
+            currentConversationId = data.conversationId
+            document.getElementById('user1ActiveConversation').textContent =
+              `ID: ${currentConversationId}`
+            document.getElementById('user2ActiveConversation').textContent =
+              `ID: ${currentConversationId}`
+
+            console.log(
+              '✅ Conversation created successfully:',
+              currentConversationId,
+            )
+
+            // Wait a moment for the conversation to be saved to Firestore
+            console.log(
+              '⏳ Waiting 2 seconds for conversation to sync to Firestore...',
+            )
+            setTimeout(() => {
+              // Start listening to this conversation
+              listenToMessages(currentConversationId)
+            }, 2000)
+
+            alert('Conversation created! ID: ' + currentConversationId)
+          } else {
+            console.error('❌ Failed to create conversation:', data)
+            showError(
+              `Failed to create conversation: ${data.error?.message || 'Unknown error'}`,
+            )
+          }
+        } catch (error) {
+          console.error('❌ API Error creating conversation:', error)
+          showError(`API Error: ${error.message}`)
+          logApiCall('POST', '/api/v1/conversations', { error: error.message })
+        }
+      }
+
+      async function loadConversations(userType) {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/api/v1/conversations?limit=10`,
+            {
+              headers: {
+                Authorization: `Bearer ${getAuthToken()}`,
+              },
+            },
+          )
+
+          const data = await response.json()
+          logApiCall('GET', '/api/v1/conversations', {
+            status: response.status,
+            data,
+          })
+
+          if (response.ok) {
+            const container = document.getElementById(
+              userType + 'Conversations',
+            )
+            container.innerHTML = ''
+
+            data.conversations.forEach((conv) => {
+              const div = document.createElement('div')
+              div.className = 'message'
+
+              // Handle participants - could be array or object
+              let participantsText = 'No participants'
+              if (
+                Array.isArray(conv.participants) &&
+                conv.participants.length > 0
+              ) {
+                participantsText = conv.participants
+                  .map((p) => p.userId)
+                  .join(', ')
+              } else if (
+                conv.participants &&
+                typeof conv.participants === 'object'
+              ) {
+                const participantKeys = Object.keys(conv.participants)
+                if (participantKeys.length > 0) {
+                  participantsText = participantKeys.join(', ')
+                } else {
+                  participantsText = 'Empty participants object'
+                }
+              }
+
+              div.innerHTML = `
+                            <strong>ID:</strong> ${conv.id}<br>
+                            <strong>Participants:</strong> ${participantsText}<br>
+                            <strong>Created:</strong> ${new Date(conv.createdAt).toLocaleString()}<br>
+                            ${conv.lastMessage ? `<strong>Last:</strong> ${conv.lastMessage.content}` : 'No messages'}
+                            <br><em>Click to select and monitor this conversation</em>
+                        `
+              div.onclick = () => selectConversation(conv.id)
+              container.appendChild(div)
+            })
+          } else {
+            showError(
+              `Failed to load conversations: ${data.error?.message || 'Unknown error'}`,
+            )
+          }
+        } catch (error) {
+          showError(`API Error: ${error.message}`)
+        }
+      }
+
+      async function sendMessage(userType) {
+        if (!currentConversationId) {
+          showError('Please select a conversation first')
+          return
+        }
+
+        const input = document.getElementById(userType + 'MessageInput')
+        const content = input.value.trim()
+
+        if (!content) {
+          showError('Please enter a message')
+          return
+        }
+
+        try {
+          console.log('📤 Sending message via API:', content)
+          console.log('🔗 Conversation ID:', currentConversationId)
+          console.log('👤 Current User ID:', currentUserId)
+          console.log('🔑 Auth Token:', getAuthToken().substring(0, 20) + '...')
+
+          const response = await fetch(
+            `${API_BASE_URL}/api/v1/conversations/${currentConversationId}/messages`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getAuthToken()}`,
+              },
+              body: JSON.stringify({
+                type: 'TEXT',
+                content: content,
+              }),
+            },
+          )
+
+          const data = await response.json()
+          logApiCall(
+            'POST',
+            `/api/v1/conversations/${currentConversationId}/messages`,
+            { status: response.status, data },
+          )
+
+          if (response.ok) {
+            console.log('✅ Message sent successfully:', data)
+            input.value = ''
+
+            // Wait a moment then check if the message appears in Firestore
+            setTimeout(() => {
+              console.log('⏳ Checking if message appeared in Firestore...')
+              db.collection('conversations')
+                .doc(currentConversationId)
+                .collection('messages')
+                .get()
+                .then((snapshot) => {
+                  console.log(
+                    `📊 Total messages in Firestore now: ${snapshot.size}`,
+                  )
+                  if (snapshot.size > 0) {
+                    console.log('📝 Latest messages:')
+                    snapshot.docs.forEach((doc) => {
+                      console.log('  -', doc.id, doc.data())
+                    })
+                  } else {
+                    console.log('❌ No messages found in Firestore!')
+                  }
+                })
+                .catch((error) => {
+                  console.error('❌ Error checking Firestore messages:', error)
+                })
+            }, 1000)
+
+            // Message will appear via real-time listener
+          } else {
+            console.error('❌ Failed to send message:', data)
+            showError(
+              `Failed to send message: ${data.error?.message || 'Unknown error'}`,
+            )
+          }
+        } catch (error) {
+          console.error('❌ API Error sending message:', error)
+          showError(`API Error: ${error.message}`)
+        }
+      }
+
+      // Real-time listeners (Firebase direct)
+      async function listenToMessages(conversationId) {
+        if (!conversationId) {
+          console.warn('No conversation ID provided for message listener')
+          return
+        }
+
+        // Don't clean up notification listener - only clean up previous message listeners
+        const messageListeners = unsubscribeFunctions.filter(
+          (fn) => fn.type === 'message',
+        )
+        messageListeners.forEach((fn) => fn())
+
+        // Remove message listeners from array, keep notification listeners
+        unsubscribeFunctions = unsubscribeFunctions.filter(
+          (fn) => fn.type !== 'message',
+        )
+
+        console.log(
+          'Setting up message listener for conversation:',
+          conversationId,
+        )
+        console.log('Firebase user ID:', firebaseUserId)
+        console.log('Backend user ID:', currentUserId)
+
+        // First, let's check if the conversation exists in Firestore
+        db.collection('conversations')
+          .doc(conversationId)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              console.log('✅ Conversation exists in Firestore:', doc.data())
+            } else {
+              console.log('❌ Conversation does NOT exist in Firestore!')
+            }
+          })
+          .catch((error) => {
+            console.error('❌ Error checking conversation:', error)
+          })
+
+        // First verify the conversation exists in Firestore
+        console.log('🔍 Verifying conversation exists in Firestore...')
+        try {
+          const conversationDoc = await db
+            .collection('conversations')
+            .doc(conversationId)
+            .get()
+          if (!conversationDoc.exists) {
+            console.error('❌ Conversation does not exist in Firestore!')
+            showError(
+              'Conversation not found in Firestore. Please wait and try again.',
+            )
+            return
+          }
+          console.log(
+            '✅ Conversation exists in Firestore:',
+            conversationDoc.data(),
+          )
+        } catch (error) {
+          console.error('❌ Error checking conversation existence:', error)
+          showError(`Error verifying conversation: ${error.message}`)
+          return
+        }
+
+        // Also check if any messages exist
+        db.collection('conversations')
+          .doc(conversationId)
+          .collection('messages')
+          .get()
+          .then((snapshot) => {
+            console.log(
+              `📝 Found ${snapshot.size} existing messages in Firestore`,
+            )
+            snapshot.docs.forEach((doc) => {
+              console.log('Message data:', doc.id, doc.data())
+            })
+          })
+          .catch((error) => {
+            console.error('❌ Error checking messages:', error)
+          })
+
+        const unsubscribe = db
+          .collection('conversations')
+          .doc(conversationId)
+          .collection('messages')
+          .orderBy('createdAt', 'asc')
+          .onSnapshot(
+            (snapshot) => {
+              console.log(
+                `📨 Message snapshot received for conversation ${conversationId}: ${snapshot.size} messages`,
+              )
+
+              // Log each message for debugging
+              snapshot.docs.forEach((doc) => {
+                console.log('Message in snapshot:', doc.id, doc.data())
+              })
+
+              updateMessagesDisplay(snapshot, 'user1Messages')
+              updateMessagesDisplay(snapshot, 'user2Messages')
+
+              // Show new message count
+              const newMessages = snapshot
+                .docChanges()
+                .filter((change) => change.type === 'added').length
+              if (newMessages > 0) {
+                console.log(`🆕 ${newMessages} new message(s) received`)
+                snapshot.docChanges().forEach((change) => {
+                  if (change.type === 'added') {
+                    console.log(
+                      'New message added:',
+                      change.doc.id,
+                      change.doc.data(),
+                    )
+                  }
+                })
+              }
+
+              // If we get here, message listener is working
+              if (snapshot.empty) {
+                console.log(
+                  '⏳ No messages in conversation yet - waiting for new messages...',
+                )
+              }
+            },
+            (error) => {
+              console.error('❌ Error listening to messages:', error)
+              console.error('Error code:', error.code)
+              console.error('Error message:', error.message)
+              console.error('Conversation ID:', conversationId)
+              console.error('Firebase Auth user:', auth.currentUser?.uid)
+
+              showError(`Message listener error: ${error.message || error}`)
+              // Don't update connection status to false - notification listener might still work
+            },
+          )
+
+        // Mark this as a message listener
+        unsubscribe.type = 'message'
+        unsubscribeFunctions.push(unsubscribe)
+      }
+
+      function updateMessagesDisplay(snapshot, elementId) {
+        const container = document.getElementById(elementId)
+        container.innerHTML = ''
+
+        snapshot.forEach((doc) => {
+          const data = doc.data()
+          const msg = document.createElement('div')
+          msg.className =
+            data.senderId === currentUserId ? 'message sent' : 'message'
+          msg.innerHTML = `
+                    <strong>${data.senderId === currentUserId ? 'You' : data.senderId}:</strong> ${data.content}<br>
+                    <span class="timestamp">${data.createdAt?.toDate?.()?.toLocaleString() || 'N/A'}</span>
+                `
+          container.appendChild(msg)
+        })
+
+        container.scrollTop = container.scrollHeight
+      }
+
+      function listenToNotifications() {
+        // Use the Firebase Auth UID for Firestore access
+        if (!firebaseUserId) {
+          console.error('No authenticated Firebase user found')
+          updateConnectionStatus(false)
+          return
+        }
+
+        console.log(
+          `Starting notification listener for Firebase user: ${firebaseUserId}`,
+        )
+        console.log(`API calls will use backend user ID: ${currentUserId}`)
+
+        // DEMO: Also listen to the demo test user for notification demos
+        const DEMO_USER_UUID = '94a4148d-33a5-478f-b376-1dd5cf6fb1fc'
+        console.log(
+          `Also starting demo notification listener for test user: ${DEMO_USER_UUID}`,
+        )
+
+        // Listen to notifications for the Firebase Auth user
+        const unsubscribe = db
+          .collection('users')
+          .doc(firebaseUserId)
+          .collection('notifications')
+          .orderBy('createdAt', 'desc')
+          .limit(10)
+          .onSnapshot(
+            (snapshot) => {
+              console.log(
+                `Received notification snapshot with ${snapshot.size} documents`,
+              )
+              const container = document.getElementById('user1Notifications')
+              container.innerHTML = ''
+
+              if (snapshot.empty) {
+                const msg = document.createElement('div')
+                msg.className = 'notification'
+                msg.innerHTML = `<em>No notifications yet for Firebase user ${firebaseUserId.slice(0, 8)}... Waiting for real-time updates...</em>`
+                container.appendChild(msg)
+              } else {
+                snapshot.forEach((doc) => {
+                  const data = doc.data()
+                  const notif = document.createElement('div')
+                  notif.className = 'notification'
+                  notif.innerHTML = `
+                              <strong>${data.title}</strong><br>
+                              ${data.body}<br>
+                              <span class="timestamp">${data.createdAt?.toDate?.()?.toLocaleString() || 'N/A'}</span>
+                          `
+                  container.appendChild(notif)
+                })
+              }
+
+              // Update connection status - if we got here, connection is working
+              console.log(
+                'Firebase connection successful - notification listener active',
+              )
+              updateConnectionStatus(true)
+
+              // Start heartbeat to monitor connection
+              startConnectionHeartbeat()
+            },
+            (error) => {
+              console.error('Error listening to notifications:', error)
+              console.error('Error details:', error)
+              showError(`Firebase listener error: ${error.message || error}`)
+              updateConnectionStatus(false)
+
+              // Try to reconnect after a delay
+              setTimeout(() => {
+                console.log('Attempting to reconnect notification listener...')
+                listenToNotifications()
+              }, 5000)
+            },
+          )
+
+        // Mark this as a notification listener and add to cleanup array
+        unsubscribe.type = 'notification'
+        unsubscribeFunctions.push(unsubscribe)
+
+        // DEMO: Also listen to demo test user notifications to see demo notifications in real-time
+        const demoUnsubscribe = db
+          .collection('users')
+          .doc(DEMO_USER_UUID)
+          .collection('notifications')
+          .orderBy('createdAt', 'desc')
+          .limit(10)
+          .onSnapshot(
+            (snapshot) => {
+              console.log(
+                `📋 Demo notifications received: ${snapshot.size} documents for test user`,
+              )
+              updateConnectionStatus(true)
+
+              if (snapshot.empty) {
+                console.log('No demo notifications yet for test user')
+                return
+              }
+
+              // Display demo notifications in the same UI area, but with a prefix
+              let notificationsHtml = ''
+              snapshot.docs.forEach((doc) => {
+                const notification = doc.data()
+                // Handle different timestamp formats from notification service
+                let createdAt = 'Unknown time'
+                if (notification.createdAt) {
+                  try {
+                    // Try Firestore Timestamp format first (has .seconds property)
+                    if (notification.createdAt.seconds) {
+                      createdAt = new Date(
+                        notification.createdAt.seconds * 1000,
+                      ).toLocaleString()
+                    }
+                    // Try ISO string format
+                    else if (typeof notification.createdAt === 'string') {
+                      createdAt = new Date(
+                        notification.createdAt,
+                      ).toLocaleString()
+                    }
+                    // Try direct Date object
+                    else {
+                      createdAt = new Date(
+                        notification.createdAt,
+                      ).toLocaleString()
+                    }
+                  } catch (error) {
+                    console.log(
+                      'Timestamp parsing error:',
+                      error,
+                      'Raw timestamp:',
+                      notification.createdAt,
+                    )
+                    createdAt = 'Just now'
+                  }
+                }
+
+                notificationsHtml += `
+                  <div style="padding: 10px; margin: 5px 0; background-color: #e8f5e8; border-radius: 4px; border-left: 4px solid #28a745;">
+                    <strong>🎯 DEMO: ${notification.title}</strong><br>
+                    ${notification.body}<br>
+                    <small class="timestamp">Type: ${notification.type} | ${createdAt}</small>
+                  </div>
+                `
+              })
+
+              // Add demo notifications to the main notifications display
+              const notificationContainer =
+                document.getElementById('user1Notifications')
+              if (notificationContainer) {
+                notificationContainer.innerHTML =
+                  notificationsHtml + (notificationContainer.innerHTML || '')
+              }
+              const notificationContainer2 =
+                document.getElementById('user2Notifications')
+              if (notificationContainer2) {
+                notificationContainer2.innerHTML =
+                  notificationsHtml + (notificationContainer2.innerHTML || '')
+              }
+            },
+            (error) => {
+              console.error('Error listening to demo notifications:', error)
+            },
+          )
+
+        // Mark demo listener for cleanup too
+        demoUnsubscribe.type = 'notification'
+        unsubscribeFunctions.push(demoUnsubscribe)
+      }
+
+      function selectConversation(conversationId) {
+        currentConversationId = conversationId
+        document.getElementById('user1ActiveConversation').textContent =
+          `ID: ${conversationId}`
+        document.getElementById('user2ActiveConversation').textContent =
+          `ID: ${conversationId}`
+        listenToMessages(conversationId)
+      }
+
+      function updateConnectionStatus(connected) {
+        const status = document.getElementById('connectionStatus')
+        if (connected) {
+          status.textContent =
+            'Connected to Firebase Emulator (Real-time active)'
+          status.className = 'status connected'
+        } else {
+          status.textContent = 'Disconnected from real-time updates'
+          status.className = 'status disconnected'
+
+          // Clear heartbeat when disconnected
+          if (connectionHeartbeat) {
+            clearInterval(connectionHeartbeat)
+            connectionHeartbeat = null
+          }
+        }
+      }
+
+      function startConnectionHeartbeat() {
+        // Clear any existing heartbeat
+        if (connectionHeartbeat) {
+          clearInterval(connectionHeartbeat)
+        }
+
+        // Check connection every 30 seconds
+        connectionHeartbeat = setInterval(() => {
+          if (!auth.currentUser) {
+            console.warn('Firebase auth user lost - connection may be unstable')
+            updateConnectionStatus(false)
+          } else {
+            console.log('Connection heartbeat: Firebase auth active')
+          }
+        }, 30000)
+      }
+
+      // Utility function to generate UUID
+      function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+          /[xy]/g,
+          function (c) {
+            const r = (Math.random() * 16) | 0
+            const v = c === 'x' ? r : (r & 0x3) | 0x8
+            return v.toString(16)
+          },
+        )
+      }
+
+      // Handle token selection change
+      document.getElementById('user1Token').addEventListener('change', (e) => {
+        document.getElementById('user1CustomToken').style.display =
+          e.target.value === 'custom' ? 'block' : 'none'
+      })
+
+      // Initialize
+      window.onload = async () => {
+        // Initialize Firebase first
+        try {
+          await initializeFirebase()
+
+          // Start listening to notifications
+          listenToNotifications()
+
+          // Load initial conversations
+          loadConversations('user1')
+        } catch (error) {
+          console.error(
+            'Firebase initialization failed - skipping real-time features:',
+            error,
+          )
+          updateConnectionStatus(false)
+        }
+      }
+
+      // Demo Notification Creation Functions
+      const NOTIFICATION_API_URL = 'http://localhost:4004'
+
+      async function createDemoNotification(type) {
+        // For the notification demo to work, we need to create notifications for the same user
+        // that the real-time listener is watching. Since Firebase Auth creates user IDs that
+        // aren't UUIDs, but notification service requires UUIDs, we have a mismatch.
+
+        // SOLUTION: Use a known test UUID and update the listener to watch this user too
+        const DEMO_USER_UUID = '94a4148d-33a5-478f-b376-1dd5cf6fb1fc' // Standard test user from testIds.ts
+        const userId = DEMO_USER_UUID
+
+        console.log('📝 NOTE: Using demo test user UUID for notifications')
+        console.log(
+          '  Demo notifications will appear in Firestore but may not in real-time UI',
+        )
+        console.log(
+          '  because real-time listener watches firebaseUserId, not demo UUID',
+        )
+        console.log(
+          '  This demonstrates the notification service working correctly with UUIDs',
+        )
+
+        console.log('🔍 Creating notification for authenticated user:')
+        console.log(
+          '  firebaseUserId:',
+          firebaseUserId,
+          'length:',
+          firebaseUserId?.length,
+          'type:',
+          typeof firebaseUserId,
+        )
+        console.log(
+          '  currentUserId:',
+          window.currentUserId,
+          'length:',
+          window.currentUserId?.length,
+          'type:',
+          typeof window.currentUserId,
+        )
+        console.log(
+          '  Using userId:',
+          userId,
+          'length:',
+          userId?.length,
+          'type:',
+          typeof userId,
+        )
+
+        // Check if the userId matches UUID pattern
+        const uuidPattern = /^[0-9a-fA-F-]{36}$/
+        console.log(
+          '  UUID pattern check:',
+          uuidPattern.test(userId),
+          'for value:',
+          userId,
+        )
+
+        const notifications = {
+          MESSAGE_RECEIVED: {
+            title: 'New Message 📨',
+            body: `You have received a new message from ${getRandomName()}`,
+            icon: 'message-icon.png',
+            entityRef: {
+              entityType: 'message',
+              entityId: generateUUID(),
+            },
+          },
+          REDEMPTION_CREATED: {
+            title: 'New Redemption Request 📅',
+            body: `You have received a new redemption request for ${getRandomService()}`,
+            icon: 'redemption-icon.png',
+            entityRef: {
+              entityType: 'redemption',
+              entityId: generateUUID(),
+            },
+          },
+          VOUCHER_CREATED: {
+            title: 'New Voucher Request 📅',
+            body: `You have received a new voucher request for ${getRandomService()}`,
+            icon: 'voucher-icon.png',
+            entityRef: {
+              entityType: 'voucher',
+              entityId: generateUUID(),
+            },
+          },
+          SYSTEM_ANNOUNCEMENT: {
+            title: 'System Announcement 📢',
+            body: getRandomAnnouncement(),
+            icon: 'system-icon.png',
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now
+          },
+        }
+
+        const notificationData = {
+          userId: userId,
+          type: type,
+          ...notifications[type],
+        }
+
+        try {
+          console.log('🔔 Creating demo notification:', notificationData)
+
+          const response = await fetch(
+            `${NOTIFICATION_API_URL}/notifications/publish`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getAuthToken()}`,
+              },
+              body: JSON.stringify(notificationData),
+            },
+          )
+
+          if (response.ok) {
+            console.log('✅ Demo notification created successfully!')
+            showSuccess(
+              `Demo ${type} notification created! Check the notifications section below.`,
+            )
+          } else {
+            const error = await response.json()
+            console.error('❌ Failed to create notification:', error)
+            showError(
+              `Failed to create notification: ${error.message || 'Unknown error'}`,
+            )
+          }
+        } catch (error) {
+          console.error('❌ Network error creating notification:', error)
+          showError(`Network error: ${error.message}`)
+        }
+      }
+
+      async function createRandomNotification() {
+        const types = [
+          'MESSAGE_RECEIVED',
+          'REDEMPTION_CREATED',
+          'VOUCHER_CREATED',
+          'SYSTEM_ANNOUNCEMENT',
+        ]
+        const randomType = types[Math.floor(Math.random() * types.length)]
+        await createDemoNotification(randomType)
+      }
+
+      async function createMultipleNotifications() {
+        console.log('🔥 Creating multiple demo notifications...')
+        const types = [
+          'MESSAGE_RECEIVED',
+          'REDEMPTION_CREATED',
+          'VOUCHER_CREATED',
+          'SYSTEM_ANNOUNCEMENT',
+        ]
+
+        for (let i = 0; i < types.length; i++) {
+          await createDemoNotification(types[i])
+          // Small delay between notifications
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        }
+
+        showSuccess('Created 3 demo notifications! 🎉')
+      }
+
+      function showSuccess(message) {
+        const successEl = document.createElement('div')
+        successEl.textContent = message
+        successEl.style.cssText =
+          'background-color: #d4edda; color: #155724; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #c3e6cb;'
+        document.body.insertBefore(
+          successEl,
+          document.querySelector('.container'),
+        )
+        setTimeout(() => successEl.remove(), 5000)
+      }
+
+      // Helper functions for generating random data
+      function getRandomName() {
+        const names = [
+          'Alice Johnson',
+          'Bob Smith',
+          'Carol Williams',
+          'David Brown',
+          'Emma Davis',
+          'Frank Wilson',
+        ]
+        return names[Math.floor(Math.random() * names.length)]
+      }
+
+      function getRandomService() {
+        const services = [
+          'House Cleaning',
+          'Plumbing Repair',
+          'Garden Maintenance',
+          'Pet Sitting',
+          'Tutoring',
+          'Moving Help',
+        ]
+        return services[Math.floor(Math.random() * services.length)]
+      }
+
+      function getRandomAnnouncement() {
+        const announcements = [
+          'Scheduled maintenance will occur tonight from 2-4 AM',
+          'New feature: Video calls are now available!',
+          'Holiday hours: We will be closed on December 25th',
+          'Security update: Please update your password',
+          'Welcome to our new notification system! 🎉',
+        ]
+        return announcements[Math.floor(Math.random() * announcements.length)]
+      }
+
+      function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+          /[xy]/g,
+          function (c) {
+            const r = (Math.random() * 16) | 0
+            const v = c == 'x' ? r : (r & 0x3) | 0x8
+            return v.toString(16)
+          },
+        )
+      }
+
+      // Update current user display when Firebase user changes
+      function updateCurrentUserDisplay() {
+        const displayEl = document.getElementById('currentFirebaseUserId')
+        if (displayEl) {
+          displayEl.textContent = firebaseUserId || 'Not authenticated'
+        }
+      }
+
+      // Call this when authentication state changes
+      setInterval(updateCurrentUserDisplay, 1000)
+    </script>
+  </body>
+</html>

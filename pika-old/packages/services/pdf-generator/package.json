@@ -1,0 +1,60 @@
+{
+  "name": "@pika/pdf-generator",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PDF Generator Service for Pika Platform - Monthly voucher book generation with QR codes",
+  "author": "Damian Meroni (@merodami)",
+  "type": "module",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@pika/api": "workspace:^",
+    "@pika/auth": "workspace:^",
+    "@pika/crypto": "workspace:^",
+    "@pika/database": "workspace:^",
+    "@pika/environment": "workspace:^",
+    "@pika/http": "workspace:^",
+    "@pika/redis": "workspace:^",
+    "@pika/sdk": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/tests": "workspace:^",
+    "@pika/types-core": "workspace:^",
+    "@prisma/client": "^6.10.1",
+    "aws-sdk": "^2.1692.0",
+    "close-with-grace": "^2.2.0",
+    "dotenv": "^17.0.0",
+    "fastify": "^5.4.0",
+    "fp-ts": "^2.16.10",
+    "io-ts": "^2.2.22",
+    "lodash-es": "^4.17.21",
+    "nanoid": "^5.1.5",
+    "pdfkit": "^0.17.1",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.34.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.7",
+    "@types/pdfkit": "^0.14.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/sharp": "^0.32.0",
+    "@types/supertest": "^6.0.3",
+    "io-ts-types": "^0.5.19",
+    "supertest": "^7.1.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "depcheck": {
+    "ignore": [
+      "nx",
+      "ts-node",
+      "tsconfig-paths"
+    ],
+    "parsers": {
+      "**/*.ts": "typescript"
+    },
+    "detectors": [
+      "requireCallExpression",
+      "importDeclaration",
+      "typescriptImportEqualsDeclaration"
+    ]
+  }
+}

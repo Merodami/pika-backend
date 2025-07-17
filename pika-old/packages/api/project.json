@@ -1,0 +1,42 @@
+{
+  "name": "@pika/api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "implicitDependencies": ["@pika/types-core"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "rm -rf dist && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && node --stack-trace-limit=200 --import tsx ./src/scripts/compile.ts",
+        "outputs": ["{projectRoot}/dist"],
+        "cwd": "{projectRoot}"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "tsc -p tsconfig.build.json --noEmit",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+          "tsc-alias -p tsconfig.build.json --watch"
+        ],
+        "parallel": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "open-docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "open dist/openapi.html",
+        "cwd": "{projectRoot}"
+      }
+    }
+  }
+}

@@ -43,6 +43,9 @@ export * from './schemas/support/index.js'
 // Storage
 export * from './schemas/storage/file.js'
 
+// Category
+export * from './schemas/category/index.js'
+
 // Other
 export * from './schemas/induction/index.js'
 export * from './schemas/stuff/index.js'

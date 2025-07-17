@@ -1,0 +1,23 @@
+// Provider reviews - customers review businesses/service providers
+model Review {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  providerId      String          @map("provider_id") @db.Uuid
+  customerId      String          @map("customer_id") @db.Uuid
+  rating          Int             @db.Integer // 1-5 stars
+  review          String?         @db.Text
+  response        String?         @db.Text
+  responseAt      DateTime?       @map("response_at") @db.Timestamptz(6)
+  createdAt       DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime?       @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  deletedAt         DateTime?         @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  provider        Provider @relation(fields: [providerId], references: [id])
+  customer        User            @relation("UserReviews", fields: [customerId], references: [id])
+
+  @@index([providerId])
+  @@index([customerId])
+  @@index([rating])
+  @@map("reviews")
+  @@schema("marketplace")
+}

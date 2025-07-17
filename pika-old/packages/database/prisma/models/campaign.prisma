@@ -1,0 +1,35 @@
+/// Marketing campaigns for providers
+model Campaign {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  providerId      String          @map("provider_id") @db.Uuid
+  name            Json            // JSONB for multilingual campaign names
+  description     Json            // JSONB for multilingual descriptions
+  budget          Decimal         @db.Decimal(12, 2) // Max $9,999,999,999.99
+  startDate       DateTime        @map("start_date") @db.Timestamptz(6)
+  endDate         DateTime        @map("end_date") @db.Timestamptz(6)
+  status          CampaignStatus  @default(DRAFT)
+  targetAudience  Json?           @map("target_audience") // JSONB for multilingual target audience
+  objectives      Json?           // JSONB for multilingual campaign objectives
+  active          Boolean         @default(true)
+  createdAt       DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime?       @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  deletedAt       DateTime?       @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  provider        Provider        @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  
+  // Indexes for performance
+  @@index([providerId])
+  @@index([status])
+  @@index([active])
+  @@index([startDate, endDate])
+  @@index([providerId, status])
+  @@index([providerId, active])
+  @@index([status, active])
+  @@index([status, startDate, endDate]) // For active campaign queries
+  @@index([providerId, status, active, startDate]) // For provider dashboard queries
+  @@index([endDate, status]) // For cleanup/expiration jobs
+  @@index([budget]) // For budget-based filtering
+  @@map("campaigns")
+  @@schema("marketplace")
+}

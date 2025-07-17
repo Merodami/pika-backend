@@ -1,0 +1,161 @@
+enum UserRole {
+  ADMIN
+  CUSTOMER
+  PROVIDER
+
+  @@schema("auth")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+
+  @@schema("auth")
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+
+  @@schema("payments")
+}
+
+enum PaymentType {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  CASH
+
+  @@schema("payments")
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  PAYMENT
+  STATUS_CHANGE
+
+  @@schema("audit")
+}
+
+enum VoucherState {
+  NEW
+  PUBLISHED
+  CLAIMED
+  REDEEMED
+  EXPIRED
+
+  @@schema("marketplace")
+}
+
+enum VoucherDiscountType {
+  PERCENTAGE
+  FIXED
+
+  @@schema("marketplace")
+}
+
+enum VoucherCodeType {
+  QR
+  SHORT
+  STATIC
+
+  @@schema("marketplace")
+}
+
+enum VoucherScanType {
+  CUSTOMER
+  BUSINESS
+
+  @@schema("marketplace")
+}
+
+enum VoucherScanSource {
+  CAMERA
+  GALLERY
+  LINK
+  SHARE
+
+  @@schema("marketplace")
+}
+
+enum CustomerVoucherStatus {
+  CLAIMED
+  REDEEMED
+  EXPIRED
+
+  @@schema("marketplace")
+}
+
+enum VoucherBookStatus {
+  DRAFT
+  READY_FOR_PRINT
+  PUBLISHED
+  ARCHIVED
+
+  @@schema("marketplace")
+}
+
+enum VoucherBookType {
+  MONTHLY
+  SPECIAL_EDITION
+  REGIONAL
+  SEASONAL
+  PROMOTIONAL
+
+  @@schema("marketplace")
+}
+
+enum PageLayoutType {
+  STANDARD      // 8 spaces (2x4 grid)
+  MIXED         // Mixed ad sizes
+  FULL_PAGE     // Single full-page ad
+  CUSTOM        // Custom layout
+
+  @@schema("marketplace")
+}
+
+enum AdSize {
+  SINGLE        // 1/8 page (1 space)
+  QUARTER       // 1/4 page (2 spaces)
+  HALF          // 1/2 page (4 spaces)
+  FULL          // Full page (8 spaces)
+
+  @@schema("marketplace")
+}
+
+enum ContentType {
+  VOUCHER       // Business voucher with QR code
+  IMAGE         // Static image content
+  AD            // Advertisement content
+  SPONSORED     // Sponsored content
+
+  @@schema("marketplace")
+}
+
+enum FraudCaseStatus {
+  PENDING         // Awaiting review
+  REVIEWING       // Under investigation
+  APPROVED        // Marked as legitimate
+  REJECTED        // Confirmed fraud
+  FALSE_POSITIVE  // Incorrectly flagged
+
+  @@schema("marketplace")
+}
+
+enum CampaignStatus {
+  DRAFT           // Campaign is being created
+  ACTIVE          // Campaign is running
+  PAUSED          // Campaign is temporarily stopped
+  COMPLETED       // Campaign has ended
+  CANCELLED       // Campaign was cancelled
+
+  @@schema("marketplace")
+}

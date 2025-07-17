@@ -1,0 +1,17 @@
+{
+  "name": "@pika/sdk",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@pika/environment": "workspace:^",
+    "@pika/types-core": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "openapi-typescript-codegen": "^0.29.0",
+    "typescript": "^5.8.3"
+  }
+}

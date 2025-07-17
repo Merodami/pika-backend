@@ -1,0 +1,53 @@
+{
+  "name": "@pika/provider",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Provider Service for Pika Platform - Manages retailers who create and redeem vouchers",
+  "author": "Damian Meroni (@merodami)",
+  "type": "module",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@fastify/multipart": "^9.0.3",
+    "@pika/api": "workspace:^",
+    "@pika/auth": "workspace:^",
+    "@pika/database": "workspace:^",
+    "@pika/environment": "workspace:^",
+    "@pika/http": "workspace:^",
+    "@pika/redis": "workspace:^",
+    "@pika/sdk": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/tests": "workspace:^",
+    "@pika/types-core": "workspace:^",
+    "@prisma/client": "^6.10.1",
+    "close-with-grace": "^2.2.0",
+    "dotenv": "^17.0.0",
+    "fastify": "^5.4.0",
+    "fp-ts": "^2.16.10",
+    "io-ts": "^2.2.22",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.7",
+    "@types/supertest": "^6.0.3",
+    "he": "^1.2.0",
+    "io-ts-types": "^0.5.19",
+    "supertest": "^7.1.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "depcheck": {
+    "ignore": [
+      "nx",
+      "ts-node",
+      "tsconfig-paths"
+    ],
+    "parsers": {
+      "**/*.ts": "typescript"
+    },
+    "detectors": [
+      "requireCallExpression",
+      "importDeclaration",
+      "typescriptImportEqualsDeclaration"
+    ]
+  }
+}

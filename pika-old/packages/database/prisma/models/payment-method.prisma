@@ -1,0 +1,22 @@
+// Payment methods
+model PaymentMethod {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String          @map("user_id") @db.Uuid
+  paymentType     PaymentType
+  cardBrand       String?         @map("card_brand") @db.VarChar(50)
+  lastFour        String?         @map("last_four") @db.VarChar(4)
+  expiryMonth     Int?            @map("expiry_month") @db.SmallInt
+  expiryYear      Int?            @map("expiry_year") @db.SmallInt
+  isDefault       Boolean         @default(false) @map("is_default")
+  createdAt       DateTime?        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime?        @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  deletedAt       DateTime?        @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  user            User            @relation(fields: [userId], references: [id])
+  payments        Payment[]
+
+  @@index([userId])
+  @@map("payment_methods")
+  @@schema("payments")
+}

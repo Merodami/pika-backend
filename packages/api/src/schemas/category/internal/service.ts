@@ -1,0 +1,160 @@
+import { z } from 'zod'
+
+import { UUID } from '../../shared/primitives.js'
+import { openapi } from '../../../common/utils/openapi.js'
+
+/**
+ * Internal category service schemas for service-to-service communication
+ */
+
+// ============= Category Data for Services =============
+
+/**
+ * Internal category data (minimal fields for service consumption)
+ */
+export const InternalCategoryData = openapi(
+  z.object({
+    id: UUID,
+    nameKey: z.string(),
+    descriptionKey: z.string().optional(),
+    icon: z.string().optional(),
+    parentId: UUID.optional(),
+    isActive: z.boolean(),
+    sortOrder: z.number().int(),
+  }),
+  {
+    description: 'Internal category data for services',
+  },
+)
+
+export type InternalCategoryData = z.infer<typeof InternalCategoryData>
+
+// ============= Query Parameters =============
+
+/**
+ * Internal category query parameters
+ */
+export const InternalCategoryQueryParams = z.object({
+  isActive: z.boolean().optional(),
+})
+
+export type InternalCategoryQueryParams = z.infer<typeof InternalCategoryQueryParams>
+
+// ============= Get Categories by IDs =============
+
+/**
+ * Bulk get categories request
+ */
+export const BulkCategoryRequest = openapi(
+  z.object({
+    categoryIds: z.array(UUID).min(1).max(100),
+  }),
+  {
+    description: 'Get multiple categories by IDs',
+  },
+)
+
+export type BulkCategoryRequest = z.infer<typeof BulkCategoryRequest>
+
+/**
+ * Bulk get categories response
+ */
+export const BulkCategoryResponse = openapi(
+  z.object({
+    categories: z.array(InternalCategoryData),
+    notFound: z.array(UUID).optional(),
+  }),
+  {
+    description: 'Categories data with not found IDs',
+  },
+)
+
+export type BulkCategoryResponse = z.infer<typeof BulkCategoryResponse>
+
+// ============= Validate Categories =============
+
+/**
+ * Validate categories request
+ */
+export const ValidateCategoryRequest = openapi(
+  z.object({
+    categoryIds: z.array(UUID).min(1).max(100),
+    checkActive: z.boolean().default(true),
+  }),
+  {
+    description: 'Validate categories exist and optionally check if active',
+  },
+)
+
+export type ValidateCategoryRequest = z.infer<typeof ValidateCategoryRequest>
+
+/**
+ * Validate categories response
+ */
+export const ValidateCategoryResponse = openapi(
+  z.object({
+    valid: z.array(UUID),
+    invalid: z.array(
+      z.object({
+        id: UUID,
+        reason: z.string(),
+      }),
+    ),
+  }),
+  {
+    description: 'Validation results for categories',
+  },
+)
+
+export type ValidateCategoryResponse = z.infer<typeof ValidateCategoryResponse>
+
+// ============= Category Hierarchy =============
+
+/**
+ * Get category hierarchy response
+ */
+export const InternalCategoryHierarchyResponse = openapi(
+  z.object({
+    data: z.array(InternalCategoryData),
+  }),
+  {
+    description: 'Category hierarchy for internal use',
+  },
+)
+
+export type InternalCategoryHierarchyResponse = z.infer<
+  typeof InternalCategoryHierarchyResponse
+>
+
+// ============= Check Category Exists =============
+
+/**
+ * Check category exists request
+ */
+export const CheckCategoryExistsRequest = openapi(
+  z.object({
+    categoryId: UUID,
+  }),
+  {
+    description: 'Check if category exists and is active',
+  },
+)
+
+export type CheckCategoryExistsRequest = z.infer<typeof CheckCategoryExistsRequest>
+
+/**
+ * Check category exists response
+ */
+export const CheckCategoryExistsResponse = openapi(
+  z.object({
+    exists: z.boolean(),
+    isActive: z.boolean().optional(),
+    category: InternalCategoryData.optional(),
+  }),
+  {
+    description: 'Category existence check result',
+  },
+)
+
+export type CheckCategoryExistsResponse = z.infer<typeof CheckCategoryExistsResponse>
+

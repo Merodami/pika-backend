@@ -1,0 +1,30 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true,
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "baseUrl": ".",
+    "paths": {
+      "@notification-read/*": ["src/read/*"],
+      "@notification-write/*": ["src/write/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/test/**", "**/*.spec.ts"],
+  "references": [
+    {
+      "path": "../../types"
+    },
+    {
+      "path": "../../shared"
+    },
+    {
+      "path": "../../http"
+    },
+    {
+      "path": "../../environment"
+    }
+  ]
+}

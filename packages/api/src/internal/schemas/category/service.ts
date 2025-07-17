@@ -91,13 +91,3 @@ export const CheckCategoryExistsResponse = openapi(
 
 export type CheckCategoryExistsResponse = z.infer<typeof CheckCategoryExistsResponse>
 
-// ============= Parameters =============
-
-/**
- * Category ID parameter
- */
-export const CategoryIdParam = z.object({
-  id: UUID,
-})
-
-export type CategoryIdParam = z.infer<typeof CategoryIdParam>

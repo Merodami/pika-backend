@@ -1,0 +1,66 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "@pika/messaging",
+  "sourceRoot": "packages/services/messaging/src",
+  "projectType": "library",
+  "targets": {
+    "local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx --watch ./src/index.ts",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.json",
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --coverage",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --config vitest.e2e.config.ts",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:e2e:watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest --config vitest.e2e.config.ts",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit",
+        "cwd": "{projectRoot}"
+      }
+    }
+  },
+  "tags": ["scope:backend", "type:service"]
+}

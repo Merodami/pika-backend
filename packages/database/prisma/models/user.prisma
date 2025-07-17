@@ -9,7 +9,7 @@ model User {
   phoneNumber       String?           @map("phone_number") @db.VarChar(50)
   phoneVerified     Boolean           @default(false) @map("phone_verified")
   avatarUrl         String?           @map("avatar_url") @db.VarChar(1000)
-  role              UserRole          @default(USER)
+  role              UserRole          @default(CUSTOMER)
   status            UserStatus        @default(ACTIVE)
   lastLoginAt       DateTime?         @map("last_login_at") @db.Timestamptz(6)
   createdAt         DateTime?         @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -44,6 +44,17 @@ model User {
   // Support relations
   supportComments   SupportComment[]
   assignedProblems  Problem[]         @relation("AssignedProblems")
+  
+  // Business relations
+  business          Business?
+  
+  // PDF relations
+  createdVoucherBooks   VoucherBook[]     @relation("VoucherBookCreatedBy")
+  updatedVoucherBooks   VoucherBook[]     @relation("VoucherBookUpdatedBy")
+  createdAdPlacements   AdPlacement[]     @relation("AdPlacementCreatedBy")
+  updatedAdPlacements   AdPlacement[]     @relation("AdPlacementUpdatedBy")
+  createdDistributions  BookDistribution[] @relation("BookDistributionCreatedBy")
+  updatedDistributions  BookDistribution[] @relation("BookDistributionUpdatedBy")
 
   @@index([email])
   @@index([phoneNumber])

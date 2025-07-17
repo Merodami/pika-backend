@@ -1,0 +1,25 @@
+import { resolve } from 'path'
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  test: {
+    globals: true,
+    environment: 'node',
+    env: {
+      ...process.env,
+    },
+    setupFiles: ['../../tests/src/utils/setupTests.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: ['node_modules/', 'dist/', '**/*.spec.ts', '**/*.test.ts'],
+    },
+  },
+  resolve: {
+    alias: {
+      '@notification-read': resolve(__dirname, './src/read'),
+      '@notification-write': resolve(__dirname, './src/write'),
+      '@tests': resolve(__dirname, '../../tests/src'),
+    },
+  },
+})

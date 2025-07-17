@@ -1,0 +1,72 @@
+{
+  "name": "@pika/redemption",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Redemption Service for Pika Platform",
+  "author": "Damian Meroni (@merodami)",
+  "type": "module",
+  "main": "dist/index.js",
+  "dependencies": {
+    "@fastify/multipart": "^9.0.3",
+    "@noble/curves": "^1.9.2",
+    "@pika/api": "workspace:^",
+    "@pika/auth": "workspace:^",
+    "@pika/crypto": "workspace:^",
+    "@pika/database": "workspace:^",
+    "@pika/environment": "workspace:^",
+    "@pika/http": "workspace:^",
+    "@pika/redis": "workspace:^",
+    "@pika/sdk": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/tests": "workspace:^",
+    "@pika/types-core": "workspace:^",
+    "@prisma/client": "^6.10.1",
+    "close-with-grace": "^2.2.0",
+    "dotenv": "^17.0.0",
+    "fastify": "^5.4.0",
+    "fp-ts": "^2.16.10",
+    "io-ts": "^2.2.22",
+    "jsonwebtoken": "^9.0.2",
+    "lodash-es": "^4.17.21",
+    "nanoid": "^5.1.5",
+    "qrcode": "^1.5.4"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "prebuild": "yarn clean",
+    "local": "tsx --watch src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:unit": "vitest run src/test/unit",
+    "test:integration": "vitest run src/test/integration"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.7",
+    "@types/qrcode": "^1.5.5",
+    "@types/supertest": "^6.0.3",
+    "he": "^1.2.0",
+    "io-ts-types": "^0.5.19",
+    "supertest": "^7.1.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "depcheck": {
+    "ignore": [
+      "nx",
+      "ts-node",
+      "tsconfig-paths"
+    ],
+    "parsers": {
+      "**/*.ts": "typescript"
+    },
+    "detectors": [
+      "requireCallExpression",
+      "importDeclaration",
+      "typescriptImportEqualsDeclaration"
+    ]
+  }
+}

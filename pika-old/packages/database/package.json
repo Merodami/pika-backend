@@ -1,0 +1,27 @@
+{
+  "name": "@pika/database",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Database service for Book Library Tool",
+  "author": "Damian Meroni (@merodami)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@pika/environment": "workspace:^",
+    "@pika/sdk": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/types-core": "workspace:^",
+    "@prisma/client": "^6.10.1",
+    "he": "^1.2.0",
+    "lodash-es": "^4.17.21",
+    "pg": "^8.16.3",
+    "prisma": "^6.10.1"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.8.0",
+    "@types/he": "^1.2.3",
+    "@types/pg": "^8.15.4",
+    "typescript": "^5.8.3"
+  }
+}

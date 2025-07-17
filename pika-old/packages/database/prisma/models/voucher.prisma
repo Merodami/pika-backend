@@ -1,0 +1,90 @@
+/// Vouchers for promotional discounts
+model Voucher {
+  id                     String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  providerId             String              @map("provider_id") @db.Uuid
+  categoryId             String              @map("category_id") @db.Uuid
+  state                  VoucherState        @default(NEW)
+  title                  Json                // JSONB for multilingual titles
+  description            Json                // JSONB for multilingual descriptions
+  terms                  Json                // JSONB for multilingual terms and conditions
+  discountType           VoucherDiscountType @map("discount_type")
+  discountValue          Decimal             @map("discount_value") @db.Decimal(10, 2)
+  currency               String              @default("PYG") @db.VarChar(3)
+  location               Unsupported("geography(Point, 4326)")? // PostGIS location for geospatial queries
+  imageUrl               String?             @map("image_url") @db.VarChar(500)
+  validFrom              DateTime            @map("valid_from") @db.Timestamptz(6)
+  expiresAt              DateTime            @map("expires_at") @db.Timestamptz(6)
+  maxRedemptions         Int?                @map("max_redemptions")
+  maxRedemptionsPerUser  Int                 @default(1) @map("max_redemptions_per_user")
+  currentRedemptions     Int                 @default(0) @map("current_redemptions")
+  scanCount              Int                 @default(0) @map("scan_count") // Track total scans
+  claimCount             Int                 @default(0) @map("claim_count") // Track total claims
+  metadata               Json?               // Additional voucher metadata
+  createdAt              DateTime?           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime?           @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  deletedAt              DateTime?           @map("deleted_at") @db.Timestamptz(6)
+
+  // Relations
+  provider               Provider     @relation(fields: [providerId], references: [id])
+  category               Category            @relation(fields: [categoryId], references: [id])
+  codes                  VoucherCode[]
+  redemptions            VoucherRedemption[]
+  scans                  VoucherScan[]
+  customerVouchers       CustomerVoucher[]
+  adPlacements           AdPlacement[]
+  fraudCases             FraudCase[]
+
+  @@index([providerId])
+  @@index([categoryId])
+  @@index([state])
+  @@index([discountType])
+  @@index([validFrom, expiresAt])
+  @@index([location], type: Gist) // Spatial index for PostGIS
+  @@index([state, expiresAt])
+  @@map("vouchers")
+  @@schema("marketplace")
+}
+
+/// Voucher codes (QR, short codes, static codes)
+model VoucherCode {
+  id         String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  voucherId  String          @map("voucher_id") @db.Uuid
+  code       String          @unique @db.VarChar(500) // Large enough for JWT tokens
+  type       VoucherCodeType
+  isActive   Boolean         @default(true) @map("is_active")
+  metadata   Json?           // Additional code metadata (algorithm, etc.)
+  createdAt  DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime?       @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+
+  // Relations
+  voucher    Voucher         @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+
+  @@index([voucherId])
+  @@index([code])
+  @@index([type, isActive])
+  @@map("voucher_codes")
+  @@schema("marketplace")
+}
+
+/// Voucher redemption tracking
+model VoucherRedemption {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  voucherId  String    @map("voucher_id") @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  codeUsed   String    @map("code_used") @db.VarChar(500)
+  redeemedAt DateTime  @map("redeemed_at") @db.Timestamptz(6)
+  metadata   Json?     // Additional redemption metadata
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  voucher    Voucher   @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id])
+  fraudCase  FraudCase?
+
+  @@unique([voucherId, userId]) // One redemption per user per voucher
+  @@index([voucherId])
+  @@index([userId])
+  @@index([redeemedAt])
+  @@map("voucher_redemptions")
+  @@schema("marketplace")
+}

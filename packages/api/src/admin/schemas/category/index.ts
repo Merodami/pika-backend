@@ -2,4 +2,5 @@
  * Admin category management schemas
  */
 
-export * from './management.js'
+// Re-export from new location for backward compatibility
+export * from '../../../schemas/category/admin/management.js'

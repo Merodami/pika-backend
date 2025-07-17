@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { UserId } from '../../../common/schemas/branded.js'
 import { CategorySortBy, SortOrder } from '../../../common/schemas/enums.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
+import { SearchParams } from '../../../common/schemas/pagination.js'
 import { UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
@@ -119,19 +120,15 @@ export type UpdateCategoryRequest = z.infer<typeof UpdateCategoryRequest>
 /**
  * Admin category search/filter parameters
  */
-export const AdminCategorySearchParams = z.object({
-  search: z.string().optional().describe('Search in category name/description'),
+export const AdminCategoryQueryParams = SearchParams.extend({
   parentId: UUID.optional().describe('Filter by parent category'),
   isActive: z.boolean().optional().describe('Filter by active status'),
   createdBy: UserId.optional().describe('Filter by creator'),
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(20),
-  sortBy: CategorySortBy.default('SORT_ORDER'),
-  sortOrder: SortOrder.default('ASC'),
+  sortBy: CategorySortBy.default('sortOrder'),
 })
 
-export type AdminCategorySearchParams = z.infer<
-  typeof AdminCategorySearchParams
+export type AdminCategoryQueryParams = z.infer<
+  typeof AdminCategoryQueryParams
 >
 
 // ============= Response Types =============
@@ -248,13 +245,3 @@ export type BulkCategoryOperationResponse = z.infer<
   typeof BulkCategoryOperationResponse
 >
 
-// ============= Parameters =============
-
-/**
- * Category ID parameter
- */
-export const CategoryIdParam = z.object({
-  id: UUID.describe('Category ID'),
-})
-
-export type CategoryIdParam = z.infer<typeof CategoryIdParam>

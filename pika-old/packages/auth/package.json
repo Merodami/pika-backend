@@ -1,0 +1,24 @@
+{
+  "name": "@pika/auth",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@pika/crypto": "workspace:^",
+    "@pika/environment": "workspace:^",
+    "@pika/redis": "workspace:^",
+    "@pika/sdk": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/types-core": "workspace:^",
+    "@prisma/client": "^6.10.1",
+    "@types/bcrypt": "^5.0.2",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,72 @@
+// Fraud detection and management models
+
+/// Fraud detection cases for redemption monitoring
+model FraudCase {
+  id                String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  caseNumber        String               @unique @map("case_number") @db.VarChar(20) // FRAUD-2024-0001
+  redemptionId      String               @unique @map("redemption_id") @db.Uuid
+  detectedAt        DateTime             @map("detected_at") @db.Timestamptz(6)
+  
+  // Detection details
+  riskScore         Int                  @map("risk_score") @db.Integer // 0-100
+  flags             Json                 // Array of detected fraud flags
+  detectionMetadata Json?                @map("detection_metadata") // Additional context
+  
+  // Entities involved
+  customerId        String               @map("customer_id") @db.Uuid
+  providerId        String               @map("provider_id") @db.Uuid
+  voucherId         String               @map("voucher_id") @db.Uuid
+  
+  // Review status
+  status            FraudCaseStatus      @default(PENDING)
+  
+  // Review details
+  reviewedAt        DateTime?            @map("reviewed_at") @db.Timestamptz(6)
+  reviewedBy        String?              @map("reviewed_by") @db.Uuid
+  reviewNotes       String?              @map("review_notes") @db.Text
+  
+  // Actions taken
+  actionsTaken      Json?                @map("actions_taken") // Array of actions
+  
+  // Timestamps
+  createdAt         DateTime?            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime?            @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  
+  // Relations
+  redemption        VoucherRedemption    @relation(fields: [redemptionId], references: [id])
+  customer          User                 @relation("FraudCaseCustomer", fields: [customerId], references: [id])
+  provider          Provider             @relation(fields: [providerId], references: [id])
+  voucher           Voucher              @relation(fields: [voucherId], references: [id])
+  reviewer          User?                @relation("FraudCaseReviewer", fields: [reviewedBy], references: [id])
+  history           FraudCaseHistory[]
+  
+  @@index([status])
+  @@index([customerId])
+  @@index([providerId])
+  @@index([detectedAt])
+  @@index([riskScore])
+  @@map("fraud_cases")
+  @@schema("marketplace")
+}
+
+/// Audit trail for fraud case actions
+model FraudCaseHistory {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fraudCaseId     String           @map("fraud_case_id") @db.Uuid
+  action          String           @db.VarChar(50) // status_change, note_added, action_taken
+  previousStatus  FraudCaseStatus? @map("previous_status")
+  newStatus       FraudCaseStatus? @map("new_status")
+  performedBy     String           @map("performed_by") @db.Uuid
+  notes           String?          @db.Text
+  metadata        Json?            // Additional action metadata
+  createdAt       DateTime?        @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  // Relations
+  fraudCase       FraudCase        @relation(fields: [fraudCaseId], references: [id], onDelete: Cascade)
+  performer       User             @relation(fields: [performedBy], references: [id])
+  
+  @@index([fraudCaseId])
+  @@index([createdAt])
+  @@map("fraud_case_history")
+  @@schema("marketplace")
+}

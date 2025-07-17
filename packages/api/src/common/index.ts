@@ -7,3 +7,4 @@ export * from './utils/validators.js'
 
 // Schemas
 export * from './schemas/query.js'
+export * from './schemas/parameters.js'

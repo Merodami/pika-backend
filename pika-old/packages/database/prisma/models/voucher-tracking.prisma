@@ -1,0 +1,49 @@
+/// Voucher scan tracking for analytics
+model VoucherScan {
+  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  voucherId   String            @map("voucher_id") @db.Uuid
+  userId      String?           @map("user_id") @db.Uuid
+  scanType    VoucherScanType   @map("scan_type")
+  scanSource  VoucherScanSource @map("scan_source")
+  location    Unsupported("geography(Point, 4326)")? // PostGIS location for geospatial analytics
+  deviceInfo  Json              @default("{}") @map("device_info") // Platform, version, model, etc.
+  scannedAt   DateTime          @map("scanned_at") @db.Timestamptz(6)
+  createdAt   DateTime?         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  voucher     Voucher   @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([voucherId])
+  @@index([userId])
+  @@index([scanType])
+  @@index([scannedAt])
+  @@index([location], type: Gist) // Spatial index for location-based analytics
+  @@map("voucher_scans")
+  @@schema("marketplace")
+}
+
+/// Customer voucher wallet - tracks claimed vouchers before redemption
+model CustomerVoucher {
+  id                      String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId              String                @map("customer_id") @db.Uuid
+  voucherId               String                @map("voucher_id") @db.Uuid
+  claimedAt               DateTime              @map("claimed_at") @db.Timestamptz(6)
+  status                  CustomerVoucherStatus @default(CLAIMED) @map("status")
+  notificationPreferences Json?                 @map("notification_preferences") // Reminder settings
+  redeemedAt              DateTime?             @map("redeemed_at") @db.Timestamptz(6)
+  createdAt               DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime?             @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+
+  // Relations
+  customer                User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  voucher                 Voucher   @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, voucherId]) // One claim per customer per voucher
+  @@index([customerId])
+  @@index([voucherId])
+  @@index([status])
+  @@index([claimedAt])
+  @@map("customer_vouchers")
+  @@schema("marketplace")
+}

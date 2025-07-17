@@ -1,0 +1,18 @@
+// Provider availability
+model Availability {
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  providerId          String          @map("provider_id") @db.Uuid
+  dayOfWeek           Int             @map("day_of_week") // 0-6 for Sun-Sat
+  startTime           String          @map("start_time") // Format HH:MM
+  endTime             String          @map("end_time") // Format HH:MM
+  createdAt           DateTime?          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime?          @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  deletedAt           DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  // Relations
+  provider            Provider @relation(fields: [providerId], references: [id])
+
+  @@unique([providerId, dayOfWeek, startTime, endTime])
+  @@index([providerId, dayOfWeek])
+  @@map("availability")
+  @@schema("marketplace")
+}

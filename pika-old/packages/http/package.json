@@ -1,0 +1,32 @@
+{
+  "name": "@pika/http",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@fastify/accepts": "^5.0.2",
+    "@fastify/cors": "^11.0.1",
+    "@fastify/helmet": "^13.0.1",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/type-provider-typebox": "^5.1.0",
+    "@pika/api": "workspace:^",
+    "@pika/auth": "workspace:^",
+    "@pika/redis": "workspace:^",
+    "@pika/shared": "workspace:^",
+    "@pika/types-core": "workspace:^",
+    "@sinclair/typebox": "^0.34.37",
+    "@types/lodash-es": "^4.17.12",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "ajv-i18n": "^4.2.0",
+    "close-with-grace": "^2.2.0",
+    "fastify": "^5.4.0",
+    "fastify-plugin": "^5.0.1",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
