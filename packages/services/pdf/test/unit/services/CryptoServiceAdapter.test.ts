@@ -1,8 +1,5 @@
-import { CryptoServiceAdapter } from '@pdf-write/infrastructure/services/CryptoServiceAdapter.js'
+import { CryptoServiceAdapter } from '@pdf/services/CryptoServiceAdapter.js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-// Use real crypto package instead of mocking
-vi.unmock('@pika/crypto')
 
 // Use real environment variables from .env.test
 

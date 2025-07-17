@@ -4,9 +4,14 @@ import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { SubscriptionPlan } from './subscriptionPlan.js'
-import { SubscriptionStatusEnum } from '../common/index.js'
+import {
+  SubscriptionStatus,
+  BillingInterval,
+  SubscriptionSortBy,
+} from '../common/enums.js'
 
 /**
  * Subscription schemas for public API
@@ -25,7 +30,7 @@ export const Subscription = openapi(
     userId: UserId,
     planId: UUID.optional(),
     planType: z.string().describe('Plan type (for backward compatibility)'),
-    status: SubscriptionStatusEnum,
+    status: SubscriptionStatus,
     billingInterval: z
       .string()
       .describe('Billing interval (for backward compatibility)'),

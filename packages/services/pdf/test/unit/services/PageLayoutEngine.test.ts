@@ -1,4 +1,4 @@
-import { PageLayoutEngine } from '@pdf-write/infrastructure/services/PageLayoutEngine.js'
+import { PageLayoutEngine } from '@pdf/services/PageLayoutEngine.js'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 describe('PageLayoutEngine', () => {

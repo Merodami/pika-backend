@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { UUID } from '@pika/api/common'
+
+import { UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**
@@ -8,20 +9,20 @@ import { openapi } from '../../../common/utils/openapi.js'
 
 export const PlanIdParam = openapi(
   z.object({
-    id: UUID,
+    id: UUID.describe('Subscription plan ID'),
   }),
   {
-    description: 'Subscription plan ID path parameter',
+    description: 'Subscription plan ID parameter',
   },
 )
 export type PlanIdParam = z.infer<typeof PlanIdParam>
 
 export const SubscriptionIdParam = openapi(
   z.object({
-    id: UUID,
+    id: UUID.describe('Subscription ID'),
   }),
   {
-    description: 'Subscription ID path parameter',
+    description: 'Subscription ID parameter',
   },
 )
 export type SubscriptionIdParam = z.infer<typeof SubscriptionIdParam>

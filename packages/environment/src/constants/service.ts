@@ -193,6 +193,27 @@ export const CATEGORY_SERVICE_HOST = getEnvVariable(
   '0.0.0.0',
 )
 
+// Translation service name
+export const TRANSLATION_SERVICE_NAME = getEnvVariable(
+  'TRANSLATION_SERVICE_NAME',
+  String,
+  'translation_service',
+)
+
+// Translation service port
+export const TRANSLATION_SERVICE_PORT = getEnvVariable(
+  'TRANSLATION_SERVICE_PORT',
+  parseNumber,
+  5520,
+)
+
+// Translation service host
+export const TRANSLATION_SERVICE_HOST = getEnvVariable(
+  'TRANSLATION_SERVICE_HOST',
+  String,
+  '0.0.0.0',
+)
+
 // Translation service configuration
 export const DEFAULT_LANGUAGE = getEnvVariable('DEFAULT_LANGUAGE', String, 'es')
 

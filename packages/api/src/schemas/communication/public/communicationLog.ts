@@ -175,7 +175,7 @@ export type TrackCommunicationEventRequest = z.infer<
 /**
  * Communication log search parameters
  */
-export const CommunicationLogSearchParams = z.object({
+export const CommunicationLogSearchParams = SearchParams.merge(DateRangeParams).extend({
   channel: CommunicationChannel.optional(),
   direction: CommunicationDirection.optional(),
   status: CommunicationStatus.optional(),
@@ -187,13 +187,9 @@ export const CommunicationLogSearchParams = z.object({
   referenceType: z.string().optional(),
   provider: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  fromDate: DateTime.optional(),
-  toDate: DateTime.optional(),
   hasOpened: z.boolean().optional(),
   hasClicked: z.boolean().optional(),
   hasFailed: z.boolean().optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
   sortBy: CommunicationLogSortBy.default('createdAt'),
 })
 

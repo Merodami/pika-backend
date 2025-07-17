@@ -4,7 +4,7 @@
 export * from './auth/index.js'
 
 // User service operations
-export * from './user/index.js'
+export * from '../../schemas/user/internal/index.js'
 
 // Payment service operations
 export * from './payment/index.js'

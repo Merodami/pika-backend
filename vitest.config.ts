@@ -52,12 +52,14 @@ export default defineConfig({
         './packages/services/file-storage/src',
       ),
       '@pikaocial': resolve(__dirname, './packages/services/social/src'),
+      '@pikapdf': resolve(__dirname, './packages/services/pdf/src'),
       // Service-specific aliases
       '@subscription': resolve(
         __dirname,
         './packages/services/subscription/src',
       ),
       '@social': resolve(__dirname, './packages/services/social/src'),
+      '@pdf': resolve(__dirname, './packages/services/pdf/src'),
     },
   },
   test: {

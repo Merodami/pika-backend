@@ -6,6 +6,16 @@ import {
 } from '../../../common/schemas/branded.js'
 import { DateTime, UUID } from '../../../common/schemas/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  NotificationCategory,
+  NotificationPriority,
+  NotificationType,
+  TemplateKey,
+  EmailStatus,
+  MessageType,
+  DevicePlatform,
+  InAppNotificationType,
+} from '../common/enums.js'
 
 /**
  * Internal communication service schemas for service-to-service communication
@@ -25,12 +35,12 @@ export const SendSystemNotificationRequest = openapi(
     // Content
     title: z.string().max(255),
     message: z.string(),
-    category: z.enum(['SYSTEM', 'SECURITY', 'BILLING', 'MARKETING']),
-    priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).default('NORMAL'),
+    category: NotificationCategory,
+    priority: NotificationPriority.default('normal'),
 
     // Channels
     channels: z
-      .array(z.enum(['IN_APP', 'EMAIL', 'PUSH', 'SMS']))
+      .array(NotificationType)
       .default(['IN_APP']),
 
     // Template
@@ -83,18 +93,7 @@ export type SendSystemNotificationResponse = z.infer<
 export const SendTransactionalEmailRequest = openapi(
   z.object({
     userId: UserId,
-    templateKey: z.enum([
-      'WELCOME',
-      'EMAIL_VERIFICATION',
-      'PASSWORD_RESET',
-      'PASSWORD_RESET_CONFIRMATION',
-      'PASSWORD_CHANGE_CONFIRMATION',
-      'PAYMENT_SUCCESS',
-      'PAYMENT_FAILED',
-      'SUBSCRIPTION_ACTIVATED',
-      'SUBSCRIPTION_EXPIRING',
-      'SUBSCRIPTION_EXPIRED',
-    ]),
+    templateKey: TemplateKey,
     variables: z.record(z.any()),
 
     // Override options
@@ -130,7 +129,7 @@ export type SendTransactionalEmailRequest = z.infer<
 export const SendTransactionalEmailResponse = openapi(
   z.object({
     messageId: z.string(),
-    status: z.enum(['QUEUED', 'SENT', 'FAILED']),
+    status: EmailStatus,
     scheduledAt: DateTime.optional(),
     errorMessage: z.string().optional(),
   }),
@@ -153,7 +152,7 @@ export const SendSMSRequest = openapi(
     userId: UserId,
     phoneNumber: z.string().optional().describe('Override user phone'),
     message: z.string().max(160),
-    type: z.enum(['VERIFICATION', 'ALERT', 'REMINDER', 'MARKETING']),
+    type: MessageType,
     metadata: z.record(z.any()).optional(),
   }),
   {
@@ -205,7 +204,7 @@ export const SendPushNotificationRequest = openapi(
     color: z.string().optional(),
 
     // Options
-    priority: z.enum(['NORMAL', 'HIGH']).default('NORMAL'),
+    priority: NotificationPriority.default('normal'),
     ttl: z
       .number()
       .int()
@@ -283,7 +282,7 @@ export const UserCommunicationPreferencesResponse = openapi(
       tokens: z.array(
         z.object({
           token: z.string(),
-          platform: z.enum(['IOS', 'ANDROID', 'WEB']),
+          platform: DevicePlatform,
           active: z.boolean(),
         }),
       ),
@@ -400,7 +399,7 @@ export const CreateNotificationRequest = openapi(
     userId: UserId,
     title: z.string(),
     content: z.string(),
-    type: z.enum(['info', 'warning', 'error', 'success']),
+    type: InAppNotificationType,
     metadata: z.record(z.any()).optional(),
   }),
   {

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import type { SimpleZodRegistry } from '../../common/registry/simple.js'
+import * as pdfParameters from '../../common/schemas/pdf/parameters.js'
 import {
   ErrorResponse,
   MessageResponse,
@@ -22,6 +23,7 @@ import * as userParqSchemas from '../../public/schemas/user/parq.js'
 import * as userPaymentMethodSchemas from '../../public/schemas/user/paymentMethod.js'
 import * as userProfessionalSchemas from '../../public/schemas/user/professional.js'
 import * as userProfileSchemas from '../../public/schemas/user/profile.js'
+import * as pdfVoucherBookSchemas from '../../public/schemas/pdf/voucher-book.js'
 
 /**
  * Register all public API schemas and routes
@@ -360,6 +362,31 @@ export function registerPublicAPI(registry: SimpleZodRegistry): void {
     'UpdateProfessionalProfileRequest',
     userProfessionalSchemas.UpdateProfessionalProfileRequest,
   )
+
+  // ============= PDF/Voucher Book Schemas =============
+  registry.registerSchema(
+    'VoucherBookResponse',
+    pdfVoucherBookSchemas.VoucherBookResponse,
+  )
+  registry.registerSchema(
+    'VoucherBookListResponse',
+    pdfVoucherBookSchemas.VoucherBookListResponse,
+  )
+  registry.registerSchema(
+    'VoucherBookDetailResponse',
+    pdfVoucherBookSchemas.VoucherBookDetailResponse,
+  )
+  registry.registerSchema(
+    'VoucherBookQueryParams',
+    pdfVoucherBookSchemas.VoucherBookQueryParams,
+  )
+  registry.registerSchema(
+    'PdfDownloadResponse',
+    pdfVoucherBookSchemas.PdfDownloadResponse,
+  )
+  
+  // PDF parameter schemas
+  registry.registerSchema('VoucherBookIdParam', pdfParameters.VoucherBookIdParam)
 
   // ============= Register Routes =============
   registerPublicRoutes(registry)
@@ -1707,6 +1734,87 @@ function registerPublicRoutes(registry: SimpleZodRegistry): void {
     responses: {
       204: {
         description: 'Comment deleted successfully',
+      },
+    },
+  })
+
+  // ============= PDF/Voucher Book Public Routes =============
+  
+  // Get all voucher books (public, read-only)
+  registry.registerRoute({
+    method: 'get',
+    path: '/voucher-books',
+    summary: 'List all published voucher books',
+    tags: ['PDF'],
+    request: {
+      query: pdfVoucherBookSchemas.VoucherBookQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of voucher books',
+        content: {
+          'application/json': {
+            schema: pdfVoucherBookSchemas.VoucherBookListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher book by ID (public, read-only)
+  registry.registerRoute({
+    method: 'get',
+    path: '/voucher-books/{id}',
+    summary: 'Get voucher book details',
+    tags: ['PDF'],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+    },
+    responses: {
+      200: {
+        description: 'Voucher book details',
+        content: {
+          'application/json': {
+            schema: pdfVoucherBookSchemas.VoucherBookDetailResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Download PDF (public, read-only)
+  registry.registerRoute({
+    method: 'get',
+    path: '/voucher-books/{id}/download',
+    summary: 'Download voucher book PDF',
+    tags: ['PDF'],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+    },
+    responses: {
+      200: {
+        description: 'PDF download information',
+        content: {
+          'application/json': {
+            schema: pdfVoucherBookSchemas.PdfDownloadResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found or PDF not available',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
       },
     },
   })

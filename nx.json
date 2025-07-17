@@ -3,7 +3,7 @@
   "tui": {
     "enabled": false
   },
-  "workspaceIgnore": ["previous-architecture", "ai", "pika"],
+  "workspaceIgnore": ["previous-architecture", "ai", "pika", "pika-old"],
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",

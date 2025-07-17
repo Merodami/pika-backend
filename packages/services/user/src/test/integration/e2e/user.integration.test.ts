@@ -2,28 +2,24 @@ import { vi } from 'vitest'
 
 // Unmock modules that might interfere with real server setup for integration tests
 vi.unmock('@pika/http') // Ensures real createExpressServer is used
-vi.unmock('@pika // Ensures real schemas from @p@p@p@pikad
-vi.unmock('@pika') // Ensures real cache decorators from @p@p@p@pikased
+vi.unmock('@pika/api') // Ensures real schemas from @pika/api are used
+vi.unmock('@pika/redis') // Ensures real cache decorators from @pika/redis are used
 
-// Force Vitest to use the actual implementation of '@pikafor this test file.
-vi.mock('@pika async () => {
-  const actualApi =
-    await vi.importActual<typeof import('@pika>('@p@p@p@pika
-
+// Force Vitest to use the actual implementation of '@pika/api' for this test file.
+vi.mock('@pika/api', async () => {
+  const actualApi = await vi.importActual('@pika/api')
   return actualApi // Return all actual exports
 })
 
-// Force Vitest to use the actual implementation of '@pikad' for this test file.
-vi.mock('@pikad', async () => {
-  const actualShared =
-    await vi.importActual<typeof import('@pikad')>('@p@p@p@pika
-
+// Force Vitest to use the actual implementation of '@pika/shared' for this test file.
+vi.mock('@pika/shared', async () => {
+  const actualShared = await vi.importActual('@pika/shared')
   return actualShared // Return all actual exports
 })
 
 import { PrismaClient, UserRole } from '@prisma/client'
-import { MemoryCacheService } from '@pika'
-import { logger } from '@pikad'
+import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import {
   AuthenticatedRequestClient,
   CommunicationServiceClientMock,

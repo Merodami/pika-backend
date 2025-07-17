@@ -138,6 +138,14 @@ Approved for future implementation. Continue with current structure for category
    - Replaced gym references with business references
    - All enum values in camelCase
 
+5. **Communication Service** ✅
+   - Centralized 25+ enums (EmailStatus, NotificationType, TemplateCategory, etc.)
+   - Created `common/parameters.ts` with service-specific params
+   - All search params use `SearchParams.extend()` pattern
+   - Service-specific SortBy enums override generic sortBy
+   - No gym features found (was already clean)
+   - All enum values in camelCase
+
 ### Pattern Requirements
 
 1. **Mandatory Structure**:
@@ -162,8 +170,26 @@ Approved for future implementation. Continue with current structure for category
    - Use `SearchParams` from `shared/pagination.js`
    - Extend with service-specific filters
    - Use `paginatedResponse` from `shared/responses.js`
+   - Override `sortBy` with service-specific SortBy enum
+   - SortOrder is already included in SearchParams
 
-4. **Domain Cleanup**:
+4. **SortBy Pattern**:
+   ```typescript
+   // In common/enums.ts
+   export const ServiceSortBy = z.enum([
+     'createdAt',
+     'name',
+     'updatedAt',
+   ])
+   
+   // In search params
+   export const ServiceSearchParams = SearchParams.extend({
+     // ... other filters
+     sortBy: ServiceSortBy.default('createdAt'),
+   })
+   ```
+
+5. **Domain Cleanup**:
    - Remove ALL gym/fitness specific features
    - Remove credit/points systems
    - Keep only core business logic

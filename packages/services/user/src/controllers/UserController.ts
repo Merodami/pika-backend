@@ -14,6 +14,7 @@ import type {
   RegisterRequest,
   UpdateProfileRequest,
 } from '@pika/api/public'
+import { userSortFieldMapper } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import { adaptMulterFile } from '@pika/http'
@@ -21,7 +22,6 @@ import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
-import { get } from 'lodash-es'
 
 import type { IUserService } from '../services/UserService.js'
 
@@ -74,7 +74,7 @@ export class UserController {
         search: query.search,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: this.mapSortField(query.sortBy),
+        sortBy: userSortFieldMapper.mapSortField(query.sortBy, 'createdAt'),
         sortOrder: query.sortOrder?.toLowerCase() as 'asc' | 'desc' | undefined,
         // Additional admin search params
         emailVerified: query.emailVerified,
@@ -427,19 +427,4 @@ export class UserController {
     }
   }
 
-  /**
-   * Map API field names to database field names
-   */
-  private mapSortField(apiField?: string): string | undefined {
-    if (!apiField) return undefined
-
-    const fieldMap: Record<string, string> = {
-      EMAIL: 'email',
-      CREATED_AT: 'createdAt',
-      LAST_LOGIN_AT: 'lastLoginAt',
-      TOTAL_SPENT: 'totalSpent',
-    }
-
-    return get(fieldMap, apiField, apiField.toLowerCase())
-  }
 }

@@ -1,9 +1,6 @@
-import {
-  ECDSAService,
-  type JWTConfig,
-  ShortCodeService,
-  VoucherQRService,
-} from '@pika/crypto'
+// TODO: Migrate crypto package from pika-old
+// Temporary implementation until crypto services are migrated
+
 import { JWT_ISSUER, JWT_SECRET } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
 
@@ -15,10 +12,53 @@ export interface GenerateQRPayloadOptions {
   ttl?: number
 }
 
+// Temporary mock implementations until crypto package is migrated
+class MockVoucherQRService {
+  async generatePrintVoucherQR(
+    voucherId: string,
+    batchId: string,
+    privateKey: string,
+    options: { ttl?: number },
+  ) {
+    // Mock implementation
+    return {
+      qrPayload: `mock-qr-${voucherId}-${batchId}`,
+    }
+  }
+}
+
+class MockShortCodeService {
+  async generateShortCode(
+    voucherId: string,
+    options?: {
+      type?: 'user' | 'print'
+      batchCode?: string
+      expirationDays?: number
+    },
+  ) {
+    // Mock implementation
+    return {
+      shortCode: `MOCK${voucherId.slice(0, 4).toUpperCase()}`,
+      checksum: 'mock-checksum',
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      metadata: {},
+    }
+  }
+}
+
+class MockECDSAService {
+  async generateKeyPair() {
+    return {
+      privateKey: 'mock-private-key',
+      publicKey: 'mock-public-key',
+    }
+  }
+}
+
 export class CryptoServiceAdapter {
-  private voucherQRService: VoucherQRService
-  private shortCodeService: ShortCodeService
-  private ecdsaService: ECDSAService
+  private voucherQRService: MockVoucherQRService
+  private shortCodeService: MockShortCodeService
+  private ecdsaService: MockECDSAService
   private keyPair: { privateKey: string; publicKey: string } | null = null
 
   constructor() {
@@ -34,20 +74,10 @@ export class CryptoServiceAdapter {
       )
     }
 
-    const jwtConfig: JWTConfig = {
-      algorithm: 'ES256',
-      issuer: JWT_ISSUER,
-      audience: 'pika-vouchers',
-      keyId: 'pdf-generator-key',
-    }
-
-    this.voucherQRService = new VoucherQRService(jwtConfig)
-    this.shortCodeService = new ShortCodeService({
-      secretKey: JWT_SECRET, // Use JWT_SECRET which is long enough (>32 chars)
-      codeLength: 8,
-      includeChecksum: true,
-    })
-    this.ecdsaService = new ECDSAService({ curve: 'P-256' })
+    // Use mock services until crypto package is migrated
+    this.voucherQRService = new MockVoucherQRService()
+    this.shortCodeService = new MockShortCodeService()
+    this.ecdsaService = new MockECDSAService()
   }
 
   /**

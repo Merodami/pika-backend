@@ -2922,4 +2922,292 @@ function registerAdminRoutes(registry: SimpleZodRegistry): void {
       },
     },
   })
+
+  // ============= PDF/Voucher Book Management Routes =============
+  
+  // Get all voucher books
+  registry.registerRoute({
+    method: 'get',
+    path: '/admin/voucher-books',
+    summary: 'List all voucher books with admin details',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminPdfSchemas.AdminVoucherBookQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of voucher books',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.AdminVoucherBookListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher book by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/admin/voucher-books/{id}',
+    summary: 'Get voucher book details',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+    },
+    responses: {
+      200: {
+        description: 'Voucher book details',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Create voucher book
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/voucher-books',
+    summary: 'Create a new voucher book',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.CreateVoucherBookRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Voucher book created successfully',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid voucher book data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update voucher book
+  registry.registerRoute({
+    method: 'put',
+    path: '/admin/voucher-books/{id}',
+    summary: 'Update voucher book information',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.UpdateVoucherBookRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher book updated successfully',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Delete voucher book
+  registry.registerRoute({
+    method: 'delete',
+    path: '/admin/voucher-books/{id}',
+    summary: 'Delete a voucher book',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+    },
+    responses: {
+      204: {
+        description: 'Voucher book deleted successfully',
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update voucher book status
+  registry.registerRoute({
+    method: 'patch',
+    path: '/admin/voucher-books/{id}/status',
+    summary: 'Update voucher book status',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.UpdateVoucherBookStatusRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher book status updated successfully',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Generate PDF
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/voucher-books/{id}/generate-pdf',
+    summary: 'Generate PDF for voucher book',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.GeneratePDFRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'PDF generated successfully',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.GeneratePDFResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk archive voucher books
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/voucher-books/bulk-archive',
+    summary: 'Archive multiple voucher books',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.BulkArchiveVoucherBooksRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher books archived successfully',
+        content: {
+          'application/json': {
+            schema: z.object({
+              archived: z.number().describe('Number of books archived'),
+              failed: z.number().describe('Number of books that failed to archive'),
+              errors: z.array(z.string()).describe('Error messages for failed operations'),
+            }),
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher book statistics
+  registry.registerRoute({
+    method: 'get',
+    path: '/admin/voucher-books/statistics',
+    summary: 'Get voucher book statistics',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminPdfSchemas.VoucherBookStatsQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher book statistics',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.VoucherBookStatisticsResponse,
+          },
+        },
+      },
+    },
+  })
 }

@@ -6,8 +6,8 @@ import { createTestDatabase, cleanupTestDatabase, clearTestDatabase } from '@pik
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 
-import { VoucherBookRepository } from '../../../repositories/VoucherBookRepository.js'
-import type { IVoucherBookRepository } from '../../../repositories/VoucherBookRepository.js'
+import { VoucherBookRepository } from '@pdf/repositories/VoucherBookRepository.js'
+import type { IVoucherBookRepository } from '@pdf/repositories/VoucherBookRepository.js'
 
 // Test database
 let testDb: { prisma: PrismaClient; container: any; stop: () => Promise<void> }

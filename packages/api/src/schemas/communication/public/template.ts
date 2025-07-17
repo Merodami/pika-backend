@@ -6,27 +6,19 @@ import {
 } from '../../../common/schemas/metadata.js'
 import { UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  TemplateType,
+  TemplateCategory,
+  TemplateVariableType,
+  TemplateSortBy,
+  EmailPriority,
+} from '../common/enums.js'
 
 /**
  * Communication template schemas for public API
  */
-
-// ============= Enums =============
-
-export const TemplateType = z.enum(['EMAIL', 'SMS', 'PUSH', 'IN_APP'])
-export type TemplateType = z.infer<typeof TemplateType>
-
-export const TemplateCategory = z.enum([
-  'AUTH',
-  'PAYMENT',
-  'REMINDER',
-  'NOTIFICATION',
-  'MARKETING',
-  'SYSTEM',
-  'CUSTOM',
-])
-export type TemplateCategory = z.infer<typeof TemplateCategory>
 
 // ============= Template Schema =============
 
@@ -56,14 +48,7 @@ export const Template = openapi(
       .array(
         z.object({
           name: z.string().describe('Variable name (e.g., userName)'),
-          type: z.enum([
-            'STRING',
-            'NUMBER',
-            'BOOLEAN',
-            'DATE',
-            'ARRAY',
-            'OBJECT',
-          ]),
+          type: TemplateVariableType,
           required: z.boolean().default(true),
           defaultValue: z.any().optional(),
           description: z.string().optional(),
@@ -73,7 +58,7 @@ export const Template = openapi(
 
     // Configuration
     locale: z.string().length(5).default('en-US').describe('Template locale'),
-    priority: z.enum(['LOW', 'NORMAL', 'HIGH']).default('NORMAL'),
+    priority: EmailPriority.default('normal'),
 
     // Metadata
     tags: z.array(z.string()).default([]),
@@ -109,14 +94,7 @@ export const CreateTemplateRequest = openapi(
       .array(
         z.object({
           name: z.string(),
-          type: z.enum([
-            'STRING',
-            'NUMBER',
-            'BOOLEAN',
-            'DATE',
-            'ARRAY',
-            'OBJECT',
-          ]),
+          type: TemplateVariableType,
           required: z.boolean().default(true),
           defaultValue: z.any().optional(),
           description: z.string().optional(),
@@ -124,7 +102,7 @@ export const CreateTemplateRequest = openapi(
       )
       .optional(),
     locale: z.string().length(5).default('en-US'),
-    priority: z.enum(['LOW', 'NORMAL', 'HIGH']).default('NORMAL'),
+    priority: EmailPriority.default('normal'),
     tags: z.array(z.string()).optional(),
     metadata: z.record(z.any()).optional(),
   }),
@@ -151,21 +129,14 @@ export const UpdateTemplateRequest = openapi(
       .array(
         z.object({
           name: z.string(),
-          type: z.enum([
-            'STRING',
-            'NUMBER',
-            'BOOLEAN',
-            'DATE',
-            'ARRAY',
-            'OBJECT',
-          ]),
+          type: TemplateVariableType,
           required: z.boolean().default(true),
           defaultValue: z.any().optional(),
           description: z.string().optional(),
         }),
       )
       .optional(),
-    priority: z.enum(['LOW', 'NORMAL', 'HIGH']).optional(),
+    priority: EmailPriority.optional(),
     tags: z.array(z.string()).optional(),
     metadata: z.record(z.any()).optional(),
     isActive: z.boolean().optional(),
@@ -240,19 +211,13 @@ export type TestTemplateResponse = z.infer<typeof TestTemplateResponse>
 /**
  * Template search parameters
  */
-export const TemplateSearchParams = z.object({
+export const TemplateSearchParams = SearchParams.extend({
   type: TemplateType.optional(),
   category: TemplateCategory.optional(),
   locale: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  search: z.string().optional().describe('Search in name and description'),
   isActive: z.boolean().optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sort: z
-    .enum(['NAME', 'CREATED_AT', 'UPDATED_AT', 'USAGE_COUNT'])
-    .default('NAME'),
-  order: z.enum(['ASC', 'DESC']).default('ASC'),
+  sortBy: TemplateSortBy.default('name'),
 })
 
 export type TemplateSearchParams = z.infer<typeof TemplateSearchParams>
@@ -279,7 +244,7 @@ export const TemplateVersion = z.object({
   variables: z.array(
     z.object({
       name: z.string(),
-      type: z.enum(['string', 'number', 'boolean', 'date', 'array', 'object']),
+      type: TemplateVariableType,
       required: z.boolean(),
       defaultValue: z.any().optional(),
       description: z.string().optional(),
@@ -315,7 +280,7 @@ export const BulkTemplateUpdateRequest = openapi(
     templateIds: z.array(UUID).min(1).max(100),
     updates: z.object({
       category: TemplateCategory.optional(),
-      priority: z.enum(['LOW', 'NORMAL', 'HIGH']).optional(),
+      priority: EmailPriority.optional(),
       tags: z.array(z.string()).optional(),
       isActive: z.boolean().optional(),
     }),

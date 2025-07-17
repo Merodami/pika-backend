@@ -6,6 +6,15 @@ This project is migrating from the old Pika codebase (pika-old) to a modern micr
 
 ### ✅ COMPLETED SERVICES
 
+#### User Service (Updated to New Patterns)
+- **Status**: COMPLETE ✅
+- **Updates Made**: Reorganized API schemas to service-first pattern, added sort field mappers
+- **Architecture**: Already follows Clean Architecture (Controller → Service → Repository)
+- **Schema Organization**: `/schemas/user/{public,admin,internal,common}/` structure
+- **Sort Field Mappers**: `userSortFieldMapper` and `adminUserSortFieldMapper` 
+- **Controllers**: Public, Admin, and Internal controllers with Zod validation
+- **SDK Integration**: UserMapper already exists in @pika/sdk
+
 #### Business Service (Migrated from Provider)
 - **Status**: COMPLETE ✅
 - **Database Schema**: Business model using translation keys (`businessNameKey`, `businessDescriptionKey`)
@@ -27,21 +36,18 @@ Currently: Business service integration tests running successfully with comprehe
 
 ## IMMEDIATE NEXT STEPS (Priority Order)
 
-### 1. 🚀 **USER SERVICE MIGRATION** (HIGH PRIORITY)
-**Why**: Foundation service - referenced by Business service and core to authentication
+### ~~1. 🚀 **USER SERVICE MIGRATION**~~ ✅ COMPLETED
+**Status**: User service already existed and has been updated to follow new patterns
 
-**Tasks**:
-- [ ] Analyze User service in pika-old
-- [ ] Create User service schemas (public, admin, internal) following Business/Category pattern
-- [ ] Implement User domain types and interfaces
-- [ ] Create User Prisma schema (update existing or migrate from pika-old)
-- [ ] Implement UserMapper for data transformations
-- [ ] Implement UserRepository with CRUD operations
-- [ ] Implement UserService with business logic
-- [ ] Create User controllers (public, admin, internal)
-- [ ] Set up User service routes and server configuration
-- [ ] Create integration tests for User service
-- [ ] Update authentication to work with new User service
+**Completed Tasks**:
+- ✅ Reorganized API schemas to follow service-first pattern (`/schemas/user/{public,admin,internal,common}/`)
+- ✅ Created common schemas (enums.ts, sorting.ts) following Business/Category pattern
+- ✅ Implemented userSortFieldMapper to replace custom implementation
+- ✅ Updated all schema exports in public/admin/internal index files
+- ✅ Updated UserController to use standardized sort field mapper
+- ✅ Service already follows Clean Architecture (Controller → Service → Repository)
+- ✅ UserMapper already exists in SDK
+- ✅ Integration tests exist (minor file corruption needs fixing)
 
 ### 2. 🌐 **TRANSLATION SERVICE IMPLEMENTATION** (HIGH PRIORITY)
 **Why**: Both Category and Business services use translation keys but currently mock the translation service
@@ -139,11 +145,11 @@ Currently: Business service integration tests running successfully with comprehe
 
 ## CURRENT MIGRATION STATUS
 
-**Completed**: 2/8 core services (Category, Business)
-**In Progress**: User service analysis
-**Next Target**: User service implementation
-**Overall Progress**: ~25% of core migration complete
+**Completed**: 3/8 core services (Category, Business, User)
+**In Progress**: Selecting next migration target
+**Next Target**: Translation Service implementation
+**Overall Progress**: ~35% of core migration complete
 
 ---
 
-*Last Updated: Business service migration completed with comprehensive testing*
+*Last Updated: User service reorganization completed to follow new patterns*

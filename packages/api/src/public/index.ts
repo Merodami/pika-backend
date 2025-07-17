@@ -10,13 +10,7 @@ export * from '../common/schemas/primitives.js'
 export * from './schemas/auth/index.js'
 
 // User
-export * from './schemas/user/address.js'
-export * from './schemas/user/parq.js'
-export * from './schemas/user/paymentMethod.js'
-export * from './schemas/user/professional.js'
-export * from './schemas/user/profile.js'
-export * from './schemas/user/queries.js'
-export * from './schemas/user/verification.js'
+export * from '../schemas/user/public/index.js'
 
 // Payment
 export * from './schemas/payment/credit.js'

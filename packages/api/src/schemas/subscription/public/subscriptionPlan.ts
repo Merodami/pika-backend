@@ -6,16 +6,17 @@ import {
 } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  BillingInterval,
+  PlanType,
+  PlanSortBy,
+} from '../common/enums.js'
 
 /**
  * Subscription plan schemas for public API
  */
-
-// ============= Enums =============
-
-export const SubscriptionInterval = z.enum(['DAY', 'WEEK', 'MONTH', 'YEAR'])
-export type SubscriptionInterval = z.infer<typeof SubscriptionInterval>
 
 // ============= Subscription Plan =============
 
@@ -36,18 +37,13 @@ export const SubscriptionPlan = openapi(
       .length(3)
       .default('usd')
       .describe('Currency code (e.g., usd, gbp)'),
-    interval: SubscriptionInterval,
+    interval: BillingInterval,
     intervalCount: z
       .number()
       .int()
       .positive()
       .default(1)
       .describe('Number of intervals between billings'),
-    creditsAmount: z
-      .number()
-      .int()
-      .nonnegative()
-      .describe('Credits granted per billing period'),
     trialPeriodDays: z
       .number()
       .int()
@@ -77,9 +73,8 @@ export const CreateSubscriptionPlanRequest = openapi(
     description: z.string().optional(),
     price: z.number().nonnegative(),
     currency: z.string().length(3).default('usd'),
-    interval: SubscriptionInterval,
+    interval: BillingInterval,
     intervalCount: z.number().int().positive().default(1),
-    creditsAmount: z.number().int().nonnegative(),
     trialPeriodDays: z.number().int().nonnegative().optional(),
     features: z.array(z.string()),
     metadata: z.record(z.any()).optional(),
@@ -105,7 +100,6 @@ export const UpdateSubscriptionPlanRequest = openapi(
     name: z.string().optional(),
     description: z.string().optional(),
     price: z.number().nonnegative().optional(),
-    creditsAmount: z.number().int().nonnegative().optional(),
     trialPeriodDays: z.number().int().nonnegative().optional(),
     features: z.array(z.string()).optional(),
     isActive: z.boolean().optional(),
