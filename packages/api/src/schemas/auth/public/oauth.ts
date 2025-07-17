@@ -85,7 +85,7 @@ export const TokenResponse = openapi(
         email: 'user@example.com' as any,
         firstName: 'John',
         lastName: 'Doe',
-        role: 'USER',
+        role: 'CUSTOMER',
       },
     },
   },

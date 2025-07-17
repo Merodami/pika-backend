@@ -5,7 +5,8 @@ import { PrismaClient } from '@prisma/client'
 import { BUSINESS_SERVICE_NAME, BUSINESS_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import { ICacheService } from '@pika/redis'
-import { logger, TranslationServiceClient } from '@pika/shared'
+import { logger } from '@pika/shared'
+import { TranslationClient } from '@pika/translation'
 
 import { createAdminBusinessRoutes } from './routes/AdminBusinessRoutes.js'
 import { createBusinessRoutes } from './routes/BusinessRoutes.js'
@@ -18,11 +19,11 @@ import { createInternalBusinessRoutes } from './routes/InternalBusinessRoutes.js
 export async function createBusinessServer({
   prisma,
   cacheService,
-  translationServiceClient,
+  translationClient,
 }: {
   prisma: PrismaClient
   cacheService: ICacheService
-  translationServiceClient?: TranslationServiceClient
+  translationClient: TranslationClient
 }) {
   logger.info(`Configuring Business service for port: ${BUSINESS_SERVICE_PORT}`)
 
@@ -78,14 +79,11 @@ export async function createBusinessServer({
     ],
   })
 
-  // Initialize translation service client
-  const translationService = translationServiceClient || new TranslationServiceClient()
-
   // Register business routes
   const businessRouter = createBusinessRoutes(
     prisma,
     cacheService,
-    translationService,
+    translationClient,
   )
 
   app.use('/businesses', businessRouter)
@@ -94,7 +92,7 @@ export async function createBusinessServer({
   const adminRouter = createAdminBusinessRoutes(
     prisma,
     cacheService,
-    translationService,
+    translationClient,
   )
 
   app.use('/admin/businesses', adminRouter)
@@ -103,7 +101,7 @@ export async function createBusinessServer({
   const internalRouter = createInternalBusinessRoutes(
     prisma,
     cacheService,
-    translationService,
+    translationClient,
   )
 
   app.use('/internal/businesses', internalRouter)

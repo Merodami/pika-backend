@@ -4,7 +4,7 @@
  */
 
 // Common schemas
-export * from './common/parameters.js'
+export * from './common/index.js'
 
 // Public API schemas
 export * from './public/index.js'

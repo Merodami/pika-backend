@@ -9,7 +9,7 @@ import type {
   BulkArchiveVoucherBooksRequest,
   VoucherBookStatsQueryParams,
 } from '@pika/api/admin'
-import { VoucherBookIdParam } from '@pika/api/common'
+import { VoucherBookIdParam } from '@pika/api/pdf'
 
 import type { AdminVoucherBookController } from '../controllers/AdminVoucherBookController.js'
 

@@ -103,7 +103,7 @@ export type CreateSubscriptionRequest = z.infer<
 export const UpdateSubscriptionRequest = openapi(
   z.object({
     planId: UUID.optional(),
-    status: SubscriptionStatusEnum.optional(),
+    status: SubscriptionStatus.optional(),
     currentPeriodStart: DateTime.optional(),
     currentPeriodEnd: DateTime.optional(),
     trialEnd: DateTime.optional(),
@@ -143,56 +143,18 @@ export type CancelSubscriptionRequest = z.infer<
   typeof CancelSubscriptionRequest
 >
 
-// ============= Process Credits =============
-
-/**
- * Process subscription credits request
- */
-export const ProcessSubscriptionCreditsRequest = openapi(
-  z.object({
-    subscriptionId: UUID,
-  }),
-  {
-    description: 'Process subscription credits',
-  },
-)
-
-export type ProcessSubscriptionCreditsRequest = z.infer<
-  typeof ProcessSubscriptionCreditsRequest
->
-
-/**
- * Credit processing response
- */
-export const CreditProcessingResponse = openapi(
-  z.object({
-    subscription: Subscription,
-    creditsAdded: z
-      .number()
-      .int()
-      .nonnegative()
-      .describe('Number of credits added'),
-    newBalance: z.number().int().nonnegative().describe('New credit balance'),
-  }),
-  {
-    description: 'Response for credit processing',
-  },
-)
-
-export type CreditProcessingResponse = z.infer<typeof CreditProcessingResponse>
 
 // ============= Search Subscriptions =============
 
 /**
  * Subscription query parameters
  */
-export const SubscriptionQueryParams = z.object({
-  status: SubscriptionStatusEnum.optional(),
+export const SubscriptionQueryParams = SearchParams.extend({
+  status: SubscriptionStatus.optional(),
   userId: UserId.optional(),
   planId: UUID.optional(),
   cancelAtPeriodEnd: z.boolean().optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
+  sortBy: SubscriptionSortBy.default('createdAt'),
 })
 
 export type SubscriptionQueryParams = z.infer<typeof SubscriptionQueryParams>
@@ -268,9 +230,6 @@ export const SubscriptionUsage = openapi(
     subscriptionId: UUID,
     periodStart: DateTime,
     periodEnd: DateTime,
-    creditsUsed: z.number().int().nonnegative(),
-    creditsRemaining: z.number().int().nonnegative(),
-    creditsTotal: z.number().int().nonnegative(),
     usageByCategory: z.record(z.number().int().nonnegative()).optional(),
   }),
   {

@@ -2,6 +2,7 @@ import type { PrismaClient } from '@prisma/client'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import type { TranslationClient } from '@pika/translation'
 
 import { CategoryController } from './controllers/CategoryController.js'
 import { AdminCategoryController } from './controllers/AdminCategoryController.js'
@@ -15,10 +16,11 @@ import { createInternalCategoryRoutes } from './routes/InternalCategoryRoutes.js
 export interface ServerConfig {
   prisma: PrismaClient
   cacheService: ICacheService
+  translationClient: TranslationClient
 }
 
 export async function createCategoryServer(config: ServerConfig) {
-  const { prisma, cacheService } = config
+  const { prisma, cacheService, translationClient } = config
 
   // Create Express app with standard configuration
   const app = await createExpressServer({

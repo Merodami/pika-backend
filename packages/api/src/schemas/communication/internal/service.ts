@@ -3,8 +3,8 @@ import { z } from 'zod'
 import {
   Email as EmailAddress,
   UserId,
-} from '../../../common/schemas/branded.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
+} from '../../shared/branded.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import {
   NotificationCategory,
@@ -41,7 +41,7 @@ export const SendSystemNotificationRequest = openapi(
     // Channels
     channels: z
       .array(NotificationType)
-      .default(['IN_APP']),
+      .default(['inApp']),
 
     // Template
     templateId: z.string().optional(),

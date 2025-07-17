@@ -2,6 +2,8 @@ import { z } from 'zod'
 
 import { CorrelationId } from './branded.js'
 import { DateTime } from './primitives.js'
+import { ErrorResponse, ValidationErrorResponse } from './errors.js'
+import { HealthStatus } from './health.js'
 
 /**
  * Common response schemas with Zod
@@ -21,16 +23,7 @@ export const ErrorDetails = z.object({
   timestamp: DateTime.describe('When the error occurred'),
 })
 
-/**
- * Standard error response
- */
-export const ErrorResponse = z
-  .object({
-    error: ErrorDetails,
-  })
-  .describe('Standard error response format')
-
-export type ErrorResponse = z.infer<typeof ErrorResponse>
+// ErrorResponse imported from ./errors.js to avoid duplicates
 
 /**
  * Validation error field
@@ -43,22 +36,7 @@ export const ValidationErrorField = z.object({
   code: z.string().optional().describe('Validation rule that failed'),
 })
 
-/**
- * Validation error response
- */
-export const ValidationErrorResponse = z
-  .object({
-    error: z.object({
-      code: z.literal('VALIDATION_ERROR'),
-      message: z.string().default('Validation failed'),
-      details: z.array(ValidationErrorField),
-      correlationId: CorrelationId,
-      timestamp: DateTime,
-    }),
-  })
-  .describe('Validation error response with field-level details')
-
-export type ValidationErrorResponse = z.infer<typeof ValidationErrorResponse>
+// ValidationErrorResponse imported from ./errors.js to avoid duplicates
 
 /**
  * Rate limit error response
@@ -223,10 +201,7 @@ export type BatchOperationResponse = z.infer<typeof BatchOperationResponse>
 
 // ============= Health Check =============
 
-/**
- * Health status enum
- */
-export const HealthStatus = z.enum(['HEALTHY', 'DEGRADED', 'UNHEALTHY'])
+// HealthStatus imported from ./health.js to avoid duplicates
 
 /**
  * Service health check

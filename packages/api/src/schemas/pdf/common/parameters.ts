@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { UUID } from '../../../common/schemas/primitives.js'
+import { UUID } from '../../shared/primitives.js'
 
 /**
  * PDF service parameters - shared across all API tiers

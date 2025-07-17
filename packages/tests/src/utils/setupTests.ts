@@ -171,10 +171,38 @@ vi.mock('@pika/shared', async (importOriginal) => {
     }
   }
 
+  // Mock BaseServiceClient class
+  class BaseServiceClient {
+    constructor(config: any) {
+      // Mock constructor
+    }
+    
+    protected async get(path: string, options?: any): Promise<any> {
+      // Mock GET request
+      return Promise.resolve({ data: 'mock data' })
+    }
+    
+    protected async post(path: string, data?: any, options?: any): Promise<any> {
+      // Mock POST request
+      return Promise.resolve({ data: 'mock data' })
+    }
+    
+    protected async put(path: string, data?: any, options?: any): Promise<any> {
+      // Mock PUT request
+      return Promise.resolve({ data: 'mock data' })
+    }
+    
+    protected async delete(path: string, options?: any): Promise<any> {
+      // Mock DELETE request
+      return Promise.resolve({ data: 'mock data' })
+    }
+  }
+
   return {
     BaseError,
     NotAuthenticatedError,
     ValidationError,
+    BaseServiceClient,
     RequestIdSource: {
       GENERATED: 'generated',
       CLIENT: 'client',

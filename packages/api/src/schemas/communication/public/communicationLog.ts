@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { UserId } from '../../shared/branded.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { SearchParams, DateRangeParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import {
@@ -88,8 +88,8 @@ export type CommunicationLog = z.infer<typeof CommunicationLog>
 export const CreateCommunicationLogRequest = openapi(
   z.object({
     channel: CommunicationChannel,
-    direction: CommunicationDirection.default('OUTBOUND'),
-    status: CommunicationStatus.default('PENDING'),
+    direction: CommunicationDirection.default('outbound'),
+    status: CommunicationStatus.default('pending'),
     userId: UserId.optional(),
     recipient: z.string().optional(),
     sender: z.string().optional(),

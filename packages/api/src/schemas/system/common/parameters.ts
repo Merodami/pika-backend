@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { UUID } from '@pika/api/common'
+import { UUID } from '../../shared/primitives.js'
 
 /**
  * System service path parameters

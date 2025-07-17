@@ -7,14 +7,14 @@
  */
 
 export { fromZodError } from 'zod-validation-error'
-export * from './common/registry/base.js'
+// export * from './common/registry/base.js'
 export * from './common/registry/simple.js'
-export * from './common/schemas/branded.js'
-export * from './common/schemas/fileUpload.js'
-export * from './common/schemas/geo.js'
-export * from './common/schemas/metadata.js'
-export * from './common/schemas/pagination.js'
-export * from './common/schemas/primitives.js'
+export * from './schemas/shared/branded.js'
+export * from './schemas/shared/fileUpload.js'
+export * from './schemas/shared/geo.js'
+export * from './schemas/shared/metadata.js'
+export * from './schemas/shared/pagination.js'
+export * from './schemas/shared/primitives.js'
 export * from './common/utils/openapi.js'
 export * from './common/utils/sorting.js'
 export * from './common/utils/validators.js'
@@ -29,12 +29,12 @@ export {
   ServiceUnavailableResponse,
   UnauthorizedResponse,
   ValidationErrorResponse,
-} from './common/schemas/errors.js'
+} from './schemas/shared/errors.js'
 export {
   HealthStatus,
   ServiceHealth,
   SimpleHealthCheckResponse,
-} from './common/schemas/health.js'
+} from './schemas/shared/health.js'
 export {
   AsyncOperationResponse,
   AsyncOperationStatus,
@@ -48,29 +48,15 @@ export {
   RateLimitResponse,
   ServiceHealthCheck,
   successResponse,
-} from './common/schemas/responses.js'
+} from './schemas/shared/responses.js'
 
-import * as adminSchemas from './admin/index.js'
-import * as internalSchemas from './internal/index.js'
-import * as publicSchemas from './public/index.js'
-
-export const zod = {
-  public: publicSchemas,
-  admin: adminSchemas,
-  internal: internalSchemas,
-}
-
-export {
-  adminSchemas as admin,
-  internalSchemas as internal,
-  publicSchemas as public,
-}
+// Note: Using new service-based structure instead of top-level admin/internal/public
 
 // Re-export commonly used public schemas for convenience
 export {
   AuthTokensResponse,
   AuthUserResponse,
-} from './public/schemas/auth/login.js'
+} from './schemas/auth/public/login.js'
 export {
   IntrospectRequest,
   IntrospectResponse,
@@ -79,7 +65,7 @@ export {
   TokenRequest,
   TokenResponse,
   UserInfoResponse,
-} from './public/schemas/auth/oauth.js'
+} from './schemas/auth/public/oauth.js'
 
 import type { z } from 'zod'
 

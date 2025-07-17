@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { Email as EmailAddress } from '../../../common/schemas/branded.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { Email as EmailAddress } from '../../shared/branded.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { SearchParams, DateRangeParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import {
@@ -87,7 +87,7 @@ export const SendEmailRequest = openapi(
         .describe('Whether the content is HTML (deprecated)'),
       replyTo: EmailAddress.optional(),
       attachments: z.array(EmailAttachment).optional(),
-      priority: EmailPriority.default('NORMAL'),
+      priority: EmailPriority.default('normal'),
 
       // Tracking and metadata
       trackOpens: z.boolean().default(true),
@@ -159,7 +159,7 @@ export const SendBulkEmailRequest = openapi(
     globalVariables: z.record(z.any()).optional(),
 
     // Options
-    priority: EmailPriority.default('NORMAL'),
+    priority: EmailPriority.default('normal'),
     trackOpens: z.boolean().default(true),
     trackClicks: z.boolean().default(true),
 
@@ -272,7 +272,7 @@ export type EmailHistoryResponse = z.infer<typeof EmailHistoryResponse>
 /**
  * Email event (for webhooks)
  */
-export const EmailEvent = z.object({
+export const EmailEventData = z.object({
   messageId: z.string(),
   event: EmailEvent,
   timestamp: DateTime,
@@ -286,11 +286,11 @@ export const EmailEvent = z.object({
   ipAddress: z.string().optional(),
 })
 
-export type EmailEvent = z.infer<typeof EmailEvent>
+export type EmailEventData = z.infer<typeof EmailEventData>
 
 /**
  * Process email event request (webhook)
  */
-export const ProcessEmailEventRequest = EmailEvent
+export const ProcessEmailEventRequest = EmailEventData
 
 export type ProcessEmailEventRequest = z.infer<typeof ProcessEmailEventRequest>

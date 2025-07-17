@@ -3,6 +3,11 @@ import { z } from 'zod'
 import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  SubscriptionStatus,
+  SubscriptionEvent,
+  UsageType,
+} from '../common/enums.js'
 
 /**
  * Internal subscription service schemas for service-to-service communication
@@ -16,14 +21,7 @@ import { openapi } from '../../../common/utils/openapi.js'
 export const ProcessSubscriptionWebhookRequest = openapi(
   z.object({
     event: z.object({
-      type: z.enum([
-        'customer.subscription.created',
-        'customer.subscription.updated',
-        'customer.subscription.deleted',
-        'customer.subscription.trial_will_end',
-        'invoice.payment_failed',
-        'invoice.payment_succeeded',
-      ]),
+      type: SubscriptionEvent,
       data: z.object({
         object: z.any(), // Stripe event object
       }),
@@ -66,15 +64,7 @@ export type ProcessSubscriptionWebhookResponse = z.infer<
 export const UpdateSubscriptionFromPaymentRequest = openapi(
   z.object({
     stripeSubscriptionId: z.string(),
-    status: z.enum([
-      'ACTIVE',
-      'PAST_DUE',
-      'CANCELED',
-      'INCOMPLETE',
-      'INCOMPLETE_EXPIRED',
-      'TRIALING',
-      'UNPAID',
-    ]),
+    status: SubscriptionStatus,
     currentPeriodStart: DateTime.optional(),
     currentPeriodEnd: DateTime.optional(),
     canceledAt: DateTime.optional(),
@@ -121,7 +111,6 @@ export const SubscriptionAccessResponse = openapi(
         planName: z.string(),
         status: z.string(),
         features: z.array(z.string()),
-        creditsRemaining: z.number().optional(),
       })
       .optional(),
     reason: z.string().optional(),
@@ -135,44 +124,6 @@ export type SubscriptionAccessResponse = z.infer<
   typeof SubscriptionAccessResponse
 >
 
-// ============= Credit Operations =============
-
-/**
- * Allocate credits from subscription
- */
-export const AllocateSubscriptionCreditsRequest = openapi(
-  z.object({
-    userId: UserId,
-    subscriptionId: UUID,
-    amount: z.number().positive(),
-    description: z.string(),
-    metadata: z.record(z.any()).optional(),
-  }),
-  {
-    description: 'Allocate credits from subscription',
-  },
-)
-
-export type AllocateSubscriptionCreditsRequest = z.infer<
-  typeof AllocateSubscriptionCreditsRequest
->
-
-/**
- * Credit allocation response
- */
-export const CreditAllocationResponse = openapi(
-  z.object({
-    success: z.boolean(),
-    creditsAllocated: z.number(),
-    remainingCredits: z.number(),
-    transactionId: UUID.optional(),
-  }),
-  {
-    description: 'Credit allocation result',
-  },
-)
-
-export type CreditAllocationResponse = z.infer<typeof CreditAllocationResponse>
 
 // ============= Subscription Queries =============
 
@@ -224,7 +175,6 @@ export const SubscriptionListResponse = openapi(
         currentPeriodStart: DateTime.optional(),
         currentPeriodEnd: DateTime.optional(),
         cancelAtPeriodEnd: z.boolean(),
-        creditsRemaining: z.number().optional(),
         createdAt: DateTime,
       }),
     ),
@@ -245,20 +195,12 @@ export type SubscriptionListResponse = z.infer<typeof SubscriptionListResponse>
 export const SendSubscriptionNotificationRequest = openapi(
   z.object({
     userId: UserId,
-    type: z.enum([
-      'CREATED',
-      'CANCELLED',
-      'PAYMENT_FAILED',
-      'CREDITS_ALLOCATED',
-      'RENEWAL_REMINDER',
-      'TRIAL_ENDING',
-    ]),
+    type: SubscriptionEvent,
     subscriptionData: z.object({
       planName: z.string(),
       planType: z.string().optional(),
       price: z.string().optional(),
       interval: z.string().optional(),
-      creditsAmount: z.number().optional(),
       currentBalance: z.number().optional(),
       endDate: z.string().optional(),
       daysRemaining: z.number().optional(),
@@ -337,7 +279,6 @@ export const InternalSubscriptionData = openapi(
     currentPeriodStart: DateTime.optional(),
     currentPeriodEnd: DateTime.optional(),
     cancelAtPeriodEnd: z.boolean(),
-    creditsRemaining: z.number().optional(),
     createdAt: DateTime,
     updatedAt: DateTime,
   }),
@@ -369,7 +310,7 @@ export const ProcessSubscriptionUsageRequest = openapi(
   z.object({
     userId: UserId,
     subscriptionId: UUID,
-    usageType: z.enum(['FEATURE_ACCESS', 'CREDIT_DEDUCTION']),
+    usageType: UsageType,
     amount: z.number().positive().optional(),
     metadata: z.record(z.any()).optional(),
   }),
@@ -389,8 +330,6 @@ export const UsageProcessingResponse = openapi(
   z.object({
     success: z.boolean(),
     usageRecorded: z.boolean(),
-    creditsDeducted: z.number().optional(),
-    remainingCredits: z.number().optional(),
     message: z.string().optional(),
   }),
   {

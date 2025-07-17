@@ -3,9 +3,9 @@ import { z } from 'zod'
 import {
   activeStatus,
   withTimestamps,
-} from '../../../common/schemas/metadata.js'
-import { UUID } from '../../../common/schemas/primitives.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+} from '../../shared/metadata.js'
+import { UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import {

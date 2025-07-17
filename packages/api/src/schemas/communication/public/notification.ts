@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { UserId } from '../../shared/branded.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import {
@@ -28,8 +28,8 @@ export const Notification = openapi(
     id: UUID,
     userId: UserId.optional().describe('User ID who receives the notification'),
     type: NotificationType.optional(),
-    status: NotificationStatus.default('PENDING'),
-    priority: NotificationPriority.default('NORMAL'),
+    status: NotificationStatus.default('pending'),
+    priority: NotificationPriority.default('normal'),
     title: z.string().max(255).optional(),
     description: z.string().optional(),
     isGlobal: z
@@ -82,7 +82,7 @@ export const CreateNotificationRequest = openapi(
     title: z.string().max(255).optional(),
     description: z.string(),
     isGlobal: z.boolean().default(false),
-    priority: NotificationPriority.default('NORMAL'),
+    priority: NotificationPriority.default('normal'),
     category: z.string().optional(),
     actionUrl: z.string().url().optional(),
     imageUrl: z.string().url().optional(),

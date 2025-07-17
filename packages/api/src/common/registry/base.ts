@@ -38,7 +38,7 @@ export class ZodRegistry {
   /**
    * Register a schema with a unique name
    */
-  register<T extends z.ZodTypeAny>(
+  registerSchema<T extends z.ZodTypeAny>(
     name: string,
     schema: T,
     options?: {
@@ -78,7 +78,7 @@ export class ZodRegistry {
   /**
    * Register an API route
    */
-  registerPath(config: RouteConfig): void {
+  registerRoute(config: RouteConfig): void {
     this.registry.registerPath(config)
   }
 
@@ -268,7 +268,7 @@ export class ZodRegistry {
     >,
   ): void {
     Object.entries(schemas).forEach(([name, config]) => {
-      this.register(name, config.schema, {
+      this.registerSchema(name, config.schema, {
         description: config.description,
         deprecated: config.deprecated,
       })
@@ -312,7 +312,7 @@ export class ScopedRegistry {
       example?: z.infer<T>
     },
   ): T {
-    return this.parent.register(`${this.prefix}.${name}`, schema, options)
+    return this.parent.registerSchema(`${this.prefix}.${name}`, schema, options)
   }
 
   /**

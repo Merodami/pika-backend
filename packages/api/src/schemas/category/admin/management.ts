@@ -17,8 +17,8 @@ import { openapi } from '../../../common/utils/openapi.js'
 /**
  * Admin category response (includes all fields for management)
  */
-export const AdminCategoryResponse: z.ZodType<any> = z.lazy(() =>
-  openapi(
+export const AdminCategoryResponse = openapi(
+  z.lazy(() =>
     withTimestamps({
       id: UUID,
       nameKey: z
@@ -48,10 +48,11 @@ export const AdminCategoryResponse: z.ZodType<any> = z.lazy(() =>
         .optional()
         .describe('Child categories for hierarchical display'),
     }),
-    {
-      description: 'Category information for admin management',
-    },
   ),
+  {
+    description: 'Category information for admin management with hierarchical structure',
+    ref: 'AdminCategoryResponse',
+  },
 )
 
 export type AdminCategoryResponse = z.infer<typeof AdminCategoryResponse>

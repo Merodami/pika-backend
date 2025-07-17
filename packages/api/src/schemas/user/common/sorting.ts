@@ -1,4 +1,4 @@
-import { createSortFieldMapper } from '@pika/api/common'
+import { createSortFieldMapper } from '@api/common/utils/sorting.js'
 
 import { AdminUserSortBy, UserSortBy } from './enums.js'
 

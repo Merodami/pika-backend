@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { DateTime } from '../../../common/schemas/primitives.js'
+import { DateTime } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

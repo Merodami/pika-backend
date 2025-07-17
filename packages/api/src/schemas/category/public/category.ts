@@ -15,44 +15,52 @@ import { openapi } from '../../../common/utils/openapi.js'
 // ============= Category Response =============
 
 /**
- * Public category response
+ * Base category response (non-recursive)
  */
-export const CategoryResponse: z.ZodType<any> = z.lazy(() =>
-  openapi(
-    withTimestamps({
-      id: UUID,
-      nameKey: z
-        .string()
-        .max(255)
-        .describe('Translation key for category name'),
-      descriptionKey: z
-        .string()
-        .max(255)
-        .optional()
-        .describe('Translation key for category description'),
-      icon: z.string().max(255).optional().describe('Category icon identifier'),
-      parentId: UUID.optional().describe(
-        'Parent category ID for hierarchical structure',
-      ),
-      isActive: z
-        .boolean()
-        .default(true)
-        .describe('Whether category is active'),
-      sortOrder: z.number().int().default(0).describe('Sort order for display'),
-      createdBy: UserId.describe('User who created the category'),
-      updatedBy: UserId.optional().describe(
-        'User who last updated the category',
-      ),
-      children: z
-        .array(CategoryResponse)
-        .optional()
-        .describe('Child categories for hierarchical display'),
-    }),
-    {
-      description: 'Category information',
-    },
-  ),
+const BaseCategoryResponse = openapi(
+  withTimestamps({
+    id: UUID,
+    nameKey: z
+      .string()
+      .max(255)
+      .describe('Translation key for category name'),
+    descriptionKey: z
+      .string()
+      .max(255)
+      .optional()
+      .describe('Translation key for category description'),
+    icon: z.string().max(255).optional().describe('Category icon identifier'),
+    parentId: UUID.optional().describe(
+      'Parent category ID for hierarchical structure',
+    ),
+    isActive: z
+      .boolean()
+      .default(true)
+      .describe('Whether category is active'),
+    sortOrder: z.number().int().default(0).describe('Sort order for display'),
+    createdBy: UserId.describe('User who created the category'),
+    updatedBy: UserId.optional().describe(
+      'User who last updated the category',
+    ),
+  }),
+  {
+    description: 'Category information',
+  },
 )
+
+/**
+ * Public category response with optional children
+ */
+export const CategoryResponse: z.ZodType<any> = BaseCategoryResponse.extend({
+  children: z
+    .array(z.lazy(() => CategoryResponse))
+    .optional()
+    .describe('Child categories for hierarchical display')
+    .openapi({ type: 'array', items: { $ref: '#/components/schemas/CategoryResponse' } }),
+}).openapi({
+  description: 'Category information with hierarchical structure',
+  ref: 'CategoryResponse',
+})
 
 export type CategoryResponse = z.infer<typeof CategoryResponse>
 

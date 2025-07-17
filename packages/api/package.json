@@ -27,17 +27,21 @@
     "./common": {
       "types": "./dist/common/index.d.ts",
       "import": "./dist/common/index.js"
+    },
+    "./pdf": {
+      "types": "./dist/schemas/pdf/index.d.ts",
+      "import": "./dist/schemas/pdf/index.js"
     }
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@asteasolutions/zod-to-openapi": "^8.0.0",
     "@pika/environment": "workspace:^",
     "@pika/types": "workspace:^",
     "@sinclair/typebox": "^0.34.37",
     "fs-extra": "^11.3.0",
     "lodash-es": "^4.17.21",
     "tsc-alias": "^1.8.16",
-    "zod": "^3.25.76",
+    "zod": "^4.0.5",
     "zod-validation-error": "^3.5.3"
   },
   "devDependencies": {

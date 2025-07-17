@@ -1,16 +1,16 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
+import { UserId } from '../../shared/branded.js'
 import {
   ProblemSortBy,
   SortOrder,
   TicketPriority,
   TicketStatus,
   TicketType,
-} from '../../../common/schemas/enums.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+} from '../../shared/enums.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { ProblemIdParam } from '../common/index.js'
 

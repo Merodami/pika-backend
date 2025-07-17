@@ -1,7 +1,8 @@
 import { DEFAULT_LANGUAGE } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import type { BusinessDomain } from '@pika/sdk'
-import { ErrorFactory, logger, type ParsedIncludes, TranslationServiceClient } from '@pika/shared'
+import { ErrorFactory, logger, type ParsedIncludes } from '@pika/shared'
+import type { TranslationClient } from '@pika/translation'
 import type { PaginatedResult } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
@@ -49,7 +50,7 @@ export interface UpdateBusinessRequest {
 export class BusinessService implements IBusinessService {
   constructor(
     private readonly businessRepository: IBusinessRepository,
-    private readonly translationService: TranslationServiceClient,
+    private readonly translationService: TranslationClient,
     private readonly cacheService?: ICacheService,
   ) {}
 
@@ -144,18 +145,18 @@ export class BusinessService implements IBusinessService {
         : undefined
 
       // Create translations
-      await this.translationService.createTranslation({
-        key: businessNameKey,
-        value: data.businessName,
-        language: DEFAULT_LANGUAGE,
-      })
+      await this.translationService.set(
+        businessNameKey,
+        DEFAULT_LANGUAGE,
+        data.businessName
+      )
 
       if (businessDescriptionKey && data.businessDescription) {
-        await this.translationService.createTranslation({
-          key: businessDescriptionKey,
-          value: data.businessDescription,
-          language: DEFAULT_LANGUAGE,
-        })
+        await this.translationService.set(
+          businessDescriptionKey,
+          DEFAULT_LANGUAGE,
+          data.businessDescription
+        )
       }
 
       // Create business record
@@ -220,11 +221,11 @@ export class BusinessService implements IBusinessService {
         } else if (data.businessDescription && !existingBusiness.businessDescriptionKey) {
           // Create new description
           const businessDescriptionKey = `business.description.${uuid()}`
-          await this.translationService.createTranslation({
-            key: businessDescriptionKey,
-            value: data.businessDescription,
-            language: DEFAULT_LANGUAGE,
-          })
+          await this.translationService.set(
+            businessDescriptionKey,
+            DEFAULT_LANGUAGE,
+            data.businessDescription
+          )
           updateData.businessDescriptionKey = businessDescriptionKey
         } else if (!data.businessDescription && existingBusiness.businessDescriptionKey) {
           // Remove description

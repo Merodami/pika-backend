@@ -4,7 +4,7 @@ import {
   HealthStatus,
   ServiceHealth,
   SimpleHealthCheckResponse,
-} from '../../../common/schemas/health.js'
+} from '../../shared/health.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

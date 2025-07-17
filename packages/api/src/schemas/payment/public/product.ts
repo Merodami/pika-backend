@@ -103,7 +103,7 @@ export const CreatePriceRequest = openapi(
   z.object({
     productId: z.string(),
     amount: Money,
-    currency: Currency.default('USD'),
+    currency: Currency.default('usd'),
     interval: PriceInterval.optional(),
     intervalCount: z.number().int().positive().optional(),
   }),

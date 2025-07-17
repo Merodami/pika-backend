@@ -7,7 +7,7 @@ import type {
   BulkArchiveVoucherBooksRequest,
   VoucherBookStatsQueryParams,
 } from '@pika/api/admin'
-import type { VoucherBookIdParam } from '@pika/api/common'
+import type { VoucherBookIdParam } from '@pika/api/pdf'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, getValidatedBody, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'

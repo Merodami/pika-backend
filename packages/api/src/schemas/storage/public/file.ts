@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { UserId } from '../../shared/branded.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { FileType, FileStatus, StorageProvider, AllowedMimeTypes, FileSortBy, FileIdParam, FileHistoryIdParam } from '../common/index.js'
 

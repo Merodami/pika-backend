@@ -1,7 +1,7 @@
 import { VOUCHER_API_URL } from '@pika/environment'
 import { VoucherDomain } from '@pika/sdk'
 import { BaseServiceClient, logger } from '@pika/shared'
-import type { ServiceContext } from '@pika/types-core'
+import type { ServiceContext } from '@pika/types'
 
 export class VoucherServiceClient extends BaseServiceClient {
   constructor(serviceUrl: string = VOUCHER_API_URL) {

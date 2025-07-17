@@ -58,22 +58,25 @@ export type PlanSortBy = z.infer<typeof PlanSortBy>
 // ============= Internal Service Enums =============
 
 export const SubscriptionEvent = z.enum([
+  'customer.subscription.created',
+  'customer.subscription.updated', 
+  'customer.subscription.deleted',
+  'customer.subscription.trial_will_end',
+  'invoice.payment_failed',
+  'invoice.payment_succeeded',
   'created',
-  'updated',
-  'canceled',
-  'reactivated',
-  'expired',
+  'cancelled',
   'paymentFailed',
-  'paymentSucceeded',
+  'creditsAllocated',
+  'renewalReminder',
+  'trialEnding',
 ])
 
 export type SubscriptionEvent = z.infer<typeof SubscriptionEvent>
 
 export const UsageType = z.enum([
   'featureAccess',
-  'apiCall',
-  'storage',
-  'bandwidth',
+  'creditDeduction',
 ])
 
 export type UsageType = z.infer<typeof UsageType>

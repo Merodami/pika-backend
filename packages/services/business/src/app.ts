@@ -1,9 +1,11 @@
 // Import the necessary dependencies
 import { PrismaClient } from '@prisma/client'
-import { BUSINESS_SERVICE_PORT } from '@pika/environment'
+import { BUSINESS_SERVICE_PORT, REDIS_PASSWORD } from '@pika/environment'
 import { startServer } from '@pika/http'
-import { initializeCache } from '@pika/redis'
-import { logger, TranslationServiceClient } from '@pika/shared'
+import { initializeCache, RedisConfigService } from '@pika/redis'
+import { logger } from '@pika/shared'
+import { createTranslationService, TranslationClient } from '@pika/translation'
+import { Redis } from 'ioredis'
 
 // Import the server creation function
 import { createBusinessServer } from './server.js'
@@ -32,7 +34,19 @@ export async function startBusinessService() {
   // Connect to services
   const prisma = await initializeDatabase()
   const cacheService = await initializeCache()
-  const translationServiceClient = new TranslationServiceClient()
+  
+  // Create translation service and client
+  // Use the same Redis configuration as the cache service
+  const redisConfig = RedisConfigService.getInstance().getConfig()
+  const translationRedis = new Redis({
+    host: redisConfig.host,
+    port: redisConfig.port,
+    password: REDIS_PASSWORD,
+    db: process.env.REDIS_DB ? parseInt(process.env.REDIS_DB) : 0,
+  })
+  
+  const translationService = createTranslationService(prisma, translationRedis)
+  const translationClient = new TranslationClient(translationService)
 
   logger.info(`Business service starting on port: ${BUSINESS_SERVICE_PORT}`)
 
@@ -40,7 +54,7 @@ export async function startBusinessService() {
   const app = await createBusinessServer({
     prisma,
     cacheService,
-    translationServiceClient,
+    translationClient,
   })
 
   // Start the server
@@ -51,8 +65,9 @@ export async function startBusinessService() {
       // Close database connection
       await prisma.$disconnect()
 
-      // Close Redis connection
+      // Close Redis connections
       await cacheService.disconnect()
+      translationRedis.disconnect()
 
       logger.info('Business service shutdown complete')
     },

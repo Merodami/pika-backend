@@ -1,17 +1,17 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
+import { UserId } from '../../shared/branded.js'
 import {
   SortOrder,
   TicketPriority,
   TicketStatus,
   TicketType,
   TimestampSortBy,
-} from '../../../common/schemas/enums.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
-import { createIncludeParam } from '../../../common/schemas/query.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+} from '../../shared/enums.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
+import { createIncludeParam } from '../../shared/query.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { AdminTicketSortBy, TicketIdParam } from '../common/index.js'
 

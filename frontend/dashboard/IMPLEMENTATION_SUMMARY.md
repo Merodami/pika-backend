@@ -25,7 +25,7 @@ This document summarizes the complete MVP implementation of the Pika Dashboard f
   "firebase": "^11.9.1",
   "axios": "^1.10.0",
   "react-hook-form": "^7.58.1",
-  "zod": "^3.25.67",
+  "zod": "^4.0.5",
   "vitest": "^3.2.4"
 }
 ```

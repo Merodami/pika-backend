@@ -65,9 +65,9 @@ export type PromoCodeWithUsages = z.infer<typeof PromoCodeWithUsages>
 // ============= Create/Update Promo Code =============
 
 /**
- * Create promo code request
+ * Create promo code request (public)
  */
-export const CreatePromoCodeRequest = openapi(
+export const PublicCreatePromoCodeRequest = openapi(
   z.object({
     code: z.string().min(1).max(50).toUpperCase(),
     discount: Percentage,
@@ -78,16 +78,16 @@ export const CreatePromoCodeRequest = openapi(
     createdBy: UserId,
   }),
   {
-    description: 'Create a new promo code',
+    description: 'Create a new promo code (public)',
   },
 )
 
-export type CreatePromoCodeRequest = z.infer<typeof CreatePromoCodeRequest>
+export type PublicCreatePromoCodeRequest = z.infer<typeof PublicCreatePromoCodeRequest>
 
 /**
- * Update promo code request
+ * Update promo code request (public)
  */
-export const UpdatePromoCodeRequest = openapi(
+export const PublicUpdatePromoCodeRequest = openapi(
   z.object({
     code: z.string().min(1).max(50).toUpperCase().optional(),
     discount: Percentage.optional(),
@@ -97,11 +97,11 @@ export const UpdatePromoCodeRequest = openapi(
     expirationDate: DateTime.optional(),
   }),
   {
-    description: 'Update promo code details',
+    description: 'Update promo code details (public)',
   },
 )
 
-export type UpdatePromoCodeRequest = z.infer<typeof UpdatePromoCodeRequest>
+export type PublicUpdatePromoCodeRequest = z.infer<typeof PublicUpdatePromoCodeRequest>
 
 // ============= Use Promo Code =============
 

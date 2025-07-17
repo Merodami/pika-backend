@@ -7,6 +7,8 @@ import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { AdminUserDetailResponse } from '../../user/admin/management.js'
+import { CategoryResponse } from '../../category/public/category.js'
 
 /**
  * Admin business management schemas
@@ -17,66 +19,46 @@ import { openapi } from '../../../common/utils/openapi.js'
 /**
  * Admin business response (includes all fields for management)
  */
-export const AdminBusinessResponse: z.ZodType<any> = z.lazy(() =>
-  openapi(
-    withTimestamps({
-      id: UUID,
-      userId: UserId.describe('User who owns this business'),
-      businessNameKey: z
-        .string()
-        .max(255)
-        .describe('Translation key for business name'),
-      businessDescriptionKey: z
-        .string()
-        .max(255)
-        .optional()
-        .describe('Translation key for business description'),
-      categoryId: UUID.describe('Category this business belongs to'),
-      verified: z
-        .boolean()
-        .default(false)
-        .describe('Whether business is verified'),
-      active: z
-        .boolean()
-        .default(true)
-        .describe('Whether business is active'),
-      avgRating: z
-        .number()
-        .min(0)
-        .max(5)
-        .default(0)
-        .describe('Average rating of the business'),
-      deletedAt: z
-        .string()
-        .datetime()
-        .nullable()
-        .describe('Soft deletion timestamp'),
-      // Optional relations
-      user: z
-        .object({
-          id: UUID,
-          firstName: z.string(),
-          lastName: z.string(),
-          email: z.string().email(),
-          role: z.enum(['ADMIN', 'CUSTOMER', 'BUSINESS']),
-        })
-        .optional()
-        .describe('User who owns this business'),
-      category: z
-        .object({
-          id: UUID,
-          nameKey: z.string(),
-          descriptionKey: z.string().optional(),
-          icon: z.string().optional(),
-          isActive: z.boolean(),
-        })
-        .optional()
-        .describe('Category information'),
-    }),
-    {
-      description: 'Business information for admin management',
-    },
-  ),
+export const AdminBusinessResponse = openapi(
+  withTimestamps({
+    id: UUID,
+    userId: UserId.describe('User who owns this business'),
+    businessNameKey: z
+      .string()
+      .max(255)
+      .describe('Translation key for business name'),
+    businessDescriptionKey: z
+      .string()
+      .max(255)
+      .optional()
+      .describe('Translation key for business description'),
+    categoryId: UUID.describe('Category this business belongs to'),
+    verified: z
+      .boolean()
+      .default(false)
+      .describe('Whether business is verified'),
+    active: z
+      .boolean()
+      .default(true)
+      .describe('Whether business is active'),
+    avgRating: z
+      .number()
+      .min(0)
+      .max(5)
+      .default(0)
+      .describe('Average rating of the business'),
+    deletedAt: z
+      .string()
+      .datetime()
+      .nullable()
+      .describe('Soft deletion timestamp'),
+    // Optional relations - industry standard pattern
+    user: AdminUserDetailResponse.optional().describe('Business owner details when ?include=user'),
+    category: CategoryResponse.optional().describe('Category information when ?include=category'),
+  }),
+  {
+    description: 'Business information for admin management',
+  },
 )
 
 export type AdminBusinessResponse = z.infer<typeof AdminBusinessResponse>

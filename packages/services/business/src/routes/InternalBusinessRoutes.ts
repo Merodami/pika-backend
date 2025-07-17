@@ -5,7 +5,7 @@ import {
   GetBusinessesByIdsRequest,
   GetBusinessesByCategoryRequest,
   UserIdParam,
-} from '@pika/api/internal'
+} from '@pika/api'
 import {
   requireInternalAuth,
   validateBody,
@@ -13,7 +13,7 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import { TranslationServiceClient } from '@pika/shared'
+import type { TranslationClient } from '@pika/translation'
 import { Router } from 'express'
 
 import { InternalBusinessController } from '../controllers/InternalBusinessController.js'
@@ -26,14 +26,13 @@ import { BusinessService } from '../services/BusinessService.js'
 export function createInternalBusinessRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
-  translationServiceClient?: TranslationServiceClient,
+  translationClient: TranslationClient,
 ): Router {
   const router = Router()
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
-  const translationService = translationServiceClient || new TranslationServiceClient()
-  const service = new BusinessService(repository, translationService, cache)
+  const service = new BusinessService(repository, translationClient, cache)
   const controller = new InternalBusinessController(service)
 
   // All routes require internal authentication

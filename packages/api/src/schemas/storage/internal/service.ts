@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
+import { UserId } from '../../shared/branded.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { FileType, FileStatus, StorageProvider } from '../common/index.js'
 

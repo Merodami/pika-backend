@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { DateTime, UUID } from '../../../common/schemas/primitives.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

@@ -3,7 +3,7 @@ import { validateQuery, validateParams } from '@pika/http'
 import type {
   VoucherBookQueryParams,
 } from '@pika/api/public'
-import { VoucherBookIdParam } from '@pika/api/common'
+import { VoucherBookIdParam } from '@pika/api/pdf'
 
 import type { VoucherBookController } from '../controllers/VoucherBookController.js'
 

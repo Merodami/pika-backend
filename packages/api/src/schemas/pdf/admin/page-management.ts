@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
-import { PageLayoutType, AdSize, ContentType } from '../../../common/schemas/enums.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { UUID } from '../../../common/schemas/primitives.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { UserId } from '../../shared/branded.js'
+import { PageLayoutType, AdSize, ContentType } from '../../shared/enums.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

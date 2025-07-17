@@ -7,9 +7,9 @@ export * as SubscriptionSchemas from './subscription/index.js'
 export * as SupportSchemas from './support/index.js'
 export * as AuthSchemas from './auth/index.js'
 export * as CommunicationSchemas from './communication/index.js'
-export * as InductionSchemas from './induction/index.js'
+// export * as InductionSchemas from './induction/index.js' // Service doesn't exist yet
 export * as StorageSchemas from './storage/index.js'
-export * as StuffSchemas from './stuff/index.js'
+// export * as StuffSchemas from './stuff/index.js' // Service doesn't exist yet
 export * as SystemSchemas from './system/index.js'
 export * as DiscoverySchemas from './discovery/index.js'
 export * as PdfSchemas from './pdf/index.js'

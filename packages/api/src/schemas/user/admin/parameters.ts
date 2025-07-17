@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { Email, UserId } from '../../../common/schemas/branded.js'
+import { Email, UserId } from '../../shared/branded.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

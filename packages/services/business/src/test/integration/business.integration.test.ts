@@ -20,44 +20,13 @@ import {
   AuthenticatedRequestClient, 
   createE2EAuthHelper, 
   E2EAuthHelper,
-  createMockTranslationServiceClient,
+  MockTranslationServiceClient,
   clearMockTranslations
 } from '@pika/tests'
+import { logger } from '@pika/shared'
+import { TranslationClient } from '@pika/translation'
 
 import { createBusinessServer } from '../../server.js'
-
-// Create a simple mock translation store
-const mockTranslations = new Map<string, string>()
-
-// Mock TranslationServiceClient inline for now
-class MockTranslationServiceClient {
-  async createTranslation({ key, value }: { key: string; value: string; language?: string }) {
-    mockTranslations.set(key, value)
-    return { key, value, language: language || 'es' }
-  }
-  
-  async updateTranslation({ key, value }: { key: string; value: string; language?: string }) {
-    mockTranslations.set(key, value)
-    return { key, value, language: language || 'es' }
-  }
-  
-  async translate(key: string) {
-    return mockTranslations.get(key) || key
-  }
-}
-
-// Mock the shared module
-vi.mock('@pika/shared', async () => {
-  const actual = await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
-  
-  return {
-    ...actual,
-    TranslationServiceClient: MockTranslationServiceClient,
-  }
-})
-
-// Import after mocking
-import { logger, TranslationServiceClient } from '@pika/shared'
 
 // Helper function to seed test businesses
 async function seedTestBusinesses(
@@ -142,7 +111,10 @@ describe('Business API Integration Tests', () => {
   let businessClient: AuthenticatedRequestClient
 
   const mockCacheService = new MemoryCacheService()
-  const mockTranslationService = createMockTranslationServiceClient()
+  
+  // Create mock translation client
+  const mockTranslationService = new MockTranslationServiceClient()
+  const mockTranslationClient = new TranslationClient(mockTranslationService as any)
 
   beforeAll(async () => {
     // Use unified test database helper
@@ -155,10 +127,10 @@ describe('Business API Integration Tests', () => {
     // Update process.env for compatibility with existing code
     process.env.DATABASE_URL = testDb.databaseUrl
 
-    const { app: server } = await createBusinessServer({
+    const server = await createBusinessServer({
       prisma: testDb.prisma,
       cacheService: mockCacheService,
-      translationServiceClient: mockTranslationService,
+      translationClient: mockTranslationClient,
     })
     
     app = server

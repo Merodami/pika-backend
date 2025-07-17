@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-import { UserId } from '../../../common/schemas/branded.js'
-import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { UUID } from '../../../common/schemas/primitives.js'
-import { createSearchSchema } from '../../../common/schemas/query.js'
-import { paginatedResponse } from '../../../common/schemas/responses.js'
+import { UserId } from '../../shared/branded.js'
+import { withTimestamps } from '../../shared/metadata.js'
+import { UUID } from '../../shared/primitives.js'
+import { createSearchSchema } from '../../shared/query.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { openapi } from '../../../common/utils/openapi.js'
 import { SupportCommentIdParam, ProblemIdForCommentsParam } from '../common/index.js'
 

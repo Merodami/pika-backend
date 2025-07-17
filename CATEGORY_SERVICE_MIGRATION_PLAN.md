@@ -7,6 +7,7 @@ This is the comprehensive migration plan for the Category Service, documenting t
 ## Implementation Status
 
 ### ✅ COMPLETED - Business Service (Migrated from Provider)
+
 - **Database Schema**: Business model using translation keys (`businessNameKey`, `businessDescriptionKey`)
 - **Domain Types**: Complete interfaces for `Business`, `BusinessSearchParams`, `CreateBusinessData`, `UpdateBusinessData`
 - **Mappers**: Full transformation between database, domain, and DTO layers with category relations
@@ -18,6 +19,7 @@ This is the comprehensive migration plan for the Category Service, documenting t
 - **Clean Architecture**: Following Controller → Service → Repository pattern with proper layer separation
 
 ### ✅ COMPLETED - Core Architecture
+
 - **Database Schema**: Enhanced with `slug`, `level`, `path`, `createdBy`, `updatedBy`, `deletedAt` fields
 - **Domain Types**: Complete interfaces for `Category`, `CategorySearchParams`, `CreateCategoryData`, `UpdateCategoryData`
 - **Mappers**: Full transformation between database, domain, and DTO layers with hierarchical support
@@ -26,11 +28,13 @@ This is the comprehensive migration plan for the Category Service, documenting t
 - **Controllers**: Public, Admin, and Internal controllers with proper validation and error handling
 
 ### ✅ COMPLETED - Translation Service Integration
+
 - **Translation Keys**: Using `nameKey` and `descriptionKey` instead of JSONB multilingual fields
 - **Language Agnostic**: Database stores translation keys, frontend resolves via translation service
 - **Backward Compatibility**: Mappers handle translation key generation and resolution
 
 ### ✅ COMPLETED - Advanced Features
+
 - **Hierarchical Categories**: Complete parent-child relationships with materialized paths
 - **Soft Delete**: All operations respect `deletedAt` field
 - **Slug Generation**: Automatic URL-friendly slug creation from `nameKey`
@@ -43,14 +47,16 @@ This is the comprehensive migration plan for the Category Service, documenting t
 ### How We Handle Multilingual Content
 
 **Old Pika System**:
+
 ```json
 {
-  "name": {"en": "Home", "es": "Hogar", "gn": "Óga"},
-  "description": {"en": "Description", "es": "Descripción", "gn": "Descripción gn"}
+  "name": { "en": "Home", "es": "Hogar", "gn": "Óga" },
+  "description": { "en": "Description", "es": "Descripción", "gn": "Descripción gn" }
 }
 ```
 
 **New Implementation**:
+
 ```typescript
 // Database Schema
 model Category {
@@ -66,12 +72,13 @@ const translatedName = await translationService.translate(translationKey, userLa
 ### Implementation Details
 
 1. **Category Creation Flow**:
+
    ```typescript
    async createCategory(data: CreateCategoryData): Promise<Category> {
      // Generate translation keys
      const nameKey = `category.name.${uuid()}`
      const descriptionKey = data.description ? `category.description.${uuid()}` : null
-     
+
      // Create category with translation keys
      const category = await this.repository.create({
        ...data,
@@ -81,31 +88,32 @@ const translatedName = await translationService.translate(translationKey, userLa
        level: calculateLevel(data.parentId),
        path: calculatePath(data.parentId)
      })
-     
+
      // Register translations in translation service
      await translationService.setTranslations(nameKey, data.name) // {en: "...", es: "..."}
      if (data.description) {
        await translationService.setTranslations(descriptionKey, data.description)
      }
-     
+
      return category
    }
    ```
 
 2. **Response Translation Flow**:
+
    ```typescript
    async getCategoryById(id: string): Promise<CategoryResponse> {
      const category = await this.repository.findById(id)
-     
+
      // Resolve translations
      const translatedName = await translationService.translate(
-       category.nameKey, 
+       category.nameKey,
        request.language || 'en'
      )
-     const translatedDescription = category.descriptionKey 
+     const translatedDescription = category.descriptionKey
        ? await translationService.translate(category.descriptionKey, request.language || 'en')
        : null
-     
+
      return {
        ...category,
        name: translatedName,
@@ -121,12 +129,12 @@ const translatedName = await translationService.translate(translationKey, userLa
      // Option 1: Search in translation service first, get keys
      const matchingKeys = await translationService.searchTranslations(search, language)
      const categories = await this.repository.findByNameKeys(matchingKeys)
-     
+
      // Option 2: Search in nameKey field directly (less precise but faster)
      const categories = await this.repository.findAll({
        search: search // searches in nameKey field
      })
-     
+
      return categories
    }
    ```
@@ -134,6 +142,7 @@ const translatedName = await translationService.translate(translationKey, userLa
 ## Current Implementation Details
 
 ### Database Schema (✅ COMPLETED)
+
 ```sql
 -- Enhanced Category table with all features from old Pika system
 CREATE TABLE catalog.categories (
@@ -163,10 +172,11 @@ CREATE INDEX idx_categories_active_deleted ON categories(is_active, deleted_at);
 ```
 
 ### Translation Service Integration (✅ COMPLETED)
+
 ```typescript
 // How we handle multilingual content in the new system
 interface CategoryTranslations {
-  nameKey: string        // "category.name.{categoryId}"
+  nameKey: string // "category.name.{categoryId}"
   descriptionKey?: string // "category.description.{categoryId}"
 }
 
@@ -176,6 +186,7 @@ const translatedName = await translationService.translate(category.nameKey, user
 ```
 
 ### API Schemas (✅ COMPLETED)
+
 ```typescript
 // Public API - Uses shared pagination and camelCase
 export const CategoryQueryParams = SearchParams.extend({
@@ -205,6 +216,7 @@ export const InternalCategoryData = z.object({
 ```
 
 ### Repository Features (✅ COMPLETED)
+
 ```typescript
 // All old Pika features implemented
 class CategoryRepository {
@@ -215,12 +227,12 @@ class CategoryRepository {
   async create(data: CreateCategoryData): Promise<Category>
   async update(id: string, data: UpdateCategoryData): Promise<Category>
   async delete(id: string): Promise<void> // Soft delete
-  
+
   // Hierarchy operations
   async getHierarchy(rootId?: string): Promise<Category[]>
   async getPath(id: string): Promise<Category[]>
   async exists(id: string): Promise<boolean>
-  
+
   // Features:
   // - Materialized path calculation
   // - Level tracking
@@ -232,6 +244,7 @@ class CategoryRepository {
 ```
 
 ### Service Layer (✅ COMPLETED)
+
 ```typescript
 class CategoryService {
   // Business logic with validation
@@ -240,7 +253,7 @@ class CategoryService {
   async createCategory(data: CreateCategoryData): Promise<Category>
   async updateCategory(id: string, data: UpdateCategoryData): Promise<Category>
   async deleteCategory(id: string): Promise<void>
-  
+
   // Advanced operations
   async toggleCategoryStatus(id: string): Promise<Category>
   async moveCategory(id: string, newParentId: string | null): Promise<Category>
@@ -248,7 +261,7 @@ class CategoryService {
   async getCategoryHierarchy(rootId?: string): Promise<Category[]>
   async getCategoryPath(id: string): Promise<Category[]>
   async categoryExists(id: string): Promise<boolean>
-  
+
   // Features:
   // - Caching with Redis
   // - Validation and error handling
@@ -257,34 +270,35 @@ class CategoryService {
 ```
 
 ### Controllers (✅ COMPLETED)
+
 ```typescript
 // Public CategoryController - Customer-facing endpoints
 class CategoryController {
-  async getAllCategories()     // GET /categories
-  async getCategoryById()      // GET /categories/:id
+  async getAllCategories() // GET /categories
+  async getCategoryById() // GET /categories/:id
   async getCategoryHierarchy() // GET /categories/hierarchy
-  async getCategoryPath()      // GET /categories/:id/path
+  async getCategoryPath() // GET /categories/:id/path
 }
 
 // Admin CategoryController - Management operations
 class AdminCategoryController {
-  async getAllCategories()           // GET /admin/categories
-  async getCategoryById()            // GET /admin/categories/:id
-  async createCategory()             // POST /admin/categories
-  async updateCategory()             // PATCH /admin/categories/:id
-  async deleteCategory()             // DELETE /admin/categories/:id
-  async toggleCategoryStatus()       // POST /admin/categories/:id/toggle-status
-  async moveCategory()               // POST /admin/categories/:id/move
-  async updateCategorySortOrder()    // POST /admin/categories/:id/sort-order
-  async bulkDeleteCategories()       // POST /admin/categories/bulk-delete
-  async getCategoryHierarchy()       // GET /admin/categories/hierarchy
+  async getAllCategories() // GET /admin/categories
+  async getCategoryById() // GET /admin/categories/:id
+  async createCategory() // POST /admin/categories
+  async updateCategory() // PATCH /admin/categories/:id
+  async deleteCategory() // DELETE /admin/categories/:id
+  async toggleCategoryStatus() // POST /admin/categories/:id/toggle-status
+  async moveCategory() // POST /admin/categories/:id/move
+  async updateCategorySortOrder() // POST /admin/categories/:id/sort-order
+  async bulkDeleteCategories() // POST /admin/categories/bulk-delete
+  async getCategoryHierarchy() // GET /admin/categories/hierarchy
 }
 
 // Internal CategoryController - Service-to-service
 class InternalCategoryController {
-  async getCategoryById()        // GET /internal/categories/:id
-  async getCategoriesByIds()     // POST /internal/categories/bulk
-  async validateCategories()     // POST /internal/categories/validate
+  async getCategoryById() // GET /internal/categories/:id
+  async getCategoriesByIds() // POST /internal/categories/bulk
+  async validateCategories() // POST /internal/categories/validate
   async getActiveCategoriesOnly() // GET /internal/categories/active
 }
 ```
@@ -292,6 +306,7 @@ class InternalCategoryController {
 ## Missing Implementation Tasks
 
 ### 🔄 TODO - Complete Integration
+
 1. **Route Definitions** - Wire controllers to Express routes
 2. **App & Server Setup** - Create service startup and configuration
 3. **API Documentation** - Register schemas in OpenAPI generation
@@ -299,12 +314,14 @@ class InternalCategoryController {
 5. **NX Configuration** - Add to monorepo build system
 
 ### 🔄 TODO - Translation Service Integration
+
 1. **Translation Client** - Add CommunicationServiceClient calls for translations
 2. **Language Middleware** - Handle Accept-Language header
 3. **Response Translation** - Resolve translation keys in mappers
 4. **Search Enhancement** - Search in translated text via translation service
 
 ### 🔄 TODO - Additional Features
+
 1. **Icon Upload** - File upload endpoint for category icons
 2. **Dependency Checking** - Validate references from other services
 3. **Advanced Filtering** - Level-based filtering, path-based queries
@@ -564,7 +581,7 @@ mkdir -p packages/services/category/{src/{controllers,services,repositories,rout
     "@pika/sdk": "workspace:^",
     "@prisma/client": "^6.1.0",
     "express": "^4.21.2",
-    "zod": "^3.24.1"
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

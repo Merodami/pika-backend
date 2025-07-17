@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-import { Email, UserId } from '../../../common/schemas/branded.js'
-import { UserRole } from '../../../common/schemas/enums.js'
+import { Email, UserId } from '../../shared/branded.js'
+import { UserRole } from '../../shared/enums.js'
 import {
   DateOnly,
   DateTime,
   LanguageCode,
   PhoneNumber,
-} from '../../../common/schemas/primitives.js'
+} from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

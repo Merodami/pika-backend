@@ -2,25 +2,18 @@ import { z } from 'zod'
 
 import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import {
+  SubscriptionStatus,
+  BillingInterval,
+  SubscriptionSortBy,
+  BulkAction,
+} from '../common/enums.js'
 
 /**
  * Admin subscription management schemas
  */
-
-// ============= Enums =============
-
-export const SubscriptionStatus = z.enum([
-  'ACTIVE',
-  'PAST_DUE',
-  'CANCELED',
-  'INCOMPLETE',
-  'INCOMPLETE_EXPIRED',
-  'TRIALING',
-  'UNPAID',
-])
-
-export const SubscriptionInterval = z.enum(['MONTHLY', 'YEARLY'])
 
 // ============= Query Parameters =============
 
@@ -28,20 +21,15 @@ export const SubscriptionInterval = z.enum(['MONTHLY', 'YEARLY'])
  * Admin get subscriptions query parameters
  */
 export const AdminGetSubscriptionsQuery = openapi(
-  z.object({
+  SearchParams.extend({
     userId: UserId.optional(),
     status: SubscriptionStatus.optional(),
-    interval: SubscriptionInterval.optional(),
+    interval: BillingInterval.optional(),
     planId: UUID.optional(),
     cancelAtPeriodEnd: z.coerce.boolean().optional(),
     fromDate: DateTime.optional(),
     toDate: DateTime.optional(),
-    page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(20),
-    sortBy: z
-      .enum(['createdAt', 'updatedAt', 'currentPeriodEnd'])
-      .default('createdAt'),
-    sortOrder: z.enum(['asc', 'desc']).default('desc'),
+    sortBy: SubscriptionSortBy.default('createdAt'),
   }),
   {
     description: 'Query parameters for admin subscription listing',
@@ -70,25 +58,3 @@ export type SubscriptionIdParam = z.infer<typeof SubscriptionIdParam>
 
 // ============= Request Bodies =============
 
-/**
- * Process subscription credits request
- */
-export const ProcessSubscriptionCreditsRequest = openapi(
-  z.object({
-    force: z
-      .boolean()
-      .default(false)
-      .describe('Force processing even if already processed'),
-    dryRun: z
-      .boolean()
-      .default(false)
-      .describe('Simulate processing without making changes'),
-  }),
-  {
-    description: 'Process monthly credits for a subscription',
-  },
-)
-
-export type ProcessSubscriptionCreditsRequest = z.infer<
-  typeof ProcessSubscriptionCreditsRequest
->

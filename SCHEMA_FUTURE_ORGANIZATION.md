@@ -61,21 +61,41 @@ src/schemas/
 5. **Extensible** - easy to add new tiers or schema types per service
 6. **Cleaner imports** - `import { CategoryIdParam } from '@pika/api/schemas/category/common'`
 
-### Import Patterns
+### Import Patterns (Using Path Mappings)
 
+**NEW: TypeScript Path Mapping Configuration**
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@api/*": ["src/*"],
+      "@api": ["src/index.ts"]
+    }
+  }
+}
+```
+
+**Improved Import Patterns**
 ```typescript
-// Service-specific imports
-import { CategoryIdParam } from '@pika/api/schemas/category/common'
-import { CreateCategoryRequest } from '@pika/api/schemas/category/admin'
-import { CategoryResponse } from '@pika/api/schemas/category/public'
+// Service-specific imports (NEW: using @api path mapping)
+import { CategoryIdParam } from '@api/schemas/category/common'
+import { CreateCategoryRequest } from '@api/schemas/category/admin'
+import { CategoryResponse } from '@api/schemas/category/public'
 
 // Cross-service imports
-import { UUIDParam, UserIdParam } from '@pika/api/schemas/shared/parameters'
-import { SortOrder } from '@pika/api/schemas/shared/enums'
+import { UUIDParam, UserIdParam } from '@api/schemas/shared/parameters'
+import { SortOrder } from '@api/schemas/shared/enums'
+
+// Utility imports (NEW: improved utilities)
+import { createSortFieldMapper, mapSortOrder } from '@api/common/utils/sorting'
+import { safeParse, formatZodError } from '@api/common/utils/validators'
+import { openapi } from '@api/common/utils/openapi'
 
 // Tier-specific imports (for backward compatibility)
-import * as AdminSchemas from '@pika/api/schemas/admin'
-import * as PublicSchemas from '@pika/api/schemas/public'
+import * as AdminSchemas from '@api/schemas/admin'
+import * as PublicSchemas from '@api/schemas/public'
 ```
 
 ### Migration Strategy

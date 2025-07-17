@@ -259,13 +259,7 @@ export const PageSize = z
   .default(20)
   .describe('Number of items per page')
 
-/**
- * Sort Order
- */
-export const SortOrder = z
-  .enum(['asc', 'desc'])
-  .default('desc')
-  .describe('Sort order direction')
+// SortOrder moved to shared/enums.ts to avoid duplicates
 
 // ============= File Types =============
 

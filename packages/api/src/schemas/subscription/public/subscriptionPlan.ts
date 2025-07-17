@@ -120,16 +120,11 @@ export type UpdateSubscriptionPlanRequest = z.infer<
 /**
  * Subscription plan query parameters
  */
-export const SubscriptionPlanQueryParams = z.object({
+export const SubscriptionPlanQueryParams = SearchParams.extend({
   isActive: z.coerce.boolean().optional(),
-  membershipType: z.string().optional().describe('Filter by membership type'),
-  membershipPackage: z
-    .string()
-    .optional()
-    .describe('Filter by membership package'),
-  interval: SubscriptionInterval.optional(),
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(100).default(20),
+  interval: BillingInterval.optional(),
+  planType: PlanType.optional(),
+  sortBy: PlanSortBy.default('name'),
 })
 
 export type SubscriptionPlanQueryParams = z.infer<

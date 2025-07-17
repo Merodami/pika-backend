@@ -27,7 +27,7 @@ export const ProcessInternalPaymentRequest = openapi(
     fromUserId: UserId,
     toUserId: UserId.optional(),
     amount: Money,
-    currency: z.string().length(3).default('USD'),
+    currency: z.string().length(3).default('usd'),
     type: InternalTransactionType,
     referenceId: z.string(),
     referenceType: z.string(),
@@ -175,7 +175,7 @@ export const ProcessPayoutRequest = openapi(
   z.object({
     businessId: UUID,
     amount: Money,
-    currency: z.string().length(3).default('USD'),
+    currency: z.string().length(3).default('usd'),
     description: z.string(),
     bankAccountId: z.string().optional(),
     metadata: z.record(z.any()).optional(),
