@@ -1,5 +1,5 @@
 import { ICacheService } from '@pika/redis'
-import { UserRole, UserStatus } from '@pika
+import { UserRole, UserStatus } from '@pika/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { JwtTokenService, User } from '../../../services/JwtTokenService.js'

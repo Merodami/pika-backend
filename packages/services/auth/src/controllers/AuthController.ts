@@ -12,7 +12,7 @@ import { RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
-import { UserRole } from '@pika/types'
+import { UserRole, mapRoleToPermissions } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import { AuthMapper } from '../mappers/AuthMapper.js'
@@ -407,7 +407,7 @@ export class AuthController {
       const user = await this.authService.getUserInfo(userId)
 
       // Get permissions based on user role
-      const permissions = this.mapRoleToPermissions(user.role)
+      const permissions = mapRoleToPermissions(user.role)
 
       const userInfo = {
         id: user.id,
@@ -430,45 +430,5 @@ export class AuthController {
     }
   }
 
-  /**
-   * Map user roles to permissions for RBAC
-   */
-  private mapRoleToPermissions(role: UserRole): string[] {
-    switch (role) {
-      case UserRole.ADMIN:
-        return [
-          // User management
-          'users:read',
-          'users:write',
-          'users:delete',
-          // Service management
-          'services:read',
-          'services:write',
-          'services:delete',
-          // Admin specific
-          'admin:dashboard',
-          'admin:settings',
-          'admin:users',
-          'admin:system',
-          // Credits management
-          'credits:admin',
-          'credits:manage_all',
-          // Payment management
-          'payments:admin',
-          'payments:manage_all',
-        ]
-      case UserRole.USER:
-        return [
-          'users:read',
-          'users:write:own',
-          'services:read',
-          'credits:read:own',
-          'credits:write:own',
-          'payments:read:own',
-          'payments:write:own',
-        ]
-      default:
-        return ['users:read:own']
-    }
-  }
+  // Role to permissions mapping is now imported from @pika/types
 }

@@ -8,7 +8,8 @@
  */
 export enum UserRole {
   ADMIN = 'ADMIN',
-  USER = 'USER',
+  CUSTOMER = 'CUSTOMER',
+  BUSINESS = 'BUSINESS',
 }
 
 /**
@@ -22,7 +23,7 @@ export type UserRoleType = `${UserRole}`
  */
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
   BANNED = 'BANNED',
   UNCONFIRMED = 'UNCONFIRMED',
 }
@@ -101,7 +102,6 @@ export enum CommunicationChannel {
  * Type definition for communication channels - use this for type annotations
  */
 export type CommunicationChannelType = `${CommunicationChannel}`
-
 
 /**
  * User verification types for unified verification system
@@ -188,3 +188,97 @@ export enum ProblemType {
  * Type definition for problem type - use this for type annotations
  */
 export type ProblemTypeType = `${ProblemType}`
+
+/**
+ * Voucher states in the system
+ * Must match Prisma schema definitions
+ */
+export enum VoucherState {
+  draft = 'draft',
+  published = 'published',
+  claimed = 'claimed',
+  redeemed = 'redeemed',
+  expired = 'expired',
+  suspended = 'suspended',
+}
+
+/**
+ * Type definition for voucher state - use this for type annotations
+ */
+export type VoucherStateType = `${VoucherState}`
+
+/**
+ * Voucher types in the system
+ * Must match Prisma schema definitions
+ */
+export enum VoucherType {
+  discount = 'discount',
+  fixedValue = 'fixedValue',
+  freeItem = 'freeItem',
+  bogo = 'bogo',
+  experience = 'experience',
+}
+
+/**
+ * Type definition for voucher type - use this for type annotations
+ */
+export type VoucherTypeType = `${VoucherType}`
+
+/**
+ * Voucher scan source types
+ * Used to track how users discovered and scanned vouchers
+ */
+export enum VoucherScanSource {
+  camera = 'camera',
+  gallery = 'gallery',
+  link = 'link',
+  share = 'share',
+}
+
+/**
+ * Type definition for voucher scan source - use this for type annotations
+ */
+export type VoucherScanSourceType = `${VoucherScanSource}`
+
+/**
+ * Voucher scan types
+ * Used to distinguish between customer and business scans
+ */
+export enum VoucherScanType {
+  customer = 'customer',
+  business = 'business',
+}
+
+/**
+ * Type definition for voucher scan type - use this for type annotations
+ */
+export type VoucherScanTypeType = `${VoucherScanType}`
+
+/**
+ * Voucher code types
+ * Used for different voucher code generation methods
+ */
+export enum VoucherCodeType {
+  qr = 'qr',
+  short = 'short',
+  static = 'static',
+}
+
+/**
+ * Type definition for voucher code type - use this for type annotations
+ */
+export type VoucherCodeTypeType = `${VoucherCodeType}`
+
+/**
+ * Voucher discount types
+ * Used to determine how discounts are calculated
+ */
+export enum VoucherDiscountType {
+  percentage = 'percentage',
+  fixed = 'fixed',
+}
+
+/**
+ * Type definition for voucher discount type - use this for type annotations
+ */
+export type VoucherDiscountTypeType = `${VoucherDiscountType}`

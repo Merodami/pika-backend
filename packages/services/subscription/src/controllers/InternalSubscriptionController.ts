@@ -1,8 +1,8 @@
 import type {
-    CheckSubscriptionAccessRequest,
-    ProcessSubscriptionWebhookRequest,
-    SendSubscriptionNotificationRequest,
-    UpdateSubscriptionFromPaymentRequest,
+  CheckSubscriptionAccessRequest,
+  ProcessSubscriptionWebhookRequest,
+  SendSubscriptionNotificationRequest,
+  UpdateSubscriptionFromPaymentRequest,
 } from '@pika/api/internal'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'

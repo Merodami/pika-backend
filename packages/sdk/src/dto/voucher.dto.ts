@@ -1,0 +1,253 @@
+/**
+ * Voucher DTOs (Data Transfer Objects)
+ * These represent the API contract for voucher-related endpoints
+ */
+
+// ============= Voucher DTO =============
+
+export interface VoucherLocationDTO {
+  lat: number
+  lng: number
+  radius?: number
+}
+
+export interface VoucherCodeDTO {
+  id: string
+  code: string
+  type: string
+  isActive: boolean
+  metadata?: Record<string, any>
+}
+
+export interface VoucherDTO {
+  id: string
+  businessId: string
+  categoryId: string
+  state: string
+  title: string // Localized by TranslationService before sending to client
+  description: string // Localized by TranslationService before sending to client
+  terms: string // Localized by TranslationService before sending to client
+  discountType: string
+  discountValue: number
+  currency: string
+  location?: VoucherLocationDTO
+  imageUrl?: string
+  validFrom: string
+  expiresAt: string
+  maxRedemptions?: number
+  maxRedemptionsPerUser: number
+  currentRedemptions: number
+  metadata?: Record<string, any>
+  createdAt: string
+  updatedAt: string
+  codes?: VoucherCodeDTO[]
+}
+
+// ============= Create/Update DTOs =============
+
+export interface CreateVoucherDTO {
+  businessId: string
+  categoryId: string
+  title: string
+  description: string
+  terms: string
+  discountType: string
+  discountValue: number
+  currency: string
+  location?: VoucherLocationDTO
+  imageUrl?: string
+  validFrom: string
+  expiresAt: string
+  maxRedemptions?: number
+  maxRedemptionsPerUser: number
+  metadata?: Record<string, any>
+}
+
+export interface UpdateVoucherDTO {
+  title?: string
+  description?: string
+  terms?: string
+  discountType?: string
+  discountValue?: number
+  currency?: string
+  location?: VoucherLocationDTO
+  imageUrl?: string
+  validFrom?: string
+  expiresAt?: string
+  maxRedemptions?: number
+  maxRedemptionsPerUser?: number
+  metadata?: Record<string, any>
+}
+
+// ============= Voucher Scan DTO =============
+
+export interface VoucherScanDTO {
+  voucherId: string
+  userId?: string
+  scanSource: string
+  scanType: string
+  location?: VoucherLocationDTO
+  userAgent?: string
+  metadata?: Record<string, any>
+  scannedAt: string
+}
+
+export interface VoucherScanRequestDTO {
+  scanSource: string
+  scanType: string
+  location?: VoucherLocationDTO
+  userAgent?: string
+  metadata?: Record<string, any>
+}
+
+export interface VoucherScanResponseDTO {
+  success: boolean
+  message: string
+  scanId: string
+  voucher: VoucherDTO
+}
+
+// ============= Voucher Claim DTO =============
+
+export interface VoucherClaimRequestDTO {
+  userId: string
+  metadata?: Record<string, any>
+}
+
+export interface VoucherClaimResponseDTO {
+  success: boolean
+  message: string
+  customerVoucher: CustomerVoucherDTO
+  redemptionCode: string
+}
+
+// ============= Voucher Redeem DTO =============
+
+export interface VoucherRedeemRequestDTO {
+  redemptionCode: string
+  location?: VoucherLocationDTO
+  metadata?: Record<string, any>
+}
+
+export interface VoucherRedeemResponseDTO {
+  success: boolean
+  message: string
+  customerVoucher: CustomerVoucherDTO
+  discountAmount: number
+}
+
+// ============= Customer Voucher DTO =============
+
+export interface CustomerVoucherDTO {
+  id: string
+  userId: string
+  voucherId: string
+  status: string
+  claimedAt: string
+  redeemedAt?: string
+  expiresAt: string
+  redemptionCode?: string
+  redemptionLocation?: VoucherLocationDTO
+  metadata?: Record<string, any>
+  createdAt: string
+  updatedAt: string
+  // Relations
+  voucher?: VoucherDTO
+}
+
+// ============= State Management DTOs =============
+
+export interface VoucherStateUpdateDTO {
+  state: string
+  metadata?: Record<string, any>
+}
+
+export interface VoucherPublishRequestDTO {
+  publishAt?: string
+  metadata?: Record<string, any>
+}
+
+export interface VoucherExpireRequestDTO {
+  reason?: string
+  metadata?: Record<string, any>
+}
+
+// ============= Validation DTOs =============
+
+export interface ValidateVoucherRequestDTO {
+  voucherId: string
+  checkActive?: boolean
+  checkExpiration?: boolean
+  checkRedemptionLimit?: boolean
+}
+
+export interface ValidateVoucherResponseDTO {
+  valid: boolean
+  voucher?: VoucherDTO
+  reason?: string
+  validationErrors?: string[]
+}
+
+// ============= Batch Operation DTOs =============
+
+export interface GetVouchersByIdsRequestDTO {
+  voucherIds: string[]
+  includeInactive?: boolean
+  includeExpired?: boolean
+}
+
+export interface GetVouchersByIdsResponseDTO {
+  vouchers: VoucherDTO[]
+  notFound?: string[]
+}
+
+// ============= Analytics DTOs =============
+
+export interface VoucherAnalyticsDTO {
+  voucherId: string
+  totalScans: number
+  totalClaims: number
+  totalRedemptions: number
+  conversionRate: number
+  scansBySource: Record<string, number>
+  scansByType: Record<string, number>
+  dailyStats: Array<{
+    date: string
+    scans: number
+    claims: number
+    redemptions: number
+  }>
+  topLocations?: Array<{
+    location: VoucherLocationDTO
+    count: number
+  }>
+}
+
+export interface VoucherAnalyticsRequestDTO {
+  voucherId: string
+  startDate?: string
+  endDate?: string
+  groupBy?: 'day' | 'week' | 'month'
+}
+
+// ============= List Response DTOs =============
+
+export interface VoucherListDTO {
+  data: VoucherDTO[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+export interface CustomerVoucherListDTO {
+  data: CustomerVoucherDTO[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}

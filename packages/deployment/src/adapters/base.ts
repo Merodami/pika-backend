@@ -3,12 +3,12 @@ import type { Application } from 'express'
 import type { Server } from 'http'
 
 import type {
-    DeploymentAdapter,
-    DeploymentConfig,
-    DeploymentPlatform,
-    HealthCheckResult,
-    ServiceDefinition,
-    ServiceRegistry,
+  DeploymentAdapter,
+  DeploymentConfig,
+  DeploymentPlatform,
+  HealthCheckResult,
+  ServiceDefinition,
+  ServiceRegistry,
 } from '../types/index.js'
 
 export abstract class BaseDeploymentAdapter implements DeploymentAdapter {

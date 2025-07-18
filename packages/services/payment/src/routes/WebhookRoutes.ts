@@ -17,9 +17,7 @@ export function createWebhookRouter(
   const stripeService = new StripeService(stripeInstance)
 
   // Initialize controller
-  const webhookController = new WebhookController(
-    stripeService,
-  )
+  const webhookController = new WebhookController(stripeService)
 
   // Modern industry standard: Raw body parsing for webhook signature verification
   router.post(

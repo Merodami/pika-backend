@@ -1,16 +1,36 @@
-import type {
-  SendEmailResponse,
-  SendSystemNotificationRequest,
-  SendSystemNotificationResponse,
-  SendTransactionalEmailRequest,
-  SendTransactionalEmailResponse,
-} from '@pika/api/internal'
 import { COMMUNICATION_API_URL } from '@pika/environment'
 import type { ServiceContext } from '@pika/types'
 
-// TODO: Fix circular dependency - move DTOs to shared or separate package
-// import type { SendEmailDTO } from '@pika
 import { BaseServiceClient } from '../BaseServiceClient.js'
+
+// Communication service client types
+export interface SendEmailResponse {
+  messageId: string
+  success: boolean
+}
+
+export interface SendSystemNotificationRequest {
+  userId: string
+  title: string
+  message: string
+  type: string
+}
+
+export interface SendSystemNotificationResponse {
+  notificationId: string
+  success: boolean
+}
+
+export interface SendTransactionalEmailRequest {
+  to: string
+  templateId: string
+  templateData: Record<string, any>
+}
+
+export interface SendTransactionalEmailResponse {
+  messageId: string
+  success: boolean
+}
 
 export interface SendNotificationRequest {
   userId: string

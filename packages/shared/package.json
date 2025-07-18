@@ -8,9 +8,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@pika/api": "workspace:^",
     "@pika/environment": "workspace:^",
     "@pika/types": "workspace:^",
+    "@pika/sdk": "workspace:^",
     "axios": "^1.10.0",
     "lodash-es": "^4.17.21",
     "pino": "^9.7.0",

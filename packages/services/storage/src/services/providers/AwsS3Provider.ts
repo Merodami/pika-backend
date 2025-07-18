@@ -1,22 +1,22 @@
 import {
-    DeleteObjectCommand,
-    GetObjectCommand,
-    HeadBucketCommand,
-    HeadObjectCommand,
-    PutObjectCommand,
-    S3Client,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadBucketCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
+  S3Client,
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { logger } from '@pika/shared'
 
 import type {
-    FileDeleteParams,
-    FileDeleteResult,
-    FileUploadParams,
-    FileUploadResult,
-    FileUrlParams,
-    FileUrlResult,
-    StorageProvider,
+  FileDeleteParams,
+  FileDeleteResult,
+  FileUploadParams,
+  FileUploadResult,
+  FileUrlParams,
+  FileUrlResult,
+  StorageProvider,
 } from './StorageProvider.js'
 
 export class AwsS3Provider implements StorageProvider {

@@ -22,21 +22,6 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason)
 })
 
-// Mock modules that are causing issues
-vi.mock('@pika/api', async (importOriginal) => {
-  const actual = (await importOriginal()) as any
-
-  return {
-    ...actual,
-    schemas: {
-      UserProfileSchema: {},
-      ServiceSchema: {},
-      PaymentMethodSchema: {},
-      LocationSchema: {},
-    },
-  }
-})
-
 // Mock Redis module with Cache decorator
 vi.mock('@pika/redis', async (importOriginal) => {
   // Create a simple in-memory cache for tests
@@ -98,6 +83,34 @@ vi.mock('@pika/redis', async (importOriginal) => {
       const query = req.query ? new URLSearchParams(req.query).toString() : ''
 
       return `${method}:${path}?${query}`
+    },
+  }
+})
+
+// Mock HTTP middleware module
+vi.mock('@pika/http', async (importOriginal) => {
+  return {
+    requireAuth: () => (req: any, res: any, next: any) => next(),
+    requireBusinessRole: () => (req: any, res: any, next: any) => next(),
+    requireAdmin: () => (req: any, res: any, next: any) => next(),
+    requireInternalAuth: () => (req: any, res: any, next: any) => next(),
+    validateBody: (schema: any) => (req: any, res: any, next: any) => next(),
+    validateParams: (schema: any) => (req: any, res: any, next: any) => next(),
+    validateQuery: (schema: any) => (req: any, res: any, next: any) => next(),
+    getValidatedQuery: (req: any) => req.query || {},
+    createExpressServer: vi.fn().mockResolvedValue({
+      use: vi.fn(),
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+      delete: vi.fn(),
+      listen: vi.fn(),
+      locals: {},
+    }),
+    errorMiddleware: vi.fn(),
+    RequestContext: class MockRequestContext {
+      constructor(public data: any) {}
     },
   }
 })
@@ -171,10 +184,42 @@ vi.mock('@pika/shared', async (importOriginal) => {
     }
   }
 
+  // Mock BaseServiceClient class
+  class BaseServiceClient {
+    constructor(config: any) {
+      // Mock constructor
+    }
+
+    protected async get(path: string, options?: any): Promise<any> {
+      // Mock GET request
+      return Promise.resolve({ data: 'mock data' })
+    }
+
+    protected async post(
+      path: string,
+      data?: any,
+      options?: any,
+    ): Promise<any> {
+      // Mock POST request
+      return Promise.resolve({ data: 'mock data' })
+    }
+
+    protected async put(path: string, data?: any, options?: any): Promise<any> {
+      // Mock PUT request
+      return Promise.resolve({ data: 'mock data' })
+    }
+
+    protected async delete(path: string, options?: any): Promise<any> {
+      // Mock DELETE request
+      return Promise.resolve({ data: 'mock data' })
+    }
+  }
+
   return {
     BaseError,
     NotAuthenticatedError,
     ValidationError,
+    BaseServiceClient,
     RequestIdSource: {
       GENERATED: 'generated',
       CLIENT: 'client',

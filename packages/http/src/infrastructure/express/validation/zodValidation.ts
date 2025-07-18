@@ -70,13 +70,13 @@ export function createZodValidatorMiddleware<T extends z.ZodTypeAny>(
         const validationError = new Error('Validation failed') as any
 
         validationError.code = 'VALIDATION_ERROR'
-        validationError.validation = error.errors.map((err) => ({
+        validationError.validation = error.issues.map((err: any) => ({
           instancePath: `/${httpPart}/${err.path.join('/')}`,
           schemaPath: '',
           keyword: err.code,
           params: {},
           message: err.message,
-          data: err.code === 'invalid_type' ? err.received : undefined,
+          data: err.code === 'invalid_type' ? (err as any).received : undefined,
         }))
         validationError.validationContext = httpPart
         validationError.zodError = error
@@ -84,7 +84,7 @@ export function createZodValidatorMiddleware<T extends z.ZodTypeAny>(
         console.log('[ZOD_VALIDATION] Creating validation error:', {
           code: validationError.code,
           httpPart,
-          errors: error.errors.length,
+          errors: error.issues?.length || 0,
           validationArray: validationError.validation,
         })
 
@@ -139,7 +139,7 @@ export function validateRequest<
         req.body = await schemas.body.parseAsync(req.body)
       }
       if (schemas.params) {
-        req.params = await schemas.params.parseAsync(req.params)
+        req.params = (await schemas.params.parseAsync(req.params)) as any
       }
       if (schemas.query) {
         const validatedQuery = await schemas.query.parseAsync(req.query)
@@ -160,19 +160,19 @@ export function validateRequest<
         const validationError = new Error('Validation failed') as any
 
         validationError.code = 'VALIDATION_ERROR'
-        validationError.validation = error.errors.map((err) => ({
+        validationError.validation = error.issues.map((err: any) => ({
           instancePath: `/${err.path.join('/')}`,
           schemaPath: '',
           keyword: err.code,
           params: {},
           message: err.message,
-          data: err.code === 'invalid_type' ? err.received : undefined,
+          data: err.code === 'invalid_type' ? (err as any).received : undefined,
         }))
         validationError.zodError = error
 
         console.log('[ZOD_VALIDATION_ASYNC] Creating validation error:', {
           code: validationError.code,
-          errors: error.errors.length,
+          errors: error.issues?.length || 0,
           validationArray: validationError.validation,
         })
 

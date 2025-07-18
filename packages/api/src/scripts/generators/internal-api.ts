@@ -1,22 +1,19 @@
 import { z } from 'zod'
 
-import type { SimpleZodRegistry } from '../../common/registry/simple.js'
-import {
-  ErrorResponse,
-  MessageResponse,
-} from '../../common/schemas/responses.js'
-import * as internalAuthSchemas from '../../internal/schemas/auth/service.js'
-import * as internalCommunicationSchemas from '../../internal/schemas/communication/service.js'
-import * as internalDiscoverySchemas from '../../internal/schemas/discovery/service.js'
-import * as healthSchemas from '../../internal/schemas/health.js'
-import * as internalSessionSchemas from '../../internal/schemas/session/service.js'
-import * as internalSubscriptionSchemas from '../../internal/schemas/subscription/service.js'
-import * as internalUserSchemas from '../../internal/schemas/user/service.js'
+import type { ZodRegistry } from '@api/common/registry/base.js'
+import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import { MessageResponse } from '@api/schemas/shared/responses.js'
+import * as internalAuthSchemas from '@api/schemas/auth/internal/service.js'
+import * as internalCommunicationSchemas from '@api/schemas/communication/internal/service.js'
+import * as internalDiscoverySchemas from '@api/schemas/discovery/internal/service.js'
+import * as healthSchemas from '@api/schemas/system/public/health.js'
+import * as internalSubscriptionSchemas from '@api/schemas/subscription/internal/service.js'
+import * as internalUserSchemas from '@api/schemas/user/internal/service.js'
 
 /**
  * Register all internal API schemas and routes
  */
-export function registerInternalAPI(registry: SimpleZodRegistry): void {
+export function registerInternalAPI(registry: ZodRegistry): void {
   // ============= Health & Discovery Schemas =============
   registry.registerSchema('ServiceHealth', healthSchemas.ServiceHealth)
   registry.registerSchema(
@@ -188,76 +185,6 @@ export function registerInternalAPI(registry: SimpleZodRegistry): void {
     internalCommunicationSchemas.BatchUpdateResponse,
   )
 
-  // ============= Session Service Schemas =============
-  registry.registerSchema(
-    'InternalSessionData',
-    internalSessionSchemas.InternalSessionData,
-  )
-  registry.registerSchema(
-    'ValidateSessionRequest',
-    internalSessionSchemas.ValidateSessionRequest,
-  )
-  registry.registerSchema(
-    'SessionValidationResponse',
-    internalSessionSchemas.SessionValidationResponse,
-  )
-  registry.registerSchema(
-    'CheckBookingEligibilityRequest',
-    internalSessionSchemas.CheckBookingEligibilityRequest,
-  )
-  registry.registerSchema(
-    'BookingEligibilityResponse',
-    internalSessionSchemas.BookingEligibilityResponse,
-  )
-  registry.registerSchema(
-    'ProcessBookingRequest',
-    internalSessionSchemas.ProcessBookingRequest,
-  )
-  registry.registerSchema(
-    'ProcessBookingResponse',
-    internalSessionSchemas.ProcessBookingResponse,
-  )
-  registry.registerSchema(
-    'BatchSessionStatusUpdateRequest',
-    internalSessionSchemas.BatchSessionStatusUpdateRequest,
-  )
-  registry.registerSchema(
-    'BatchUpdateResponse',
-    internalSessionSchemas.SessionBatchUpdateResponse,
-  )
-  registry.registerSchema(
-    'GetUserBookingsRequest',
-    internalSessionSchemas.GetUserBookingsRequest,
-  )
-  registry.registerSchema(
-    'UserBookingsResponse',
-    internalSessionSchemas.UserBookingsResponse,
-  )
-  registry.registerSchema(
-    'GetProfessionalScheduleRequest',
-    internalSessionSchemas.GetProfessionalScheduleRequest,
-  )
-  registry.registerSchema(
-    'ProfessionalScheduleResponse',
-    internalSessionSchemas.ProfessionalScheduleResponse,
-  )
-  registry.registerSchema(
-    'SessionConflictCheckRequest',
-    internalSessionSchemas.SessionConflictCheckRequest,
-  )
-  registry.registerSchema(
-    'SessionConflictResponse',
-    internalSessionSchemas.SessionConflictResponse,
-  )
-  registry.registerSchema(
-    'SessionStatsRequest',
-    internalSessionSchemas.SessionStatsRequest,
-  )
-  registry.registerSchema(
-    'SessionStatsResponse',
-    internalSessionSchemas.SessionStatsResponse,
-  )
-
   // ============= User Service Schemas =============
   registry.registerSchema(
     'InternalUserData',
@@ -278,14 +205,6 @@ export function registerInternalAPI(registry: SimpleZodRegistry): void {
   registry.registerSchema(
     'GetUsersResponse',
     internalUserSchemas.GetUsersResponse,
-  )
-  registry.registerSchema(
-    'UpdateUserCreditsRequest',
-    internalUserSchemas.UpdateUserCreditsRequest,
-  )
-  registry.registerSchema(
-    'UpdateUserCreditsResponse',
-    internalUserSchemas.UpdateUserCreditsResponse,
   )
   registry.registerSchema(
     'CheckUserPermissionRequest',
@@ -425,7 +344,7 @@ export function registerInternalAPI(registry: SimpleZodRegistry): void {
 /**
  * Register all internal API routes
  */
-function registerInternalRoutes(registry: SimpleZodRegistry): void {
+function registerInternalRoutes(registry: ZodRegistry): void {
   // Health check route
   registry.registerRoute({
     method: 'get',
@@ -729,153 +648,6 @@ function registerInternalRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
-  // Session Service Internal Routes
-  registry.registerRoute({
-    method: 'get',
-    path: '/sessions/{id}',
-    summary: 'Get session by ID',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'Session details',
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.SessionResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Session not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/sessions/conflicts',
-    summary: 'Check for scheduling conflicts',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.ConflictCheckRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Conflict check result',
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.ConflictCheckResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/sessions/by-user/{userId}',
-    summary: 'Get sessions by user',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        userId: z.string().uuid(),
-      }),
-      query: z.object({
-        status: z.string().optional(),
-        fromDate: z.string().optional(),
-        toDate: z.string().optional(),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'User sessions',
-        content: {
-          'application/json': {
-            schema: z.array(internalSessionSchemas.SessionResponse),
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'put',
-    path: '/sessions/{id}/status',
-    summary: 'Update session status',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.UpdateSessionStatusRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Session updated',
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.SessionResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/sessions/batch/status',
-    summary: 'Batch update session statuses',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.BatchUpdateSessionStatusRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Sessions updated',
-        content: {
-          'application/json': {
-            schema: z.object({
-              updated: z.number(),
-              failed: z.number(),
-            }),
-          },
-        },
-      },
-    },
-  })
-
   // User Service Internal Routes
   registry.registerRoute({
     method: 'get',
@@ -935,64 +707,10 @@ function registerInternalRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
-  registry.registerRoute({
-    method: 'patch',
-    path: '/users/{id}',
-    summary: 'Update user internally',
-    tags: ['User Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: internalUserSchemas.UpdateUserCreditsRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'User updated',
-        content: {
-          'application/json': {
-            schema: internalUserSchemas.InternalUserData,
-          },
-        },
-      },
-    },
-  })
+  // Note: PATCH /users/{id} route removed - UpdateUserRequest schema doesn't exist in internal user schemas
+  // This route should be re-added once the proper schema is defined
 
   // Subscription Service Internal Routes
-  registry.registerRoute({
-    method: 'post',
-    path: '/subscriptions/process-credits',
-    summary: 'Process subscription credits',
-    tags: ['Subscription Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema:
-              internalSubscriptionSchemas.AllocateSubscriptionCreditsRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Credits processed',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-    },
-  })
 
   registry.registerRoute({
     method: 'post',

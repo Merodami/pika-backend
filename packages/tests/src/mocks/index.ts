@@ -5,3 +5,9 @@ export * from './serviceClientMocks.js'
 export * from './services/index.js'
 export * from './sharedMock.js'
 export * from './stripeMock.js'
+export * from './translationServiceMock.js'
+export {
+  MockTranslationClient,
+  createMockTranslationClient,
+  createTranslationClientWithMock,
+} from './translationClientMock.js'

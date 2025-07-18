@@ -17,3 +17,22 @@ export const RATE_LIMIT_WINDOW_MS = getEnvVariable(
   parseNumber,
   900000, // 15 minutes in milliseconds
 )
+
+// PDF service specific rate limiting
+export const PDF_RATE_LIMIT_MAX_REQUESTS_PER_HOUR = getEnvVariable(
+  'PDF_RATE_LIMIT_MAX_REQUESTS_PER_HOUR',
+  parseNumber,
+  100,
+)
+
+export const PDF_RATE_LIMIT_MAX_REQUESTS_PER_DAY = getEnvVariable(
+  'PDF_RATE_LIMIT_MAX_REQUESTS_PER_DAY',
+  parseNumber,
+  1000,
+)
+
+export const PDF_RATE_LIMIT_WINDOW_SIZE_MINUTES = getEnvVariable(
+  'PDF_RATE_LIMIT_WINDOW_SIZE_MINUTES',
+  parseNumber,
+  60,
+)

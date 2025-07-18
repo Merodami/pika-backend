@@ -76,6 +76,6 @@
     { "path": "packages/services/payment" },
     { "path": "packages/services/communication" },
     { "path": "packages/services/support" },
-    { "path": "packages/services/storage" },
+    { "path": "packages/services/storage" }
   ]
 }

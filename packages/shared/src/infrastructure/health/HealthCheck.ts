@@ -1,10 +1,10 @@
 import { HEALTH_CHECK_CACHE_TIME } from '@pika/environment'
 import {
-    HealthCheckFunction,
-    HealthCheckOptions,
-    HealthStatus,
-    ServiceHealth,
-    SystemHealth,
+  HealthCheckFunction,
+  HealthCheckOptions,
+  HealthStatus,
+  ServiceHealth,
+  SystemHealth,
 } from '@shared/infrastructure/health/types.js'
 import logger from '@shared/infrastructure/logger/Logger.js'
 

@@ -1,12 +1,4 @@
-import {
-  CreatePriceRequest,
-  CreateProductRequest,
-  ListPricesQuery,
-  ListProductsQuery,
-  PriceIdParam,
-  ProductIdParam,
-  UpdateProductRequest,
-} from '@pika/api/public'
+import { paymentPublic } from '@pika/api'
 import {
   requireServiceAuth,
   validateBody,
@@ -28,20 +20,20 @@ export function createProductRouter(productService: IProductService): Router {
   router.post(
     '/products',
     requireServiceAuth(),
-    validateBody(CreateProductRequest),
+    validateBody(paymentPublic.CreateProductRequest),
     controller.createProduct,
   )
   router.put(
     '/products/:id',
     requireServiceAuth(),
-    validateParams(ProductIdParam),
-    validateBody(UpdateProductRequest),
+    validateParams(paymentPublic.ProductIdParam),
+    validateBody(paymentPublic.UpdateProductRequest),
     controller.updateProduct,
   )
   router.get(
     '/products',
     requireServiceAuth(),
-    validateQuery(ListProductsQuery),
+    validateQuery(paymentPublic.ListProductsQuery),
     controller.listProducts,
   )
 
@@ -49,19 +41,19 @@ export function createProductRouter(productService: IProductService): Router {
   router.post(
     '/prices',
     requireServiceAuth(),
-    validateBody(CreatePriceRequest),
+    validateBody(paymentPublic.CreatePriceRequest),
     controller.createPrice,
   )
   router.put(
     '/prices/:id/deactivate',
     requireServiceAuth(),
-    validateParams(PriceIdParam),
+    validateParams(paymentPublic.PriceIdParam),
     controller.deactivatePrice,
   )
   router.get(
     '/prices',
     requireServiceAuth(),
-    validateQuery(ListPricesQuery),
+    validateQuery(paymentPublic.ListPricesQuery),
     controller.listPrices,
   )
 

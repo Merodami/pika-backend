@@ -4,10 +4,10 @@ import { ErrorFactory } from '../../errors/index.js'
 import { logger } from '../logger/index.js'
 import { getSystemDetails } from './systemCheck.js'
 import {
-    HealthCheckDependency,
-    HealthStatus,
-    ServiceHealth,
-    SystemHealth,
+  HealthCheckDependency,
+  HealthStatus,
+  ServiceHealth,
+  SystemHealth,
 } from './types.js'
 
 /**

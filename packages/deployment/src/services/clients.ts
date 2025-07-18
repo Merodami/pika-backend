@@ -1,8 +1,8 @@
 import {
-    CommunicationServiceClient,
-    PaymentServiceClient,
-    SubscriptionServiceClient,
-    UserServiceClient,
+  CommunicationServiceClient,
+  PaymentServiceClient,
+  SubscriptionServiceClient,
+  UserServiceClient,
 } from '@pika/shared'
 
 import type { DeploymentAdapter, ServiceClients } from '../types/index.js'

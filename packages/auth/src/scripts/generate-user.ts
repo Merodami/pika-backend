@@ -14,14 +14,12 @@ async function main() {
   const args = process.argv.slice(2)
   const email = args[0]
   const password = args[1] || 'Test123!'
-  const role = (args[2] as UserRole) || UserRole.USER
+  const role = (args[2] as UserRole) || UserRole.CUSTOMER
 
   if (!email) {
     console.log('Usage: yarn user:create <email> [password] [role]')
     console.log('Example: yarn user:create test@example.com Test123! ADMIN')
-    console.log(
-      'Roles: ADMIN, USER',
-    )
+    console.log('Roles: ADMIN, CUSTOMER, BUSINESS')
     process.exit(1)
   }
 

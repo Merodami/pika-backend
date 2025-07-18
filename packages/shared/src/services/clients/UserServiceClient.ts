@@ -1,37 +1,50 @@
-import type {
-  CreateUserRequest,
-  EmailVerificationTokenResponse,
-  ExistsResponse,
-  PasswordResetTokenResponse,
-  UpdateLastLoginRequest,
-  UpdatePasswordRequest,
-  UserAuthData,
-  ValidatePasswordResetTokenRequest,
-  VerifyEmailRequest,
-} from '@pika/api/internal'
 import { USER_API_URL } from '@pika/environment'
-import type {
-  ServiceContext,
-  UserRoleType,
-  UserStatusType,
-} from '@pika/types'
+import type { ServiceContext } from '@pika/types'
+import type { UserDomain } from '@pika/sdk'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 
-export interface User {
-  id: string
+// Service client request/response types - NOT API schemas
+export interface CreateUserRequest {
   email: string
-  emailVerified: boolean
+  passwordHash: string
   firstName: string
   lastName: string
   phoneNumber?: string
-  phoneVerified: boolean
-  avatarUrl?: string
-  role: UserRoleType
-  status: UserStatusType
-  lastLoginAt?: string
-  createdAt: string
-  updatedAt: string
+  role?: string
+}
+
+export interface UpdateLastLoginRequest {
+  lastLoginAt: string
+}
+
+export interface UpdatePasswordRequest {
+  userId: string
+  passwordHash: string
+}
+
+export interface VerifyEmailRequest {
+  userId: string
+}
+
+export interface ValidatePasswordResetTokenRequest {
+  token: string
+}
+
+export interface UserAuthData extends UserDomain {
+  passwordHash?: string
+}
+
+export interface ExistsResponse {
+  exists: boolean
+}
+
+export interface PasswordResetTokenResponse {
+  token: string
+}
+
+export interface EmailVerificationTokenResponse {
+  token: string
 }
 
 /**
@@ -52,9 +65,9 @@ export class UserServiceClient extends BaseServiceClient {
   async getUser(
     userId: string,
     context?: ServiceContext,
-  ): Promise<User | null> {
+  ): Promise<UserDomain | null> {
     try {
-      return await this.get<User>(`/internal/users/auth/${userId}`, {
+      return await this.get<UserDomain>(`/internal/users/auth/${userId}`, {
         ...context,
         useServiceAuth: true,
       })
@@ -98,9 +111,9 @@ export class UserServiceClient extends BaseServiceClient {
   async getUserByEmail(
     email: string,
     context?: ServiceContext,
-  ): Promise<User | null> {
+  ): Promise<UserDomain | null> {
     try {
-      return await this.get<User>(
+      return await this.get<UserDomain>(
         `/internal/users/auth/by-email/${encodeURIComponent(email)}`,
         {
           ...context,

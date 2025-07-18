@@ -18,15 +18,15 @@ import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
 import { createRegistry } from '../common/registry/base.js'
-import { ErrorResponse } from '../common/schemas/responses.js'
+import { ErrorResponse } from '../schemas/shared/errors.js'
 import {
-    apiKeyAuth,
-    bearerAuth,
-    documentRoute,
+  apiKeyAuth,
+  bearerAuth,
+  documentRoute,
 } from '../common/utils/openapi.js'
 // Import schemas
-import * as authSchemas from '../public/schemas/auth/login.js'
-import * as oauthSchemas from '../public/schemas/auth/oauth.js'
+import * as authSchemas from '../schemas/auth/public/login.js'
+import * as oauthSchemas from '../schemas/auth/public/oauth.js'
 
 /**
  * Generate OpenAPI specifications for all APIs
@@ -70,22 +70,37 @@ const publicRegistry = createRegistry({
 publicRegistry.registerSecurityScheme('bearerAuth', bearerAuth)
 
 // Register common auth schemas
-publicRegistry.register('AuthTokensResponse', authSchemas.AuthTokensResponse)
-publicRegistry.register('AuthUserResponse', authSchemas.AuthUserResponse)
+publicRegistry.registerSchema(
+  'AuthTokensResponse',
+  authSchemas.AuthTokensResponse,
+)
+publicRegistry.registerSchema('AuthUserResponse', authSchemas.AuthUserResponse)
 
 // Register OAuth schemas
-publicRegistry.register('TokenRequest', oauthSchemas.TokenRequest)
-publicRegistry.register('TokenResponse', oauthSchemas.TokenResponse)
-publicRegistry.register('IntrospectRequest', oauthSchemas.IntrospectRequest)
-publicRegistry.register('IntrospectResponse', oauthSchemas.IntrospectResponse)
-publicRegistry.register('RevokeTokenRequest', oauthSchemas.RevokeTokenRequest)
-publicRegistry.register('RevokeTokenResponse', oauthSchemas.RevokeTokenResponse)
-publicRegistry.register('UserInfoResponse', oauthSchemas.UserInfoResponse)
+publicRegistry.registerSchema('TokenRequest', oauthSchemas.TokenRequest)
+publicRegistry.registerSchema('TokenResponse', oauthSchemas.TokenResponse)
+publicRegistry.registerSchema(
+  'IntrospectRequest',
+  oauthSchemas.IntrospectRequest,
+)
+publicRegistry.registerSchema(
+  'IntrospectResponse',
+  oauthSchemas.IntrospectResponse,
+)
+publicRegistry.registerSchema(
+  'RevokeTokenRequest',
+  oauthSchemas.RevokeTokenRequest,
+)
+publicRegistry.registerSchema(
+  'RevokeTokenResponse',
+  oauthSchemas.RevokeTokenResponse,
+)
+publicRegistry.registerSchema('UserInfoResponse', oauthSchemas.UserInfoResponse)
 
 // OAuth 2.0 routes are registered below
 
 // OAuth 2.0 endpoints
-publicRegistry.registerPath(
+publicRegistry.registerRoute(
   documentRoute({
     method: 'post',
     path: '/auth/token',
@@ -114,7 +129,7 @@ publicRegistry.registerPath(
   }),
 )
 
-publicRegistry.registerPath(
+publicRegistry.registerRoute(
   documentRoute({
     method: 'post',
     path: '/auth/introspect',
@@ -134,7 +149,7 @@ publicRegistry.registerPath(
   }),
 )
 
-publicRegistry.registerPath(
+publicRegistry.registerRoute(
   documentRoute({
     method: 'post',
     path: '/auth/revoke',
@@ -154,7 +169,7 @@ publicRegistry.registerPath(
   }),
 )
 
-publicRegistry.registerPath(
+publicRegistry.registerRoute(
   documentRoute({
     method: 'get',
     path: '/auth/userinfo',

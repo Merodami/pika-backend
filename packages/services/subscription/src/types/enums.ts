@@ -3,9 +3,9 @@
 
 // Re-export shared enums for convenience
 export {
-    BillingInterval as SubscriptionInterval,
-    SubscriptionStatus
-} from '@pika/types';
+  BillingInterval as SubscriptionInterval,
+  SubscriptionStatus,
+} from '@pika/types'
 
 export enum MembershipType {
   FULL_ACCESS = 'FULL_ACCESS',
@@ -24,11 +24,4 @@ export enum StripeWebhookEvent {
   CUSTOMER_SUBSCRIPTION_DELETED = 'customer.subscription.deleted',
   INVOICE_PAYMENT_SUCCEEDED = 'invoice.payment_succeeded',
   INVOICE_PAYMENT_FAILED = 'invoice.payment_failed',
-}
-
-export enum CreditProcessingStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
 }

@@ -1,16 +1,16 @@
 import type { ICacheService } from '@pika/redis'
 import type {
-    CreateNotificationDTO,
-    NotificationDomain,
-    UpdateNotificationDTO,
+  CreateNotificationDTO,
+  NotificationDomain,
+  UpdateNotificationDTO,
 } from '@pika/sdk'
 import { Cache } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 
 import type {
-    INotificationRepository,
-    NotificationSearchParams,
+  INotificationRepository,
+  NotificationSearchParams,
 } from '../repositories/NotificationRepository.js'
 import type { IEmailService } from './EmailService.js'
 

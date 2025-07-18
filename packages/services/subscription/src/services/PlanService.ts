@@ -211,9 +211,6 @@ export class PlanService implements IPlanService {
                 currency: price.currency,
                 interval: price.recurring.interval as BillingIntervalType,
                 intervalCount: price.recurring.intervalCount,
-                creditsAmount: product.metadata.creditsAmount
-                  ? parseInt(product.metadata.creditsAmount)
-                  : 0,
                 features: product.metadata.features
                   ? JSON.parse(product.metadata.features)
                   : [],

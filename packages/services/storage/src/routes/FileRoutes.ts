@@ -1,12 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
-import {
-  BatchFileUploadRequest,
-  FileHistoryIdParam,
-  FileIdParam,
-  FileUploadRequest,
-  GetFileHistoryQuery,
-  GetFileUrlQuery,
-} from '@pika/api/public'
+import { storagePublic, storageCommon } from '@pika/api'
 import {
   allowServiceOrUserAuth,
   requireAuth,
@@ -95,7 +88,7 @@ export function createFileRouter(
     allowServiceOrUserAuth(),
     upload.single('file'),
     handleMulterError,
-    validateBody(FileUploadRequest),
+    validateBody(storagePublic.FileUploadRequest),
     controller.uploadFile,
   )
 
@@ -104,36 +97,36 @@ export function createFileRouter(
     allowServiceOrUserAuth(),
     upload.array('files', 10), // Maximum 10 files
     handleMulterError,
-    validateBody(BatchFileUploadRequest),
+    validateBody(storagePublic.BatchFileUploadRequest),
     controller.uploadBatch,
   )
 
   router.delete(
     '/:fileId',
     requireAuth(),
-    validateParams(FileIdParam),
+    validateParams(storageCommon.FileIdParam),
     controller.deleteFile,
   )
 
   router.get(
     '/:fileId/url',
     requireAuth(),
-    validateParams(FileIdParam),
-    validateQuery(GetFileUrlQuery),
+    validateParams(storageCommon.FileIdParam),
+    validateQuery(storagePublic.GetFileUrlQuery),
     controller.getFileUrl,
   )
 
   router.get(
     '/history',
     requireAuth(),
-    validateQuery(GetFileHistoryQuery),
+    validateQuery(storagePublic.GetFileHistoryQuery),
     controller.getFileHistory,
   )
 
   router.get(
     '/history/:id',
     requireAuth(),
-    validateParams(FileHistoryIdParam),
+    validateParams(storageCommon.FileHistoryIdParam),
     controller.getFileById,
   )
 

@@ -1,7 +1,7 @@
 import type {
-    ProblemPriorityType,
-    ProblemStatusType,
-    ProblemTypeType,
+  ProblemPriorityType,
+  ProblemStatusType,
+  ProblemTypeType,
 } from '@pika/types'
 
 import type { SupportCommentDomain } from './supportComment.js'

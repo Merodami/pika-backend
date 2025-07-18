@@ -1,11 +1,25 @@
 import { ICacheService } from '@pika/redis'
 import { UserRole, UserStatus } from '@pika/types'
-import type { Email, UserId } from '@pika/api'
 import { ErrorFactory, logger } from '@pika/shared'
-import type { UserAuthData } from '@pika/api/internal'
 import { randomBytes } from 'crypto'
+import type { UserDomain } from '@pika/sdk'
 
 import type { IUserRepository } from '../repositories/UserRepository.js'
+
+// Domain interface for auth-specific data
+interface UserAuthData {
+  id: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  phoneNumber?: string
+  role: UserRole
+  status: UserStatus
+  emailVerified: boolean
+  createdAt: string
+  lastLoginAt?: string
+}
 
 export interface IInternalUserService {
   getUserAuthDataByEmail(email: string): Promise<UserAuthData | null>
@@ -44,8 +58,8 @@ export class InternalUserService implements IInternalUserService {
 
       // Map database user to UserAuthData
       const authData: UserAuthData = {
-        id: user.id as UserId,
-        email: user.email as Email,
+        id: user.id,
+        email: user.email,
         password: user.password,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -74,8 +88,8 @@ export class InternalUserService implements IInternalUserService {
 
       // Map database user to UserAuthData
       const authData: UserAuthData = {
-        id: user.id as UserId,
-        email: user.email as Email,
+        id: user.id,
+        email: user.email,
         password: user.password,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -135,8 +149,8 @@ export class InternalUserService implements IInternalUserService {
 
       // Map raw user to UserAuthData
       const authData: UserAuthData = {
-        id: rawUser.id as UserId,
-        email: rawUser.email as Email,
+        id: rawUser.id,
+        email: rawUser.email,
         password: rawUser.password,
         firstName: rawUser.firstName,
         lastName: rawUser.lastName,

@@ -1,12 +1,4 @@
-import {
-  CreatePriceRequest,
-  CreateProductRequest,
-  ListPricesQuery,
-  ListProductsQuery,
-  PriceIdParam,
-  ProductIdParam,
-  UpdateProductRequest,
-} from '@pika/api/public'
+import { paymentPublic } from '@pika/api'
 import { getValidatedQuery } from '@pika/http'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -32,7 +24,7 @@ export class ProductController {
    * Create a new Stripe product
    */
   async createProduct(
-    request: Request<{}, {}, CreateProductRequest>,
+    request: Request<{}, {}, paymentPublic.CreateProductRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -58,7 +50,11 @@ export class ProductController {
    * Update Stripe product
    */
   async updateProduct(
-    request: Request<ProductIdParam, {}, UpdateProductRequest>,
+    request: Request<
+      paymentPublic.ProductIdParam,
+      {},
+      paymentPublic.UpdateProductRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -86,7 +82,7 @@ export class ProductController {
    * Create a new price for a product
    */
   async createPrice(
-    request: Request<{}, {}, CreatePriceRequest>,
+    request: Request<{}, {}, paymentPublic.CreatePriceRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -115,7 +111,7 @@ export class ProductController {
    * Deactivate a price
    */
   async deactivatePrice(
-    request: Request<PriceIdParam>,
+    request: Request<paymentPublic.PriceIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -142,7 +138,7 @@ export class ProductController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<ListProductsQuery>(request)
+      const query = getValidatedQuery<paymentPublic.ListProductsQuery>(request)
       const { limit } = query
 
       logger.info('Listing products via API', { limit })
@@ -165,7 +161,7 @@ export class ProductController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<ListPricesQuery>(request)
+      const query = getValidatedQuery<paymentPublic.ListPricesQuery>(request)
       const { productId, limit } = query
 
       logger.info('Listing prices via API', { productId, limit })

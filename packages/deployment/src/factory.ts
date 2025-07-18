@@ -3,9 +3,9 @@ import { logger } from '@pika/shared'
 import { VercelDeploymentAdapter } from './adapters/vercel/adapter.js'
 import { getVercelConfig } from './adapters/vercel/config.js'
 import type {
-    DeploymentAdapter,
-    DeploymentConfig,
-    DeploymentPlatform,
+  DeploymentAdapter,
+  DeploymentConfig,
+  DeploymentPlatform,
 } from './types/index.js'
 
 export async function createDeploymentAdapter(

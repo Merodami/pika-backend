@@ -34,17 +34,17 @@ vi.mock('@communication/services/providers/ProviderFactory.js', async () => {
 
 import { MemoryCacheService } from '@pika/redis'
 import {
-    AuthenticatedRequestClient,
-    createE2EAuthHelper,
-    E2EAuthHelper,
+  AuthenticatedRequestClient,
+  createE2EAuthHelper,
+  E2EAuthHelper,
 } from '@pikaests'
 import { logger } from '@pikahared'
 import { PrismaClient } from '@prisma/client'
 import {
-    cleanupTestDatabase,
-    clearTestDatabase,
-    createTestDatabase,
-    type TestDatabaseResult,
+  cleanupTestDatabase,
+  clearTestDatabase,
+  createTestDatabase,
+  type TestDatabaseResult,
 } from '@tests/utils/testDatabaseHelper.js'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'

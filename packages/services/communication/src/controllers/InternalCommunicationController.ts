@@ -1,10 +1,10 @@
 import type {
-    SendEmailRequest,
-    SendEmailResponse,
-    SendSystemNotificationRequest,
-    SendSystemNotificationResponse,
-    SendTransactionalEmailRequest,
-    SendTransactionalEmailResponse,
+  SendEmailRequest,
+  SendEmailResponse,
+  SendSystemNotificationRequest,
+  SendSystemNotificationResponse,
+  SendTransactionalEmailRequest,
+  SendTransactionalEmailResponse,
 } from '@pika/api/internal'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'

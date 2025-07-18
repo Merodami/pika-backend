@@ -1,8 +1,8 @@
 import { NODE_ENV, REDIS_DEFAULT_TTL } from '@pika/environment'
 import type {
-    BulkEmailDTO,
-    CommunicationLogDomain,
-    SendEmailDTO,
+  BulkEmailDTO,
+  CommunicationLogDomain,
+  SendEmailDTO,
 } from '@pika/sdk'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
@@ -12,18 +12,18 @@ import Handlebars from 'handlebars'
 import { nth } from 'lodash-es'
 
 import type {
-    CommunicationLogSearchParams,
-    ICommunicationLogRepository,
+  CommunicationLogSearchParams,
+  ICommunicationLogRepository,
 } from '../repositories/CommunicationLogRepository.js'
 import { TemplateService } from '../templates/TemplateRegistry.js'
 import type {
-    BulkEmailParams,
-    EmailParams,
-    EmailProvider,
+  BulkEmailParams,
+  EmailParams,
+  EmailProvider,
 } from './providers/EmailProvider.js'
 import {
-    type ProviderConfig,
-    ProviderFactory,
+  type ProviderConfig,
+  ProviderFactory,
 } from './providers/ProviderFactory.js'
 
 export interface EmailConfig {

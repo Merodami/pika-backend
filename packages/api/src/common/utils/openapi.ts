@@ -276,46 +276,6 @@ export function withExample<T extends z.ZodTypeAny>(
   return schema.openapi({ example } as any)
 }
 
-// ============= Common Response Examples =============
-
-import {
-  ErrorResponse,
-  RateLimitResponse,
-  ValidationErrorResponse,
-} from '../schemas/responses.js'
-
-/**
- * Common error responses for reuse
- */
-export const commonErrorResponses = {
-  400: apiResponse(ValidationErrorResponse, 'Bad Request - Validation error'),
-  401: apiResponse(ErrorResponse, 'Unauthorized - Authentication required'),
-  403: apiResponse(ErrorResponse, 'Forbidden - Insufficient permissions'),
-  404: apiResponse(ErrorResponse, 'Not Found - Resource does not exist'),
-  409: apiResponse(ErrorResponse, 'Conflict - Resource already exists'),
-  429: apiResponse(
-    RateLimitResponse,
-    'Too Many Requests - Rate limit exceeded',
-  ),
-  500: apiResponse(ErrorResponse, 'Internal Server Error'),
-  503: apiResponse(ErrorResponse, 'Service Unavailable'),
-}
-
-/**
- * Get common error responses
- */
-export function getErrorResponses(
-  codes: Array<keyof typeof commonErrorResponses>,
-): Record<string, ResponseConfig> {
-  return codes.reduce(
-    (acc, code) => ({
-      ...acc,
-      [code]: commonErrorResponses[code],
-    }),
-    {},
-  )
-}
-
 // ============= Route Documentation Helper =============
 
 /**

@@ -1,15 +1,33 @@
-import type {
-  ProcessInternalPaymentRequest,
-  ProcessInternalPaymentResponse,
-  ProcessInternalRefundRequest,
-  ProcessInternalRefundResponse,
-} from '@pika/api/internal'
 import { PAYMENT_API_URL } from '@pika/environment'
-// TODO: Fix circular dependency - move domain types to shared or separate package
-// import type { CreditsDomain } from '@pika
 import type { BillingIntervalType, ServiceContext } from '@pika/types'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
+
+// Payment service client types
+export interface ProcessInternalPaymentRequest {
+  userId: string
+  amount: number
+  currency: string
+  description?: string
+}
+
+export interface ProcessInternalPaymentResponse {
+  paymentId: string
+  success: boolean
+  transactionId?: string
+}
+
+export interface ProcessInternalRefundRequest {
+  paymentId: string
+  amount?: number
+  reason?: string
+}
+
+export interface ProcessInternalRefundResponse {
+  refundId: string
+  success: boolean
+  refundedAmount: number
+}
 
 // Temporary interface to avoid circular dependency
 export interface CreditsDomain {

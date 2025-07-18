@@ -54,14 +54,7 @@ tsconfig.tsbuildinfo
 .nx/cache
 .nx/workspace-data
 
-CODEOWNERS
 localstack_data
-ai/
-ORIGINAL.md
-CLAUDE.md
-CHANGELOG.md
-PIKA.md
-
 
 # Security - Never commit private keys
 keys/
@@ -159,4 +152,4 @@ tsconfig.tsbuildinfo
 
 # Uploads folder
 uploads/
-pika/
+pika-old/

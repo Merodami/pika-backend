@@ -2,26 +2,26 @@ import { vi } from 'vitest'
 
 // Unmock modules that might interfere with real server setup for integration tests
 vi.unmock('@pika/http')
-vi.unmock('@pika
-vi.unmock('@pika
+vi.unmock('@pika/api')
+vi.unmock('@pika/redis')
 
 // Force Vitest to use the actual implementation
-vi.mock('@pikanc () => {
+vi.mock('@pika/api', async () => {
   const actualApi =
-    await vi.importActual<typeof import('@pikap@p@p@p@p@pika
+    await vi.importActual<typeof import('@pika/api')>('@pika/api')
 
   return actualApi
 })
 
-vi.mock('@pikaasync () => {
+vi.mock('@pika/shared', async () => {
   const actualShared =
-    await vi.importActual<typeof import('@pika('@p@p@p@p@p@pika
+    await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
 
   return actualShared
 })
 
-import { MemoryCacheService } from '@pika
-import { logger } from '@pika
+import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import {
   CommunicationServiceClientMock,
   UserServiceClientMock,

@@ -1,9 +1,9 @@
 import { UserRole } from '@pika/types'
 
 import {
-    AuthResult,
-    AuthStrategy,
-    RegistrationData,
+  AuthResult,
+  AuthStrategy,
+  RegistrationData,
 } from '../../strategies/AuthStrategy.js'
 
 export interface RegisterUseCaseParams {

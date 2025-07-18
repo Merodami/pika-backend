@@ -82,7 +82,7 @@ export class RequestContext {
    * Check if the user is a regular user (not admin)
    */
   static isUser(context: UserContext): boolean {
-    return context.role === UserRole.USER
+    return context.role === UserRole.CUSTOMER
   }
 
   /**

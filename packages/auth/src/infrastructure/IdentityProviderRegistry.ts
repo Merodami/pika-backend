@@ -1,9 +1,9 @@
 import { logger } from '@pika/shared'
 
 import {
-    IdentityProvider,
-    IdentityProviderFactory,
-    IdentityProviderOptions,
+  IdentityProvider,
+  IdentityProviderFactory,
+  IdentityProviderOptions,
 } from '../domain/interfaces/IdentityProvider.js'
 
 /**

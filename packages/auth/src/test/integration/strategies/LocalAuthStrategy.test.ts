@@ -4,13 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { JwtTokenService } from '../../../services/JwtTokenService.js'
 import { PasswordSecurityService } from '../../../services/PasswordSecurityService.js'
 import {
-    LoginCredentials,
-    RegistrationData,
+  LoginCredentials,
+  RegistrationData,
 } from '../../../strategies/AuthStrategy.js'
 import {
-    LocalAuthStrategy,
-    UserService,
-    UserServiceUser,
+  LocalAuthStrategy,
+  UserService,
+  UserServiceUser,
 } from '../../../strategies/LocalAuthStrategy.js'
 
 describe('LocalAuthStrategy Integration', () => {

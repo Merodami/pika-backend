@@ -214,7 +214,7 @@ export class SubscriptionService implements ISubscriptionService {
     const updatedSubscription = await this.subscriptionRepository.update(id, {
       cancelAtPeriodEnd,
       cancelledAt: cancelAtPeriodEnd ? undefined : new Date(),
-      status: cancelAtPeriodEnd ? subscription.status : 'CANCELLED' as any,
+      status: cancelAtPeriodEnd ? subscription.status : ('CANCELLED' as any),
     })
 
     // Clear subscription cache
@@ -312,9 +312,7 @@ export class SubscriptionService implements ISubscriptionService {
   }
 
   // Credit processing method removed - no credit tables in database
-  async processSubscriptionCredits(
-    subscriptionId: string,
-  ): Promise<never> {
+  async processSubscriptionCredits(subscriptionId: string): Promise<never> {
     logger.info('Processing subscription credits', { subscriptionId })
 
     const subscription =
@@ -400,7 +398,6 @@ export class SubscriptionService implements ISubscriptionService {
           planName: plan.name,
           price: `$${(plan.price / 100).toFixed(2)}`,
           interval: plan.interval,
-          creditsAmount: plan.creditsAmount.toString(),
           features: plan.features.join(', '),
           nextBillingDate: subscription.currentPeriodEnd
             ? new Date(subscription.currentPeriodEnd).toLocaleDateString()

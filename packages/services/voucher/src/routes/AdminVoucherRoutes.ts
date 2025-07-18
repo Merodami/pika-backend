@@ -1,0 +1,167 @@
+import type { PrismaClient } from '@prisma/client'
+import { voucherAdmin, voucherCommon, shared } from '@pika/api'
+import {
+  createMulterMiddleware,
+  requireAdmin,
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '@pika/http'
+import type { ICacheService } from '@pika/redis'
+import { FileStoragePort, CommunicationServiceClient } from '@pika/shared'
+import type { TranslationClient } from '@pika/translation'
+import { Router } from 'express'
+
+import { AdminVoucherController } from '../controllers/AdminVoucherController.js'
+import { VoucherRepository } from '../repositories/VoucherRepository.js'
+import { VoucherService } from '../services/VoucherService.js'
+
+/**
+ * Creates admin voucher routes
+ */
+export function createAdminVoucherRoutes(
+  prisma: PrismaClient,
+  cache: ICacheService,
+  translationClient: TranslationClient,
+  fileStorage: FileStoragePort,
+  communicationClient?: CommunicationServiceClient,
+): Router {
+  const router = Router()
+
+  // Initialize dependencies
+  const repository = new VoucherRepository(prisma, cache)
+  const service = new VoucherService(
+    repository,
+    cache,
+    translationClient,
+    fileStorage,
+    undefined,
+    communicationClient,
+  )
+  const controller = new AdminVoucherController(service)
+
+  // All admin routes require admin authentication
+  router.use(requireAdmin())
+
+  // GET /admin/vouchers - Get all vouchers with admin filters
+  router.get(
+    '/',
+    validateQuery(voucherAdmin.AdminVoucherQueryParams),
+    controller.getAllVouchers,
+  )
+
+  // GET /admin/vouchers/:id - Get voucher by ID with full details
+  router.get(
+    '/:id',
+    validateParams(voucherCommon.VoucherIdParam),
+    validateQuery(voucherAdmin.AdminVoucherQueryParams),
+    controller.getVoucherById,
+  )
+
+  // POST /admin/vouchers - Create new voucher
+  router.post(
+    '/',
+    validateBody(voucherAdmin.CreateVoucherRequest),
+    controller.createVoucher,
+  )
+
+  // PATCH /admin/vouchers/:id - Update voucher
+  router.patch(
+    '/:id',
+    validateParams(voucherCommon.VoucherIdParam),
+    validateBody(voucherAdmin.UpdateVoucherRequest),
+    controller.updateVoucher,
+  )
+
+  // DELETE /admin/vouchers/:id - Delete voucher
+  router.delete(
+    '/:id',
+    validateParams(voucherCommon.VoucherIdParam),
+    controller.deleteVoucher,
+  )
+
+  // PUT /admin/vouchers/:id/state - Update voucher state
+  router.put(
+    '/:id/state',
+    validateParams(voucherCommon.VoucherIdParam),
+    validateBody(voucherAdmin.UpdateVoucherStateRequest),
+    controller.updateVoucherState,
+  )
+
+  // POST /admin/vouchers/:id/codes - Generate voucher codes
+  router.post(
+    '/:id/codes',
+    validateParams(voucherCommon.VoucherIdParam),
+    validateBody(voucherAdmin.GenerateVoucherCodesRequest),
+    controller.generateVoucherCodes,
+  )
+
+  // Image upload route with multer middleware
+  const upload = createMulterMiddleware({
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit for voucher images
+    },
+  })
+
+  // POST /admin/vouchers/:id/image - Upload voucher image
+  router.post(
+    '/:id/image',
+    validateParams(voucherCommon.VoucherIdParam),
+    upload.single('image'),
+    controller.uploadVoucherImage,
+  )
+
+  // PUT /admin/vouchers/:id/translations - Update voucher translations
+  router.put(
+    '/:id/translations',
+    validateParams(voucherCommon.VoucherIdParam),
+    validateBody(voucherAdmin.UpdateVoucherTranslationsRequest),
+    controller.updateVoucherTranslations,
+  )
+
+  // GET /admin/vouchers/:id/translations - Get voucher translations
+  router.get(
+    '/:id/translations',
+    validateParams(voucherCommon.VoucherIdParam),
+    controller.getVoucherTranslations,
+  )
+
+  // PUT /admin/vouchers/bulk - Bulk update vouchers
+  router.put(
+    '/bulk',
+    validateBody(voucherAdmin.BulkVoucherUpdateRequest),
+    controller.bulkUpdateVouchers,
+  )
+
+  // GET /admin/vouchers/:id/analytics - Get voucher analytics
+  router.get(
+    '/:id/analytics',
+    validateParams(voucherCommon.VoucherIdParam),
+    validateQuery(voucherAdmin.VoucherAnalyticsQueryParams),
+    controller.getVoucherAnalytics,
+  )
+
+  // GET /admin/vouchers/business/:id/stats - Get business voucher statistics
+  router.get(
+    '/business/:id/stats',
+    validateParams(shared.BusinessIdParam),
+    validateQuery(voucherAdmin.BusinessVoucherStatsQueryParams),
+    controller.getBusinessVoucherStats,
+  )
+
+  // POST /admin/vouchers/:id/publish - Publish voucher
+  router.post(
+    '/:id/publish',
+    validateParams(voucherCommon.VoucherIdParam),
+    controller.publishVoucher,
+  )
+
+  // POST /admin/vouchers/:id/expire - Expire voucher
+  router.post(
+    '/:id/expire',
+    validateParams(voucherCommon.VoucherIdParam),
+    controller.expireVoucher,
+  )
+
+  return router
+}

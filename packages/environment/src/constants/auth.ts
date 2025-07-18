@@ -37,11 +37,7 @@ export const JWT_REFRESH_TOKEN_EXPIRY = getEnvVariable(
   parseString,
   '7d',
 )
-export const JWT_ISSUER = getEnvVariable(
-  'JWT_ISSUER',
-  parseString,
-  'pika-api',
-)
+export const JWT_ISSUER = getEnvVariable('JWT_ISSUER', parseString, 'pika-api')
 export const JWT_AUDIENCE = getEnvVariable(
   'JWT_AUDIENCE',
   parseString,

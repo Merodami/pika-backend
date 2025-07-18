@@ -48,7 +48,7 @@ export class E2EAuthHelper {
       password: 'TestUser123!',
       firstName: 'Test',
       lastName: 'User',
-      role: UserRole.USER,
+      role: UserRole.CUSTOMER,
       phoneNumber: '+1234567891',
     },
     MEMBER: {
@@ -56,7 +56,7 @@ export class E2EAuthHelper {
       password: 'TestMember123!',
       firstName: 'Test',
       lastName: 'Member',
-      role: UserRole.USER,
+      role: UserRole.CUSTOMER,
       phoneNumber: '+1234567892',
     },
     PROFESSIONAL: {
@@ -64,7 +64,7 @@ export class E2EAuthHelper {
       password: 'TestProfessional123!',
       firstName: 'Test',
       lastName: 'Professional',
-      role: UserRole.USER,
+      role: UserRole.CUSTOMER,
       phoneNumber: '+1234567893',
     },
   }
@@ -498,7 +498,7 @@ export function createE2EAuthHelper(
  */
 export const TEST_USER_ROLES = {
   ADMIN: 'ADMIN' as const,
-  USER: 'USER' as const,
+  USER: 'CUSTOMER' as const,
 } as const
 
 export type TestUserRole =

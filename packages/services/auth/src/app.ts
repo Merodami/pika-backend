@@ -1,6 +1,6 @@
 import { AUTH_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
-import { type ICacheService,initializeCache } from '@pika/redis'
+import { type ICacheService, initializeCache } from '@pika/redis'
 import {
   CommunicationServiceClient,
   logger,

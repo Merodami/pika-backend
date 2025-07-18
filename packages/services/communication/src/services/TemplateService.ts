@@ -1,8 +1,8 @@
 import type { ICacheService } from '@pika/redis'
 import type {
-    CreateTemplateDTO,
-    TemplateDomain,
-    UpdateTemplateDTO,
+  CreateTemplateDTO,
+  TemplateDomain,
+  UpdateTemplateDTO,
 } from '@pika/sdk'
 import { Cache } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
@@ -10,8 +10,8 @@ import type { PaginatedResult } from '@pika/types'
 import Handlebars from 'handlebars'
 
 import type {
-    ITemplateRepository,
-    TemplateSearchParams,
+  ITemplateRepository,
+  TemplateSearchParams,
 } from '../repositories/TemplateRepository.js'
 import { EMAIL_TEMPLATES } from '../types/constants.js'
 

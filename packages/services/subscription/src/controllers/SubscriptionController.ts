@@ -1,6 +1,4 @@
-import type {
-  SubscriptionIdParam,
-} from '@pika/api/admin'
+import type { SubscriptionIdParam } from '@pika/api/admin'
 import type { AdminGetSubscriptionsQuery } from '@pika/api/admin'
 import type {
   CancelSubscriptionRequest,

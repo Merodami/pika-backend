@@ -521,7 +521,7 @@ export class LocalAuthStrategy implements AuthStrategy {
               expirationHours: '24',
             },
           })
-          .catch((error) => {
+          .catch((error: Error) => {
             logger.error(
               'Failed to send password reset email',
               error as Error,
@@ -598,7 +598,7 @@ export class LocalAuthStrategy implements AuthStrategy {
               firstName: user.firstName,
             },
           })
-          .catch((error) => {
+          .catch((error: Error) => {
             logger.error(
               'Failed to send password reset confirmation',
               error as Error,
@@ -653,7 +653,7 @@ export class LocalAuthStrategy implements AuthStrategy {
               firstName: user.firstName,
             },
           })
-          .catch((error) => {
+          .catch((error: Error) => {
             logger.error('Failed to send welcome email', error as Error, {
               userId,
             })
@@ -713,7 +713,7 @@ export class LocalAuthStrategy implements AuthStrategy {
               verificationUrl: `${API_GATEWAY_BASE_URL}${API_PREFIX}/auth/verify-email/${verificationToken}`,
             },
           })
-          .catch((error) => {
+          .catch((error: Error) => {
             logger.error('Failed to send verification email', error as Error, {
               userId: user.id,
             })
@@ -787,7 +787,7 @@ export class LocalAuthStrategy implements AuthStrategy {
               firstName: user.firstName,
             },
           })
-          .catch((error) => {
+          .catch((error: Error) => {
             logger.error(
               'Failed to send password change confirmation',
               error as Error,

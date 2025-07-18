@@ -1,9 +1,8 @@
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import type {
-    CreditProcessingStatus,
-    SubscriptionInterval,
-    SubscriptionStatus,
+  SubscriptionInterval,
+  SubscriptionStatus,
 } from '@subscription/types/enums.js'
 
 // Service configuration interfaces
@@ -14,28 +13,10 @@ export interface SubscriptionServiceConfig {
 
 // Plan configuration interfaces
 export interface PlanConfiguration {
-  creditsAmount: number
   features: string[]
 }
 
-// Credit processing interfaces
-export interface CreditProcessingJob {
-  subscriptionId: string
-  userId: string
-  creditsAmount: number
-  status: CreditProcessingStatus
-  attempts: number
-  lastAttemptAt?: Date
-  scheduledFor?: Date
-  error?: string
-}
-
-export interface CreditProcessingResult {
-  success: boolean
-  creditsAdded?: number
-  newBalance?: number
-  error?: string
-}
+// Credit processing interfaces removed - credits system discontinued
 
 // Subscription management interfaces
 export interface SubscriptionCreationData {
@@ -65,7 +46,6 @@ export interface PlanCreationData {
   currency: string
   interval: SubscriptionInterval
   intervalCount: number
-  creditsAmount: number
   trialPeriodDays?: number
   features: string[]
   // Removed gym-related properties
@@ -76,7 +56,6 @@ export interface PlanUpdateData {
   name?: string
   description?: string
   price?: number
-  creditsAmount?: number
   features?: string[]
   isActive?: boolean
   metadata?: Record<string, any>
@@ -113,10 +92,5 @@ export interface UserMembershipStatus {
     // Removed gym-related properties
     currentPeriodEnd?: Date
     cancelAtPeriodEnd: boolean
-  }
-  creditBalance?: {
-    total: number
-    demand: number
-    subscription: number
   }
 }

@@ -9,7 +9,8 @@
     "declarationDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "@api/*": ["src/*"]
+      "@api/*": ["src/*"],
+      "@api": ["src/index.ts"]
     }
   },
   "include": ["src/**/*.ts"],

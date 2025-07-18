@@ -1,11 +1,4 @@
-import type {
-  BatchFileUploadRequest,
-  FileHistoryIdParam,
-  FileIdParam,
-  FileUploadRequest,
-  GetFileHistoryQuery,
-  GetFileUrlQuery,
-} from '@pika/api/public'
+import { storagePublic, storageCommon } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -74,7 +67,7 @@ export class FileController implements IFileController {
    * Upload a single file
    */
   async uploadFile(
-    request: Request<{}, {}, FileUploadRequest>,
+    request: Request<{}, {}, storagePublic.FileUploadRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -126,7 +119,7 @@ export class FileController implements IFileController {
    * Upload multiple files
    */
   async uploadBatch(
-    request: Request<{}, {}, BatchFileUploadRequest>,
+    request: Request<{}, {}, storagePublic.BatchFileUploadRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -182,7 +175,7 @@ export class FileController implements IFileController {
    * Delete a file
    */
   async deleteFile(
-    request: Request<FileIdParam>,
+    request: Request<storageCommon.FileIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -206,13 +199,13 @@ export class FileController implements IFileController {
    * Get signed URL for file access
    */
   async getFileUrl(
-    request: Request<FileIdParam>,
+    request: Request<storageCommon.FileIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { fileId } = request.params
-      const query = getValidatedQuery<GetFileUrlQuery>(request)
+      const query = getValidatedQuery<storagePublic.GetFileUrlQuery>(request)
       const { expiresIn } = query
       const context = RequestContext.getContext(request)
       const userId = context.userId
@@ -252,7 +245,8 @@ export class FileController implements IFileController {
     try {
       const context = RequestContext.getContext(request)
       const userId = context.userId
-      const query = getValidatedQuery<GetFileHistoryQuery>(request)
+      const query =
+        getValidatedQuery<storagePublic.GetFileHistoryQuery>(request)
 
       // Transform API query to service params
       const params: FileStorageLogSearchParams = {
@@ -284,7 +278,7 @@ export class FileController implements IFileController {
    * Get file details by ID
    */
   async getFileById(
-    request: Request<FileHistoryIdParam>,
+    request: Request<storageCommon.FileHistoryIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

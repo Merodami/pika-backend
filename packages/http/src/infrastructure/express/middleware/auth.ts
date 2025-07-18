@@ -9,60 +9,13 @@ import {
   NODE_ENV,
   SKIP_AUTH,
 } from '@pika/environment'
-import {
-  logger,
-  NotAuthenticatedError,
-  NotAuthorizedError,
-} from '@pika/shared'
-import { UserRole } from '@pika/types'
+import { logger, NotAuthenticatedError, NotAuthorizedError } from '@pika/shared'
+import { UserRole, mapRoleToPermissions } from '@pika/types'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import { ApiTokenOptions } from '../../../domain/types/server.js'
 
-/**
- * Map user roles to permissions for RBAC
- */
-function mapRoleToPermissions(role: UserRole): string[] {
-  switch (role) {
-    case UserRole.ADMIN:
-      return [
-        // User management
-        'users:read',
-        'users:write',
-        'users:delete',
-        // Service management
-        'services:read',
-        'services:write',
-        'services:delete',
-        // Admin specific
-        'admin:dashboard',
-        'admin:settings',
-        'admin:users',
-        'admin:system',
-        // Credits management
-        'credits:admin',
-        'credits:manage_all',
-        // Payment management
-        'payments:admin',
-        'payments:manage_all',
-      ]
-    case UserRole.USER:
-      return [
-        // Basic user permissions
-        'users:read_own',
-        'users:update_own',
-        // Credits permissions
-        'credits:view_own',
-        'credits:use_own',
-        'credits:transfer_own',
-        // Payment permissions
-        'payments:own',
-        'payments:purchase',
-      ]
-    default:
-      return []
-  }
-}
+// Role to permissions mapping is now imported from @pika/types
 
 /**
  * Enhanced API token authentication middleware for Express.
@@ -333,14 +286,13 @@ export function requireUser(): RequestHandler {
       return next(new NotAuthenticatedError('Authentication required'))
     }
 
-    if (req.user.role !== UserRole.USER) {
+    if (req.user.role !== UserRole.CUSTOMER) {
       return next(new NotAuthorizedError('User access required'))
     }
 
     next()
   }
 }
-
 
 /**
  * Require specific roles (any of the provided roles)

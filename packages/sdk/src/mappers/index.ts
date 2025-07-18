@@ -1,3 +1,5 @@
+export * from './BusinessMapper.js'
+export * from './CategoryMapper.js'
 export * from './CommunicationLogMapper.js'
 export * from './FileStorageLogMapper.js'
 export * from './NotificationMapper.js'

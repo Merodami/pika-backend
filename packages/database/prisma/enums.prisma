@@ -1,6 +1,7 @@
 enum UserRole {
   ADMIN
-  USER
+  CUSTOMER
+  BUSINESS
 
   @@schema("identity")
 }
@@ -64,7 +65,7 @@ enum NotificationStatus {
   FAILED
   READ
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum NotificationType {
@@ -73,7 +74,7 @@ enum NotificationType {
   PUSH
   IN_APP
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum CommunicationMethod {
@@ -82,7 +83,7 @@ enum CommunicationMethod {
   PUSH
   IN_APP
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum SubscriptionStatus {
@@ -112,4 +113,114 @@ enum StorageProvider {
   MINIO
 
   @@schema("files")
+}
+
+enum VoucherBookStatus {
+  DRAFT
+  READY_FOR_PRINT
+  PUBLISHED
+  ARCHIVED
+
+  @@schema("files")
+}
+
+enum VoucherBookType {
+  MONTHLY
+  SPECIAL_EDITION
+  REGIONAL
+  SEASONAL
+  PROMOTIONAL
+
+  @@schema("files")
+}
+
+enum PageLayoutType {
+  STANDARD      // 8 spaces (2x4 grid)
+  MIXED         // Mixed ad sizes
+  FULL_PAGE     // Single full-page ad
+  CUSTOM        // Custom layout
+
+  @@schema("files")
+}
+
+enum AdSize {
+  SINGLE        // 1/8 page (1 space)
+  QUARTER       // 1/4 page (2 spaces)
+  HALF          // 1/2 page (4 spaces)
+  FULL          // Full page (8 spaces)
+
+  @@schema("files")
+}
+
+enum ContentType {
+  VOUCHER       // Business voucher with QR code
+  IMAGE         // Static image content
+  AD            // Advertisement content
+  SPONSORED     // Sponsored content
+
+  @@schema("files")
+}
+
+// ===== VOUCHER SYSTEM ENUMS =====
+
+enum VoucherState {
+  DRAFT
+  PUBLISHED
+  CLAIMED
+  REDEEMED
+  EXPIRED
+
+  @@schema("business")
+}
+
+enum VoucherType {
+  PERCENTAGE
+  FIXED_VALUE
+  FREE_ITEM
+  BUY_ONE_GET_ONE
+  CASHBACK
+
+  @@schema("business")
+}
+
+enum VoucherCodeType {
+  QR            // QR code (JWT-based)
+  SHORT         // Short alphanumeric code
+  STATIC        // Static code (reusable)
+
+  @@schema("business")
+}
+
+enum VoucherScanType {
+  CUSTOMER      // Customer scanning voucher
+  BUSINESS      // Business scanning voucher for redemption
+
+  @@schema("analytics")
+}
+
+enum VoucherScanSource {
+  CAMERA        // Scanned with camera
+  GALLERY       // Uploaded from gallery
+  LINK          // Opened via link
+  SHARE         // Shared link/code
+
+  @@schema("analytics")
+}
+
+enum CustomerVoucherStatus {
+  CLAIMED       // Voucher claimed to wallet
+  REDEEMED      // Voucher redeemed
+  EXPIRED       // Voucher expired
+
+  @@schema("business")
+}
+
+enum FraudCaseStatus {
+  PENDING         // Awaiting review
+  REVIEWING       // Under investigation
+  APPROVED        // Marked as legitimate
+  REJECTED        // Confirmed fraud
+  FALSE_POSITIVE  // Incorrectly flagged
+
+  @@schema("security")
 }

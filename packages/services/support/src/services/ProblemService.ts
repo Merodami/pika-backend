@@ -1,8 +1,8 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type {
-    CreateProblemDTO,
-    ProblemDomain,
-    UpdateProblemDTO,
+  CreateProblemDTO,
+  ProblemDomain,
+  UpdateProblemDTO,
 } from '@pika/sdk'
 import { ProblemMapper } from '@pika/sdk'
 import type { ICacheService } from '@pika/redis'
@@ -11,10 +11,10 @@ import { ErrorFactory, logger } from '@pika/shared'
 import type { ParsedIncludes } from '@pika/types'
 
 import type {
-    CreateProblemInput,
-    IProblemRepository,
-    ProblemSearchParams,
-    UpdateProblemInput,
+  CreateProblemInput,
+  IProblemRepository,
+  ProblemSearchParams,
+  UpdateProblemInput,
 } from '../repositories/ProblemRepository.js'
 
 export interface IProblemService {

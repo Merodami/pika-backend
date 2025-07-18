@@ -1,8 +1,8 @@
 import {
-    CreateSupportCommentRequest,
-    ProblemIdForCommentsParam,
-    SupportCommentIdParam,
-    UpdateSupportCommentRequest,
+  CreateSupportCommentRequest,
+  ProblemIdForCommentsParam,
+  SupportCommentIdParam,
+  UpdateSupportCommentRequest,
 } from '@pika/api/public'
 import type { ICacheService } from '@pika/redis'
 import { requireAuth, validateBody, validateParams } from '@pika/http'

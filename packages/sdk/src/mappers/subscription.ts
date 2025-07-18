@@ -12,7 +12,6 @@ export interface SubscriptionPlanDocument {
   currency: string
   interval: string
   intervalCount: number
-  creditsAmount: number
   trialPeriodDays: number | null
   features: string[]
   isActive: boolean
@@ -73,7 +72,6 @@ export class SubscriptionPlanMapper {
       currency: doc.currency,
       interval: doc.interval,
       intervalCount: doc.intervalCount,
-      creditsAmount: doc.creditsAmount,
       trialPeriodDays: doc.trialPeriodDays || undefined,
       features: doc.features,
       isActive: doc.isActive,
@@ -94,7 +92,6 @@ export class SubscriptionPlanMapper {
       currency: domain.currency,
       interval: domain.interval,
       intervalCount: domain.intervalCount,
-      creditsAmount: domain.creditsAmount,
       trialPeriodDays: domain.trialPeriodDays,
       features: domain.features,
       isActive: domain.isActive,
@@ -115,7 +112,6 @@ export class SubscriptionPlanMapper {
       currency: dto.currency,
       interval: dto.interval,
       intervalCount: dto.intervalCount,
-      creditsAmount: dto.creditsAmount,
       trialPeriodDays: dto.trialPeriodDays,
       features: dto.features,
       isActive: dto.isActive,

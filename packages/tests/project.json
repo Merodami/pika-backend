@@ -1,7 +1,14 @@
 {
   "name": "@pika/tests",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["@pika/types", "@pika/environment", "@pika/api", "@pika/shared", "@pika/database", "@pika/redis"],
+  "implicitDependencies": [
+    "@pika/types",
+    "@pika/environment",
+    "@pika/api",
+    "@pika/shared",
+    "@pika/database",
+    "@pika/redis"
+  ],
   "targets": {
     "typecheck": {
       "executor": "nx:run-commands",

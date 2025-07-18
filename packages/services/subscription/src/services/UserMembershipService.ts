@@ -4,9 +4,7 @@ import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
-import {
-    SubscriptionStatus,
-} from '@subscription/types/enums.js'
+import { SubscriptionStatus } from '@subscription/types/enums.js'
 import type { UserMembershipStatus } from '@subscription/types/interfaces.js'
 
 export interface IUserMembershipService {
@@ -63,7 +61,6 @@ export class UserMembershipService implements IUserMembershipService {
               cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
             }
           : undefined,
-        creditBalance: undefined, // Credits removed - no credit tables in database
       }
 
       return membershipStatus
@@ -96,10 +93,7 @@ export class UserMembershipService implements IUserMembershipService {
 
     // Check if subscription is active
     const status = subscription.status as string
-    if (
-      status !== 'ACTIVE' &&
-      status !== 'TRIALING'
-    ) {
+    if (status !== 'ACTIVE' && status !== 'TRIALING') {
       return false
     }
 
