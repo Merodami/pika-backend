@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
-import { businessAdmin, shared } from '@pika/api'
+import { businessAdmin, businessCommon, shared } from '@pika/api'
 import {
   requireAdmin,
   requireAuth,
@@ -44,7 +44,7 @@ export function createAdminBusinessRoutes(
   // GET /admin/businesses/:id - Get business by ID with full details
   router.get(
     '/:id',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     validateQuery(businessAdmin.AdminBusinessQueryParams),
     controller.getBusinessById,
   )
@@ -59,7 +59,7 @@ export function createAdminBusinessRoutes(
   // PATCH /admin/businesses/:id - Update business
   router.patch(
     '/:id',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     validateBody(businessAdmin.UpdateBusinessRequest),
     controller.updateBusiness,
   )
@@ -67,14 +67,14 @@ export function createAdminBusinessRoutes(
   // DELETE /admin/businesses/:id - Delete business
   router.delete(
     '/:id',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     controller.deleteBusiness,
   )
 
   // POST /admin/businesses/:id/verify - Verify business
   router.post(
     '/:id/verify',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     validateBody(businessAdmin.ToggleBusinessVerificationRequest),
     controller.verifyBusiness,
   )
@@ -82,21 +82,21 @@ export function createAdminBusinessRoutes(
   // POST /admin/businesses/:id/deactivate - Deactivate business
   router.post(
     '/:id/deactivate',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     controller.deactivateBusiness,
   )
 
   // POST /admin/businesses/:id/activate - Activate business
   router.post(
     '/:id/activate',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     controller.activateBusiness,
   )
 
   // POST /admin/businesses/:id/rating - Update business rating
   router.post(
     '/:id/rating',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     validateBody(businessAdmin.UpdateBusinessRatingRequest),
     controller.updateBusinessRating,
   )

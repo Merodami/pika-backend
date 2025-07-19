@@ -6,19 +6,20 @@
  * Subscription access check result
  */
 export type SubscriptionCheckResponse = {
-  hasAccess: boolean
-  subscription?: {
-    /**
-     * Universally Unique Identifier
-     */
-    id: string
-    /**
-     * Universally Unique Identifier
-     */
-    planId: string
-    planName: string
-    status: string
-    features: Array<string>
-  }
-  reason?: string
-}
+    hasAccess: boolean;
+    subscription?: {
+        /**
+         * Universally Unique Identifier
+         */
+        id: string;
+        /**
+         * Universally Unique Identifier
+         */
+        planId: string;
+        planName: string;
+        status: string;
+        features: Array<string>;
+    };
+    reason?: string;
+};
+

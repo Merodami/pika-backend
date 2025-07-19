@@ -18,6 +18,7 @@ import type {
 import type {
   VoucherSearchParams,
   UserVoucherSearchParams,
+  InternalVoucherSearchParams,
   VoucherValidationOptions,
   VoucherValidationResult,
   VoucherExistsOptions,

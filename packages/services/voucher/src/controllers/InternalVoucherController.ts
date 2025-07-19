@@ -3,6 +3,7 @@ import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { paginatedResponse } from '@pika/http'
 import { VoucherMapper, type VoucherDomain } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
+import { VoucherState } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IInternalVoucherService, BatchProcessOperation } from '../services/InternalVoucherService.js'
@@ -46,7 +47,7 @@ export class InternalVoucherController {
       )
 
       res.json({
-        vouchers: vouchers.map((voucher) => VoucherMapper.toDTO(voucher)),
+        vouchers: vouchers.map((voucher) => VoucherMapper.toAdminDTO(voucher)),
         notFound,
       })
     } catch (error) {
@@ -83,7 +84,7 @@ export class InternalVoucherController {
         isValid: validation.isValid,
         reason: validation.reason,
         voucher: validation.voucher
-          ? VoucherMapper.toDTO(validation.voucher)
+          ? VoucherMapper.toAdminDTO(validation.voucher)
           : undefined,
       })
     } catch (error) {
@@ -114,7 +115,7 @@ export class InternalVoucherController {
 
       const updatedVoucher = await this.internalVoucherService.updateVoucherStateInternal(
         voucherId,
-        state,
+        state as VoucherState,
         reason,
       )
 
@@ -169,7 +170,7 @@ export class InternalVoucherController {
 
       const params = {
         businessId,
-        state,
+        state: state as VoucherState | undefined,
         includeExpired,
         includeDeleted,
         page: page || 1,
@@ -201,7 +202,7 @@ export class InternalVoucherController {
 
       const params = {
         categoryId,
-        state,
+        state: state as VoucherState | undefined,
         includeExpired,
         page: page || 1,
         limit: limit || PAGINATION_DEFAULT_LIMIT,

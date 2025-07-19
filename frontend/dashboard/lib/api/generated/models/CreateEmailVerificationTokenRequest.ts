@@ -5,4 +5,6 @@
 /**
  * Create email verification token
  */
-export type CreateEmailVerificationTokenRequest = {}
+export type CreateEmailVerificationTokenRequest = {
+};
+

@@ -1,9 +1,4 @@
-import type {
-  CheckSubscriptionAccessRequest,
-  ProcessSubscriptionWebhookRequest,
-  SendSubscriptionNotificationRequest,
-  UpdateSubscriptionFromPaymentRequest,
-} from '@pika/api/internal'
+import { subscriptionInternal } from '@pika/api'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { ISubscriptionRepository } from '../repositories/SubscriptionRepository.js'
@@ -33,7 +28,7 @@ export class InternalSubscriptionController {
    * Process subscription webhook events
    */
   async processWebhook(
-    request: Request<unknown, unknown, ProcessSubscriptionWebhookRequest>,
+    request: Request<unknown, unknown, subscriptionInternal.ProcessSubscriptionWebhookRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -94,7 +89,7 @@ export class InternalSubscriptionController {
    * Update subscription from payment service
    */
   async updateFromPayment(
-    request: Request<unknown, unknown, UpdateSubscriptionFromPaymentRequest>,
+    request: Request<unknown, unknown, subscriptionInternal.UpdateSubscriptionFromPaymentRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -138,7 +133,7 @@ export class InternalSubscriptionController {
    * Check subscription access for features
    */
   async checkAccess(
-    request: Request<unknown, unknown, CheckSubscriptionAccessRequest>,
+    request: Request<unknown, unknown, subscriptionInternal.CheckSubscriptionAccessRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -278,7 +273,7 @@ export class InternalSubscriptionController {
    * Send subscription notification
    */
   async sendNotification(
-    request: Request<unknown, unknown, SendSubscriptionNotificationRequest>,
+    request: Request<unknown, unknown, subscriptionInternal.SendSubscriptionNotificationRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -314,11 +309,9 @@ export class InternalSubscriptionController {
       }
 
       await this.communicationClient.sendTransactionalEmail({
-        userId: userId as any,
-        templateKey: templateKey as any,
-        variables: subscriptionData as any,
-        trackOpens: true,
-        trackClicks: true,
+        userId,
+        templateKey,
+        variables: subscriptionData,
       })
 
       response.json({ success: true })

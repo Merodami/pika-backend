@@ -1,14 +1,6 @@
-import type {
-  AdminTicketDetailResponse,
-  AdminTicketListResponse,
-  AdminTicketQueryParams,
-  AssignTicketRequest,
-  TicketIdParam,
-  UpdateTicketStatusRequest,
-} from '@pika/api/admin'
+import { supportAdmin, supportCommon } from '@pika/api'
 import type { ProblemDomain } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
-import { ADMIN_PROBLEM_RELATIONS } from '@pika/api/admin'
 import { getValidatedQuery } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -31,7 +23,7 @@ export class AdminSupportController {
    */
   private toAdminTicketResponse(
     problem: ProblemDomain,
-  ): AdminTicketDetailResponse {
+  ): supportAdmin.AdminTicketDetailResponse {
     return {
       id: problem.id as any,
       ticketNumber: problem.ticketNumber || undefined,
@@ -66,12 +58,12 @@ export class AdminSupportController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const params = getValidatedQuery<AdminTicketQueryParams>(req)
+      const params = getValidatedQuery<supportAdmin.AdminTicketQueryParams>(req)
 
       // Parse include parameter
       const parsedIncludes = parseIncludeParam(
         params.include,
-        ADMIN_PROBLEM_RELATIONS as unknown as string[],
+        supportAdmin.ADMIN_PROBLEM_RELATIONS as unknown as string[],
       )
 
       const result = await this.problemService.searchProblems({
@@ -90,7 +82,7 @@ export class AdminSupportController {
       })
 
       // Map to admin response format
-      const response: AdminTicketListResponse = {
+      const response: supportAdmin.AdminTicketListResponse = {
         data: result.data.map((problem) => this.toAdminTicketResponse(problem)),
         pagination: result.pagination,
       }
@@ -106,7 +98,7 @@ export class AdminSupportController {
    * Get single ticket details
    */
   async getTicketById(
-    req: Request<TicketIdParam>,
+    req: Request<supportCommon.TicketIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -117,7 +109,7 @@ export class AdminSupportController {
       const query = getValidatedQuery<{ include?: string }>(req)
       const parsedIncludes = parseIncludeParam(
         query.include,
-        ADMIN_PROBLEM_RELATIONS as unknown as string[],
+        supportAdmin.ADMIN_PROBLEM_RELATIONS as unknown as string[],
       )
 
       const problem = await this.problemService.getProblemById(
@@ -142,7 +134,7 @@ export class AdminSupportController {
    * Update ticket status
    */
   async updateTicketStatus(
-    req: Request<TicketIdParam, {}, UpdateTicketStatusRequest>,
+    req: Request<supportCommon.TicketIdParam, {}, supportAdmin.UpdateTicketStatusRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -164,7 +156,7 @@ export class AdminSupportController {
    * Assign ticket to admin user
    */
   async assignTicket(
-    req: Request<TicketIdParam, {}, AssignTicketRequest>,
+    req: Request<supportCommon.TicketIdParam, {}, supportAdmin.AssignTicketRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

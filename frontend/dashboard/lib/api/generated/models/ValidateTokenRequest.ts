@@ -6,7 +6,8 @@
  * Validate JWT token
  */
 export type ValidateTokenRequest = {
-  token: string
-  checkExpiry?: boolean
-  requiredRoles?: Array<string>
-}
+    token: string;
+    checkExpiry?: boolean;
+    requiredRoles?: Array<string>;
+};
+

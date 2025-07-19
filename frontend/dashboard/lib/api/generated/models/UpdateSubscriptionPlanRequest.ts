@@ -6,12 +6,13 @@
  * Update a subscription plan
  */
 export type UpdateSubscriptionPlanRequest = {
-  name?: string
-  description?: string
-  price?: number
-  trialPeriodDays?: number
-  features?: Array<string>
-  isActive?: boolean
-  metadata?: Record<string, any>
-  stripePriceId?: string
-}
+    name?: string;
+    description?: string;
+    price?: number;
+    trialPeriodDays?: number;
+    features?: Array<string>;
+    isActive?: boolean;
+    metadata?: Record<string, any>;
+    stripePriceId?: string;
+};
+

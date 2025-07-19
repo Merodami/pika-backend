@@ -6,8 +6,9 @@
  * Create a service-to-service session
  */
 export type CreateServiceSessionRequest = {
-  userId: string
-  serviceName: string
-  expiresIn?: number
-  metadata?: Record<string, any>
-}
+    userId: string;
+    serviceName: string;
+    expiresIn?: number;
+    metadata?: Record<string, any>;
+};
+

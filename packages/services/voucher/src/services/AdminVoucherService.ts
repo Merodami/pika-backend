@@ -7,10 +7,9 @@ import {
   FileStoragePort,
   logger,
   VoucherBusinessRules,
-  type ParsedIncludes,
 } from '@pika/shared'
-import type { TranslationClient } from '@pika/translation'
-import { PaginatedResult, VoucherState, VoucherType } from '@pika/types'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
+import { PaginatedResult, VoucherState, VoucherDiscountType, type LanguageCode, type ParsedIncludes } from '@pika/types'
 import {
   generateSecureShortCode,
   generateVoucherCodes,
@@ -19,29 +18,33 @@ import { v4 as uuid } from 'uuid'
 
 import type { IAdminVoucherRepository } from '../repositories/AdminVoucherRepository.js'
 import type {
-  CreateVoucherData,
-  UpdateVoucherData,
   VoucherSearchParams,
-  BulkUpdateData,
   VoucherAnalytics,
   BusinessVoucherStats,
   GenerateCodesData,
   VoucherCode,
   VoucherTranslations,
+  CreateVoucherData as RepositoryCreateVoucherData,
+  UpdateVoucherData as RepositoryUpdateVoucherData,
+  BulkUpdateData,
 } from '../types/index.js'
+import type {
+  CreateVoucherData as DomainCreateVoucherData,
+  UpdateVoucherData as DomainUpdateVoucherData,
+} from '@pika/sdk'
 
 export interface IAdminVoucherService {
   // Core CRUD operations
-  getAllVouchers(params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
-  getVoucherById(id: string, parsedIncludes?: ParsedIncludes): Promise<VoucherDomain>
-  createVoucher(data: CreateVoucherData): Promise<VoucherDomain>
-  updateVoucher(id: string, data: UpdateVoucherData): Promise<VoucherDomain>
+  getAllVouchers(params: VoucherSearchParams, language?: LanguageCode): Promise<PaginatedResult<VoucherDomain>>
+  getVoucherById(id: string, parsedIncludes?: ParsedIncludes, language?: LanguageCode): Promise<VoucherDomain>
+  createVoucher(data: DomainCreateVoucherData, language?: LanguageCode): Promise<VoucherDomain>
+  updateVoucher(id: string, data: DomainUpdateVoucherData, language?: LanguageCode): Promise<VoucherDomain>
   deleteVoucher(id: string): Promise<void>
   
   // State management
-  updateVoucherState(id: string, state: VoucherState): Promise<VoucherDomain>
-  publishVoucher(id: string): Promise<VoucherDomain>
-  expireVoucher(id: string): Promise<VoucherDomain>
+  updateVoucherState(id: string, state: VoucherState, language?: LanguageCode): Promise<VoucherDomain>
+  publishVoucher(id: string, language?: LanguageCode): Promise<VoucherDomain>
+  expireVoucher(id: string, language?: LanguageCode): Promise<VoucherDomain>
   
   // Asset management
   uploadVoucherImage(voucherId: string, file: any): Promise<string>
@@ -54,7 +57,7 @@ export interface IAdminVoucherService {
   getVoucherTranslations(voucherId: string): Promise<VoucherTranslations>
   
   // Bulk operations
-  bulkUpdateVouchers(data: BulkUpdateData): Promise<VoucherDomain[]>
+  bulkUpdateVouchers(data: { ids: string[]; updates: DomainUpdateVoucherData }, language?: LanguageCode): Promise<VoucherDomain[]>
   
   // Analytics and reporting
   getVoucherAnalytics(filters?: {
@@ -70,35 +73,49 @@ export class AdminVoucherService implements IAdminVoucherService {
     private readonly repository: IAdminVoucherRepository,
     private readonly cache: ICacheService,
     private readonly translationClient: TranslationClient,
+    private readonly translationResolver: TranslationResolver,
     private readonly fileStorage?: FileStoragePort,
     private readonly businessServiceClient?: BusinessServiceClient,
   ) {}
 
-  async getAllVouchers(params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>> {
+  async getAllVouchers(params: VoucherSearchParams, language?: LanguageCode): Promise<PaginatedResult<VoucherDomain>> {
     try {
-      return await this.repository.findAll(params)
+      const result = await this.repository.findAll(params)
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        const resolvedData = await this.translationResolver.resolveArray(result.data, language)
+        return { data: resolvedData, pagination: result.pagination }
+      }
+      
+      return result
     } catch (error) {
-      logger.error('Failed to get all vouchers', { error, params })
+      logger.error('Failed to get all vouchers', { error, params, language })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async getVoucherById(id: string, parsedIncludes?: ParsedIncludes): Promise<VoucherDomain> {
+  async getVoucherById(id: string, parsedIncludes?: ParsedIncludes, language?: LanguageCode): Promise<VoucherDomain> {
     try {
-      const voucher = await this.repository.findById(id, parsedIncludes)
+      const voucher = await this.repository.findById(id)
       
       if (!voucher) {
         throw ErrorFactory.resourceNotFound('Voucher', id)
       }
       
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
+      
       return voucher
     } catch (error) {
-      logger.error('Failed to get voucher by id', { error, id })
+      logger.error('Failed to get voucher by id', { error, id, language })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async createVoucher(data: CreateVoucherData): Promise<VoucherDomain> {
+  async createVoucher(data: DomainCreateVoucherData, language?: LanguageCode): Promise<VoucherDomain> {
     try {
       // Validate business exists
       if (this.businessServiceClient) {
@@ -110,17 +127,17 @@ export class AdminVoucherService implements IAdminVoucherService {
       }
 
       // Validate voucher type and required fields
-      if (data.type === VoucherType.discount && !data.discount) {
+      if (data.discountType === VoucherDiscountType.percentage && !data.discountValue) {
         throw ErrorFactory.businessRuleViolation(
           'Discount voucher requires discount percentage',
-          'Discount field is required for discount vouchers',
+          'Discount value is required for percentage discount vouchers',
         )
       }
 
-      if (data.type === VoucherType.fixedValue && !data.value) {
+      if (data.discountType === VoucherDiscountType.fixed && !data.discountValue) {
         throw ErrorFactory.businessRuleViolation(
           'Fixed value voucher requires value',
-          'Value field is required for fixed value vouchers',
+          'Discount value is required for fixed discount vouchers',
         )
       }
 
@@ -129,55 +146,66 @@ export class AdminVoucherService implements IAdminVoucherService {
       const descriptionKey = `voucher.description.${uuid()}`
       const termsAndConditionsKey = `voucher.termsAndConditions.${uuid()}`
 
-      // Create all translations in a single batch for better performance
-      await this.translationClient.setBulk(
-        [
-          {
-            key: titleKey,
-            value: data.title,
-            context: 'Voucher title',
-            service: 'voucher-service',
-          },
-          {
-            key: descriptionKey,
-            value: data.description,
-            context: 'Voucher description',
-            service: 'voucher-service',
-          },
-          {
-            key: termsAndConditionsKey,
-            value: data.termsAndConditions,
-            context: 'Voucher terms and conditions',
-            service: 'voucher-service',
-          },
-        ],
-        DEFAULT_LANGUAGE,
-      )
+      // Create translations for all provided languages
+      const translationPromises: Promise<void>[] = []
+      
+      // Process title translations
+      for (const [lang, value] of Object.entries(data.title)) {
+        translationPromises.push(
+          this.translationClient.set(titleKey, lang as LanguageCode, value)
+        )
+      }
+      
+      // Process description translations
+      for (const [lang, value] of Object.entries(data.description)) {
+        translationPromises.push(
+          this.translationClient.set(descriptionKey, lang as LanguageCode, value)
+        )
+      }
+      
+      // Process terms translations
+      for (const [lang, value] of Object.entries(data.termsAndConditions)) {
+        translationPromises.push(
+          this.translationClient.set(termsAndConditionsKey, lang as LanguageCode, value)
+        )
+      }
+      
+      // Execute all translation operations in parallel
+      await Promise.all(translationPromises)
 
-      // Generate QR code if not provided
-      const qrCode = data.qrCode || (await this.generateQRCode())
+      // Generate QR code
+      const qrCode = await this.generateQRCode()
 
+      // Map domain fields to repository fields
       const voucher = await this.repository.create({
         businessId: data.businessId,
-        type: data.type,
+        categoryId: data.categoryId,
+        type: data.discountType === VoucherDiscountType.percentage ? 'discount' : 'fixedValue',
         titleKey,
         descriptionKey,
         termsAndConditionsKey,
-        value: data.value,
-        discount: data.discount,
-        maxRedemptions: data.maxRedemptions,
+        value: data.discountType === VoucherDiscountType.fixed ? data.discountValue : undefined,
+        discount: data.discountType === VoucherDiscountType.percentage ? data.discountValue : undefined,
+        currency: data.currency,
+        maxRedemptions: data.maxRedemptions ?? undefined,
+        maxRedemptionsPerUser: data.maxRedemptionsPerUser,
         validFrom: data.validFrom,
-        validUntil: data.validUntil,
-        metadata: data.metadata,
+        validUntil: data.expiresAt,
+        metadata: data.metadata ?? undefined,
+        imageUrl: data.imageUrl ?? undefined,
         qrCode,
         state: VoucherState.draft,
-        currentRedemptions: 0,
       })
 
       // Invalidate cache
       await this.invalidateCache()
 
       logger.info('Admin created voucher', { voucherId: voucher.id, businessId: data.businessId })
+
+      // Resolve translations if language is provided
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
 
       return voucher
     } catch (error) {
@@ -188,7 +216,8 @@ export class AdminVoucherService implements IAdminVoucherService {
 
   async updateVoucher(
     id: string,
-    data: UpdateVoucherData,
+    data: DomainUpdateVoucherData,
+    language?: LanguageCode,
   ): Promise<VoucherDomain> {
     try {
       // Validate voucher exists
@@ -210,51 +239,58 @@ export class AdminVoucherService implements IAdminVoucherService {
       }
 
       const updateData: any = {}
-      const translationUpdates = []
+      const translationPromises: Promise<void>[] = []
 
-      // Update translations for multilingual fields
+      // Update title translations for all provided languages
       if (data.title) {
-        translationUpdates.push({
-          key: existing.titleKey,
-          value: data.title,
-          context: 'Voucher title',
-          service: 'voucher-service',
-        })
+        for (const [lang, value] of Object.entries(data.title)) {
+          translationPromises.push(
+            this.translationClient.set(existing.titleKey, lang as LanguageCode, value)
+          )
+        }
       }
 
+      // Update description translations for all provided languages
       if (data.description) {
-        translationUpdates.push({
-          key: existing.descriptionKey,
-          value: data.description,
-          context: 'Voucher description',
-          service: 'voucher-service',
-        })
+        for (const [lang, value] of Object.entries(data.description)) {
+          translationPromises.push(
+            this.translationClient.set(existing.descriptionKey, lang as LanguageCode, value)
+          )
+        }
       }
 
+      // Update terms translations for all provided languages
       if (data.termsAndConditions) {
-        translationUpdates.push({
-          key: existing.termsAndConditionsKey,
-          value: data.termsAndConditions,
-          context: 'Voucher terms and conditions',
-          service: 'voucher-service',
-        })
+        for (const [lang, value] of Object.entries(data.termsAndConditions)) {
+          translationPromises.push(
+            this.translationClient.set(existing.termsAndConditionsKey, lang as LanguageCode, value)
+          )
+        }
       }
 
-      // Update translations if any
-      if (translationUpdates.length > 0) {
-        await this.translationClient.setBulk(
-          translationUpdates,
-          DEFAULT_LANGUAGE,
-        )
+      // Execute all translation updates in parallel
+      if (translationPromises.length > 0) {
+        await Promise.all(translationPromises)
       }
 
-      // Update other fields
-      if (data.value !== undefined) updateData.value = data.value
-      if (data.discount !== undefined) updateData.discount = data.discount
-      if (data.maxRedemptions !== undefined)
-        updateData.maxRedemptions = data.maxRedemptions
+      // Update other fields - these don't need translation
+      if (data.discountType !== undefined) {
+        updateData.type = data.discountType === VoucherDiscountType.percentage ? 'discount' : 'fixedValue'
+      }
+      if (data.discountValue !== undefined) {
+        if (data.discountType === VoucherDiscountType.percentage || existing.discountType === VoucherDiscountType.percentage) {
+          updateData.discount = data.discountValue
+        } else {
+          updateData.value = data.discountValue
+        }
+      }
+      if (data.currency !== undefined) updateData.currency = data.currency
+      if (data.location !== undefined) updateData.location = data.location
+      if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl
+      if (data.maxRedemptions !== undefined) updateData.maxRedemptions = data.maxRedemptions
+      if (data.maxRedemptionsPerUser !== undefined) updateData.maxRedemptionsPerUser = data.maxRedemptionsPerUser
       if (data.validFrom !== undefined) updateData.validFrom = data.validFrom
-      if (data.validUntil !== undefined) updateData.validUntil = data.validUntil
+      if (data.expiresAt !== undefined) updateData.validUntil = data.expiresAt
       if (data.metadata !== undefined) updateData.metadata = data.metadata
 
       const voucher = await this.repository.update(id, updateData)
@@ -263,6 +299,11 @@ export class AdminVoucherService implements IAdminVoucherService {
       await this.invalidateCache(id)
 
       logger.info('Admin updated voucher', { voucherId: id, updates: Object.keys(updateData) })
+
+      // Resolve translations if language is provided
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
 
       return voucher
     } catch (error) {
@@ -308,6 +349,7 @@ export class AdminVoucherService implements IAdminVoucherService {
   async updateVoucherState(
     id: string,
     state: VoucherState,
+    language?: LanguageCode,
   ): Promise<VoucherDomain> {
     try {
       // Validate voucher exists
@@ -331,6 +373,11 @@ export class AdminVoucherService implements IAdminVoucherService {
         newState: state 
       })
 
+      // Resolve translations if language is provided
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
+
       return voucher
     } catch (error) {
       logger.error('Failed to update voucher state', { error, id, state })
@@ -338,7 +385,7 @@ export class AdminVoucherService implements IAdminVoucherService {
     }
   }
 
-  async publishVoucher(id: string): Promise<VoucherDomain> {
+  async publishVoucher(id: string, language?: LanguageCode): Promise<VoucherDomain> {
     try {
       const voucher = await this.repository.findById(id)
 
@@ -359,10 +406,10 @@ export class AdminVoucherService implements IAdminVoucherService {
         )
       }
 
-      if (voucher.validUntil && voucher.validUntil < now) {
+      if (voucher.expiresAt && voucher.expiresAt < now) {
         throw ErrorFactory.businessRuleViolation(
           'Cannot publish expired voucher',
-          `Voucher expired at ${voucher.validUntil.toISOString()}`,
+          `Voucher expired at ${voucher.expiresAt.toISOString()}`,
         )
       }
 
@@ -376,6 +423,11 @@ export class AdminVoucherService implements IAdminVoucherService {
 
       logger.info('Admin published voucher', { voucherId: id })
 
+      // Resolve translations if language is provided
+      if (language) {
+        return await this.translationResolver.resolve(updatedVoucher, language)
+      }
+
       return updatedVoucher
     } catch (error) {
       logger.error('Failed to publish voucher', { error, id })
@@ -383,7 +435,7 @@ export class AdminVoucherService implements IAdminVoucherService {
     }
   }
 
-  async expireVoucher(id: string): Promise<VoucherDomain> {
+  async expireVoucher(id: string, language?: LanguageCode): Promise<VoucherDomain> {
     try {
       const voucher = await this.repository.findById(id)
 
@@ -403,6 +455,11 @@ export class AdminVoucherService implements IAdminVoucherService {
       await this.invalidateCache(id)
 
       logger.info('Admin expired voucher', { voucherId: id })
+
+      // Resolve translations if language is provided
+      if (language) {
+        return await this.translationResolver.resolve(updatedVoucher, language)
+      }
 
       return updatedVoucher
     } catch (error) {
@@ -477,7 +534,8 @@ export class AdminVoucherService implements IAdminVoucherService {
 
       const generatedCodes: VoucherCode[] = []
 
-      for (let i = 0; i < data.quantity; i++) {
+      const quantity = data.quantity || 1
+      for (let i = 0; i < quantity; i++) {
         const codes = await generateVoucherCodes(codeOptions, voucherId)
         
         // Find the requested code type
@@ -567,12 +625,10 @@ export class AdminVoucherService implements IAdminVoucherService {
       for (const update of translationUpdates) {
         await this.translationClient.set(
           update.key,
-          update.value,
           update.language,
-          {
-            context: update.context,
-            service: update.service,
-          },
+          update.value,
+          update.context,
+          update.service,
         )
       }
 
@@ -598,25 +654,35 @@ export class AdminVoucherService implements IAdminVoucherService {
         throw ErrorFactory.resourceNotFound('Voucher', voucherId)
       }
 
-      // Get all translations for each field
-      const [titleTranslations, descriptionTranslations, termsTranslations] = await Promise.all([
-        this.translationClient.getAll(voucher.titleKey),
-        this.translationClient.getAll(voucher.descriptionKey),
-        this.translationClient.getAll(voucher.termsAndConditionsKey),
-      ])
-
-      return {
-        title: titleTranslations || {},
-        description: descriptionTranslations || {},
-        termsAndConditions: termsTranslations || {},
+      // Get translations for all supported languages
+      const supportedLanguages = ['es', 'en', 'gn'] // TODO: Get from language service
+      const translations: VoucherTranslations = {
+        title: {},
+        description: {},
+        termsAndConditions: {},
       }
+      
+      // Get translations for each language
+      for (const lang of supportedLanguages) {
+        const [title, description, terms] = await Promise.all([
+          this.translationClient.get(voucher.titleKey, lang),
+          this.translationClient.get(voucher.descriptionKey, lang),
+          this.translationClient.get(voucher.termsAndConditionsKey, lang),
+        ])
+        
+        if (title) translations.title[lang] = title
+        if (description) translations.description[lang] = description
+        if (terms) translations.termsAndConditions[lang] = terms
+      }
+
+      return translations
     } catch (error) {
       logger.error('Failed to get voucher translations', { error, voucherId })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async bulkUpdateVouchers(data: BulkUpdateData): Promise<VoucherDomain[]> {
+  async bulkUpdateVouchers(data: { ids: string[]; updates: DomainUpdateVoucherData }, language?: LanguageCode): Promise<VoucherDomain[]> {
     try {
       const { ids, updates } = data
       const updatedVouchers: VoucherDomain[] = []
@@ -625,7 +691,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       // Process each voucher update
       for (const id of ids) {
         try {
-          const updated = await this.updateVoucher(id, updates)
+          const updated = await this.updateVoucher(id, updates, language)
           updatedVouchers.push(updated)
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -652,7 +718,7 @@ export class AdminVoucherService implements IAdminVoucherService {
         throw ErrorFactory.businessRuleViolation(
           `Bulk update partially failed: ${failedUpdates.length} of ${ids.length} vouchers failed to update`,
           'Some vouchers could not be updated',
-          { failedUpdates },
+          { metadata: { failedUpdates } }
         )
       }
 
@@ -751,7 +817,10 @@ export class AdminVoucherService implements IAdminVoucherService {
       if (this.businessServiceClient) {
         try {
           const business = await this.businessServiceClient.getBusiness(businessId)
-          businessName = business.name
+          // Resolve business name from translation key
+          if (business.businessNameKey) {
+            businessName = await this.translationClient.get(business.businessNameKey, DEFAULT_LANGUAGE)
+          }
         } catch (error) {
           logger.warn('Failed to fetch business details for stats', { businessId, error })
         }

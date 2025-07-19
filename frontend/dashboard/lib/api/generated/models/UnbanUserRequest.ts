@@ -6,6 +6,7 @@
  * Unban a user
  */
 export type UnbanUserRequest = {
-  reason?: string
-  notifyUser?: boolean
-}
+    reason?: string;
+    notifyUser?: boolean;
+};
+

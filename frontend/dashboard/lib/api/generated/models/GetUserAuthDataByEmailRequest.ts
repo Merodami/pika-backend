@@ -6,5 +6,6 @@
  * Get user auth data by email for authentication
  */
 export type GetUserAuthDataByEmailRequest = {
-  email: string
-}
+    email: string;
+};
+

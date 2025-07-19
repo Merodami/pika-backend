@@ -6,5 +6,6 @@
  * Validate password reset token
  */
 export type ValidatePasswordResetTokenRequest = {
-  token: string
-}
+    token: string;
+};
+

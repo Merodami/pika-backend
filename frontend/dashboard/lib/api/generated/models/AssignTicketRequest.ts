@@ -6,7 +6,8 @@
  * Assign ticket to agent
  */
 export type AssignTicketRequest = {
-  assigneeId: string
-  note?: string
-  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | 'CRITICAL'
-}
+    assigneeId: string;
+    note?: string;
+    priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | 'CRITICAL';
+};
+

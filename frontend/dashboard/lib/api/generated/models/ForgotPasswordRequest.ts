@@ -6,5 +6,6 @@
  * Request password reset email
  */
 export type ForgotPasswordRequest = {
-  email: string
-}
+    email: string;
+};
+

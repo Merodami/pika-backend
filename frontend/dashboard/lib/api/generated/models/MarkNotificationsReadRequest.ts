@@ -6,10 +6,11 @@
  * Mark notifications as read
  */
 export type MarkNotificationsReadRequest = {
-  notificationIds?: Array<string>
-  all?: boolean
-  /**
-   * Mark all in category as read
-   */
-  category?: string
-}
+    notificationIds?: Array<string>;
+    all?: boolean;
+    /**
+     * Mark all in category as read
+     */
+    category?: string;
+};
+

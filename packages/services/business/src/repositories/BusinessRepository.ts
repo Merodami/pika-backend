@@ -5,9 +5,8 @@ import {
   ErrorFactory,
   ErrorSeverity,
   logger,
-  type ParsedIncludes,
 } from '@pika/shared'
-import type { PaginatedResult } from '@pika/types'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import { Prisma, type PrismaClient } from '@prisma/client'
 
 import type { BusinessFilters, BusinessSearchParams } from '../types/search.js'
@@ -165,7 +164,6 @@ export class BusinessRepository implements IBusinessRepository {
           avatarUrl: true,
           emailVerified: true,
           phoneVerified: true,
-          identityVerified: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -179,7 +177,6 @@ export class BusinessRepository implements IBusinessRepository {
           slug: true,
           nameKey: true,
           descriptionKey: true,
-          iconUrl: true,
           active: true,
           createdAt: true,
           updatedAt: true,
@@ -219,7 +216,10 @@ export class BusinessRepository implements IBusinessRepository {
 
       // Map to domain entities using BusinessMapper
       const domainBusinesses = businesses.map((business) =>
-        BusinessMapper.fromDocument(business),
+        BusinessMapper.fromDocument({
+          ...business,
+          avgRating: business.avgRating.toNumber(),
+        }),
       )
 
       const totalPages = Math.ceil(totalCount / limit)
@@ -230,7 +230,7 @@ export class BusinessRepository implements IBusinessRepository {
           total: totalCount,
           page,
           limit,
-          pages: totalPages,
+          totalPages,
           hasNext: page < totalPages,
           hasPrev: page > 1,
         },
@@ -295,7 +295,10 @@ export class BusinessRepository implements IBusinessRepository {
         return null
       }
 
-      const domainBusiness = BusinessMapper.fromDocument(business)
+      const domainBusiness = BusinessMapper.fromDocument({
+        ...business,
+        avgRating: business.avgRating.toNumber(),
+      })
 
       // Cache the result
       if (this.cacheService) {
@@ -358,7 +361,10 @@ export class BusinessRepository implements IBusinessRepository {
         return null
       }
 
-      const domainBusiness = BusinessMapper.fromDocument(business)
+      const domainBusiness = BusinessMapper.fromDocument({
+        ...business,
+        avgRating: business.avgRating.toNumber(),
+      })
 
       // Cache the result
       if (this.cacheService) {
@@ -414,8 +420,7 @@ export class BusinessRepository implements IBusinessRepository {
               avatarUrl: true,
               emailVerified: true,
               phoneVerified: true,
-              identityVerified: true,
-              createdAt: true,
+                  createdAt: true,
               updatedAt: true,
             },
           },
@@ -425,8 +430,7 @@ export class BusinessRepository implements IBusinessRepository {
               slug: true,
               nameKey: true,
               descriptionKey: true,
-              iconUrl: true,
-              active: true,
+                  active: true,
               createdAt: true,
               updatedAt: true,
             },
@@ -434,7 +438,10 @@ export class BusinessRepository implements IBusinessRepository {
         },
       })
 
-      const domainBusiness = BusinessMapper.fromDocument(business)
+      const domainBusiness = BusinessMapper.fromDocument({
+        ...business,
+        avgRating: business.avgRating.toNumber(),
+      })
 
       // Cache the new business
       if (this.cacheService) {
@@ -456,7 +463,8 @@ export class BusinessRepository implements IBusinessRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError(
+          throw ErrorFactory.resourceConflict(
+            'Business',
             'Business already exists for this user',
             {
               source: 'BusinessRepository.create',
@@ -510,8 +518,7 @@ export class BusinessRepository implements IBusinessRepository {
               avatarUrl: true,
               emailVerified: true,
               phoneVerified: true,
-              identityVerified: true,
-              createdAt: true,
+                  createdAt: true,
               updatedAt: true,
             },
           },
@@ -521,8 +528,7 @@ export class BusinessRepository implements IBusinessRepository {
               slug: true,
               nameKey: true,
               descriptionKey: true,
-              iconUrl: true,
-              active: true,
+                  active: true,
               createdAt: true,
               updatedAt: true,
             },
@@ -530,7 +536,10 @@ export class BusinessRepository implements IBusinessRepository {
         },
       })
 
-      const domainBusiness = BusinessMapper.fromDocument(business)
+      const domainBusiness = BusinessMapper.fromDocument({
+        ...business,
+        avgRating: business.avgRating.toNumber(),
+      })
 
       // Update cache
       if (this.cacheService) {
@@ -601,8 +610,8 @@ export class BusinessRepository implements IBusinessRepository {
 
         if (business) {
           await Promise.all([
-            this.cacheService.delete(`business:${id}`),
-            this.cacheService.delete(`business:user:${business.userId}`),
+            this.cacheService.del(`business:${id}`),
+            this.cacheService.del(`business:user:${business.userId}`),
           ])
         }
       }

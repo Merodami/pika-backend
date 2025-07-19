@@ -6,9 +6,10 @@
  * User verification response
  */
 export type VerifyUserResponse = {
-  userId: string
-  exists: boolean
-  isActive: boolean
-  isVerified: boolean
-  verificationLevel: 'NONE' | 'EMAIL' | 'PHONE' | 'FULL'
-}
+    userId: string;
+    exists: boolean;
+    isActive: boolean;
+    isVerified: boolean;
+    verificationLevel: 'NONE' | 'EMAIL' | 'PHONE' | 'FULL';
+};
+

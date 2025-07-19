@@ -29,3 +29,9 @@ export const DaysOfWeek = {
   SATURDAY: 'SATURDAY',
   SUNDAY: 'SUNDAY',
 } as const
+
+export const SupportedLanguage = {
+  SPANISH: 'es',
+  ENGLISH: 'en',
+  GUARANI: 'gn',
+} as const

@@ -3,13 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ServiceHealth = {
-  status: 'HEALTHY' | 'DEGRADED' | 'UNHEALTHY'
-  /**
-   * Service URL
-   */
-  url: string
-  /**
-   * Response time in milliseconds
-   */
-  responseTime: number
-}
+    status: 'HEALTHY' | 'DEGRADED' | 'UNHEALTHY';
+    /**
+     * Service URL
+     */
+    url: string;
+    /**
+     * Response time in milliseconds
+     */
+    responseTime: number;
+};
+

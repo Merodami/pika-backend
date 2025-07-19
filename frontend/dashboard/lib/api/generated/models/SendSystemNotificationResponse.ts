@@ -6,20 +6,18 @@
  * System notification result
  */
 export type SendSystemNotificationResponse = {
-  /**
-   * Universally Unique Identifier
-   */
-  notificationId: string
-  recipientCount: number
-  channels: Record<
-    string,
-    {
-      sent: number
-      failed: number
-    }
-  >
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  timestamp: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    notificationId: string;
+    recipientCount: number;
+    channels: Record<string, {
+        sent: number;
+        failed: number;
+    }>;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    timestamp: string;
+};
+

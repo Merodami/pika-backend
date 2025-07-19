@@ -6,9 +6,10 @@
  * Get multiple users by ID
  */
 export type GetUsersRequest = {
-  userIds: Array<string>
-  /**
-   * Specific fields to return
-   */
-  fields?: Array<string>
-}
+    userIds: Array<string>;
+    /**
+     * Specific fields to return
+     */
+    fields?: Array<string>;
+};
+

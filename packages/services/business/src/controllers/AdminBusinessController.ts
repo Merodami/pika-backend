@@ -2,7 +2,7 @@ import {
   mapSortOrder,
   businessAdmin,
   businessPublic,
-  businessSortFieldMapper,
+  businessCommon,
   shared,
 } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
@@ -61,7 +61,7 @@ export class AdminBusinessController {
         search: query.search,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: businessSortFieldMapper.mapSortField(query.sortBy, 'createdAt'),
+        sortBy: query.sortBy || 'createdAt',
         sortOrder: mapSortOrder(query.sortOrder),
         includeDeleted: query.includeDeleted,
         parsedIncludes: {
@@ -129,7 +129,14 @@ export class AdminBusinessController {
     try {
       const data = req.body
 
-      const business = await this.businessService.createBusiness(data)
+      const business = await this.businessService.createBusiness({
+        userId: data.userId,
+        businessName: data.businessNameKey, // Service expects businessName, not businessNameKey
+        businessDescription: data.businessDescriptionKey,
+        categoryId: data.categoryId,
+        verified: data.verified,
+        active: data.active,
+      })
 
       const dto = BusinessMapper.toDTO(business)
 
@@ -280,4 +287,5 @@ export class AdminBusinessController {
       next(error)
     }
   }
+
 }

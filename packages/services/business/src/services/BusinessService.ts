@@ -1,9 +1,9 @@
 import { DEFAULT_LANGUAGE } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import type { BusinessDomain } from '@pika/sdk'
-import { ErrorFactory, logger, type ParsedIncludes } from '@pika/shared'
+import { ErrorFactory, logger } from '@pika/shared'
 import type { TranslationClient } from '@pika/translation'
-import type { PaginatedResult } from '@pika/types'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
 import type {
@@ -156,7 +156,8 @@ export class BusinessService implements IBusinessService {
         data.userId,
       )
       if (existingBusiness) {
-        throw ErrorFactory.conflictError(
+        throw ErrorFactory.resourceConflict(
+          'Business',
           'Business already exists for this user',
           {
             source: 'BusinessService.createBusiness',
@@ -287,8 +288,8 @@ export class BusinessService implements IBusinessService {
 
       // Invalidate related cache entries
       if (this.cacheService) {
-        await this.cacheService.delete(`business:${id}`)
-        await this.cacheService.delete(`business:user:${business.userId}`)
+        await this.cacheService.del(`business:${id}`)
+        await this.cacheService.del(`business:user:${business.userId}`)
       }
 
       logger.debug(`Business updated successfully: ${id}`)
@@ -321,8 +322,8 @@ export class BusinessService implements IBusinessService {
 
       // Invalidate cache
       if (this.cacheService) {
-        await this.cacheService.delete(`business:${id}`)
-        await this.cacheService.delete(`business:user:${business.userId}`)
+        await this.cacheService.del(`business:${id}`)
+        await this.cacheService.del(`business:user:${business.userId}`)
       }
 
       logger.debug(`Business deleted successfully: ${id}`)

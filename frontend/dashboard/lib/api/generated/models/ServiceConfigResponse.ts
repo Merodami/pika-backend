@@ -6,12 +6,13 @@
  * Service configuration data
  */
 export type ServiceConfigResponse = {
-  serviceName: string
-  environment: 'DEVELOPMENT' | 'STAGING' | 'PRODUCTION' | 'TEST'
-  configuration: Record<string, any>
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  lastUpdated: string
-  version: string
-}
+    serviceName: string;
+    environment: 'DEVELOPMENT' | 'STAGING' | 'PRODUCTION' | 'TEST';
+    configuration: Record<string, any>;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    lastUpdated: string;
+    version: string;
+};
+

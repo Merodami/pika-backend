@@ -6,13 +6,14 @@
  * Registration success response
  */
 export type RegisterResponse = {
-  message?: string
-  /**
-   * Newly created user ID
-   */
-  userId: string
-  /**
-   * Whether verification email was sent successfully
-   */
-  emailSent: boolean
-}
+    message?: string;
+    /**
+     * Newly created user ID
+     */
+    userId: string;
+    /**
+     * Whether verification email was sent successfully
+     */
+    emailSent: boolean;
+};
+

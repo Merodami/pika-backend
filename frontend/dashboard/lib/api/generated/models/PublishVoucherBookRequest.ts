@@ -6,12 +6,13 @@
  * Publish a voucher book
  */
 export type PublishVoucherBookRequest = {
-  /**
-   * Publication date (defaults to now)
-   */
-  publishedAt?: string
-  /**
-   * Generate PDF during publication
-   */
-  generatePdf?: boolean
-}
+    /**
+     * Publication date (defaults to now)
+     */
+    publishedAt?: string;
+    /**
+     * Generate PDF during publication
+     */
+    generatePdf?: boolean;
+};
+

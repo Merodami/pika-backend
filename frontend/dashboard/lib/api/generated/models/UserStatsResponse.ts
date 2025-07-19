@@ -6,26 +6,26 @@
  * User statistics for admin view
  */
 export type UserStatsResponse = {
-  userId: string
-  period: {
+    userId: string;
+    period: {
+        /**
+         * ISO 8601 datetime with timezone
+         */
+        start: string;
+        /**
+         * ISO 8601 datetime with timezone
+         */
+        end: string;
+    };
+    totalBookings: number;
+    creditsBalance: number;
+    friendsCount: number;
+    followersCount: number;
+    reportsCount: number;
+    activityScore: number;
     /**
      * ISO 8601 datetime with timezone
      */
-    start: string
-    /**
-     * ISO 8601 datetime with timezone
-     */
-    end: string
-  }
-  totalBookings: number
-  totalSpent: number
-  creditsBalance: number
-  friendsCount: number
-  followersCount: number
-  reportsCount: number
-  activityScore: number
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  lastActiveDate?: string
-}
+    lastActiveDate?: string;
+};
+

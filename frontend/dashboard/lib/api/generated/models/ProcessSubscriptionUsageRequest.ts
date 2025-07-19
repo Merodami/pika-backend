@@ -6,12 +6,13 @@
  * Process subscription usage
  */
 export type ProcessSubscriptionUsageRequest = {
-  userId: string
-  /**
-   * Universally Unique Identifier
-   */
-  subscriptionId: string
-  usageType: 'featureAccess' | 'creditDeduction'
-  amount?: number
-  metadata?: Record<string, any>
-}
+    userId: string;
+    /**
+     * Universally Unique Identifier
+     */
+    subscriptionId: string;
+    usageType: 'featureAccess' | 'creditDeduction';
+    amount?: number;
+    metadata?: Record<string, any>;
+};
+

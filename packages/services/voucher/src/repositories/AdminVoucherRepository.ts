@@ -312,6 +312,28 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
     throw error
   }
 
+  async findByBusinessId(
+    businessId: string,
+    params: VoucherSearchParams,
+  ): Promise<PaginatedResult<VoucherDomain>> {
+    try {
+      // Merge businessId into params and delegate to findAll
+      const searchParams: VoucherSearchParams = {
+        ...params,
+        businessId,
+      }
+      
+      return await this.findAll(searchParams)
+    } catch (error) {
+      logger.error('Failed to find vouchers by business ID', { error, businessId, params })
+      throw ErrorFactory.databaseError(
+        'findByBusinessId',
+        'Failed to retrieve vouchers by business ID',
+        error,
+      )
+    }
+  }
+
   async bulkUpdateState(
     ids: string[],
     state: VoucherState,

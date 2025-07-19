@@ -6,8 +6,9 @@
  * Simple message response
  */
 export type MessageResponse = {
-  /**
-   * Success message
-   */
-  message: string
-}
+    /**
+     * Success message
+     */
+    message: string;
+};
+

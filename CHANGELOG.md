@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2025-07-19] - Voucher Service Stabilization & Quality Improvements
+
+### Fixed
+
+- **🔧 Voucher Service Property Fixes**
+  - Fixed `count` to `quantity` in AdminVoucherService generateVoucherCodes
+  - Fixed `getBusinessById` to `getBusiness` method call
+  - Fixed `value` to `discountValue` for VoucherDomain objects (multiple locations)
+  - Fixed `type` to `discountType` for VoucherDomain
+  - Fixed `redemptionCount` typo to use proper logic with `redemptionCode`
+  - Fixed enum access: `VoucherScanType.BUSINESS` to `VoucherScanType.business`
+  - Fixed enum access: `VoucherScanSource.SHARE` to `VoucherScanSource.share`
+
+- **🎯 Controller Response Pattern Standardization**
+  - Verified all voucher controllers properly return DTOs following established pattern
+  - Added missing method bindings in controller constructors:
+    - VoucherController: Added `getVoucherByCode` binding
+    - AdminVoucherController: Added `publishVoucher` and `expireVoucher` bindings
+  - Confirmed proper use of `paginatedResponse()` utility across all list endpoints
+  - Validated specialized mappers for different response types (scan, claim, redeem, user vouchers)
+
+- **🗂️ VoucherMapper Enhancements**
+  - Added `toAdminDTO()` method for admin-specific responses with translation keys and analytics
+  - Added `toTranslationsDTO()` and `fromTranslationsDTO()` for translation handling
+  - Updated VoucherDocument interface to match actual database fields
+  - Fixed field name transformations: `validUntil` vs `expiresAt`, `redemptionsCount` vs `currentRedemptions`
+  - Added computed fields: `isActive`, `isExpired`, `redemptionRate`, `daysUntilExpiry`
+
+### Removed
+
+- **🧹 Firebase References Cleanup**
+  - Removed Firebase references from voucher service MVP_IMPROVEMENTS.md
+  - Cleaned up health check examples to use only available services
+  - Maintained focus on PostgreSQL, Redis, and Elasticsearch stack
+
+### Technical Improvements
+
+- **📊 DTO Pattern Compliance**
+  - **VoucherController**: 8 methods validated - All using VoucherMapper.toDTO() and specialized response mappers
+  - **AdminVoucherController**: 15 methods validated - All using VoucherMapper.toAdminDTO() and admin-specific mappers
+  - **InternalVoucherController**: 10 methods validated - All using VoucherMapper.toDTO() and proper transformations
+  - Zero raw domain objects returned directly to clients
+  - Consistent pagination structure across all list endpoints
+
+- **🔧 Type Safety Improvements**
+  - Added proper Request type parameters with API schema types
+  - Enhanced error handling with correlation IDs
+  - Maintained clean architecture boundaries between layers
+
 ## [2025-07-18] - Voucher Service Migration Completed
 
 ### Completed

@@ -6,5 +6,6 @@
  * Request to resend verification email
  */
 export type ResendVerificationRequest = {
-  email: string
-}
+    email: string;
+};
+

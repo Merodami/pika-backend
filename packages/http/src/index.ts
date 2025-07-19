@@ -22,6 +22,7 @@ export {
   requireAdmin,
   requireAuth,
   requireUser,
+  requireBusinessRole,
   requireOwnership,
   requirePermissions,
   requireRoles,
@@ -47,6 +48,7 @@ export {
   getValidatedData,
   getValidatedParams,
   getValidatedQuery,
+  getRequestLanguage,
 } from './infrastructure/express/types/validated-request.js'
 export {
   createZodValidatorMiddleware,

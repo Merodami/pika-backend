@@ -6,5 +6,6 @@
  * Check if phone number already exists
  */
 export type CheckPhoneExistsRequest = {
-  phoneNumber: string
-}
+    phoneNumber: string;
+};
+

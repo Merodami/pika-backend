@@ -6,7 +6,8 @@
  * Role check result
  */
 export type RoleCheckResponse = {
-  hasRole: boolean
-  userRoles: Array<string>
-  missingRoles?: Array<string>
-}
+    hasRole: boolean;
+    userRoles: Array<string>;
+    missingRoles?: Array<string>;
+};
+

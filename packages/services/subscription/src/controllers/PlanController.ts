@@ -1,9 +1,4 @@
-import type {
-  CreateSubscriptionPlanRequest,
-  PlanIdParam,
-  SubscriptionPlanQueryParams,
-  UpdateSubscriptionPlanRequest,
-} from '@pika/api/public'
+import { subscriptionPublic, subscriptionCommon } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -32,7 +27,7 @@ export class PlanController {
    * Create new subscription plan
    */
   async createPlan(
-    request: Request<{}, {}, CreateSubscriptionPlanRequest>,
+    request: Request<{}, {}, subscriptionPublic.CreateSubscriptionPlanRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -66,7 +61,7 @@ export class PlanController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<SubscriptionPlanQueryParams>(request)
+      const query = getValidatedQuery<subscriptionPublic.SubscriptionPlanQueryParams>(request)
 
       // Transform API query to service params
       const params: PlanSearchParams = {
@@ -98,7 +93,7 @@ export class PlanController {
    * Get subscription plan by ID
    */
   async getPlanById(
-    request: Request<PlanIdParam>,
+    request: Request<subscriptionCommon.PlanIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -122,7 +117,7 @@ export class PlanController {
    * Update subscription plan
    */
   async updatePlan(
-    request: Request<PlanIdParam, {}, UpdateSubscriptionPlanRequest>,
+    request: Request<subscriptionCommon.PlanIdParam, {}, subscriptionPublic.UpdateSubscriptionPlanRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -147,7 +142,7 @@ export class PlanController {
    * Delete subscription plan
    */
   async deletePlan(
-    request: Request<PlanIdParam>,
+    request: Request<subscriptionCommon.PlanIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

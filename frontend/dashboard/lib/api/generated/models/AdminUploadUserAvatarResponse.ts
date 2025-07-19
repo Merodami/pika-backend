@@ -6,8 +6,9 @@
  * Avatar upload response
  */
 export type AdminUploadUserAvatarResponse = {
-  /**
-   * URL of the uploaded avatar
-   */
-  avatarUrl: string
-}
+    /**
+     * URL of the uploaded avatar
+     */
+    avatarUrl: string;
+};
+

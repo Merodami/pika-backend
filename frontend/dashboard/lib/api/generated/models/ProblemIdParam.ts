@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ProblemIdParam = {
-  /**
-   * Universally Unique Identifier
-   */
-  id: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    id: string;
+};
+

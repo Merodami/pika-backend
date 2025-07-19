@@ -365,3 +365,20 @@ export function requirePermissions(...permissions: string[]): RequestHandler {
     next()
   }
 }
+
+/**
+ * Require business role
+ */
+export function requireBusinessRole(): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    if (req.user.role !== UserRole.BUSINESS) {
+      return next(new NotAuthorizedError('Business access required'))
+    }
+
+    next()
+  }
+}

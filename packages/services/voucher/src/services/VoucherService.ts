@@ -17,13 +17,14 @@ import {
   UserServiceClient,
   VoucherBusinessRules,
 } from '@pika/shared'
-import type { TranslationClient } from '@pika/translation'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import {
   type PaginatedResult,
   VoucherScanSource,
   VoucherScanType,
   VoucherState,
   VoucherType,
+  type LanguageCode,
 } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
@@ -39,35 +40,41 @@ import type {
 export interface IVoucherService {
   getAllVouchers(
     params: VoucherSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<VoucherDomain>>
-  getVoucherById(id: string, parsedIncludes?: any): Promise<VoucherDomain>
+  getVoucherById(id: string, parsedIncludes?: any, language?: LanguageCode): Promise<VoucherDomain>
   getVouchersByBusinessId(
     params: VoucherSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<VoucherDomain>>
   getVouchersByUserId(
     userId: string,
     params: VoucherSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<VoucherDomain>>
-  getUserVouchers(params: UserVoucherSearchParams): Promise<PaginatedResult<UserVoucherData>>
-  getVouchersByIds(ids: string[]): Promise<VoucherDomain[]>
+  getUserVouchers(params: UserVoucherSearchParams, language?: LanguageCode): Promise<PaginatedResult<UserVoucherData>>
+  getVouchersByIds(ids: string[], language?: LanguageCode): Promise<VoucherDomain[]>
   claimVoucher(
     voucherId: string,
     userId: string,
     data?: VoucherClaimData,
+    language?: LanguageCode,
   ): Promise<VoucherClaimResult>
   redeemVoucher(
     voucherId: string,
     data: VoucherRedeemData,
+    language?: LanguageCode,
   ): Promise<VoucherRedeemResult>
   scanVoucher(
     voucherId: string,
     data: VoucherScanData,
+    language?: LanguageCode,
   ): Promise<VoucherScanResult>
   // Code-based voucher lookup methods (critical for QR scanning)
-  getVoucherByQRCode(qrCode: string): Promise<VoucherDomain>
-  getVoucherByShortCode(shortCode: string): Promise<VoucherDomain>
-  getVoucherByStaticCode(staticCode: string): Promise<VoucherDomain>
-  getVoucherByAnyCode(code: string): Promise<VoucherDomain>
+  getVoucherByQRCode(qrCode: string, language?: LanguageCode): Promise<VoucherDomain>
+  getVoucherByShortCode(shortCode: string, language?: LanguageCode): Promise<VoucherDomain>
+  getVoucherByStaticCode(staticCode: string, language?: LanguageCode): Promise<VoucherDomain>
+  getVoucherByAnyCode(code: string, language?: LanguageCode): Promise<VoucherDomain>
 }
 
 export class VoucherService implements IVoucherService {
@@ -75,6 +82,7 @@ export class VoucherService implements IVoucherService {
     private readonly repository: IVoucherRepository,
     private readonly cache: ICacheService,
     private readonly translationClient: TranslationClient,
+    private readonly translationResolver: TranslationResolver,
     private readonly internalVoucherService: IInternalVoucherService, // Now required
     private readonly communicationClient?: CommunicationServiceClient,
     private readonly userServiceClient?: UserServiceClient,
@@ -88,13 +96,20 @@ export class VoucherService implements IVoucherService {
   })
   async getAllVouchers(
     params: VoucherSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       const result = await this.repository.findAll(params)
-
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        const resolvedData = await this.translationResolver.resolveArray(result.data, language)
+        return { data: resolvedData, pagination: result.pagination }
+      }
+      
       return result
     } catch (error) {
-      logger.error('Failed to get all vouchers', { error, params })
+      logger.error('Failed to get all vouchers', { error, params, language })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -108,6 +123,7 @@ export class VoucherService implements IVoucherService {
   async getVoucherById(
     id: string,
     parsedIncludes?: any,
+    language?: LanguageCode,
   ): Promise<VoucherDomain> {
     try {
       // Validate UUID format
@@ -120,10 +136,15 @@ export class VoucherService implements IVoucherService {
       if (!voucher) {
         throw ErrorFactory.resourceNotFound('Voucher', id)
       }
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
 
       return voucher
     } catch (error) {
-      logger.error('Failed to get voucher by id', { error, id })
+      logger.error('Failed to get voucher by id', { error, id, language })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -131,10 +152,14 @@ export class VoucherService implements IVoucherService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:vouchers:business',
-    keyGenerator: (params) => `${params.businessId}:${JSON.stringify(params)}`,
+    keyGenerator: (params) => {
+      const searchParams = params as VoucherSearchParams
+      return `${searchParams.businessId}:${JSON.stringify(searchParams)}`
+    },
   })
   async getVouchersByBusinessId(
     params: VoucherSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       // Validate UUID format
@@ -150,10 +175,16 @@ export class VoucherService implements IVoucherService {
         params.businessId,
         params,
       )
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        const resolvedData = await this.translationResolver.resolveArray(result.data, language)
+        return { data: resolvedData, pagination: result.pagination }
+      }
 
       return result
     } catch (error) {
-      logger.error('Failed to get vouchers by business id', { error, params })
+      logger.error('Failed to get vouchers by business id', { error, params, language })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -166,6 +197,7 @@ export class VoucherService implements IVoucherService {
   async getVouchersByUserId(
     userId: string,
     params: VoucherSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       // Validate UUID format
@@ -174,15 +206,21 @@ export class VoucherService implements IVoucherService {
       }
 
       const result = await this.repository.findByUserId(userId, params)
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        const resolvedData = await this.translationResolver.resolveArray(result.data, language)
+        return { data: resolvedData, pagination: result.pagination }
+      }
 
       return result
     } catch (error) {
-      logger.error('Failed to get vouchers by user id', { error, userId })
+      logger.error('Failed to get vouchers by user id', { error, userId, language })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async getUserVouchers(params: UserVoucherSearchParams): Promise<PaginatedResult<UserVoucherData>> {
+  async getUserVouchers(params: UserVoucherSearchParams, language?: LanguageCode): Promise<PaginatedResult<UserVoucherData>> {
     try {
       // Validate UUID format
       if (!isUuidV4(params.userId)) {
@@ -191,9 +229,9 @@ export class VoucherService implements IVoucherService {
 
       // Convert status filter to array if provided
       const statusFilter =
-        params.status && params.status !== 'all' ? [params.status] : undefined
+        params.status && params.status !== 'all' ? [params.status as VoucherState] : undefined
 
-      const searchParams = {
+      const searchParams: VoucherSearchParams = {
         userId: params.userId,
         state: statusFilter,
         page: params.page || 1,
@@ -207,8 +245,14 @@ export class VoucherService implements IVoucherService {
         searchParams,
       )
 
+      // Resolve translations if language is provided
+      let resolvedVouchers = result.data
+      if (language) {
+        resolvedVouchers = await this.translationResolver.resolveArray(result.data, language)
+      }
+      
       // Convert VoucherDomain results to UserVoucherData
-      const userVoucherData: UserVoucherData[] = result.data.map((voucher) => ({
+      const userVoucherData: UserVoucherData[] = resolvedVouchers.map((voucher) => ({
         voucher,
         claimedAt: voucher.createdAt, // This should come from userVoucher table in repository
         status: voucher.state as string,
@@ -220,12 +264,12 @@ export class VoucherService implements IVoucherService {
         pagination: result.pagination,
       }
     } catch (error) {
-      logger.error('Failed to get user vouchers', { error, params })
+      logger.error('Failed to get user vouchers', { error, params, language })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async getVouchersByIds(ids: string[]): Promise<VoucherDomain[]> {
+  async getVouchersByIds(ids: string[], language?: LanguageCode): Promise<VoucherDomain[]> {
     try {
       // Validate all IDs are UUID format
       const invalidIds = ids.filter((id) => !isUuidV4(id))
@@ -237,10 +281,15 @@ export class VoucherService implements IVoucherService {
       }
 
       const vouchers = await this.repository.findByIds(ids)
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        return await this.translationResolver.resolveArray(vouchers, language)
+      }
 
       return vouchers
     } catch (error) {
-      logger.error('Failed to get vouchers by ids', { error, ids })
+      logger.error('Failed to get vouchers by ids', { error, ids, language })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -253,6 +302,7 @@ export class VoucherService implements IVoucherService {
     voucherId: string,
     userId: string,
     data?: VoucherClaimData,
+    language?: LanguageCode,
   ): Promise<VoucherClaimResult> {
     try {
       const voucher = await this.repository.findById(voucherId)
@@ -286,10 +336,16 @@ export class VoucherService implements IVoucherService {
       // Invalidate cache
       await this.invalidateCache(voucherId)
 
+      // Resolve translations if language is provided
+      let resolvedVoucher = customerVoucher.voucher || voucher
+      if (language) {
+        resolvedVoucher = await this.translationResolver.resolve(resolvedVoucher, language)
+      }
+      
       // Create claim result using customer voucher data
       const claimResult: VoucherClaimResult = {
         claimId: customerVoucher.id,
-        voucher: customerVoucher.voucher || voucher,
+        voucher: resolvedVoucher,
         claimedAt: customerVoucher.claimedAt,
         expiresAt: customerVoucher.expiresAt,
         walletPosition: 1, // This could be calculated based on user's voucher count
@@ -297,7 +353,7 @@ export class VoucherService implements IVoucherService {
 
       return claimResult
     } catch (error) {
-      logger.error('Failed to claim voucher', { error, voucherId, userId })
+      logger.error('Failed to claim voucher', { error, voucherId, userId, language })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -305,6 +361,7 @@ export class VoucherService implements IVoucherService {
   async redeemVoucher(
     voucherId: string,
     data: VoucherRedeemData,
+    language?: LanguageCode,
   ): Promise<VoucherRedeemResult> {
     try {
       const voucher = await this.repository.findById(voucherId)
@@ -359,18 +416,24 @@ export class VoucherService implements IVoucherService {
       // Invalidate cache
       await this.invalidateCache(voucherId)
 
+      // Resolve translations if language is provided
+      let resolvedVoucher = redeemedCustomerVoucher.voucher || voucher
+      if (language) {
+        resolvedVoucher = await this.translationResolver.resolve(resolvedVoucher, language)
+      }
+      
       // Create redemption result using customer voucher data
       const redeemResult: VoucherRedeemResult = {
         message: 'Voucher redeemed successfully',
         voucherId,
         redeemedAt: redeemedCustomerVoucher.redeemedAt || new Date(),
         discountApplied: voucher.discountValue || 0,
-        voucher: redeemedCustomerVoucher.voucher || voucher,
+        voucher: resolvedVoucher,
       }
 
       return redeemResult
     } catch (error) {
-      logger.error('Failed to redeem voucher', { error, voucherId, data })
+      logger.error('Failed to redeem voucher', { error, voucherId, data, language })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -378,6 +441,7 @@ export class VoucherService implements IVoucherService {
   async scanVoucher(
     voucherId: string,
     data: VoucherScanData,
+    language?: LanguageCode,
   ): Promise<VoucherScanResult> {
     try {
       const voucher = await this.repository.findById(voucherId)
@@ -416,9 +480,15 @@ export class VoucherService implements IVoucherService {
       // TODO: Implement nearby locations logic based on data.location
       const nearbyLocations = data.location ? [] : undefined
 
+      // Resolve translations if language is provided
+      let resolvedVoucher = voucher
+      if (language) {
+        resolvedVoucher = await this.translationResolver.resolve(voucher, language)
+      }
+      
       // Create scan result
       const scanResult: VoucherScanResult = {
-        voucher,
+        voucher: resolvedVoucher,
         scanId: uuid(),
         canClaim,
         alreadyClaimed,
@@ -459,7 +529,7 @@ export class VoucherService implements IVoucherService {
 
       return scanResult
     } catch (error) {
-      logger.error('Failed to scan voucher', { error, voucherId, data })
+      logger.error('Failed to scan voucher', { error, voucherId, data, language })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -467,22 +537,27 @@ export class VoucherService implements IVoucherService {
 
 
 
-  async getVoucherByQRCode(qrCode: string): Promise<VoucherDomain> {
+  async getVoucherByQRCode(qrCode: string, language?: LanguageCode): Promise<VoucherDomain> {
     try {
       const voucher = await this.repository.findByQRCode(qrCode)
 
       if (!voucher) {
         throw ErrorFactory.resourceNotFound('Voucher', `QR code: ${qrCode}`)
       }
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
 
       return voucher
     } catch (error) {
-      logger.error('Failed to get voucher by QR code', { error, qrCode })
+      logger.error('Failed to get voucher by QR code', { error, qrCode, language })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async getVoucherByShortCode(shortCode: string): Promise<VoucherDomain> {
+  async getVoucherByShortCode(shortCode: string, language?: LanguageCode): Promise<VoucherDomain> {
     try {
       const voucher = await this.repository.findByShortCode(shortCode)
 
@@ -492,15 +567,20 @@ export class VoucherService implements IVoucherService {
           `Short code: ${shortCode}`,
         )
       }
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
 
       return voucher
     } catch (error) {
-      logger.error('Failed to get voucher by short code', { error, shortCode })
+      logger.error('Failed to get voucher by short code', { error, shortCode, language })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async getVoucherByStaticCode(staticCode: string): Promise<VoucherDomain> {
+  async getVoucherByStaticCode(staticCode: string, language?: LanguageCode): Promise<VoucherDomain> {
     try {
       const voucher = await this.repository.findByStaticCode(staticCode)
 
@@ -510,12 +590,18 @@ export class VoucherService implements IVoucherService {
           `Static code: ${staticCode}`,
         )
       }
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
 
       return voucher
     } catch (error) {
       logger.error('Failed to get voucher by static code', {
         error,
         staticCode,
+        language,
       })
       throw ErrorFactory.fromError(error)
     }
@@ -526,17 +612,22 @@ export class VoucherService implements IVoucherService {
     prefix: 'service:voucher:code',
     keyGenerator: (code) => code,
   })
-  async getVoucherByAnyCode(code: string): Promise<VoucherDomain> {
+  async getVoucherByAnyCode(code: string, language?: LanguageCode): Promise<VoucherDomain> {
     try {
       const voucher = await this.repository.findByAnyCode(code)
 
       if (!voucher) {
         throw ErrorFactory.resourceNotFound('Voucher', `Code: ${code}`)
       }
+      
+      // Resolve translations if language is provided - one line!
+      if (language) {
+        return await this.translationResolver.resolve(voucher, language)
+      }
 
       return voucher
     } catch (error) {
-      logger.error('Failed to get voucher by any code', { error, code })
+      logger.error('Failed to get voucher by any code', { error, code, language })
       throw ErrorFactory.fromError(error)
     }
   }

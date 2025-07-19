@@ -6,33 +6,27 @@
  * Send transactional email
  */
 export type SendTransactionalEmailRequest = {
-  userId: string
-  templateKey:
-    | 'welcome'
-    | 'passwordReset'
-    | 'emailVerification'
-    | 'paymentSuccess'
-    | 'paymentFailed'
-    | 'subscriptionActivated'
-    | 'subscriptionCancelled'
-  variables: Record<string, any>
-  /**
-   * Override template subject
-   */
-  subject?: string
-  replyTo?: string
-  attachments?: Array<{
-    filename: string
+    userId: string;
+    templateKey: 'welcome' | 'passwordReset' | 'emailVerification' | 'paymentSuccess' | 'paymentFailed' | 'subscriptionActivated' | 'subscriptionCancelled';
+    variables: Record<string, any>;
     /**
-     * Base64 encoded
+     * Override template subject
      */
-    content: string
-    contentType: string
-  }>
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  sendAt?: string
-  trackOpens?: boolean
-  trackClicks?: boolean
-}
+    subject?: string;
+    replyTo?: string;
+    attachments?: Array<{
+        filename: string;
+        /**
+         * Base64 encoded
+         */
+        content: string;
+        contentType: string;
+    }>;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    sendAt?: string;
+    trackOpens?: boolean;
+    trackClicks?: boolean;
+};
+

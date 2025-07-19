@@ -12,3 +12,8 @@ export {
 } from './services/TranslationService.js'
 export { TranslationClient } from './clients/TranslationClient.js'
 export { createTranslationService } from './factories/TranslationServiceFactory.js'
+export {
+  TranslationResolver,
+  createTranslationResolver,
+  type TranslationResolverOptions,
+} from './utils/TranslationResolver.js'

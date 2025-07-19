@@ -39,26 +39,10 @@ export const AdminVoucherDetailResponse = openapi(
     // Lifecycle
     state: VoucherState,
 
-    // Content as translation keys (resolved by translation service)
-    titleKey: z.string().describe('Translation key for voucher title'),
-    descriptionKey: z
-      .string()
-      .describe('Translation key for voucher description'),
-    termsKey: z.string().describe('Translation key for voucher terms'),
-
-    // Localized content (resolved by translation service in response)
-    title: z
-      .string()
-      .optional()
-      .describe('Resolved title in requested language'),
-    description: z
-      .string()
-      .optional()
-      .describe('Resolved description in requested language'),
-    terms: z
-      .string()
-      .optional()
-      .describe('Resolved terms in requested language'),
+    // Resolved content only - no translation keys exposed
+    title: z.string().describe('Voucher title in requested language'),
+    description: z.string().describe('Voucher description in requested language'),
+    terms: z.string().describe('Voucher terms and conditions in requested language'),
 
     // Discount configuration
     discountType: VoucherDiscountType,
@@ -166,9 +150,9 @@ export const CreateVoucherRequest = openapi(
     description: z
       .record(z.string(), z.string())
       .describe('Description translations by language code'),
-    terms: z
+    termsAndConditions: z
       .record(z.string(), z.string())
-      .describe('Terms translations by language code'),
+      .describe('Terms and conditions translations by language code'),
 
     // Discount configuration
     discountType: VoucherDiscountType,
@@ -177,6 +161,9 @@ export const CreateVoucherRequest = openapi(
 
     // Geographic targeting
     location: LocationPoint.nullable().optional(),
+
+    // Media
+    imageUrl: z.string().url().nullable().optional(),
 
     // Validity period
     validFrom: DateTime,
@@ -210,10 +197,10 @@ export const UpdateVoucherRequest = openapi(
       .record(z.string(), z.string())
       .optional()
       .describe('Description translations by language code'),
-    terms: z
+    termsAndConditions: z
       .record(z.string(), z.string())
       .optional()
-      .describe('Terms translations by language code'),
+      .describe('Terms and conditions translations by language code'),
 
     // Discount configuration
     discountType: VoucherDiscountType.optional(),
@@ -222,6 +209,9 @@ export const UpdateVoucherRequest = openapi(
 
     // Geographic targeting
     location: LocationPoint.nullable().optional(),
+
+    // Media
+    imageUrl: z.string().url().nullable().optional(),
 
     // Validity period
     validFrom: DateTime.optional(),

@@ -6,9 +6,10 @@
  * Send bulk emails request
  */
 export type BulkEmailRequest = {
-  templateId: string
-  recipients: Array<{
-    to: string
-    variables?: Record<string, any>
-  }>
-}
+    templateId: string;
+    recipients: Array<{
+        to: string;
+        variables?: Record<string, any>;
+    }>;
+};
+

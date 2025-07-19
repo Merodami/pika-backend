@@ -6,7 +6,8 @@
  * SMS send result
  */
 export type SendSMSResponse = {
-  messageId: string
-  status: 'SENT' | 'FAILED' | 'QUEUED'
-  errorMessage?: string
-}
+    messageId: string;
+    status: 'SENT' | 'FAILED' | 'QUEUED';
+    errorMessage?: string;
+};
+

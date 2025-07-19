@@ -5,4 +5,6 @@
 /**
  * Create password reset token
  */
-export type CreatePasswordResetTokenRequest = {}
+export type CreatePasswordResetTokenRequest = {
+};
+

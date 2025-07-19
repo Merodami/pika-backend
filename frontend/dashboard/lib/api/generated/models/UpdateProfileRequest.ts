@@ -6,17 +6,18 @@
  * Fields that can be updated by the user
  */
 export type UpdateProfileRequest = {
-  firstName?: string
-  lastName?: string
-  displayName?: string
-  /**
-   * Phone number in E.164 format
-   */
-  phoneNumber?: string
-  bio?: string
-  /**
-   * Date in YYYY-MM-DD format
-   */
-  dateOfBirth?: string
-  preferredLanguage?: string
-}
+    firstName?: string;
+    lastName?: string;
+    displayName?: string;
+    /**
+     * Phone number in E.164 format
+     */
+    phoneNumber?: string;
+    bio?: string;
+    /**
+     * Date in YYYY-MM-DD format
+     */
+    dateOfBirth?: string;
+    preferredLanguage?: string;
+};
+

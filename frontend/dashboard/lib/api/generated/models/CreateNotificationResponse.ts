@@ -6,5 +6,6 @@
  * Create notification result
  */
 export type CreateNotificationResponse = {
-  id: string
-}
+    id: string;
+};
+

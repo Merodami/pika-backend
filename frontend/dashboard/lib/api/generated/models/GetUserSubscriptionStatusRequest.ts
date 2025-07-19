@@ -6,5 +6,6 @@
  * Get user subscription status
  */
 export type GetUserSubscriptionStatusRequest = {
-  userId: string
-}
+    userId: string;
+};
+

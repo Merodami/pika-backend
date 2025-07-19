@@ -6,16 +6,17 @@
  * Send email request
  */
 export type SendEmailRequest = {
-  to: string
-  /**
-   * Optional when using templateId
-   */
-  subject?: string
-  templateId?: string
-  templateParams?: Record<string, any>
-  body?: string
-  isHtml?: boolean
-  replyTo?: string
-  cc?: Array<string>
-  bcc?: Array<string>
-}
+    to: string;
+    /**
+     * Optional when using templateId
+     */
+    subject?: string;
+    templateId?: string;
+    templateParams?: Record<string, any>;
+    body?: string;
+    isHtml?: boolean;
+    replyTo?: string;
+    cc?: Array<string>;
+    bcc?: Array<string>;
+};
+

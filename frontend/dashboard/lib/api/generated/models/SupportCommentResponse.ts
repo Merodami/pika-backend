@@ -6,23 +6,24 @@
  * Support comment
  */
 export type SupportCommentResponse = {
-  /**
-   * Universally Unique Identifier
-   */
-  id: string
-  /**
-   * Universally Unique Identifier
-   */
-  problemId: string
-  userId: string
-  content: string
-  isInternal?: boolean
-  /**
-   * When the record was created
-   */
-  createdAt: string
-  /**
-   * When the record was last updated
-   */
-  updatedAt: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    id: string;
+    /**
+     * Universally Unique Identifier
+     */
+    problemId: string;
+    userId: string;
+    content: string;
+    isInternal?: boolean;
+    /**
+     * When the record was created
+     */
+    createdAt: string;
+    /**
+     * When the record was last updated
+     */
+    updatedAt: string;
+};
+

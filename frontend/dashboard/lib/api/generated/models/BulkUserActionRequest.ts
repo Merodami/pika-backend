@@ -6,11 +6,12 @@
  * Update multiple users at once
  */
 export type BulkUserActionRequest = {
-  userIds: Array<string>
-  updates: {
-    status?: 'ACTIVE' | 'SUSPENDED' | 'UNCONFIRMED'
-    role?: 'ADMIN' | 'CUSTOMER' | 'BUSINESS'
-    flags?: Array<'VERIFIED' | 'PREMIUM' | 'SUSPICIOUS' | 'REPORTED' | 'VIP'>
-  }
-  reason: string
-}
+    userIds: Array<string>;
+    updates: {
+        status?: 'ACTIVE' | 'SUSPENDED' | 'UNCONFIRMED';
+        role?: 'ADMIN' | 'CUSTOMER' | 'BUSINESS';
+        flags?: Array<'VERIFIED' | 'PREMIUM' | 'SUSPICIOUS' | 'REPORTED' | 'VIP'>;
+    };
+    reason: string;
+};
+

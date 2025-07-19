@@ -1,9 +1,4 @@
-import {
-  CreateSupportCommentRequest,
-  ProblemIdForCommentsParam,
-  SupportCommentIdParam,
-  UpdateSupportCommentRequest,
-} from '@pika/api/public'
+import { supportPublic, supportCommon } from '@pika/api'
 import type { ICacheService } from '@pika/redis'
 import {
   requireAdmin,
@@ -36,7 +31,7 @@ export function createAdminCommentRouter(
     '/problem/:problemId',
     requireAuth(),
     requireAdmin(),
-    validateParams(ProblemIdForCommentsParam),
+    validateParams(supportCommon.ProblemIdForCommentsParam),
     controller.getCommentsByProblemId,
   )
 
@@ -44,7 +39,7 @@ export function createAdminCommentRouter(
     '/',
     requireAuth(),
     requireAdmin(),
-    validateBody(CreateSupportCommentRequest),
+    validateBody(supportPublic.CreateSupportCommentRequest),
     controller.createInternalComment,
   )
 
@@ -52,8 +47,8 @@ export function createAdminCommentRouter(
     '/:id',
     requireAuth(),
     requireAdmin(),
-    validateParams(SupportCommentIdParam),
-    validateBody(UpdateSupportCommentRequest),
+    validateParams(supportCommon.SupportCommentIdParam),
+    validateBody(supportPublic.UpdateSupportCommentRequest),
     controller.updateAnyComment,
   )
 
@@ -61,7 +56,7 @@ export function createAdminCommentRouter(
     '/:id',
     requireAuth(),
     requireAdmin(),
-    validateParams(SupportCommentIdParam),
+    validateParams(supportCommon.SupportCommentIdParam),
     controller.deleteAnyComment,
   )
 

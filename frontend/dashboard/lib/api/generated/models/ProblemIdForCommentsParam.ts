@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ProblemIdForCommentsParam = {
-  /**
-   * Universally Unique Identifier
-   */
-  problemId: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    problemId: string;
+};
+

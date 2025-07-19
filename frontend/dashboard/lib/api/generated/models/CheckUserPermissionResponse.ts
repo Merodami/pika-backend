@@ -6,6 +6,7 @@
  * Permission check result
  */
 export type CheckUserPermissionResponse = {
-  allowed: boolean
-  reason?: string
-}
+    allowed: boolean;
+    reason?: string;
+};
+

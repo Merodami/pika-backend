@@ -6,6 +6,7 @@
  * Get user subscriptions
  */
 export type GetUserSubscriptionsRequest = {
-  userId: string
-  includeInactive?: boolean
-}
+    userId: string;
+    includeInactive?: boolean;
+};
+

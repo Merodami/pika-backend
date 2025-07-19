@@ -6,9 +6,10 @@
  * Email verification token
  */
 export type EmailVerificationTokenResponse = {
-  token: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  expiresAt: string
-}
+    token: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    expiresAt: string;
+};
+

@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type VoucherBookIdParam = {
-  /**
-   * Voucher book ID
-   */
-  id: string
-}
+    /**
+     * Voucher book ID
+     */
+    id: string;
+};
+

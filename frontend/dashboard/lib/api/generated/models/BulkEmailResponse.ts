@@ -6,6 +6,7 @@
  * Bulk email result
  */
 export type BulkEmailResponse = {
-  sent: number
-  failed: number
-}
+    sent: number;
+    failed: number;
+};
+

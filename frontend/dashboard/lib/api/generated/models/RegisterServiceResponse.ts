@@ -6,18 +6,19 @@
  * Service registration confirmation
  */
 export type RegisterServiceResponse = {
-  /**
-   * Universally Unique Identifier
-   */
-  instanceId: string
-  serviceName: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  registeredAt: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  expiresAt: string
-  healthCheckUrl?: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    instanceId: string;
+    serviceName: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    registeredAt: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    expiresAt: string;
+    healthCheckUrl?: string;
+};
+

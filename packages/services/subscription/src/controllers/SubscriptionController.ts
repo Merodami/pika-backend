@@ -1,10 +1,4 @@
-import type { SubscriptionIdParam } from '@pika/api/admin'
-import type { AdminGetSubscriptionsQuery } from '@pika/api/admin'
-import type {
-  CancelSubscriptionRequest,
-  CreateSubscriptionRequest,
-  UpdateSubscriptionRequest,
-} from '@pika/api/public'
+import { subscriptionAdmin, subscriptionPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -34,7 +28,7 @@ export class SubscriptionController {
    * Create new subscription
    */
   async createSubscription(
-    request: Request<{}, {}, CreateSubscriptionRequest>,
+    request: Request<{}, {}, subscriptionPublic.CreateSubscriptionRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -73,7 +67,7 @@ export class SubscriptionController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<AdminGetSubscriptionsQuery>(request)
+      const query = getValidatedQuery<subscriptionAdmin.AdminGetSubscriptionsQuery>(request)
 
       // Transform API query to service params
       const params: SubscriptionSearchParams = {
@@ -105,7 +99,7 @@ export class SubscriptionController {
    * Get subscription by ID
    */
   async getSubscriptionById(
-    request: Request<SubscriptionIdParam>,
+    request: Request<subscriptionAdmin.SubscriptionIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -161,7 +155,7 @@ export class SubscriptionController {
    * Update subscription
    */
   async updateSubscription(
-    request: Request<SubscriptionIdParam, {}, UpdateSubscriptionRequest>,
+    request: Request<subscriptionAdmin.SubscriptionIdParam, {}, subscriptionPublic.UpdateSubscriptionRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -189,7 +183,7 @@ export class SubscriptionController {
    * Cancel subscription
    */
   async cancelSubscription(
-    request: Request<SubscriptionIdParam, {}, CancelSubscriptionRequest>,
+    request: Request<subscriptionAdmin.SubscriptionIdParam, {}, subscriptionPublic.CancelSubscriptionRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -217,7 +211,7 @@ export class SubscriptionController {
    * Reactivate cancelled subscription
    */
   async reactivateSubscription(
-    request: Request<SubscriptionIdParam>,
+    request: Request<subscriptionAdmin.SubscriptionIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

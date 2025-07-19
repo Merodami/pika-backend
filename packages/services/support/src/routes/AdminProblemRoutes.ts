@@ -1,9 +1,5 @@
-import {
-  AdminTicketQueryParams,
-  AdminUpdateProblemRequest,
-} from '@pika/api/admin'
+import { supportAdmin, supportCommon } from '@pika/api'
 import type { ICacheService } from '@pika/redis'
-import { ProblemIdParam } from '@pika/api/public'
 import {
   requireAdmin,
   requireAuth,
@@ -34,7 +30,7 @@ export function createAdminProblemRouter(
     '/',
     requireAuth(),
     requireAdmin(),
-    validateQuery(AdminTicketQueryParams),
+    validateQuery(supportAdmin.AdminTicketQueryParams),
     controller.getAllProblems,
   )
 
@@ -42,7 +38,7 @@ export function createAdminProblemRouter(
     '/:id',
     requireAuth(),
     requireAdmin(),
-    validateParams(ProblemIdParam),
+    validateParams(supportCommon.ProblemIdParam),
     controller.getProblemById,
   )
 
@@ -50,8 +46,8 @@ export function createAdminProblemRouter(
     '/:id',
     requireAuth(),
     requireAdmin(),
-    validateParams(ProblemIdParam),
-    validateBody(AdminUpdateProblemRequest),
+    validateParams(supportCommon.ProblemIdParam),
+    validateBody(supportAdmin.AdminUpdateProblemRequest),
     controller.updateProblem,
   )
 
@@ -59,7 +55,7 @@ export function createAdminProblemRouter(
     '/:id',
     requireAuth(),
     requireAdmin(),
-    validateParams(ProblemIdParam),
+    validateParams(supportCommon.ProblemIdParam),
     controller.deleteProblem,
   )
 

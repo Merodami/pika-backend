@@ -3,10 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UnifiedVerificationRequest = {
-  type: 'EMAIL' | 'PHONE' | 'ACCOUNT_CONFIRMATION'
-  token?: string
-  code?: string
-  userId?: string
-  email?: string
-  phoneNumber?: string
-}
+    type: 'EMAIL' | 'PHONE' | 'ACCOUNT_CONFIRMATION';
+    token?: string;
+    code?: string;
+    userId?: string;
+    email?: string;
+    phoneNumber?: string;
+};
+

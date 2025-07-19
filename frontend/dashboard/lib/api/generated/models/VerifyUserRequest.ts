@@ -6,6 +6,7 @@
  * Verify user for internal services
  */
 export type VerifyUserRequest = {
-  userId: string
-  verificationType: 'EMAIL' | 'PHONE' | 'IDENTITY'
-}
+    userId: string;
+    verificationType: 'EMAIL' | 'PHONE' | 'IDENTITY';
+};
+

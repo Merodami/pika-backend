@@ -6,5 +6,6 @@
  * Validate email verification token
  */
 export type ValidateEmailVerificationTokenRequest = {
-  token: string
-}
+    token: string;
+};
+

@@ -6,7 +6,8 @@
  * Cancel Stripe subscription
  */
 export type CancelStripeSubscriptionRequest = {
-  stripeSubscriptionId: string
-  cancelAtPeriodEnd?: boolean
-  reason?: string
-}
+    stripeSubscriptionId: string;
+    cancelAtPeriodEnd?: boolean;
+    reason?: string;
+};
+

@@ -6,10 +6,11 @@
  * Update current admin user profile
  */
 export type UpdateAdminProfileRequest = {
-  firstName?: string
-  lastName?: string
-  phoneNumber?: string
-  dateOfBirth?: string
-  avatarUrl?: string
-  adminNotes?: string
-}
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    dateOfBirth?: string;
+    avatarUrl?: string;
+    adminNotes?: string;
+};
+

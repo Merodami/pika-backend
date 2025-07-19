@@ -6,6 +6,7 @@
  * Initiate password reset
  */
 export type InitiatePasswordResetRequest = {
-  email: string
-  callbackUrl?: string
-}
+    email: string;
+    callbackUrl?: string;
+};
+

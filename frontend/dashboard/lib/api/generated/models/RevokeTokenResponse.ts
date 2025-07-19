@@ -6,10 +6,11 @@
  * Token revocation response
  */
 export type RevokeTokenResponse = {
-  success?: boolean
-  message?: string
-  /**
-   * Number of tokens revoked
-   */
-  revokedCount?: number
-}
+    success?: boolean;
+    message?: string;
+    /**
+     * Number of tokens revoked
+     */
+    revokedCount?: number;
+};
+

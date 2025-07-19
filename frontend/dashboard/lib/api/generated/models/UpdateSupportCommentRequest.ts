@@ -6,5 +6,6 @@
  * Update support comment
  */
 export type UpdateSupportCommentRequest = {
-  content: string
-}
+    content: string;
+};
+

@@ -6,12 +6,13 @@
  * Token introspection request
  */
 export type IntrospectRequest = {
-  /**
-   * Token to validate
-   */
-  token: string
-  /**
-   * Hint about token type
-   */
-  tokenTypeHint?: 'accessToken' | 'refreshToken'
-}
+    /**
+     * Token to validate
+     */
+    token: string;
+    /**
+     * Hint about token type
+     */
+    tokenTypeHint?: 'accessToken' | 'refreshToken';
+};
+

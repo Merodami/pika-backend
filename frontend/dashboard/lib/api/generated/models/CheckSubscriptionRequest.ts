@@ -6,7 +6,8 @@
  * Check if user has subscription access
  */
 export type CheckSubscriptionRequest = {
-  userId: string
-  feature?: string
-  requiredPlan?: string
-}
+    userId: string;
+    feature?: string;
+    requiredPlan?: string;
+};
+

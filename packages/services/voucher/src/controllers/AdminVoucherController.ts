@@ -1,7 +1,8 @@
 import { businessCommon, shared, voucherAdmin, voucherCommon } from '@pika/api'
-import { DEFAULT_LANGUAGE, PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
+  getRequestLanguage,
   paginatedResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -11,7 +12,7 @@ import { VoucherState } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IAdminVoucherService } from '../services/AdminVoucherService.js'
-import type { BulkUpdateData } from '../types/index.js'
+import type { VoucherSearchParams } from '../types/index.js'
 
 /**
  * Handles admin voucher management operations
@@ -53,6 +54,7 @@ export class AdminVoucherController {
   ): Promise<void> {
     try {
       const query = getValidatedQuery<voucherAdmin.AdminVoucherQueryParams>(req)
+      const language = getRequestLanguage(req)
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
@@ -61,10 +63,10 @@ export class AdminVoucherController {
         : {}
 
       // Map API query to service params - admins can see all vouchers
-      const params = {
+      const params: VoucherSearchParams = {
         businessId: query.businessId,
         categoryId: query.categoryId,
-        state: query.state,
+        state: query.state as VoucherState | undefined,
         discountType: query.discountType,
         minDiscount: query.minDiscount,
         maxDiscount: query.maxDiscount,
@@ -91,7 +93,7 @@ export class AdminVoucherController {
         parsedIncludes,
       }
 
-      const result = await this.voucherService.getAllVouchers(params)
+      const result = await this.voucherService.getAllVouchers(params, language)
 
       res.json(paginatedResponse(result, (voucher) => VoucherMapper.toAdminDTO(voucher)))
     } catch (error) {
@@ -116,6 +118,7 @@ export class AdminVoucherController {
     try {
       const { id: voucherId } = req.params
       const query = getValidatedQuery<voucherAdmin.AdminVoucherQueryParams>(req)
+      const language = getRequestLanguage(req)
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
@@ -126,6 +129,7 @@ export class AdminVoucherController {
       const voucher = await this.voucherService.getVoucherById(
         voucherId,
         parsedIncludes,
+        language,
       )
 
       res.json(VoucherMapper.toAdminDTO(voucher))
@@ -144,9 +148,10 @@ export class AdminVoucherController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const data = VoucherMapper.fromCreateDTO(req.body)
+      const data = VoucherMapper.fromCreateRequestData(req.body)
+      const language = getRequestLanguage(req)
 
-      const voucher = await this.voucherService.createVoucher(data)
+      const voucher = await this.voucherService.createVoucher(data, language)
 
       res.status(201).json(VoucherMapper.toAdminDTO(voucher))
     } catch (error) {
@@ -169,9 +174,10 @@ export class AdminVoucherController {
   ): Promise<void> {
     try {
       const { id: voucherId } = req.params
-      const data = VoucherMapper.fromUpdateDTO(req.body)
+      const data = VoucherMapper.fromUpdateRequestData(req.body)
+      const language = getRequestLanguage(req)
 
-      const voucher = await this.voucherService.updateVoucher(voucherId, data)
+      const voucher = await this.voucherService.updateVoucher(voucherId, data, language)
 
       res.json(VoucherMapper.toAdminDTO(voucher))
     } catch (error) {
@@ -215,10 +221,12 @@ export class AdminVoucherController {
     try {
       const { id: voucherId } = req.params
       const { state, reason } = req.body
+      const language = getRequestLanguage(req)
 
       const voucher = await this.voucherService.updateVoucherState(
         voucherId,
         state as VoucherState,
+        language,
       )
 
       res.json(VoucherMapper.toAdminDTO(voucher))
@@ -319,7 +327,11 @@ export class AdminVoucherController {
 
       res.json({
         voucherId,
-        translations,
+        translations: {
+          title: translations.title || {},
+          description: translations.description || {},
+          terms: translations.terms || {},
+        },
       })
     } catch (error) {
       next(error)
@@ -364,13 +376,22 @@ export class AdminVoucherController {
   ): Promise<void> {
     try {
       const { voucherIds, updates, reason } = req.body
+      const language = getRequestLanguage(req)
 
-      const data: BulkUpdateData = {
-        ids: voucherIds,
-        updates,
+      // Convert the bulk update data to UpdateVoucherDTO format
+      const updateDTO = {
+        ...(updates.state && { state: updates.state }),
+        ...(updates.expiresAt && { expiresAt: updates.expiresAt }),
+        ...(updates.maxRedemptions !== undefined && { maxRedemptions: updates.maxRedemptions }),
+        ...(updates.maxRedemptionsPerUser && { maxRedemptionsPerUser: updates.maxRedemptionsPerUser }),
       }
       
-      const result = await this.voucherService.bulkUpdateVouchers(data)
+      const updateData = VoucherMapper.fromUpdateDTO(updateDTO)
+      
+      const result = await this.voucherService.bulkUpdateVouchers({
+        ids: voucherIds,
+        updates: updateData,
+      }, language)
 
       res.json(VoucherMapper.toBulkUpdateResponseDTO(result))
     } catch (error) {
@@ -441,8 +462,9 @@ export class AdminVoucherController {
   ): Promise<void> {
     try {
       const { id } = req.params
+      const language = getRequestLanguage(req)
 
-      const voucher = await this.voucherService.publishVoucher(id)
+      const voucher = await this.voucherService.publishVoucher(id, language)
       const dto = VoucherMapper.toAdminDTO(voucher)
 
       res.status(200).json(dto)
@@ -462,8 +484,9 @@ export class AdminVoucherController {
   ): Promise<void> {
     try {
       const { id } = req.params
+      const language = getRequestLanguage(req)
 
-      const voucher = await this.voucherService.expireVoucher(id)
+      const voucher = await this.voucherService.expireVoucher(id, language)
       const dto = VoucherMapper.toAdminDTO(voucher)
 
       res.status(200).json(dto)

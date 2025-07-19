@@ -6,5 +6,6 @@
  * Email path parameter
  */
 export type EmailParam = {
-  email: string
-}
+    email: string;
+};
+

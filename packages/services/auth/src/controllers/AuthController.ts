@@ -1,13 +1,14 @@
-import {
-  ChangePasswordRequest,
-  ForgotPasswordRequest,
-  IntrospectRequest,
-  RegisterRequest,
-  ResetPasswordRequest,
-  RevokeTokenRequest,
-  TokenRequest,
-  VerifyEmailRequest,
-} from '@pika/api/public'
+import { authPublic } from '@pika/api'
+import type { z } from 'zod'
+
+type ChangePasswordRequest = z.infer<typeof authPublic.ChangePasswordRequest>
+type ForgotPasswordRequest = z.infer<typeof authPublic.ForgotPasswordRequest>
+type IntrospectRequest = z.infer<typeof authPublic.IntrospectRequest>
+type RegisterRequest = z.infer<typeof authPublic.RegisterRequest>
+type ResetPasswordRequest = z.infer<typeof authPublic.ResetPasswordRequest>
+type RevokeTokenRequest = z.infer<typeof authPublic.RevokeTokenRequest>
+type TokenRequest = z.infer<typeof authPublic.TokenRequest>
+type VerifyEmailRequest = z.infer<typeof authPublic.VerifyEmailRequest>
 import { RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
@@ -53,10 +54,7 @@ export class AuthController {
         firstName,
         lastName,
         phoneNumber,
-        role,
         dateOfBirth,
-        description,
-        specialties,
         acceptTerms,
         marketingConsent,
       } = request.body
@@ -67,12 +65,10 @@ export class AuthController {
         firstName,
         lastName,
         phoneNumber,
-        role: role as UserRole, // Cast API role to UserRole enum
         dateOfBirth,
-        description,
-        specialties,
         acceptTerms,
         marketingConsent,
+        role: UserRole.CUSTOMER, // Default role for new registrations
       })
 
       // If email verification is required, return success message without tokens

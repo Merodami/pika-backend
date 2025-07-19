@@ -9,11 +9,12 @@ import { openapi } from '../../../common/utils/openapi.js'
 
 // Voucher state enum (from pika-old VoucherState)
 export const VoucherState = z.enum([
-  'new',
+  'draft',
   'published',
   'claimed',
   'redeemed',
   'expired',
+  'suspended',
 ])
 
 export type VoucherState = z.infer<typeof VoucherState>

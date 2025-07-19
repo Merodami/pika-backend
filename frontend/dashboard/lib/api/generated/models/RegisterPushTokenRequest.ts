@@ -6,8 +6,9 @@
  * Register device for push notifications
  */
 export type RegisterPushTokenRequest = {
-  token: string
-  platform: 'ios' | 'android' | 'web'
-  deviceId?: string
-  deviceName?: string
-}
+    token: string;
+    platform: 'ios' | 'android' | 'web';
+    deviceId?: string;
+    deviceName?: string;
+};
+

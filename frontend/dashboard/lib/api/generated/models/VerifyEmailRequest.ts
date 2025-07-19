@@ -6,8 +6,9 @@
  * Email verification token
  */
 export type VerifyEmailRequest = {
-  /**
-   * Email verification token from email link
-   */
-  token: string
-}
+    /**
+     * Email verification token from email link
+     */
+    token: string;
+};
+

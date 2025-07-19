@@ -6,5 +6,6 @@
  * Unregister device from push notifications
  */
 export type UnregisterPushTokenRequest = {
-  token: string
-}
+    token: string;
+};
+

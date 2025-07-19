@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type SupportCommentIdParam = {
-  /**
-   * Universally Unique Identifier
-   */
-  id: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    id: string;
+};
+

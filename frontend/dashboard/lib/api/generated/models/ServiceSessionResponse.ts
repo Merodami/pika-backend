@@ -6,13 +6,14 @@
  * Service session details
  */
 export type ServiceSessionResponse = {
-  /**
-   * Universally Unique Identifier
-   */
-  sessionId: string
-  token: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  expiresAt: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    sessionId: string;
+    token: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    expiresAt: string;
+};
+

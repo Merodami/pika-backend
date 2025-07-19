@@ -6,7 +6,8 @@
  * Webhook acknowledgment response
  */
 export type WebhookResponse = {
-  received?: boolean
-  eventId?: string
-  message?: string
-}
+    received?: boolean;
+    eventId?: string;
+    message?: string;
+};
+

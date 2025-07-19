@@ -1,8 +1,4 @@
-import type {
-  AdminTicketQueryParams,
-  AdminUpdateProblemRequest,
-} from '@pika/api/admin'
-import type { ProblemIdParam } from '@pika/api/public'
+import { supportAdmin, supportCommon } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -39,14 +35,14 @@ export class AdminProblemController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<AdminTicketQueryParams>(request)
+      const query = getValidatedQuery<supportAdmin.AdminTicketQueryParams>(request)
 
       // Transform API query to service params
       const problemParams = {
         page: query.page,
         limit: query.limit,
         sortBy: query.sortBy,
-        sortOrder: query.sortOrder,
+        sortOrder: query.sortOrder.toUpperCase() as 'ASC' | 'DESC',
         search: query.search,
         status: query.status,
         priority: query.priority,
@@ -77,7 +73,7 @@ export class AdminProblemController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getProblemById(
-    request: Request<ProblemIdParam>,
+    request: Request<supportCommon.ProblemIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -104,7 +100,7 @@ export class AdminProblemController {
    * Update support ticket
    */
   async updateProblem(
-    request: Request<ProblemIdParam, {}, AdminUpdateProblemRequest>,
+    request: Request<supportCommon.ProblemIdParam, {}, supportAdmin.AdminUpdateProblemRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -134,7 +130,7 @@ export class AdminProblemController {
    * Delete support ticket
    */
   async deleteProblem(
-    request: Request<ProblemIdParam>,
+    request: Request<supportCommon.ProblemIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

@@ -1,9 +1,4 @@
-import {
-  AdminTicketQueryParams,
-  AssignTicketRequest,
-  TicketIdParam,
-  UpdateTicketStatusRequest,
-} from '@pika/api/admin'
+import { supportAdmin, supportCommon } from '@pika/api'
 import type { ICacheService } from '@pika/redis'
 import {
   requireAdmin,
@@ -35,7 +30,7 @@ export function createAdminSupportRouter(
     '/tickets',
     requireAuth(),
     requireAdmin(),
-    validateQuery(AdminTicketQueryParams),
+    validateQuery(supportAdmin.AdminTicketQueryParams),
     controller.getAllTickets,
   )
 
@@ -43,7 +38,7 @@ export function createAdminSupportRouter(
     '/tickets/:id',
     requireAuth(),
     requireAdmin(),
-    validateParams(TicketIdParam),
+    validateParams(supportCommon.TicketIdParam),
     controller.getTicketById,
   )
 
@@ -51,8 +46,8 @@ export function createAdminSupportRouter(
     '/tickets/:id/status',
     requireAuth(),
     requireAdmin(),
-    validateParams(TicketIdParam),
-    validateBody(UpdateTicketStatusRequest),
+    validateParams(supportCommon.TicketIdParam),
+    validateBody(supportAdmin.UpdateTicketStatusRequest),
     controller.updateTicketStatus,
   )
 
@@ -60,8 +55,8 @@ export function createAdminSupportRouter(
     '/tickets/:id/assign',
     requireAuth(),
     requireAdmin(),
-    validateParams(TicketIdParam),
-    validateBody(AssignTicketRequest),
+    validateParams(supportCommon.TicketIdParam),
+    validateBody(supportAdmin.AssignTicketRequest),
     controller.assignTicket,
   )
 

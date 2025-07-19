@@ -6,6 +6,7 @@
  * Validate service API key
  */
 export type ValidateServiceKeyRequest = {
-  apiKey: string
-  serviceName: string
-}
+    apiKey: string;
+    serviceName: string;
+};
+

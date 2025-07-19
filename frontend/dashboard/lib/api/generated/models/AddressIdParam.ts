@@ -6,8 +6,9 @@
  * Address ID path parameter
  */
 export type AddressIdParam = {
-  /**
-   * Universally Unique Identifier
-   */
-  id: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    id: string;
+};
+

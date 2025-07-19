@@ -6,24 +6,25 @@
  * PDF generation job status
  */
 export type GeneratePdfResponse = {
-  /**
-   * PDF generation job ID
-   */
-  jobId: string
-  /**
-   * Generation status
-   */
-  status: 'queued' | 'processing' | 'completed' | 'failed'
-  /**
-   * Status message
-   */
-  message: string
-  /**
-   * Estimated completion time
-   */
-  estimatedCompletion?: string
-  /**
-   * PDF URL if already completed
-   */
-  pdfUrl?: string
-}
+    /**
+     * PDF generation job ID
+     */
+    jobId: string;
+    /**
+     * Generation status
+     */
+    status: 'queued' | 'processing' | 'completed' | 'failed';
+    /**
+     * Status message
+     */
+    message: string;
+    /**
+     * Estimated completion time
+     */
+    estimatedCompletion?: string;
+    /**
+     * PDF URL if already completed
+     */
+    pdfUrl?: string;
+};
+

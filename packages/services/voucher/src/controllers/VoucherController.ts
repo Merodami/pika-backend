@@ -2,6 +2,8 @@ import { shared, voucherCommon, voucherPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
+  getValidatedParams,
+  getRequestLanguage,
   RequestContext,
   paginatedResponse,
 } from '@pika/http'
@@ -48,6 +50,7 @@ export class VoucherController {
   ): Promise<void> {
     try {
       const query = getValidatedQuery<voucherPublic.VoucherQueryParams>(req)
+      const language = getRequestLanguage(req)
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
@@ -79,7 +82,7 @@ export class VoucherController {
         parsedIncludes,
       }
 
-      const result = await this.voucherService.getAllVouchers(params)
+      const result = await this.voucherService.getAllVouchers(params, language)
 
       res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
@@ -109,6 +112,7 @@ export class VoucherController {
     try {
       const { id: voucherId } = req.params
       const query = getValidatedQuery<voucherPublic.GetVoucherByIdQuery>(req)
+      const language = getRequestLanguage(req)
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
@@ -119,6 +123,7 @@ export class VoucherController {
       const voucher = await this.voucherService.getVoucherById(
         voucherId,
         parsedIncludes,
+        language,
       )
 
       // Check if voucher is published for public access
@@ -150,11 +155,12 @@ export class VoucherController {
       const scanData = req.body
       const context = RequestContext.getContext(req)
       const userId = context?.userId
+      const language = getRequestLanguage(req)
 
       const scanResult = await this.voucherService.scanVoucher(voucherId, {
         ...scanData,
         userId,
-      })
+      }, language)
 
       res.json(VoucherMapper.toScanResponseDTO(scanResult))
     } catch (error) {
@@ -180,6 +186,7 @@ export class VoucherController {
       const claimData = req.body
       const context = RequestContext.getContext(req)
       const userId = context.userId
+      const language = getRequestLanguage(req)
 
       if (!userId) {
         throw ErrorFactory.unauthorized(
@@ -191,6 +198,7 @@ export class VoucherController {
         voucherId,
         userId,
         claimData,
+        language,
       )
 
       res.json(VoucherMapper.toClaimResponseDTO(claimResult))
@@ -217,11 +225,12 @@ export class VoucherController {
       const redeemData = req.body
       const context = RequestContext.getContext(req)
       const userId = context?.userId
+      const language = getRequestLanguage(req)
 
       const redeemResult = await this.voucherService.redeemVoucher(voucherId, {
         ...redeemData,
         userId,
-      })
+      }, language)
 
       res.json(VoucherMapper.toRedeemResponseDTO(redeemResult))
     } catch (error) {
@@ -239,20 +248,16 @@ export class VoucherController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getUserVouchers(
-    req: Request<
-      shared.UserIdParam,
-      {},
-      {},
-      voucherPublic.UserVouchersQueryParams
-    >,
-    res: Response<voucherPublic.UserVouchersListResponse>,
+    req: Request,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { id: userId } = req.params
+      const { id: userId } = getValidatedParams<shared.UserIdParam>(req)
       const query =
         getValidatedQuery<voucherPublic.UserVouchersQueryParams>(req)
       const context = RequestContext.getContext(req)
+      const language = getRequestLanguage(req)
 
       // Users can only see their own vouchers unless admin
       if (context?.userId !== userId && context?.role !== 'admin') {
@@ -268,7 +273,7 @@ export class VoucherController {
         sortOrder: query.sortOrder,
       }
 
-      const result = await this.voucherService.getUserVouchers(params)
+      const result = await this.voucherService.getUserVouchers(params, language)
 
       res.json(paginatedResponse(result, VoucherMapper.toUserVoucherDTO))
     } catch (error) {
@@ -286,18 +291,14 @@ export class VoucherController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getBusinessVouchers(
-    req: Request<
-      shared.BusinessIdParam,
-      {},
-      {},
-      voucherPublic.VoucherQueryParams
-    >,
-    res: Response<voucherPublic.VoucherListResponse>,
+    req: Request,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { id: businessId } = req.params
+      const { id: businessId } = getValidatedParams<shared.BusinessIdParam>(req)
       const query = getValidatedQuery<voucherPublic.VoucherQueryParams>(req)
+      const language = getRequestLanguage(req)
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
@@ -325,7 +326,7 @@ export class VoucherController {
         parsedIncludes,
       }
 
-      const result = await this.voucherService.getVouchersByBusinessId(params)
+      const result = await this.voucherService.getVouchersByBusinessId(params, language)
 
       res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
@@ -350,6 +351,7 @@ export class VoucherController {
     try {
       const { code } = req.params
       const query = getValidatedQuery<voucherPublic.GetVoucherByIdQuery>(req)
+      const language = getRequestLanguage(req)
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
@@ -357,7 +359,7 @@ export class VoucherController {
           )
         : {}
 
-      const voucher = await this.voucherService.getVoucherByAnyCode(code)
+      const voucher = await this.voucherService.getVoucherByAnyCode(code, language)
 
       // Apply includes if needed
       let voucherWithIncludes = voucher
@@ -366,6 +368,7 @@ export class VoucherController {
         voucherWithIncludes = await this.voucherService.getVoucherById(
           voucher.id,
           parsedIncludes,
+          language,
         )
       }
 

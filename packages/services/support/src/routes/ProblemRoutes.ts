@@ -1,4 +1,4 @@
-import { CreateSupportProblemRequest } from '@pika/api/public'
+import { supportPublic } from '@pika/api'
 import type { ICacheService } from '@pika/redis'
 import { requireAuth, validateBody } from '@pika/http'
 import type { PrismaClient } from '@prisma/client'
@@ -27,7 +27,7 @@ export function createProblemRouter(
   router.post(
     '/',
     requireAuth(),
-    validateBody(CreateSupportProblemRequest),
+    validateBody(supportPublic.CreateSupportProblemRequest),
     controller.createProblem,
   )
 

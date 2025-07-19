@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import { businessInternal, businessPublic, shared } from '@pika/api'
 import {
-  requireInternalAuth,
+  requireServiceAuth,
   validateBody,
   validateParams,
   validateQuery,
@@ -30,7 +30,7 @@ export function createInternalBusinessRoutes(
   const controller = new InternalBusinessController(service)
 
   // All routes require internal authentication
-  router.use(requireInternalAuth())
+  router.use(requireServiceAuth())
 
   // GET /internal/businesses/:id - Get business by ID
   router.get(
@@ -51,7 +51,7 @@ export function createInternalBusinessRoutes(
   // POST /internal/businesses/batch - Get multiple businesses by IDs
   router.post(
     '/batch',
-    validateBody(businessInternal.GetBusinessesByIdsRequest),
+    validateBody(businessInternal.BulkBusinessRequest),
     controller.getBusinessesByIds,
   )
 

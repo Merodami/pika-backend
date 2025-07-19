@@ -54,6 +54,8 @@ export type InternalBusinessQueryParams = z.infer<
 export const BulkBusinessRequest = openapi(
   z.object({
     businessIds: z.array(UUID).min(1).max(100),
+    includeUser: z.boolean().optional().default(false),
+    includeCategory: z.boolean().optional().default(false),
   }),
   {
     description: 'Get multiple businesses by IDs',
@@ -153,6 +155,23 @@ export type GetBusinessesByUserResponse = z.infer<
   typeof GetBusinessesByUserResponse
 >
 
+// ============= Get Business Request =============
+
+/**
+ * Get business request query parameters
+ */
+export const GetBusinessRequest = openapi(
+  z.object({
+    includeUser: z.boolean().optional().default(false),
+    includeCategory: z.boolean().optional().default(false),
+  }),
+  {
+    description: 'Query parameters for getting business details',
+  },
+)
+
+export type GetBusinessRequest = z.infer<typeof GetBusinessRequest>
+
 // ============= Get Businesses by Category =============
 
 /**
@@ -164,6 +183,8 @@ export const GetBusinessesByCategoryRequest = openapi(
     onlyActive: z.boolean().default(true),
     onlyVerified: z.boolean().default(false),
     limit: z.number().int().min(1).max(100).default(50),
+    includeUser: z.boolean().optional().default(false),
+    includeCategory: z.boolean().optional().default(false),
   }),
   {
     description: 'Get businesses in a specific category',

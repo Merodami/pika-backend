@@ -6,17 +6,18 @@
  * Authentication token pair
  */
 export type AuthTokensResponse = {
-  /**
-   * JWT access token
-   */
-  accessToken: string
-  /**
-   * JWT refresh token
-   */
-  refreshToken: string
-  tokenType?: 'Bearer'
-  /**
-   * Access token expiration in seconds
-   */
-  expiresIn: number
-}
+    /**
+     * JWT access token
+     */
+    accessToken: string;
+    /**
+     * JWT refresh token
+     */
+    refreshToken: string;
+    tokenType?: 'Bearer';
+    /**
+     * Access token expiration in seconds
+     */
+    expiresIn: number;
+};
+

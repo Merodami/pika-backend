@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UnifiedVerificationResponse = {
-  success: boolean
-  message?: string
-}
+    success: boolean;
+    message?: string;
+};
+

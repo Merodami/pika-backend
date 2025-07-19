@@ -1,4 +1,4 @@
-import type { ParsedIncludes } from '@pika/shared'
+import type { ParsedIncludes } from '@pika/types'
 
 /**
  * Business search and filter types

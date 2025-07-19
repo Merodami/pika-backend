@@ -6,8 +6,9 @@
  * Archive a voucher book
  */
 export type ArchiveVoucherBookRequest = {
-  /**
-   * Reason for archiving
-   */
-  reason?: string
-}
+    /**
+     * Reason for archiving
+     */
+    reason?: string;
+};
+

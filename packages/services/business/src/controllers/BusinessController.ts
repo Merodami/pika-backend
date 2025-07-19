@@ -1,7 +1,7 @@
 import {
   mapSortOrder,
   businessPublic,
-  businessSortFieldMapper,
+  businessCommon,
   shared,
 } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
@@ -9,6 +9,7 @@ import { getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
+import { UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IBusinessService } from '../services/BusinessService.js'
@@ -52,11 +53,10 @@ export class BusinessController {
         verified: query.verified,
         active: true, // Always filter by active for public routes
         minRating: query.minRating,
-        maxRating: query.maxRating,
         search: query.search,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: businessSortFieldMapper.mapSortField(query.sortBy, 'createdAt'),
+        sortBy: query.sortBy || 'createdAt',
         sortOrder: mapSortOrder(query.sortOrder),
       }
 
@@ -89,11 +89,10 @@ export class BusinessController {
     try {
       const { id: businessId } = req.params
       const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
-      const { includeUser, includeCategory } = query
 
       const business = await this.businessService.getBusinessById(businessId, {
-        user: includeUser,
-        category: includeCategory,
+        user: false,
+        category: false,
       })
 
       // Check if business is active for public access
@@ -124,11 +123,10 @@ export class BusinessController {
     try {
       const { id: userId } = req.params
       const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
-      const { includeUser, includeCategory } = query
 
       const business = await this.businessService.getBusinessByUserId(userId, {
-        user: includeUser,
-        category: includeCategory,
+        user: false,
+        category: false,
       })
 
       // Check if business is active for public access
@@ -155,18 +153,17 @@ export class BusinessController {
       const context = RequestContext.getContext(req)
       const userId = context.userId
       const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
-      const { includeUser, includeCategory } = query
 
       // Only business owners can access this endpoint
-      if (context.role !== 'BUSINESS') {
+      if (context.role !== UserRole.BUSINESS) {
         throw ErrorFactory.forbidden(
           'Only business owners can access this endpoint',
         )
       }
 
       const business = await this.businessService.getBusinessByUserId(userId, {
-        user: includeUser,
-        category: includeCategory,
+        user: false,
+        category: false,
       })
 
       res.json(BusinessMapper.toDTO(business))
@@ -180,7 +177,7 @@ export class BusinessController {
    * Create business for current authenticated user (business owner)
    */
   async createMyBusiness(
-    req: Request<{}, {}, businessPublic.CreateBusinessRequest>,
+    req: Request<{}, {}, businessPublic.CreateMyBusinessRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -189,7 +186,7 @@ export class BusinessController {
       const authenticatedUserId = context.userId
 
       // Only users with BUSINESS role can create a business
-      if (context.role !== 'BUSINESS') {
+      if (context.role !== UserRole.BUSINESS) {
         throw ErrorFactory.forbidden(
           'Only users with business role can create a business',
         )
@@ -215,7 +212,7 @@ export class BusinessController {
    * Update current authenticated user's business (business owner)
    */
   async updateMyBusiness(
-    req: Request<{}, {}, businessPublic.UpdateBusinessRequest>,
+    req: Request<{}, {}, businessPublic.UpdateMyBusinessRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -224,7 +221,7 @@ export class BusinessController {
       const userId = context.userId
 
       // Only business owners can update their business
-      if (context.role !== 'BUSINESS') {
+      if (context.role !== UserRole.BUSINESS) {
         throw ErrorFactory.forbidden(
           'Only business owners can update their business',
         )

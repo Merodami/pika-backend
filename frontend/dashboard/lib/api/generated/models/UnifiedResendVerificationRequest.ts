@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UnifiedResendVerificationRequest = {
-  type: 'EMAIL' | 'PHONE'
-  userId?: string
-  email?: string
-  phoneNumber?: string
-}
+    type: 'EMAIL' | 'PHONE';
+    userId?: string;
+    email?: string;
+    phoneNumber?: string;
+};
+

@@ -1,4 +1,6 @@
 import type { Request } from 'express'
+import { DEFAULT_LANGUAGE } from '@pika/environment'
+import type { LanguageCode } from '@pika/types'
 
 /**
  * Helper functions for handling validated request data after Zod middleware transformation
@@ -83,4 +85,25 @@ export function getValidatedData<TQuery = any, TParams = any, TBody = any>(
     params: request.params as TParams,
     body: request.body as TBody,
   }
+}
+
+/**
+ * Get request language with proper fallback
+ * 
+ * This helper provides standardized language extraction from requests,
+ * following the industry standard language detection pattern:
+ * 1. Language middleware sets req.language based on headers/query params
+ * 2. Falls back to DEFAULT_LANGUAGE if not set
+ * 
+ * @example
+ * ```typescript
+ * // Instead of:
+ * const language = req.language || DEFAULT_LANGUAGE
+ * 
+ * // Use:
+ * const language = getRequestLanguage(req)
+ * ```
+ */
+export function getRequestLanguage(request: Request): LanguageCode {
+  return (request.language || DEFAULT_LANGUAGE) as LanguageCode
 }

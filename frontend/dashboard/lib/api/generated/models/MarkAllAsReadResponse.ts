@@ -6,8 +6,9 @@
  * Response for marking notifications as read
  */
 export type MarkAllAsReadResponse = {
-  /**
-   * Number of notifications marked as read
-   */
-  updated: number
-}
+    /**
+     * Number of notifications marked as read
+     */
+    updated: number;
+};
+

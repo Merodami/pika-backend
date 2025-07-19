@@ -6,12 +6,13 @@
  * Reset password with token
  */
 export type ResetPasswordRequest = {
-  /**
-   * Password reset token from email
-   */
-  token: string
-  /**
-   * New password meeting security requirements
-   */
-  newPassword: string
-}
+    /**
+     * Password reset token from email
+     */
+    token: string;
+    /**
+     * New password meeting security requirements
+     */
+    newPassword: string;
+};
+

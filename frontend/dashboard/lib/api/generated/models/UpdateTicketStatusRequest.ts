@@ -6,14 +6,8 @@
  * Update ticket status
  */
 export type UpdateTicketStatusRequest = {
-  status:
-    | 'OPEN'
-    | 'ASSIGNED'
-    | 'IN_PROGRESS'
-    | 'WAITING_CUSTOMER'
-    | 'WAITING_INTERNAL'
-    | 'RESOLVED'
-    | 'CLOSED'
-  note?: string
-  notifyUser?: boolean
-}
+    status: 'OPEN' | 'ASSIGNED' | 'IN_PROGRESS' | 'WAITING_CUSTOMER' | 'WAITING_INTERNAL' | 'RESOLVED' | 'CLOSED';
+    note?: string;
+    notifyUser?: boolean;
+};
+

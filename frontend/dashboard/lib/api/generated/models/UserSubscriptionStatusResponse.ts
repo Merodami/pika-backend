@@ -6,13 +6,14 @@
  * User subscription status
  */
 export type UserSubscriptionStatusResponse = {
-  userId: string
-  hasActiveSubscription: boolean
-  subscriptionType?: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  expiresAt?: string
-  creditsRemaining: number
-  canBookSessions: boolean
-}
+    userId: string;
+    hasActiveSubscription: boolean;
+    subscriptionType?: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    expiresAt?: string;
+    creditsRemaining: number;
+    canBookSessions: boolean;
+};
+

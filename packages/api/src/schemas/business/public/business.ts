@@ -115,3 +115,54 @@ export const BusinessesByCategoryResponse = openapi(
 export type BusinessesByCategoryResponse = z.infer<
   typeof BusinessesByCategoryResponse
 >
+
+// ============= Create/Update Requests =============
+
+/**
+ * Create my business request (for business owners)
+ */
+export const CreateMyBusinessRequest = openapi(
+  z.object({
+    businessName: z
+      .string()
+      .min(1)
+      .max(100)
+      .describe('Business name'),
+    businessDescription: z
+      .string()
+      .max(500)
+      .optional()
+      .describe('Business description'),
+    categoryId: UUID.describe('Category ID'),
+  }),
+  {
+    description: 'Create business data for business owners',
+  },
+)
+
+export type CreateMyBusinessRequest = z.infer<typeof CreateMyBusinessRequest>
+
+/**
+ * Update my business request (for business owners)
+ */
+export const UpdateMyBusinessRequest = openapi(
+  z.object({
+    businessName: z
+      .string()
+      .min(1)
+      .max(100)
+      .optional()
+      .describe('Business name'),
+    businessDescription: z
+      .string()
+      .max(500)
+      .optional()
+      .describe('Business description'),
+    categoryId: UUID.optional().describe('Category ID'),
+  }),
+  {
+    description: 'Update business data for business owners',
+  },
+)
+
+export type UpdateMyBusinessRequest = z.infer<typeof UpdateMyBusinessRequest>

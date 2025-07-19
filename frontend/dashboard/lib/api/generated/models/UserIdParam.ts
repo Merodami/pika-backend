@@ -6,5 +6,6 @@
  * User ID path parameter
  */
 export type UserIdParam = {
-  id: string
-}
+    id: string;
+};
+

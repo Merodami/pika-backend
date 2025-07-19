@@ -6,8 +6,9 @@
  * Upload avatar for a user (admin only)
  */
 export type AdminUploadUserAvatarRequest = {
-  /**
-   * Avatar image file (multipart/form-data)
-   */
-  file?: any
-}
+    /**
+     * Avatar image file (multipart/form-data)
+     */
+    file?: any;
+};
+

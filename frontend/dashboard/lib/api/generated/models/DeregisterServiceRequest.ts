@@ -6,8 +6,9 @@
  * Deregister service instance
  */
 export type DeregisterServiceRequest = {
-  reason?: 'SHUTDOWN' | 'MAINTENANCE' | 'ERROR' | 'SCALE_DOWN'
-  gracefulShutdown?: boolean
-  drainConnections?: boolean
-  drainTimeoutSeconds?: number
-}
+    reason?: 'SHUTDOWN' | 'MAINTENANCE' | 'ERROR' | 'SCALE_DOWN';
+    gracefulShutdown?: boolean;
+    drainConnections?: boolean;
+    drainTimeoutSeconds?: number;
+};
+

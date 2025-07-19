@@ -6,15 +6,16 @@
  * Service deregistration confirmation
  */
 export type DeregisterServiceResponse = {
-  /**
-   * Universally Unique Identifier
-   */
-  instanceId: string
-  serviceName: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  deregisteredAt: string
-  gracefulShutdown: boolean
-  message?: string
-}
+    /**
+     * Universally Unique Identifier
+     */
+    instanceId: string;
+    serviceName: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    deregisteredAt: string;
+    gracefulShutdown: boolean;
+    message?: string;
+};
+

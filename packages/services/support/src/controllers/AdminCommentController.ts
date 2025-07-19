@@ -1,18 +1,8 @@
-import {
-  ADMIN_COMMENT_RELATIONS,
-  AdminCommentsByProblemQuery,
-  AdminGetAllCommentsQuery,
-} from '@pika/api/admin'
+import { supportAdmin, supportPublic, supportCommon } from '@pika/api'
 import { SupportCommentMapper } from '@pika/sdk'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { parseIncludeParam } from '@pika/shared'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import type {
-  CreateSupportCommentRequest,
-  ProblemIdForCommentsParam,
-  SupportCommentIdParam,
-  UpdateSupportCommentRequest,
-} from '@pika/api/public'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -49,12 +39,12 @@ export class AdminCommentController {
   ): Promise<void> {
     try {
       // Validate query parameters
-      const query = getValidatedQuery<AdminGetAllCommentsQuery>(request)
+      const query = getValidatedQuery<supportAdmin.AdminGetAllCommentsQuery>(request)
 
       // Parse include query parameter
       const parsedIncludes = parseIncludeParam(
         query.include,
-        ADMIN_COMMENT_RELATIONS as unknown as string[],
+        supportAdmin.ADMIN_COMMENT_RELATIONS as unknown as string[],
       )
 
       const comments =
@@ -80,10 +70,10 @@ export class AdminCommentController {
   })
   async getCommentsByProblemId(
     request: Request<
-      ProblemIdForCommentsParam,
+      supportCommon.ProblemIdForCommentsParam,
       {},
       {},
-      AdminCommentsByProblemQuery
+      supportAdmin.AdminCommentsByProblemQuery
     >,
     response: Response,
     next: NextFunction,
@@ -92,12 +82,12 @@ export class AdminCommentController {
       const { problemId } = request.params
 
       // Validate query parameters
-      const query = getValidatedQuery<AdminCommentsByProblemQuery>(request)
+      const query = getValidatedQuery<supportAdmin.AdminCommentsByProblemQuery>(request)
 
       // Parse include query parameter
       const parsedIncludes = parseIncludeParam(
         query.include,
-        ADMIN_COMMENT_RELATIONS as unknown as string[],
+        supportAdmin.ADMIN_COMMENT_RELATIONS as unknown as string[],
       )
 
       const comments = await this.adminCommentService.getCommentsByProblemId(
@@ -122,7 +112,7 @@ export class AdminCommentController {
     request: Request<
       {},
       {},
-      CreateSupportCommentRequest & { isInternal?: boolean }
+      supportPublic.CreateSupportCommentRequest & { isInternal?: boolean }
     >,
     response: Response,
     next: NextFunction,
@@ -156,7 +146,7 @@ export class AdminCommentController {
    * Update any comment (admin only)
    */
   async updateAnyComment(
-    request: Request<SupportCommentIdParam, {}, UpdateSupportCommentRequest>,
+    request: Request<supportCommon.SupportCommentIdParam, {}, supportPublic.UpdateSupportCommentRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -183,7 +173,7 @@ export class AdminCommentController {
    * Delete any comment (admin only)
    */
   async deleteAnyComment(
-    request: Request<SupportCommentIdParam>,
+    request: Request<supportCommon.SupportCommentIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

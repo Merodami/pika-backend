@@ -6,7 +6,8 @@
  * Check if user has specified roles
  */
 export type CheckUserRoleRequest = {
-  userId: string
-  roles: Array<string>
-  requireAll?: boolean
-}
+    userId: string;
+    roles: Array<string>;
+    requireAll?: boolean;
+};
+

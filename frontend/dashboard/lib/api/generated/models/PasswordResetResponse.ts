@@ -6,10 +6,11 @@
  * Password reset initiated
  */
 export type PasswordResetResponse = {
-  resetToken: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  expiresAt: string
-  emailSent: boolean
-}
+    resetToken: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    expiresAt: string;
+    emailSent: boolean;
+};
+

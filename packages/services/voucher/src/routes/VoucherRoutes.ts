@@ -1,4 +1,4 @@
-import { shared,voucherCommon, voucherPublic } from '@pika/api'
+import { businessCommon, shared, voucherCommon, voucherPublic } from '@pika/api'
 import {
   requireAuth,
   validateBody,
@@ -12,7 +12,7 @@ import {
   UserServiceClient,
   BusinessServiceClient,
 } from '@pika/shared'
-import type { TranslationClient } from '@pika/translation'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -29,6 +29,7 @@ export async function createVoucherRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
   translationClient: TranslationClient,
+  translationResolver: TranslationResolver,
   fileStorage: FileStoragePort,
   communicationClient?: CommunicationServiceClient,
   userServiceClient?: UserServiceClient,
@@ -48,6 +49,7 @@ export async function createVoucherRoutes(
     repository,
     cache,
     translationClient,
+    translationResolver,
     internalService, // Now passing the internal service
     communicationClient,
     userServiceClient,
@@ -74,7 +76,7 @@ export async function createVoucherRoutes(
   // GET /vouchers/business/:id - Get business vouchers
   router.get(
     '/business/:id',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     validateQuery(voucherPublic.VoucherQueryParams),
     controller.getBusinessVouchers,
   )

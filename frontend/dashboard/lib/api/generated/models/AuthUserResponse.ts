@@ -6,13 +6,14 @@
  * Basic user information for authentication context
  */
 export type AuthUserResponse = {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  profilePicture?: string
-  /**
-   * User role
-   */
-  role: 'ADMIN' | 'CUSTOMER' | 'BUSINESS'
-}
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    profilePicture?: string;
+    /**
+     * User role
+     */
+    role: 'ADMIN' | 'CUSTOMER' | 'BUSINESS';
+};
+

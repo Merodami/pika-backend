@@ -6,10 +6,11 @@
  * Ban a user
  */
 export type BanUserRequest = {
-  reason?: string
-  /**
-   * Ban duration in days
-   */
-  duration?: number
-  notifyUser?: boolean
-}
+    reason?: string;
+    /**
+     * Ban duration in days
+     */
+    duration?: number;
+    notifyUser?: boolean;
+};
+

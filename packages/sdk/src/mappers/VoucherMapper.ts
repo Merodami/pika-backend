@@ -50,10 +50,14 @@ import type {
   VoucherDTO,
   CreateVoucherDTO,
   UpdateVoucherDTO,
+  CreateVoucherRequestData,
+  UpdateVoucherRequestData,
+  BulkVoucherUpdateData,
   VoucherScanDTO,
   CustomerVoucherDTO,
   VoucherLocationDTO,
   VoucherCodeDTO,
+  GeoJSONPoint,
 } from '../dto/voucher.dto.js'
 
 /**
@@ -129,11 +133,14 @@ export class VoucherMapper {
       businessId: doc.businessId,
       categoryId: doc.categoryId || '',
       state: mapVoucherState(doc.state),
-      // For now, use the translation keys as the content
-      // In the future, these should be resolved by TranslationService
-      title: doc.titleKey || '',
-      description: doc.descriptionKey || '',
-      terms: doc.termsAndConditionsKey || '',
+      // Translation keys from database
+      titleKey: doc.titleKey,
+      descriptionKey: doc.descriptionKey,
+      termsAndConditionsKey: doc.termsAndConditionsKey,
+      // Resolved content is optional - populated by TranslationResolver when needed
+      title: undefined,
+      description: undefined,
+      termsAndConditions: undefined,
       discountType: mapVoucherDiscountType(doc.type),
       discountValue: doc.discount || doc.value || 0,
       currency: doc.currency,
@@ -180,7 +187,7 @@ export class VoucherMapper {
 
   /**
    * Maps a domain entity to an API DTO
-   * Transforms camelCase and handles date formatting
+   * Uses only resolved content, no translation keys
    */
   static toDTO(domain: VoucherDomain): VoucherDTO {
     const formatDate = (date: Date | string | undefined | null): string => {
@@ -195,9 +202,9 @@ export class VoucherMapper {
       businessId: domain.businessId,
       categoryId: domain.categoryId,
       state: this.mapStateToDTO(domain.state),
-      title: domain.title,
-      description: domain.description,
-      terms: domain.terms,
+      title: domain.title || '',
+      description: domain.description || '',
+      terms: domain.termsAndConditions || '',
       discountType: this.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
@@ -217,46 +224,42 @@ export class VoucherMapper {
     }
   }
 
+
   /**
-   * Maps an API DTO to a domain entity
-   * Transforms and handles date parsing
+   * Maps create request data (from Zod validation) to domain data
+   * Request data has Date objects from Zod transformation
    */
-  static fromDTO(dto: VoucherDTO): VoucherDomain {
+  static fromCreateRequestData(data: CreateVoucherRequestData): CreateVoucherData {
     return {
-      id: dto.id,
-      businessId: dto.businessId,
-      categoryId: dto.categoryId,
-      state: mapVoucherState(dto.state),
-      title: dto.title,
-      description: dto.description,
-      terms: dto.terms,
-      discountType: mapVoucherDiscountType(dto.discountType),
-      discountValue: dto.discountValue,
-      currency: dto.currency,
-      location: dto.location ? this.mapLocationFromDTO(dto.location) : null,
-      imageUrl: dto.imageUrl || null,
-      validFrom: new Date(dto.validFrom),
-      expiresAt: new Date(dto.expiresAt),
-      maxRedemptions: dto.maxRedemptions || null,
-      maxRedemptionsPerUser: dto.maxRedemptionsPerUser,
-      currentRedemptions: dto.currentRedemptions,
-      metadata: dto.metadata || null,
-      createdAt: new Date(dto.createdAt),
-      updatedAt: new Date(dto.updatedAt),
-      codes: dto.codes?.map((code) => this.mapCodeFromDTO(code)),
+      businessId: data.businessId,
+      categoryId: data.categoryId,
+      title: data.title,
+      description: data.description,
+      termsAndConditions: data.termsAndConditions,
+      discountType: mapVoucherDiscountType(data.discountType),
+      discountValue: data.discountValue,
+      currency: data.currency,
+      location: data.location ? this.mapLocationFromDTO(data.location) : null,
+      imageUrl: data.imageUrl || null,
+      validFrom: data.validFrom, // Already a Date from Zod
+      expiresAt: data.expiresAt, // Already a Date from Zod
+      maxRedemptions: data.maxRedemptions || null,
+      maxRedemptionsPerUser: data.maxRedemptionsPerUser,
+      metadata: data.metadata || null,
     }
   }
 
   /**
    * Maps create DTO to domain data
+   * DTO contains multilingual content as Record<string, string>
    */
   static fromCreateDTO(dto: CreateVoucherDTO): CreateVoucherData {
     return {
       businessId: dto.businessId,
       categoryId: dto.categoryId,
-      title: dto.title,
-      description: dto.description,
-      terms: dto.terms,
+      title: dto.title, // Already Record<string, string> from DTO
+      description: dto.description, // Already Record<string, string>
+      termsAndConditions: dto.termsAndConditions, // Already Record<string, string>
       discountType: mapVoucherDiscountType(dto.discountType),
       discountValue: dto.discountValue,
       currency: dto.currency,
@@ -271,14 +274,46 @@ export class VoucherMapper {
   }
 
   /**
+   * Maps update request data (from Zod validation) to domain data
+   * Request data has Date objects from Zod transformation
+   */
+  static fromUpdateRequestData(data: UpdateVoucherRequestData): UpdateVoucherData {
+    const result: UpdateVoucherData = {}
+
+    if (data.title !== undefined) result.title = data.title
+    if (data.description !== undefined) result.description = data.description
+    if (data.termsAndConditions !== undefined) result.termsAndConditions = data.termsAndConditions
+    if (data.discountType !== undefined)
+      result.discountType = mapVoucherDiscountType(data.discountType)
+    if (data.discountValue !== undefined)
+      result.discountValue = data.discountValue
+    if (data.currency !== undefined) result.currency = data.currency
+    if (data.location !== undefined)
+      result.location = data.location
+        ? this.mapLocationFromDTO(data.location)
+        : null
+    if (data.imageUrl !== undefined) result.imageUrl = data.imageUrl || null
+    if (data.validFrom !== undefined) result.validFrom = data.validFrom // Already a Date from Zod
+    if (data.expiresAt !== undefined) result.expiresAt = data.expiresAt // Already a Date from Zod
+    if (data.maxRedemptions !== undefined)
+      result.maxRedemptions = data.maxRedemptions || null
+    if (data.maxRedemptionsPerUser !== undefined)
+      result.maxRedemptionsPerUser = data.maxRedemptionsPerUser
+    if (data.metadata !== undefined) result.metadata = data.metadata || null
+
+    return result
+  }
+
+  /**
    * Maps update DTO to domain data
+   * DTO contains multilingual content as Record<string, string>
    */
   static fromUpdateDTO(dto: UpdateVoucherDTO): UpdateVoucherData {
     const result: UpdateVoucherData = {}
 
-    if (dto.title !== undefined) result.title = dto.title
-    if (dto.description !== undefined) result.description = dto.description
-    if (dto.terms !== undefined) result.terms = dto.terms
+    if (dto.title !== undefined) result.title = dto.title // Already Record<string, string>
+    if (dto.description !== undefined) result.description = dto.description // Already Record<string, string>
+    if (dto.termsAndConditions !== undefined) result.termsAndConditions = dto.termsAndConditions // Already Record<string, string>
     if (dto.discountType !== undefined)
       result.discountType = mapVoucherDiscountType(dto.discountType)
     if (dto.discountValue !== undefined)
@@ -298,6 +333,34 @@ export class VoucherMapper {
     if (dto.metadata !== undefined) result.metadata = dto.metadata || null
 
     return result
+  }
+
+  /**
+   * Maps bulk update data (from Zod validation) to domain data
+   * Used for bulk voucher updates with limited fields
+   * Note: State changes are handled separately via updateVoucherState
+   */
+  static fromBulkUpdateData(data: BulkVoucherUpdateData): { updates: UpdateVoucherData; state?: VoucherState } {
+    const updates: UpdateVoucherData = {}
+    let state: VoucherState | undefined
+
+    // Handle state separately - not part of domain update data
+    if (data.state !== undefined) {
+      state = mapVoucherState(data.state)
+    }
+
+    // Handle regular update fields
+    if (data.expiresAt !== undefined) {
+      updates.expiresAt = data.expiresAt // Already a Date from Zod
+    }
+    if (data.maxRedemptions !== undefined) {
+      updates.maxRedemptions = data.maxRedemptions || null
+    }
+    if (data.maxRedemptionsPerUser !== undefined) {
+      updates.maxRedemptionsPerUser = data.maxRedemptionsPerUser
+    }
+
+    return { updates, state }
   }
 
   /**
@@ -406,14 +469,27 @@ export class VoucherMapper {
 
   /**
    * Maps location from DTO format
+   * Handles both VoucherLocationDTO format and GeoJSON Point format
    */
   private static mapLocationFromDTO(
-    location: VoucherLocationDTO,
+    location: VoucherLocationDTO | GeoJSONPoint,
   ): VoucherLocation {
+    // Handle GeoJSON Point format from API
+    if ('type' in location && location.type === 'Point' && Array.isArray(location.coordinates)) {
+      return {
+        lng: location.coordinates[0], // longitude is first in GeoJSON
+        lat: location.coordinates[1], // latitude is second in GeoJSON
+        radius: location.radius,
+      }
+    }
+    
+    // Handle simple lat/lng format (backward compatibility)
+    // At this point, TypeScript knows location is VoucherLocationDTO
+    const voucherLocation = location as VoucherLocationDTO
     return {
-      lat: location.lat,
-      lng: location.lng,
-      radius: location.radius,
+      lat: voucherLocation.lat,
+      lng: voucherLocation.lng,
+      radius: voucherLocation.radius,
     }
   }
 
@@ -501,12 +577,6 @@ export class VoucherMapper {
     return domains.map((domain) => this.toDTO(domain))
   }
 
-  /**
-   * Maps array of DTOs to domains
-   */
-  static fromDTOArray(dtos: VoucherDTO[]): VoucherDomain[] {
-    return dtos.map((dto) => this.fromDTO(dto))
-  }
 
   /**
    * Maps array of documents to domains
@@ -570,9 +640,9 @@ export class VoucherMapper {
 
   /**
    * Maps a domain entity to an Admin API DTO
-   * Admin responses include translation keys and analytics fields
+   * Admin responses include only resolved translations, no keys
    */
-  static toAdminDTO(domain: VoucherDomain, doc?: VoucherDocument): any {
+  static toAdminDTO(domain: VoucherDomain): any {
     const formatDate = (date: Date | string | undefined | null): string => {
       if (!date) return new Date().toISOString()
       if (typeof date === 'string') return date
@@ -590,15 +660,10 @@ export class VoucherMapper {
       categoryId: domain.categoryId,
       state: this.mapStateToDTO(domain.state),
       
-      // Translation keys (from document if available, otherwise generate from domain)
-      titleKey: doc?.titleKey || `voucher.title.${domain.id}`,
-      descriptionKey: doc?.descriptionKey || `voucher.description.${domain.id}`,
-      termsKey: doc?.termsAndConditionsKey || `voucher.terms.${domain.id}`,
-      
-      // Localized content (optional - resolved by translation service)
-      title: domain.title,
-      description: domain.description,
-      terms: domain.terms,
+      // Only resolved content - no translation keys exposed
+      title: domain.title || '',
+      description: domain.description || '',
+      terms: domain.termsAndConditions || '',
       
       // Discount configuration
       discountType: this.mapDiscountTypeToDTO(domain.discountType),
@@ -620,9 +685,9 @@ export class VoucherMapper {
       maxRedemptionsPerUser: domain.maxRedemptionsPerUser,
       currentRedemptions: domain.currentRedemptions,
       
-      // Analytics (from document if available)
-      scanCount: doc?.scanCount || 0,
-      claimCount: doc?.claimCount || 0,
+      // Analytics (defaults - should be populated from includes if needed)
+      scanCount: 0,
+      claimCount: 0,
       
       // Extensibility
       metadata: domain.metadata,
@@ -707,7 +772,7 @@ export class VoucherMapper {
    * Maps voucher translations from domain to API format
    * Converts termsAndConditions to terms for API compatibility
    */
-  static toTranslationsDTO(translations: VoucherTranslations): any {
+  static toTranslationsDTO(translations: any): any {
     return {
       title: translations.title,
       description: translations.description,
@@ -719,11 +784,11 @@ export class VoucherMapper {
    * Maps voucher translations from API to domain format
    * Converts terms to termsAndConditions for domain compatibility
    */
-  static fromTranslationsDTO(dto: any): VoucherTranslations {
+  static fromTranslationsDTO(dto: any): any {
     return {
       title: dto.title || {},
       description: dto.description || {},
-      termsAndConditions: dto.terms || {},
+      termsAndConditions: dto.termsAndConditions || {},
     }
   }
 }

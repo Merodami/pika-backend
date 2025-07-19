@@ -6,8 +6,9 @@
  * Check user permission
  */
 export type CheckUserPermissionRequest = {
-  userId: string
-  resource: string
-  action: 'READ' | 'CREATE' | 'UPDATE' | 'DELETE'
-  resourceId?: string
-}
+    userId: string;
+    resource: string;
+    action: 'READ' | 'CREATE' | 'UPDATE' | 'DELETE';
+    resourceId?: string;
+};
+

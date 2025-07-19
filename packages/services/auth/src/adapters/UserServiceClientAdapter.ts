@@ -1,4 +1,3 @@
-import type { Email, UserId } from '@pika/api/public'
 import { UserServiceClient } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
 
@@ -19,7 +18,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.password,
+      password: user.passwordHash || '',
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -33,22 +32,18 @@ export class UserServiceClientAdapter implements UserService {
 
   async createUser(data: CreateUserData): Promise<UserServiceUser> {
     const user = await this.userServiceClient.createUser({
-      email: data.email as Email,
+      email: data.email,
       passwordHash: data.password!,
       firstName: data.firstName,
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
-      dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
-      acceptTerms: data.acceptTerms,
-      marketingConsent: data.marketingConsent,
-      role: data.role as any,
-      avatarUrl: data.avatarUrl,
+      role: data.role,
     })
 
     return {
       id: user.id,
       email: user.email,
-      password: user.password,
+      password: user.passwordHash || '',
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -61,7 +56,7 @@ export class UserServiceClientAdapter implements UserService {
   }
 
   async updateLastLogin(userId: string, loginTime: Date): Promise<void> {
-    await this.userServiceClient.updateLastLogin(userId, { loginTime })
+    await this.userServiceClient.updateLastLogin(userId, { lastLoginAt: loginTime.toISOString() })
   }
 
   async emailExists(email: string): Promise<boolean> {
@@ -80,7 +75,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.password,
+      password: user.passwordHash || '',
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -94,13 +89,13 @@ export class UserServiceClientAdapter implements UserService {
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
     await this.userServiceClient.updatePassword({
-      userId: userId as UserId,
+      userId: userId,
       passwordHash,
     })
   }
 
   async verifyEmail(userId: string): Promise<void> {
-    await this.userServiceClient.verifyEmail({ userId: userId as UserId })
+    await this.userServiceClient.verifyEmail({ userId: userId })
   }
 
   async createPasswordResetToken(userId: string): Promise<string> {

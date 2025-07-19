@@ -6,5 +6,6 @@
  * Get user by email
  */
 export type GetUserByEmailRequest = {
-  email: string
-}
+    email: string;
+};
+

@@ -6,8 +6,9 @@
  * Update user last login timestamp
  */
 export type UpdateLastLoginRequest = {
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  loginTime?: string
-}
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    loginTime?: string;
+};
+

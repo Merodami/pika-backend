@@ -1,5 +1,5 @@
 import { voucherCommon,voucherInternal } from '@pika/api'
-import { requireApiKey, validateBody, validateParams } from '@pika/http'
+import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { TranslationClient } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
@@ -30,8 +30,8 @@ export function createInternalVoucherRoutes(
   )
   const controller = new InternalVoucherController(service)
 
-  // All internal routes require API key authentication
-  router.use(requireApiKey())
+  // All internal routes require service authentication
+  router.use(requireServiceAuth())
 
   // POST /internal/vouchers/by-ids - Get multiple vouchers by IDs
   router.post(

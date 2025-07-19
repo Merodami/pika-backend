@@ -6,16 +6,17 @@
  * Cancel a subscription
  */
 export type CancelSubscriptionRequest = {
-  /**
-   * Whether to cancel at period end
-   */
-  cancelAtPeriodEnd?: boolean
-  /**
-   * Cancellation reason
-   */
-  reason?: string
-  /**
-   * User feedback
-   */
-  feedback?: string
-}
+    /**
+     * Whether to cancel at period end
+     */
+    cancelAtPeriodEnd?: boolean;
+    /**
+     * Cancellation reason
+     */
+    reason?: string;
+    /**
+     * User feedback
+     */
+    feedback?: string;
+};
+

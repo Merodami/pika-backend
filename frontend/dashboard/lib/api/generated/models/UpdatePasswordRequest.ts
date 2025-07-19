@@ -6,6 +6,7 @@
  * Update user password
  */
 export type UpdatePasswordRequest = {
-  userId: string
-  passwordHash: string
-}
+    userId: string;
+    passwordHash: string;
+};
+

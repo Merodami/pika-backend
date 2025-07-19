@@ -5,7 +5,7 @@ import { VOUCHER_SERVICE_NAME, VOUCHER_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import { ICacheService } from '@pika/redis'
 import { BusinessServiceClient, FileStoragePort, logger } from '@pika/shared'
-import { TranslationClient } from '@pika/translation'
+import { TranslationClient, TranslationResolver } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminVoucherRoutes } from './routes/AdminVoucherRoutes.js'
@@ -21,16 +21,19 @@ export async function createVoucherServer({
   cacheService,
   fileStorage,
   translationClient,
+  translationResolver,
   communicationClient,
 }: {
   prisma: PrismaClient
   cacheService: ICacheService
   fileStorage: FileStoragePort
   translationClient: TranslationClient
+  translationResolver: TranslationResolver
   communicationClient?: any
 }) {
   // Initialize service clients
   const businessServiceClient = new BusinessServiceClient()
+  
   logger.info(`Configuring Voucher service for port: ${VOUCHER_SERVICE_PORT}`)
 
   // Create Express server
@@ -90,6 +93,7 @@ export async function createVoucherServer({
     prisma,
     cacheService,
     translationClient,
+    translationResolver,
     fileStorage,
     communicationClient,
   )
@@ -101,6 +105,7 @@ export async function createVoucherServer({
     prisma,
     cacheService,
     translationClient,
+    translationResolver,
     fileStorage,
     communicationClient,
     businessServiceClient,

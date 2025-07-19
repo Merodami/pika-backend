@@ -6,57 +6,58 @@
  * Paginated response
  */
 export type SupportCommentListResponse = {
-  /**
-   * Page items
-   */
-  data: Array<{
     /**
-     * Universally Unique Identifier
+     * Page items
      */
-    id: string
+    data: Array<{
+        /**
+         * Universally Unique Identifier
+         */
+        id: string;
+        /**
+         * Universally Unique Identifier
+         */
+        problemId: string;
+        userId: string;
+        content: string;
+        isInternal?: boolean;
+        /**
+         * When the record was created
+         */
+        createdAt: string;
+        /**
+         * When the record was last updated
+         */
+        updatedAt: string;
+    }>;
     /**
-     * Universally Unique Identifier
+     * Pagination information
      */
-    problemId: string
-    userId: string
-    content: string
-    isInternal?: boolean
-    /**
-     * When the record was created
-     */
-    createdAt: string
-    /**
-     * When the record was last updated
-     */
-    updatedAt: string
-  }>
-  /**
-   * Pagination information
-   */
-  pagination: {
-    /**
-     * Current page number
-     */
-    page: number
-    /**
-     * Items per page
-     */
-    limit: number
-    /**
-     * Total number of items
-     */
-    total: number
-    /**
-     * Total number of pages
-     */
-    totalPages: number
-    /**
-     * Whether there is a next page
-     */
-    hasNext: boolean
-    /**
-     * Whether there is a previous page
-     */
-    hasPrev: boolean
-  }
-}
+    pagination: {
+        /**
+         * Current page number
+         */
+        page: number;
+        /**
+         * Items per page
+         */
+        limit: number;
+        /**
+         * Total number of items
+         */
+        total: number;
+        /**
+         * Total number of pages
+         */
+        totalPages: number;
+        /**
+         * Whether there is a next page
+         */
+        hasNext: boolean;
+        /**
+         * Whether there is a previous page
+         */
+        hasPrev: boolean;
+    };
+};
+

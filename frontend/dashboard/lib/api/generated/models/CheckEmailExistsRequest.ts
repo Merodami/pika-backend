@@ -6,5 +6,6 @@
  * Check if email already exists
  */
 export type CheckEmailExistsRequest = {
-  email: string
-}
+    email: string;
+};
+

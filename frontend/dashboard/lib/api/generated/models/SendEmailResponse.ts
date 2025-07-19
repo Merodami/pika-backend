@@ -6,6 +6,7 @@
  * Send email result
  */
 export type SendEmailResponse = {
-  id: string
-  status: string
-}
+    id: string;
+    status: string;
+};
+

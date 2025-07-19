@@ -71,9 +71,14 @@ export interface VoucherDomain {
   businessId: string
   categoryId: string
   state: VoucherState
-  title: string // Simple string - translations handled by TranslationService using key "voucher.title.{id}"
-  description: string // Simple string - translations handled by TranslationService using key "voucher.description.{id}"
-  terms: string // Simple string - translations handled by TranslationService using key "voucher.terms.{id}"
+  // Translation keys - stored in database
+  titleKey: string
+  descriptionKey: string
+  termsAndConditionsKey: string
+  // Resolved content - populated by TranslationResolver when needed
+  title?: string
+  description?: string
+  termsAndConditions?: string
   discountType: VoucherDiscountType
   discountValue: number
   currency: string
@@ -96,9 +101,9 @@ export interface VoucherDomain {
 export interface CreateVoucherData {
   businessId: string
   categoryId: string
-  title: string
-  description: string
-  terms: string
+  title: Record<string, string> // Multilingual: { es: "...", en: "..." }
+  description: Record<string, string>
+  termsAndConditions: Record<string, string>
   discountType: VoucherDiscountType
   discountValue: number
   currency: string
@@ -112,9 +117,9 @@ export interface CreateVoucherData {
 }
 
 export interface UpdateVoucherData {
-  title?: string
-  description?: string
-  terms?: string
+  title?: Record<string, string> // Multilingual: { es: "...", en: "..." }
+  description?: Record<string, string>
+  termsAndConditions?: Record<string, string>
   discountType?: VoucherDiscountType
   discountValue?: number
   currency?: string

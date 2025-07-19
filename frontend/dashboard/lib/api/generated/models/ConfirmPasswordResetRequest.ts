@@ -6,6 +6,7 @@
  * Confirm password reset
  */
 export type ConfirmPasswordResetRequest = {
-  token: string
-  newPassword: string
-}
+    token: string;
+    newPassword: string;
+};
+

@@ -6,10 +6,11 @@
  * Batch update result
  */
 export type BatchUpdateResponse = {
-  processed: number
-  failed: number
-  errors?: Array<{
-    messageId: string
-    error: string
-  }>
-}
+    processed: number;
+    failed: number;
+    errors?: Array<{
+        messageId: string;
+        error: string;
+    }>;
+};
+

@@ -273,3 +273,23 @@ export const BulkDeleteBusinessesRequest = openapi(
 export type BulkDeleteBusinessesRequest = z.infer<
   typeof BulkDeleteBusinessesRequest
 >
+
+/**
+ * Update business rating request
+ */
+export const UpdateBusinessRatingRequest = openapi(
+  z.object({
+    rating: z
+      .number()
+      .min(0)
+      .max(5)
+      .describe('New rating value for the business'),
+  }),
+  {
+    description: 'Update business rating data',
+  },
+)
+
+export type UpdateBusinessRatingRequest = z.infer<
+  typeof UpdateBusinessRatingRequest
+>

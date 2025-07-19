@@ -6,8 +6,9 @@
  * Subscription plan ID parameter
  */
 export type PlanIdParam = {
-  /**
-   * Subscription plan ID
-   */
-  id: string
-}
+    /**
+     * Subscription plan ID
+     */
+    id: string;
+};
+

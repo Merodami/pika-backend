@@ -6,16 +6,17 @@
  * Token revocation request
  */
 export type RevokeTokenRequest = {
-  /**
-   * Token to revoke
-   */
-  token: string
-  /**
-   * Hint about token type
-   */
-  tokenTypeHint?: 'accessToken' | 'refreshToken'
-  /**
-   * Revoke all tokens for user
-   */
-  allDevices?: boolean
-}
+    /**
+     * Token to revoke
+     */
+    token: string;
+    /**
+     * Hint about token type
+     */
+    tokenTypeHint?: 'accessToken' | 'refreshToken';
+    /**
+     * Revoke all tokens for user
+     */
+    allDevices?: boolean;
+};
+

@@ -1,4 +1,4 @@
-import { businessInternal, shared } from '@pika/api'
+import { businessCommon, businessInternal, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
@@ -24,7 +24,7 @@ export class InternalBusinessController {
    */
   async getBusinessById(
     req: Request<
-      shared.BusinessIdParam,
+      businessCommon.BusinessIdParam,
       {},
       {},
       businessInternal.GetBusinessRequest
@@ -52,12 +52,7 @@ export class InternalBusinessController {
    * Get business by user ID for internal services
    */
   async getBusinessByUserId(
-    req: Request<
-      shared.UserIdParam,
-      {},
-      {},
-      businessInternal.GetBusinessRequest
-    >,
+    req: Request<shared.UserIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -81,7 +76,7 @@ export class InternalBusinessController {
    * Get multiple businesses by IDs
    */
   async getBusinessesByIds(
-    req: Request<{}, {}, businessInternal.GetBusinessesByIdsRequest>,
+    req: Request<{}, {}, businessInternal.BulkBusinessRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

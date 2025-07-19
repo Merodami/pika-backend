@@ -3,7 +3,7 @@ import { REDIS_PASSWORD,VOUCHER_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { initializeCache, RedisConfigService } from '@pika/redis'
 import { FileStoragePort, logger, StorageServiceClient } from '@pika/shared'
-import { createTranslationService, TranslationClient } from '@pika/translation'
+import { createTranslationService, TranslationClient, createTranslationResolver } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 import { Redis } from 'ioredis'
 
@@ -59,6 +59,7 @@ export async function startVoucherService() {
 
   const translationService = createTranslationService(prisma, translationRedis)
   const translationClient = new TranslationClient(translationService)
+  const translationResolver = createTranslationResolver(translationClient)
 
   logger.info(
     `Unified Voucher service starting on port: ${VOUCHER_SERVICE_PORT}`,
@@ -70,6 +71,7 @@ export async function startVoucherService() {
     cacheService,
     fileStorage,
     translationClient,
+    translationResolver,
   })
 
   // Start the server

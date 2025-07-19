@@ -1,4 +1,4 @@
-import { shared,voucherAdmin, voucherCommon } from '@pika/api'
+import { businessCommon, shared, voucherAdmin, voucherCommon } from '@pika/api'
 import {
   createMulterMiddleware,
   requireAdmin,
@@ -8,7 +8,7 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { BusinessServiceClient, CommunicationServiceClient, FileStoragePort } from '@pika/shared'
-import type { TranslationClient } from '@pika/translation'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -23,6 +23,7 @@ export function createAdminVoucherRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
   translationClient: TranslationClient,
+  translationResolver: TranslationResolver,
   fileStorage: FileStoragePort,
   communicationClient?: CommunicationServiceClient,
   businessServiceClient?: BusinessServiceClient,
@@ -35,6 +36,7 @@ export function createAdminVoucherRoutes(
     repository,
     cache,
     translationClient,
+    translationResolver,
     fileStorage,
     businessServiceClient,
   )
@@ -144,7 +146,7 @@ export function createAdminVoucherRoutes(
   // GET /admin/vouchers/business/:id/stats - Get business voucher statistics
   router.get(
     '/business/:id/stats',
-    validateParams(shared.BusinessIdParam),
+    validateParams(businessCommon.BusinessIdParam),
     validateQuery(voucherAdmin.BusinessVoucherStatsQueryParams),
     controller.getBusinessVoucherStats,
   )

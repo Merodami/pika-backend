@@ -6,16 +6,17 @@
  * Bulk operation on multiple voucher books
  */
 export type BulkVoucherBookOperationRequest = {
-  /**
-   * Voucher book IDs to operate on
-   */
-  bookIds: Array<string>
-  /**
-   * Operation to perform
-   */
-  operation: 'publish' | 'archive' | 'generate_pdf' | 'delete'
-  /**
-   * Operation-specific options
-   */
-  options?: Record<string, any>
-}
+    /**
+     * Voucher book IDs to operate on
+     */
+    bookIds: Array<string>;
+    /**
+     * Operation to perform
+     */
+    operation: 'publish' | 'archive' | 'generate_pdf' | 'delete';
+    /**
+     * Operation-specific options
+     */
+    options?: Record<string, any>;
+};
+

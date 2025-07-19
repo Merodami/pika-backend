@@ -6,13 +6,14 @@
  * Webhook error response
  */
 export type WebhookErrorResponse = {
-  error: {
-    code: 'INVALID_SIGNATURE' | 'PROCESSING_ERROR' | 'UNKNOWN_EVENT_TYPE'
-    message: string
-    eventId?: string
-    /**
-     * ISO 8601 datetime with timezone
-     */
-    timestamp: string
-  }
-}
+    error: {
+        code: 'INVALID_SIGNATURE' | 'PROCESSING_ERROR' | 'UNKNOWN_EVENT_TYPE';
+        message: string;
+        eventId?: string;
+        /**
+         * ISO 8601 datetime with timezone
+         */
+        timestamp: string;
+    };
+};
+

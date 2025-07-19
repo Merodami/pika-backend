@@ -373,28 +373,37 @@ The voucher service demonstrates a complete implementation of the translation pa
    }
    ```
 
-2. **Domain Model** - Uses translation keys internally:
+2. **Domain Model** - Hybrid approach for translation handling:
    ```typescript
    interface VoucherDomain {
+     // Translation keys from database
      titleKey: string
      descriptionKey: string
      termsAndConditionsKey: string
+     
+     // Resolved content (populated by TranslationResolver in service layer)
+     title?: string  // Optional until resolved
+     description?: string
+     terms?: string
+     
      // ... other fields
    }
    ```
+   
+   **Why this hybrid approach?**
+   - Domain objects carry both keys (for updates) and resolved content (for display)
+   - TranslationResolver populates the resolved fields based on requested language
+   - Mappers only use the resolved content for API responses
+   - API consumers never see translation keys
 
-3. **API Response** - Can include both keys and resolved translations:
+3. **API Response** - Contains ONLY resolved translations:
    ```typescript
    interface AdminVoucherDetailResponse {
-     // Translation keys (always included)
-     titleKey: string
-     descriptionKey: string
-     termsKey: string  // Note: Different name for API consistency
-     
-     // Resolved translations (optional, based on language)
-     title?: string
-     description?: string
-     terms?: string
+     // Resolved translations only - no keys exposed to API consumers
+     title: string
+     description: string
+     terms: string
+     // ... other fields
    }
    ```
 
@@ -437,50 +446,48 @@ async updateVoucherTranslations(voucherId: string, translations: {
 }
 ```
 
-### Mapper Pattern for Admin Responses
+### Mapper Pattern for API Responses
 
 The VoucherMapper handles the transformation between database/domain models and API responses:
 
 ```typescript
 class VoucherMapper {
-  // For admin responses that need both keys and translations
-  static toAdminDTO(domain: VoucherDomain, translations?: {
-    title?: string
-    description?: string
-    terms?: string
-  }): AdminVoucherDetailResponse {
+  // API responses ONLY include resolved content, never translation keys
+  static toAdminDTO(domain: VoucherDomain): AdminVoucherDetailResponse {
     return {
-      // Always include keys
-      titleKey: domain.titleKey,
-      descriptionKey: domain.descriptionKey,
-      termsKey: domain.termsAndConditionsKey, // Note field name mapping
-      
-      // Include resolved translations if provided
-      title: translations?.title,
-      description: translations?.description,
-      terms: translations?.terms,
+      id: domain.id,
+      businessId: domain.businessId,
+      // Resolved translations (set by TranslationResolver in service layer)
+      title: domain.title, // Already resolved
+      description: domain.description, // Already resolved
+      terms: domain.terms, // Already resolved
       
       // ... other fields
+      discountType: domain.discountType,
+      discountValue: domain.discountValue,
+      // No translation keys exposed!
     }
   }
   
-  // For public responses that only need resolved content
-  static toPublicDTO(domain: VoucherDomain, language: string): Promise<VoucherDTO> {
-    const translations = await translationClient.getBulk([
-      domain.titleKey,
-      domain.descriptionKey,
-      domain.termsAndConditionsKey
-    ], language)
-    
+  // Same for public responses - only resolved content
+  static toPublicDTO(domain: VoucherDomain): VoucherDTO {
     return {
-      title: translations[domain.titleKey],
-      description: translations[domain.descriptionKey],
-      terms: translations[domain.termsAndConditionsKey],
+      id: domain.id,
+      title: domain.title, // Already resolved by service
+      description: domain.description,
+      terms: domain.terms,
       // ... other fields
     }
   }
 }
 ```
+
+### Translation Resolution Flow
+
+1. **Repository** returns domain objects with translation keys only
+2. **Service** uses TranslationResolver to add resolved content
+3. **Mapper** transforms to DTO using the resolved content
+4. **API** returns only resolved content to consumers
 
 ### Key Naming Conventions for Vouchers
 

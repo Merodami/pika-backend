@@ -6,9 +6,10 @@
  * Password reset token
  */
 export type PasswordResetTokenResponse = {
-  token: string
-  /**
-   * ISO 8601 datetime with timezone
-   */
-  expiresAt: string
-}
+    token: string;
+    /**
+     * ISO 8601 datetime with timezone
+     */
+    expiresAt: string;
+};
+

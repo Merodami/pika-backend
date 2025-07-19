@@ -2,7 +2,6 @@ import type { PrismaClient } from '@prisma/client'
 import { businessPublic, shared } from '@pika/api'
 import {
   requireAuth,
-  requireBusinessRole,
   validateBody,
   validateParams,
   validateQuery,
@@ -59,7 +58,6 @@ export function createBusinessRoutes(
   router.get(
     '/me',
     requireAuth(),
-    requireBusinessRole(),
     validateQuery(businessPublic.BusinessQueryParams),
     controller.getMyBusiness,
   )
@@ -68,8 +66,7 @@ export function createBusinessRoutes(
   router.post(
     '/me',
     requireAuth(),
-    requireBusinessRole(),
-    validateBody(businessPublic.CreateBusinessRequest),
+    validateBody(businessPublic.CreateMyBusinessRequest),
     controller.createMyBusiness,
   )
 
@@ -77,8 +74,7 @@ export function createBusinessRoutes(
   router.put(
     '/me',
     requireAuth(),
-    requireBusinessRole(),
-    validateBody(businessPublic.UpdateBusinessRequest),
+    validateBody(businessPublic.UpdateMyBusinessRequest),
     controller.updateMyBusiness,
   )
 

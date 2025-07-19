@@ -6,5 +6,6 @@
  * Phone number path parameter
  */
 export type PhoneParam = {
-  phone: string
-}
+    phone: string;
+};
+

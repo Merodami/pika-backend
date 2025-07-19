@@ -11,6 +11,13 @@ export interface VoucherLocationDTO {
   radius?: number
 }
 
+// GeoJSON Point format for location
+export interface GeoJSONPoint {
+  type: 'Point'
+  coordinates: [number, number] // [longitude, latitude]
+  radius?: number
+}
+
 export interface VoucherCodeDTO {
   id: string
   code: string
@@ -30,14 +37,14 @@ export interface VoucherDTO {
   discountType: string
   discountValue: number
   currency: string
-  location?: VoucherLocationDTO
-  imageUrl?: string
+  location?: VoucherLocationDTO | null
+  imageUrl?: string | null
   validFrom: string
   expiresAt: string
-  maxRedemptions?: number
+  maxRedemptions?: number | null
   maxRedemptionsPerUser: number
   currentRedemptions: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, any> | null
   createdAt: string
   updatedAt: string
   codes?: VoucherCodeDTO[]
@@ -45,38 +52,80 @@ export interface VoucherDTO {
 
 // ============= Create/Update DTOs =============
 
-export interface CreateVoucherDTO {
+// Internal types that represent the data after Zod transformation
+export interface CreateVoucherRequestData {
   businessId: string
   categoryId: string
-  title: string
-  description: string
-  terms: string
+  title: Record<string, string>
+  description: Record<string, string>
+  termsAndConditions: Record<string, string>
   discountType: string
   discountValue: number
   currency: string
-  location?: VoucherLocationDTO
-  imageUrl?: string
-  validFrom: string
-  expiresAt: string
-  maxRedemptions?: number
+  location?: GeoJSONPoint | null
+  imageUrl?: string | null
+  validFrom: Date // Zod transforms to Date
+  expiresAt: Date // Zod transforms to Date
+  maxRedemptions?: number | null
   maxRedemptionsPerUser: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, any> | null
 }
 
-export interface UpdateVoucherDTO {
-  title?: string
-  description?: string
-  terms?: string
+export interface UpdateVoucherRequestData {
+  title?: Record<string, string>
+  description?: Record<string, string>
+  termsAndConditions?: Record<string, string>
   discountType?: string
   discountValue?: number
   currency?: string
-  location?: VoucherLocationDTO
-  imageUrl?: string
+  location?: GeoJSONPoint | null
+  imageUrl?: string | null
+  validFrom?: Date // Zod transforms to Date
+  expiresAt?: Date // Zod transforms to Date
+  maxRedemptions?: number | null
+  maxRedemptionsPerUser?: number
+  metadata?: Record<string, any> | null
+}
+
+export interface BulkVoucherUpdateData {
+  state?: string
+  expiresAt?: Date // Zod transforms to Date
+  maxRedemptions?: number | null
+  maxRedemptionsPerUser?: number
+}
+
+export interface CreateVoucherDTO {
+  businessId: string
+  categoryId: string
+  title: Record<string, string> // Multilingual content: { es: "...", en: "..." }
+  description: Record<string, string>
+  termsAndConditions: Record<string, string>
+  discountType: string
+  discountValue: number
+  currency: string
+  location?: VoucherLocationDTO | GeoJSONPoint | null
+  imageUrl?: string | null
+  validFrom: string
+  expiresAt: string
+  maxRedemptions?: number | null
+  maxRedemptionsPerUser: number
+  metadata?: Record<string, any> | null
+}
+
+export interface UpdateVoucherDTO {
+  title?: Record<string, string> // Multilingual content: { es: "...", en: "..." }
+  description?: Record<string, string>
+  termsAndConditions?: Record<string, string>
+  discountType?: string
+  discountValue?: number
+  currency?: string
+  location?: VoucherLocationDTO | GeoJSONPoint | null
+  imageUrl?: string | null
   validFrom?: string
   expiresAt?: string
-  maxRedemptions?: number
+  maxRedemptions?: number | null
   maxRedemptionsPerUser?: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, any> | null
 }
 
 // ============= Voucher Scan DTO =============
@@ -86,7 +135,7 @@ export interface VoucherScanDTO {
   userId?: string
   scanSource: string
   scanType: string
-  location?: VoucherLocationDTO
+  location?: VoucherLocationDTO | GeoJSONPoint | null
   userAgent?: string
   metadata?: Record<string, any>
   scannedAt: string
@@ -95,7 +144,7 @@ export interface VoucherScanDTO {
 export interface VoucherScanRequestDTO {
   scanSource: string
   scanType: string
-  location?: VoucherLocationDTO
+  location?: VoucherLocationDTO | GeoJSONPoint | null
   userAgent?: string
   metadata?: Record<string, any>
 }
@@ -125,7 +174,7 @@ export interface VoucherClaimResponseDTO {
 
 export interface VoucherRedeemRequestDTO {
   redemptionCode: string
-  location?: VoucherLocationDTO
+  location?: VoucherLocationDTO | GeoJSONPoint | null
   metadata?: Record<string, any>
 }
 
@@ -218,7 +267,7 @@ export interface VoucherAnalyticsDTO {
     redemptions: number
   }>
   topLocations?: Array<{
-    location: VoucherLocationDTO
+    location: VoucherLocationDTO | GeoJSONPoint
     count: number
   }>
 }

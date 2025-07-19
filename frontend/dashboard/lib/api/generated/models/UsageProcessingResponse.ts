@@ -6,7 +6,8 @@
  * Usage processing result
  */
 export type UsageProcessingResponse = {
-  success: boolean
-  usageRecorded: boolean
-  message?: string
-}
+    success: boolean;
+    usageRecorded: boolean;
+    message?: string;
+};
+

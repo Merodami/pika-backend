@@ -6,5 +6,6 @@
  * Get user communication preferences
  */
 export type GetUserCommunicationPreferencesRequest = {
-  userId: string
-}
+    userId: string;
+};
+

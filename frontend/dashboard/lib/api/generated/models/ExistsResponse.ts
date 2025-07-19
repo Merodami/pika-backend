@@ -6,5 +6,6 @@
  * Resource exists response
  */
 export type ExistsResponse = {
-  exists: boolean
-}
+    exists: boolean;
+};
+
