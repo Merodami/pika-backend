@@ -1,12 +1,12 @@
 // Load environment variables first
 import '@pika/environment'
 
-import { PrismaClient } from '@prisma/client'
 import { VOUCHER_SERVICE_NAME, VOUCHER_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import { ICacheService } from '@pika/redis'
-import { FileStoragePort, logger } from '@pika/shared'
+import { BusinessServiceClient, FileStoragePort, logger } from '@pika/shared'
 import { TranslationClient } from '@pika/translation'
+import { PrismaClient } from '@prisma/client'
 
 import { createAdminVoucherRoutes } from './routes/AdminVoucherRoutes.js'
 import { createInternalVoucherRoutes } from './routes/InternalVoucherRoutes.js'
@@ -29,6 +29,8 @@ export async function createVoucherServer({
   translationClient: TranslationClient
   communicationClient?: any
 }) {
+  // Initialize service clients
+  const businessServiceClient = new BusinessServiceClient()
   logger.info(`Configuring Voucher service for port: ${VOUCHER_SERVICE_PORT}`)
 
   // Create Express server
@@ -101,6 +103,7 @@ export async function createVoucherServer({
     translationClient,
     fileStorage,
     communicationClient,
+    businessServiceClient,
   )
 
   app.use('/admin/vouchers', adminRouter)

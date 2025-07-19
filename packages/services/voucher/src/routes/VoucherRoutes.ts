@@ -1,5 +1,4 @@
-import type { PrismaClient } from '@prisma/client'
-import { voucherPublic, voucherCommon, shared } from '@pika/api'
+import { shared,voucherCommon, voucherPublic } from '@pika/api'
 import {
   requireAuth,
   validateBody,
@@ -7,13 +6,21 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import { FileStoragePort, CommunicationServiceClient } from '@pika/shared'
+import { 
+  CommunicationServiceClient,
+  FileStoragePort,
+  UserServiceClient,
+  BusinessServiceClient,
+} from '@pika/shared'
 import type { TranslationClient } from '@pika/translation'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { VoucherController } from '../controllers/VoucherController.js'
 import { VoucherRepository } from '../repositories/VoucherRepository.js'
+import { InternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
 import { VoucherService } from '../services/VoucherService.js'
+import { InternalVoucherService } from '../services/InternalVoucherService.js'
 
 /**
  * Creates public voucher routes
@@ -24,18 +31,27 @@ export async function createVoucherRoutes(
   translationClient: TranslationClient,
   fileStorage: FileStoragePort,
   communicationClient?: CommunicationServiceClient,
+  userServiceClient?: UserServiceClient,
+  businessServiceClient?: BusinessServiceClient,
 ): Promise<Router> {
   const router = Router()
 
   // Initialize dependencies
   const repository = new VoucherRepository(prisma, cache)
+  const internalRepository = new InternalVoucherRepository(prisma, cache)
+  const internalService = new InternalVoucherService(
+    internalRepository,
+    repository, // InternalService needs public repository for some operations
+    cache,
+  )
   const service = new VoucherService(
     repository,
     cache,
     translationClient,
-    fileStorage,
-    undefined,
+    internalService, // Now passing the internal service
     communicationClient,
+    userServiceClient,
+    businessServiceClient,
   )
   const controller = new VoucherController(service)
 

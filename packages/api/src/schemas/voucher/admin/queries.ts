@@ -6,6 +6,7 @@ import {
   VoucherState,
   VoucherDiscountType,
   AdminVoucherSortBy,
+  AnalyticsGroupBy,
 } from '../common/enums.js'
 import { ADMIN_VOUCHER_ALLOWED_RELATIONS } from '../common/relations.js'
 import {
@@ -66,3 +67,25 @@ export const AdminVoucherQueryParams = SearchParams.merge(
   })
 
 export type AdminVoucherQueryParams = z.infer<typeof AdminVoucherQueryParams>
+
+/**
+ * Voucher analytics query parameters
+ */
+export const VoucherAnalyticsQueryParams = z.object({
+  startDate: DateTime.optional(),
+  endDate: DateTime.optional(),
+  groupBy: AnalyticsGroupBy.optional(),
+})
+
+export type VoucherAnalyticsQueryParams = z.infer<typeof VoucherAnalyticsQueryParams>
+
+/**
+ * Business voucher stats query parameters
+ */
+export const BusinessVoucherStatsQueryParams = z.object({
+  startDate: DateTime.optional(),
+  endDate: DateTime.optional(),
+  groupBy: AnalyticsGroupBy.optional(),
+})
+
+export type BusinessVoucherStatsQueryParams = z.infer<typeof BusinessVoucherStatsQueryParams>

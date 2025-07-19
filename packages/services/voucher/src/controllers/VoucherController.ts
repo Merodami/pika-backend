@@ -1,13 +1,13 @@
-import { voucherPublic, voucherCommon, shared } from '@pika/api'
+import { shared, voucherCommon, voucherPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   RequestContext,
-  parseIncludeParam,
+  paginatedResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { VoucherMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
+import { ErrorFactory, parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IVoucherService } from '../services/VoucherService.js'
@@ -17,7 +17,9 @@ import type { IVoucherService } from '../services/VoucherService.js'
  * Public routes for viewing and interacting with vouchers
  */
 export class VoucherController {
-  constructor(private readonly voucherService: IVoucherService) {
+  constructor(
+    private readonly voucherService: IVoucherService,
+  ) {
     // Bind methods to preserve 'this' context
     this.getAllVouchers = this.getAllVouchers.bind(this)
     this.getVoucherById = this.getVoucherById.bind(this)
@@ -26,6 +28,7 @@ export class VoucherController {
     this.redeemVoucher = this.redeemVoucher.bind(this)
     this.getUserVouchers = this.getUserVouchers.bind(this)
     this.getBusinessVouchers = this.getBusinessVouchers.bind(this)
+    this.getVoucherByCode = this.getVoucherByCode.bind(this)
   }
 
   /**
@@ -57,17 +60,16 @@ export class VoucherController {
         businessId: query.businessId,
         categoryId: query.categoryId,
         state: 'published' as const, // Always filter by published for public routes
-        discountType: query.discountType,
+        type: query.type,
+        minValue: query.minValue,
+        maxValue: query.maxValue,
         minDiscount: query.minDiscount,
         maxDiscount: query.maxDiscount,
-        latitude: query.latitude,
-        longitude: query.longitude,
-        radius: query.radius,
-        validNow: query.validNow,
-        expiringInDays: query.expiringInDays,
-        hasAvailableUses: query.hasAvailableUses,
+        currency: query.currency,
+        validFrom: query.validFrom,
+        validUntil: query.validUntil,
         search: query.search,
-        page: query.page,
+        page: query.page || 1,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
         sortBy: voucherCommon.voucherSortFieldMapper.mapSortField(
           query.sortBy,
@@ -79,11 +81,7 @@ export class VoucherController {
 
       const result = await this.voucherService.getAllVouchers(params)
 
-      // Convert to DTOs
-      res.json({
-        data: result.data.map((voucher) => VoucherMapper.toDTO(voucher)),
-        pagination: result.pagination,
-      })
+      res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
       next(error)
     }
@@ -158,13 +156,7 @@ export class VoucherController {
         userId,
       })
 
-      res.json({
-        voucher: VoucherMapper.toDTO(scanResult.voucher),
-        scanId: scanResult.scanId,
-        canClaim: scanResult.canClaim,
-        alreadyClaimed: scanResult.alreadyClaimed,
-        nearbyLocations: scanResult.nearbyLocations,
-      })
+      res.json(VoucherMapper.toScanResponseDTO(scanResult))
     } catch (error) {
       next(error)
     }
@@ -201,13 +193,7 @@ export class VoucherController {
         claimData,
       )
 
-      res.json({
-        claimId: claimResult.claimId,
-        voucher: VoucherMapper.toDTO(claimResult.voucher),
-        claimedAt: claimResult.claimedAt.toISOString(),
-        expiresAt: claimResult.expiresAt?.toISOString() || null,
-        walletPosition: claimResult.walletPosition,
-      })
+      res.json(VoucherMapper.toClaimResponseDTO(claimResult))
     } catch (error) {
       next(error)
     }
@@ -237,13 +223,7 @@ export class VoucherController {
         userId,
       })
 
-      res.json({
-        message: redeemResult.message,
-        voucherId: redeemResult.voucherId,
-        redeemedAt: redeemResult.redeemedAt.toISOString(),
-        discountApplied: redeemResult.discountApplied,
-        voucher: VoucherMapper.toDTO(redeemResult.voucher),
-      })
+      res.json(VoucherMapper.toRedeemResponseDTO(redeemResult))
     } catch (error) {
       next(error)
     }
@@ -290,15 +270,7 @@ export class VoucherController {
 
       const result = await this.voucherService.getUserVouchers(params)
 
-      res.json({
-        data: result.data.map((userVoucher) => ({
-          voucher: VoucherMapper.toDTO(userVoucher.voucher),
-          claimedAt: userVoucher.claimedAt.toISOString(),
-          status: userVoucher.status,
-          redeemedAt: userVoucher.redeemedAt?.toISOString(),
-        })),
-        pagination: result.pagination,
-      })
+      res.json(paginatedResponse(result, VoucherMapper.toUserVoucherDTO))
     } catch (error) {
       next(error)
     }
@@ -355,10 +327,7 @@ export class VoucherController {
 
       const result = await this.voucherService.getVouchersByBusinessId(params)
 
-      res.json({
-        data: result.data.map((voucher) => VoucherMapper.toDTO(voucher)),
-        pagination: result.pagination,
-      })
+      res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
       next(error)
     }
@@ -392,6 +361,7 @@ export class VoucherController {
 
       // Apply includes if needed
       let voucherWithIncludes = voucher
+
       if (Object.keys(parsedIncludes).length > 0) {
         voucherWithIncludes = await this.voucherService.getVoucherById(
           voucher.id,
@@ -399,8 +369,7 @@ export class VoucherController {
         )
       }
 
-      const dto = VoucherMapper.toDTO(voucherWithIncludes)
-      res.json(dto)
+      res.json(VoucherMapper.toDTO(voucherWithIncludes))
     } catch (error) {
       next(error)
     }

@@ -77,5 +77,11 @@ export * as userPublic from './user/public/index.js'
 export * as userInternal from './user/internal/index.js'
 export * as userCommon from './user/common/index.js'
 
+// Voucher Service
+export * as voucherAdmin from './voucher/admin/index.js'
+export * as voucherPublic from './voucher/public/index.js'
+export * as voucherInternal from './voucher/internal/index.js'
+export * as voucherCommon from './voucher/common/index.js'
+
 // ============= Shared Schemas =============
 export * as shared from './shared/index.js'

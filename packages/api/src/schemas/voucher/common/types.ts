@@ -63,7 +63,7 @@ export const VoucherScan = z.object({
   scanType: VoucherScanType,
   scanSource: VoucherScanSource,
   location: LocationPoint.nullable(),
-  deviceInfo: z.record(z.any()),
+  deviceInfo: z.record(z.string(), z.any()),
   scannedAt: DateTime,
   createdAt: DateTime,
 })
@@ -78,7 +78,7 @@ export const CustomerVoucher = z.object({
   customerId: UUID,
   claimedAt: DateTime,
   status: CustomerVoucherStatus,
-  notificationPreferences: z.record(z.any()).nullable(),
+  notificationPreferences: z.record(z.string(), z.any()).nullable(),
   redeemedAt: DateTime.nullable(),
   createdAt: DateTime,
   updatedAt: DateTime,

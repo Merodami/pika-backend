@@ -239,3 +239,28 @@ export const VOUCHER_SERVICE_HOST = getEnvVariable(
 export const DEFAULT_LANGUAGE = getEnvVariable('DEFAULT_LANGUAGE', String, 'es')
 
 export const SUPPORTED_LANGUAGES = ['es', 'en', 'gn'] as const
+
+// Voucher service configuration
+export const VOUCHER_CODE_ALPHABET = getEnvVariable(
+  'VOUCHER_CODE_ALPHABET',
+  String,
+  'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', // No ambiguous chars
+)
+
+export const VOUCHER_SHORT_CODE_LENGTH = getEnvVariable(
+  'VOUCHER_SHORT_CODE_LENGTH',
+  parseNumber,
+  8,
+)
+
+export const VOUCHER_JWT_ALGORITHM = getEnvVariable(
+  'VOUCHER_JWT_ALGORITHM',
+  String,
+  'RS256',
+)
+
+export const VOUCHER_JWT_PRIVATE_KEY = getEnvVariable(
+  'VOUCHER_JWT_PRIVATE_KEY',
+  String,
+  '',
+)

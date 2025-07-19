@@ -1,13 +1,14 @@
-import type { PrismaClient } from '@prisma/client'
-import { voucherInternal, voucherCommon } from '@pika/api'
+import { voucherCommon,voucherInternal } from '@pika/api'
 import { requireApiKey, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { TranslationClient } from '@pika/translation'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { InternalVoucherController } from '../controllers/InternalVoucherController.js'
 import { VoucherRepository } from '../repositories/VoucherRepository.js'
-import { VoucherService } from '../services/VoucherService.js'
+import { InternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
+import { InternalVoucherService } from '../services/InternalVoucherService.js'
 
 /**
  * Creates internal voucher routes for service-to-service communication
@@ -20,8 +21,13 @@ export function createInternalVoucherRoutes(
   const router = Router()
 
   // Initialize dependencies
-  const repository = new VoucherRepository(prisma, cache)
-  const service = new VoucherService(repository, cache, translationClient)
+  const publicRepository = new VoucherRepository(prisma, cache)
+  const internalRepository = new InternalVoucherRepository(prisma, cache)
+  const service = new InternalVoucherService(
+    internalRepository,
+    publicRepository, // InternalService needs public repository for some operations
+    cache,
+  )
   const controller = new InternalVoucherController(service)
 
   // All internal routes require API key authentication

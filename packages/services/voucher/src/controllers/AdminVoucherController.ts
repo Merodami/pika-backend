@@ -1,22 +1,23 @@
-import { voucherAdmin, voucherCommon, shared } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { businessCommon, shared, voucherAdmin, voucherCommon } from '@pika/api'
+import { DEFAULT_LANGUAGE, PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
-  RequestContext,
-  parseIncludeParam,
+  paginatedResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { VoucherMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
+import { ErrorFactory, parseIncludeParam } from '@pika/shared'
+import { VoucherState } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IVoucherService } from '../services/VoucherService.js'
+import type { IAdminVoucherService } from '../services/AdminVoucherService.js'
+import type { BulkUpdateData } from '../types/index.js'
 
 /**
  * Handles admin voucher management operations
  */
 export class AdminVoucherController {
-  constructor(private readonly voucherService: IVoucherService) {
+  constructor(private readonly voucherService: IAdminVoucherService) {
     // Bind methods to preserve 'this' context
     this.getAllVouchers = this.getAllVouchers.bind(this)
     this.getVoucherById = this.getVoucherById.bind(this)
@@ -31,6 +32,8 @@ export class AdminVoucherController {
     this.bulkUpdateVouchers = this.bulkUpdateVouchers.bind(this)
     this.getVoucherAnalytics = this.getVoucherAnalytics.bind(this)
     this.getBusinessVoucherStats = this.getBusinessVoucherStats.bind(this)
+    this.publishVoucher = this.publishVoucher.bind(this)
+    this.expireVoucher = this.expireVoucher.bind(this)
   }
 
   /**
@@ -44,7 +47,7 @@ export class AdminVoucherController {
     condition: (result) => result && result.data && Array.isArray(result.data),
   })
   async getAllVouchers(
-    req: Request<{}, {}, {}, voucherAdmin.AdminVoucherQueryParams>,
+    req: Request,
     res: Response<voucherAdmin.AdminVoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -53,7 +56,7 @@ export class AdminVoucherController {
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
-            voucherCommon.ADMIN_VOUCHER_ALLOWED_RELATIONS,
+            [...voucherCommon.ADMIN_VOUCHER_ALLOWED_RELATIONS],
           )
         : {}
 
@@ -90,11 +93,7 @@ export class AdminVoucherController {
 
       const result = await this.voucherService.getAllVouchers(params)
 
-      // Convert to DTOs
-      res.json({
-        data: result.data.map((voucher) => VoucherMapper.toDTO(voucher)),
-        pagination: result.pagination,
-      })
+      res.json(paginatedResponse(result, (voucher) => VoucherMapper.toAdminDTO(voucher)))
     } catch (error) {
       next(error)
     }
@@ -110,12 +109,7 @@ export class AdminVoucherController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getVoucherById(
-    req: Request<
-      voucherCommon.VoucherIdParam,
-      {},
-      {},
-      voucherAdmin.AdminVoucherQueryParams
-    >,
+    req: Request<voucherCommon.VoucherIdParam>,
     res: Response<voucherAdmin.AdminVoucherDetailResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -125,7 +119,7 @@ export class AdminVoucherController {
       const parsedIncludes = query.include
         ? parseIncludeParam(
             query.include,
-            voucherCommon.ADMIN_VOUCHER_ALLOWED_RELATIONS,
+            [...voucherCommon.ADMIN_VOUCHER_ALLOWED_RELATIONS],
           )
         : {}
 
@@ -134,7 +128,7 @@ export class AdminVoucherController {
         parsedIncludes,
       )
 
-      res.json(VoucherMapper.toDTO(voucher))
+      res.json(VoucherMapper.toAdminDTO(voucher))
     } catch (error) {
       next(error)
     }
@@ -154,7 +148,7 @@ export class AdminVoucherController {
 
       const voucher = await this.voucherService.createVoucher(data)
 
-      res.status(201).json(VoucherMapper.toDTO(voucher))
+      res.status(201).json(VoucherMapper.toAdminDTO(voucher))
     } catch (error) {
       next(error)
     }
@@ -179,7 +173,7 @@ export class AdminVoucherController {
 
       const voucher = await this.voucherService.updateVoucher(voucherId, data)
 
-      res.json(VoucherMapper.toDTO(voucher))
+      res.json(VoucherMapper.toAdminDTO(voucher))
     } catch (error) {
       next(error)
     }
@@ -224,11 +218,10 @@ export class AdminVoucherController {
 
       const voucher = await this.voucherService.updateVoucherState(
         voucherId,
-        state,
-        reason,
+        state as VoucherState,
       )
 
-      res.json(VoucherMapper.toDTO(voucher))
+      res.json(VoucherMapper.toAdminDTO(voucher))
     } catch (error) {
       next(error)
     }
@@ -251,7 +244,7 @@ export class AdminVoucherController {
       const { id: voucherId } = req.params
       const { codeType, quantity, customCodes } = req.body
 
-      const voucher = await this.voucherService.generateVoucherCodes(
+      const codes = await this.voucherService.generateVoucherCodes(
         voucherId,
         {
           codeType,
@@ -260,7 +253,10 @@ export class AdminVoucherController {
         },
       )
 
-      res.json(VoucherMapper.toDTO(voucher))
+      // Get the updated voucher with the new codes
+      const voucher = await this.voucherService.getVoucherById(voucherId)
+
+      res.json(VoucherMapper.toAdminDTO(voucher))
     } catch (error) {
       next(error)
     }
@@ -313,14 +309,17 @@ export class AdminVoucherController {
       const { id: voucherId } = req.params
       const { translations } = req.body
 
-      const result = await this.voucherService.updateVoucherTranslations(
+      // Map API 'terms' to domain 'termsAndConditions'
+      const domainTranslations = VoucherMapper.fromTranslationsDTO(translations)
+      
+      await this.voucherService.updateVoucherTranslations(
         voucherId,
-        translations,
+        domainTranslations,
       )
 
       res.json({
         voucherId,
-        translations: result,
+        translations,
       })
     } catch (error) {
       next(error)
@@ -342,9 +341,12 @@ export class AdminVoucherController {
       const translations =
         await this.voucherService.getVoucherTranslations(voucherId)
 
+      // Map domain 'termsAndConditions' back to API 'terms'
+      const apiTranslations = VoucherMapper.toTranslationsDTO(translations)
+
       res.json({
         voucherId,
-        translations,
+        translations: apiTranslations,
       })
     } catch (error) {
       next(error)
@@ -363,13 +365,14 @@ export class AdminVoucherController {
     try {
       const { voucherIds, updates, reason } = req.body
 
-      const result = await this.voucherService.bulkUpdateVouchers(
-        voucherIds,
+      const data: BulkUpdateData = {
+        ids: voucherIds,
         updates,
-        reason,
-      )
+      }
+      
+      const result = await this.voucherService.bulkUpdateVouchers(data)
 
-      res.json(result)
+      res.json(VoucherMapper.toBulkUpdateResponseDTO(result))
     } catch (error) {
       next(error)
     }
@@ -380,12 +383,7 @@ export class AdminVoucherController {
    * Get voucher analytics (admin)
    */
   async getVoucherAnalytics(
-    req: Request<
-      voucherCommon.VoucherIdParam,
-      {},
-      {},
-      voucherAdmin.VoucherAnalyticsQueryParams
-    >,
+    req: Request<voucherCommon.VoucherIdParam>,
     res: Response<voucherAdmin.VoucherAnalyticsResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -394,16 +392,15 @@ export class AdminVoucherController {
       const query =
         getValidatedQuery<voucherAdmin.VoucherAnalyticsQueryParams>(req)
 
-      const analytics = await this.voucherService.getVoucherAnalytics(
-        voucherId,
-        {
-          startDate: query.startDate,
-          endDate: query.endDate,
-          groupBy: query.groupBy,
-        },
-      )
+      const analytics = await this.voucherService.getVoucherAnalytics({
+        startDate: query.startDate,
+        endDate: query.endDate,
+      })
 
-      res.json(analytics)
+      res.json(VoucherMapper.toVoucherAnalyticsDTO(analytics, voucherId, {
+        startDate: query.startDate,
+        endDate: query.endDate,
+      }))
     } catch (error) {
       next(error)
     }
@@ -414,12 +411,7 @@ export class AdminVoucherController {
    * Get business voucher statistics (admin)
    */
   async getBusinessVoucherStats(
-    req: Request<
-      shared.BusinessIdParam,
-      {},
-      {},
-      voucherAdmin.BusinessVoucherStatsQueryParams
-    >,
+    req: Request<businessCommon.BusinessIdParam>,
     res: Response<voucherAdmin.BusinessVoucherStatsResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -430,14 +422,9 @@ export class AdminVoucherController {
 
       const stats = await this.voucherService.getBusinessVoucherStats(
         businessId,
-        {
-          startDate: query.startDate,
-          endDate: query.endDate,
-          groupBy: query.groupBy,
-        },
       )
 
-      res.json(stats)
+      res.json(VoucherMapper.toBusinessVoucherStatsDTO(stats))
     } catch (error) {
       next(error)
     }
@@ -456,7 +443,7 @@ export class AdminVoucherController {
       const { id } = req.params
 
       const voucher = await this.voucherService.publishVoucher(id)
-      const dto = VoucherMapper.toDTO(voucher)
+      const dto = VoucherMapper.toAdminDTO(voucher)
 
       res.status(200).json(dto)
     } catch (error) {
@@ -477,7 +464,7 @@ export class AdminVoucherController {
       const { id } = req.params
 
       const voucher = await this.voucherService.expireVoucher(id)
-      const dto = VoucherMapper.toDTO(voucher)
+      const dto = VoucherMapper.toAdminDTO(voucher)
 
       res.status(200).json(dto)
     } catch (error) {
@@ -485,33 +472,4 @@ export class AdminVoucherController {
     }
   }
 
-  /**
-   * POST /admin/vouchers/:id/image
-   * Upload voucher image (admin)
-   */
-  async uploadVoucherImage(
-    req: Request<voucherCommon.VoucherIdParam>,
-    res: Response<voucherAdmin.UploadVoucherImageResponse>,
-    next: NextFunction,
-  ): Promise<void> {
-    try {
-      const { id } = req.params
-
-      if (!req.file) {
-        throw ErrorFactory.badRequest('No image file provided')
-      }
-
-      const imageUrl = await this.voucherService.uploadVoucherImage(
-        id,
-        req.file,
-      )
-
-      res.status(201).json({
-        imageUrl,
-        message: 'Voucher image uploaded successfully',
-      })
-    } catch (error) {
-      next(error)
-    }
-  }
 }

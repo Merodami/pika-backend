@@ -99,17 +99,20 @@ export async function generateSecureShortCode(options?: {
 
   // Generate random code using safe character set
   const bytes = randomBytes(length)
+
   let code = ''
 
   for (let i = 0; i < length; i++) {
     const byteValue = bytes[i] || 0
     const index = byteValue % SAFE_CHARS.length
+
     code += SAFE_CHARS[index]
   }
 
   // Add dash separator for readability (if length >= 6)
   if (includeDash && length >= 6) {
     const midPoint = Math.floor(length / 2)
+
     code = code.substring(0, midPoint) + '-' + code.substring(midPoint)
   }
 
@@ -133,11 +136,13 @@ export async function generateBatchCode(options?: {
 
   // Generate random sequence
   const bytes = randomBytes(sequenceLength)
+
   let sequence = ''
 
   for (let i = 0; i < sequenceLength; i++) {
     const byteValue = bytes[i] || 0
     const index = byteValue % SAFE_CHARS.length
+
     sequence += SAFE_CHARS[index]
   }
 
@@ -254,6 +259,7 @@ export function validateVoucherCode(
       // Validate JWT format
       try {
         const parts = code.split('.')
+
         return parts.length === 3 // Basic JWT validation
       } catch {
         return false
@@ -301,6 +307,7 @@ export function decodeQRToken(token: string): { voucherId: string } | null {
     return { voucherId: decoded.vid }
   } catch (error) {
     logger.debug('Failed to decode QR token', { error: error.message })
+
     return null
   }
 }
@@ -318,11 +325,13 @@ export async function generateQRFriendlyCode(
   }
 
   const bytes = randomBytes(length)
+
   let code = ''
 
   for (let i = 0; i < length; i++) {
     const byteValue = bytes[i] || 0
     const index = byteValue % SAFE_CHARS.length
+
     code += SAFE_CHARS[index]
   }
 
@@ -361,6 +370,7 @@ export function calculateCheckDigit(code: string): string {
   }
 
   const checkDigit = (10 - (sum % 10)) % 10
+
   return checkDigit.toString()
 }
 
@@ -372,6 +382,7 @@ export async function generateCodeWithCheckDigit(
 ): Promise<string> {
   const baseCode = await generateQRFriendlyCode(baseLength)
   const checkDigit = calculateCheckDigit(baseCode)
+
   return baseCode + checkDigit
 }
 
@@ -412,6 +423,7 @@ export function validateBatchCode(code: string): boolean {
   // Format: PREFIX-YYYY-MM-XXX
   const pattern =
     /^[A-Z]{2,10}-\d{4}-\d{2}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{2,8}$/
+
   return pattern.test(code)
 }
 
@@ -429,6 +441,7 @@ export function parseBatchCode(code: string): {
   }
 
   const parts = code.split('-')
+
   if (parts.length !== 4) {
     return null
   }

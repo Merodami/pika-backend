@@ -1,81 +1,73 @@
-import { Prisma, PrismaClient } from '@prisma/client'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
-import { type VoucherDomain, type VoucherScanData, type CustomerVoucherDomain, VoucherMapper, type CustomerVoucherDocument } from '@pika/sdk'
-import { ErrorFactory, logger, type ParsedIncludes, toPrismaInclude } from '@pika/shared'
-import type { PaginatedResult, VoucherScanSource, VoucherScanType, VoucherState, VoucherCodeType } from '@pika/types'
-
-export interface VoucherSearchParams {
-  businessId?: string
-  userId?: string
-  type?: string
-  state?: VoucherState | VoucherState[]
-  search?: string
-  minValue?: number
-  maxValue?: number
-  minDiscount?: number
-  maxDiscount?: number
-  validFrom?: Date
-  validUntil?: Date
-  maxRedemptions?: number
-  page?: number
-  limit?: number
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
-  parsedIncludes?: ParsedIncludes
-}
-
-export interface CreateVoucherData {
-  businessId: string
-  type: string
-  titleKey: string
-  descriptionKey: string
-  termsAndConditionsKey: string
-  value?: number
-  discount?: number
-  maxRedemptions?: number
-  validFrom?: Date
-  validUntil?: Date
-  metadata?: any
-  qrCode: string
-  state: VoucherState
-  redemptionsCount: number
-}
-
-export interface UpdateVoucherData {
-  value?: number
-  discount?: number
-  maxRedemptions?: number
-  validFrom?: Date
-  validUntil?: Date
-  metadata?: any
-  imageUrl?: string
-}
+import {
+  type CustomerVoucherDocument,
+  type CustomerVoucherDomain,
+  type VoucherDomain,
+  VoucherMapper,
+  type VoucherScanData,
+} from '@pika/sdk'
+import {
+  ErrorFactory,
+  logger,
+  type ParsedIncludes,
+  toPrismaInclude,
+} from '@pika/shared'
+import type {
+  PaginatedResult,
+  VoucherCodeType,
+  VoucherState,
+} from '@pika/types'
+import { Prisma, PrismaClient } from '@prisma/client'
+import type {
+  VoucherSearchParams,
+  CreateVoucherData,
+  UpdateVoucherData,
+} from '../types/index.js'
 
 export interface IVoucherRepository {
   findAll(params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
-  findById(id: string, parsedIncludes?: ParsedIncludes): Promise<VoucherDomain | null>
-  findByIds(ids: string[]): Promise<VoucherDomain[]>
-  findByBusinessId(businessId: string, params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
-  findByUserId(userId: string, params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
-  findUserVoucher(userId: string, voucherId: string): Promise<VoucherDomain | null>
-  create(data: CreateVoucherData): Promise<VoucherDomain>
-  update(id: string, data: UpdateVoucherData): Promise<VoucherDomain>
-  updateState(id: string, state: VoucherState): Promise<VoucherDomain>
-  delete(id: string): Promise<void>
-  claimVoucher(voucherId: string, userId: string): Promise<CustomerVoucherDomain>
-  redeemVoucher(voucherId: string, userId: string): Promise<CustomerVoucherDomain>
-  findCustomerVoucher(userId: string, voucherId: string): Promise<CustomerVoucherDomain | null>
-  getCustomerVouchers(userId: string, status?: string): Promise<CustomerVoucherDomain[]>
-  incrementRedemptions(id: string): Promise<void>
+  findById(
+    id: string,
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain | null>
+  findByIds(
+    ids: string[],
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain[]>
+  findByBusinessId(
+    businessId: string,
+    params: VoucherSearchParams,
+  ): Promise<PaginatedResult<VoucherDomain>>
+  findByUserId(
+    userId: string,
+    params: VoucherSearchParams,
+  ): Promise<PaginatedResult<VoucherDomain>>
+  findUserVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<VoucherDomain | null>
+  claimVoucher(
+    voucherId: string,
+    userId: string,
+  ): Promise<CustomerVoucherDomain>
+  redeemVoucher(
+    voucherId: string,
+    userId: string,
+  ): Promise<CustomerVoucherDomain>
+  findCustomerVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<CustomerVoucherDomain | null>
+  getCustomerVouchers(
+    userId: string,
+    status?: string,
+  ): Promise<CustomerVoucherDomain[]>
   // Code-based voucher lookup methods (critical for QR scanning)
   findByQRCode(qrCode: string): Promise<VoucherDomain | null>
   findByShortCode(shortCode: string): Promise<VoucherDomain | null>
   findByStaticCode(staticCode: string): Promise<VoucherDomain | null>
   findByAnyCode(code: string): Promise<VoucherDomain | null>
-  // Scan tracking methods
-  trackScan(data: VoucherScanData & { id: string }): Promise<void>
-  incrementScanCount(voucherId: string): Promise<void>
 }
 
 export class VoucherRepository implements IVoucherRepository {
@@ -235,13 +227,19 @@ export class VoucherRepository implements IVoucherRepository {
     }
   }
 
-  async findByIds(ids: string[]): Promise<VoucherDomain[]> {
+  async findByIds(
+    ids: string[],
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain[]> {
     try {
+      const include = this.buildInclude(parsedIncludes)
+
       const vouchers = await this.prisma.voucher.findMany({
         where: {
           id: { in: ids },
           deletedAt: null,
         },
+        include,
       })
 
       return vouchers.map((voucher) => VoucherMapper.fromDocument(voucher))
@@ -259,6 +257,7 @@ export class VoucherRepository implements IVoucherRepository {
       throw error
     }
   }
+
 
   async findByBusinessId(
     businessId: string,
@@ -325,8 +324,10 @@ export class VoucherRepository implements IVoucherRepository {
       return {
         data: items.map((item) => {
           const voucher = VoucherMapper.fromDocument(item.voucher)
+
           // Add user-specific state
           voucher.state = item.state as VoucherState
+
           return voucher
         }),
         pagination: {
@@ -353,7 +354,10 @@ export class VoucherRepository implements IVoucherRepository {
     }
   }
 
-  async findUserVoucher(userId: string, voucherId: string): Promise<VoucherDomain | null> {
+  async findUserVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<VoucherDomain | null> {
     try {
       const customerVoucher = await this.prisma.customerVoucher.findUnique({
         where: {
@@ -372,13 +376,22 @@ export class VoucherRepository implements IVoucherRepository {
       }
 
       const voucher = VoucherMapper.fromDocument(customerVoucher.voucher)
+
       // Add user-specific state based on customer voucher status
-      voucher.state = customerVoucher.status === 'claimed' ? 'claimed' as VoucherState : 
-                     customerVoucher.status === 'redeemed' ? 'redeemed' as VoucherState : 
-                     voucher.state
+      voucher.state =
+        customerVoucher.status === 'claimed'
+          ? ('claimed' as VoucherState)
+          : customerVoucher.status === 'redeemed'
+            ? ('redeemed' as VoucherState)
+            : voucher.state
+
       return voucher
     } catch (error) {
-      logger.error('Failed to find user voucher', { error, customerId: userId, voucherId })
+      logger.error('Failed to find user voucher', {
+        error,
+        customerId: userId,
+        voucherId,
+      })
 
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw ErrorFactory.databaseError(
@@ -392,252 +405,12 @@ export class VoucherRepository implements IVoucherRepository {
     }
   }
 
-  async create(data: CreateVoucherData): Promise<VoucherDomain> {
-    try {
-      const voucher = await this.prisma.voucher.create({
-        data: {
-          ...data,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      })
 
-      return VoucherMapper.fromDocument(voucher)
-    } catch (error) {
-      logger.error('Failed to create voucher', { error, data })
 
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw ErrorFactory.businessRuleViolation(
-            'Voucher with this QR code already exists',
-            'QR code must be unique',
-          )
-        }
 
-        throw ErrorFactory.databaseError(
-          'create',
-          'Failed to create voucher',
-          error,
-        )
-      }
 
-      throw error
-    }
-  }
 
-  async update(id: string, data: UpdateVoucherData): Promise<VoucherDomain> {
-    try {
-      const voucher = await this.prisma.voucher.update({
-        where: { id },
-        data: {
-          ...data,
-          updatedAt: new Date(),
-        },
-      })
 
-      return VoucherMapper.fromDocument(voucher)
-    } catch (error) {
-      logger.error('Failed to update voucher', { error, id, data })
-
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw ErrorFactory.resourceNotFound('Voucher', id)
-        }
-
-        throw ErrorFactory.databaseError(
-          'update',
-          'Failed to update voucher',
-          error,
-        )
-      }
-
-      throw error
-    }
-  }
-
-  async updateState(id: string, state: VoucherState): Promise<VoucherDomain> {
-    try {
-      const voucher = await this.prisma.voucher.update({
-        where: { id },
-        data: {
-          state,
-          updatedAt: new Date(),
-        },
-      })
-
-      return VoucherMapper.fromDocument(voucher)
-    } catch (error) {
-      logger.error('Failed to update voucher state', { error, id, state })
-
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw ErrorFactory.resourceNotFound('Voucher', id)
-        }
-
-        throw ErrorFactory.databaseError(
-          'updateState',
-          'Failed to update voucher state',
-          error,
-        )
-      }
-
-      throw error
-    }
-  }
-
-  async delete(id: string): Promise<void> {
-    try {
-      // Soft delete by setting deletedAt
-      await this.prisma.voucher.update({
-        where: { id },
-        data: {
-          deletedAt: new Date(),
-          updatedAt: new Date(),
-        },
-      })
-    } catch (error) {
-      logger.error('Failed to delete voucher', { error, id })
-
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw ErrorFactory.resourceNotFound('Voucher', id)
-        }
-
-        throw ErrorFactory.databaseError(
-          'delete',
-          'Failed to delete voucher',
-          error,
-        )
-      }
-
-      throw error
-    }
-  }
-
-  async claimVoucher(voucherId: string, userId: string): Promise<VoucherDomain> {
-    try {
-      // Create customer voucher association
-      const customerVoucher = await this.prisma.customerVoucher.create({
-        data: {
-          customerId: userId,
-          voucherId,
-          status: 'claimed',
-          claimedAt: new Date(),
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from claim
-        },
-        include: {
-          voucher: true,
-        },
-      })
-
-      const voucher = VoucherMapper.fromDocument(customerVoucher.voucher)
-      // Add user-specific state
-      voucher.state = 'claimed' as VoucherState
-      return voucher
-    } catch (error) {
-      logger.error('Failed to claim voucher', { error, voucherId, userId })
-
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw ErrorFactory.businessRuleViolation(
-            'Voucher already claimed',
-            'User has already claimed this voucher',
-          )
-        }
-
-        throw ErrorFactory.databaseError(
-          'claimVoucher',
-          'Failed to claim voucher',
-          error,
-        )
-      }
-
-      throw error
-    }
-  }
-
-  async redeemVoucher(voucherId: string, userId: string): Promise<VoucherDomain> {
-    try {
-      // Update customer voucher state and increment redemptions in a transaction
-      const [customerVoucher, _] = await this.prisma.$transaction([
-        this.prisma.customerVoucher.update({
-          where: {
-            customerId_voucherId: {
-              customerId: userId,
-              voucherId,
-            },
-          },
-          data: {
-            status: 'redeemed',
-            redeemedAt: new Date(),
-          },
-          include: {
-            voucher: true,
-          },
-        }),
-        this.prisma.voucher.update({
-          where: { id: voucherId },
-          data: {
-            redemptionsCount: {
-              increment: 1,
-            },
-            updatedAt: new Date(),
-          },
-        }),
-      ])
-
-      const voucher = VoucherMapper.fromDocument(customerVoucher.voucher)
-      // Add user-specific state
-      voucher.state = 'redeemed' as VoucherState
-      return voucher
-    } catch (error) {
-      logger.error('Failed to redeem voucher', { error, voucherId, userId })
-
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw ErrorFactory.resourceNotFound('CustomerVoucher', `${userId}-${voucherId}`)
-        }
-
-        throw ErrorFactory.databaseError(
-          'redeemVoucher',
-          'Failed to redeem voucher',
-          error,
-        )
-      }
-
-      throw error
-    }
-  }
-
-  async incrementRedemptions(id: string): Promise<void> {
-    try {
-      await this.prisma.voucher.update({
-        where: { id },
-        data: {
-          redemptionsCount: {
-            increment: 1,
-          },
-          updatedAt: new Date(),
-        },
-      })
-    } catch (error) {
-      logger.error('Failed to increment redemptions', { error, id })
-
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw ErrorFactory.resourceNotFound('Voucher', id)
-        }
-
-        throw ErrorFactory.databaseError(
-          'incrementRedemptions',
-          'Failed to increment redemptions',
-          error,
-        )
-      }
-
-      throw error
-    }
-  }
 
   private buildOrderBy(sortBy: string, sortOrder: 'asc' | 'desc'): any {
     // Handle nested sorting for related fields
@@ -656,48 +429,15 @@ export class VoucherRepository implements IVoucherRepository {
     }
   }
 
-  private buildInclude(parsedIncludes?: ParsedIncludes): Prisma.VoucherInclude | undefined {
+  private buildInclude(
+    parsedIncludes?: ParsedIncludes,
+  ): Prisma.VoucherInclude | undefined {
     return parsedIncludes && Object.keys(parsedIncludes).length > 0
       ? (toPrismaInclude(parsedIncludes) as Prisma.VoucherInclude)
       : undefined
   }
 
-  async trackScan(data: VoucherScanData & { id: string }): Promise<void> {
-    try {
-      await this.prisma.voucherScan.create({
-        data: {
-          id: data.id,
-          voucherId: data.voucherId,
-          userId: data.customerId: userId,
-          scanType: data.scanType,
-          scanSource: data.scanSource,
-          location: data.location ? JSON.stringify(data.location) : null,
-          userAgent: data.userAgent,
-          metadata: data.metadata ? JSON.stringify(data.metadata) : null,
-          scannedAt: new Date(),
-        },
-      })
-    } catch (error) {
-      logger.error('Failed to track voucher scan', { error, data })
-      throw ErrorFactory.fromError(error)
-    }
-  }
 
-  async incrementScanCount(voucherId: string): Promise<void> {
-    try {
-      await this.prisma.voucher.update({
-        where: { id: voucherId },
-        data: {
-          scanCount: {
-            increment: 1,
-          },
-        },
-      })
-    } catch (error) {
-      logger.error('Failed to increment scan count', { error, voucherId })
-      throw ErrorFactory.fromError(error)
-    }
-  }
 
   async findByQRCode(qrCode: string): Promise<VoucherDomain | null> {
     try {
@@ -774,7 +514,10 @@ export class VoucherRepository implements IVoucherRepository {
 
       return VoucherMapper.fromDocument(voucher)
     } catch (error) {
-      logger.error('Failed to find voucher by static code', { error, staticCode })
+      logger.error('Failed to find voucher by static code', {
+        error,
+        staticCode,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -784,6 +527,7 @@ export class VoucherRepository implements IVoucherRepository {
       // Try all code types in order of likelihood
       // 1. QR code (most common for scanning)
       let voucher = await this.findByQRCode(code)
+
       if (voucher) return voucher
 
       // 2. Short code (human-readable codes)
@@ -801,7 +545,10 @@ export class VoucherRepository implements IVoucherRepository {
     }
   }
 
-  async claimVoucher(voucherId: string, userId: string): Promise<CustomerVoucherDomain> {
+  async claimVoucher(
+    voucherId: string,
+    userId: string,
+  ): Promise<CustomerVoucherDomain> {
     try {
       // Create customer voucher relationship
       const customerVoucher = await this.prisma.customerVoucher.create({
@@ -817,14 +564,19 @@ export class VoucherRepository implements IVoucherRepository {
         },
       })
 
-      return VoucherMapper.mapCustomerVoucherFromDocument(customerVoucher as CustomerVoucherDocument)
+      return VoucherMapper.mapCustomerVoucherFromDocument(
+        customerVoucher as CustomerVoucherDocument,
+      )
     } catch (error) {
       logger.error('Failed to claim voucher', { error, voucherId, userId })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async redeemVoucher(voucherId: string, userId: string): Promise<CustomerVoucherDomain> {
+  async redeemVoucher(
+    voucherId: string,
+    userId: string,
+  ): Promise<CustomerVoucherDomain> {
     try {
       // Update customer voucher to redeemed status
       const customerVoucher = await this.prisma.customerVoucher.update({
@@ -846,14 +598,19 @@ export class VoucherRepository implements IVoucherRepository {
       // Increment the voucher's redemption count
       await this.incrementRedemptions(voucherId)
 
-      return VoucherMapper.mapCustomerVoucherFromDocument(customerVoucher as CustomerVoucherDocument)
+      return VoucherMapper.mapCustomerVoucherFromDocument(
+        customerVoucher as CustomerVoucherDocument,
+      )
     } catch (error) {
       logger.error('Failed to redeem voucher', { error, voucherId, userId })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async findCustomerVoucher(userId: string, voucherId: string): Promise<CustomerVoucherDomain | null> {
+  async findCustomerVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<CustomerVoucherDomain | null> {
     try {
       const customerVoucher = await this.prisma.customerVoucher.findUnique({
         where: {
@@ -871,17 +628,26 @@ export class VoucherRepository implements IVoucherRepository {
         return null
       }
 
-      return VoucherMapper.mapCustomerVoucherFromDocument(customerVoucher as CustomerVoucherDocument)
+      return VoucherMapper.mapCustomerVoucherFromDocument(
+        customerVoucher as CustomerVoucherDocument,
+      )
     } catch (error) {
-      logger.error('Failed to find customer voucher', { error, customerId: userId, voucherId })
+      logger.error('Failed to find customer voucher', {
+        error,
+        customerId: userId,
+        voucherId,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async getCustomerVouchers(userId: string, status?: string): Promise<CustomerVoucherDomain[]> {
+  async getCustomerVouchers(
+    userId: string,
+    status?: string,
+  ): Promise<CustomerVoucherDomain[]> {
     try {
       const whereClause: any = { userId }
-      
+
       if (status && status !== 'all') {
         whereClause.status = status
       }
@@ -896,11 +662,31 @@ export class VoucherRepository implements IVoucherRepository {
         },
       })
 
-      return customerVouchers.map(cv => 
-        VoucherMapper.mapCustomerVoucherFromDocument(cv as CustomerVoucherDocument)
+      return customerVouchers.map((cv) =>
+        VoucherMapper.mapCustomerVoucherFromDocument(
+          cv as CustomerVoucherDocument,
+        ),
       )
     } catch (error) {
-      logger.error('Failed to get customer vouchers', { error, customerId: userId, status })
+      logger.error('Failed to get customer vouchers', {
+        error,
+        customerId: userId,
+        status,
+      })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  private async incrementRedemptions(voucherId: string): Promise<void> {
+    try {
+      await this.prisma.voucher.update({
+        where: { id: voucherId },
+        data: {
+          redemptionsCount: { increment: 1 },
+        },
+      })
+    } catch (error) {
+      logger.error('Failed to increment redemptions', { error, voucherId })
       throw ErrorFactory.fromError(error)
     }
   }

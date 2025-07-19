@@ -1,10 +1,47 @@
 import { VoucherState, VoucherDiscountType } from '@pika/types'
 
+// Helper functions for mapping enum values
+function mapVoucherState(state: string): VoucherState {
+  // Map database values to API enum values
+  switch (state) {
+    case 'draft':
+      return VoucherState.draft
+    case 'published':
+      return VoucherState.published
+    case 'expired':
+      return VoucherState.expired
+    case 'claimed':
+      return VoucherState.claimed
+    case 'redeemed':
+      return VoucherState.redeemed
+    case 'suspended':
+      return VoucherState.suspended
+    default:
+      return VoucherState.draft
+  }
+}
+
+function mapVoucherDiscountType(type: string): VoucherDiscountType {
+  // Map database values to API enum values
+  switch (type) {
+    case 'percentage':
+      return VoucherDiscountType.percentage
+    case 'fixed':
+      return VoucherDiscountType.fixed
+    default:
+      return VoucherDiscountType.percentage
+  }
+}
+
 import type {
   VoucherDomain,
   CreateVoucherData,
   UpdateVoucherData,
   VoucherScanData,
+  VoucherScanResult,
+  VoucherClaimResult,
+  VoucherRedeemResult,
+  UserVoucherData,
   CustomerVoucherDomain,
   VoucherLocation,
   VoucherCode,
@@ -26,21 +63,24 @@ import type {
 export interface VoucherDocument {
   id: string
   businessId: string
-  categoryId: string
+  categoryId: string | null
   state: string
-  title: string // Base title (usually in default language)
-  description: string // Base description (usually in default language)
-  terms: string // Base terms (usually in default language)
-  discountType: string
-  discountValue: number
+  titleKey: string // Translation key for title
+  descriptionKey: string // Translation key for description
+  termsAndConditionsKey: string // Translation key for terms
+  type: string // Voucher type from database
+  value?: number | null // Fixed value amount
+  discount?: number | null // Percentage discount
   currency: string
   location?: any | null // VoucherLocation stored as JSON
   imageUrl: string | null
   validFrom: Date | null
-  expiresAt: Date | null
+  validUntil: Date | null // Database field name
   maxRedemptions: number | null
   maxRedemptionsPerUser: number
-  currentRedemptions: number
+  redemptionsCount: number // Database field name
+  scanCount: number
+  claimCount: number
   metadata?: any | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -87,13 +127,15 @@ export class VoucherMapper {
     return {
       id: doc.id,
       businessId: doc.businessId,
-      categoryId: doc.categoryId,
+      categoryId: doc.categoryId || '',
       state: mapVoucherState(doc.state),
-      title: doc.title || '',
-      description: doc.description || '',
-      terms: doc.terms || '',
-      discountType: mapVoucherDiscountType(doc.discountType),
-      discountValue: doc.discountValue,
+      // For now, use the translation keys as the content
+      // In the future, these should be resolved by TranslationService
+      title: doc.titleKey || '',
+      description: doc.descriptionKey || '',
+      terms: doc.termsAndConditionsKey || '',
+      discountType: mapVoucherDiscountType(doc.type),
+      discountValue: doc.discount || doc.value || 0,
       currency: doc.currency,
       location: doc.location
         ? this.mapLocationFromDocument(doc.location)
@@ -106,14 +148,14 @@ export class VoucherMapper {
             ? new Date(doc.validFrom)
             : new Date(),
       expiresAt:
-        doc.expiresAt instanceof Date
-          ? doc.expiresAt
-          : doc.expiresAt
-            ? new Date(doc.expiresAt)
+        doc.validUntil instanceof Date
+          ? doc.validUntil
+          : doc.validUntil
+            ? new Date(doc.validUntil)
             : new Date(),
       maxRedemptions: doc.maxRedemptions,
       maxRedemptionsPerUser: doc.maxRedemptionsPerUser,
-      currentRedemptions: doc.currentRedemptions,
+      currentRedemptions: doc.redemptionsCount,
       metadata: doc.metadata,
       createdAt:
         doc.createdAt instanceof Date
@@ -471,5 +513,217 @@ export class VoucherMapper {
    */
   static fromDocumentArray(docs: VoucherDocument[]): VoucherDomain[] {
     return docs.map((doc) => this.fromDocument(doc))
+  }
+
+  // ============= Response Mapping Methods =============
+
+  /**
+   * Maps scan result to API response format
+   */
+  static toScanResponseDTO(result: VoucherScanResult): any {
+    return {
+      voucher: this.toDTO(result.voucher),
+      scanId: result.scanId,
+      canClaim: result.canClaim,
+      alreadyClaimed: result.alreadyClaimed,
+      nearbyLocations: result.nearbyLocations,
+    }
+  }
+
+  /**
+   * Maps claim result to API response format
+   */
+  static toClaimResponseDTO(result: VoucherClaimResult): any {
+    return {
+      claimId: result.claimId,
+      voucher: this.toDTO(result.voucher),
+      claimedAt: result.claimedAt.toISOString(),
+      expiresAt: result.expiresAt?.toISOString() || null,
+      walletPosition: result.walletPosition,
+    }
+  }
+
+  /**
+   * Maps redeem result to API response format
+   */
+  static toRedeemResponseDTO(result: VoucherRedeemResult): any {
+    return {
+      message: result.message,
+      voucherId: result.voucherId,
+      redeemedAt: result.redeemedAt.toISOString(),
+      discountApplied: result.discountApplied,
+      voucher: this.toDTO(result.voucher),
+    }
+  }
+
+  /**
+   * Maps user voucher data to API response format
+   */
+  static toUserVoucherDTO(data: UserVoucherData): any {
+    return {
+      voucher: this.toDTO(data.voucher),
+      claimedAt: data.claimedAt.toISOString(),
+      status: data.status,
+      redeemedAt: data.redeemedAt?.toISOString() || undefined,
+    }
+  }
+
+  /**
+   * Maps a domain entity to an Admin API DTO
+   * Admin responses include translation keys and analytics fields
+   */
+  static toAdminDTO(domain: VoucherDomain, doc?: VoucherDocument): any {
+    const formatDate = (date: Date | string | undefined | null): string => {
+      if (!date) return new Date().toISOString()
+      if (typeof date === 'string') return date
+      if (date instanceof Date) return date.toISOString()
+      return new Date().toISOString()
+    }
+
+    const now = new Date()
+    const expiresAt = domain.expiresAt instanceof Date ? domain.expiresAt : new Date(domain.expiresAt)
+    const daysUntilExpiry = expiresAt > now ? Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null
+
+    return {
+      id: domain.id,
+      businessId: domain.businessId,
+      categoryId: domain.categoryId,
+      state: this.mapStateToDTO(domain.state),
+      
+      // Translation keys (from document if available, otherwise generate from domain)
+      titleKey: doc?.titleKey || `voucher.title.${domain.id}`,
+      descriptionKey: doc?.descriptionKey || `voucher.description.${domain.id}`,
+      termsKey: doc?.termsAndConditionsKey || `voucher.terms.${domain.id}`,
+      
+      // Localized content (optional - resolved by translation service)
+      title: domain.title,
+      description: domain.description,
+      terms: domain.terms,
+      
+      // Discount configuration
+      discountType: this.mapDiscountTypeToDTO(domain.discountType),
+      discountValue: domain.discountValue,
+      currency: domain.currency,
+      
+      // Geographic targeting
+      location: domain.location ? this.mapLocationToDTO(domain.location) : null,
+      
+      // Media
+      imageUrl: domain.imageUrl,
+      
+      // Validity period
+      validFrom: formatDate(domain.validFrom),
+      expiresAt: formatDate(domain.expiresAt),
+      
+      // Redemption limits
+      maxRedemptions: domain.maxRedemptions,
+      maxRedemptionsPerUser: domain.maxRedemptionsPerUser,
+      currentRedemptions: domain.currentRedemptions,
+      
+      // Analytics (from document if available)
+      scanCount: doc?.scanCount || 0,
+      claimCount: doc?.claimCount || 0,
+      
+      // Extensibility
+      metadata: domain.metadata,
+      
+      // Timestamps
+      createdAt: formatDate(domain.createdAt),
+      updatedAt: formatDate(domain.updatedAt),
+      deletedAt: domain.deletedAt ? formatDate(domain.deletedAt) : null,
+      
+      // Computed fields
+      isActive: domain.state === VoucherState.published && 
+                (!domain.expiresAt || new Date(domain.expiresAt) > now) &&
+                (!domain.maxRedemptions || domain.currentRedemptions < domain.maxRedemptions),
+      isExpired: domain.state === VoucherState.expired || 
+                 (domain.expiresAt && new Date(domain.expiresAt) <= now),
+      redemptionRate: domain.maxRedemptions && domain.maxRedemptions > 0 
+                      ? domain.currentRedemptions / domain.maxRedemptions 
+                      : 0,
+      daysUntilExpiry,
+      
+      // Optional includes (will be undefined unless populated)
+      codes: domain.codes?.map((code) => this.mapCodeToDTO(code)),
+    }
+  }
+
+  /**
+   * Maps bulk update result to Admin API response
+   */
+  static toBulkUpdateResponseDTO(vouchers: VoucherDomain[], errors?: Array<{ id: string; error: string }>): any {
+    return {
+      successful: vouchers.length,
+      failed: errors?.length || 0,
+      errors: errors?.map(e => ({
+        voucherId: e.id,
+        message: e.error,
+      })) || [],
+    }
+  }
+
+  /**
+   * Maps voucher analytics to Admin API response
+   */
+  static toVoucherAnalyticsDTO(analytics: any, voucherId: string, filters?: { startDate?: Date; endDate?: Date }): any {
+    return {
+      voucherId,
+      period: {
+        start: filters?.startDate || new Date(),
+        end: filters?.endDate || new Date(),
+      },
+      totalScans: analytics.totalScans || 0,
+      totalClaims: analytics.totalClaims || 0,
+      totalRedemptions: analytics.totalRedemptions,
+      uniqueUsers: analytics.uniqueUsers || 0,
+      redemptionRate: analytics.redemptionRate,
+      scansBySource: analytics.scansBySource || {},
+      scansByType: analytics.scansByType || {},
+      dailyStats: analytics.dailyStats || [],
+    }
+  }
+
+  /**
+   * Maps business voucher stats to Admin API response
+   */
+  static toBusinessVoucherStatsDTO(stats: any): any {
+    return {
+      businessId: stats.businessId,
+      period: {
+        start: new Date(),
+        end: new Date(),
+      },
+      totalVouchers: stats.totalVouchers,
+      activeVouchers: stats.activeVouchers,
+      expiredVouchers: stats.expiredVouchers,
+      totalRedemptions: stats.totalRedemptions,
+      totalScans: stats.totalScans || 0,
+      averageRedemptionRate: stats.averageRedemptionValue || 0,
+      topPerformingVouchers: [],
+    }
+  }
+
+  /**
+   * Maps voucher translations from domain to API format
+   * Converts termsAndConditions to terms for API compatibility
+   */
+  static toTranslationsDTO(translations: VoucherTranslations): any {
+    return {
+      title: translations.title,
+      description: translations.description,
+      terms: translations.termsAndConditions,
+    }
+  }
+
+  /**
+   * Maps voucher translations from API to domain format
+   * Converts terms to termsAndConditions for domain compatibility
+   */
+  static fromTranslationsDTO(dto: any): VoucherTranslations {
+    return {
+      title: dto.title || {},
+      description: dto.description || {},
+      termsAndConditions: dto.terms || {},
+    }
   }
 }

@@ -358,6 +358,140 @@ const translations = [
 yarn nx run @pika/database:prisma:seed
 ```
 
+## Voucher Service Translation Pattern
+
+### Domain Model vs API Response
+
+The voucher service demonstrates a complete implementation of the translation pattern:
+
+1. **Database Storage** - Stores translation keys only:
+   ```prisma
+   model Voucher {
+     titleKey               String  // e.g., "voucher.title.abc123"
+     descriptionKey         String  // e.g., "voucher.description.abc123"
+     termsAndConditionsKey  String  // e.g., "voucher.terms.abc123"
+   }
+   ```
+
+2. **Domain Model** - Uses translation keys internally:
+   ```typescript
+   interface VoucherDomain {
+     titleKey: string
+     descriptionKey: string
+     termsAndConditionsKey: string
+     // ... other fields
+   }
+   ```
+
+3. **API Response** - Can include both keys and resolved translations:
+   ```typescript
+   interface AdminVoucherDetailResponse {
+     // Translation keys (always included)
+     titleKey: string
+     descriptionKey: string
+     termsKey: string  // Note: Different name for API consistency
+     
+     // Resolved translations (optional, based on language)
+     title?: string
+     description?: string
+     terms?: string
+   }
+   ```
+
+### Translation Management for Vouchers
+
+```typescript
+// Creating multilingual voucher
+async createVoucher(data: CreateVoucherRequest) {
+  // API receives multilingual content
+  // data.title = { es: "Descuento", en: "Discount", gn: "..." }
+  
+  // Generate unique keys
+  const titleKey = `voucher.title.${uuid()}`
+  const descriptionKey = `voucher.description.${uuid()}`
+  const termsKey = `voucher.terms.${uuid()}`
+  
+  // Store all translations
+  for (const [lang, value] of Object.entries(data.title)) {
+    await translationClient.set(titleKey, lang, value)
+  }
+  // ... same for description and terms
+  
+  // Create voucher with keys only
+  return repository.create({ titleKey, descriptionKey, termsKey, ... })
+}
+
+// Updating translations
+async updateVoucherTranslations(voucherId: string, translations: {
+  title: Record<string, string>
+  description: Record<string, string>
+  terms: Record<string, string>
+}) {
+  const voucher = await repository.findById(voucherId)
+  
+  // Update each language variant
+  for (const [lang, value] of Object.entries(translations.title)) {
+    await translationClient.set(voucher.titleKey, lang, value)
+  }
+  // ... same pattern for other fields
+}
+```
+
+### Mapper Pattern for Admin Responses
+
+The VoucherMapper handles the transformation between database/domain models and API responses:
+
+```typescript
+class VoucherMapper {
+  // For admin responses that need both keys and translations
+  static toAdminDTO(domain: VoucherDomain, translations?: {
+    title?: string
+    description?: string
+    terms?: string
+  }): AdminVoucherDetailResponse {
+    return {
+      // Always include keys
+      titleKey: domain.titleKey,
+      descriptionKey: domain.descriptionKey,
+      termsKey: domain.termsAndConditionsKey, // Note field name mapping
+      
+      // Include resolved translations if provided
+      title: translations?.title,
+      description: translations?.description,
+      terms: translations?.terms,
+      
+      // ... other fields
+    }
+  }
+  
+  // For public responses that only need resolved content
+  static toPublicDTO(domain: VoucherDomain, language: string): Promise<VoucherDTO> {
+    const translations = await translationClient.getBulk([
+      domain.titleKey,
+      domain.descriptionKey,
+      domain.termsAndConditionsKey
+    ], language)
+    
+    return {
+      title: translations[domain.titleKey],
+      description: translations[domain.descriptionKey],
+      terms: translations[domain.termsAndConditionsKey],
+      // ... other fields
+    }
+  }
+}
+```
+
+### Key Naming Conventions for Vouchers
+
+```
+voucher.title.{uuid}              # Voucher title
+voucher.description.{uuid}        # Voucher description  
+voucher.terms.{uuid}              # Terms and conditions
+voucher.book.title.{uuid}         # Voucher book title
+voucher.book.description.{uuid}   # Voucher book description
+```
+
 ## Usage Examples
 
 ### Service Integration

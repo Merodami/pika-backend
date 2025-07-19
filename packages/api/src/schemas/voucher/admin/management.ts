@@ -142,6 +142,13 @@ export const AdminVoucherListResponse = paginatedResponse(
 
 export type AdminVoucherListResponse = z.infer<typeof AdminVoucherListResponse>
 
+/**
+ * Admin voucher response (alias for detail response)
+ */
+export const AdminVoucherResponse = AdminVoucherDetailResponse
+
+export type AdminVoucherResponse = z.infer<typeof AdminVoucherResponse>
+
 // ============= Voucher Actions =============
 
 /**

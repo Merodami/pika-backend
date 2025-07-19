@@ -313,7 +313,7 @@ services:
 ```typescript
 // Comprehensive health check endpoint
 app.get('/health/detailed', async (request, reply) => {
-  const checks = await Promise.allSettled([this.checkDatabase(), this.checkRedis(), this.checkElasticsearch(), this.checkFirebase(), this.checkExternalAPIs()])
+  const checks = await Promise.allSettled([this.checkDatabase(), this.checkRedis(), this.checkElasticsearch(), this.checkExternalAPIs()])
 
   const status = checks.every((c) => c.status === 'fulfilled') ? 'healthy' : 'degraded'
 
@@ -324,8 +324,7 @@ app.get('/health/detailed', async (request, reply) => {
       database: checks[0],
       cache: checks[1],
       search: checks[2],
-      firebase: checks[3],
-      external: checks[4],
+      external: checks[3],
     },
     metrics: {
       uptime: process.uptime(),

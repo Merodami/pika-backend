@@ -43,6 +43,11 @@ export const CustomerVoucherStatus = z.enum(['claimed', 'redeemed', 'expired'])
 
 export type CustomerVoucherStatus = z.infer<typeof CustomerVoucherStatus>
 
+// Analytics grouping period enum
+export const AnalyticsGroupBy = z.enum(['day', 'week', 'month'])
+
+export type AnalyticsGroupBy = z.infer<typeof AnalyticsGroupBy>
+
 // Voucher sort fields for search (converted from pika-old VoucherSortFields to camelCase)
 export const VoucherSortField = z.enum([
   'title',

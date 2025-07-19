@@ -1,5 +1,4 @@
-import type { PrismaClient } from '@prisma/client'
-import { voucherAdmin, voucherCommon, shared } from '@pika/api'
+import { shared,voucherAdmin, voucherCommon } from '@pika/api'
 import {
   createMulterMiddleware,
   requireAdmin,
@@ -8,13 +7,14 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import { FileStoragePort, CommunicationServiceClient } from '@pika/shared'
+import { BusinessServiceClient, CommunicationServiceClient, FileStoragePort } from '@pika/shared'
 import type { TranslationClient } from '@pika/translation'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { AdminVoucherController } from '../controllers/AdminVoucherController.js'
-import { VoucherRepository } from '../repositories/VoucherRepository.js'
-import { VoucherService } from '../services/VoucherService.js'
+import { AdminVoucherRepository } from '../repositories/AdminVoucherRepository.js'
+import { AdminVoucherService } from '../services/AdminVoucherService.js'
 
 /**
  * Creates admin voucher routes
@@ -25,18 +25,18 @@ export function createAdminVoucherRoutes(
   translationClient: TranslationClient,
   fileStorage: FileStoragePort,
   communicationClient?: CommunicationServiceClient,
+  businessServiceClient?: BusinessServiceClient,
 ): Router {
   const router = Router()
 
   // Initialize dependencies
-  const repository = new VoucherRepository(prisma, cache)
-  const service = new VoucherService(
+  const repository = new AdminVoucherRepository(prisma, cache)
+  const service = new AdminVoucherService(
     repository,
     cache,
     translationClient,
     fileStorage,
-    undefined,
-    communicationClient,
+    businessServiceClient,
   )
   const controller = new AdminVoucherController(service)
 

@@ -33,17 +33,25 @@ packages/services/{service-name}/
 │   │   └── Internal{ServiceName}Controller.ts  # Internal endpoints
 │   ├── services/
 │   │   └── {ServiceName}Service.ts             # Business logic
+│   │   └── Admin{ServiceName}Service.ts             # Business logic
+│   │   └── Internal{ServiceName}Service.ts             # Business logic
 │   ├── repositories/
 │   │   └── {ServiceName}Repository.ts          # Data access
+│   │   └── Admin{ServiceName}Repository.ts          # Data access
+│   │   └── Internal{ServiceName}Repository.ts          # Data access
 │   ├── routes/
 │   │   ├── {ServiceName}Routes.ts              # Public routes
 │   │   ├── Admin{ServiceName}Routes.ts         # Admin routes
 │   │   └── Internal{ServiceName}Routes.ts      # Internal routes
 │   ├── mappers/
 │   │   └── {ServiceName}Mapper.ts              # Data transformation
+│   │   └── Admin{ServiceName}Mapper.ts              # Data transformation
+│   │   └── Internal{ServiceName}Mapper.ts              # Data transformation
 │   ├── types/
+│   │   ├── index.ts                            # Export barrel file
 │   │   ├── domain.ts                           # Domain interfaces
-│   │   └── search.ts                           # Search parameters
+│   │   ├── search.ts                           # Search parameters
+│   │   └── repository.ts                       # Repository data types
 │   ├── utils/                                  # Service-specific utilities
 │   ├── app.ts                                  # Service initialization
 │   ├── server.ts                               # Server configuration
@@ -178,13 +186,21 @@ export class {ServiceName}Controller {
       const query = getValidatedQuery<Search{ServiceName}Request>(request)
       const parsedIncludes = query.include ? parseIncludeParam(query.include, {SERVICE}_RELATIONS) : {}
 
+      // Map API query parameters inline - avoid separate mapper utilities
       const params = {
+        businessId: query.businessId,
+        categoryId: query.categoryId,
+        state: query.state || 'published',
+        type: query.type,
+        minValue: query.minValue,
+        maxValue: query.maxValue,
+        search: query.search,
         page: query.page || 1,
         limit: query.limit || 20,
         sortBy: query.sortBy || 'createdAt',
         sortOrder: query.sortOrder || 'desc',
         parsedIncludes,
-        // ... other params
+        // ... other params as needed
       }
 
       const result = await this.{service}Service.getAll(params)
@@ -327,6 +343,72 @@ export class Internal{ServiceName}Controller {
 }
 ```
 
+### Parameter Mapping Best Practices
+
+**Map API query parameters to service parameters inline within controllers.** Avoid creating separate parameter mapper utilities or functions.
+
+#### Why Inline Mapping?
+
+1. **Simplicity**: Keeps mapping logic close to where it's used
+2. **No Extra Dependencies**: Avoids utils depending on API schemas  
+3. **Clear Data Flow**: Easy to see how API params transform to service params
+4. **Easier Maintenance**: Changes to API contracts are localized to controllers
+
+#### Example: Public Controller Parameter Mapping
+
+```typescript
+// ✅ CORRECT - Map parameters inline
+async getAll(request: Request, response: Response, next: NextFunction): Promise<void> {
+  try {
+    const query = getValidatedQuery<VoucherQueryParams>(request)
+    
+    // Map inline - clear and simple
+    const params = {
+      businessId: query.businessId,
+      categoryId: query.categoryId,
+      state: 'published', // Apply business rules
+      type: query.type,
+      minValue: query.minValue,
+      maxValue: query.maxValue,
+      search: query.search,
+      page: query.page || 1,
+      limit: query.limit || PAGINATION_DEFAULT_LIMIT,
+      sortBy: sortFieldMapper.mapSortField(query.sortBy, 'createdAt'),
+      sortOrder: query.sortOrder || 'desc',
+      parsedIncludes,
+    }
+    
+    const result = await this.service.getAll(params)
+    // ...
+  } catch (error) {
+    next(error)
+  }
+}
+
+// ❌ WRONG - Don't create separate mapper utilities
+// utils/parameterMappers.ts
+export function mapPublicQueryToSearchParams(query: VoucherQueryParams): SearchParams {
+  // This creates unnecessary abstraction and dependencies
+}
+```
+
+#### Example: Admin Controller Parameter Mapping
+
+```typescript
+// Admin controllers may have more complex mappings - still do it inline
+const params = {
+  ...mapBasicParams(query), // OK if internal to controller
+  // Admin-specific mappings
+  includeDeleted: query.isDeleted,
+  createdFromStart: query.createdFromStart,
+  createdFromEnd: query.createdFromEnd,
+  minRedemptions: query.minRedemptions,
+  maxRedemptions: query.maxRedemptions,
+  // Apply any admin-specific business rules
+  state: query.state, // Admins can see all states
+}
+```
+
 ## 4. Authentication & Authorization (MANDATORY)
 
 ### Route Authentication Patterns:
@@ -394,18 +476,293 @@ export async function create{ServiceName}Server(config: ServerConfig) {
 }
 ```
 
-## 5. Service Layer Pattern (MANDATORY)
+## 5. Type Organization Pattern (MANDATORY)
+
+### Overview
+
+Each service MUST organize its types in a dedicated `/types` folder following Domain-Driven Design principles. This ensures:
+
+- **Type Safety**: All parameters and data structures are properly typed
+- **Reusability**: Types can be shared across layers within the service
+- **Maintainability**: Clear organization makes types easy to find and update
+- **Consistency**: All services follow the same type organization pattern
+
+### Type Structure:
+
+```
+packages/services/{service-name}/src/types/
+├── index.ts         # Export barrel file
+├── domain.ts        # Business logic types
+├── search.ts        # Search and filter parameters
+└── repository.ts    # Data layer types
+```
+
+### Type Files:
+
+#### 1. domain.ts - Business Logic Types
+
+```typescript
+// src/types/domain.ts
+import type { {ServiceName}Domain } from '@pika/sdk'
+import type { PaginatedResult } from '@pika/types'
+
+// Service operation types
+export interface {ServiceName}ClaimData {
+  notificationPreferences?: {
+    enableReminders: boolean
+    reminderDaysBefore?: number
+  }
+}
+
+export interface {ServiceName}ValidateOptions {
+  checkActive?: boolean
+  checkExpiry?: boolean
+  includeRelations?: boolean
+}
+
+export interface {ServiceName}ValidationResult {
+  isValid: boolean
+  reason?: string
+  {service}?: {ServiceName}Domain
+}
+
+// Analytics types
+export interface {ServiceName}Analytics {
+  total{ServiceName}s: number
+  active{ServiceName}s: number
+  average{Property}: number
+  {service}sByCategory: Record<string, number>
+}
+
+// Batch operation types
+export interface Batch{ServiceName}Operation {
+  {service}Ids: string[]
+  operation: 'activate' | 'deactivate' | 'validate'
+  context?: Record<string, any>
+}
+
+export interface Batch{ServiceName}Result {
+  processedCount: number
+  successCount: number
+  failedCount: number
+  results: Array<{
+    {service}Id: string
+    success: boolean
+    error?: string
+  }>
+}
+```
+
+#### 2. search.ts - Search Parameter Types
+
+```typescript
+// src/types/search.ts
+import type { ParsedIncludes } from '@pika/shared'
+import type { SearchParams } from '@pika/types'
+
+/**
+ * Public search parameters
+ */
+export interface {ServiceName}SearchParams extends SearchParams {
+  // Filters
+  categoryId?: string
+  isActive?: boolean
+  minPrice?: number
+  maxPrice?: number
+  search?: string
+  
+  // Date ranges
+  createdFromStart?: Date
+  createdFromEnd?: Date
+  
+  // Relations
+  parsedIncludes?: ParsedIncludes
+}
+
+/**
+ * Admin search parameters with extended filters
+ */
+export interface Admin{ServiceName}SearchParams extends {ServiceName}SearchParams {
+  createdBy?: string
+  updatedBy?: string
+  includeDeleted?: boolean
+  includeInactive?: boolean
+}
+
+/**
+ * Internal search parameters for service-to-service
+ */
+export interface Internal{ServiceName}SearchParams extends SearchParams {
+  {service}Ids?: string[]
+  categoryIds?: string[]
+  includeAll?: boolean
+}
+```
+
+#### 3. repository.ts - Data Layer Types
+
+```typescript
+// src/types/repository.ts
+import type { {ServiceName}Domain } from '@pika/sdk'
+
+/**
+ * Data types for repository operations
+ */
+
+export interface Create{ServiceName}Data {
+  // Required fields
+  name: string
+  categoryId: string
+  price: number
+  
+  // Optional fields
+  description?: string
+  imageUrl?: string
+  metadata?: Record<string, any>
+  
+  // System fields
+  createdBy: string
+}
+
+export interface Update{ServiceName}Data {
+  // All fields optional for partial updates
+  name?: string
+  description?: string
+  price?: number
+  isActive?: boolean
+  metadata?: Record<string, any>
+  
+  // System fields
+  updatedBy?: string
+}
+
+export interface BulkUpdate{ServiceName}Data {
+  isActive?: boolean
+  categoryId?: string
+  metadata?: Record<string, any>
+}
+```
+
+#### 4. index.ts - Export Barrel
+
+```typescript
+// src/types/index.ts
+/**
+ * {ServiceName} service types
+ * 
+ * Organization follows DDD principles:
+ * - Domain types: Business logic and domain concepts
+ * - Repository types: Data layer contracts
+ * - Search types: Query and filter parameters
+ */
+
+// Re-export all types
+export * from './domain.js'
+export * from './repository.js'
+export * from './search.js'
+```
+
+### Usage Guidelines:
+
+#### 1. Import Pattern
+
+```typescript
+// ✅ CORRECT - Import from types index
+import type {
+  {ServiceName}SearchParams,
+  Create{ServiceName}Data,
+  {ServiceName}ValidationResult,
+} from '../types/index.js'
+
+// ❌ WRONG - Don't import from individual files
+import type { {ServiceName}SearchParams } from '../types/search.js'
+```
+
+#### 2. Layer-Specific Usage
+
+**Repository Layer:**
+```typescript
+import type {
+  Create{ServiceName}Data,
+  Update{ServiceName}Data,
+  {ServiceName}SearchParams,
+} from '../types/index.js'
+
+export class {ServiceName}Repository {
+  async create(data: Create{ServiceName}Data): Promise<{ServiceName}Domain> {
+    // Implementation
+  }
+}
+```
+
+**Service Layer:**
+```typescript
+import type {
+  {ServiceName}ValidationOptions,
+  {ServiceName}ValidationResult,
+  Batch{ServiceName}Operation,
+} from '../types/index.js'
+
+export class {ServiceName}Service {
+  async validate(
+    id: string, 
+    options: {ServiceName}ValidationOptions
+  ): Promise<{ServiceName}ValidationResult> {
+    // Implementation
+  }
+}
+```
+
+**Controller Layer:**
+```typescript
+// Controllers use API schemas, not internal types
+import type { {service}Public } from '@pika/api'
+
+// Transform API types to domain types at boundaries
+const searchParams: {ServiceName}SearchParams = {
+  page: query.page,
+  limit: query.limit,
+  // ... map from API schema
+}
+```
+
+### Type Definition Rules:
+
+1. **No Inline Types**: Define all types in the types folder
+2. **Extend Base Types**: Use `extends SearchParams` for consistency
+3. **Optional vs Required**: Be explicit about optional fields
+4. **Use Type Imports**: Always use `import type` for type-only imports
+5. **Avoid `any`**: Use `unknown` or specific types instead
+6. **Document Complex Types**: Add JSDoc comments for clarity
+
+### Common Mistakes to Avoid:
+
+- ❌ Defining types directly in service/repository files
+- ❌ Using inline object types in function parameters
+- ❌ Importing types from other services directly
+- ❌ Using `any` for complex objects
+- ❌ Missing parsedIncludes in search parameters
+- ❌ Not extending base types from @pika/types
+
+## 6. Service Layer Pattern (MANDATORY)
 
 ```typescript
 // src/services/{ServiceName}Service.ts
+import type {
+  {ServiceName}SearchParams,
+  Create{ServiceName}Data,
+  {ServiceName}ValidationOptions,
+  {ServiceName}ValidationResult,
+} from '../types/index.js'
+
 export interface I{ServiceName}Service {
   getAll(params: {ServiceName}SearchParams): Promise<PaginatedResult<{ServiceName}Domain>>
   getById(id: string, parsedIncludes?: ParsedIncludes): Promise<{ServiceName}Domain | null>
   getByIds(ids: string[]): Promise<{ServiceName}Domain[]>
   create(data: Create{ServiceName}Data): Promise<{ServiceName}Domain>
-  update(id: string, data: Partial<{ServiceName}Domain>): Promise<{ServiceName}Domain>
+  update(id: string, data: Update{ServiceName}Data): Promise<{ServiceName}Domain>
   delete(id: string): Promise<void>
-  validate(id: string, checkActive?: boolean): Promise<{ valid: boolean; {service}?: {ServiceName}Domain; reason?: string }>
+  validate(id: string, options: {ServiceName}ValidationOptions): Promise<{ServiceName}ValidationResult>
 }
 
 export class {ServiceName}Service implements I{ServiceName}Service {
@@ -479,16 +836,22 @@ export class {ServiceName}Service implements I{ServiceName}Service {
 }
 ```
 
-## 6. Repository Pattern (MANDATORY)
+## 7. Repository Pattern (MANDATORY)
 
 ```typescript
 // src/repositories/{ServiceName}Repository.ts
+import type {
+  {ServiceName}SearchParams,
+  Create{ServiceName}Data,
+  Update{ServiceName}Data,
+} from '../types/index.js'
+
 export interface I{ServiceName}Repository {
   findAll(params: {ServiceName}SearchParams): Promise<PaginatedResult<{ServiceName}Domain>>
   findById(id: string, parsedIncludes?: ParsedIncludes): Promise<{ServiceName}Domain | null>
   findByIds(ids: string[]): Promise<{ServiceName}Domain[]>
   create(data: Create{ServiceName}Data): Promise<{ServiceName}Domain>
-  update(id: string, data: Partial<{ServiceName}Domain>): Promise<{ServiceName}Domain>
+  update(id: string, data: Update{ServiceName}Data): Promise<{ServiceName}Domain>
   delete(id: string): Promise<void>
   exists(id: string): Promise<boolean>
 }
@@ -553,7 +916,7 @@ export class {ServiceName}Repository implements I{ServiceName}Repository {
 }
 ```
 
-## 7. Testing Pattern (MANDATORY)
+## 8. Testing Pattern (MANDATORY)
 
 ### Test Structure:
 
@@ -798,7 +1161,7 @@ describe('{ServiceName} Internal API', () => {
 })
 ```
 
-## 8. DTO and Mapper Pattern (MANDATORY)
+## 9. DTO and Mapper Pattern (MANDATORY)
 
 ### Conceptual Overview
 
@@ -859,7 +1222,7 @@ API Response (JSON)
 - `packages/sdk/src/mappers/{ServiceName}Mapper.ts` - All transformations
 - Services import and use these shared definitions
 
-## 9. Environment Configuration (MANDATORY)
+## 10. Environment Configuration (MANDATORY)
 
 Add service-specific environment variables:
 
@@ -869,7 +1232,7 @@ export const {SERVICE_NAME}_SERVICE_PORT = parseInt(process.env.{SERVICE_NAME}_S
 export const {SERVICE_NAME}_SERVICE_URL = process.env.{SERVICE_NAME}_SERVICE_URL || `http://localhost:${{{SERVICE_NAME}_SERVICE_PORT}}`
 ```
 
-## 10. API Documentation Integration (MANDATORY)
+## 11. API Documentation Integration (MANDATORY)
 
 ### Schema Registration:
 
@@ -894,7 +1257,7 @@ registry.registerRoute({
 })
 ```
 
-## 11. Package Configuration (MANDATORY)
+## 12. Package Configuration (MANDATORY)
 
 ### package.json:
 
@@ -965,7 +1328,7 @@ registry.registerRoute({
 }
 ```
 
-## 12. Clean Architecture Rules (CRITICAL)
+## 13. Clean Architecture Rules (CRITICAL)
 
 ### Layer Import Rules:
 
@@ -994,7 +1357,7 @@ registry.registerRoute({
 - ❌ Cross-service direct imports (use service clients)
 - ❌ Database queries in Controllers
 
-## 13. Validation Rules (MANDATORY)
+## 14. Validation Rules (MANDATORY)
 
 ### Request Validation:
 
@@ -1132,7 +1495,7 @@ async getByIds(
 - ❌ Using DTOs instead of schema types in Response<>
 - ❌ Not using paginatedResponse() for list endpoints
 
-## 14. Checklist for New Services
+## 15. Checklist for New Services
 
 When creating a new service, verify ALL of these items:
 
@@ -1147,10 +1510,11 @@ When creating a new service, verify ALL of these items:
 ### Service Structure:
 
 - [ ] Created proper directory structure
-- [ ] Implemented domain types and interfaces
-- [ ] Created comprehensive mapper class
-- [ ] Implemented repository with include support
-- [ ] Implemented service with business logic
+- [ ] Created `/types` folder with domain.ts, search.ts, repository.ts, index.ts
+- [ ] Implemented all type definitions properly (no inline types)
+- [ ] Created comprehensive mapper class in @pika/sdk
+- [ ] Implemented repository with proper type imports
+- [ ] Implemented service with proper type imports
 - [ ] Created all three controllers (Public, Admin, Internal)
 
 ### Routes & Authentication:

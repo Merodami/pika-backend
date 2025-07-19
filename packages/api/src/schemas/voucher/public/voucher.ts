@@ -60,7 +60,7 @@ export const VoucherResponse = openapi(
     maxRedemptions: z.number().int().min(1).optional().nullable(),
     maxRedemptionsPerUser: z.number().int().min(1).default(1),
     currentRedemptions: z.number().int().min(0).default(0),
-    metadata: z.record(z.any()).optional().nullable(),
+    metadata: z.record(z.string(), z.any()).optional().nullable(),
     codes: z.array(VoucherCodeResponse).optional(),
   }),
   {

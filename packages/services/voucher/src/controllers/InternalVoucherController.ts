@@ -1,16 +1,19 @@
-import { voucherInternal, voucherCommon, shared } from '@pika/api'
+import { voucherCommon, voucherInternal } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import { VoucherMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
+import { paginatedResponse } from '@pika/http'
+import { VoucherMapper, type VoucherDomain } from '@pika/sdk'
+import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IVoucherService } from '../services/VoucherService.js'
+import type { IInternalVoucherService, BatchProcessOperation } from '../services/InternalVoucherService.js'
 
 /**
  * Handles internal voucher operations for service-to-service communication
  */
 export class InternalVoucherController {
-  constructor(private readonly voucherService: IVoucherService) {
+  constructor(
+    private readonly internalVoucherService: IInternalVoucherService,
+  ) {
     // Bind methods to preserve 'this' context
     this.getVouchersByIds = this.getVouchersByIds.bind(this)
     this.validateVoucher = this.validateVoucher.bind(this)
@@ -20,6 +23,8 @@ export class InternalVoucherController {
     this.getVouchersByCategory = this.getVouchersByCategory.bind(this)
     this.getUserVouchers = this.getUserVouchers.bind(this)
     this.trackRedemption = this.trackRedemption.bind(this)
+    this.batchProcessVouchers = this.batchProcessVouchers.bind(this)
+    this.batchUpdateVoucherState = this.batchUpdateVoucherState.bind(this)
   }
 
   /**
@@ -34,10 +39,8 @@ export class InternalVoucherController {
     try {
       const { voucherIds, include } = req.body
 
-      const vouchers = await this.voucherService.getVouchersByIds(
-        voucherIds,
-        include,
-      )
+      const parsedIncludes = include ? parseIncludeParam(include) : undefined
+      const vouchers = await this.internalVoucherService.getVouchersByIds(voucherIds, parsedIncludes)
       const notFound = voucherIds.filter(
         (id) => !vouchers.find((v) => v.id === id),
       )
@@ -69,7 +72,7 @@ export class InternalVoucherController {
         checkState,
       } = req.body
 
-      const validation = await this.voucherService.validateVoucher(voucherId, {
+      const validation = await this.internalVoucherService.validateVoucher(voucherId, {
         userId,
         checkRedemptionLimit,
         checkExpiry,
@@ -106,10 +109,10 @@ export class InternalVoucherController {
       const { state, reason, serviceId } = req.body
 
       // Get current voucher to check previous state
-      const currentVoucher = await this.voucherService.getVoucherById(voucherId)
+      const currentVoucher = await this.internalVoucherService.getVoucherById(voucherId)
       const previousState = currentVoucher.state
 
-      const updatedVoucher = await this.voucherService.updateVoucherState(
+      const updatedVoucher = await this.internalVoucherService.updateVoucherStateInternal(
         voucherId,
         state,
         reason,
@@ -137,7 +140,7 @@ export class InternalVoucherController {
     try {
       const { voucherId, code } = req.body
 
-      const exists = await this.voucherService.checkVoucherExists({
+      const exists = await this.internalVoucherService.checkVoucherExists({
         voucherId,
         code,
       })
@@ -173,12 +176,12 @@ export class InternalVoucherController {
         limit: limit || PAGINATION_DEFAULT_LIMIT,
       }
 
-      const result = await this.voucherService.getVouchersByBusinessId(params)
+      const result = await this.internalVoucherService.getVouchersByBusinessInternal(
+        businessId,
+        params,
+      )
 
-      res.json({
-        data: result.data.map((voucher) => VoucherMapper.toDTO(voucher)),
-        pagination: result.pagination,
-      })
+      res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
       next(error)
     }
@@ -204,12 +207,12 @@ export class InternalVoucherController {
         limit: limit || PAGINATION_DEFAULT_LIMIT,
       }
 
-      const result = await this.voucherService.getAllVouchers(params)
+      const result = await this.internalVoucherService.getVouchersByCategoryInternal(
+        categoryId,
+        params,
+      )
 
-      res.json({
-        data: result.data.map((voucher) => VoucherMapper.toDTO(voucher)),
-        pagination: result.pagination,
-      })
+      res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
       next(error)
     }
@@ -234,17 +237,9 @@ export class InternalVoucherController {
         limit: limit || PAGINATION_DEFAULT_LIMIT,
       }
 
-      const result = await this.voucherService.getUserVouchers(params)
+      const result = await this.internalVoucherService.getUserVouchers(params)
 
-      res.json({
-        data: result.data.map((userVoucher) => ({
-          voucher: VoucherMapper.toDTO(userVoucher.voucher),
-          claimedAt: userVoucher.claimedAt.toISOString(),
-          status: userVoucher.status,
-          redeemedAt: userVoucher.redeemedAt?.toISOString() || null,
-        })),
-        pagination: result.pagination,
-      })
+      res.json(paginatedResponse(result, VoucherMapper.toUserVoucherDTO))
     } catch (error) {
       next(error)
     }
@@ -262,7 +257,7 @@ export class InternalVoucherController {
     try {
       const { voucherId, userId, code, metadata } = req.body
 
-      const result = await this.voucherService.trackRedemption({
+      const result = await this.internalVoucherService.trackRedemption({
         voucherId,
         userId,
         code,
@@ -291,58 +286,25 @@ export class InternalVoucherController {
   ): Promise<void> {
     try {
       const { voucherIds, operation, context } = req.body
-      const startTime = Date.now()
 
-      const results = []
-      let successful = 0
-      let failed = 0
-
-      for (const voucherId of voucherIds) {
-        try {
-          let voucher: VoucherDomain | undefined
-
-          switch (operation) {
-            case 'publish':
-              voucher = await this.voucherService.publishVoucher(voucherId)
-              break
-            case 'expire':
-              voucher = await this.voucherService.expireVoucher(voucherId)
-              break
-            case 'validate':
-              voucher = await this.voucherService.getVoucherById(voucherId)
-              break
-            case 'refresh':
-              // Refresh cache by getting voucher and invalidating cache
-              voucher = await this.voucherService.getVoucherById(voucherId)
-              break
-            default:
-              throw new Error(`Unknown operation: ${operation}`)
-          }
-
-          results.push({
-            voucherId,
-            success: true,
-            voucher: VoucherMapper.toDTO(voucher),
-          })
-          successful++
-        } catch (error) {
-          results.push({
-            voucherId,
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          })
-          failed++
-        }
+      const batchOperation: BatchProcessOperation = {
+        voucherIds,
+        operation: operation as 'expire' | 'validate' | 'activate',
+        context,
       }
 
-      const processingTime = Date.now() - startTime
+      const result = await this.internalVoucherService.batchProcessVouchers(batchOperation)
 
       res.status(200).json({
-        successful,
-        failed,
-        total: voucherIds.length,
-        results,
-        processingTime,
+        successful: result.successCount,
+        failed: result.failedCount,
+        total: result.processedCount,
+        results: result.results.map(r => ({
+          voucherId: r.voucherId,
+          success: r.success,
+          error: r.error,
+        })),
+        processingTime: 0, // The internal service doesn't track this, but we need it for API compatibility
       })
     } catch (error) {
       next(error)
@@ -362,21 +324,23 @@ export class InternalVoucherController {
       const { updates, context } = req.body
 
       const updateResults = []
+
       let successful = 0
       let failed = 0
 
       for (const update of updates) {
         try {
           // Get current state
-          const currentVoucher = await this.voucherService.getVoucherById(
+          const currentVoucher = await this.internalVoucherService.getVoucherById(
             update.voucherId,
           )
           const oldState = currentVoucher.state
 
           // Update state
-          const updatedVoucher = await this.voucherService.updateVoucherState(
+          const updatedVoucher = await this.internalVoucherService.updateVoucherStateInternal(
             update.voucherId,
             update.state,
+            context?.reason,
           )
 
           updateResults.push({
