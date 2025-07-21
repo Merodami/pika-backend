@@ -1,16 +1,10 @@
-import type {
-  TemplateSearchParams as ApiTemplateSearchParams,
-  CreateTemplateRequest,
-  TemplateIdParam,
-  TestTemplateRequest,
-  UpdateTemplateRequest,
-} from '@pika/api/public'
-import type { CreateTemplateDTO, UpdateTemplateDTO } from '@pika/sdk'
-import { TemplateMapper } from '@pika/sdk'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { ErrorFactory, logger } from '@pika/shared'
+import { communicationCommon, communicationPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import type { CreateTemplateDTO, UpdateTemplateDTO } from '@pika/sdk'
+import { TemplateMapper } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { TemplateSearchParams } from '../repositories/TemplateRepository.js'
@@ -80,7 +74,7 @@ export class TemplateController implements ITemplateController {
    * Create a new template
    */
   async createTemplate(
-    request: Request<{}, {}, CreateTemplateRequest>,
+    request: Request<{}, {}, communicationPublic.CreateTemplateRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -126,7 +120,8 @@ export class TemplateController implements ITemplateController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<ApiTemplateSearchParams>(request)
+      const query =
+        getValidatedQuery<communicationPublic.TemplateSearchParams>(request)
 
       // Transform API params to service params
       const params: TemplateSearchParams = {
@@ -156,7 +151,7 @@ export class TemplateController implements ITemplateController {
    * Get template by ID
    */
   async getTemplateById(
-    request: Request<TemplateIdParam>,
+    request: Request<communicationCommon.TemplateIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -178,7 +173,11 @@ export class TemplateController implements ITemplateController {
    * Update template
    */
   async updateTemplate(
-    request: Request<TemplateIdParam, {}, UpdateTemplateRequest>,
+    request: Request<
+      communicationCommon.TemplateIdParam,
+      {},
+      communicationPublic.UpdateTemplateRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -215,7 +214,7 @@ export class TemplateController implements ITemplateController {
    * Delete template
    */
   async deleteTemplate(
-    request: Request<TemplateIdParam>,
+    request: Request<communicationCommon.TemplateIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -237,7 +236,7 @@ export class TemplateController implements ITemplateController {
    * Validate template with variables
    */
   async validateTemplate(
-    request: Request<{}, {}, TestTemplateRequest>,
+    request: Request<{}, {}, communicationPublic.TestTemplateRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

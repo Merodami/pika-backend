@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client'
 import { PDF_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
 
 import { createPDFServer } from './server.js'
 
@@ -12,6 +12,7 @@ async function initializeDatabase(): Promise<PrismaClient> {
   try {
     await prisma.$queryRaw`SELECT 1`
     logger.info('Successfully connected to PostgreSQL database')
+
     return prisma
   } catch (error) {
     logger.error('Failed to connect to PostgreSQL database:', error)

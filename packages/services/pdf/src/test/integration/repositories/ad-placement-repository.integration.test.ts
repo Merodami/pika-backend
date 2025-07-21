@@ -1,15 +1,15 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import type { PrismaClient } from '@prisma/client'
-import { v4 as uuid } from 'uuid'
-import {
-  createTestDatabase,
-  cleanupTestDatabase,
-  clearTestDatabase,
-} from '@pika/tests'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { AdPlacementRepository } from '../../../repositories/AdPlacementRepository.js'
+import {
+  clearTestDatabase,
+  createTestDatabase,
+} from '@pika/tests'
+import type { PrismaClient } from '@prisma/client'
+import { v4 as uuid } from 'uuid'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+
 import type { IAdPlacementRepository } from '../../../repositories/AdPlacementRepository.js'
+import { AdPlacementRepository } from '../../../repositories/AdPlacementRepository.js'
 
 describe('AdPlacementRepository Integration Tests', () => {
   let prisma: PrismaClient
@@ -23,6 +23,7 @@ describe('AdPlacementRepository Integration Tests', () => {
 
   beforeAll(async () => {
     const result = await createTestDatabase()
+
     prisma = result.prisma
     testContext = result
     cache = new MemoryCacheService()
@@ -318,12 +319,14 @@ describe('AdPlacementRepository Integration Tests', () => {
 
       // Should not be found in regular queries
       const result = await repository.findById(adPlacement.id)
+
       expect(result).toBeNull()
 
       // But should exist in database with deletedAt timestamp
       const deletedRecord = await prisma.adPlacement.findFirst({
         where: { id: adPlacement.id },
       })
+
       expect(deletedRecord?.deletedAt).toBeInstanceOf(Date)
     })
   })
@@ -420,15 +423,18 @@ describe('AdPlacementRepository Integration Tests', () => {
 
       // First call - should cache the result
       const result1 = await repository.findById(adPlacement.id)
+
       expect(result1).not.toBeNull()
 
       // Check if cached
       const cacheKey = `ad_placement:${adPlacement.id}`
       const cached = await cache.get(cacheKey)
+
       expect(cached).not.toBeNull()
 
       // Second call - should use cache
       const result2 = await repository.findById(adPlacement.id)
+
       expect(result2).toEqual(result1)
     })
 
@@ -459,6 +465,7 @@ describe('AdPlacementRepository Integration Tests', () => {
       // Cache should be cleared
       const cacheKey = `ad_placement:${adPlacement.id}`
       const cached = await cache.get(cacheKey)
+
       expect(cached).toBeNull()
     })
   })

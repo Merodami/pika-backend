@@ -5,25 +5,14 @@ import {
   type CustomerVoucherDomain,
   type VoucherDomain,
   VoucherMapper,
-  type VoucherScanData,
 } from '@pika/sdk'
-import {
-  ErrorFactory,
-  logger,
-  type ParsedIncludes,
-  toPrismaInclude,
-} from '@pika/shared'
-import type {
-  PaginatedResult,
-  VoucherCodeType,
-  VoucherState,
-} from '@pika/types'
+import { ErrorFactory, logger, toPrismaInclude } from '@pika/shared'
+import type { ParsedIncludes } from '@pika/types'
+import type { PaginatedResult, VoucherState } from '@pika/types'
+import { CustomerVoucherStatus, VoucherCodeType } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
-import type {
-  VoucherSearchParams,
-  CreateVoucherData,
-  UpdateVoucherData,
-} from '../types/index.js'
+
+import type { VoucherSearchParams } from '../types/index.js'
 
 export interface IVoucherRepository {
   findAll(params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
@@ -258,7 +247,6 @@ export class VoucherRepository implements IVoucherRepository {
     }
   }
 
-
   async findByBusinessId(
     businessId: string,
     params: VoucherSearchParams,
@@ -272,7 +260,6 @@ export class VoucherRepository implements IVoucherRepository {
   ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       const {
-        voucherId,
         state,
         page = 1,
         limit = PAGINATION_DEFAULT_LIMIT,
@@ -286,10 +273,6 @@ export class VoucherRepository implements IVoucherRepository {
         voucher: {
           deletedAt: null,
         },
-      }
-
-      if (voucherId) {
-        where.voucherId = voucherId
       }
 
       if (state) {
@@ -325,8 +308,13 @@ export class VoucherRepository implements IVoucherRepository {
         data: items.map((item) => {
           const voucher = VoucherMapper.fromDocument(item.voucher)
 
-          // Add user-specific state
-          voucher.state = item.state as VoucherState
+          // Add user-specific state based on customer voucher status
+          voucher.state =
+            item.status === CustomerVoucherStatus.claimed
+              ? ('claimed' as VoucherState)
+              : item.status === CustomerVoucherStatus.redeemed
+                ? ('redeemed' as VoucherState)
+                : voucher.state
 
           return voucher
         }),
@@ -379,9 +367,9 @@ export class VoucherRepository implements IVoucherRepository {
 
       // Add user-specific state based on customer voucher status
       voucher.state =
-        customerVoucher.status === 'claimed'
+        customerVoucher.status === CustomerVoucherStatus.claimed
           ? ('claimed' as VoucherState)
-          : customerVoucher.status === 'redeemed'
+          : customerVoucher.status === CustomerVoucherStatus.redeemed
             ? ('redeemed' as VoucherState)
             : voucher.state
 
@@ -404,13 +392,6 @@ export class VoucherRepository implements IVoucherRepository {
       throw error
     }
   }
-
-
-
-
-
-
-
 
   private buildOrderBy(sortBy: string, sortOrder: 'asc' | 'desc'): any {
     // Handle nested sorting for related fields
@@ -436,8 +417,6 @@ export class VoucherRepository implements IVoucherRepository {
       ? (toPrismaInclude(parsedIncludes) as Prisma.VoucherInclude)
       : undefined
   }
-
-
 
   async findByQRCode(qrCode: string): Promise<VoucherDomain | null> {
     try {
@@ -470,7 +449,7 @@ export class VoucherRepository implements IVoucherRepository {
               codes: {
                 some: {
                   code: shortCode,
-                  type: 'short' as VoucherCodeType,
+                  type: VoucherCodeType.short,
                   isActive: true,
                 },
               },
@@ -499,7 +478,7 @@ export class VoucherRepository implements IVoucherRepository {
           codes: {
             some: {
               code: staticCode,
-              type: 'static' as VoucherCodeType,
+              type: VoucherCodeType.static,
               isActive: true,
             },
           },
@@ -555,9 +534,8 @@ export class VoucherRepository implements IVoucherRepository {
         data: {
           customerId: userId,
           voucherId,
-          status: 'claimed',
+          status: CustomerVoucherStatus.claimed,
           claimedAt: new Date(),
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from claim
         },
         include: {
           voucher: true,
@@ -565,7 +543,7 @@ export class VoucherRepository implements IVoucherRepository {
       })
 
       return VoucherMapper.mapCustomerVoucherFromDocument(
-        customerVoucher as CustomerVoucherDocument,
+        this.convertPrismaCustomerVoucherToDocument(customerVoucher),
       )
     } catch (error) {
       logger.error('Failed to claim voucher', { error, voucherId, userId })
@@ -587,7 +565,7 @@ export class VoucherRepository implements IVoucherRepository {
           },
         },
         data: {
-          status: 'redeemed',
+          status: CustomerVoucherStatus.redeemed,
           redeemedAt: new Date(),
         },
         include: {
@@ -599,7 +577,7 @@ export class VoucherRepository implements IVoucherRepository {
       await this.incrementRedemptions(voucherId)
 
       return VoucherMapper.mapCustomerVoucherFromDocument(
-        customerVoucher as CustomerVoucherDocument,
+        this.convertPrismaCustomerVoucherToDocument(customerVoucher),
       )
     } catch (error) {
       logger.error('Failed to redeem voucher', { error, voucherId, userId })
@@ -629,7 +607,7 @@ export class VoucherRepository implements IVoucherRepository {
       }
 
       return VoucherMapper.mapCustomerVoucherFromDocument(
-        customerVoucher as CustomerVoucherDocument,
+        this.convertPrismaCustomerVoucherToDocument(customerVoucher),
       )
     } catch (error) {
       logger.error('Failed to find customer voucher', {
@@ -646,7 +624,7 @@ export class VoucherRepository implements IVoucherRepository {
     status?: string,
   ): Promise<CustomerVoucherDomain[]> {
     try {
-      const whereClause: any = { userId }
+      const whereClause: any = { customerId: userId }
 
       if (status && status !== 'all') {
         whereClause.status = status
@@ -662,11 +640,26 @@ export class VoucherRepository implements IVoucherRepository {
         },
       })
 
-      return customerVouchers.map((cv) =>
-        VoucherMapper.mapCustomerVoucherFromDocument(
-          cv as CustomerVoucherDocument,
-        ),
-      )
+      return customerVouchers.map((cv) => {
+        // Map Prisma result to CustomerVoucherDocument format
+        const customerVoucherDoc: CustomerVoucherDocument = {
+          id: cv.id,
+          userId: cv.customerId, // Map customerId to userId
+          voucherId: cv.voucherId,
+          status: cv.status,
+          claimedAt: cv.claimedAt,
+          redeemedAt: cv.redeemedAt,
+          expiresAt: cv.voucher?.validUntil || new Date(),
+          redemptionCode: null,
+          redemptionLocation: null,
+          metadata: cv.notificationPreferences,
+          createdAt: cv.createdAt,
+          updatedAt: cv.updatedAt,
+          voucher: cv.voucher as any,
+        }
+
+        return VoucherMapper.mapCustomerVoucherFromDocument(customerVoucherDoc)
+      })
     } catch (error) {
       logger.error('Failed to get customer vouchers', {
         error,
@@ -688,6 +681,29 @@ export class VoucherRepository implements IVoucherRepository {
     } catch (error) {
       logger.error('Failed to increment redemptions', { error, voucherId })
       throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Helper method to convert Prisma CustomerVoucher to CustomerVoucherDocument
+   */
+  private convertPrismaCustomerVoucherToDocument(
+    prismaCustomerVoucher: any,
+  ): CustomerVoucherDocument {
+    return {
+      id: prismaCustomerVoucher.id,
+      userId: prismaCustomerVoucher.customerId, // Map customerId to userId
+      voucherId: prismaCustomerVoucher.voucherId,
+      status: prismaCustomerVoucher.status,
+      claimedAt: prismaCustomerVoucher.claimedAt,
+      redeemedAt: prismaCustomerVoucher.redeemedAt,
+      expiresAt: prismaCustomerVoucher.voucher?.validUntil || new Date(),
+      redemptionCode: null,
+      redemptionLocation: null,
+      metadata: prismaCustomerVoucher.notificationPreferences,
+      createdAt: prismaCustomerVoucher.createdAt,
+      updatedAt: prismaCustomerVoucher.updatedAt,
+      voucher: prismaCustomerVoucher.voucher || undefined,
     }
   }
 }

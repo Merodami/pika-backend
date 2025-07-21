@@ -1,11 +1,11 @@
 import { NODE_ENV, REDIS_DEFAULT_TTL } from '@pika/environment'
+import type { ICacheService } from '@pika/redis'
+import { Cache } from '@pika/redis'
 import type {
   BulkEmailDTO,
   CommunicationLogDomain,
   SendEmailDTO,
 } from '@pika/sdk'
-import type { ICacheService } from '@pika/redis'
-import { Cache } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { EmailTemplateId, PaginatedResult } from '@pika/types'
 import Handlebars from 'handlebars'

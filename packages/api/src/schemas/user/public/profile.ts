@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { UserRole } from '../../shared/enums.js'
 import {
@@ -8,7 +9,6 @@ import {
   LanguageCode,
   PhoneNumber,
 } from '../../shared/primitives.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * User profile schemas for public API

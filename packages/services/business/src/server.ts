@@ -1,12 +1,12 @@
 // Load environment variables first
 import '@pika/environment'
 
-import { PrismaClient } from '@prisma/client'
 import { BUSINESS_SERVICE_NAME, BUSINESS_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import { TranslationClient } from '@pika/translation'
+import { PrismaClient } from '@prisma/client'
 
 import { createAdminBusinessRoutes } from './routes/AdminBusinessRoutes.js'
 import { createBusinessRoutes } from './routes/BusinessRoutes.js'

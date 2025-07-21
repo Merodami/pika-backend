@@ -6,10 +6,10 @@ import type {
   Category,
   CategorySearchParams,
   CreateCategoryData,
-  UpdateCategoryData,
-  PaginatedResult,
   ICategoryRepository,
   ICategoryService,
+  PaginatedResult,
+  UpdateCategoryData,
 } from '../types/interfaces.js'
 
 export class CategoryService implements ICategoryService {
@@ -21,13 +21,16 @@ export class CategoryService implements ICategoryService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:categories',
-    keyGenerator: (params) => JSON.stringify(params),
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${JSON.stringify(args[0])}`
+    },
   })
   async getAllCategories(
     params: CategorySearchParams,
   ): Promise<PaginatedResult<Category>> {
     try {
       const result = await this.repository.findAll(params)
+
       return result
     } catch (error) {
       logger.error('Failed to get all categories', { error, params })
@@ -38,7 +41,9 @@ export class CategoryService implements ICategoryService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:category',
-    keyGenerator: (id) => id,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getCategoryById(id: string): Promise<Category> {
     try {
@@ -63,12 +68,17 @@ export class CategoryService implements ICategoryService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:categories:bulk',
-    keyGenerator: (ids) => JSON.stringify(ids.sort()),
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const ids = args[0] as string[]
+
+      return `${prefix}:${JSON.stringify(ids.sort())}`
+    },
   })
   async getCategoriesByIds(ids: string[]): Promise<Category[]> {
     try {
       // Validate all IDs are proper UUIDs
       const invalidIds = ids.filter((id) => !isUuidV4(id))
+
       if (invalidIds.length > 0) {
         throw ErrorFactory.badRequest(
           `Invalid category ID format: ${invalidIds.join(', ')}`,
@@ -76,6 +86,7 @@ export class CategoryService implements ICategoryService {
       }
 
       const categories = await this.repository.findByIds(ids)
+
       return categories
     } catch (error) {
       logger.error('Failed to get categories by ids', { error, ids })
@@ -88,6 +99,7 @@ export class CategoryService implements ICategoryService {
       // Validate parent category exists if provided
       if (data.parentId) {
         const parentExists = await this.repository.exists(data.parentId)
+
         if (!parentExists) {
           throw ErrorFactory.businessRuleViolation(
             'Parent category not found',
@@ -115,6 +127,7 @@ export class CategoryService implements ICategoryService {
     try {
       // Validate category exists
       const existing = await this.repository.findById(id)
+
       if (!existing) {
         throw ErrorFactory.resourceNotFound('Category', id)
       }
@@ -122,6 +135,7 @@ export class CategoryService implements ICategoryService {
       // Validate parent category exists if provided
       if (data.parentId) {
         const parentExists = await this.repository.exists(data.parentId)
+
         if (!parentExists) {
           throw ErrorFactory.businessRuleViolation(
             'Parent category not found',
@@ -154,6 +168,7 @@ export class CategoryService implements ICategoryService {
     try {
       // Validate category exists
       const existing = await this.repository.findById(id)
+
       if (!existing) {
         throw ErrorFactory.resourceNotFound('Category', id)
       }
@@ -174,6 +189,7 @@ export class CategoryService implements ICategoryService {
     try {
       // Validate category exists
       const existing = await this.repository.findById(id)
+
       if (!existing) {
         throw ErrorFactory.resourceNotFound('Category', id)
       }
@@ -199,6 +215,7 @@ export class CategoryService implements ICategoryService {
     try {
       // Validate category exists
       const existing = await this.repository.findById(id)
+
       if (!existing) {
         throw ErrorFactory.resourceNotFound('Category', id)
       }
@@ -206,6 +223,7 @@ export class CategoryService implements ICategoryService {
       // Validate new parent exists if provided
       if (newParentId) {
         const parentExists = await this.repository.exists(newParentId)
+
         if (!parentExists) {
           throw ErrorFactory.businessRuleViolation(
             'New parent category not found',
@@ -223,7 +241,7 @@ export class CategoryService implements ICategoryService {
       }
 
       const category = await this.repository.update(id, {
-        parentId: newParentId,
+        parentId: newParentId || undefined,
       })
 
       // Invalidate cache
@@ -243,6 +261,7 @@ export class CategoryService implements ICategoryService {
     try {
       // Validate category exists
       const existing = await this.repository.findById(id)
+
       if (!existing) {
         throw ErrorFactory.resourceNotFound('Category', id)
       }
@@ -273,6 +292,7 @@ export class CategoryService implements ICategoryService {
   async getCategoryHierarchy(rootId?: string): Promise<Category[]> {
     try {
       const categories = await this.repository.getHierarchy(rootId)
+
       return categories
     } catch (error) {
       logger.error('Failed to get category hierarchy', { error, rootId })
@@ -293,6 +313,7 @@ export class CategoryService implements ICategoryService {
       }
 
       const path = await this.repository.getPath(id)
+
       return path
     } catch (error) {
       logger.error('Failed to get category path', { error, id })

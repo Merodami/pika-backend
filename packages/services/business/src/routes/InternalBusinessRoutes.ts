@@ -1,4 +1,3 @@
-import type { PrismaClient } from '@prisma/client'
 import { businessInternal, businessPublic, shared } from '@pika/api'
 import {
   requireServiceAuth,
@@ -8,6 +7,7 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { TranslationClient } from '@pika/translation'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { InternalBusinessController } from '../controllers/InternalBusinessController.js'

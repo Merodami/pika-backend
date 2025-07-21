@@ -1,17 +1,14 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import type { PrismaClient } from '@prisma/client'
-import { v4 as uuid } from 'uuid'
-
-import {
-  createTestDatabase,
-  cleanupTestDatabase,
-  clearTestDatabase,
-} from '@pika/tests'
+import type { IVoucherBookRepository } from '@pdf/repositories/VoucherBookRepository.js'
+import { VoucherBookRepository } from '@pdf/repositories/VoucherBookRepository.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-
-import { VoucherBookRepository } from '@pdf/repositories/VoucherBookRepository.js'
-import type { IVoucherBookRepository } from '@pdf/repositories/VoucherBookRepository.js'
+import {
+  cleanupTestDatabase,
+  createTestDatabase,
+} from '@pika/tests'
+import type { PrismaClient } from '@prisma/client'
+import { v4 as uuid } from 'uuid'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 // Test database
 let testDb: { prisma: PrismaClient; container: any; stop: () => Promise<void> }
@@ -31,6 +28,7 @@ describe('VoucherBookRepository Integration Tests', () => {
 
     // Create cache service
     const cacheService = new MemoryCacheService(3600)
+
     await cacheService.connect()
 
     // Create repository
@@ -388,6 +386,7 @@ describe('VoucherBookRepository Integration Tests', () => {
       await repository.delete(book.id)
 
       const result = await repository.findById(book.id)
+
       expect(result).toBeNull()
     })
 
@@ -617,5 +616,6 @@ function getMonthName(month: number): string {
     'November',
     'December',
   ]
+
   return months[month - 1]
 }

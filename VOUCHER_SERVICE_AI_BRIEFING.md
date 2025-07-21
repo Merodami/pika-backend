@@ -7,6 +7,7 @@ The voucher service is **85% complete** with excellent architecture. The core im
 ## 🎯 **Work Division Overview**
 
 ### **Completed Work** ✅
+
 - **Core Implementation**: 100% complete (1,954 lines of business logic)
 - **API Schemas**: 100% complete (all tiers implemented)
 - **SDK Layer**: 100% complete (types, DTOs, mappers)
@@ -16,6 +17,7 @@ The voucher service is **85% complete** with excellent architecture. The core im
 - **Environment Config**: 100% complete
 
 ### **Remaining Work** ❌
+
 - **Integration Tests**: 0% complete (HIGH PRIORITY)
 - **API Documentation**: 30% remaining (MEDIUM PRIORITY)
 - **Service Client**: 0% complete (LOW PRIORITY)
@@ -25,6 +27,7 @@ The voucher service is **85% complete** with excellent architecture. The core im
 ## 👤 **AI Instance #1: Testing Specialist**
 
 ### **Your Mission**
+
 Create comprehensive test coverage for the voucher service. The service has zero voucher-specific tests currently.
 
 ### **Tasks** (2 days estimated)
@@ -43,6 +46,7 @@ Create these test files in `/packages/services/voucher/src/test/integration/e2e/
 **Test Coverage Required:**
 
 **Public Endpoints** (`public-voucher.integration.test.ts`):
+
 - Browse vouchers with filters
 - View voucher details with includes
 - Scan voucher (QR/short/static codes)
@@ -52,6 +56,7 @@ Create these test files in `/packages/services/voucher/src/test/integration/e2e/
 - Error cases (expired, already claimed, etc.)
 
 **Admin Endpoints** (`admin-voucher.integration.test.ts`):
+
 - CRUD operations
 - Publish/expire vouchers
 - File upload for images
@@ -60,12 +65,14 @@ Create these test files in `/packages/services/voucher/src/test/integration/e2e/
 - State management
 
 **Internal Endpoints** (`internal-voucher.integration.test.ts`):
+
 - Batch voucher fetch
 - Validate voucher
 - Update voucher state
 - Service authentication
 
 **Lifecycle Tests** (`voucher-lifecycle.integration.test.ts`):
+
 - Complete flow: Create → Publish → Scan → Claim → Redeem
 - State transition validation
 - Code generation and lookup
@@ -87,6 +94,7 @@ Create unit tests for critical components:
 ```
 
 **Focus Areas:**
+
 - Business logic validation
 - State transition rules
 - Code generation algorithms
@@ -95,11 +103,13 @@ Create unit tests for critical components:
 ### **Reference Patterns**
 
 Look at these existing test examples:
+
 - `/packages/services/user/src/test/` - User service patterns
 - `/packages/services/business/src/test/` - Business service patterns
 - `/packages/services/category/src/test/` - Category service patterns
 
 ### **Success Criteria**
+
 - [ ] All endpoints have test coverage
 - [ ] Critical business logic tested
 - [ ] Error scenarios covered
@@ -111,6 +121,7 @@ Look at these existing test examples:
 ## 👤 **AI Instance #2: Documentation & Infrastructure Specialist**
 
 ### **Your Mission**
+
 Complete API documentation registration and create the service client for inter-service communication.
 
 ### **Tasks** (1-2 days estimated)
@@ -120,6 +131,7 @@ Complete API documentation registration and create the service client for inter-
 **File to Update**: `/packages/api/src/scripts/generators/internal-api.ts`
 
 **What to Do:**
+
 1. Import voucher internal schemas
 2. Register each schema
 3. Register all internal routes
@@ -143,6 +155,7 @@ registry.registerRoute({
 ```
 
 **Verify:**
+
 - Run `yarn generate:api`
 - Run `yarn generate:sdk`
 - Check generated files include voucher endpoints
@@ -152,6 +165,7 @@ registry.registerRoute({
 **Create**: `/packages/shared/src/services/clients/VoucherServiceClient.ts`
 
 **Pattern to Follow:**
+
 ```typescript
 import { BaseServiceClient } from './BaseServiceClient.js'
 import type { ValidateVoucherRequest, ValidateVoucherResponse } from '@pika/api'
@@ -174,12 +188,14 @@ export class VoucherServiceClient extends BaseServiceClient {
 ```
 
 **Also Update**:
+
 - Add export to `/packages/shared/src/services/clients/index.ts`
 - Add to shared package exports
 
 #### **3. Final Verification** ✅
 
 **Checklist:**
+
 - [ ] Run `yarn typecheck` - no errors
 - [ ] Run `yarn lint` - no issues
 - [ ] Run `yarn build` - successful
@@ -187,6 +203,7 @@ export class VoucherServiceClient extends BaseServiceClient {
 - [ ] Service starts correctly
 
 ### **Reference Files**
+
 - `/packages/shared/src/services/clients/UserServiceClient.ts`
 - `/packages/shared/src/services/clients/BusinessServiceClient.ts`
 - `/packages/api/src/scripts/generators/admin-api.ts` (for pattern)

@@ -1,13 +1,12 @@
 import { z } from 'zod'
 
-import { UserId } from '../../shared/branded.js'
-import { withTimestamps } from '../../shared/metadata.js'
-import { UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { UserId } from '../../shared/branded.js'
+import { UUID } from '../../shared/primitives.js'
 import {
-  TicketStatus,
-  TicketPriority,
   TicketCategory,
+  TicketPriority,
+  TicketStatus,
 } from '../common/index.js'
 
 /**

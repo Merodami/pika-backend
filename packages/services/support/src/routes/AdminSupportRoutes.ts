@@ -1,5 +1,4 @@
 import { supportAdmin, supportCommon } from '@pika/api'
-import type { ICacheService } from '@pika/redis'
 import {
   requireAdmin,
   requireAuth,
@@ -7,6 +6,7 @@ import {
   validateParams,
   validateQuery,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 

@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { Email, JWTToken, UserId } from '../../shared/branded.js'
 import { UserRole } from '../../shared/enums.js'
-import { openapi } from '../../../common/utils/openapi.js'
-import { OAuthProvider, DeviceType } from '../common/enums.js'
+import { DeviceType,OAuthProvider } from '../common/enums.js'
 
 /**
  * Public API authentication schemas

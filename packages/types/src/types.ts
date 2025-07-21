@@ -51,7 +51,8 @@ export type DayOfWeek = (typeof DaysOfWeek)[keyof typeof DaysOfWeek]
  * Supported language code for internationalization
  * Based on ISO 639-1 language codes
  */
-export type LanguageCode = (typeof SupportedLanguage)[keyof typeof SupportedLanguage]
+export type LanguageCode =
+  (typeof SupportedLanguage)[keyof typeof SupportedLanguage]
 
 /**
  * Basic user interface

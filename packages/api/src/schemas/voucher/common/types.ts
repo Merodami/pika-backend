@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { UUID, DateTime } from '../../shared/primitives.js'
+import { DateTime,UUID } from '../../shared/primitives.js'
 import {
-  VoucherCodeType,
   CustomerVoucherStatus,
-  VoucherScanType,
+  VoucherCodeType,
   VoucherScanSource,
+  VoucherScanType,
 } from './enums.js'
 
 /**

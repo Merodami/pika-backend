@@ -1,8 +1,9 @@
-import type { PrismaClient } from '@prisma/client'
 import { SUBSCRIPTION_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { logger, PaymentServiceClient } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
+
 import { createInternalSubscriptionRouter } from './routes/InternalSubscriptionRoutes.js'
 import { createPlanRouter } from './routes/PlanRoutes.js'
 import { createSubscriptionRouter } from './routes/SubscriptionRoutes.js'

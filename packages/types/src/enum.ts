@@ -282,3 +282,18 @@ export enum VoucherDiscountType {
  * Type definition for voucher discount type - use this for type annotations
  */
 export type VoucherDiscountTypeType = `${VoucherDiscountType}`
+
+/**
+ * Customer voucher status
+ * Used to track voucher status in customer's wallet
+ */
+export enum CustomerVoucherStatus {
+  claimed = 'claimed',
+  redeemed = 'redeemed',
+  expired = 'expired',
+}
+
+/**
+ * Type definition for customer voucher status - use this for type annotations
+ */
+export type CustomerVoucherStatusType = `${CustomerVoucherStatus}`

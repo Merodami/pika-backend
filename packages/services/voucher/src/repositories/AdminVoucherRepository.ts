@@ -1,13 +1,8 @@
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { type VoucherDomain, VoucherMapper } from '@pika/sdk'
-import {
-  ErrorFactory,
-  logger,
-  type ParsedIncludes,
-  toPrismaInclude,
-} from '@pika/shared'
-import type { PaginatedResult, VoucherState } from '@pika/types'
+import { ErrorFactory, logger, toPrismaInclude } from '@pika/shared'
+import type { PaginatedResult, ParsedIncludes,VoucherState } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 import type {
@@ -24,9 +19,7 @@ export interface IAdminVoucherRepository {
   delete(id: string): Promise<void>
   findById(id: string): Promise<VoucherDomain | null>
   // Admin search with extended filters
-  findAll(
-    params: VoucherSearchParams,
-  ): Promise<PaginatedResult<VoucherDomain>>
+  findAll(params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
   findByBusinessId(
     businessId: string,
     params: VoucherSearchParams,
@@ -61,7 +54,23 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
     try {
       const voucher = await this.prisma.voucher.create({
         data: {
-          ...data,
+          businessId: data.businessId,
+          categoryId: data.categoryId,
+          titleKey: data.titleKey,
+          descriptionKey: data.descriptionKey,
+          termsAndConditionsKey: data.termsAndConditionsKey,
+          type: data.type as 'percentage' | 'fixed',
+          value: data.value,
+          discount: data.discount,
+          currency: data.currency,
+          validFrom: data.validFrom,
+          validUntil: data.validUntil,
+          maxRedemptions: data.maxRedemptions,
+          maxRedemptionsPerUser: data.maxRedemptionsPerUser,
+          metadata: data.metadata,
+          imageUrl: data.imageUrl,
+          qrCode: data.qrCode,
+          state: data.state,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -92,12 +101,34 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
 
   async update(id: string, data: UpdateVoucherData): Promise<VoucherDomain> {
     try {
+      const updateData: any = {
+        updatedAt: new Date(),
+      }
+
+      // Only include fields that are actually defined and valid for Prisma
+      if (data.categoryId !== undefined) updateData.categoryId = data.categoryId
+      if (data.titleKey !== undefined) updateData.titleKey = data.titleKey
+      if (data.descriptionKey !== undefined)
+        updateData.descriptionKey = data.descriptionKey
+      if (data.termsAndConditionsKey !== undefined)
+        updateData.termsAndConditionsKey = data.termsAndConditionsKey
+      if (data.type !== undefined) updateData.type = data.type
+      if (data.value !== undefined) updateData.value = data.value
+      if (data.discount !== undefined) updateData.discount = data.discount
+      if (data.currency !== undefined) updateData.currency = data.currency
+      if (data.validFrom !== undefined) updateData.validFrom = data.validFrom
+      if (data.validUntil !== undefined) updateData.validUntil = data.validUntil
+      if (data.maxRedemptions !== undefined)
+        updateData.maxRedemptions = data.maxRedemptions
+      if (data.maxRedemptionsPerUser !== undefined)
+        updateData.maxRedemptionsPerUser = data.maxRedemptionsPerUser
+      if (data.metadata !== undefined) updateData.metadata = data.metadata
+      if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl
+      if (data.state !== undefined) updateData.state = data.state
+
       const voucher = await this.prisma.voucher.update({
         where: { id },
-        data: {
-          ...data,
-          updatedAt: new Date(),
-        },
+        data: updateData,
         include: {
           business: true,
           category: true,
@@ -108,8 +139,8 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
       // Clear cache
       if (this.cache) {
         await Promise.all([
-          this.cache.delete(`voucher:${id}`),
-          this.cache.delete('vouchers:*'),
+          this.cache.del(`voucher:${id}`),
+          this.cache.del('vouchers:*'),
         ])
       }
 
@@ -138,7 +169,7 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
       const voucher = await this.prisma.voucher.update({
         where: { id },
         data: {
-          state,
+          state: state,
           updatedAt: new Date(),
         },
         include: {
@@ -151,8 +182,8 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
       // Clear cache
       if (this.cache) {
         await Promise.all([
-          this.cache.delete(`voucher:${id}`),
-          this.cache.delete('vouchers:*'),
+          this.cache.del(`voucher:${id}`),
+          this.cache.del('vouchers:*'),
         ])
       }
 
@@ -172,8 +203,6 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async delete(id: string): Promise<void> {
@@ -190,8 +219,8 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
       // Clear cache
       if (this.cache) {
         await Promise.all([
-          this.cache.delete(`voucher:${id}`),
-          this.cache.delete('vouchers:*'),
+          this.cache.del(`voucher:${id}`),
+          this.cache.del('vouchers:*'),
         ])
       }
     } catch (error) {
@@ -209,8 +238,6 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async findById(id: string): Promise<VoucherDomain | null> {
@@ -308,8 +335,6 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async findByBusinessId(
@@ -322,10 +347,14 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
         ...params,
         businessId,
       }
-      
+
       return await this.findAll(searchParams)
     } catch (error) {
-      logger.error('Failed to find vouchers by business ID', { error, businessId, params })
+      logger.error('Failed to find vouchers by business ID', {
+        error,
+        businessId,
+        params,
+      })
       throw ErrorFactory.databaseError(
         'findByBusinessId',
         'Failed to retrieve vouchers by business ID',
@@ -345,14 +374,14 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
           deletedAt: null,
         },
         data: {
-          state,
+          state: state,
           updatedAt: new Date(),
         },
       })
 
       // Clear cache
       if (this.cache) {
-        await this.cache.delete('vouchers:*')
+        await this.cache.del('vouchers:*')
       }
 
       return {
@@ -371,11 +400,11 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
-  async bulkDelete(ids: string[]): Promise<{ success: number; failed: number }> {
+  async bulkDelete(
+    ids: string[],
+  ): Promise<{ success: number; failed: number }> {
     try {
       // Soft delete
       const result = await this.prisma.voucher.updateMany({
@@ -391,7 +420,7 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
 
       // Clear cache
       if (this.cache) {
-        await this.cache.delete('vouchers:*')
+        await this.cache.del('vouchers:*')
       }
 
       return {
@@ -406,8 +435,6 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async getVoucherStats(voucherId: string): Promise<{
@@ -462,8 +489,6 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   // Helper methods
@@ -471,17 +496,25 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
     sortBy: string,
     sortOrder: 'asc' | 'desc',
   ): Prisma.VoucherOrderByWithRelationInput {
-    const orderByMap: Record<string, Prisma.VoucherOrderByWithRelationInput> = {
-      createdAt: { createdAt: sortOrder },
-      updatedAt: { updatedAt: sortOrder },
-      expiresAt: { expiresAt: sortOrder },
-      discountValue: { discountValue: sortOrder },
-      currentRedemptions: { currentRedemptions: sortOrder },
-      state: { state: sortOrder },
-      businessId: { businessId: sortOrder },
+    // Validate sortBy to prevent object injection
+    switch (sortBy) {
+      case 'createdAt':
+        return { createdAt: sortOrder }
+      case 'updatedAt':
+        return { updatedAt: sortOrder }
+      case 'expiresAt':
+        return { validUntil: sortOrder }
+      case 'discountValue':
+        return { discount: sortOrder }
+      case 'currentRedemptions':
+        return { redemptionsCount: sortOrder }
+      case 'state':
+        return { state: sortOrder }
+      case 'businessId':
+        return { businessId: sortOrder }
+      default:
+        return { createdAt: sortOrder }
     }
-
-    return orderByMap[sortBy] || { createdAt: sortOrder }
   }
 
   private buildInclude(

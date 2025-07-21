@@ -1,10 +1,4 @@
-import {
-  CommunicationLogIdParam,
-  CommunicationLogSearchParams,
-  SendBulkEmailRequest,
-  SendEmailRequest,
-} from '@pika/api/public'
-import type { ICacheService } from '@pika/redis'
+import { communicationCommon, communicationPublic } from '@pika/api'
 import {
   requireAdmin,
   requireAuth,
@@ -12,6 +6,7 @@ import {
   validateParams,
   validateQuery,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -46,28 +41,28 @@ export function createEmailRouter(
   router.post(
     '/send',
     requireAuth(),
-    validateBody(SendEmailRequest),
+    validateBody(communicationPublic.SendEmailRequest),
     controller.sendEmail,
   )
 
   router.post(
     '/send-bulk',
     requireAdmin(),
-    validateBody(SendBulkEmailRequest),
+    validateBody(communicationPublic.SendBulkEmailRequest),
     controller.sendBulkEmail,
   )
 
   router.get(
     '/history',
     requireAuth(),
-    validateQuery(CommunicationLogSearchParams),
+    validateQuery(communicationPublic.CommunicationLogSearchParams),
     controller.getEmailHistory,
   )
 
   router.get(
     '/history/:id',
     requireAuth(),
-    validateParams(CommunicationLogIdParam),
+    validateParams(communicationCommon.CommunicationLogIdParam),
     controller.getEmailById,
   )
 

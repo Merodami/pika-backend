@@ -112,6 +112,7 @@ export class VoucherBookMapper {
     if (!value || typeof value !== 'object') {
       return undefined
     }
+
     return value
   }
 
@@ -137,8 +138,10 @@ export class VoucherBookMapper {
           month: 'long',
         },
       )
+
       return `${monthName} ${voucherBook.year}`
     }
+
     return voucherBook.year.toString()
   }
 
@@ -150,6 +153,7 @@ export class VoucherBookMapper {
     const created = new Date(createdAt)
     const now = new Date()
     const diffTime = Math.abs(now.getTime() - created.getTime())
+
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
@@ -199,6 +203,7 @@ export class VoucherBookMapper {
    */
   static validateMonth(month?: number | null): boolean {
     if (month === null || month === undefined) return true
+
     return month >= 1 && month <= 12
   }
 
@@ -380,6 +385,7 @@ export class VoucherBookMapper {
     }
 
     const totalPages = dto.totalPages || 24
+
     if (totalPages < 1) {
       throw new Error('VoucherBook must have at least 1 page')
     }
@@ -461,6 +467,7 @@ export class VoucherBookMapper {
       'PUBLISHED',
       'ARCHIVED',
     ]
+
     statuses.forEach((status) => {
       statusMap.set(status, [])
     })
@@ -468,6 +475,7 @@ export class VoucherBookMapper {
     // Group books
     for (const book of voucherBooks) {
       const statusList = statusMap.get(book.status) || []
+
       statusList.push(this.toSimpleDTO(book))
       statusMap.set(book.status, statusList)
     }
@@ -486,6 +494,7 @@ export class VoucherBookMapper {
     return voucherBooks.filter((book) => {
       if (book.year !== year) return false
       if (month && book.month !== month) return false
+
       return true
     })
   }
@@ -503,6 +512,7 @@ export class VoucherBookMapper {
       if (a.month !== b.month) {
         if (a.month === null) return 1
         if (b.month === null) return -1
+
         return b.month - a.month
       }
 

@@ -1,4 +1,4 @@
-import type { User, UserRoleType, UserStatusType } from '@pika/types'
+import type { User } from '@pika/types'
 import { mapUserRole, mapUserStatus } from '@pika/types'
 
 /**

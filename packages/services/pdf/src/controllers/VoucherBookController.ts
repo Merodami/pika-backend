@@ -2,9 +2,10 @@ import { pdfCommon, pdfPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { VoucherBookMapper } from '../mappers/VoucherBookMapper.js'
+import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
+import { VoucherBookMapper } from '../mappers/VoucherBookMapper.js'
 import type { IVoucherBookService } from '../services/VoucherBookService.js'
 
 /**
@@ -53,6 +54,7 @@ export class VoucherBookController {
 
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toPublicListResponse(result)
+
       res.json(response)
     } catch (error) {
       next(error)
@@ -76,11 +78,11 @@ export class VoucherBookController {
     try {
       const { id } = req.params
 
-      const voucherBook =
-        await this.voucherBookService.getPublishedVoucherBookById(id)
+      const voucherBook = await this.voucherBookService.getVoucherBookById(id)
 
       // Convert to public DTO using mapper
       const response = VoucherBookMapper.toPublicDTO(voucherBook)
+
       res.json(response)
     } catch (error) {
       next(error)
@@ -99,10 +101,15 @@ export class VoucherBookController {
     try {
       const { id } = req.params
 
-      const downloadInfo = await this.voucherBookService.getPDFDownloadInfo(id)
+      const voucherBook = await this.voucherBookService.getVoucherBookById(id)
+
+      if (!voucherBook.pdfUrl) {
+        return next(ErrorFactory.notFound('PDF', id))
+      }
 
       // Use mapper for proper response transformation
-      const response = VoucherBookMapper.toPDFDownloadResponse(downloadInfo)
+      const response = VoucherBookMapper.toPDFDownloadResponse(voucherBook)
+
       res.json(response)
     } catch (error) {
       next(error)

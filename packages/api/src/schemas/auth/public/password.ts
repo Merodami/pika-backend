@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { Email } from '../../shared/branded.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { Email } from '../../shared/branded.js'
 
 /**
  * Password management schemas for public API

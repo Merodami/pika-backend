@@ -25,3 +25,13 @@ export enum StripeWebhookEvent {
   INVOICE_PAYMENT_SUCCEEDED = 'invoice.payment_succeeded',
   INVOICE_PAYMENT_FAILED = 'invoice.payment_failed',
 }
+
+// Available template keys from communication service
+export type AvailableTemplateKey =
+  | 'welcome'
+  | 'passwordReset'
+  | 'emailVerification'
+  | 'paymentSuccess'
+  | 'paymentFailed'
+  | 'subscriptionActivated'
+  | 'subscriptionCancelled'

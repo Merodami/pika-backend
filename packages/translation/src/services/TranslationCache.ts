@@ -15,11 +15,13 @@ export class TranslationCache implements ITranslationCache {
 
   async get(key: string, language: string): Promise<string | null> {
     const cacheKey = `${this.prefix}${language}:${key}`
+
     return this.redis.get(cacheKey)
   }
 
   async set(key: string, language: string, value: string): Promise<void> {
     const cacheKey = `${this.prefix}${language}:${key}`
+
     await this.redis.set(cacheKey, value, 'EX', this.ttl)
   }
 
@@ -30,6 +32,7 @@ export class TranslationCache implements ITranslationCache {
       // Invalidate all languages for this key
       const pattern = `${this.prefix}*:${key}`
       const keys = await this.redis.keys(pattern)
+
       if (keys.length > 0) {
         await this.redis.del(...keys)
       }

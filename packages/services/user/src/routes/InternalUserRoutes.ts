@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
 import { userInternal } from '@pika/api'
 import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
 import { ICacheService } from '@pika/redis'
+import { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { InternalUserController } from '../controllers/InternalUserController.js'

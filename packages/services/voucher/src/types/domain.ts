@@ -1,6 +1,4 @@
-import type { VoucherDomain, VoucherScanData, UserVoucherData } from '@pika/sdk'
-import type { VoucherState } from '@pika/types'
-import type { UpdateVoucherData } from './repository.js'
+import type { VoucherDomain } from '@pika/sdk'
 
 /**
  * Domain types for voucher service operations

@@ -19,6 +19,18 @@
     "./common": {
       "types": "./dist/common/index.d.ts",
       "import": "./dist/common/index.js"
+    },
+    "./public": {
+      "types": "./dist/public.d.ts",
+      "import": "./dist/public.js"
+    },
+    "./admin": {
+      "types": "./dist/admin.d.ts",
+      "import": "./dist/admin.js"
+    },
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "import": "./dist/internal.js"
     }
   },
   "dependencies": {

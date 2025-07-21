@@ -233,21 +233,6 @@ export const ContentType = z.enum(['VOUCHER', 'IMAGE', 'AD', 'SPONSORED'])
 
 export type ContentType = z.infer<typeof ContentType>
 
-/**
- * Voucher book sorting options
- */
-export const VoucherBookSortBy = z.enum([
-  'createdAt',
-  'updatedAt',
-  'title',
-  'year',
-  'month',
-  'status',
-  'publishedAt',
-])
-
-export type VoucherBookSortBy = z.infer<typeof VoucherBookSortBy>
-
 // ============= OpenAPI Documentation =============
 
 /**

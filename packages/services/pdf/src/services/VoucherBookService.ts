@@ -2,30 +2,31 @@ import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type {
-  VoucherBook,
-  VoucherBookStatus,
   BookFormat,
   Orientation,
+  VoucherBook,
+  VoucherBookStatus,
 } from '@prisma/client'
 
 import type {
-  IVoucherBookRepository,
-  IVoucherBookPageRepository,
   IAdPlacementRepository,
   IBookDistributionRepository,
+  IVoucherBookPageRepository,
+  IVoucherBookRepository,
 } from '../repositories/index.js'
+import type { VoucherBookSearchParams } from '../types/index.js'
+import { CryptoServiceAdapter } from './CryptoServiceAdapter.js'
 import {
-  PDFGenerationService,
+  AdPlacementInfo,
+  PageLayout,
+  PageLayoutEngine,
+} from './PageLayoutEngine.js'
+import {
   GeneratePDFOptions,
+  PDFGenerationService,
   VoucherData,
 } from './PDFGenerationService.js'
-import {
-  PageLayoutEngine,
-  PageLayout,
-  AdPlacementInfo,
-} from './PageLayoutEngine.js'
 import { VoucherServiceClient } from './VoucherServiceClient.js'
-import { CryptoServiceAdapter } from './CryptoServiceAdapter.js'
 
 export interface CreateVoucherBookData {
   title: string
@@ -56,20 +57,6 @@ export interface UpdateVoucherBookData {
   region?: string
   metadata?: Record<string, any>
   updatedById: string
-}
-
-export interface VoucherBookSearchParams {
-  page?: number
-  limit?: number
-  search?: string
-  status?: VoucherBookStatus
-  format?: BookFormat
-  isActive?: boolean
-  providerId?: string
-  region?: string
-  createdById?: string
-  sortBy?: 'createdAt' | 'updatedAt' | 'title'
-  sortOrder?: 'asc' | 'desc'
 }
 
 export interface PaginatedResult<T> {
@@ -211,6 +198,7 @@ export class VoucherBookService implements IVoucherBookService {
       }
 
       const voucherBook = await this.voucherBookRepository.findById(id)
+
       if (!voucherBook) {
         throw ErrorFactory.notFound('Voucher book not found')
       }
@@ -232,6 +220,7 @@ export class VoucherBookService implements IVoucherBookService {
   ): Promise<PaginatedResult<VoucherBook>> {
     try {
       const result = await this.voucherBookRepository.findAll(params)
+
       return result
     } catch (error) {
       logger.error('Failed to get all voucher books', { error, params })
@@ -255,10 +244,12 @@ export class VoucherBookService implements IVoucherBookService {
 
       // Recalculate total vouchers if page structure changes
       const updateData = { ...data }
+
       if (data.totalPages || data.vouchersPerPage) {
         const totalPages = data.totalPages || currentBook.totalPages
         const vouchersPerPage =
           data.vouchersPerPage || currentBook.vouchersPerPage
+
         updateData.totalVouchers = totalPages * vouchersPerPage
 
         // If increasing pages, create new page records
@@ -284,6 +275,7 @@ export class VoucherBookService implements IVoucherBookService {
         id,
         updatedFields: Object.keys(data),
       })
+
       return updatedBook
     } catch (error) {
       logger.error('Failed to update voucher book', { error, id, data })
@@ -339,6 +331,7 @@ export class VoucherBookService implements IVoucherBookService {
       await this.cache.del(`service:voucher-book:${id}`)
 
       logger.info('Voucher book published', { id, userId })
+
       return updatedBook
     } catch (error) {
       logger.error('Failed to publish voucher book', { error, id, userId })
@@ -363,6 +356,7 @@ export class VoucherBookService implements IVoucherBookService {
       await this.cache.del(`service:voucher-book:${id}`)
 
       logger.info('Voucher book archived', { id, userId })
+
       return updatedBook
     } catch (error) {
       logger.error('Failed to archive voucher book', { error, id, userId })
@@ -415,6 +409,7 @@ export class VoucherBookService implements IVoucherBookService {
         // Generate JWT payload using crypto service
         const payload =
           await this.cryptoServiceAdapter.generateVoucherPayload(voucherId)
+
         qrPayloads.set(voucherId, payload)
       }
 
@@ -494,11 +489,13 @@ export class VoucherBookService implements IVoucherBookService {
 
       // Calculate used spaces using layout engine
       let usedSpaces = 0
+
       for (const placement of placements) {
         if (placement.isActive) {
           const spacesRequired = this.pageLayoutEngine.getRequiredSpaces(
             placement.position as any,
           )
+
           usedSpaces += spacesRequired
         }
       }
@@ -510,6 +507,7 @@ export class VoucherBookService implements IVoucherBookService {
           if (placement.isActive) {
             acc[placement.contentType] = (acc[placement.contentType] || 0) + 1
           }
+
           return acc
         },
         {} as Record<string, number>,
@@ -669,6 +667,7 @@ export class VoucherBookService implements IVoucherBookService {
       HALF: 1,
       FULL: 1,
     }
+
     return positionMap[position] || 1
   }
 
@@ -679,6 +678,7 @@ export class VoucherBookService implements IVoucherBookService {
     // Check if this space is occupied by the placement
     const startPosition = placement.position
     const endPosition = startPosition + placement.spacesUsed - 1
+
     return space >= startPosition && space <= endPosition
   }
 }

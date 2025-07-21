@@ -1,20 +1,16 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import {
   VoucherBookStatus,
   VoucherBookType,
-  VoucherBookSortBy,
-  SortOrder,
-  PageLayoutType,
-  AdSize,
-  ContentType,
 } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { openapi } from '../../../common/utils/openapi.js'
+import { VoucherBookSortBy } from '../common/enums.js'
 
 /**
  * Admin PDF voucher book schemas - full management capabilities
@@ -422,3 +418,118 @@ export const BulkVoucherBookOperationResponse = openapi(
 export type BulkVoucherBookOperationResponse = z.infer<
   typeof BulkVoucherBookOperationResponse
 >
+
+// ============= Status Management =============
+
+/**
+ * Update voucher book status request
+ */
+export const UpdateVoucherBookStatusRequest = openapi(
+  z.object({
+    status: VoucherBookStatus.describe('New status for the voucher book'),
+  }),
+  {
+    description: 'Update voucher book status',
+  },
+)
+
+export type UpdateVoucherBookStatusRequest = z.infer<
+  typeof UpdateVoucherBookStatusRequest
+>
+
+/**
+ * Bulk archive voucher books request
+ */
+export const BulkArchiveVoucherBooksRequest = openapi(
+  z.object({
+    voucherBookIds: z
+      .array(UUID)
+      .min(1)
+      .max(100)
+      .describe('Voucher book IDs to archive'),
+  }),
+  {
+    description: 'Bulk archive multiple voucher books',
+  },
+)
+
+export type BulkArchiveVoucherBooksRequest = z.infer<
+  typeof BulkArchiveVoucherBooksRequest
+>
+
+// ============= Statistics =============
+
+/**
+ * Voucher book statistics query parameters
+ */
+export const VoucherBookStatsQueryParams = openapi(
+  z.object({
+    year: z
+      .number()
+      .int()
+      .min(2020)
+      .max(2100)
+      .optional()
+      .describe('Filter statistics by year'),
+    month: z
+      .number()
+      .int()
+      .min(1)
+      .max(12)
+      .optional()
+      .describe('Filter statistics by month'),
+  }),
+  {
+    description: 'Query parameters for voucher book statistics',
+  },
+)
+
+export type VoucherBookStatsQueryParams = z.infer<
+  typeof VoucherBookStatsQueryParams
+>
+
+/**
+ * Voucher book statistics response
+ */
+export const VoucherBookStatsResponse = openapi(
+  z.object({
+    total: z.number().int().nonnegative().describe('Total voucher books'),
+    byStatus: z
+      .object({
+        draft: z.number().int().nonnegative(),
+        readyForPrint: z.number().int().nonnegative(),
+        published: z.number().int().nonnegative(),
+        archived: z.number().int().nonnegative(),
+      })
+      .describe('Count by status'),
+    byType: z
+      .object({
+        monthly: z.number().int().nonnegative(),
+        specialEdition: z.number().int().nonnegative(),
+        regional: z.number().int().nonnegative(),
+      })
+      .describe('Count by type'),
+    distributions: z
+      .object({
+        total: z.number().int().nonnegative(),
+        pending: z.number().int().nonnegative(),
+        shipped: z.number().int().nonnegative(),
+        delivered: z.number().int().nonnegative(),
+      })
+      .describe('Distribution statistics'),
+    recentActivity: z
+      .array(
+        z.object({
+          date: z.string().datetime(),
+          action: z.string(),
+          count: z.number().int().nonnegative(),
+        }),
+      )
+      .describe('Recent activity data'),
+  }),
+  {
+    description: 'Voucher book statistics',
+  },
+)
+
+export type VoucherBookStatsResponse = z.infer<typeof VoucherBookStatsResponse>

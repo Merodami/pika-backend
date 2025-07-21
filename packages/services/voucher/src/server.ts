@@ -33,7 +33,7 @@ export async function createVoucherServer({
 }) {
   // Initialize service clients
   const businessServiceClient = new BusinessServiceClient()
-  
+
   logger.info(`Configuring Voucher service for port: ${VOUCHER_SERVICE_PORT}`)
 
   // Create Express server

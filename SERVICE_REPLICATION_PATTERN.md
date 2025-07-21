@@ -350,7 +350,7 @@ export class Internal{ServiceName}Controller {
 #### Why Inline Mapping?
 
 1. **Simplicity**: Keeps mapping logic close to where it's used
-2. **No Extra Dependencies**: Avoids utils depending on API schemas  
+2. **No Extra Dependencies**: Avoids utils depending on API schemas
 3. **Clear Data Flow**: Easy to see how API params transform to service params
 4. **Easier Maintenance**: Changes to API contracts are localized to controllers
 
@@ -361,7 +361,7 @@ export class Internal{ServiceName}Controller {
 async getAll(request: Request, response: Response, next: NextFunction): Promise<void> {
   try {
     const query = getValidatedQuery<VoucherQueryParams>(request)
-    
+
     // Map inline - clear and simple
     const params = {
       businessId: query.businessId,
@@ -377,7 +377,7 @@ async getAll(request: Request, response: Response, next: NextFunction): Promise<
       sortOrder: query.sortOrder || 'desc',
       parsedIncludes,
     }
-    
+
     const result = await this.service.getAll(params)
     // ...
   } catch (error) {
@@ -570,11 +570,11 @@ export interface {ServiceName}SearchParams extends SearchParams {
   minPrice?: number
   maxPrice?: number
   search?: string
-  
+
   // Date ranges
   createdFromStart?: Date
   createdFromEnd?: Date
-  
+
   // Relations
   parsedIncludes?: ParsedIncludes
 }
@@ -614,12 +614,12 @@ export interface Create{ServiceName}Data {
   name: string
   categoryId: string
   price: number
-  
+
   // Optional fields
   description?: string
   imageUrl?: string
   metadata?: Record<string, any>
-  
+
   // System fields
   createdBy: string
 }
@@ -631,7 +631,7 @@ export interface Update{ServiceName}Data {
   price?: number
   isActive?: boolean
   metadata?: Record<string, any>
-  
+
   // System fields
   updatedBy?: string
 }
@@ -649,7 +649,7 @@ export interface BulkUpdate{ServiceName}Data {
 // src/types/index.ts
 /**
  * {ServiceName} service types
- * 
+ *
  * Organization follows DDD principles:
  * - Domain types: Business logic and domain concepts
  * - Repository types: Data layer contracts
@@ -681,6 +681,7 @@ import type { {ServiceName}SearchParams } from '../types/search.js'
 #### 2. Layer-Specific Usage
 
 **Repository Layer:**
+
 ```typescript
 import type {
   Create{ServiceName}Data,
@@ -696,6 +697,7 @@ export class {ServiceName}Repository {
 ```
 
 **Service Layer:**
+
 ```typescript
 import type {
   {ServiceName}ValidationOptions,
@@ -705,7 +707,7 @@ import type {
 
 export class {ServiceName}Service {
   async validate(
-    id: string, 
+    id: string,
     options: {ServiceName}ValidationOptions
   ): Promise<{ServiceName}ValidationResult> {
     // Implementation
@@ -714,6 +716,7 @@ export class {ServiceName}Service {
 ```
 
 **Controller Layer:**
+
 ```typescript
 // Controllers use API schemas, not internal types
 import type { {service}Public } from '@pika/api'
@@ -1189,6 +1192,29 @@ The platform uses a **three-layer data transformation pattern** to maintain clea
    - Controllers: Use mappers to transform between API and domain
    - Services: Work only with domain types
    - Repositories: Transform between database and domain
+
+### 🚨 CRITICAL: Infrastructure Isolation in Mappers
+
+**NEVER import Prisma types in mappers!** This violates Clean Architecture.
+
+✅ **Correct Pattern**:
+
+```typescript
+// Repository layer handles Prisma conversion
+const vouchers = await this.prisma.voucher.findMany()
+// Convert Prisma result to generic document interface
+const documents = vouchers.map((v) => ({ ...v, state: v.state as string }))
+return documents.map(VoucherMapper.fromDocument)
+```
+
+❌ **Wrong Pattern**:
+
+```typescript
+// NEVER do this in mappers!
+import { VoucherState as PrismaVoucherState } from '@prisma/client' // ❌
+```
+
+**Rule**: Mappers work with whatever the repository provides. Use generic string/primitive types in document interfaces, not infrastructure-specific types. The repository layer is responsible for converting infrastructure types to domain-compatible types.
 
 ### Data Flow
 

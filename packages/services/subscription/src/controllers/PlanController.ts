@@ -1,12 +1,13 @@
-import { subscriptionPublic, subscriptionCommon } from '@pika/api'
+import { subscriptionCommon, subscriptionPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
+import type { NextFunction, Request, Response } from 'express'
+
 import type { PlanSearchParams } from '../repositories/PlanRepository.js'
 import type { IPlanService } from '../services/PlanService.js'
-import type { NextFunction, Request, Response } from 'express'
 
 /**
  * Handles subscription plan management operations
@@ -36,7 +37,17 @@ export class PlanController {
 
       logger.info('Creating subscription plan', { name: data.name })
 
-      const plan = await this.planService.createPlan(data)
+      // Transform interval to uppercase format expected by service
+      const planData = {
+        ...data,
+        interval: data.interval.toUpperCase() as
+          | 'DAY'
+          | 'WEEK'
+          | 'MONTH'
+          | 'YEAR',
+      }
+
+      const plan = await this.planService.createPlan(planData)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
 
@@ -61,7 +72,10 @@ export class PlanController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<subscriptionPublic.SubscriptionPlanQueryParams>(request)
+      const query =
+        getValidatedQuery<subscriptionPublic.SubscriptionPlanQueryParams>(
+          request,
+        )
 
       // Transform API query to service params
       const params: PlanSearchParams = {
@@ -117,7 +131,11 @@ export class PlanController {
    * Update subscription plan
    */
   async updatePlan(
-    request: Request<subscriptionCommon.PlanIdParam, {}, subscriptionPublic.UpdateSubscriptionPlanRequest>,
+    request: Request<
+      subscriptionCommon.PlanIdParam,
+      {},
+      subscriptionPublic.UpdateSubscriptionPlanRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

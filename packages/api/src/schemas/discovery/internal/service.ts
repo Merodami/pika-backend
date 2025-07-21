@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * Service discovery schemas for internal API

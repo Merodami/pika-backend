@@ -1,16 +1,16 @@
-import { Prisma, PrismaClient } from '@prisma/client'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 import { CategoryMapper } from '../mappers/CategoryMapper.js'
 import type {
   Category,
   CategorySearchParams,
   CreateCategoryData,
-  UpdateCategoryData,
-  PaginatedResult,
   ICategoryRepository,
+  PaginatedResult,
+  UpdateCategoryData,
 } from '../types/interfaces.js'
 
 export class CategoryRepository implements ICategoryRepository {
@@ -63,6 +63,7 @@ export class CategoryRepository implements ICategoryRepository {
 
       // Build order by clause
       const orderBy: Prisma.CategoryOrderByWithRelationInput = {}
+
       if (sortBy === 'name') {
         orderBy.nameKey = sortOrder as 'asc' | 'desc'
       } else if (sortBy === 'sortOrder') {
@@ -171,7 +172,7 @@ export class CategoryRepository implements ICategoryRepository {
         })
 
         if (!parent) {
-          throw ErrorFactory.validationError('Parent category not found')
+          throw ErrorFactory.resourceNotFound('Category', data.parentId!)
         }
 
         level = (parent.level || 1) + 1
@@ -200,7 +201,11 @@ export class CategoryRepository implements ICategoryRepository {
       logger.error('Error in CategoryRepository.create:', error)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError('Category slug already exists')
+          throw ErrorFactory.uniqueConstraintViolation(
+            'Category',
+            'slug',
+            data.nameKey || 'unknown',
+          )
         }
       }
       throw ErrorFactory.databaseError(
@@ -231,7 +236,7 @@ export class CategoryRepository implements ICategoryRepository {
           })
 
           if (!parent) {
-            throw ErrorFactory.validationError('Parent category not found')
+            throw ErrorFactory.resourceNotFound('Category', data.parentId)
           }
 
           updateData.level = (parent.level || 1) + 1
@@ -257,10 +262,14 @@ export class CategoryRepository implements ICategoryRepository {
       logger.error('Error in CategoryRepository.update:', error)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError('Category slug already exists')
+          throw ErrorFactory.uniqueConstraintViolation(
+            'Category',
+            'slug',
+            data.nameKey || 'unknown',
+          )
         }
         if (error.code === 'P2025') {
-          throw ErrorFactory.notFoundError('Category not found')
+          throw ErrorFactory.resourceNotFound('Category', id)
         }
       }
       throw ErrorFactory.databaseError(
@@ -282,7 +291,8 @@ export class CategoryRepository implements ICategoryRepository {
       })
 
       if (childrenCount > 0) {
-        throw ErrorFactory.validationError(
+        throw ErrorFactory.businessRuleViolation(
+          'category_has_children',
           'Cannot delete category with children',
         )
       }
@@ -302,7 +312,7 @@ export class CategoryRepository implements ICategoryRepository {
       logger.error('Error in CategoryRepository.delete:', error)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw ErrorFactory.notFoundError('Category not found')
+          throw ErrorFactory.resourceNotFound('Category', id)
         }
       }
       throw ErrorFactory.databaseError(
@@ -342,7 +352,7 @@ export class CategoryRepository implements ICategoryRepository {
         })
 
         if (!rootCategory) {
-          throw ErrorFactory.notFoundError('Root category not found')
+          throw ErrorFactory.resourceNotFound('Category', rootId)
         }
 
         where.OR = [
@@ -364,6 +374,7 @@ export class CategoryRepository implements ICategoryRepository {
 
       const domainCategories =
         CategoryMapper.fromPrismaCategoryArray(categories)
+
       return CategoryMapper.buildHierarchy(domainCategories)
     } catch (error) {
       logger.error('Error in CategoryRepository.getHierarchy:', error)
@@ -382,10 +393,11 @@ export class CategoryRepository implements ICategoryRepository {
       })
 
       if (!category) {
-        throw ErrorFactory.notFoundError('Category not found')
+        throw ErrorFactory.resourceNotFound('Category', id)
       }
 
       const pathIds = category.path ? category.path.split('.') : []
+
       pathIds.push(id)
 
       const categories = await this.prisma.category.findMany({

@@ -3,7 +3,7 @@ model Voucher {
   id                     String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   businessId             String              @map("business_id") @db.Uuid // Renamed from providerId to match new architecture
   categoryId             String?             @map("category_id") @db.Uuid // Optional category association
-  state                  VoucherState        @default(DRAFT) // Changed from NEW to DRAFT to match new architecture
+  state                  VoucherState        @default(draft) // Changed from NEW to DRAFT to match new architecture
   
   // Multilingual content using translation keys (new translation system)
   titleKey               String              @map("title_key") @db.VarChar(255) // Translation key for title
@@ -132,7 +132,7 @@ model CustomerVoucher {
   customerId              String                @map("customer_id") @db.Uuid
   voucherId               String                @map("voucher_id") @db.Uuid
   claimedAt               DateTime              @map("claimed_at") @db.Timestamptz(6)
-  status                  CustomerVoucherStatus @default(CLAIMED) @map("status")
+  status                  CustomerVoucherStatus @default(claimed) @map("status")
   
   // Notification and reminder settings
   notificationPreferences Json?                 @map("notification_preferences") // Reminder settings, push notifications
@@ -221,7 +221,7 @@ model FraudCase {
   voucherId         String               @map("voucher_id") @db.Uuid
   
   // Case management
-  status            FraudCaseStatus      @default(PENDING)
+  status            FraudCaseStatus      @default(pending)
   reviewedAt        DateTime?            @map("reviewed_at") @db.Timestamptz(6)
   reviewedBy        String?              @map("reviewed_by") @db.Uuid
   reviewNotes       String?              @map("review_notes") @db.Text

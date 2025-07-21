@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { UUID } from '../../shared/primitives.js'
 
 /**
  * Internal category service schemas for service-to-service communication
@@ -93,15 +93,24 @@ export type ValidateCategoryRequest = z.infer<typeof ValidateCategoryRequest>
 /**
  * Validate categories response
  */
+/**
+ * Individual category validation result
+ */
+export const CategoryValidationResult = z.object({
+  categoryId: UUID,
+  exists: z.boolean(),
+  isActive: z.boolean(),
+  valid: z.boolean(),
+})
+
+export type CategoryValidationResult = z.infer<typeof CategoryValidationResult>
+
 export const ValidateCategoryResponse = openapi(
   z.object({
-    valid: z.array(UUID),
-    invalid: z.array(
-      z.object({
-        id: UUID,
-        reason: z.string(),
-      }),
-    ),
+    valid: z.boolean().describe('Whether all categories are valid'),
+    results: z
+      .array(CategoryValidationResult)
+      .describe('Individual validation results'),
   }),
   {
     description: 'Validation results for categories',

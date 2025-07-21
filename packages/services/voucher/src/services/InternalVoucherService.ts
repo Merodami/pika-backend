@@ -1,96 +1,94 @@
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
-import type { VoucherDomain, VoucherScanData, UserVoucherData } from '@pika/sdk'
-import {
-  ErrorFactory,
-  logger,
-  VoucherBusinessRules,
-} from '@pika/shared'
-import type { PaginatedResult, VoucherState, ParsedIncludes } from '@pika/types'
-import { VoucherScanType, VoucherScanSource } from '@pika/types'
+import type { UserVoucherData, VoucherDomain, VoucherScanData } from '@pika/sdk'
+import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult, ParsedIncludes, VoucherState } from '@pika/types'
+import { VoucherScanSource, VoucherScanType } from '@pika/types'
 
+import type { IInternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
+import type { IVoucherRepository } from '../repositories/VoucherRepository.js'
 import type {
-  IInternalVoucherRepository,
-} from '../repositories/InternalVoucherRepository.js'
-import type {
-  IVoucherRepository,
-} from '../repositories/VoucherRepository.js'
-import type {
-  VoucherSearchParams,
-  UserVoucherSearchParams,
-  InternalVoucherSearchParams,
-  VoucherValidationOptions,
-  VoucherValidationResult,
-  VoucherExistsOptions,
-  VoucherExistsResult,
-  RedemptionTrackingData,
-  RedemptionTrackingResult,
   BatchProcessOperation,
   BatchProcessResult,
+  InternalVoucherSearchParams,
+  RedemptionTrackingData,
+  RedemptionTrackingResult,
+  UserVoucherSearchParams,
+  VoucherExistsOptions,
+  VoucherExistsResult,
+  VoucherSearchParams,
+  VoucherValidationOptions,
+  VoucherValidationResult,
 } from '../types/index.js'
 
 // Re-export types that are part of the service's public API
 export type {
-  VoucherValidationOptions,
-  VoucherValidationResult,
-  VoucherExistsOptions,
-  VoucherExistsResult,
-  RedemptionTrackingData,
-  RedemptionTrackingResult,
   BatchProcessOperation,
   BatchProcessResult,
+  RedemptionTrackingData,
+  RedemptionTrackingResult,
+  VoucherExistsOptions,
+  VoucherExistsResult,
+  VoucherValidationOptions,
+  VoucherValidationResult,
 } from '../types/index.js'
 
 export interface IInternalVoucherService {
   // Voucher retrieval operations
-  getVoucherById(id: string, parsedIncludes?: ParsedIncludes): Promise<VoucherDomain>
-  getVouchersByIds(ids: string[], parsedIncludes?: ParsedIncludes): Promise<VoucherDomain[]>
-  getUserVouchers(params: UserVoucherSearchParams): Promise<PaginatedResult<UserVoucherData>>
-  
+  getVoucherById(
+    id: string,
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain>
+  getVouchersByIds(
+    ids: string[],
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain[]>
+  getUserVouchers(
+    params: UserVoucherSearchParams,
+  ): Promise<PaginatedResult<UserVoucherData>>
+
   // Validation operations
   validateVoucher(
     voucherId: string,
     options: VoucherValidationOptions,
   ): Promise<VoucherValidationResult>
-  
+
   // Existence checks
   checkVoucherExists(
     options: VoucherExistsOptions,
   ): Promise<VoucherExistsResult>
-  
+
   // State updates for internal use
   updateVoucherStateInternal(
     voucherId: string,
     state: VoucherState,
     reason?: string,
   ): Promise<VoucherDomain>
-  
+
   // Scan tracking
-  trackScan(
-    data: VoucherScanData & { id: string },
-  ): Promise<void>
-  
+  trackScan(data: VoucherScanData & { id: string }): Promise<void>
+
   // Redemption tracking
   trackRedemption(
     data: RedemptionTrackingData,
   ): Promise<RedemptionTrackingResult>
-  
+
   // Batch operations
   batchProcessVouchers(
     operation: BatchProcessOperation,
   ): Promise<BatchProcessResult>
-  
+
   // Internal queries
   getVouchersByBusinessInternal(
     businessId: string,
     filters?: Partial<VoucherSearchParams>,
   ): Promise<PaginatedResult<VoucherDomain>>
-  
+
   getVouchersByCategoryInternal(
     categoryId: string,
     filters?: Partial<VoucherSearchParams>,
   ): Promise<PaginatedResult<VoucherDomain>>
-  
+
   // Cleanup operations
   cleanupExpiredVouchers(): Promise<number>
   cleanupOrphanedCustomerVouchers(): Promise<number>
@@ -103,14 +101,20 @@ export class InternalVoucherService implements IInternalVoucherService {
     private readonly cache: ICacheService,
   ) {}
 
-  async getVoucherById(id: string, parsedIncludes?: ParsedIncludes): Promise<VoucherDomain> {
+  async getVoucherById(
+    id: string,
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain> {
     try {
-      const vouchers = await this.internalRepository.findByIds([id], parsedIncludes)
-      
+      const vouchers = await this.internalRepository.findByIds(
+        [id],
+        parsedIncludes,
+      )
+
       if (vouchers.length === 0) {
         throw ErrorFactory.resourceNotFound('Voucher', id)
       }
-      
+
       return vouchers[0]
     } catch (error) {
       logger.error('Failed to get voucher by id', { error, id })
@@ -118,7 +122,10 @@ export class InternalVoucherService implements IInternalVoucherService {
     }
   }
 
-  async getVouchersByIds(ids: string[], parsedIncludes?: ParsedIncludes): Promise<VoucherDomain[]> {
+  async getVouchersByIds(
+    ids: string[],
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain[]> {
     try {
       return await this.internalRepository.findByIds(ids, parsedIncludes)
     } catch (error) {
@@ -127,16 +134,19 @@ export class InternalVoucherService implements IInternalVoucherService {
     }
   }
 
-  async getUserVouchers(params: UserVoucherSearchParams): Promise<PaginatedResult<UserVoucherData>> {
+  async getUserVouchers(
+    params: UserVoucherSearchParams,
+  ): Promise<PaginatedResult<UserVoucherData>> {
     try {
       // Get customer vouchers from repository
       const customerVouchers = await this.internalRepository.getUserVouchers(
         params.userId,
-        params.status
+        params.status,
       )
 
       // Apply pagination
-      const startIndex = ((params.page || 1) - 1) * (params.limit || PAGINATION_DEFAULT_LIMIT)
+      const startIndex =
+        ((params.page || 1) - 1) * (params.limit || PAGINATION_DEFAULT_LIMIT)
       const endIndex = startIndex + (params.limit || PAGINATION_DEFAULT_LIMIT)
       const paginatedData = customerVouchers.slice(startIndex, endIndex)
 
@@ -154,7 +164,10 @@ export class InternalVoucherService implements IInternalVoucherService {
           page: params.page || 1,
           limit: params.limit || PAGINATION_DEFAULT_LIMIT,
           total: customerVouchers.length,
-          totalPages: Math.ceil(customerVouchers.length / (params.limit || PAGINATION_DEFAULT_LIMIT)),
+          totalPages: Math.ceil(
+            customerVouchers.length /
+              (params.limit || PAGINATION_DEFAULT_LIMIT),
+          ),
           hasNext: endIndex < customerVouchers.length,
           hasPrev: (params.page || 1) > 1,
         },
@@ -172,7 +185,7 @@ export class InternalVoucherService implements IInternalVoucherService {
     try {
       // Use publicRepository for findById as it's not in internal repository
       const voucher = await this.publicRepository.findById(voucherId)
-      
+
       if (!voucher) {
         return {
           isValid: false,
@@ -194,7 +207,7 @@ export class InternalVoucherService implements IInternalVoucherService {
       // Check expiry if requested
       if (options.checkExpiry) {
         const now = new Date()
-        
+
         if (voucher.validFrom && voucher.validFrom > now) {
           return {
             isValid: false,
@@ -202,7 +215,7 @@ export class InternalVoucherService implements IInternalVoucherService {
             voucher,
           }
         }
-        
+
         if (voucher.expiresAt && voucher.expiresAt < now) {
           return {
             isValid: false,
@@ -228,14 +241,16 @@ export class InternalVoucherService implements IInternalVoucherService {
         // Check user-specific redemption limit if userId provided
         if (options.userId && voucher.maxRedemptionsPerUser) {
           // Use publicRepository for findCustomerVoucher
-          const customerVoucher = await this.publicRepository.findCustomerVoucher(
-            options.userId,
-            voucherId,
-          )
-          
+          const customerVoucher =
+            await this.publicRepository.findCustomerVoucher(
+              options.userId,
+              voucherId,
+            )
+
           if (
             customerVoucher &&
-            customerVoucher.redemptionCode && voucher.maxRedemptionsPerUser === 1
+            customerVoucher.redemptionCode &&
+            voucher.maxRedemptionsPerUser === 1
           ) {
             return {
               isValid: false,
@@ -287,7 +302,10 @@ export class InternalVoucherService implements IInternalVoucherService {
   ): Promise<VoucherDomain> {
     try {
       // Use internalRepository for updateState
-      const updatedVoucher = await this.internalRepository.updateState(voucherId, state)
+      const updatedVoucher = await this.internalRepository.updateState(
+        voucherId,
+        state,
+      )
 
       // Invalidate cache
       await this.invalidateCache(voucherId)
@@ -311,16 +329,14 @@ export class InternalVoucherService implements IInternalVoucherService {
     }
   }
 
-  async trackScan(
-    data: VoucherScanData & { id: string },
-  ): Promise<void> {
+  async trackScan(data: VoucherScanData & { id: string }): Promise<void> {
     try {
       // Track the scan
       await this.internalRepository.trackScan(data)
-      
+
       // Increment scan count
       await this.internalRepository.incrementScanCount(data.voucherId)
-      
+
       logger.info('Voucher scan tracked', {
         scanId: data.id,
         voucherId: data.voucherId,
@@ -337,11 +353,11 @@ export class InternalVoucherService implements IInternalVoucherService {
     data: RedemptionTrackingData,
   ): Promise<RedemptionTrackingResult> {
     try {
-      const { voucherId, userId, code, metadata } = data
+      const { voucherId, userId, code: _code, metadata } = data
 
       // Check if voucher exists using internal repository
       const exists = await this.internalRepository.exists(voucherId)
-      
+
       if (!exists) {
         throw ErrorFactory.resourceNotFound('Voucher', voucherId)
       }
@@ -351,6 +367,7 @@ export class InternalVoucherService implements IInternalVoucherService {
 
       // Track the redemption scan
       const scanId = `red-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
       await this.internalRepository.trackScan({
         id: scanId,
         voucherId,
@@ -387,7 +404,12 @@ export class InternalVoucherService implements IInternalVoucherService {
     operation: BatchProcessOperation,
   ): Promise<BatchProcessResult> {
     const startTime = Date.now()
-    const results: Array<{ voucherId: string; success: boolean; error?: string }> = []
+    const results: Array<{
+      voucherId: string
+      success: boolean
+      error?: string
+    }> = []
+
     let successCount = 0
     let failedCount = 0
 
@@ -405,17 +427,18 @@ export class InternalVoucherService implements IInternalVoucherService {
               )
               break
 
-            case 'validate':
+            case 'validate': {
               const validation = await this.validateVoucher(voucherId, {
                 checkState: true,
                 checkExpiry: true,
                 checkRedemptionLimit: true,
               })
-              
+
               if (!validation.isValid) {
                 throw new Error(validation.reason || 'Validation failed')
               }
               break
+            }
 
             case 'activate':
               await this.updateVoucherStateInternal(
@@ -432,10 +455,12 @@ export class InternalVoucherService implements IInternalVoucherService {
           results.push({ voucherId, success: true })
           successCount++
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          const errorMessage =
+            error instanceof Error ? error.message : 'Unknown error'
+
           results.push({ voucherId, success: false, error: errorMessage })
           failedCount++
-          
+
           logger.error('Failed to process voucher in batch', {
             voucherId,
             operation: op,
@@ -445,7 +470,7 @@ export class InternalVoucherService implements IInternalVoucherService {
       }
 
       const duration = Date.now() - startTime
-      
+
       logger.info('Batch voucher processing completed', {
         operation: op,
         totalCount: voucherIds.length,
@@ -533,6 +558,7 @@ export class InternalVoucherService implements IInternalVoucherService {
 
       // Use publicRepository for findAll
       const result = await this.publicRepository.findAll(params)
+
       let expiredCount = 0
 
       for (const voucher of result.data) {
@@ -567,7 +593,7 @@ export class InternalVoucherService implements IInternalVoucherService {
       // This would require a custom repository method to find customer vouchers
       // without corresponding vouchers (orphaned records)
       // For now, returning 0 as placeholder
-      
+
       logger.info('Orphaned customer vouchers cleanup completed', {
         cleanedCount: 0,
       })

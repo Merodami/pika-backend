@@ -1,23 +1,22 @@
 import { z } from 'zod'
 
-import { UUID, DateTime, Decimal } from '../../shared/primitives.js'
-import { withTimestamps } from '../../shared/metadata.js'
-import { paginatedResponse } from '../../shared/responses.js'
-import { createBulkOperationResponse } from '../../shared/operations.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { withTimestampsString } from '../../shared/metadata.js'
+import { createBulkOperationResponse } from '../../shared/operations.js'
+import { DateTime, Decimal,UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import {
-  VoucherState,
-  VoucherDiscountType,
   VoucherCodeType,
+  VoucherDiscountType,
+  VoucherState,
 } from '../common/enums.js'
 import {
+  CustomerVoucher,
   LocationPoint,
   VoucherCode,
   VoucherRedemption,
   VoucherScan,
-  CustomerVoucher,
 } from '../common/types.js'
-import { AdminVoucherQueryParams } from './queries.js'
 
 /**
  * Admin voucher management schemas
@@ -31,7 +30,7 @@ import { AdminVoucherQueryParams } from './queries.js'
  * Following industry standard include pattern - complete objects when included
  */
 export const AdminVoucherDetailResponse = openapi(
-  withTimestamps({
+  withTimestampsString({
     id: UUID,
     businessId: UUID,
     categoryId: UUID,
@@ -41,8 +40,12 @@ export const AdminVoucherDetailResponse = openapi(
 
     // Resolved content only - no translation keys exposed
     title: z.string().describe('Voucher title in requested language'),
-    description: z.string().describe('Voucher description in requested language'),
-    terms: z.string().describe('Voucher terms and conditions in requested language'),
+    description: z
+      .string()
+      .describe('Voucher description in requested language'),
+    terms: z
+      .string()
+      .describe('Voucher terms and conditions in requested language'),
 
     // Discount configuration
     discountType: VoucherDiscountType,

@@ -1,18 +1,27 @@
 import { ICacheService } from '@pika/redis'
 import {
+  type CustomerVoucherDomain,
   type VoucherDomain,
   VoucherMapper,
   type VoucherScanData,
-  type CustomerVoucherDomain,
 } from '@pika/sdk'
-import { ErrorFactory, logger, type ParsedIncludes, toPrismaInclude } from '@pika/shared'
-import type { VoucherState, PaginatedResult } from '@pika/types'
+import { ErrorFactory, logger, toPrismaInclude } from '@pika/shared'
+import type {
+  CustomerVoucherStatus,
+  PaginatedResult,
+  ParsedIncludes,
+  VoucherState,
+} from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
+
 import type { InternalVoucherSearchParams } from '../types/index.js'
 
 export interface IInternalVoucherRepository {
   // Batch operations for service-to-service
-  findByIds(ids: string[], parsedIncludes?: ParsedIncludes): Promise<VoucherDomain[]>
+  findByIds(
+    ids: string[],
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain[]>
   // State management for internal services
   updateState(id: string, state: VoucherState): Promise<VoucherDomain>
   // Increment redemptions for internal tracking
@@ -24,10 +33,19 @@ export interface IInternalVoucherRepository {
   exists(id: string): Promise<boolean>
   validateBatch(ids: string[]): Promise<{ valid: string[]; invalid: string[] }>
   // User voucher operations
-  getUserVouchers(userId: string, status?: string): Promise<CustomerVoucherDomain[]>
+  getUserVouchers(
+    userId: string,
+    status?: string,
+  ): Promise<CustomerVoucherDomain[]>
   // Business and category queries
-  findByBusinessId(businessId: string, params: InternalVoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
-  findByCategoryId(categoryId: string, params: InternalVoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
+  findByBusinessId(
+    businessId: string,
+    params: InternalVoucherSearchParams,
+  ): Promise<PaginatedResult<VoucherDomain>>
+  findByCategoryId(
+    categoryId: string,
+    params: InternalVoucherSearchParams,
+  ): Promise<PaginatedResult<VoucherDomain>>
 }
 
 /**
@@ -40,19 +58,23 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
     private readonly cache?: ICacheService,
   ) {}
 
-  async findByIds(ids: string[], parsedIncludes?: ParsedIncludes): Promise<VoucherDomain[]> {
+  async findByIds(
+    ids: string[],
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<VoucherDomain[]> {
     try {
       if (ids.length === 0) {
         return []
       }
 
-      const include = parsedIncludes && Object.keys(parsedIncludes).length > 0
-        ? (toPrismaInclude(parsedIncludes) as Prisma.VoucherInclude)
-        : {
-            business: true,
-            category: true,
-            codes: true,
-          }
+      const include =
+        parsedIncludes && Object.keys(parsedIncludes).length > 0
+          ? (toPrismaInclude(parsedIncludes) as Prisma.VoucherInclude)
+          : {
+              business: true,
+              category: true,
+              codes: true,
+            }
 
       const vouchers = await this.prisma.voucher.findMany({
         where: {
@@ -72,8 +94,6 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async updateState(id: string, state: VoucherState): Promise<VoucherDomain> {
@@ -81,7 +101,7 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
       const voucher = await this.prisma.voucher.update({
         where: { id },
         data: {
-          state,
+          state: state,
           updatedAt: new Date(),
         },
         include: {
@@ -94,8 +114,8 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
       // Clear cache
       if (this.cache) {
         await Promise.all([
-          this.cache.delete(`voucher:${id}`),
-          this.cache.delete('vouchers:*'),
+          this.cache.del(`voucher:${id}`),
+          this.cache.del('vouchers:*'),
         ])
       }
 
@@ -115,8 +135,6 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async incrementRedemptions(id: string): Promise<void> {
@@ -124,7 +142,7 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
       await this.prisma.voucher.update({
         where: { id },
         data: {
-          currentRedemptions: {
+          redemptionsCount: {
             increment: 1,
           },
           updatedAt: new Date(),
@@ -134,8 +152,8 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
       // Clear cache
       if (this.cache) {
         await Promise.all([
-          this.cache.delete(`voucher:${id}`),
-          this.cache.delete('vouchers:*'),
+          this.cache.del(`voucher:${id}`),
+          this.cache.del('vouchers:*'),
         ])
       }
     } catch (error) {
@@ -153,8 +171,6 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async trackScan(data: VoucherScanData & { id: string }): Promise<void> {
@@ -166,11 +182,17 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
           userId: data.userId,
           scanType: data.scanType,
           scanSource: data.scanSource,
-          location: data.location ? JSON.stringify(data.location) : null,
-          userAgent: data.userAgent,
           businessId: data.businessId,
-          deviceInfo: data.deviceInfo ? JSON.stringify(data.deviceInfo) : null,
-          metadata: data.metadata ? JSON.stringify(data.metadata) : null,
+          deviceInfo: data.deviceInfo
+            ? JSON.stringify(data.deviceInfo)
+            : undefined,
+          metadata:
+            data.metadata || data.userAgent
+              ? JSON.stringify({
+                  ...data.metadata,
+                  userAgent: data.userAgent,
+                })
+              : undefined,
           scannedAt: new Date(),
         },
       })
@@ -183,8 +205,6 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
   async incrementScanCount(voucherId: string): Promise<void> {
@@ -196,14 +216,13 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
           scanCount: {
             increment: 1,
           },
-          lastScannedAt: new Date(),
           updatedAt: new Date(),
         },
       })
 
       // Clear cache
       if (this.cache) {
-        await this.cache.delete(`voucher:${voucherId}`)
+        await this.cache.del(`voucher:${voucherId}`)
       }
     } catch (error) {
       logger.error('Failed to increment scan count', { error, voucherId })
@@ -225,6 +244,7 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
       return count > 0
     } catch (error) {
       logger.error('Failed to check voucher existence', { error, id })
+
       return false
     }
   }
@@ -258,13 +278,15 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
         error,
       )
     }
-
-    throw error
   }
 
-  async getUserVouchers(userId: string, status?: string): Promise<CustomerVoucherDomain[]> {
+  async getUserVouchers(
+    userId: string,
+    status?: string,
+  ): Promise<CustomerVoucherDomain[]> {
     try {
       const whereClause: any = { userId }
+
       if (status && status !== 'all') {
         whereClause.status = status
       }
@@ -285,13 +307,16 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
 
       return customerVouchers.map((cv) => ({
         id: cv.id,
-        userId: cv.userId,
+        userId: cv.customerId,
         voucherId: cv.voucherId,
         voucher: VoucherMapper.fromDocument(cv.voucher),
         claimedAt: cv.claimedAt,
         redeemedAt: cv.redeemedAt,
-        status: cv.status,
-        redemptionCount: cv.redemptionCount,
+        status: cv.status as CustomerVoucherStatus,
+        expiresAt: cv.voucher.validUntil || new Date(),
+        metadata: null,
+        redemptionCode: null,
+        redemptionLocation: null,
         createdAt: cv.createdAt,
         updatedAt: cv.updatedAt,
       }))
@@ -324,10 +349,7 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
 
       // Apply expiry filter
       if (!params.includeExpired) {
-        where.OR = [
-          { validUntil: null },
-          { validUntil: { gte: new Date() } },
-        ]
+        where.OR = [{ validUntil: null }, { validUntil: { gte: new Date() } }]
       }
 
       const [vouchers, total] = await Promise.all([
@@ -352,12 +374,18 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
           limit: params.limit || 20,
           total,
           totalPages: Math.ceil(total / (params.limit || 20)),
-          hasNext: ((params.page || 1) - 1) * (params.limit || 20) + vouchers.length < total,
-          hasPrevious: (params.page || 1) > 1,
+          hasNext:
+            ((params.page || 1) - 1) * (params.limit || 20) + vouchers.length <
+            total,
+          hasPrev: (params.page || 1) > 1,
         },
       }
     } catch (error) {
-      logger.error('Failed to find vouchers by business', { error, businessId, params })
+      logger.error('Failed to find vouchers by business', {
+        error,
+        businessId,
+        params,
+      })
       throw ErrorFactory.databaseError(
         'findByBusinessId',
         'Failed to retrieve vouchers by business',
@@ -385,10 +413,7 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
 
       // Apply expiry filter
       if (!params.includeExpired) {
-        where.OR = [
-          { validUntil: null },
-          { validUntil: { gte: new Date() } },
-        ]
+        where.OR = [{ validUntil: null }, { validUntil: { gte: new Date() } }]
       }
 
       const [vouchers, total] = await Promise.all([
@@ -413,12 +438,18 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
           limit: params.limit || 20,
           total,
           totalPages: Math.ceil(total / (params.limit || 20)),
-          hasNext: ((params.page || 1) - 1) * (params.limit || 20) + vouchers.length < total,
-          hasPrevious: (params.page || 1) > 1,
+          hasNext:
+            ((params.page || 1) - 1) * (params.limit || 20) + vouchers.length <
+            total,
+          hasPrev: (params.page || 1) > 1,
         },
       }
     } catch (error) {
-      logger.error('Failed to find vouchers by category', { error, categoryId, params })
+      logger.error('Failed to find vouchers by category', {
+        error,
+        categoryId,
+        params,
+      })
       throw ErrorFactory.databaseError(
         'findByCategoryId',
         'Failed to retrieve vouchers by category',

@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient } from '@prisma/client'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { type UserDomain, UserMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface UserSearchParams {
   email?: string

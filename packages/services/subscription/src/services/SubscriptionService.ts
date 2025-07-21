@@ -1,4 +1,3 @@
-import type { PrismaClient } from '@prisma/client'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
@@ -17,12 +16,14 @@ import {
   logger,
 } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+
 import type { IPlanRepository } from '../repositories/PlanRepository.js'
 import type {
   ISubscriptionRepository,
   SubscriptionSearchParams,
 } from '../repositories/SubscriptionRepository.js'
-import { CACHE_TTL_MULTIPLIERS } from '../types/constants.js'
+import { CACHE_TTL_MULTIPLIERS, TEMPLATE_KEYS } from '../types/constants.js'
 
 export interface ISubscriptionService {
   createSubscription(
@@ -342,7 +343,7 @@ export class SubscriptionService implements ISubscriptionService {
     const activeSubscriptions =
       await this.subscriptionRepository.findAllActive()
 
-    let processedCount = 0
+    const processedCount = 0
 
     for (const subscription of activeSubscriptions) {
       try {
@@ -392,8 +393,8 @@ export class SubscriptionService implements ISubscriptionService {
 
     try {
       await this.communicationClient.sendTransactionalEmail({
-        userId: userId as any,
-        templateKey: 'SUBSCRIPTION_ACTIVATED',
+        userId: userId as any, // Communication client expects branded UserId
+        templateKey: TEMPLATE_KEYS.SUBSCRIPTION_ACTIVATED,
         variables: {
           planName: plan.name,
           price: `$${(plan.price / 100).toFixed(2)}`,
@@ -430,8 +431,8 @@ export class SubscriptionService implements ISubscriptionService {
 
     try {
       await this.communicationClient.sendTransactionalEmail({
-        userId: userId as any,
-        templateKey: 'SUBSCRIPTION_EXPIRED',
+        userId: userId as any, // Communication client expects branded UserId
+        templateKey: TEMPLATE_KEYS.SUBSCRIPTION_CANCELLED,
         variables: {
           planType: 'Standard', // planType field removed
           cancelAtPeriodEnd: cancelAtPeriodEnd.toString(),

@@ -1,5 +1,15 @@
+import { communicationInternal } from '@pika/api'
 import { COMMUNICATION_API_URL } from '@pika/environment'
 import type { ServiceContext } from '@pika/types'
+import { z } from 'zod'
+
+// Use types from the communication internal namespace
+type SendTransactionalEmailRequest = z.infer<
+  typeof communicationInternal.SendTransactionalEmailRequest
+>
+type SendTransactionalEmailResponse = z.infer<
+  typeof communicationInternal.SendTransactionalEmailResponse
+>
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 
@@ -21,16 +31,7 @@ export interface SendSystemNotificationResponse {
   success: boolean
 }
 
-export interface SendTransactionalEmailRequest {
-  to: string
-  templateId: string
-  templateData: Record<string, any>
-}
-
-export interface SendTransactionalEmailResponse {
-  messageId: string
-  success: boolean
-}
+// SendTransactionalEmailRequest and SendTransactionalEmailResponse are now imported from @pika/api
 
 export interface SendNotificationRequest {
   userId: string

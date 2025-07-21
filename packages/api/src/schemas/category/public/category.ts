@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import { CategorySortBy, SortOrder } from '../../shared/enums.js'
+import { CategorySortBy } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
-import { PaginationParams, SearchParams } from '../../shared/pagination.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * Public category schemas

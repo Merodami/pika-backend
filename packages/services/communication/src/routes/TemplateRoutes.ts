@@ -1,11 +1,4 @@
-import {
-  CreateTemplateRequest,
-  TemplateIdParam,
-  TemplateSearchParams,
-  TestTemplateRequest,
-  UpdateTemplateRequest,
-} from '@pika/api/public'
-import type { ICacheService } from '@pika/redis'
+import { communicationCommon, communicationPublic } from '@pika/api'
 import {
   requireAdmin,
   requireAuth,
@@ -13,6 +6,7 @@ import {
   validateParams,
   validateQuery,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -39,14 +33,14 @@ export function createTemplateRouter(
   router.get(
     '/',
     requireAuth(),
-    validateQuery(TemplateSearchParams),
+    validateQuery(communicationPublic.TemplateSearchParams),
     controller.getTemplates,
   )
 
   router.get(
     '/:id',
     requireAuth(),
-    validateParams(TemplateIdParam),
+    validateParams(communicationCommon.TemplateIdParam),
     controller.getTemplateById,
   )
 
@@ -54,29 +48,29 @@ export function createTemplateRouter(
   router.post(
     '/',
     requireAdmin(),
-    validateBody(CreateTemplateRequest),
+    validateBody(communicationPublic.CreateTemplateRequest),
     controller.createTemplate,
   )
 
   router.put(
     '/:id',
     requireAdmin(),
-    validateParams(TemplateIdParam),
-    validateBody(UpdateTemplateRequest),
+    validateParams(communicationCommon.TemplateIdParam),
+    validateBody(communicationPublic.UpdateTemplateRequest),
     controller.updateTemplate,
   )
 
   router.delete(
     '/:id',
     requireAdmin(),
-    validateParams(TemplateIdParam),
+    validateParams(communicationCommon.TemplateIdParam),
     controller.deleteTemplate,
   )
 
   router.post(
     '/validate',
     requireAuth(),
-    validateBody(TestTemplateRequest),
+    validateBody(communicationPublic.TestTemplateRequest),
     controller.validateTemplate,
   )
 

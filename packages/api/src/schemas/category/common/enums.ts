@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { createSortFieldMapper } from '../../../common/utils/sorting.js'
+
 /**
  * Category-specific enum schemas
  */
@@ -17,3 +19,14 @@ export const CategorySortBy = z.enum([
 ])
 
 export type CategorySortBy = z.infer<typeof CategorySortBy>
+
+/**
+ * Category sort field mapper
+ * Maps API sort fields to database column names
+ */
+export const categorySortFieldMapper = createSortFieldMapper(CategorySortBy, {
+  name: 'nameKey',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+})

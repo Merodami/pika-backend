@@ -13,7 +13,7 @@ import { RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
-import { UserRole, mapRoleToPermissions } from '@pika/types'
+import { mapRoleToPermissions, UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import { AuthMapper } from '../mappers/AuthMapper.js'

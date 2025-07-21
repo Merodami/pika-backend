@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { GymId, UserId } from './branded.js'
-import { DateTime } from './primitives.js'
+import { DateTime, DateTimeString } from './primitives.js'
 
 /**
  * Common metadata schemas with Zod
@@ -25,11 +25,19 @@ export const updatedAt = z.object({
 })
 
 /**
- * Both timestamps
+ * Both timestamps - Using Date objects (for internal use)
  */
 export const timestamps = z.object({
   createdAt: DateTime.describe('When the record was created'),
   updatedAt: DateTime.describe('When the record was last updated'),
+})
+
+/**
+ * Both timestamps - Using strings (for API responses)
+ */
+export const timestampsString = z.object({
+  createdAt: DateTimeString.describe('When the record was created'),
+  updatedAt: DateTimeString.describe('When the record was last updated'),
 })
 
 export type Timestamps = z.infer<typeof timestamps>
@@ -61,10 +69,17 @@ export type SoftDelete = z.infer<typeof softDelete>
 // ============= Mixin Functions =============
 
 /**
- * Add timestamps to any schema
+ * Add timestamps to any schema (Date objects for internal use)
  */
 export function withTimestamps<T extends z.ZodRawShape>(shape: T) {
   return z.object(shape).merge(timestamps)
+}
+
+/**
+ * Add timestamps to any schema (strings for API responses)
+ */
+export function withTimestampsString<T extends z.ZodRawShape>(shape: T) {
+  return z.object(shape).merge(timestampsString)
 }
 
 /**

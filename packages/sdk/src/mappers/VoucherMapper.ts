@@ -1,63 +1,45 @@
-import { VoucherState, VoucherDiscountType } from '@pika/types'
+import {
+  CustomerVoucherStatus,
+  VoucherDiscountType,
+  VoucherDiscountTypeType,
+  VoucherState,
+  VoucherStateType,
+} from '@pika/types'
+import { Decimal } from '@prisma/client/runtime/library'
 
-// Helper functions for mapping enum values
-function mapVoucherState(state: string): VoucherState {
-  // Map database values to API enum values
-  switch (state) {
-    case 'draft':
-      return VoucherState.draft
-    case 'published':
-      return VoucherState.published
-    case 'expired':
-      return VoucherState.expired
-    case 'claimed':
-      return VoucherState.claimed
-    case 'redeemed':
-      return VoucherState.redeemed
-    case 'suspended':
-      return VoucherState.suspended
-    default:
-      return VoucherState.draft
-  }
-}
+function convertDecimalToNumber(
+  value: number | Decimal | null | undefined,
+): number {
+  if (value === null || value === undefined) return 0
+  if (typeof value === 'number') return value
+  if (value instanceof Decimal) return value.toNumber()
 
-function mapVoucherDiscountType(type: string): VoucherDiscountType {
-  // Map database values to API enum values
-  switch (type) {
-    case 'percentage':
-      return VoucherDiscountType.percentage
-    case 'fixed':
-      return VoucherDiscountType.fixed
-    default:
-      return VoucherDiscountType.percentage
-  }
+  return 0
 }
 
 import type {
-  VoucherDomain,
   CreateVoucherData,
-  UpdateVoucherData,
-  VoucherScanData,
-  VoucherScanResult,
-  VoucherClaimResult,
-  VoucherRedeemResult,
-  UserVoucherData,
   CustomerVoucherDomain,
-  VoucherLocation,
+  UpdateVoucherData,
+  UserVoucherData,
+  VoucherClaimResult,
   VoucherCode,
+  VoucherDomain,
+  VoucherLocation,
+  VoucherRedeemResult,
+  VoucherScanResult,
 } from '../domain/voucher.js'
 import type {
-  VoucherDTO,
-  CreateVoucherDTO,
-  UpdateVoucherDTO,
-  CreateVoucherRequestData,
-  UpdateVoucherRequestData,
   BulkVoucherUpdateData,
-  VoucherScanDTO,
+  CreateVoucherDTO,
+  CreateVoucherRequestData,
   CustomerVoucherDTO,
-  VoucherLocationDTO,
-  VoucherCodeDTO,
   GeoJSONPoint,
+  UpdateVoucherDTO,
+  UpdateVoucherRequestData,
+  VoucherCodeDTO,
+  VoucherDTO,
+  VoucherLocationDTO,
 } from '../dto/voucher.dto.js'
 
 /**
@@ -73,8 +55,8 @@ export interface VoucherDocument {
   descriptionKey: string // Translation key for description
   termsAndConditionsKey: string // Translation key for terms
   type: string // Voucher type from database
-  value?: number | null // Fixed value amount
-  discount?: number | null // Percentage discount
+  value?: number | Decimal | null // Fixed value amount (Prisma Decimal or number)
+  discount?: number | Decimal | null // Percentage discount (Prisma Decimal or number)
   currency: string
   location?: any | null // VoucherLocation stored as JSON
   imageUrl: string | null
@@ -132,7 +114,7 @@ export class VoucherMapper {
       id: doc.id,
       businessId: doc.businessId,
       categoryId: doc.categoryId || '',
-      state: mapVoucherState(doc.state),
+      state: doc.state as VoucherState,
       // Translation keys from database
       titleKey: doc.titleKey,
       descriptionKey: doc.descriptionKey,
@@ -141,8 +123,11 @@ export class VoucherMapper {
       title: undefined,
       description: undefined,
       termsAndConditions: undefined,
-      discountType: mapVoucherDiscountType(doc.type),
-      discountValue: doc.discount || doc.value || 0,
+      discountType: doc.type as VoucherDiscountType,
+      discountValue:
+        convertDecimalToNumber(doc.discount) ||
+        convertDecimalToNumber(doc.value) ||
+        0,
       currency: doc.currency,
       location: doc.location
         ? this.mapLocationFromDocument(doc.location)
@@ -194,6 +179,7 @@ export class VoucherMapper {
       if (!date) return new Date().toISOString()
       if (typeof date === 'string') return date
       if (date instanceof Date) return date.toISOString()
+
       return new Date().toISOString()
     }
 
@@ -208,9 +194,7 @@ export class VoucherMapper {
       discountType: this.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
-      location: domain.location
-        ? this.mapLocationToDTO(domain.location)
-        : undefined,
+      location: domain.location ? this.mapLocationToDTO(domain.location) : null,
       imageUrl: domain.imageUrl || undefined,
       validFrom: formatDate(domain.validFrom),
       expiresAt: formatDate(domain.expiresAt),
@@ -224,19 +208,20 @@ export class VoucherMapper {
     }
   }
 
-
   /**
    * Maps create request data (from Zod validation) to domain data
    * Request data has Date objects from Zod transformation
    */
-  static fromCreateRequestData(data: CreateVoucherRequestData): CreateVoucherData {
+  static fromCreateRequestData(
+    data: CreateVoucherRequestData,
+  ): CreateVoucherData {
     return {
       businessId: data.businessId,
       categoryId: data.categoryId,
       title: data.title,
       description: data.description,
       termsAndConditions: data.termsAndConditions,
-      discountType: mapVoucherDiscountType(data.discountType),
+      discountType: data.discountType as VoucherDiscountType,
       discountValue: data.discountValue,
       currency: data.currency,
       location: data.location ? this.mapLocationFromDTO(data.location) : null,
@@ -260,7 +245,7 @@ export class VoucherMapper {
       title: dto.title, // Already Record<string, string> from DTO
       description: dto.description, // Already Record<string, string>
       termsAndConditions: dto.termsAndConditions, // Already Record<string, string>
-      discountType: mapVoucherDiscountType(dto.discountType),
+      discountType: dto.discountType as VoucherDiscountType,
       discountValue: dto.discountValue,
       currency: dto.currency,
       location: dto.location ? this.mapLocationFromDTO(dto.location) : null,
@@ -277,14 +262,17 @@ export class VoucherMapper {
    * Maps update request data (from Zod validation) to domain data
    * Request data has Date objects from Zod transformation
    */
-  static fromUpdateRequestData(data: UpdateVoucherRequestData): UpdateVoucherData {
+  static fromUpdateRequestData(
+    data: UpdateVoucherRequestData,
+  ): UpdateVoucherData {
     const result: UpdateVoucherData = {}
 
     if (data.title !== undefined) result.title = data.title
     if (data.description !== undefined) result.description = data.description
-    if (data.termsAndConditions !== undefined) result.termsAndConditions = data.termsAndConditions
+    if (data.termsAndConditions !== undefined)
+      result.termsAndConditions = data.termsAndConditions
     if (data.discountType !== undefined)
-      result.discountType = mapVoucherDiscountType(data.discountType)
+      result.discountType = data.discountType as VoucherDiscountType
     if (data.discountValue !== undefined)
       result.discountValue = data.discountValue
     if (data.currency !== undefined) result.currency = data.currency
@@ -313,9 +301,10 @@ export class VoucherMapper {
 
     if (dto.title !== undefined) result.title = dto.title // Already Record<string, string>
     if (dto.description !== undefined) result.description = dto.description // Already Record<string, string>
-    if (dto.termsAndConditions !== undefined) result.termsAndConditions = dto.termsAndConditions // Already Record<string, string>
+    if (dto.termsAndConditions !== undefined)
+      result.termsAndConditions = dto.termsAndConditions // Already Record<string, string>
     if (dto.discountType !== undefined)
-      result.discountType = mapVoucherDiscountType(dto.discountType)
+      result.discountType = dto.discountType as VoucherDiscountType
     if (dto.discountValue !== undefined)
       result.discountValue = dto.discountValue
     if (dto.currency !== undefined) result.currency = dto.currency
@@ -340,13 +329,17 @@ export class VoucherMapper {
    * Used for bulk voucher updates with limited fields
    * Note: State changes are handled separately via updateVoucherState
    */
-  static fromBulkUpdateData(data: BulkVoucherUpdateData): { updates: UpdateVoucherData; state?: VoucherState } {
+  static fromBulkUpdateData(data: BulkVoucherUpdateData): {
+    updates: UpdateVoucherData
+    state?: VoucherState
+  } {
     const updates: UpdateVoucherData = {}
+
     let state: VoucherState | undefined
 
     // Handle state separately - not part of domain update data
     if (data.state !== undefined) {
-      state = mapVoucherState(data.state)
+      state = data.state as VoucherState
     }
 
     // Handle regular update fields
@@ -373,7 +366,7 @@ export class VoucherMapper {
       id: doc.id,
       userId: doc.userId,
       voucherId: doc.voucherId,
-      status: doc.status as 'claimed' | 'redeemed' | 'expired',
+      status: doc.status as CustomerVoucherStatus,
       claimedAt:
         doc.claimedAt instanceof Date
           ? doc.claimedAt
@@ -475,17 +468,22 @@ export class VoucherMapper {
     location: VoucherLocationDTO | GeoJSONPoint,
   ): VoucherLocation {
     // Handle GeoJSON Point format from API
-    if ('type' in location && location.type === 'Point' && Array.isArray(location.coordinates)) {
+    if (
+      'type' in location &&
+      location.type === 'Point' &&
+      Array.isArray(location.coordinates)
+    ) {
       return {
         lng: location.coordinates[0], // longitude is first in GeoJSON
         lat: location.coordinates[1], // latitude is second in GeoJSON
         radius: location.radius,
       }
     }
-    
+
     // Handle simple lat/lng format (backward compatibility)
     // At this point, TypeScript knows location is VoucherLocationDTO
     const voucherLocation = location as VoucherLocationDTO
+
     return {
       lat: voucherLocation.lat,
       lng: voucherLocation.lng,
@@ -535,7 +533,7 @@ export class VoucherMapper {
   /**
    * Maps domain state to DTO state (API compatible)
    */
-  private static mapStateToDTO(state: VoucherState): string {
+  private static mapStateToDTO(state: VoucherState): VoucherStateType {
     switch (state) {
       case VoucherState.draft:
         return VoucherState.draft
@@ -559,7 +557,7 @@ export class VoucherMapper {
    */
   private static mapDiscountTypeToDTO(
     discountType: VoucherDiscountType,
-  ): string {
+  ): VoucherDiscountTypeType {
     switch (discountType) {
       case VoucherDiscountType.percentage:
         return VoucherDiscountType.percentage
@@ -576,7 +574,6 @@ export class VoucherMapper {
   static toDTOArray(domains: VoucherDomain[]): VoucherDTO[] {
     return domains.map((domain) => this.toDTO(domain))
   }
-
 
   /**
    * Maps array of documents to domains
@@ -647,67 +644,80 @@ export class VoucherMapper {
       if (!date) return new Date().toISOString()
       if (typeof date === 'string') return date
       if (date instanceof Date) return date.toISOString()
+
       return new Date().toISOString()
     }
 
     const now = new Date()
-    const expiresAt = domain.expiresAt instanceof Date ? domain.expiresAt : new Date(domain.expiresAt)
-    const daysUntilExpiry = expiresAt > now ? Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null
+    const expiresAt =
+      domain.expiresAt instanceof Date
+        ? domain.expiresAt
+        : new Date(domain.expiresAt)
+    const daysUntilExpiry =
+      expiresAt > now
+        ? Math.ceil(
+            (expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+          )
+        : null
 
     return {
       id: domain.id,
       businessId: domain.businessId,
       categoryId: domain.categoryId,
       state: this.mapStateToDTO(domain.state),
-      
+
       // Only resolved content - no translation keys exposed
       title: domain.title || '',
       description: domain.description || '',
       terms: domain.termsAndConditions || '',
-      
+
       // Discount configuration
       discountType: this.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
-      
+
       // Geographic targeting
       location: domain.location ? this.mapLocationToDTO(domain.location) : null,
-      
+
       // Media
       imageUrl: domain.imageUrl,
-      
+
       // Validity period
       validFrom: formatDate(domain.validFrom),
       expiresAt: formatDate(domain.expiresAt),
-      
+
       // Redemption limits
       maxRedemptions: domain.maxRedemptions,
       maxRedemptionsPerUser: domain.maxRedemptionsPerUser,
       currentRedemptions: domain.currentRedemptions,
-      
+
       // Analytics (defaults - should be populated from includes if needed)
       scanCount: 0,
       claimCount: 0,
-      
+
       // Extensibility
       metadata: domain.metadata,
-      
+
       // Timestamps
       createdAt: formatDate(domain.createdAt),
       updatedAt: formatDate(domain.updatedAt),
       deletedAt: domain.deletedAt ? formatDate(domain.deletedAt) : null,
-      
+
       // Computed fields
-      isActive: domain.state === VoucherState.published && 
-                (!domain.expiresAt || new Date(domain.expiresAt) > now) &&
-                (!domain.maxRedemptions || domain.currentRedemptions < domain.maxRedemptions),
-      isExpired: domain.state === VoucherState.expired || 
-                 (domain.expiresAt && new Date(domain.expiresAt) <= now),
-      redemptionRate: domain.maxRedemptions && domain.maxRedemptions > 0 
-                      ? domain.currentRedemptions / domain.maxRedemptions 
-                      : 0,
+      isActive:
+        domain.state === VoucherState.published &&
+        (!domain.expiresAt || new Date(domain.expiresAt) > now) &&
+        (!domain.maxRedemptions ||
+          domain.currentRedemptions < domain.maxRedemptions),
+      isExpired:
+        domain.state === VoucherState.expired ||
+        (domain.expiresAt && new Date(domain.expiresAt) <= now),
+      redemptionRate:
+        domain.maxRedemptions && domain.maxRedemptions > 0
+          ? domain.currentRedemptions / domain.maxRedemptions
+          : 0,
       daysUntilExpiry,
-      
+
       // Optional includes (will be undefined unless populated)
       codes: domain.codes?.map((code) => this.mapCodeToDTO(code)),
     }
@@ -716,21 +726,29 @@ export class VoucherMapper {
   /**
    * Maps bulk update result to Admin API response
    */
-  static toBulkUpdateResponseDTO(vouchers: VoucherDomain[], errors?: Array<{ id: string; error: string }>): any {
+  static toBulkUpdateResponseDTO(
+    vouchers: VoucherDomain[],
+    errors?: Array<{ id: string; error: string }>,
+  ): any {
     return {
       successful: vouchers.length,
       failed: errors?.length || 0,
-      errors: errors?.map(e => ({
-        voucherId: e.id,
-        message: e.error,
-      })) || [],
+      errors:
+        errors?.map((e) => ({
+          voucherId: e.id,
+          message: e.error,
+        })) || [],
     }
   }
 
   /**
    * Maps voucher analytics to Admin API response
    */
-  static toVoucherAnalyticsDTO(analytics: any, voucherId: string, filters?: { startDate?: Date; endDate?: Date }): any {
+  static toVoucherAnalyticsDTO(
+    analytics: any,
+    voucherId: string,
+    filters?: { startDate?: Date; endDate?: Date },
+  ): any {
     return {
       voucherId,
       period: {

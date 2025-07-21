@@ -1,17 +1,16 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { SearchParams } from '../../shared/pagination.js'
-import { openapi } from '../../../common/utils/openapi.js'
-import { SubscriptionPlan } from './subscriptionPlan.js'
 import {
-  SubscriptionStatus,
-  BillingInterval,
   SubscriptionSortBy,
+  SubscriptionStatus,
 } from '../common/enums.js'
+import { SubscriptionPlan } from './subscriptionPlan.js'
 
 /**
  * Subscription schemas for public API

@@ -1,16 +1,16 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import {
-  VoucherBookStatus,
-  VoucherBookType,
-  PageLayoutType,
   AdSize,
   ContentType,
+  PageLayoutType,
+  VoucherBookStatus,
+  VoucherBookType,
 } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * Internal PDF service schemas - service-to-service communication

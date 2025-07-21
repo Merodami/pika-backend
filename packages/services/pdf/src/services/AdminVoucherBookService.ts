@@ -1,18 +1,13 @@
-import type { VoucherBook, VoucherBookStatus } from '@prisma/client'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import type { VoucherBook, VoucherBookStatus } from '@prisma/client'
 
+import type {
+  AdminVoucherBookSearchParams,
+  BatchVoucherBookResult,
+  VoucherBookStatistics,
+} from '../types/index.js'
 import { VoucherBookService } from './VoucherBookService.js'
-import type { VoucherBookSearchParams } from './VoucherBookService.js'
-
-export interface AdminVoucherBookSearchParams extends VoucherBookSearchParams {
-  // Admin-specific search parameters
-  createdBy?: string
-  updatedBy?: string
-  hasContent?: boolean
-  hasPdf?: boolean
-  status?: VoucherBookStatus
-}
 
 export interface IAdminVoucherBookService {
   getAllVoucherBooks(
@@ -28,14 +23,14 @@ export interface IAdminVoucherBookService {
     userId: string,
   ): Promise<VoucherBook>
   generatePDF(id: string, userId?: string): Promise<any>
-  bulkArchiveVoucherBooks(ids: string[], userId: string): Promise<void>
-  getVoucherBookStatistics(id: string): Promise<{
-    totalPages: number
-    usedSpaces: number
-    availableSpaces: number
-    totalPlacements: number
-    placementsByType: Record<string, number>
-  }>
+  bulkArchiveVoucherBooks(
+    ids: string[],
+    userId: string,
+  ): Promise<BatchVoucherBookResult>
+  getVoucherBookStatistics(
+    year?: number,
+    month?: number,
+  ): Promise<VoucherBookStatistics>
 }
 
 /**
@@ -118,7 +113,10 @@ export class AdminVoucherBookService
    * Bulk archive voucher books with proper error handling
    * Based on the pika-old batch operation patterns
    */
-  async bulkArchiveVoucherBooks(ids: string[], userId: string): Promise<void> {
+  async bulkArchiveVoucherBooks(
+    ids: string[],
+    userId: string,
+  ): Promise<BatchVoucherBookResult> {
     try {
       logger.info('Bulk archiving voucher books', { count: ids.length, userId })
 
@@ -146,11 +144,24 @@ export class AdminVoucherBookService
         })
       }
 
+      const successCount = results.filter((r) => r.success).length
+
       logger.info('Bulk archive operation completed', {
         total: ids.length,
-        successful: results.filter((r) => r.success).length,
+        successful: successCount,
         failed: errors.length,
       })
+
+      return {
+        processedCount: ids.length,
+        successCount,
+        failedCount: errors.length,
+        results: results.map((r) => ({
+          bookId: r.id,
+          success: r.success,
+          error: r.error,
+        })),
+      }
     } catch (error) {
       logger.error('Bulk archive operation failed', { ids, error })
       throw ErrorFactory.fromError(
@@ -192,6 +203,7 @@ export class AdminVoucherBookService
     }
 
     const allowed = allowedTransitions[currentStatus] || []
+
     if (!allowed.includes(newStatus)) {
       throw ErrorFactory.badRequest(
         `Invalid state transition from ${currentStatus} to ${newStatus}`,
@@ -219,5 +231,47 @@ export class AdminVoucherBookService
     }
 
     return super.getAllVoucherBooks(baseParams)
+  }
+
+  /**
+   * Get voucher book statistics for admin dashboard
+   */
+  async getVoucherBookStatistics(
+    year?: number,
+    month?: number,
+  ): Promise<VoucherBookStatistics> {
+    try {
+      logger.info('Getting voucher book statistics', { year, month })
+
+      // Mock implementation - should be replaced with actual statistics logic
+      return {
+        total: 0,
+        byStatus: {
+          draft: 0,
+          readyForPrint: 0,
+          published: 0,
+          archived: 0,
+        },
+        byType: {
+          monthly: 0,
+          specialEdition: 0,
+          regional: 0,
+        },
+        distributions: {
+          total: 0,
+          pending: 0,
+          shipped: 0,
+          delivered: 0,
+        },
+        recentActivity: [],
+      }
+    } catch (error) {
+      logger.error('Failed to get voucher book statistics', {
+        year,
+        month,
+        error,
+      })
+      throw ErrorFactory.fromError(error, 'Failed to get statistics')
+    }
   }
 }

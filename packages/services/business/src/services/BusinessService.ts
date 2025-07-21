@@ -7,7 +7,6 @@ import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
 import type {
-  BusinessRepository,
   CreateBusinessData,
   IBusinessRepository,
   UpdateBusinessData,
@@ -81,7 +80,7 @@ export class BusinessService implements IBusinessService {
       return result
     } catch (error) {
       logger.error('Error in getAllBusinesses:', error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error fetching businesses', {
         source: 'BusinessService.getAllBusinesses',
       })
     }
@@ -108,7 +107,7 @@ export class BusinessService implements IBusinessService {
       return business
     } catch (error) {
       logger.error(`Error fetching business ${id}:`, error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error fetching business', {
         source: 'BusinessService.getBusinessById',
       })
     }
@@ -138,7 +137,7 @@ export class BusinessService implements IBusinessService {
       return business
     } catch (error) {
       logger.error(`Error fetching business for user ${userId}:`, error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error fetching business by user', {
         source: 'BusinessService.getBusinessByUserId',
       })
     }
@@ -155,6 +154,7 @@ export class BusinessService implements IBusinessService {
       const existingBusiness = await this.businessRepository.findByUserId(
         data.userId,
       )
+
       if (existingBusiness) {
         throw ErrorFactory.resourceConflict(
           'Business',
@@ -205,7 +205,7 @@ export class BusinessService implements IBusinessService {
       return business
     } catch (error) {
       logger.error('Error creating business:', error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error creating business', {
         source: 'BusinessService.createBusiness',
       })
     }
@@ -223,6 +223,7 @@ export class BusinessService implements IBusinessService {
 
       // Get existing business
       const existingBusiness = await this.businessRepository.findById(id)
+
       if (!existingBusiness) {
         throw ErrorFactory.resourceNotFound('Business', id, {
           source: 'BusinessService.updateBusiness',
@@ -233,11 +234,11 @@ export class BusinessService implements IBusinessService {
 
       // Update business name translation if provided
       if (data.businessName) {
-        await this.translationService.updateTranslation({
-          key: existingBusiness.businessNameKey,
-          value: data.businessName,
-          language: DEFAULT_LANGUAGE,
-        })
+        await this.translationService.set(
+          existingBusiness.businessNameKey,
+          DEFAULT_LANGUAGE,
+          data.businessName,
+        )
       }
 
       // Update business description translation if provided
@@ -247,17 +248,18 @@ export class BusinessService implements IBusinessService {
           existingBusiness.businessDescriptionKey
         ) {
           // Update existing description
-          await this.translationService.updateTranslation({
-            key: existingBusiness.businessDescriptionKey,
-            value: data.businessDescription,
-            language: DEFAULT_LANGUAGE,
-          })
+          await this.translationService.set(
+            existingBusiness.businessDescriptionKey,
+            DEFAULT_LANGUAGE,
+            data.businessDescription,
+          )
         } else if (
           data.businessDescription &&
           !existingBusiness.businessDescriptionKey
         ) {
           // Create new description
           const businessDescriptionKey = `business.description.${uuid()}`
+
           await this.translationService.set(
             businessDescriptionKey,
             DEFAULT_LANGUAGE,
@@ -297,7 +299,7 @@ export class BusinessService implements IBusinessService {
       return business
     } catch (error) {
       logger.error(`Error updating business ${id}:`, error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error updating business', {
         source: 'BusinessService.updateBusiness',
       })
     }
@@ -312,6 +314,7 @@ export class BusinessService implements IBusinessService {
 
       // Check if business exists
       const business = await this.businessRepository.findById(id)
+
       if (!business) {
         throw ErrorFactory.resourceNotFound('Business', id, {
           source: 'BusinessService.deleteBusiness',
@@ -329,7 +332,7 @@ export class BusinessService implements IBusinessService {
       logger.debug(`Business deleted successfully: ${id}`)
     } catch (error) {
       logger.error(`Error deleting business ${id}:`, error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error deleting business', {
         source: 'BusinessService.deleteBusiness',
       })
     }
@@ -351,7 +354,7 @@ export class BusinessService implements IBusinessService {
       return business
     } catch (error) {
       logger.error(`Error verifying business ${id}:`, error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error verifying business', {
         source: 'BusinessService.verifyBusiness',
       })
     }
@@ -373,7 +376,7 @@ export class BusinessService implements IBusinessService {
       return business
     } catch (error) {
       logger.error(`Error deactivating business ${id}:`, error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error deactivating business', {
         source: 'BusinessService.deactivateBusiness',
       })
     }
@@ -406,7 +409,7 @@ export class BusinessService implements IBusinessService {
       return business
     } catch (error) {
       logger.error(`Error updating business rating ${id}:`, error)
-      throw ErrorFactory.fromError(error, {
+      throw ErrorFactory.fromError(error, 'Error updating business rating', {
         source: 'BusinessService.updateBusinessRating',
       })
     }

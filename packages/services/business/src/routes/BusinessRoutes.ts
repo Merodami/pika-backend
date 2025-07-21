@@ -1,4 +1,3 @@
-import type { PrismaClient } from '@prisma/client'
 import { businessPublic, shared } from '@pika/api'
 import {
   requireAuth,
@@ -8,6 +7,7 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { TranslationClient } from '@pika/translation'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { BusinessController } from '../controllers/BusinessController.js'
@@ -41,7 +41,7 @@ export function createBusinessRoutes(
   router.get(
     '/:id',
     validateParams(businessPublic.BusinessPathParams),
-    validateQuery(businessPublic.BusinessQueryParams),
+    validateQuery(businessPublic.BusinessDetailQueryParams),
     controller.getBusinessById,
   )
 
@@ -49,7 +49,7 @@ export function createBusinessRoutes(
   router.get(
     '/user/:id',
     validateParams(shared.UserIdParam),
-    validateQuery(businessPublic.BusinessQueryParams),
+    validateQuery(businessPublic.BusinessDetailQueryParams),
     controller.getBusinessByUserId,
   )
 
@@ -58,7 +58,7 @@ export function createBusinessRoutes(
   router.get(
     '/me',
     requireAuth(),
-    validateQuery(businessPublic.BusinessQueryParams),
+    validateQuery(businessPublic.BusinessDetailQueryParams),
     controller.getMyBusiness,
   )
 

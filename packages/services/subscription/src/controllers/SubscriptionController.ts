@@ -4,9 +4,10 @@ import { getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
+import type { NextFunction, Request, Response } from 'express'
+
 import type { SubscriptionSearchParams } from '../repositories/SubscriptionRepository.js'
 import type { ISubscriptionService } from '../services/SubscriptionService.js'
-import type { NextFunction, Request, Response } from 'express'
 
 /**
  * Handles subscription management operations
@@ -67,7 +68,8 @@ export class SubscriptionController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<subscriptionAdmin.AdminGetSubscriptionsQuery>(request)
+      const query =
+        getValidatedQuery<subscriptionAdmin.AdminGetSubscriptionsQuery>(request)
 
       // Transform API query to service params
       const params: SubscriptionSearchParams = {
@@ -155,7 +157,11 @@ export class SubscriptionController {
    * Update subscription
    */
   async updateSubscription(
-    request: Request<subscriptionAdmin.SubscriptionIdParam, {}, subscriptionPublic.UpdateSubscriptionRequest>,
+    request: Request<
+      subscriptionAdmin.SubscriptionIdParam,
+      {},
+      subscriptionPublic.UpdateSubscriptionRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -183,7 +189,11 @@ export class SubscriptionController {
    * Cancel subscription
    */
   async cancelSubscription(
-    request: Request<subscriptionAdmin.SubscriptionIdParam, {}, subscriptionPublic.CancelSubscriptionRequest>,
+    request: Request<
+      subscriptionAdmin.SubscriptionIdParam,
+      {},
+      subscriptionPublic.CancelSubscriptionRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

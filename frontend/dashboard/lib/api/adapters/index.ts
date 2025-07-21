@@ -9,10 +9,10 @@ export { api as sdk } from '../client'
 // Re-export commonly used types
 export type {
   AuthResponse,
+  BusinessProfile,
   Category,
   CategoryListResponse,
   Login,
-  BusinessProfile,
   Review,
   UserProfile,
   UserRegistration,

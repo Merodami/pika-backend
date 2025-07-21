@@ -90,6 +90,7 @@ export class CategoryMapper {
       if (!date) return undefined
       if (typeof date === 'string') return date
       if (date instanceof Date) return date.toISOString()
+
       return undefined
     }
 

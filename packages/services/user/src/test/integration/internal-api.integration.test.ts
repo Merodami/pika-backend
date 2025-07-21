@@ -1,9 +1,9 @@
 import { vi } from 'vitest'
 
 // Mock @pika/shared to provide CommunicationServiceClient
-vi.mock('@pikad', async () => {
+vi.mock('@pika/shared', async () => {
   const actualShared =
-    await vi.importActual<typeof import('@pikad')>('@p@p@p@pika
+    await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
 
   return {
     ...actualShared,
@@ -18,15 +18,15 @@ import type {
   CreatePasswordResetTokenRequest,
   ValidatePasswordResetTokenRequest,
   VerifyEmailRequest,
-} from '@pikanternal'
-import { MemoryCacheService } from '@pika'
-import type { FileStoragePort } from '@pikad'
-import type { InternalAPIClient, TestDatabase } from '@pika'
+} from '@pika/api'
+import { MemoryCacheService } from '@pika/redis'
+import type { FileStoragePort } from '@pika/shared'
+import type { InternalAPIClient, TestDatabase } from '@pika/tests'
 import {
   cleanupTestDatabase,
   createTestDatabase,
   InternalAPITestHelper,
-} from '@pika'
+} from '@pika/tests'
 import bcrypt from 'bcrypt'
 import type { Express } from 'express'
 import supertest from 'supertest'

@@ -1,6 +1,6 @@
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
@@ -45,7 +45,6 @@ export class UserMembershipService implements IUserMembershipService {
       })
 
       // Credits removed - no credit tables in database
-      const credits = null
 
       const hasActiveSubscription = !!subscription
 
@@ -76,10 +75,7 @@ export class UserMembershipService implements IUserMembershipService {
     return membershipStatus.hasActiveSubscription
   }
 
-  async canAccessGym(
-    userId: string,
-    accessTime: Date = new Date(),
-  ): Promise<boolean> {
+  async canAccessGym(userId: string): Promise<boolean> {
     const membershipStatus = await this.getUserMembershipStatus(userId)
 
     if (
@@ -93,6 +89,7 @@ export class UserMembershipService implements IUserMembershipService {
 
     // Check if subscription is active
     const status = subscription.status as string
+
     if (status !== 'ACTIVE' && status !== 'TRIALING') {
       return false
     }

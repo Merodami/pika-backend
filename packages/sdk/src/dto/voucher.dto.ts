@@ -3,6 +3,14 @@
  * These represent the API contract for voucher-related endpoints
  */
 
+import type {
+  CustomerVoucherStatus,
+  VoucherCodeType,
+  VoucherScanSource,
+  VoucherScanType,
+  VoucherStateType,
+} from '@pika/types'
+
 // ============= Voucher DTO =============
 
 export interface VoucherLocationDTO {
@@ -21,7 +29,7 @@ export interface GeoJSONPoint {
 export interface VoucherCodeDTO {
   id: string
   code: string
-  type: string
+  type: VoucherCodeType
   isActive: boolean
   metadata?: Record<string, any>
 }
@@ -30,14 +38,14 @@ export interface VoucherDTO {
   id: string
   businessId: string
   categoryId: string
-  state: string
+  state: VoucherStateType
   title: string // Localized by TranslationService before sending to client
   description: string // Localized by TranslationService before sending to client
   terms: string // Localized by TranslationService before sending to client
-  discountType: string
+  discountType: 'percentage' | 'fixed'
   discountValue: number
   currency: string
-  location?: VoucherLocationDTO | null
+  location: VoucherLocationDTO | null
   imageUrl?: string | null
   validFrom: string
   expiresAt: string
@@ -59,7 +67,7 @@ export interface CreateVoucherRequestData {
   title: Record<string, string>
   description: Record<string, string>
   termsAndConditions: Record<string, string>
-  discountType: string
+  discountType: 'percentage' | 'fixed'
   discountValue: number
   currency: string
   location?: GeoJSONPoint | null
@@ -75,7 +83,7 @@ export interface UpdateVoucherRequestData {
   title?: Record<string, string>
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>
-  discountType?: string
+  discountType?: 'percentage' | 'fixed'
   discountValue?: number
   currency?: string
   location?: GeoJSONPoint | null
@@ -88,7 +96,13 @@ export interface UpdateVoucherRequestData {
 }
 
 export interface BulkVoucherUpdateData {
-  state?: string
+  state?:
+    | 'draft'
+    | 'published'
+    | 'claimed'
+    | 'redeemed'
+    | 'expired'
+    | 'suspended'
   expiresAt?: Date // Zod transforms to Date
   maxRedemptions?: number | null
   maxRedemptionsPerUser?: number
@@ -100,7 +114,7 @@ export interface CreateVoucherDTO {
   title: Record<string, string> // Multilingual content: { es: "...", en: "..." }
   description: Record<string, string>
   termsAndConditions: Record<string, string>
-  discountType: string
+  discountType: 'percentage' | 'fixed'
   discountValue: number
   currency: string
   location?: VoucherLocationDTO | GeoJSONPoint | null
@@ -116,7 +130,7 @@ export interface UpdateVoucherDTO {
   title?: Record<string, string> // Multilingual content: { es: "...", en: "..." }
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>
-  discountType?: string
+  discountType?: 'percentage' | 'fixed'
   discountValue?: number
   currency?: string
   location?: VoucherLocationDTO | GeoJSONPoint | null
@@ -133,8 +147,8 @@ export interface UpdateVoucherDTO {
 export interface VoucherScanDTO {
   voucherId: string
   userId?: string
-  scanSource: string
-  scanType: string
+  scanSource: VoucherScanSource
+  scanType: VoucherScanType
   location?: VoucherLocationDTO | GeoJSONPoint | null
   userAgent?: string
   metadata?: Record<string, any>
@@ -142,8 +156,8 @@ export interface VoucherScanDTO {
 }
 
 export interface VoucherScanRequestDTO {
-  scanSource: string
-  scanType: string
+  scanSource: VoucherScanSource
+  scanType: VoucherScanType
   location?: VoucherLocationDTO | GeoJSONPoint | null
   userAgent?: string
   metadata?: Record<string, any>
@@ -191,7 +205,7 @@ export interface CustomerVoucherDTO {
   id: string
   userId: string
   voucherId: string
-  status: string
+  status: CustomerVoucherStatus
   claimedAt: string
   redeemedAt?: string
   expiresAt: string

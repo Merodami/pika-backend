@@ -1,18 +1,11 @@
-import type {
-  AdminCategoryQueryParams,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-  MoveCategoryRequest,
-  UpdateCategorySortOrderRequest,
-  BulkDeleteCategoriesRequest,
-} from '@pika/api/admin'
+import { categoryAdmin, categoryCommon } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { CategoryMapper } from '../mappers/CategoryMapper.js'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { ICategoryService } from '../services/CategoryService.js'
+import { CategoryMapper } from '../mappers/CategoryMapper.js'
+import type { ICategoryService } from '../types/interfaces.js'
 
 /**
  * Handles admin category management operations
@@ -48,7 +41,8 @@ export class AdminCategoryController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<AdminCategoryQueryParams>(req)
+      const query =
+        getValidatedQuery<categoryAdmin.AdminCategoryQueryParams>(req)
 
       // Map API query to service params
       const params = {
@@ -58,7 +52,7 @@ export class AdminCategoryController {
         createdBy: query.createdBy,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: query.sortBy,
+        sortBy: (query.sortBy as categoryCommon.CategorySortBy) || 'sortOrder',
         sortOrder: query.sortOrder,
       }
 
@@ -104,7 +98,7 @@ export class AdminCategoryController {
    * Create new category
    */
   async createCategory(
-    req: Request<{}, {}, CreateCategoryRequest>,
+    req: Request<{}, {}, categoryAdmin.CreateCategoryRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -132,7 +126,7 @@ export class AdminCategoryController {
    * Update category information
    */
   async updateCategory(
-    req: Request<{ id: string }, {}, UpdateCategoryRequest>,
+    req: Request<{ id: string }, {}, categoryAdmin.UpdateCategoryRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -199,15 +193,18 @@ export class AdminCategoryController {
    * Move category to different parent
    */
   async moveCategory(
-    req: Request<{ id: string }, {}, MoveCategoryRequest>,
+    req: Request<{ id: string }, {}, categoryAdmin.MoveCategoryRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id } = req.params
-      const { newParentId } = req.body
+      const { parentId } = req.body
 
-      const category = await this.categoryService.moveCategory(id, newParentId)
+      const category = await this.categoryService.moveCategory(
+        id,
+        parentId || null,
+      )
 
       res.json(CategoryMapper.toDTO(category))
     } catch (error) {
@@ -220,7 +217,11 @@ export class AdminCategoryController {
    * Update category sort order
    */
   async updateCategorySortOrder(
-    req: Request<{ id: string }, {}, UpdateCategorySortOrderRequest>,
+    req: Request<
+      categoryCommon.CategoryIdParam,
+      {},
+      categoryAdmin.UpdateCategorySortOrderRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -244,7 +245,7 @@ export class AdminCategoryController {
    * Bulk delete categories
    */
   async bulkDeleteCategories(
-    req: Request<{}, {}, BulkDeleteCategoriesRequest>,
+    req: Request<{}, {}, categoryAdmin.BulkDeleteCategoriesRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

@@ -8,8 +8,8 @@ import type {
   CreateBusinessDTO,
   UpdateBusinessDTO,
 } from '../dto/business.dto.js'
-import { UserMapper, type UserDocument } from './UserMapper.js'
-import { CategoryMapper, type CategoryDocument } from './CategoryMapper.js'
+import { type CategoryDocument,CategoryMapper } from './CategoryMapper.js'
+import { type UserDocument,UserMapper } from './UserMapper.js'
 
 /**
  * Interface representing a database Business document
@@ -84,6 +84,7 @@ export class BusinessMapper {
       if (!date) return undefined
       if (typeof date === 'string') return date
       if (date instanceof Date) return date.toISOString()
+
       return undefined
     }
 

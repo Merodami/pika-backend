@@ -3,9 +3,8 @@
  * These represent the core business entities used internally
  */
 
-import type { UserRoleType } from '@pika/types'
-import type { UserDomain } from './user.js'
 import type { CategoryDomain } from './category.js'
+import type { UserDomain } from './user.js'
 
 // ============= Business Domain =============
 

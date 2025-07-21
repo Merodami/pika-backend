@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { Email, JWTToken, UserId } from '../../shared/branded.js'
 import { UserRole } from '../../shared/enums.js'
-import { openapi } from '../../../common/utils/openapi.js'
+import { OAuthError, TokenType } from '../common/enums.js'
 import { AuthUserResponse } from './login.js'
-import { GrantType, OAuthError, TokenType } from '../common/enums.js'
 
 /**
  * OAuth 2.0 compatible schemas with camelCase naming

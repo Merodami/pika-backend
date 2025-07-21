@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { UserRole, UserStatus } from '../../shared/enums.js'
 import { DateTime } from '../../shared/primitives.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * Internal user service schemas for service-to-service communication

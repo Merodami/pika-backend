@@ -14,6 +14,7 @@ vi.unmock('@pika/http')
 vi.mock('@pika/api', async () => {
   const actualApi =
     await vi.importActual<typeof import('@pika/api')>('@pika/api')
+
   return actualApi
 })
 
@@ -21,28 +22,28 @@ vi.mock('@pika/api', async () => {
 vi.mock('@pika/shared', async () => {
   const actualShared =
     await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
+
   return actualShared
 })
 // --- END MOCKING CONFIGURATION ---
 
-import { PrismaClient } from '@prisma/client'
+import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { Express } from 'express'
-import supertest from 'supertest'
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { logger } from '@pika/shared'
 import {
-  MockCacheService,
   createE2EAuthHelper,
   E2EAuthHelper,
+  MockCacheService,
 } from '@pika/tests'
+import { PrismaClient } from '@prisma/client'
+import { Express } from 'express'
+import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createCategoryServer } from '../../../server.js'
 
@@ -89,6 +90,7 @@ async function seedTestCategories(
   }
 
   logger.debug('Test categories seeded.')
+
   return { parentCategory, childCategories }
 }
 
@@ -220,6 +222,7 @@ describe('Category API Integration Tests', () => {
         .expect(200)
 
       const sortOrders = response.body.data.map((cat: any) => cat.sortOrder)
+
       expect(sortOrders).toEqual([...sortOrders].sort((a, b) => b - a))
     })
 
@@ -286,10 +289,12 @@ describe('Category API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('data')
       expect(Array.isArray(response.body.data)).toBe(true)
+
       // Should have hierarchical structure with children
       const parentCategory = response.body.data.find(
         (cat: any) => cat.level === 1,
       )
+
       expect(parentCategory).toBeDefined()
     })
   })

@@ -1,7 +1,7 @@
-import { type ICacheService, initializeCache } from '@pika/redis'
 import { createGatewayWithServices } from '@pika/api-gateway'
-import { logger } from '@pika/shared'
 import { CACHE_DISABLED } from '@pika/environment'
+import { type ICacheService, initializeCache } from '@pika/redis'
+import { logger } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 import {
   type Application,

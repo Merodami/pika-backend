@@ -28,8 +28,8 @@ export interface VoucherCode {
 
 // Character sets for different code types (copied from pika-old)
 const SAFE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // No ambiguous chars
-const NUMERIC_CHARS = '0123456789'
-const ALPHA_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+const _NUMERIC_CHARS = '0123456789'
+const _ALPHA_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 /**
  * Generates a cryptographically secure random short code
@@ -99,14 +99,15 @@ export async function generateSecureShortCode(options?: {
 
   // Generate random code using safe character set
   const bytes = randomBytes(length)
+  const byteArray = Array.from(bytes)
 
   let code = ''
 
   for (let i = 0; i < length; i++) {
-    const byteValue = bytes[i] || 0
+    const byteValue = byteArray.at(i) || 0
     const index = byteValue % SAFE_CHARS.length
 
-    code += SAFE_CHARS[index]
+    code += SAFE_CHARS.charAt(index)
   }
 
   // Add dash separator for readability (if length >= 6)
@@ -136,14 +137,15 @@ export async function generateBatchCode(options?: {
 
   // Generate random sequence
   const bytes = randomBytes(sequenceLength)
+  const byteArray = Array.from(bytes)
 
   let sequence = ''
 
   for (let i = 0; i < sequenceLength; i++) {
-    const byteValue = bytes[i] || 0
+    const byteValue = byteArray.at(i) || 0
     const index = byteValue % SAFE_CHARS.length
 
-    sequence += SAFE_CHARS[index]
+    sequence += SAFE_CHARS.charAt(index)
   }
 
   return `${prefix}-${year}-${month.toString().padStart(2, '0')}-${sequence}`
@@ -325,14 +327,15 @@ export async function generateQRFriendlyCode(
   }
 
   const bytes = randomBytes(length)
+  const byteArray = Array.from(bytes)
 
   let code = ''
 
   for (let i = 0; i < length; i++) {
-    const byteValue = bytes[i] || 0
+    const byteValue = byteArray.at(i) || 0
     const index = byteValue % SAFE_CHARS.length
 
-    code += SAFE_CHARS[index]
+    code += SAFE_CHARS.charAt(index)
   }
 
   return code
@@ -355,8 +358,10 @@ export function calculateCheckDigit(code: string): string {
   let sum = 0
   let isEven = false
 
-  for (let i = digits.length - 1; i >= 0; i--) {
-    let digit = digits[i] || 0
+  const digitsArray = [...digits] // Create a copy to avoid mutation
+
+  for (let i = digitsArray.length - 1; i >= 0; i--) {
+    let digit = digitsArray.at(i) || 0
 
     if (isEven) {
       digit *= 2

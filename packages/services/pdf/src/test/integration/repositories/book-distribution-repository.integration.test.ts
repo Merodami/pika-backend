@@ -1,17 +1,15 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import type { PrismaClient } from '@prisma/client'
-import { v4 as uuid } from 'uuid'
-
-import {
-  createTestDatabase,
-  cleanupTestDatabase,
-  clearTestDatabase,
-} from '@pika/tests'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import {
+  cleanupTestDatabase,
+  createTestDatabase,
+} from '@pika/tests'
+import type { PrismaClient } from '@prisma/client'
+import { v4 as uuid } from 'uuid'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { BookDistributionRepository } from '../../../repositories/BookDistributionRepository.js'
 import type { IBookDistributionRepository } from '../../../repositories/BookDistributionRepository.js'
+import { BookDistributionRepository } from '../../../repositories/BookDistributionRepository.js'
 
 // Test database
 let testDb: { prisma: PrismaClient; container: any; stop: () => Promise<void> }
@@ -34,6 +32,7 @@ describe('BookDistributionRepository Integration Tests', () => {
 
     // Create cache service
     const cacheService = new MemoryCacheService(3600)
+
     await cacheService.connect()
 
     // Create repository
@@ -267,6 +266,7 @@ describe('BookDistributionRepository Integration Tests', () => {
     it('should filter by businessId', async () => {
       // Create distribution with known businessId
       const knownBusinessId = uuid()
+
       await testDb.prisma.bookDistribution.create({
         data: {
           bookId: testBookId,
@@ -633,6 +633,7 @@ describe('BookDistributionRepository Integration Tests', () => {
 
       // Check that each business has 1 distribution
       const businessCounts = Object.values(stats.distributionsByBusiness)
+
       expect(businessCounts.every((count) => count === 1)).toBe(true)
       expect(businessCounts).toHaveLength(5)
     })
@@ -682,6 +683,7 @@ describe('BookDistributionRepository Integration Tests', () => {
     it('should delete all distributions for a specific book', async () => {
       // Verify initial state
       const allDistributions = await repository.findAll({})
+
       expect(allDistributions.data).toHaveLength(2)
 
       // Delete distributions for one book
@@ -689,6 +691,7 @@ describe('BookDistributionRepository Integration Tests', () => {
 
       // Verify only distributions for other book remain
       const remainingDistributions = await repository.findAll({})
+
       expect(remainingDistributions.data).toHaveLength(1)
       expect(remainingDistributions.data[0].bookId).toBe(otherBookId)
     })

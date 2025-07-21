@@ -1,8 +1,9 @@
 import { voucherPublic } from '@pika/api'
-import { VoucherState, VoucherDiscountType } from '@pika/types'
-import { describe, it, expect } from 'vitest'
-import { VoucherResponseBuilder } from '../../builders/VoucherResponseBuilder.js'
 import type { VoucherDomain } from '@pika/sdk'
+import { VoucherDiscountType, VoucherState } from '@pika/types'
+import { describe, expect, it } from 'vitest'
+
+import { VoucherResponseBuilder } from '../../builders/VoucherResponseBuilder.js'
 
 describe('VoucherResponseBuilder', () => {
   const builder = new VoucherResponseBuilder()
@@ -34,9 +35,9 @@ describe('VoucherResponseBuilder', () => {
         code: 'TEST123',
         type: 'static',
         isActive: true,
-        metadata: null
-      }
-    ]
+        metadata: null,
+      },
+    ],
   }
 
   describe('build', () => {
@@ -69,7 +70,7 @@ describe('VoucherResponseBuilder', () => {
         imageUrl: null,
         maxRedemptions: null,
         metadata: null,
-        codes: undefined
+        codes: undefined,
       }
 
       const response = builder.build(voucherWithNulls)
@@ -83,9 +84,10 @@ describe('VoucherResponseBuilder', () => {
 
     it('should validate response against schema', () => {
       const response = builder.build(mockVoucherDomain)
-      
+
       // This should not throw
       const validated = voucherPublic.VoucherResponse.parse(response)
+
       expect(validated).toBeDefined()
     })
 
@@ -106,7 +108,7 @@ describe('VoucherResponseBuilder', () => {
         page: 1,
         limit: 10,
         total: 1,
-        totalPages: 1
+        totalPages: 1,
       }
 
       const response = builder.buildList(vouchers, pagination)
@@ -123,13 +125,14 @@ describe('VoucherResponseBuilder', () => {
         page: 1,
         limit: 10,
         total: 1,
-        totalPages: 1
+        totalPages: 1,
       }
 
       const response = builder.buildList(vouchers, pagination)
-      
+
       // This should not throw
       const validated = voucherPublic.VoucherListResponse.parse(response)
+
       expect(validated).toBeDefined()
     })
   })

@@ -1,8 +1,7 @@
 import { ICacheService } from '@pika/redis'
-import { UserRole, UserStatus } from '@pika/types'
 import { ErrorFactory, logger } from '@pika/shared'
+import { UserRole, UserStatus } from '@pika/types'
 import { randomBytes } from 'crypto'
-import type { UserDomain } from '@pika/sdk'
 
 import type { IUserRepository } from '../repositories/UserRepository.js'
 

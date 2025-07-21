@@ -1,4 +1,4 @@
-import { voucherCommon,voucherInternal } from '@pika/api'
+import { voucherCommon, voucherInternal } from '@pika/api'
 import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { TranslationClient } from '@pika/translation'
@@ -6,8 +6,8 @@ import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { InternalVoucherController } from '../controllers/InternalVoucherController.js'
-import { VoucherRepository } from '../repositories/VoucherRepository.js'
 import { InternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
+import { VoucherRepository } from '../repositories/VoucherRepository.js'
 import { InternalVoucherService } from '../services/InternalVoucherService.js'
 
 /**
@@ -16,7 +16,7 @@ import { InternalVoucherService } from '../services/InternalVoucherService.js'
 export function createInternalVoucherRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
-  translationClient: TranslationClient,
+  _translationClient: TranslationClient,
 ): Router {
   const router = Router()
 

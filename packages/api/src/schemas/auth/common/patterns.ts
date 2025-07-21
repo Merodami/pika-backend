@@ -1,6 +1,5 @@
 import { z } from 'zod'
-import { openapi } from '../../../common/utils/openapi.js'
-import { TokenType, GrantType } from './enums.js'
+
 
 /**
  * Common auth patterns and validators shared across all auth tiers

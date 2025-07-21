@@ -1,12 +1,11 @@
-import type { PrismaClient } from '@prisma/client'
-import { Prisma } from '@prisma/client'
-
-import { ErrorFactory, logger } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
 import type { BookDistributionDomain } from '@pika/sdk'
 import { BookDistributionMapper } from '@pika/sdk'
-import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 /**
  * Book distribution repository interface
@@ -177,7 +176,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2003') {
-          throw ErrorFactory.badRequestError('Invalid book ID or business ID')
+          throw ErrorFactory.badRequest('Invalid book ID or business ID')
         }
       }
       throw ErrorFactory.databaseError('create', 'BookDistribution', error)
@@ -311,6 +310,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
 
       // Build order by clause
       const orderBy: Prisma.BookDistributionOrderByWithRelationInput = {}
+
       if (sortBy === 'businessName') {
         orderBy.businessName = sortOrder
       } else if (sortBy === 'quantity') {
@@ -430,6 +430,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
           : undefined
 
       const where: Prisma.BookDistributionWhereInput = { businessId }
+
       if (locationId) {
         where.locationId = locationId
       }
@@ -586,6 +587,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
         delivered: 0,
         cancelled: 0,
       }
+
       statusCounts.forEach((item) => {
         if (item.status in statusBreakdown) {
           statusBreakdown[item.status as keyof typeof statusBreakdown] =
@@ -600,6 +602,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
         delivered: 0,
         cancelled: 0,
       }
+
       quantityByStatus.forEach((item) => {
         if (item.status in quantityByStatusMap) {
           quantityByStatusMap[item.status as keyof typeof quantityByStatusMap] =
@@ -611,6 +614,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
       const distributionsByBusinessMap = distributionsByBusiness.reduce(
         (acc, item) => {
           acc[item.businessId] = item._count._all
+
           return acc
         },
         {} as Record<string, number>,
@@ -620,6 +624,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
       const distributionsByTypeMap = distributionsByType.reduce(
         (acc, item) => {
           acc[item.distributionType] = item._count._all
+
           return acc
         },
         {} as Record<string, number>,

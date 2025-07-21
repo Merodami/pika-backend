@@ -1,12 +1,11 @@
-import type { PrismaClient } from '@prisma/client'
-import { Prisma } from '@prisma/client'
-
-import { ErrorFactory, logger } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
 import type { AdPlacementDomain } from '@pika/sdk'
 import { AdPlacementMapper } from '@pika/sdk'
-import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 /**
  * Ad placement repository interface
@@ -127,7 +126,8 @@ export class AdPlacementRepository implements IAdPlacementRepository {
       )
 
       if (!isValidPosition) {
-        throw ErrorFactory.conflictError(
+        throw ErrorFactory.resourceConflict(
+          'AdPlacement',
           'Position is already occupied or conflicts with existing placements',
         )
       }
@@ -154,12 +154,13 @@ export class AdPlacementRepository implements IAdPlacementRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError(
+          throw ErrorFactory.resourceConflict(
+            'AdPlacement',
             'Position is already occupied on this page',
           )
         }
         if (error.code === 'P2003') {
-          throw ErrorFactory.badRequestError('Invalid page ID')
+          throw ErrorFactory.badRequest('Invalid page ID')
         }
       }
       throw ErrorFactory.databaseError('create', 'AdPlacement', error)
@@ -283,6 +284,7 @@ export class AdPlacementRepository implements IAdPlacementRepository {
 
       // Build order by clause
       const orderBy: Prisma.AdPlacementOrderByWithRelationInput = {}
+
       if (sortBy === 'position') {
         orderBy.position = sortOrder
       } else if (sortBy === 'contentType') {
@@ -346,7 +348,8 @@ export class AdPlacementRepository implements IAdPlacementRepository {
           )
 
           if (!isValidPosition) {
-            throw ErrorFactory.conflictError(
+            throw ErrorFactory.resourceConflict(
+              'AdPlacement',
               'Position is already occupied or conflicts with existing placements',
             )
           }
@@ -377,7 +380,8 @@ export class AdPlacementRepository implements IAdPlacementRepository {
           throw ErrorFactory.resourceNotFound('AdPlacement', id)
         }
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError(
+          throw ErrorFactory.resourceConflict(
+            'AdPlacement',
             'Position is already occupied on this page',
           )
         }
@@ -548,6 +552,7 @@ export class AdPlacementRepository implements IAdPlacementRepository {
         pageId,
         position,
       })
+
       return false
     }
   }

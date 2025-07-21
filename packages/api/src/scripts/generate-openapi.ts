@@ -18,7 +18,6 @@ import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
 import { createRegistry } from '../common/registry/base.js'
-import { ErrorResponse } from '../schemas/shared/errors.js'
 import {
   apiKeyAuth,
   bearerAuth,
@@ -27,6 +26,7 @@ import {
 // Import schemas
 import * as authSchemas from '../schemas/auth/public/login.js'
 import * as oauthSchemas from '../schemas/auth/public/oauth.js'
+import { ErrorResponse } from '../schemas/shared/errors.js'
 
 /**
  * Generate OpenAPI specifications for all APIs

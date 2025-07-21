@@ -1,15 +1,15 @@
-import type { PrismaClient } from '@prisma/client'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
 
-import { VoucherBookController } from './controllers/VoucherBookController.js'
 import { AdminVoucherBookController } from './controllers/AdminVoucherBookController.js'
+import { VoucherBookController } from './controllers/VoucherBookController.js'
 import { VoucherBookRepository } from './repositories/VoucherBookRepository.js'
-import { VoucherBookService } from './services/VoucherBookService.js'
-import { AdminVoucherBookService } from './services/AdminVoucherBookService.js'
-import { createVoucherBookRoutes } from './routes/VoucherBookRoutes.js'
 import { createAdminVoucherBookRoutes } from './routes/AdminVoucherBookRoutes.js'
+import { createVoucherBookRoutes } from './routes/VoucherBookRoutes.js'
+import { AdminVoucherBookService } from './services/AdminVoucherBookService.js'
+import { VoucherBookService } from './services/VoucherBookService.js'
 
 export interface ServerConfig {
   prisma: PrismaClient
@@ -26,6 +26,7 @@ export async function createPDFServer(config: ServerConfig) {
     healthChecks: {
       postgresql: async () => {
         await prisma.$queryRaw`SELECT 1`
+
         return { status: 'healthy' }
       },
       redis: async () => {
@@ -33,6 +34,7 @@ export async function createPDFServer(config: ServerConfig) {
         if (typeof cacheService.ping === 'function') {
           await cacheService.ping()
         }
+
         return { status: 'healthy' }
       },
     },

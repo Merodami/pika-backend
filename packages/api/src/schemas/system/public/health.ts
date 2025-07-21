@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import {
   HealthStatus,
   ServiceHealth,
   SimpleHealthCheckResponse,
 } from '../../shared/health.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * Health check and system schemas for public API

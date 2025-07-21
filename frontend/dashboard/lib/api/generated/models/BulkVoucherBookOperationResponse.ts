@@ -1,35 +1,34 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
-/* eslint-disable */
+
 /**
  * Bulk operation results
  */
 export type BulkVoucherBookOperationResponse = {
+  /**
+   * Number of successful operations
+   */
+  successful: number
+  /**
+   * Number of failed operations
+   */
+  failed: number
+  /**
+   * Detailed results for each book
+   */
+  results: Array<{
     /**
-     * Number of successful operations
+     * Voucher book ID
      */
-    successful: number;
+    bookId: string
     /**
-     * Number of failed operations
+     * Whether operation succeeded
      */
-    failed: number;
+    success: boolean
     /**
-     * Detailed results for each book
+     * Error message if failed
      */
-    results: Array<{
-        /**
-         * Voucher book ID
-         */
-        bookId: string;
-        /**
-         * Whether operation succeeded
-         */
-        success: boolean;
-        /**
-         * Error message if failed
-         */
-        error?: string;
-    }>;
-};
-
+    error?: string
+  }>
+}

@@ -1,9 +1,4 @@
-import {
-  mapSortOrder,
-  businessPublic,
-  businessCommon,
-  shared,
-} from '@pika/api'
+import { businessPublic, mapSortOrder, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -88,11 +83,14 @@ export class BusinessController {
   ): Promise<void> {
     try {
       const { id: businessId } = req.params
-      const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
+      const query =
+        getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
 
+      // Parse include parameter
+      const includeRelations = query.include?.split(',') || []
       const business = await this.businessService.getBusinessById(businessId, {
-        user: false,
-        category: false,
+        user: includeRelations.includes('user'),
+        category: includeRelations.includes('category'),
       })
 
       // Check if business is active for public access
@@ -122,11 +120,14 @@ export class BusinessController {
   ): Promise<void> {
     try {
       const { id: userId } = req.params
-      const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
+      const query =
+        getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
 
+      // Parse include parameter
+      const includeRelations = query.include?.split(',') || []
       const business = await this.businessService.getBusinessByUserId(userId, {
-        user: false,
-        category: false,
+        user: includeRelations.includes('user'),
+        category: includeRelations.includes('category'),
       })
 
       // Check if business is active for public access
@@ -152,7 +153,8 @@ export class BusinessController {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
-      const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
+      const query =
+        getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
 
       // Only business owners can access this endpoint
       if (context.role !== UserRole.BUSINESS) {
@@ -161,9 +163,11 @@ export class BusinessController {
         )
       }
 
+      // Parse include parameter
+      const includeRelations = query.include?.split(',') || []
       const business = await this.businessService.getBusinessByUserId(userId, {
-        user: false,
-        category: false,
+        user: includeRelations.includes('user'),
+        category: includeRelations.includes('category'),
       })
 
       res.json(BusinessMapper.toDTO(business))

@@ -1,10 +1,4 @@
-import {
-  CreateNotificationRequest,
-  NotificationIdParam,
-  NotificationSearchParams,
-  UpdateNotificationStatusRequest,
-} from '@pika/api/public'
-import type { ICacheService } from '@pika/redis'
+import { communicationCommon, communicationPublic } from '@pika/api'
 import {
   requireAdmin,
   requireAuth,
@@ -12,6 +6,7 @@ import {
   validateParams,
   validateQuery,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -54,36 +49,36 @@ export function createNotificationRouter(
   router.post(
     '/',
     requireAuth(),
-    validateBody(CreateNotificationRequest),
+    validateBody(communicationPublic.CreateNotificationRequest),
     controller.createNotification,
   )
 
   router.get(
     '/',
     requireAuth(),
-    validateQuery(NotificationSearchParams),
+    validateQuery(communicationPublic.NotificationSearchParams),
     controller.getNotifications,
   )
 
   router.get(
     '/:id',
     requireAuth(),
-    validateParams(NotificationIdParam),
+    validateParams(communicationCommon.NotificationIdParam),
     controller.getNotificationById,
   )
 
   router.put(
     '/:id',
     requireAuth(),
-    validateParams(NotificationIdParam),
-    validateBody(UpdateNotificationStatusRequest),
+    validateParams(communicationCommon.NotificationIdParam),
+    validateBody(communicationPublic.UpdateNotificationStatusRequest),
     controller.updateNotification,
   )
 
   router.put(
     '/:id/read',
     requireAuth(),
-    validateParams(NotificationIdParam),
+    validateParams(communicationCommon.NotificationIdParam),
     controller.markAsRead,
   )
 
@@ -92,7 +87,7 @@ export function createNotificationRouter(
   router.delete(
     '/:id',
     requireAuth(),
-    validateParams(NotificationIdParam),
+    validateParams(communicationCommon.NotificationIdParam),
     controller.deleteNotification,
   )
 
@@ -100,7 +95,7 @@ export function createNotificationRouter(
   router.post(
     '/global',
     requireAdmin(),
-    validateBody(CreateNotificationRequest),
+    validateBody(communicationPublic.CreateNotificationRequest),
     controller.createGlobalNotification,
   )
 
@@ -108,7 +103,7 @@ export function createNotificationRouter(
   router.post(
     '/admin/notification',
     requireAdmin(),
-    validateBody(CreateNotificationRequest),
+    validateBody(communicationPublic.CreateNotificationRequest),
     controller.createGlobalNotification,
   )
 

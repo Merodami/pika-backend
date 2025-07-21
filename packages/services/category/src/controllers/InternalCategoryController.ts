@@ -1,14 +1,11 @@
-import type {
-  InternalCategoryData,
-  InternalCategoryIdsRequest,
-  InternalCategoryValidationRequest,
-} from '@pika/api/internal'
+import { categoryInternal } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { CategoryMapper } from '../mappers/CategoryMapper.js'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { ICategoryService } from '../services/CategoryService.js'
+import { CategoryMapper } from '../mappers/CategoryMapper.js'
+import type { ICategoryService } from '../types/interfaces.js'
 
 /**
  * Handles internal category operations for service-to-service communication
@@ -16,10 +13,12 @@ import type { ICategoryService } from '../services/CategoryService.js'
 export class InternalCategoryController {
   constructor(private readonly categoryService: ICategoryService) {
     // Bind methods to preserve 'this' context
+    this.getAllCategories = this.getAllCategories.bind(this)
     this.getCategoryById = this.getCategoryById.bind(this)
     this.getCategoriesByIds = this.getCategoriesByIds.bind(this)
     this.validateCategories = this.validateCategories.bind(this)
     this.getActiveCategoriesOnly = this.getActiveCategoriesOnly.bind(this)
+    this.getCategoryHierarchy = this.getCategoryHierarchy.bind(this)
   }
 
   /**
@@ -58,7 +57,7 @@ export class InternalCategoryController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getCategoriesByIds(
-    req: Request<{}, {}, InternalCategoryIdsRequest>,
+    req: Request<{}, {}, categoryInternal.BulkCategoryRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -83,34 +82,40 @@ export class InternalCategoryController {
    * Validate category IDs exist and are active (internal service use)
    */
   async validateCategories(
-    req: Request<{}, {}, InternalCategoryValidationRequest>,
-    res: Response,
+    req: Request<{}, {}, categoryInternal.ValidateCategoryRequest>,
+    res: Response<categoryInternal.ValidateCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { categoryIds } = req.body
 
-      const validationResults = await Promise.all(
-        categoryIds.map(async (categoryId) => {
-          try {
-            const category =
-              await this.categoryService.getCategoryById(categoryId)
-            return {
+      const validationResults: categoryInternal.CategoryValidationResult[] =
+        await Promise.all(
+          categoryIds.map(
+            async (
               categoryId,
-              exists: true,
-              isActive: category.isActive,
-              valid: category.isActive,
-            }
-          } catch (error) {
-            return {
-              categoryId,
-              exists: false,
-              isActive: false,
-              valid: false,
-            }
-          }
-        }),
-      )
+            ): Promise<categoryInternal.CategoryValidationResult> => {
+              try {
+                const category =
+                  await this.categoryService.getCategoryById(categoryId)
+
+                return {
+                  categoryId,
+                  exists: true,
+                  isActive: category.isActive,
+                  valid: category.isActive,
+                }
+              } catch (error) {
+                return {
+                  categoryId,
+                  exists: false,
+                  isActive: false,
+                  valid: false,
+                }
+              }
+            },
+          ),
+        )
 
       const allValid = validationResults.every((result) => result.valid)
 
@@ -153,6 +158,72 @@ export class InternalCategoryController {
           CategoryMapper.toInternalDTO(category),
         ),
         total: result.pagination.total,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /internal/categories
+   * Get all categories (internal service use)
+   */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'internal:categories',
+    keyGenerator: httpRequestKeyGenerator,
+  })
+  async getAllCategories(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const query =
+        getValidatedQuery<categoryInternal.InternalCategoryQueryParams>(req)
+
+      const params = {
+        isActive: query.isActive,
+        page: 1,
+        limit: 1000, // High limit for internal use
+        sortBy: 'sortOrder' as const,
+        sortOrder: 'asc' as const,
+      }
+
+      const result = await this.categoryService.getAllCategories(params)
+
+      res.json({
+        data: result.data.map((category) =>
+          CategoryMapper.toInternalDTO(category),
+        ),
+        total: result.pagination.total,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /internal/categories/hierarchy
+   * Get category hierarchy (internal service use)
+   */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'internal:categories:hierarchy',
+    keyGenerator: httpRequestKeyGenerator,
+  })
+  async getCategoryHierarchy(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const categories = await this.categoryService.getCategoryHierarchy()
+
+      res.json({
+        data: categories.map((category) =>
+          CategoryMapper.toInternalDTO(category),
+        ),
       })
     } catch (error) {
       next(error)

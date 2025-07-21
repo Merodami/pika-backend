@@ -6,6 +6,13 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 
 import {
+  AuthenticatedRequestClient,
+  createE2EAuthHelper,
+  createS3TestHelper,
+  E2EAuthHelper,
+  S3TestHelper,
+} from '@pika'
+import {
   AWS_S3_ACCESS_KEY_ID,
   AWS_S3_ENDPOINT,
   AWS_S3_REGION,
@@ -13,13 +20,6 @@ import {
 } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import {
-  AuthenticatedRequestClient,
-  createE2EAuthHelper,
-  createS3TestHelper,
-  E2EAuthHelper,
-  S3TestHelper,
-} from '@pika'
 import {
   cleanupTestDatabase,
   clearTestDatabase,

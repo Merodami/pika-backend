@@ -1,5 +1,4 @@
-import type { PrismaClient } from '@prisma/client'
-import { businessAdmin, businessCommon, shared } from '@pika/api'
+import { businessAdmin, businessCommon } from '@pika/api'
 import {
   requireAdmin,
   requireAuth,
@@ -9,6 +8,7 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { TranslationClient } from '@pika/translation'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { AdminBusinessController } from '../controllers/AdminBusinessController.js'

@@ -35,7 +35,8 @@ export class AdminProblemController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<supportAdmin.AdminTicketQueryParams>(request)
+      const query =
+        getValidatedQuery<supportAdmin.AdminTicketQueryParams>(request)
 
       // Transform API query to service params
       const problemParams = {
@@ -100,7 +101,11 @@ export class AdminProblemController {
    * Update support ticket
    */
   async updateProblem(
-    request: Request<supportCommon.ProblemIdParam, {}, supportAdmin.AdminUpdateProblemRequest>,
+    request: Request<
+      supportCommon.ProblemIdParam,
+      {},
+      supportAdmin.AdminUpdateProblemRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

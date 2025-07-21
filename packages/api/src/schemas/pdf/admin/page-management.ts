@@ -1,11 +1,10 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import { PageLayoutType, AdSize, ContentType } from '../../shared/enums.js'
+import { AdSize, ContentType,PageLayoutType } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
-import { paginatedResponse } from '../../shared/responses.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * Admin page and placement management schemas

@@ -1,4 +1,4 @@
-import type { SearchParams, VoucherState, ParsedIncludes } from '@pika/types'
+import type { ParsedIncludes, SearchParams, VoucherState } from '@pika/types'
 
 /**
  * Voucher search and filter types

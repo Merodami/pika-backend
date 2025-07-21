@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { openapi } from '../../../common/utils/openapi.js'
-import { VoucherState } from '../common/enums.js'
 import { AdminVoucherDetailResponse } from '../admin/management.js'
+import { VoucherState } from '../common/enums.js'
 
 /**
  * Internal voucher service schemas

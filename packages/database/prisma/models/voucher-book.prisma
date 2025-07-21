@@ -3,10 +3,10 @@ model VoucherBook {
   id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title             String             @db.VarChar(255)
   edition           String?            @db.VarChar(100) // e.g., "January 2024", "Special Edition", "North Region"
-  bookType          VoucherBookType    @default(MONTHLY) @map("book_type")
+  bookType          VoucherBookType    @default(monthly) @map("book_type")
   month             Int?               // 1-12 (optional for non-monthly books)
   year              Int                // e.g., 2024
-  status            VoucherBookStatus  @default(DRAFT)
+  status            VoucherBookStatus  @default(draft)
   totalPages        Int                @default(24) @map("total_pages")
   publishedAt       DateTime?          @map("published_at") @db.Timestamptz(6)
   coverImageUrl     String?            @map("cover_image_url") @db.VarChar(500) // Front cover image
@@ -47,7 +47,7 @@ model VoucherBookPage {
   id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   bookId            String            @map("book_id") @db.Uuid
   pageNumber        Int               @map("page_number")
-  layoutType        PageLayoutType    @default(STANDARD) @map("layout_type")
+  layoutType        PageLayoutType    @default(standard) @map("layout_type")
   metadata          Json?             // Page-specific metadata
   createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
@@ -66,9 +66,9 @@ model VoucherBookPage {
 model AdPlacement {
   id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   pageId            String            @map("page_id") @db.Uuid
-  contentType       ContentType       @default(VOUCHER) @map("content_type") // VOUCHER, IMAGE, AD
+  contentType       ContentType       @default(voucher) @map("content_type") // VOUCHER, IMAGE, AD
   position          Int               // Starting position 1-8 for standard layout
-  size              AdSize            @default(SINGLE) // SINGLE, QUARTER, HALF, FULL
+  size              AdSize            @default(single) // SINGLE, QUARTER, HALF, FULL
   spacesUsed        Int               @default(1) @map("spaces_used") // 1, 2, 4, or 8 spaces
   imageUrl          String?           @map("image_url") @db.VarChar(500) // Main content image
   qrCodePayload     String?           @map("qr_code_payload") @db.Text // JWT payload for QR codes

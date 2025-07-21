@@ -32,6 +32,7 @@ export function validate<T extends z.ZodTypeAny>(
           .map((issue) => {
             const path =
               issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
             return `${path}${issue.message}`
           })
           .join(
@@ -94,6 +95,7 @@ export function validateAll(validators: {
           .map((issue) => {
             const path =
               issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
             return `${path}${issue.message}`
           })
           .join('; ')}`
@@ -154,6 +156,7 @@ export function validateAsync<T extends z.ZodTypeAny>(
           .map((issue) => {
             const path =
               issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
             return `${path}${issue.message}`
           })
           .join('; ')
@@ -200,6 +203,7 @@ export function safeParse<T extends z.ZodTypeAny>(
     const errorMessage = result.error.issues
       .map((issue) => {
         const path = issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
         return `${path}${issue.message}`
       })
       .join('; ')

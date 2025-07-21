@@ -66,3 +66,17 @@ export const CREDIT_PROCESSING = {
   PROCESSING_DELAY_MS: 1000,
   MAX_CONCURRENT_JOBS: 5,
 } as const
+
+// Template keys used by subscription service
+export const TEMPLATE_KEYS = {
+  SUBSCRIPTION_ACTIVATED: 'subscriptionActivated',
+  SUBSCRIPTION_CANCELLED: 'subscriptionCancelled',
+  PAYMENT_FAILED: 'paymentFailed',
+  // Fallback template keys for notifications that don't have specific templates yet
+  CREDITS_ALLOCATED: 'subscriptionActivated', // Using closest available template
+  RENEWAL_REMINDER: 'subscriptionActivated', // Using closest available template
+  TRIAL_ENDING: 'subscriptionActivated', // Using closest available template
+} as const
+
+export type TemplateKeysType =
+  (typeof TEMPLATE_KEYS)[keyof typeof TEMPLATE_KEYS]

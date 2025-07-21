@@ -13,23 +13,27 @@ export class MockTranslationClient {
    */
   async get(key: string, language: string, fallback?: string): Promise<string> {
     const translations = this.mockTranslations.get(key)
+
     if (!translations) {
       return fallback || key
     }
 
     const translation = translations.get(language)
+
     if (translation) {
       return translation
     }
 
     // Try fallback language (English)
     const englishTranslation = translations.get('en')
+
     if (englishTranslation) {
       return englishTranslation
     }
 
     // Return any available translation
     const anyTranslation = translations.values().next().value
+
     return anyTranslation || fallback || key
   }
 
@@ -100,6 +104,7 @@ export class MockTranslationClient {
       const translationMap = new Map<string, string>(
         Object.entries(translationData),
       )
+
       this.mockTranslations.set(key, translationMap)
     }
   }

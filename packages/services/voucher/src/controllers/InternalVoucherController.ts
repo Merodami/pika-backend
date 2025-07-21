@@ -1,12 +1,15 @@
 import { voucherCommon, voucherInternal } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { paginatedResponse } from '@pika/http'
-import { VoucherMapper, type VoucherDomain } from '@pika/sdk'
+import { VoucherMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import { VoucherState } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IInternalVoucherService, BatchProcessOperation } from '../services/InternalVoucherService.js'
+import type {
+  BatchProcessOperation,
+  IInternalVoucherService,
+} from '../services/InternalVoucherService.js'
 
 /**
  * Handles internal voucher operations for service-to-service communication
@@ -41,7 +44,10 @@ export class InternalVoucherController {
       const { voucherIds, include } = req.body
 
       const parsedIncludes = include ? parseIncludeParam(include) : undefined
-      const vouchers = await this.internalVoucherService.getVouchersByIds(voucherIds, parsedIncludes)
+      const vouchers = await this.internalVoucherService.getVouchersByIds(
+        voucherIds,
+        parsedIncludes,
+      )
       const notFound = voucherIds.filter(
         (id) => !vouchers.find((v) => v.id === id),
       )
@@ -73,12 +79,15 @@ export class InternalVoucherController {
         checkState,
       } = req.body
 
-      const validation = await this.internalVoucherService.validateVoucher(voucherId, {
-        userId,
-        checkRedemptionLimit,
-        checkExpiry,
-        checkState,
-      })
+      const validation = await this.internalVoucherService.validateVoucher(
+        voucherId,
+        {
+          userId,
+          checkRedemptionLimit,
+          checkExpiry,
+          checkState,
+        },
+      )
 
       res.json({
         isValid: validation.isValid,
@@ -107,17 +116,19 @@ export class InternalVoucherController {
   ): Promise<void> {
     try {
       const { id: voucherId } = req.params
-      const { state, reason, serviceId } = req.body
+      const { state, reason, serviceId: _serviceId } = req.body
 
       // Get current voucher to check previous state
-      const currentVoucher = await this.internalVoucherService.getVoucherById(voucherId)
+      const currentVoucher =
+        await this.internalVoucherService.getVoucherById(voucherId)
       const previousState = currentVoucher.state
 
-      const updatedVoucher = await this.internalVoucherService.updateVoucherStateInternal(
-        voucherId,
-        state as VoucherState,
-        reason,
-      )
+      const updatedVoucher =
+        await this.internalVoucherService.updateVoucherStateInternal(
+          voucherId,
+          state as VoucherState,
+          reason,
+        )
 
       res.json({
         success: true,
@@ -177,12 +188,13 @@ export class InternalVoucherController {
         limit: limit || PAGINATION_DEFAULT_LIMIT,
       }
 
-      const result = await this.internalVoucherService.getVouchersByBusinessInternal(
-        businessId,
-        params,
-      )
+      const result =
+        await this.internalVoucherService.getVouchersByBusinessInternal(
+          businessId,
+          params,
+        )
 
-      res.json(paginatedResponse(result, VoucherMapper.toDTO))
+      res.json(paginatedResponse(result, VoucherMapper.toAdminDTO))
     } catch (error) {
       next(error)
     }
@@ -208,12 +220,13 @@ export class InternalVoucherController {
         limit: limit || PAGINATION_DEFAULT_LIMIT,
       }
 
-      const result = await this.internalVoucherService.getVouchersByCategoryInternal(
-        categoryId,
-        params,
-      )
+      const result =
+        await this.internalVoucherService.getVouchersByCategoryInternal(
+          categoryId,
+          params,
+        )
 
-      res.json(paginatedResponse(result, VoucherMapper.toDTO))
+      res.json(paginatedResponse(result, VoucherMapper.toAdminDTO))
     } catch (error) {
       next(error)
     }
@@ -269,7 +282,7 @@ export class InternalVoucherController {
         redemptionId: result.redemptionId,
         success: result.success,
         currentRedemptions: result.currentRedemptions,
-        maxRedemptions: result.maxRedemptions,
+        maxRedemptions: result.maxRedemptions ?? null,
       })
     } catch (error) {
       next(error)
@@ -294,13 +307,14 @@ export class InternalVoucherController {
         context,
       }
 
-      const result = await this.internalVoucherService.batchProcessVouchers(batchOperation)
+      const result =
+        await this.internalVoucherService.batchProcessVouchers(batchOperation)
 
       res.status(200).json({
         successful: result.successCount,
         failed: result.failedCount,
         total: result.processedCount,
-        results: result.results.map(r => ({
+        results: result.results.map((r) => ({
           voucherId: r.voucherId,
           success: r.success,
           error: r.error,
@@ -332,17 +346,17 @@ export class InternalVoucherController {
       for (const update of updates) {
         try {
           // Get current state
-          const currentVoucher = await this.internalVoucherService.getVoucherById(
-            update.voucherId,
-          )
+          const currentVoucher =
+            await this.internalVoucherService.getVoucherById(update.voucherId)
           const oldState = currentVoucher.state
 
           // Update state
-          const updatedVoucher = await this.internalVoucherService.updateVoucherStateInternal(
-            update.voucherId,
-            update.state,
-            context?.reason,
-          )
+          const updatedVoucher =
+            await this.internalVoucherService.updateVoucherStateInternal(
+              update.voucherId,
+              update.state as VoucherState,
+              update.reason,
+            )
 
           updateResults.push({
             voucherId: update.voucherId,

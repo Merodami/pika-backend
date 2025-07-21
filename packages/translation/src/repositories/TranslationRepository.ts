@@ -1,9 +1,9 @@
-import { type PrismaClient } from '@prisma/client'
 import type {
   Language,
   Translation,
   UserLanguagePreference,
 } from '@prisma/client'
+import { type PrismaClient } from '@prisma/client'
 
 export interface ITranslationRepository {
   findByKeyAndLanguage(

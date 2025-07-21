@@ -1,14 +1,15 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
+import { CategoryResponse } from '../../category/public/category.js'
 import { UserId } from '../../shared/branded.js'
-import { BusinessSortBy, BUSINESS_RELATIONS } from '../common/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
+import { createByIdQuerySchema } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { openapi } from '../../../common/utils/openapi.js'
 import { PublicUserProfile } from '../../user/public/profile.js'
-import { CategoryResponse } from '../../category/public/category.js'
+import { BUSINESS_RELATIONS,BusinessSortBy } from '../common/enums.js'
 
 /**
  * Public business schemas
@@ -88,6 +89,16 @@ export const BusinessPathParams = z.object({
 
 export type BusinessPathParams = z.infer<typeof BusinessPathParams>
 
+/**
+ * Business detail query parameters (for single business endpoints)
+ */
+export const BusinessDetailQueryParams =
+  createByIdQuerySchema(BUSINESS_RELATIONS)
+
+export type BusinessDetailQueryParams = z.infer<
+  typeof BusinessDetailQueryParams
+>
+
 // ============= Response Types =============
 
 /**
@@ -123,11 +134,7 @@ export type BusinessesByCategoryResponse = z.infer<
  */
 export const CreateMyBusinessRequest = openapi(
   z.object({
-    businessName: z
-      .string()
-      .min(1)
-      .max(100)
-      .describe('Business name'),
+    businessName: z.string().min(1).max(100).describe('Business name'),
     businessDescription: z
       .string()
       .max(500)

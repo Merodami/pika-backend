@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { UUID } from '../../shared/primitives.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { UUID } from '../../shared/primitives.js'
 
 /**
  * Communication service parameters

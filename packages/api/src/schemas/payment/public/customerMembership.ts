@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { Email, UserId } from '../../shared/branded.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { Email, UserId } from '../../shared/branded.js'
 
 /**
  * Customer and membership creation schemas

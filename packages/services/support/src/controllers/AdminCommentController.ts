@@ -1,9 +1,9 @@
-import { supportAdmin, supportPublic, supportCommon } from '@pika/api'
-import { SupportCommentMapper } from '@pika/sdk'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { parseIncludeParam } from '@pika/shared'
+import { supportAdmin, supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { SupportCommentMapper } from '@pika/sdk'
+import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IAdminSupportCommentService } from '../services/AdminSupportCommentService.js'
@@ -39,7 +39,8 @@ export class AdminCommentController {
   ): Promise<void> {
     try {
       // Validate query parameters
-      const query = getValidatedQuery<supportAdmin.AdminGetAllCommentsQuery>(request)
+      const query =
+        getValidatedQuery<supportAdmin.AdminGetAllCommentsQuery>(request)
 
       // Parse include query parameter
       const parsedIncludes = parseIncludeParam(
@@ -82,7 +83,8 @@ export class AdminCommentController {
       const { problemId } = request.params
 
       // Validate query parameters
-      const query = getValidatedQuery<supportAdmin.AdminCommentsByProblemQuery>(request)
+      const query =
+        getValidatedQuery<supportAdmin.AdminCommentsByProblemQuery>(request)
 
       // Parse include query parameter
       const parsedIncludes = parseIncludeParam(
@@ -146,7 +148,11 @@ export class AdminCommentController {
    * Update any comment (admin only)
    */
   async updateAnyComment(
-    request: Request<supportCommon.SupportCommentIdParam, {}, supportPublic.UpdateSupportCommentRequest>,
+    request: Request<
+      supportCommon.SupportCommentIdParam,
+      {},
+      supportPublic.UpdateSupportCommentRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

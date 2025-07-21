@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import {
   SortOrder,
@@ -12,8 +13,7 @@ import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { createIncludeParam } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { openapi } from '../../../common/utils/openapi.js'
-import { AdminTicketSortBy, TicketIdParam } from '../common/index.js'
+import { AdminTicketSortBy } from '../common/index.js'
 
 /**
  * Admin support ticket management schemas

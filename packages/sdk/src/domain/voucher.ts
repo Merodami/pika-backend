@@ -4,11 +4,13 @@
  */
 
 import type {
-  VoucherState,
+  Coordinates,
+  CustomerVoucherStatus,
+  VoucherCodeType,
   VoucherDiscountType,
   VoucherScanSource,
   VoucherScanType,
-  Coordinates,
+  VoucherState,
 } from '@pika/types'
 
 // ============= Voucher Domain =============
@@ -20,7 +22,7 @@ export interface VoucherLocation extends Coordinates {
 export interface VoucherCode {
   id: string
   code: string
-  type: string
+  type: VoucherCodeType
   isActive: boolean
   metadata?: Record<string, any>
 }
@@ -156,7 +158,7 @@ export interface CustomerVoucherDomain {
   id: string
   userId: string
   voucherId: string
-  status: 'claimed' | 'redeemed' | 'expired'
+  status: CustomerVoucherStatus
   claimedAt: Date
   redeemedAt?: Date | null
   expiresAt: Date

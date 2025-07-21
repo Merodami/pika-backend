@@ -1,17 +1,18 @@
-import type { PrismaClient } from '@prisma/client'
+import { CATEGORY_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import type { TranslationClient } from '@pika/translation'
+import type { PrismaClient } from '@prisma/client'
 
-import { CategoryController } from './controllers/CategoryController.js'
 import { AdminCategoryController } from './controllers/AdminCategoryController.js'
+import { CategoryController } from './controllers/CategoryController.js'
 import { InternalCategoryController } from './controllers/InternalCategoryController.js'
 import { CategoryRepository } from './repositories/CategoryRepository.js'
-import { CategoryService } from './services/CategoryService.js'
-import { createCategoryRoutes } from './routes/CategoryRoutes.js'
 import { createAdminCategoryRoutes } from './routes/AdminCategoryRoutes.js'
+import { createCategoryRoutes } from './routes/CategoryRoutes.js'
 import { createInternalCategoryRoutes } from './routes/InternalCategoryRoutes.js'
+import { CategoryService } from './services/CategoryService.js'
 
 export interface ServerConfig {
   prisma: PrismaClient
@@ -25,20 +26,47 @@ export async function createCategoryServer(config: ServerConfig) {
   // Create Express app with standard configuration
   const app = await createExpressServer({
     serviceName: 'category',
+    port: CATEGORY_SERVICE_PORT,
     cacheService,
-    healthChecks: {
-      postgresql: async () => {
-        await prisma.$queryRaw`SELECT 1`
-        return { status: 'healthy' }
+    healthChecks: [
+      {
+        name: 'postgres',
+        check: async () => {
+          try {
+            await prisma.$queryRaw`SELECT 1`
+
+            return true
+          } catch {
+            return false
+          }
+        },
+        details: { type: 'PostgreSQL' },
       },
-      redis: async () => {
-        // Handle both RedisService and MemoryCacheService
-        if (typeof cacheService.ping === 'function') {
-          await cacheService.ping()
-        }
-        return { status: 'healthy' }
+      {
+        name: 'redis',
+        check: async () => {
+          try {
+            // Handle both RedisService and MemoryCacheService
+            if (typeof cacheService.checkHealth === 'function') {
+              const health = await cacheService.checkHealth()
+
+              return health.status === 'healthy' || health.status === 'degraded'
+            }
+            // For MemoryCacheService that doesn't have checkHealth, do a simple operation test
+            await cacheService.set('health_check', 'ok', 5)
+
+            const result = await cacheService.get('health_check')
+
+            return result === 'ok'
+          } catch (error) {
+            logger.error('Cache health check failed:', error)
+
+            return false
+          }
+        },
+        details: { type: 'Cache' },
       },
-    },
+    ],
     idempotencyOptions: {
       enabled: true,
       defaultTTL: 86400, // 24 hours

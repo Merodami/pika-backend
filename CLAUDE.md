@@ -361,6 +361,29 @@ export class EntityMapper {
 }
 ```
 
+### Critical Architectural Principle: Infrastructure Isolation
+
+**NEVER import Prisma types in mappers!** This violates Clean Architecture.
+
+✅ **Correct Pattern**:
+
+```typescript
+// Repository layer handles Prisma conversion
+const vouchers = await this.prisma.voucher.findMany()
+// Convert Prisma result to generic document interface
+const documents = vouchers.map((v) => ({ ...v, state: v.state as string }))
+return documents.map(VoucherMapper.fromDocument)
+```
+
+❌ **Wrong Pattern**:
+
+```typescript
+// NEVER do this in mappers!
+import { VoucherState as PrismaVoucherState } from '@prisma/client' // ❌
+```
+
+**Rule**: Mappers work with whatever the repository provides. Use generic string/primitive types in document interfaces, not infrastructure-specific types. The repository layer is responsible for converting infrastructure types to domain-compatible types.
+
 ### Usage in Controllers
 
 Controllers must use mappers for all data transformations:

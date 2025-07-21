@@ -1,13 +1,4 @@
-import type { PrismaClient } from '@prisma/client'
-import {
-  AdminGetSubscriptionsQuery,
-  SubscriptionIdParam,
-} from '@pika/api/admin'
-import {
-  CancelSubscriptionRequest,
-  CreateSubscriptionRequest,
-  UpdateSubscriptionRequest,
-} from '@pika/api/public'
+import { subscriptionAdmin, subscriptionPublic } from '@pika/api'
 import {
   requireAdmin,
   requireAuth,
@@ -17,11 +8,13 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
+import { Router } from 'express'
+
 import { SubscriptionController } from '../controllers/SubscriptionController.js'
 import { PlanRepository } from '../repositories/PlanRepository.js'
 import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
 import { SubscriptionService } from '../services/SubscriptionService.js'
-import { Router } from 'express'
 
 export function createSubscriptionRouter(
   prisma: PrismaClient,
@@ -52,37 +45,37 @@ export function createSubscriptionRouter(
   router.post(
     '/',
     requireAuth(),
-    validateBody(CreateSubscriptionRequest),
+    validateBody(subscriptionPublic.CreateSubscriptionRequest),
     controller.createSubscription,
   )
 
   router.get(
     '/:id',
     requireAuth(),
-    validateParams(SubscriptionIdParam),
+    validateParams(subscriptionAdmin.SubscriptionIdParam),
     controller.getSubscriptionById,
   )
 
   router.put(
     '/:id',
     requireAuth(),
-    validateParams(SubscriptionIdParam),
-    validateBody(UpdateSubscriptionRequest),
+    validateParams(subscriptionAdmin.SubscriptionIdParam),
+    validateBody(subscriptionPublic.UpdateSubscriptionRequest),
     controller.updateSubscription,
   )
 
   router.post(
     '/:id/cancel',
     requireAuth(),
-    validateParams(SubscriptionIdParam),
-    validateBody(CancelSubscriptionRequest),
+    validateParams(subscriptionAdmin.SubscriptionIdParam),
+    validateBody(subscriptionPublic.CancelSubscriptionRequest),
     controller.cancelSubscription,
   )
 
   router.post(
     '/:id/reactivate',
     requireAuth(),
-    validateParams(SubscriptionIdParam),
+    validateParams(subscriptionAdmin.SubscriptionIdParam),
     controller.reactivateSubscription,
   )
 
@@ -92,7 +85,7 @@ export function createSubscriptionRouter(
   router.get(
     '/',
     requireAdmin(),
-    validateQuery(AdminGetSubscriptionsQuery),
+    validateQuery(subscriptionAdmin.AdminGetSubscriptionsQuery),
     controller.getSubscriptions,
   )
 

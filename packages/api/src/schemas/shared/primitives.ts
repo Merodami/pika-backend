@@ -17,12 +17,22 @@ export const UUID = z
 
 /**
  * DateTime - ISO 8601 string that can be parsed to Date
+ * Used for request inputs where we want Date objects
  */
 export const DateTime = z
   .string()
   .datetime({ offset: true, message: 'Must be a valid ISO 8601 datetime' })
   .transform((str) => new Date(str))
   .describe('ISO 8601 datetime with timezone')
+
+/**
+ * DateTimeString - ISO 8601 string without transformation
+ * Used for API responses to maintain string format
+ */
+export const DateTimeString = z
+  .string()
+  .datetime({ offset: true, message: 'Must be a valid ISO 8601 datetime' })
+  .describe('ISO 8601 datetime string with timezone')
 
 /**
  * DateOnly - Date in YYYY-MM-DD format

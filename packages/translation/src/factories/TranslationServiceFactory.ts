@@ -1,5 +1,6 @@
 import type { PrismaClient } from '@prisma/client'
 import type { Redis } from 'ioredis'
+
 import { TranslationRepository } from '../repositories/TranslationRepository.js'
 import { TranslationCache } from '../services/TranslationCache.js'
 import { TranslationService } from '../services/TranslationService.js'

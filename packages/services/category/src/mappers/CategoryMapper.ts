@@ -2,10 +2,10 @@ import type { Category } from '@prisma/client'
 
 import type {
   Category as CategoryDomain,
-  CreateCategoryData,
-  UpdateCategoryData,
   CategorySearchParams,
+  CreateCategoryData,
   PaginatedResult,
+  UpdateCategoryData,
   ValidationResult,
 } from '../types/interfaces.js'
 
@@ -24,7 +24,7 @@ export interface CategoryDocument {
   createdBy: string
   updatedBy: string | null
   createdAt: Date
-  updatedAt: Date
+  updatedAt: Date | null
 }
 
 /**
@@ -41,7 +41,7 @@ export interface CategoryDTO {
   createdBy: string
   updatedBy?: string
   createdAt: string
-  updatedAt: string
+  updatedAt: string | null
   children?: CategoryDTO[]
 }
 
@@ -68,8 +68,8 @@ export interface CategorySearchParamsDTO {
   createdBy?: string
   page?: number
   limit?: number
-  sortBy?: 'NAME' | 'SORT_ORDER' | 'CREATED_AT' | 'UPDATED_AT'
-  sortOrder?: 'ASC' | 'DESC'
+  sortBy?: 'name' | 'sortOrder' | 'createdAt' | 'updatedAt'
+  sortOrder?: 'asc' | 'desc'
 }
 
 /**
@@ -120,8 +120,11 @@ export class CategoryMapper {
       updatedBy: doc.updatedBy || undefined,
       createdAt:
         doc.createdAt instanceof Date ? doc.createdAt : new Date(doc.createdAt),
-      updatedAt:
-        doc.updatedAt instanceof Date ? doc.updatedAt : new Date(doc.updatedAt),
+      updatedAt: doc.updatedAt
+        ? doc.updatedAt instanceof Date
+          ? doc.updatedAt
+          : new Date(doc.updatedAt)
+        : null,
     }
   }
 
@@ -134,6 +137,7 @@ export class CategoryMapper {
       if (!date) return new Date().toISOString()
       if (typeof date === 'string') return date
       if (date instanceof Date) return date.toISOString()
+
       return new Date().toISOString()
     }
 
@@ -148,7 +152,7 @@ export class CategoryMapper {
       createdBy: domain.createdBy,
       updatedBy: domain.updatedBy,
       createdAt: formatDate(domain.createdAt),
-      updatedAt: formatDate(domain.updatedAt),
+      updatedAt: domain.updatedAt ? formatDate(domain.updatedAt) : null,
       children: domain.children
         ? domain.children.map((child) => this.toDTO(child))
         : undefined,
@@ -171,7 +175,7 @@ export class CategoryMapper {
       createdBy: dto.createdBy,
       updatedBy: dto.updatedBy,
       createdAt: new Date(dto.createdAt),
-      updatedAt: new Date(dto.updatedAt),
+      updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : null,
       children: dto.children
         ? dto.children.map((child) => this.fromDTO(child))
         : undefined,
@@ -191,8 +195,8 @@ export class CategoryMapper {
       createdBy: dto.createdBy,
       page: dto.page || 1,
       limit: dto.limit || 20,
-      sortBy: dto.sortBy || 'SORT_ORDER',
-      sortOrder: dto.sortOrder || 'ASC',
+      sortBy: dto.sortBy || 'sortOrder',
+      sortOrder: dto.sortOrder || 'asc',
     }
   }
 
@@ -319,6 +323,7 @@ export class CategoryMapper {
 
       if (category.parentId) {
         const parent = categoryMap.get(category.parentId)
+
         if (parent) {
           parent.children = parent.children || []
           parent.children.push(categoryWithChildren)
@@ -340,6 +345,7 @@ export class CategoryMapper {
     const flatten = (cats: CategoryDomain[]) => {
       cats.forEach((category) => {
         const { children, ...categoryWithoutChildren } = category
+
         result.push(categoryWithoutChildren)
 
         if (children && children.length > 0) {
@@ -349,6 +355,7 @@ export class CategoryMapper {
     }
 
     flatten(categories)
+
     return result
   }
 

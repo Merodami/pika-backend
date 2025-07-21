@@ -46,11 +46,11 @@ export async function seedInitialTranslations(prisma: PrismaClient): Promise<voi
     { key: 'email.welcome.subject', en: 'Welcome to Pika!', es: '¡Bienvenido a Pika!', gn: 'Tereg̃ua Pika-pe!' },
     { key: 'email.welcome.greeting', en: 'Hello {name}!', es: '¡Hola {name}!', gn: 'Mba\'éichapa {name}!' },
     { key: 'email.welcome.body', en: 'Welcome to our fitness platform.', es: 'Bienvenido a nuestra plataforma de fitness.', gn: 'Tereg̃ua ore plataforma de ejercicio-pe.' },
-    
+
     // Common notifications
     { key: 'notification.payment.success', en: 'Payment successful', es: 'Pago exitoso', gn: 'Jehepyme\'ẽ oĩ porã' },
     { key: 'notification.payment.failed', en: 'Payment failed', es: 'Pago fallido', gn: 'Jehepyme\'ẽ ndoikói' },
-    
+
     // Error messages
     { key: 'error.not_found', en: 'Not found', es: 'No encontrado', gn: 'Ndojejuhúi' },
     { key: 'error.unauthorized', en: 'Unauthorized', es: 'No autorizado', gn: 'Ndaikatúi' },
@@ -59,20 +59,20 @@ export async function seedInitialTranslations(prisma: PrismaClient): Promise<voi
 
   for (const translation of translations) {
     const { key, en, es, gn } = translation
-    
+
     // Create translations for each language
     await prisma.translation.upsert({
       where: { key_languageCode: { key, languageCode: 'en' } },
       update: { value: en },
       create: { key, value: en, languageCode: 'en' },
     })
-    
+
     await prisma.translation.upsert({
       where: { key_languageCode: { key, languageCode: 'es' } },
       update: { value: es },
       create: { key, value: es, languageCode: 'es' },
     })
-    
+
     await prisma.translation.upsert({
       where: { key_languageCode: { key, languageCode: 'gn' } },
       update: { value: gn },

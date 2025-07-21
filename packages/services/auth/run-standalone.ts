@@ -5,11 +5,11 @@
  * This allows us to test the auth service in isolation
  */
 
-import { PrismaClient } from '@prisma/client'
 import { AUTH_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
 
 import { createAuthServer } from './src/server.js'
 

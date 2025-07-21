@@ -1,14 +1,9 @@
-import type {
-  CommunicationLogSearchParams as ApiCommunicationLogSearchParams,
-  CommunicationLogIdParam,
-  SendBulkEmailRequest,
-  SendEmailRequest,
-} from '@pika/api/public'
-import { CommunicationLogMapper } from '@pika/sdk'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { communicationCommon, communicationPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { CommunicationLogMapper } from '@pika/sdk'
+import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { CommunicationLogSearchParams } from '../repositories/CommunicationLogRepository.js'
@@ -61,7 +56,7 @@ export class EmailController implements IEmailController {
    * Send an email to a single recipient
    */
   async sendEmail(
-    request: Request<{}, {}, SendEmailRequest>,
+    request: Request<{}, {}, communicationPublic.SendEmailRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -103,7 +98,7 @@ export class EmailController implements IEmailController {
    * Send emails to multiple recipients
    */
   async sendBulkEmail(
-    request: Request<{}, {}, SendBulkEmailRequest>,
+    request: Request<{}, {}, communicationPublic.SendBulkEmailRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -158,7 +153,10 @@ export class EmailController implements IEmailController {
       const context = RequestContext.getContext(request)
       const userId = context.userId
 
-      const query = getValidatedQuery<ApiCommunicationLogSearchParams>(request)
+      const query =
+        getValidatedQuery<communicationPublic.CommunicationLogSearchParams>(
+          request,
+        )
 
       // Transform API params to service params
       const params: CommunicationLogSearchParams = {
@@ -188,7 +186,7 @@ export class EmailController implements IEmailController {
    * Get specific email details by ID
    */
   async getEmailById(
-    request: Request<CommunicationLogIdParam>,
+    request: Request<communicationCommon.CommunicationLogIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

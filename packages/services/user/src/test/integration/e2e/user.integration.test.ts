@@ -8,24 +8,26 @@ vi.unmock('@pika/redis') // Ensures real cache decorators from @pika/redis are u
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
   const actualApi = await vi.importActual('@pika/api')
+
   return actualApi // Return all actual exports
 })
 
 // Force Vitest to use the actual implementation of '@pika/shared' for this test file.
 vi.mock('@pika/shared', async () => {
   const actualShared = await vi.importActual('@pika/shared')
+
   return actualShared // Return all actual exports
 })
 
-import { PrismaClient, UserRole } from '@prisma/client'
-import { MemoryCacheService } from '@pika/redis'
-import { logger } from '@pika/shared'
 import {
   AuthenticatedRequestClient,
   CommunicationServiceClientMock,
   createE2EAuthHelper,
   E2EAuthHelper,
 } from '@pika'
+import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
+import { PrismaClient, UserRole } from '@prisma/client'
 import {
   cleanupTestDatabase,
   clearTestDatabase,

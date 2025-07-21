@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { PhoneNumber } from '../../shared/primitives.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * User registration schemas for public API

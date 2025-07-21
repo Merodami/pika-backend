@@ -121,6 +121,7 @@ export class BookDistributionMapper {
     if (!value || typeof value !== 'object') {
       return undefined
     }
+
     return value
   }
 
@@ -414,6 +415,7 @@ export class BookDistributionMapper {
     // Group distributions
     for (const distribution of distributions) {
       const statusList = statusMap.get(distribution.status) || []
+
       statusList.push(this.toSimpleDTO(distribution))
       statusMap.set(distribution.status, statusList)
     }
@@ -471,6 +473,7 @@ export class BookDistributionMapper {
     if (distribution.locationName) {
       return `${distribution.businessName} - ${distribution.locationName}`
     }
+
     return distribution.businessName
   }
 
@@ -497,6 +500,7 @@ export class BookDistributionMapper {
 
     const now = new Date()
     const diffTime = Math.abs(now.getTime() - statusDate.getTime())
+
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 }

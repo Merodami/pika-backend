@@ -1,14 +1,13 @@
-import { z } from 'zod'
-
 import type { ZodRegistry } from '@api/common/registry/base.js'
-import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as internalAuthSchemas from '@api/schemas/auth/internal/service.js'
 import * as internalCommunicationSchemas from '@api/schemas/communication/internal/service.js'
 import * as internalDiscoverySchemas from '@api/schemas/discovery/internal/service.js'
-import * as healthSchemas from '@api/schemas/system/public/health.js'
+import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as internalSubscriptionSchemas from '@api/schemas/subscription/internal/service.js'
+import * as healthSchemas from '@api/schemas/system/public/health.js'
 import * as internalUserSchemas from '@api/schemas/user/internal/service.js'
+import { z } from 'zod'
 
 /**
  * Register all internal API schemas and routes

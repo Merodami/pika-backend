@@ -26,13 +26,12 @@ vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/shared')
 
+import { createPDFGeneratorServer } from '@pdf/server.js'
 import { MockCacheService } from '@tests/mocks/cacheServiceMock.js'
 import {
   createE2EAuthHelper,
   type E2EAuthHelper,
 } from '@tests/utils/e2eAuth.js'
-
-import { createPDFGeneratorServer } from '@pdf/server.js'
 
 describe('PDF Generator API Integration Tests', () => {
   let testDb: TestDatabaseResult

@@ -1,8 +1,10 @@
-import { PrismaClient } from '@prisma/client'
 import { SUBSCRIPTION_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
-import { type ICacheService, initializeCache } from '@pika/redis'
+import type { ICacheService } from '@pika/redis'
+import { initializeCache } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
+
 import { createSubscriptionServer } from './server.js'
 
 async function initializeDatabase(): Promise<PrismaClient> {

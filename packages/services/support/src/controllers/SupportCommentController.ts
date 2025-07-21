@@ -1,4 +1,4 @@
-import { supportPublic, supportCommon } from '@pika/api'
+import { supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -105,7 +105,11 @@ export class SupportCommentController {
    * Update comment
    */
   async updateComment(
-    request: Request<supportCommon.SupportCommentIdParam, {}, supportPublic.UpdateSupportCommentRequest>,
+    request: Request<
+      supportCommon.SupportCommentIdParam,
+      {},
+      supportPublic.UpdateSupportCommentRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

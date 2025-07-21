@@ -1,4 +1,3 @@
-import type { PrismaClient } from '@prisma/client'
 import { userAdmin, userPublic } from '@pika/api'
 import {
   requireAdmin,
@@ -8,6 +7,7 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 import multer from 'multer'
 

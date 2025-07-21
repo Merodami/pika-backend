@@ -112,7 +112,7 @@ export class InternalCommunicationController {
       // For now, we'll return a mock response
       const responseData: SendTransactionalEmailResponse = {
         messageId: `msg-${Date.now()}`,
-        status: 'QUEUED',
+        status: 'queued',
         scheduledAt: new Date(),
       }
 

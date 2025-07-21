@@ -1,14 +1,9 @@
-import type {
-  NotificationSearchParams as ApiNotificationSearchParams,
-  CreateNotificationRequest,
-  NotificationIdParam,
-  UpdateNotificationStatusRequest,
-} from '@pika/api/public'
-import { NotificationMapper } from '@pika/sdk'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { communicationCommon, communicationPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { NotificationMapper } from '@pika/sdk'
+import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { NotificationSearchParams } from '../repositories/NotificationRepository.js'
@@ -89,7 +84,7 @@ export class NotificationController implements INotificationController {
    * Create a new notification
    */
   async createNotification(
-    request: Request<{}, {}, CreateNotificationRequest>,
+    request: Request<{}, {}, communicationPublic.CreateNotificationRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -132,7 +127,8 @@ export class NotificationController implements INotificationController {
       const context = RequestContext.getContext(request)
       const userId = context.userId
 
-      const query = getValidatedQuery<ApiNotificationSearchParams>(request)
+      const query =
+        getValidatedQuery<communicationPublic.NotificationSearchParams>(request)
 
       // Transform API params to service params
       const params: NotificationSearchParams = {
@@ -163,7 +159,7 @@ export class NotificationController implements INotificationController {
    * Get notification by ID
    */
   async getNotificationById(
-    request: Request<NotificationIdParam>,
+    request: Request<communicationCommon.NotificationIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -190,7 +186,11 @@ export class NotificationController implements INotificationController {
    * Update notification status
    */
   async updateNotification(
-    request: Request<NotificationIdParam, {}, UpdateNotificationStatusRequest>,
+    request: Request<
+      communicationCommon.NotificationIdParam,
+      {},
+      communicationPublic.UpdateNotificationStatusRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -219,7 +219,7 @@ export class NotificationController implements INotificationController {
    * Mark notification as read
    */
   async markAsRead(
-    request: Request<NotificationIdParam>,
+    request: Request<communicationCommon.NotificationIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -266,7 +266,7 @@ export class NotificationController implements INotificationController {
    * Delete a notification
    */
   async deleteNotification(
-    request: Request<NotificationIdParam>,
+    request: Request<communicationCommon.NotificationIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -290,7 +290,7 @@ export class NotificationController implements INotificationController {
    * Create a global notification for all users
    */
   async createGlobalNotification(
-    request: Request<{}, {}, CreateNotificationRequest>,
+    request: Request<{}, {}, communicationPublic.CreateNotificationRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

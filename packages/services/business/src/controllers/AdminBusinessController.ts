@@ -1,15 +1,9 @@
-import {
-  mapSortOrder,
-  businessAdmin,
-  businessPublic,
-  businessCommon,
-  shared,
-} from '@pika/api'
+import { businessAdmin, businessPublic, mapSortOrder } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
+import type { ParsedIncludes } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IBusinessService } from '../services/BusinessService.js'
@@ -65,14 +59,9 @@ export class AdminBusinessController {
         sortOrder: mapSortOrder(query.sortOrder),
         includeDeleted: query.includeDeleted,
         parsedIncludes: {
-          user: query.includeUser,
-          category: query.includeCategory,
+          user: query.includeUser || false,
+          category: query.includeCategory || false,
         },
-        // Additional admin filters
-        createdFrom: query.createdFrom,
-        createdTo: query.createdTo,
-        updatedFrom: query.updatedFrom,
-        updatedTo: query.updatedTo,
       }
 
       const result = await this.businessService.getAllBusinesses(params)
@@ -106,10 +95,15 @@ export class AdminBusinessController {
       const query =
         getValidatedQuery<businessAdmin.AdminBusinessQueryParams>(req)
 
-      const business = await this.businessService.getBusinessById(businessId, {
-        user: query.includeUser,
-        category: query.includeCategory,
-      })
+      const includes: ParsedIncludes = {}
+
+      if (query.includeUser) includes.user = true
+      if (query.includeCategory) includes.category = true
+
+      const business = await this.businessService.getBusinessById(
+        businessId,
+        includes,
+      )
 
       res.json(BusinessMapper.toDTO(business))
     } catch (error) {
@@ -287,5 +281,4 @@ export class AdminBusinessController {
       next(error)
     }
   }
-
 }

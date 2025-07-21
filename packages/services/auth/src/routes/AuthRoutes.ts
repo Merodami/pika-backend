@@ -23,7 +23,11 @@ export function createAuthRouter(
   const controller = new AuthController(authService)
 
   // Public routes (no authentication required)
-  router.post('/register', validateBody(authPublic.RegisterRequest), controller.register)
+  router.post(
+    '/register',
+    validateBody(authPublic.RegisterRequest),
+    controller.register,
+  )
 
   // Password reset routes (public)
   router.post(
@@ -68,7 +72,11 @@ export function createAuthRouter(
     controller.introspect,
   )
 
-  router.post('/revoke', validateBody(authPublic.RevokeTokenRequest), controller.revoke)
+  router.post(
+    '/revoke',
+    validateBody(authPublic.RevokeTokenRequest),
+    controller.revoke,
+  )
 
   // Protected route - auth is handled manually in the controller
   router.get('/userinfo', controller.userinfo)

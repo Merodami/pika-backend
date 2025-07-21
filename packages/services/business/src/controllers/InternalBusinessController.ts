@@ -1,7 +1,7 @@
 import { businessCommon, businessInternal, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
+import { getValidatedQuery } from '@pika/http'
 import { BusinessMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IBusinessService } from '../services/BusinessService.js'
@@ -23,18 +23,14 @@ export class InternalBusinessController {
    * Get business by ID for internal services
    */
   async getBusinessById(
-    req: Request<
-      businessCommon.BusinessIdParam,
-      {},
-      {},
-      businessInternal.GetBusinessRequest
-    >,
+    req: Request<businessCommon.BusinessIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: businessId } = req.params
-      const { includeUser, includeCategory } = req.query
+      const query = getValidatedQuery<businessInternal.GetBusinessRequest>(req)
+      const { includeUser, includeCategory } = query
 
       const business = await this.businessService.getBusinessById(businessId, {
         user: includeUser,
@@ -58,11 +54,12 @@ export class InternalBusinessController {
   ): Promise<void> {
     try {
       const { id: userId } = req.params
-      const { includeUser, includeCategory } = req.query
+      const query = getValidatedQuery<businessInternal.GetBusinessRequest>(req)
+      const { includeUser, includeCategory } = query
 
       const business = await this.businessService.getBusinessByUserId(userId, {
-        user: includeUser,
-        category: includeCategory,
+        user: !!includeUser,
+        category: !!includeCategory,
       })
 
       res.json(BusinessMapper.toDTO(business))
@@ -112,22 +109,19 @@ export class InternalBusinessController {
    * Get businesses by category for internal services
    */
   async getBusinessesByCategory(
-    req: Request<
-      { categoryId: string },
-      {},
-      {},
-      businessInternal.GetBusinessesByCategoryRequest
-    >,
+    req: Request<shared.CategoryIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { categoryId } = req.params
+      const { id: categoryId } = req.params
+      const query =
+        getValidatedQuery<businessInternal.GetBusinessesByCategoryRequest>(req)
       const {
         limit = PAGINATION_DEFAULT_LIMIT,
         includeUser,
         includeCategory,
-      } = req.query
+      } = query
 
       const result = await this.businessService.getAllBusinesses({
         categoryId,
@@ -135,8 +129,8 @@ export class InternalBusinessController {
         verified: true,
         limit,
         parsedIncludes: {
-          user: includeUser,
-          category: includeCategory,
+          user: !!includeUser,
+          category: !!includeCategory,
         },
       })
 

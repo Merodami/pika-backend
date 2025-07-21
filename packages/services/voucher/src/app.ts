@@ -1,9 +1,13 @@
 // Import the necessary dependencies
-import { REDIS_PASSWORD,VOUCHER_SERVICE_PORT } from '@pika/environment'
+import { REDIS_PASSWORD, VOUCHER_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { initializeCache, RedisConfigService } from '@pika/redis'
 import { FileStoragePort, logger, StorageServiceClient } from '@pika/shared'
-import { createTranslationService, TranslationClient, createTranslationResolver } from '@pika/translation'
+import {
+  createTranslationResolver,
+  createTranslationService,
+  TranslationClient,
+} from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 import { Redis } from 'ioredis'
 

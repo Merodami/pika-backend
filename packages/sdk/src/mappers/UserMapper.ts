@@ -1,5 +1,5 @@
-import type { UserRoleType, UserStatusType } from '@pika/types'
-import { UserRole, UserStatus, mapUserRole, mapUserStatus } from '@pika/types'
+import type { UserStatusType } from '@pika/types'
+import { mapUserRole, mapUserStatus,UserRole, UserStatus } from '@pika/types'
 
 import type {
   AddressDomain,
@@ -24,7 +24,7 @@ export interface UserDocument {
   avatarUrl: string | null
   role: string
   status: string
-  lastLoginAt: Date | null
+  lastLoginAt?: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt?: Date | null
@@ -95,7 +95,7 @@ export class UserMapper {
       avatarUrl: doc.avatarUrl,
       role: mapUserRole(doc.role),
       status: mapUserStatus(doc.status),
-      lastLoginAt: doc.lastLoginAt,
+      lastLoginAt: doc.lastLoginAt ?? null,
       createdAt:
         doc.createdAt instanceof Date
           ? doc.createdAt

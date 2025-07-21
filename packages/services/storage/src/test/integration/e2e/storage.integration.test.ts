@@ -13,27 +13,27 @@ vi.mock('@pika/api', async () => {
   return actualApi // Return all actual exports
 })
 
-// Force Vitest to use the actual implementation of '@pikad' for this test file.
-vi.mock('@pikad', async () => {
+// Force Vitest to use the actual implementation of '@pika/shared' for this test file.
+vi.mock('@pika/shared', async () => {
   const actualShared =
-    await vi.importActual<typeof import('@pikad')>('@p@p@p@pika
+    await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
 
   return actualShared // Return all actual exports
 })
 
+import { MemoryCacheService } from '@pika'
+import {
+  AuthenticatedRequestClient,
+  createE2EAuthHelper,
+  E2EAuthHelper,
+} from '@pika'
+import { logger } from '@pikad'
 import {
   AWS_S3_ACCESS_KEY_ID,
   AWS_S3_BUCKET,
   AWS_S3_REGION,
   AWS_S3_SECRET_ACCESS_KEY,
 } from '@pikaonment'
-import { MemoryCacheService } from '@pika'
-import { logger } from '@pikad'
-import {
-  AuthenticatedRequestClient,
-  createE2EAuthHelper,
-  E2EAuthHelper,
-} from '@pika'
 import {
   cleanupTestDatabase,
   clearTestDatabase,

@@ -4,6 +4,7 @@ import { vi } from 'vitest'
 vi.mock('@pika/shared', async () => {
   const actualShared =
     await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
+
   return {
     ...actualShared,
     // Mock any service clients if needed
@@ -16,6 +17,7 @@ vi.mock('@pika/translation', async () => {
     await vi.importActual<typeof import('@pika/translation')>(
       '@pika/translation',
     )
+
   return {
     ...actualTranslation,
     TranslationClient: vi.fn().mockImplementation(() => ({
@@ -28,18 +30,18 @@ vi.mock('@pika/translation', async () => {
   }
 })
 
-import { PrismaClient } from '@prisma/client'
 import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import type { TestDatabase } from '@pika/tests'
 import {
-  cleanupTestDatabase,
-  createTestDatabase,
-  InternalAPITestHelper,
   AuthenticatedRequestClient,
+  cleanupTestDatabase,
   createE2EAuthHelper,
+  createTestDatabase,
   E2EAuthHelper,
+  InternalAPITestHelper,
 } from '@pika/tests'
-import { logger } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -692,6 +694,7 @@ describe('Business Integration Tests', () => {
 
         // Find an unverified business
         const unverifiedBusiness = testBusinesses.find((b) => !b.verified)
+
         expect(unverifiedBusiness).toBeDefined()
 
         const response = await adminClient
@@ -864,6 +867,7 @@ describe('Business Integration Tests', () => {
 
       // Find an unverified business
       const unverifiedBusiness = testBusinesses.find((b) => !b.verified)
+
       expect(unverifiedBusiness).toBeDefined()
 
       // Customer should be able to see unverified businesses
@@ -913,6 +917,7 @@ describe('Business Integration Tests', () => {
 
       // Verify it has the highest rating
       const allRatings = listResponse.body.data.map((b: any) => b.avgRating)
+
       expect(Math.max(...allRatings)).toBe(newRating)
     })
   })

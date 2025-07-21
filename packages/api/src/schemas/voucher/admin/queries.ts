@@ -1,18 +1,18 @@
 import { z } from 'zod'
 
-import { UUID, DateTime } from '../../shared/primitives.js'
 import { SearchParams } from '../../shared/pagination.js'
+import { DateTime,UUID } from '../../shared/primitives.js'
 import {
-  VoucherState,
-  VoucherDiscountType,
   AdminVoucherSortBy,
   AnalyticsGroupBy,
+  VoucherDiscountType,
+  VoucherState,
 } from '../common/enums.js'
-import { ADMIN_VOUCHER_ALLOWED_RELATIONS } from '../common/relations.js'
 import {
   GeographicSearchParams,
   VoucherFilterParams,
 } from '../common/queries.js'
+import { ADMIN_VOUCHER_ALLOWED_RELATIONS } from '../common/relations.js'
 
 /**
  * Admin voucher query parameters
@@ -77,7 +77,9 @@ export const VoucherAnalyticsQueryParams = z.object({
   groupBy: AnalyticsGroupBy.optional(),
 })
 
-export type VoucherAnalyticsQueryParams = z.infer<typeof VoucherAnalyticsQueryParams>
+export type VoucherAnalyticsQueryParams = z.infer<
+  typeof VoucherAnalyticsQueryParams
+>
 
 /**
  * Business voucher stats query parameters
@@ -88,4 +90,6 @@ export const BusinessVoucherStatsQueryParams = z.object({
   groupBy: AnalyticsGroupBy.optional(),
 })
 
-export type BusinessVoucherStatsQueryParams = z.infer<typeof BusinessVoucherStatsQueryParams>
+export type BusinessVoucherStatsQueryParams = z.infer<
+  typeof BusinessVoucherStatsQueryParams
+>

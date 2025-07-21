@@ -1,5 +1,6 @@
-import type { Request } from 'express'
 import { DEFAULT_LANGUAGE } from '@pika/environment'
+import type { Request } from 'express'
+
 import type { ITranslationRepository } from '../repositories/TranslationRepository.js'
 import type { ITranslationCache } from './TranslationCache.js'
 
@@ -37,6 +38,7 @@ export class TranslationService implements ITranslationService {
   async get(key: string, language: string, fallback?: string): Promise<string> {
     // 1. Check cache
     const cached = await this.cache.get(key, language)
+
     if (cached) return cached
 
     // 2. Check database
@@ -44,14 +46,17 @@ export class TranslationService implements ITranslationService {
       key,
       language,
     )
+
     if (translation) {
       await this.cache.set(key, language, translation.value)
+
       return translation.value
     }
 
     // 3. Try default language
     if (language !== this.defaultLanguage) {
       const defaultTrans = await this.get(key, this.defaultLanguage)
+
       if (defaultTrans !== key) return defaultTrans
     }
 
@@ -69,6 +74,7 @@ export class TranslationService implements ITranslationService {
     // Check cache first
     for (const key of keys) {
       const cached = await this.cache.get(key, language)
+
       if (cached) {
         results[key] = cached
       } else {
@@ -94,6 +100,7 @@ export class TranslationService implements ITranslationService {
           // Try default language
           if (language !== this.defaultLanguage) {
             const defaultTrans = await this.get(key, this.defaultLanguage)
+
             results[key] = defaultTrans
           } else {
             results[key] = key // Return key as fallback
@@ -162,20 +169,24 @@ export class TranslationService implements ITranslationService {
   async detectLanguage(request: Request): Promise<string> {
     // 1. Check user preference header
     const userLang = request.headers['x-user-language'] as string
+
     if (userLang && (await this.isValidLanguage(userLang))) {
       return userLang
     }
 
     // 2. Check query parameter
     const queryLang = request.query.lang as string
+
     if (queryLang && (await this.isValidLanguage(queryLang))) {
       return queryLang
     }
 
     // 3. Parse Accept-Language header
     const acceptLang = request.headers['accept-language']
+
     if (acceptLang) {
       const preferredLang = this.parseAcceptLanguage(acceptLang)
+
       if (preferredLang && (await this.isValidLanguage(preferredLang))) {
         return preferredLang
       }
@@ -187,12 +198,14 @@ export class TranslationService implements ITranslationService {
 
   async getUserLanguage(userId: string): Promise<string> {
     const preference = await this.repository.findUserLanguagePreference(userId)
+
     return preference?.languageCode || this.defaultLanguage
   }
 
   async setUserLanguage(userId: string, languageCode: string): Promise<void> {
     // Validate language exists and is active
     const language = await this.repository.findLanguageByCode(languageCode)
+
     if (!language || !language.isActive) {
       throw new Error(`Language ${languageCode} is not available`)
     }
@@ -203,15 +216,19 @@ export class TranslationService implements ITranslationService {
   private parseAcceptLanguage(acceptLanguage: string): string | null {
     // Simple parsing - take first language
     const languages = acceptLanguage.split(',')
+
     if (languages.length > 0) {
       const lang = languages[0].split(';')[0].split('-')[0].trim()
+
       return lang
     }
+
     return null
   }
 
   private async isValidLanguage(code: string): Promise<boolean> {
     const language = await this.repository.findLanguageByCode(code)
+
     return language !== null && language.isActive
   }
 }

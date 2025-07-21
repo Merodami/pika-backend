@@ -1,15 +1,11 @@
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
-import { BusinessMapper, type BusinessDomain } from '@pika/sdk'
-import {
-  ErrorFactory,
-  ErrorSeverity,
-  logger,
-} from '@pika/shared'
+import { type BusinessDomain, BusinessMapper } from '@pika/sdk'
+import { ErrorFactory, ErrorSeverity, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import { Prisma, type PrismaClient } from '@prisma/client'
 
-import type { BusinessFilters, BusinessSearchParams } from '../types/search.js'
+import type { BusinessSearchParams } from '../types/search.js'
 
 export interface IBusinessRepository {
   findAll(
@@ -40,7 +36,7 @@ export interface CreateBusinessData {
 
 export interface UpdateBusinessData {
   businessNameKey?: string
-  businessDescriptionKey?: string
+  businessDescriptionKey?: string | null
   categoryId?: string
   verified?: boolean
   active?: boolean
@@ -164,6 +160,7 @@ export class BusinessRepository implements IBusinessRepository {
           avatarUrl: true,
           emailVerified: true,
           phoneVerified: true,
+          lastLoginAt: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -177,7 +174,7 @@ export class BusinessRepository implements IBusinessRepository {
           slug: true,
           nameKey: true,
           descriptionKey: true,
-          active: true,
+          isActive: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -276,7 +273,9 @@ export class BusinessRepository implements IBusinessRepository {
 
         if (cached) {
           logger.debug(`Cache hit for business ${id}`)
+
           const cachedData = JSON.parse(cached)
+
           return cachedData as BusinessDomain
         }
       }
@@ -342,7 +341,9 @@ export class BusinessRepository implements IBusinessRepository {
 
         if (cached) {
           logger.debug(`Cache hit for business by user ${userId}`)
+
           const cachedData = JSON.parse(cached)
+
           return cachedData as BusinessDomain
         }
       }
@@ -420,7 +421,7 @@ export class BusinessRepository implements IBusinessRepository {
               avatarUrl: true,
               emailVerified: true,
               phoneVerified: true,
-                  createdAt: true,
+              createdAt: true,
               updatedAt: true,
             },
           },
@@ -430,7 +431,14 @@ export class BusinessRepository implements IBusinessRepository {
               slug: true,
               nameKey: true,
               descriptionKey: true,
-                  active: true,
+              icon: true,
+              parentId: true,
+              isActive: true,
+              sortOrder: true,
+              level: true,
+              path: true,
+              createdBy: true,
+              updatedBy: true,
               createdAt: true,
               updatedAt: true,
             },
@@ -518,7 +526,7 @@ export class BusinessRepository implements IBusinessRepository {
               avatarUrl: true,
               emailVerified: true,
               phoneVerified: true,
-                  createdAt: true,
+              createdAt: true,
               updatedAt: true,
             },
           },
@@ -528,7 +536,14 @@ export class BusinessRepository implements IBusinessRepository {
               slug: true,
               nameKey: true,
               descriptionKey: true,
-                  active: true,
+              icon: true,
+              parentId: true,
+              isActive: true,
+              sortOrder: true,
+              level: true,
+              path: true,
+              createdBy: true,
+              updatedBy: true,
               createdAt: true,
               updatedAt: true,
             },

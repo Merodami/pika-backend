@@ -74,24 +74,28 @@ export class MockTranslationServiceClient {
     language: string = DEFAULT_TEST_LANGUAGE,
   ): Promise<string> {
     const translations = mockTranslations.get(key)
+
     if (!translations) {
       return key // Return key if no translation found
     }
 
     // Try requested language first
     const translation = translations.get(language)
+
     if (translation) {
       return translation
     }
 
     // Fallback to default language
     const defaultTranslation = translations.get(DEFAULT_TEST_LANGUAGE)
+
     if (defaultTranslation) {
       return defaultTranslation
     }
 
     // Fallback to any available language
     const anyTranslation = translations.values().next().value
+
     if (anyTranslation) {
       return anyTranslation
     }
@@ -104,6 +108,7 @@ export class MockTranslationServiceClient {
    */
   async getTranslations(key: string): Promise<Record<string, string>> {
     const translations = mockTranslations.get(key)
+
     if (!translations) {
       return {}
     }
@@ -119,6 +124,7 @@ export class MockTranslationServiceClient {
       mockTranslations.delete(key)
     } else {
       const translations = mockTranslations.get(key)
+
       if (translations) {
         translations.delete(language)
         if (translations.size === 0) {
@@ -171,6 +177,7 @@ export function seedMockTranslations(
     const translationMap = new Map<string, string>(
       Object.entries(translationData),
     )
+
     mockTranslations.set(key, translationMap)
   }
 }

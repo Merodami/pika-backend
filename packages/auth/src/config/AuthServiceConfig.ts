@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client'
 import {
   AUTH_PROVIDER,
   JWT_ACCESS_TOKEN_EXPIRY,
@@ -8,6 +7,7 @@ import {
   JWT_SECRET,
 } from '@pika/environment'
 import { UserRole, UserStatus } from '@pika/types'
+import { PrismaClient } from '@prisma/client'
 
 import { AuthController } from '../api/controllers/AuthController.js'
 import { LoginUseCase } from '../application/use_cases/LoginUseCase.js'

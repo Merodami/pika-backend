@@ -1,6 +1,19 @@
+import { createPDFServer } from '@pdf/server.js'
+import { MemoryCacheService } from '@pika/redis'
+import type { VoucherBookDomain } from '@pika/sdk'
+import { logger } from '@pika/shared'
+import type { AuthTestClient, E2EAuthHelper } from '@pika/tests'
+import {
+  cleanupTestDatabase,
+  clearTestDatabase,
+  createE2EAuthHelper,
+  createTestDatabase,
+} from '@pika/tests'
+import type { PrismaClient } from '@prisma/client'
+import type { Express } from 'express'
+import { v4 as uuid } from 'uuid'
 import {
   afterAll,
-  afterEach,
   beforeAll,
   beforeEach,
   describe,
@@ -8,29 +21,13 @@ import {
   it,
   vi,
 } from 'vitest'
-import supertest from 'supertest'
-import type { Express } from 'express'
-import type { PrismaClient } from '@prisma/client'
-import { v4 as uuid } from 'uuid'
-
-import type { AuthTestClient, E2EAuthHelper } from '@pika/tests'
-import {
-  createE2EAuthHelper,
-  createTestDatabase,
-  cleanupTestDatabase,
-  clearTestDatabase,
-} from '@pika/tests'
-import { MemoryCacheService } from '@pika/redis'
-import { logger } from '@pika/shared'
-
-import { createPDFServer } from '@pdf/server.js'
-import type { VoucherBookDomain } from '@pika/sdk'
 
 // Mock VoucherServiceClient to avoid BaseServiceClient dependency
 vi.mock('@pdf/services/VoucherServiceClient.js', () => ({
   VoucherServiceClient: class MockVoucherServiceClient {
     async getVouchersByIds(ids: string[]) {
       const vouchers = new Map()
+
       for (const id of ids) {
         vouchers.set(id, {
           id,
@@ -43,6 +40,7 @@ vi.mock('@pdf/services/VoucherServiceClient.js', () => ({
           expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         })
       }
+
       return vouchers
     }
 
@@ -92,6 +90,7 @@ describe('PDF Voucher Book Integration Tests', () => {
 
     // 3. Create mock cache service
     const mockCacheService = new MemoryCacheService(3600)
+
     await mockCacheService.connect()
 
     // 4. Create server
@@ -252,6 +251,7 @@ describe('PDF Voucher Book Integration Tests', () => {
       beforeEach(async () => {
         // Create test books
         createdBooks = []
+
         for (let month = 1; month <= 3; month++) {
           const response = await adminClient
             .post('/api/admin/pdf/voucher-books')
@@ -263,6 +263,7 @@ describe('PDF Voucher Book Integration Tests', () => {
               totalPages: 24,
             })
             .expect(201)
+
           createdBooks.push(response.body.data)
         }
       })
@@ -343,6 +344,7 @@ describe('PDF Voucher Book Integration Tests', () => {
             totalPages: 20,
           })
           .expect(201)
+
         voucherBook = response.body.data
       })
 
@@ -368,6 +370,7 @@ describe('PDF Voucher Book Integration Tests', () => {
 
       it('should return 404 for non-existent book', async () => {
         const fakeId = uuid()
+
         await adminClient
           .put(`/api/admin/pdf/voucher-books/${fakeId}`)
           .send({ title: 'Updated' })
@@ -398,6 +401,7 @@ describe('PDF Voucher Book Integration Tests', () => {
             totalPages: 24,
           })
           .expect(201)
+
         voucherBook = response.body.data
       })
 
@@ -439,6 +443,7 @@ describe('PDF Voucher Book Integration Tests', () => {
             totalPages: 20,
           })
           .expect(201)
+
         voucherBook = response.body.data
       })
 
@@ -482,6 +487,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           totalPages: 24,
         })
         .expect(201)
+
       voucherBook = response.body.data
     })
 
@@ -600,6 +606,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           totalPages: 24,
         })
         .expect(201)
+
       voucherBook = bookResponse.body.data
 
       // Create page
@@ -607,6 +614,7 @@ describe('PDF Voucher Book Integration Tests', () => {
         .post(`/api/admin/pdf/voucher-books/${voucherBook.id}/pages`)
         .send({ pageNumber: 2, layoutType: 'STANDARD' })
         .expect(201)
+
       page = pageResponse.body.data
     })
 
@@ -725,6 +733,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           totalPages: 24,
         })
         .expect(201)
+
       voucherBook = bookResponse.body.data
 
       // Publish it
@@ -809,6 +818,7 @@ describe('PDF Voucher Book Integration Tests', () => {
             contactEmail: 'jane@business.com',
           })
           .expect(201)
+
         distribution = response.body.data
       })
 
@@ -844,6 +854,7 @@ describe('PDF Voucher Book Integration Tests', () => {
             contactName: 'Bob Manager',
           })
           .expect(201)
+
         distribution = createResponse.body.data
 
         // Ship it
@@ -976,6 +987,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           totalPages: 24,
         })
         .expect(201)
+
       draftBook = draftResponse.body.data
 
       // Create and publish book
@@ -990,6 +1002,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           pdfUrl: 'https://example.com/published-book.pdf',
         })
         .expect(201)
+
       publishedBook = publishResponse.body.data
 
       await adminClient
@@ -1169,5 +1182,6 @@ function getMonthName(month: number): string {
     'November',
     'December',
   ]
+
   return months[month - 1]
 }

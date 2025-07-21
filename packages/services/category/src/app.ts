@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client'
 import { CATEGORY_SERVICE_PORT, REDIS_PASSWORD } from '@pika/environment'
 import { startServer } from '@pika/http'
 import {
@@ -8,6 +7,7 @@ import {
 } from '@pika/redis'
 import { logger } from '@pika/shared'
 import { createTranslationService, TranslationClient } from '@pika/translation'
+import { PrismaClient } from '@prisma/client'
 import { Redis } from 'ioredis'
 
 import { createCategoryServer } from './server.js'
@@ -18,6 +18,7 @@ async function initializeDatabase(): Promise<PrismaClient> {
   try {
     await prisma.$queryRaw`SELECT 1`
     logger.info('Successfully connected to PostgreSQL database')
+
     return prisma
   } catch (error) {
     logger.error('Failed to connect to PostgreSQL database:', error)
@@ -38,6 +39,7 @@ export async function startCategoryService(): Promise<void> {
     // Create translation service and client
     // Use the same Redis configuration as the cache service
     const redisConfig = RedisConfigService.getInstance().getConfig()
+
     translationRedis = new Redis({
       host: redisConfig.host,
       port: redisConfig.port,

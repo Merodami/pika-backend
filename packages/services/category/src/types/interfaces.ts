@@ -63,52 +63,64 @@ export interface ICategoryService {
   /**
    * Get all categories
    */
-  getAll(params: CategorySearchParams): Promise<PaginatedResult<Category>>
+  getAllCategories(
+    params: CategorySearchParams,
+  ): Promise<PaginatedResult<Category>>
 
   /**
    * Get category by ID
    */
-  getById(id: string): Promise<Category>
+  getCategoryById(id: string): Promise<Category>
 
   /**
    * Get multiple categories by IDs
    */
-  getByIds(ids: string[]): Promise<Category[]>
+  getCategoriesByIds(ids: string[]): Promise<Category[]>
 
   /**
    * Create new category
    */
-  create(data: CreateCategoryData): Promise<Category>
+  createCategory(data: CreateCategoryData): Promise<Category>
 
   /**
    * Update category
    */
-  update(id: string, data: UpdateCategoryData): Promise<Category>
+  updateCategory(id: string, data: UpdateCategoryData): Promise<Category>
 
   /**
    * Delete category
    */
-  delete(id: string): Promise<void>
+  deleteCategory(id: string): Promise<void>
+
+  /**
+   * Toggle category active status
+   */
+  toggleCategoryStatus(id: string): Promise<Category>
+
+  /**
+   * Move category to new parent
+   */
+  moveCategory(id: string, newParentId: string | null): Promise<Category>
+
+  /**
+   * Update category sort order
+   */
+  updateCategorySortOrder(id: string, sortOrder: number): Promise<Category>
 
   /**
    * Check if category exists and is active
    */
-  exists(id: string): Promise<boolean>
+  categoryExists(id: string): Promise<boolean>
 
   /**
    * Get category hierarchy
    */
-  getHierarchy(rootId?: string): Promise<Category[]>
+  getCategoryHierarchy(rootId?: string | null): Promise<Category[]>
 
   /**
    * Get category path (breadcrumb)
    */
-  getPath(id: string): Promise<Category[]>
-
-  /**
-   * Validate category IDs
-   */
-  validateIds(ids: string[]): Promise<ValidationResult>
+  getCategoryPath(id: string): Promise<Category[]>
 }
 
 // ============= Domain Types =============
@@ -127,7 +139,7 @@ export interface Category {
   createdBy: string
   updatedBy?: string
   createdAt: Date
-  updatedAt: Date
+  updatedAt: Date | null
   children?: Category[]
 }
 
@@ -141,8 +153,8 @@ export interface CategorySearchParams {
   createdBy?: string
   page?: number
   limit?: number
-  sortBy?: 'NAME' | 'SORT_ORDER' | 'CREATED_AT' | 'UPDATED_AT'
-  sortOrder?: 'ASC' | 'DESC'
+  sortBy?: 'name' | 'sortOrder' | 'createdAt' | 'updatedAt'
+  sortOrder?: 'asc' | 'desc'
 }
 
 /**

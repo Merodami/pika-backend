@@ -1,5 +1,3 @@
-import { z } from 'zod'
-
 // Updated imports to use @api paths
 import type { ZodRegistry } from '@api/common/registry/base.js'
 import * as adminBusinessSchemas from '@api/schemas/business/admin/management.js'
@@ -14,6 +12,7 @@ import * as adminSupportSchemas from '@api/schemas/support/admin/tickets.js'
 import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
 import * as adminUserSchemas from '@api/schemas/user/admin/index.js'
 import * as userVerificationSchemas from '@api/schemas/user/public/verification.js'
+import { z } from 'zod'
 
 /**
  * Register all admin API schemas and routes

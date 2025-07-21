@@ -1,5 +1,3 @@
-import type { Business, User, Category } from '@pika/database'
-
 /**
  * Business domain interfaces
  */
@@ -52,9 +50,4 @@ export interface UpdateBusinessData {
   categoryId?: string
   verified?: boolean
   active?: boolean
-}
-
-export interface BusinessWithRelations extends Business {
-  user?: User | null
-  category?: Category | null
 }

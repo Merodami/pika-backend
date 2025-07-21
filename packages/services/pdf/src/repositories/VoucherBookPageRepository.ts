@@ -1,12 +1,11 @@
-import type { PrismaClient } from '@prisma/client'
-import { Prisma } from '@prisma/client'
-
-import { ErrorFactory, logger } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
 import type { VoucherBookPageDomain } from '@pika/sdk'
 import { VoucherBookPageMapper } from '@pika/sdk'
-import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 /**
  * Voucher book page repository interface
@@ -108,12 +107,13 @@ export class VoucherBookPageRepository implements IVoucherBookPageRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError(
+          throw ErrorFactory.resourceConflict(
+            'VoucherBookPage',
             'Page number already exists for this book',
           )
         }
         if (error.code === 'P2003') {
-          throw ErrorFactory.badRequestError('Invalid book ID')
+          throw ErrorFactory.badRequest('Invalid book ID')
         }
       }
       throw ErrorFactory.databaseError('create', 'VoucherBookPage', error)
@@ -220,6 +220,7 @@ export class VoucherBookPageRepository implements IVoucherBookPageRepository {
 
       // Build order by clause
       const orderBy: Prisma.VoucherBookPageOrderByWithRelationInput = {}
+
       if (sortBy === 'pageNumber') {
         orderBy.pageNumber = sortOrder
       } else if (sortBy === 'layoutType') {
@@ -281,7 +282,8 @@ export class VoucherBookPageRepository implements IVoucherBookPageRepository {
           throw ErrorFactory.resourceNotFound('VoucherBookPage', id)
         }
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError(
+          throw ErrorFactory.resourceConflict(
+            'VoucherBookPage',
             'Page number already exists for this book',
           )
         }

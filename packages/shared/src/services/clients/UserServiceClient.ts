@@ -1,6 +1,6 @@
 import { USER_API_URL } from '@pika/environment'
-import type { ServiceContext } from '@pika/types'
 import type { UserDomain } from '@pika/sdk'
+import type { ServiceContext } from '@pika/types'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 

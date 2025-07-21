@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import { CategorySortBy, SortOrder } from '../../shared/enums.js'
+import { CategorySortBy } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { openapi } from '../../../common/utils/openapi.js'
 
 /**
  * Admin category management schemas
@@ -175,6 +175,22 @@ export const MoveCategoryRequest = openapi(
 )
 
 export type MoveCategoryRequest = z.infer<typeof MoveCategoryRequest>
+
+/**
+ * Update category sort order request
+ */
+export const UpdateCategorySortOrderRequest = openapi(
+  z.object({
+    sortOrder: z.number().int().describe('New sort order value'),
+  }),
+  {
+    description: 'Update category sort order',
+  },
+)
+
+export type UpdateCategorySortOrderRequest = z.infer<
+  typeof UpdateCategorySortOrderRequest
+>
 
 /**
  * Toggle category activation request

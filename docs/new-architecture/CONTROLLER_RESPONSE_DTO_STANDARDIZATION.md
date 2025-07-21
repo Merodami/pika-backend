@@ -22,15 +22,19 @@ After analyzing multiple service controllers, I found that controllers are incor
 ## Industry Standard Pattern Analysis
 
 ### Pattern 1: Direct DTO Usage (Not Applicable)
+
 The API schemas use Zod, which defines validation schemas, not TypeScript types directly. We cannot simply return these as responses.
 
 ### Pattern 2: Mapper Pattern (Current SDK Pattern)
+
 The SDK provides mappers (e.g., `VoucherMapper.toDTO()`) that transform domain objects to DTOs. However, this pattern has limitations:
+
 - Returns generic DTOs, not specific response types
 - Doesn't handle response-specific fields (e.g., pagination, metadata)
 - No validation against the actual API schema
 
 ### Pattern 3: Response Builder Pattern (Recommended)
+
 Industry best practice for typed API responses with validation schemas.
 
 ## Recommended Solution: Response Builder Pattern
@@ -49,11 +53,11 @@ Industry best practice for typed API responses with validation schemas.
 // 1. Base Response Builder (in shared package)
 export abstract class BaseResponseBuilder<TSchema, TDomain> {
   abstract build(domain: TDomain): TSchema
-  
+
   buildList(domains: TDomain[], pagination?: Pagination): any {
     throw new Error('buildList must be implemented by subclass')
   }
-  
+
   protected validate<T>(schema: ZodSchema<T>, data: unknown): T {
     return schema.parse(data)
   }
@@ -67,16 +71,16 @@ export class CategoryResponseBuilder extends BaseResponseBuilder<CategoryRespons
       nameKey: domain.nameKey,
       // ... map all fields according to CategoryResponse schema
     }
-    
+
     return this.validate(CategoryResponse, response)
   }
-  
+
   buildList(domains: CategoryDomain[], pagination: Pagination): CategoryListResponse {
     const response = {
-      data: domains.map(domain => this.build(domain)),
-      pagination
+      data: domains.map((domain) => this.build(domain)),
+      pagination,
     }
-    
+
     return this.validate(CategoryListResponse, response)
   }
 }
@@ -85,9 +89,9 @@ export class CategoryResponseBuilder extends BaseResponseBuilder<CategoryRespons
 export class CategoryController {
   constructor(
     private readonly service: ICategoryService,
-    private readonly responseBuilder: CategoryResponseBuilder
+    private readonly responseBuilder: CategoryResponseBuilder,
   ) {}
-  
+
   async getCategory(req: Request, res: Response, next: NextFunction) {
     try {
       const category = await this.service.getCategory(req.params.id)
@@ -107,7 +111,7 @@ export class CategoryController {
 async getAllItems(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await this.service.getAllItems(params)
-    
+
     // Manual construction - NO TYPE SAFETY!
     res.json({
       data: result.data.map(item => ({
@@ -126,7 +130,7 @@ async getAllItems(req: Request, res: Response, next: NextFunction) {
 async getAllItems(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await this.service.getAllItems(params)
-    
+
     // Type-safe, validated response
     const response = this.responseBuilder.buildList(
       result.data,
@@ -164,6 +168,7 @@ async getAllItems(req: Request, res: Response, next: NextFunction) {
 For each service, create response builders following this structure:
 
 1. **Service Builder Structure**
+
    ```
    packages/services/[service-name]/src/builders/
    ├── [Service]ResponseBuilder.ts      # Public API responses
@@ -178,27 +183,19 @@ For each service, create response builders following this structure:
    - Internal: `Internal{Service}ResponseBuilder`
 
 3. **CRITICAL: Import Schemas from Correct API Tier**
+
    ```typescript
    // ✅ CORRECT - Public builder uses public schemas
    import { voucherPublic } from '@pika/api'
-   export class VoucherResponseBuilder extends BaseResponseBuilder<
-     voucherPublic.VoucherResponse,
-     VoucherDomain
-   > { }
+   export class VoucherResponseBuilder extends BaseResponseBuilder<voucherPublic.VoucherResponse, VoucherDomain> {}
 
    // ✅ CORRECT - Admin builder uses admin schemas
    import { voucherAdmin } from '@pika/api'
-   export class AdminVoucherResponseBuilder extends BaseResponseBuilder<
-     voucherAdmin.AdminVoucherDetailResponse,
-     VoucherDomain
-   > { }
+   export class AdminVoucherResponseBuilder extends BaseResponseBuilder<voucherAdmin.AdminVoucherDetailResponse, VoucherDomain> {}
 
    // ✅ CORRECT - Internal builder uses internal schemas
    import { voucherInternal } from '@pika/api'
-   export class InternalVoucherResponseBuilder extends BaseResponseBuilder<
-     voucherInternal.GetVouchersByIdsResponse,
-     VoucherDomain[]
-   > { }
+   export class InternalVoucherResponseBuilder extends BaseResponseBuilder<voucherInternal.GetVouchersByIdsResponse, VoucherDomain[]> {}
 
    // ❌ WRONG - Never mix schemas from different tiers!
    import { voucherPublic, voucherAdmin } from '@pika/api' // DON'T DO THIS!
@@ -206,10 +203,7 @@ For each service, create response builders following this structure:
 
 4. **Schema Validation Example**
    ```typescript
-   export class CategoryResponseBuilder extends BaseResponseBuilder<
-     categoryPublic.CategoryResponse,
-     CategoryDomain
-   > {
+   export class CategoryResponseBuilder extends BaseResponseBuilder<categoryPublic.CategoryResponse, CategoryDomain> {
      build(domain: CategoryDomain): categoryPublic.CategoryResponse {
        const response = {
          id: domain.id,
@@ -224,6 +218,7 @@ For each service, create response builders following this structure:
 ### Phase 3: Update Controllers
 
 1. **Inject Response Builders**
+
    ```typescript
    constructor(
      private readonly service: I{Service}Service,
@@ -232,13 +227,14 @@ For each service, create response builders following this structure:
    ```
 
 2. **Replace Manual Construction**
+
    ```typescript
    // Before
    res.json({
-     data: result.data.map(item => SomeMapper.toDTO(item)),
-     pagination: result.pagination
+     data: result.data.map((item) => SomeMapper.toDTO(item)),
+     pagination: result.pagination,
    })
-   
+
    // After
    const response = this.responseBuilder.buildList(result.data, result.pagination)
    res.json(response)
@@ -260,6 +256,7 @@ For each service, create response builders following this structure:
 ### Phase 4: Cleanup Legacy Code
 
 1. **Remove Old Mapper Imports**
+
    ```typescript
    // ❌ Remove these imports from controllers
    import { SomeMapper } from '@pika/sdk'
@@ -272,11 +269,12 @@ For each service, create response builders following this structure:
    - Keep mappers only if used for domain transformations (not API responses)
 
 3. **Update Import Statements**
+
    ```typescript
    // Before
    import { VoucherMapper } from '@pika/sdk'
    import { someHelperFunction } from '../utils/helpers.js'
-   
+
    // After - Only import what's still needed
    import { someHelperFunction } from '../utils/helpers.js'
    ```
@@ -368,6 +366,7 @@ When migrating a controller method:
 ## Implementation Guidelines
 
 ### DO's:
+
 - ✅ Always validate responses against schemas
 - ✅ Use the base builder class for common functionality
 - ✅ Create separate builders for each API tier (public/admin/internal)
@@ -376,6 +375,7 @@ When migrating a controller method:
 - ✅ Import schemas from the correct API tier package
 
 ### DON'Ts:
+
 - ❌ Don't manually construct response objects in controllers
 - ❌ Don't bypass schema validation
 - ❌ Don't mix response builders between API tiers
@@ -387,7 +387,8 @@ When migrating a controller method:
 
 ```typescript
 // ❌ WRONG - Public endpoint using admin schema
-class VoucherController { // Public controller
+class VoucherController {
+  // Public controller
   async getVoucher() {
     // This exposes admin-only fields to public users!
     return this.adminResponseBuilder.build(voucher)
@@ -395,7 +396,8 @@ class VoucherController { // Public controller
 }
 
 // ✅ CORRECT - Public endpoint using public schema
-class VoucherController { // Public controller
+class VoucherController {
+  // Public controller
   async getVoucher() {
     // Only exposes public fields
     return this.publicResponseBuilder.build(voucher)
@@ -404,19 +406,28 @@ class VoucherController { // Public controller
 
 // ❌ WRONG - Mixing schemas in one builder
 import { voucherPublic, voucherAdmin } from '@pika/api'
-class MixedResponseBuilder { // DON'T DO THIS!
-  buildPublic() { /* uses public schema */ }
-  buildAdmin() { /* uses admin schema */ }
+class MixedResponseBuilder {
+  // DON'T DO THIS!
+  buildPublic() {
+    /* uses public schema */
+  }
+  buildAdmin() {
+    /* uses admin schema */
+  }
 }
 
 // ✅ CORRECT - Separate builders for each tier
 // VoucherResponseBuilder.ts
 import { voucherPublic } from '@pika/api'
-export class VoucherResponseBuilder { /* only public schemas */ }
+export class VoucherResponseBuilder {
+  /* only public schemas */
+}
 
 // AdminVoucherResponseBuilder.ts
 import { voucherAdmin } from '@pika/api'
-export class AdminVoucherResponseBuilder { /* only admin schemas */ }
+export class AdminVoucherResponseBuilder {
+  /* only admin schemas */
+}
 ```
 
 ## Success Metrics
@@ -477,6 +488,7 @@ When reviewing controllers:
 ## Migration Examples
 
 ### Example 1: Simple GET endpoint
+
 ```typescript
 // Before
 async getItem(req: Request, res: Response) {
@@ -497,6 +509,7 @@ async getItem(req: Request, res: Response) {
 ```
 
 ### Example 2: Paginated endpoint
+
 ```typescript
 // Before
 async getItems(req: Request, res: Response) {
@@ -519,6 +532,7 @@ async getItems(req: Request, res: Response) {
 ```
 
 ### Example 3: Complex nested response
+
 ```typescript
 // Before
 async getItemWithRelations(req: Request, res: Response) {
@@ -574,6 +588,7 @@ async getItem(req: Request, res: Response, next: NextFunction) {
 ### Response Builder Responsibilities
 
 Response builders are ONLY responsible for successful responses:
+
 - ✅ 2xx responses (200 OK, 201 Created, etc.)
 - ❌ 4xx/5xx error responses (handled by error middleware)
 
@@ -588,13 +603,13 @@ describe('ItemResponseBuilder', () => {
   it('should build valid response', () => {
     const domain = createMockDomain()
     const response = builder.build(domain)
-    
+
     // Verify structure
     expect(response).toMatchObject({
       id: domain.id,
       // ... other fields
     })
-    
+
     // Verify schema validation passes
     const validated = itemPublic.ItemResponse.parse(response)
     expect(validated).toBeDefined()
@@ -603,7 +618,7 @@ describe('ItemResponseBuilder', () => {
   it('should handle null/undefined correctly', () => {
     const domain = { ...createMockDomain(), optionalField: null }
     const response = builder.build(domain)
-    
+
     expect(response.optionalField).toBeUndefined() // Not null!
   })
 })
@@ -613,10 +628,8 @@ describe('ItemResponseBuilder', () => {
 
 ```typescript
 it('should return properly formatted response', async () => {
-  const response = await request(app)
-    .get('/items/123')
-    .expect(200)
-  
+  const response = await request(app).get('/items/123').expect(200)
+
   // Verify response matches schema
   const validated = itemPublic.ItemResponse.parse(response.body)
   expect(validated.id).toBe('123')
@@ -640,12 +653,12 @@ build(domain: ItemDomain, options?: { include?: string[] }): ItemResponse {
     name: domain.name,
     // Always included fields
   }
-  
+
   // Only transform relations if requested
   if (options?.include?.includes('category')) {
     response.category = this.transformCategory(domain.category)
   }
-  
+
   return this.validate(ItemResponse, response)
 }
 ```
@@ -665,6 +678,7 @@ Consider these patterns for future iterations:
 Manual response construction is a critical anti-pattern that undermines type safety, API contracts, and maintainability. The Response Builder pattern provides a scalable, type-safe solution that ensures consistency across all services. This standardization is mandatory for all services moving forward.
 
 By following this guide, we ensure:
+
 - 🔒 **Security**: No accidental data exposure
 - 📋 **Consistency**: Uniform responses across all endpoints
 - 🎯 **Type Safety**: Full compile-time and runtime validation

@@ -82,6 +82,7 @@ export class ZodRegistry {
     // Debug logging
     if ((config as any).request?.body?.content) {
       const content = (config as any).request.body.content
+
       for (const [contentType, contentConfig] of Object.entries(content)) {
         if (!contentConfig || !(contentConfig as any).schema) {
           console.error(

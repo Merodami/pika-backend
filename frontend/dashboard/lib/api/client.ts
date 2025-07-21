@@ -164,10 +164,10 @@ export function resetApiClient() {
 // Re-export types for convenience
 export type {
   AuthResponse,
+  BusinessProfile,
   Category,
   CategoryListResponse,
   Login,
-  BusinessProfile,
   Review,
   UserProfile,
   UserRegistration,

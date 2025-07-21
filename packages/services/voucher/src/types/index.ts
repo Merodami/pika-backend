@@ -1,6 +1,6 @@
 /**
  * Voucher service types
- * 
+ *
  * Organization follows DDD principles:
  * - Domain types: Business logic and domain concepts
  * - Repository types: Data layer contracts

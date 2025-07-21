@@ -3,8 +3,8 @@ import { Cache, ICacheService } from '@pika/redis'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type {
   BookDistribution,
-  DistributionStatus,
   BusinessType,
+  DistributionStatus,
   DistributionType,
 } from '@prisma/client'
 
@@ -188,6 +188,7 @@ export class BookDistributionService implements IBookDistributionService {
       }
 
       const distribution = await this.distributionRepository.findById(id)
+
       if (!distribution) {
         throw ErrorFactory.notFound('Book distribution not found')
       }
@@ -209,6 +210,7 @@ export class BookDistributionService implements IBookDistributionService {
   ): Promise<PaginatedResult<BookDistribution>> {
     try {
       const result = await this.distributionRepository.findAll(params)
+
       return result
     } catch (error) {
       logger.error('Failed to get all distributions', { error, params })
@@ -231,6 +233,7 @@ export class BookDistributionService implements IBookDistributionService {
 
       const distributions =
         await this.distributionRepository.findByVoucherBookId(voucherBookId)
+
       return distributions
     } catch (error) {
       logger.error('Failed to get distributions by voucher book ID', {
@@ -275,6 +278,7 @@ export class BookDistributionService implements IBookDistributionService {
         id,
         updatedFields: Object.keys(data),
       })
+
       return updatedDistribution
     } catch (error) {
       logger.error('Failed to update distribution', { error, id, data })
@@ -414,6 +418,7 @@ export class BookDistributionService implements IBookDistributionService {
   async getBusinessStats(): Promise<BusinessDistributionStats[]> {
     try {
       const stats = await this.distributionRepository.getBusinessStats()
+
       return stats
     } catch (error) {
       logger.error('Failed to get business stats', { error })
@@ -433,6 +438,7 @@ export class BookDistributionService implements IBookDistributionService {
     }
 
     const voucherBook = await this.voucherBookRepository.findById(voucherBookId)
+
     if (!voucherBook) {
       throw ErrorFactory.notFound('Voucher book not found')
     }
@@ -482,6 +488,7 @@ export class BookDistributionService implements IBookDistributionService {
       }
 
     const allowed = allowedTransitions[currentStatus] || []
+
     if (!allowed.includes(newStatus)) {
       throw ErrorFactory.badRequest(
         `Invalid status transition from ${currentStatus} to ${newStatus}`,
@@ -516,12 +523,14 @@ export class BookDistributionService implements IBookDistributionService {
 
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
     return emailRegex.test(email)
   }
 
   private isValidPhone(phone: string): boolean {
     // Basic phone validation - accepts various formats
     const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/
+
     return phoneRegex.test(phone)
   }
 }

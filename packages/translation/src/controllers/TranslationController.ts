@@ -1,4 +1,5 @@
-import type { Request, Response, NextFunction } from 'express'
+import type { NextFunction,Request, Response } from 'express'
+
 import type { ITranslationService } from '../services/TranslationService.js'
 
 export class TranslationController {
@@ -19,11 +20,13 @@ export class TranslationController {
 
       if (!keys || !Array.isArray(keys)) {
         res.status(400).json({ error: 'Keys must be an array' })
+
         return
       }
 
       if (!language || typeof language !== 'string') {
         res.status(400).json({ error: 'Language is required' })
+
         return
       }
 
@@ -45,6 +48,7 @@ export class TranslationController {
 
       if (!key || !language || !value) {
         res.status(400).json({ error: 'Key, language, and value are required' })
+
         return
       }
 
@@ -86,6 +90,7 @@ export class TranslationController {
 
       if (!userId || !language) {
         res.status(400).json({ error: 'UserId and language are required' })
+
         return
       }
 

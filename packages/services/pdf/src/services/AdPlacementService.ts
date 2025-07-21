@@ -7,7 +7,7 @@ import type {
   IAdPlacementRepository,
   IVoucherBookRepository,
 } from '../repositories/index.js'
-import { PageLayoutEngine, AdSize } from './PageLayoutEngine.js'
+import { AdSize,PageLayoutEngine } from './PageLayoutEngine.js'
 
 export interface CreateAdPlacementData {
   voucherBookId: string
@@ -119,6 +119,7 @@ export class AdPlacementService implements IAdPlacementService {
         data.voucherBookId,
         data.position,
       )
+
       if (!validation.isValid) {
         throw ErrorFactory.badRequest(
           `Placement validation failed: ${validation.errors.join(', ')}`,
@@ -164,6 +165,7 @@ export class AdPlacementService implements IAdPlacementService {
       }
 
       const placement = await this.placementRepository.findById(id)
+
       if (!placement) {
         throw ErrorFactory.notFound('Ad placement not found')
       }
@@ -190,6 +192,7 @@ export class AdPlacementService implements IAdPlacementService {
 
       const placements =
         await this.placementRepository.findByVoucherBookId(voucherBookId)
+
       return placements
     } catch (error) {
       logger.error('Failed to get ad placements by voucher book ID', {
@@ -221,6 +224,7 @@ export class AdPlacementService implements IAdPlacementService {
           data.position,
           id, // Exclude current placement from conflict check
         )
+
         if (!validation.isValid) {
           throw ErrorFactory.badRequest(
             `Position validation failed: ${validation.errors.join(', ')}`,
@@ -246,6 +250,7 @@ export class AdPlacementService implements IAdPlacementService {
         id,
         updatedFields: Object.keys(data),
       })
+
       return updatedPlacement
     } catch (error) {
       logger.error('Failed to update ad placement', { error, id, data })
@@ -384,6 +389,7 @@ export class AdPlacementService implements IAdPlacementService {
         voucherBookId,
         position,
       })
+
       return {
         isValid: false,
         errors: ['Validation failed due to internal error'],
@@ -412,6 +418,7 @@ export class AdPlacementService implements IAdPlacementService {
 
       for (const position of positionsToTest) {
         const validation = await this.validatePlacement(voucherBookId, position)
+
         if (validation.isValid) {
           suggestions.push(position)
         }
@@ -441,6 +448,7 @@ export class AdPlacementService implements IAdPlacementService {
     voucherBookId: string,
   ): Promise<void> {
     const voucherBook = await this.voucherBookRepository.findById(voucherBookId)
+
     if (!voucherBook) {
       throw ErrorFactory.notFound('Voucher book not found')
     }
@@ -489,6 +497,7 @@ export class AdPlacementService implements IAdPlacementService {
       ...existingPlacements.map((p) => p.displayOrder),
       0,
     )
+
     return maxOrder + 1
   }
 
@@ -507,6 +516,7 @@ export class AdPlacementService implements IAdPlacementService {
       HALF: 'HALF',
       FULL: 'FULL',
     }
+
     return mapping[position] || 'SINGLE'
   }
 
@@ -569,6 +579,7 @@ export class AdPlacementService implements IAdPlacementService {
     return suggestions.sort((a, b) => {
       const aIndex = preferredOrder.indexOf(a)
       const bIndex = preferredOrder.indexOf(b)
+
       return aIndex - bIndex
     })
   }

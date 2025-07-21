@@ -3,7 +3,6 @@ import { z } from 'zod'
 
 // Import our schemas to test compilation
 import {
-  ZodRegistry,
   DateTime,
   Email,
   ErrorResponse,
@@ -13,6 +12,7 @@ import {
   UserId,
   UUID,
   validate,
+  ZodRegistry,
 } from '../index.js'
 import { TokenRequest, TokenResponse } from '../schemas/auth/public/oauth.js'
 

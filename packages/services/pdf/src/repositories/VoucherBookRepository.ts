@@ -1,12 +1,11 @@
-import type { PrismaClient } from '@prisma/client'
-import { Prisma } from '@prisma/client'
-
-import { ErrorFactory, logger } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
 import type { VoucherBookDomain } from '@pika/sdk'
 import { VoucherBookMapper } from '@pika/sdk'
-import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 /**
  * Voucher book repository interface
@@ -140,7 +139,8 @@ export class VoucherBookRepository implements IVoucherBookRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError(
+          throw ErrorFactory.resourceConflict(
+            'VoucherBook',
             'Voucher book with this title and year already exists',
           )
         }
@@ -261,6 +261,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
 
       // Build order by clause
       const orderBy: Prisma.VoucherBookOrderByWithRelationInput = {}
+
       if (sortBy === 'title') {
         orderBy.title = sortOrder
       } else if (sortBy === 'year') {
@@ -335,7 +336,8 @@ export class VoucherBookRepository implements IVoucherBookRepository {
           throw ErrorFactory.resourceNotFound('VoucherBook', id)
         }
         if (error.code === 'P2002') {
-          throw ErrorFactory.conflictError(
+          throw ErrorFactory.resourceConflict(
+            'VoucherBook',
             'Voucher book with this title and year already exists',
           )
         }
@@ -372,6 +374,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
   ): Promise<VoucherBookDomain[]> {
     try {
       const where: Prisma.VoucherBookWhereInput = { year }
+
       if (month) {
         where.month = month
       }
@@ -450,6 +453,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
 
       // Build order by clause
       const orderBy: Prisma.VoucherBookOrderByWithRelationInput = {}
+
       if (sortBy === 'title') {
         orderBy.title = sortOrder
       } else if (sortBy === 'year') {

@@ -1,16 +1,16 @@
 import { z } from 'zod'
 
-import { UUID } from '../../shared/primitives.js'
-import { SearchParams } from '../../shared/pagination.js'
-import { paginatedResponse } from '../../shared/responses.js'
-import { withTimestamps } from '../../shared/metadata.js'
 import { openapi } from '../../../common/utils/openapi.js'
+import { withTimestampsString } from '../../shared/metadata.js'
+import { SearchParams } from '../../shared/pagination.js'
+import { UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import {
-  VoucherStateSchema,
-  VoucherDiscountTypeSchema,
   VoucherCodeTypeSchema,
+  VoucherDiscountTypeSchema,
   VoucherScanSourceSchema,
   VoucherSortBy,
+  VoucherStateSchema,
 } from '../common/enums.js'
 import {
   GeographicSearchParams,
@@ -42,7 +42,7 @@ export type VoucherCodeResponse = z.infer<typeof VoucherCodeResponse>
 // ============= Voucher Response =============
 
 export const VoucherResponse = openapi(
-  withTimestamps({
+  withTimestampsString({
     id: UUID,
     businessId: UUID,
     categoryId: UUID,
@@ -92,6 +92,24 @@ export const VoucherQueryParams = SearchParams.merge(GeographicSearchParams)
       .min(0)
       .optional()
       .describe('Maximum discount value'),
+    minValue: z.number().min(0).optional().describe('Minimum voucher value'),
+    maxValue: z.number().min(0).optional().describe('Maximum voucher value'),
+    type: z.string().optional().describe('Voucher type filter'),
+    currency: z.string().optional().describe('Filter by currency'),
+    validFrom: z
+      .string()
+      .datetime()
+      .optional()
+      .describe('Valid from date filter'),
+    validUntil: z
+      .string()
+      .datetime()
+      .optional()
+      .describe('Valid until date filter'),
+    include: z
+      .string()
+      .optional()
+      .describe('Comma-separated relations to include'),
 
     // Additional public filters
     hasAvailableUses: z

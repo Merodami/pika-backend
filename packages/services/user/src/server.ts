@@ -1,11 +1,11 @@
 // Load environment variables first
 import '@pika/environment'
 
-import { PrismaClient } from '@prisma/client'
 import { USER_SERVICE_NAME, USER_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import { ICacheService } from '@pika/redis'
 import { FileStoragePort, logger } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
 
 import { createAdminUserRouter } from './routes/AdminUserRoutes.js'
 import { createInternalUserRouter } from './routes/InternalUserRoutes.js'

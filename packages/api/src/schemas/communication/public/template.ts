@@ -1,16 +1,16 @@
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { activeStatus, withTimestamps } from '../../shared/metadata.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { SearchParams } from '../../shared/pagination.js'
-import { openapi } from '../../../common/utils/openapi.js'
 import {
-  TemplateType,
-  TemplateCategory,
-  TemplateVariableType,
-  TemplateSortBy,
   EmailPriority,
+  TemplateCategory,
+  TemplateSortBy,
+  TemplateType,
+  TemplateVariableType,
 } from '../common/enums.js'
 
 /**

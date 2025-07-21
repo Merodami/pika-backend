@@ -1,10 +1,10 @@
 import type { ICacheService } from '@pika/redis'
+import { Cache } from '@pika/redis'
 import type {
   CreateNotificationDTO,
   NotificationDomain,
   UpdateNotificationDTO,
 } from '@pika/sdk'
-import { Cache } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 

@@ -1,6 +1,7 @@
 # Voucher Service Architecture Validation Report
 
 ## Overview
+
 This document tracks the comprehensive validation of the voucher service architecture, covering all layers (Public, Admin, Internal) and checking for proper type usage, implementation completeness, and architectural consistency.
 
 ## Validation Status
@@ -8,30 +9,39 @@ This document tracks the comprehensive validation of the voucher service archite
 ### 1. Repository Layer
 
 #### VoucherRepository (Public) ❌
+
 **Issues Found:**
+
 - **Type Definition Location**: `VoucherSearchParams`, `CreateVoucherData`, and `UpdateVoucherData` are defined directly in the repository file (lines 23-68) instead of being imported from `../types/index.js`
 - **Type Mismatch**: The `CreateVoucherData` in repository doesn't match the one in `types/repository.ts`:
   - Repository version has: `titleKey`, `descriptionKey`, `termsAndConditionsKey`, `qrCode`, `state`, `redemptionsCount`
   - Types version has: `nameKey`, `descriptionKey`, `termsKey`, `categoryId`, `createdBy`, `discountType`, `discountValue`, etc.
 
 #### AdminVoucherRepository ❌
+
 **Issues Found:**
+
 - **Import Source**: Importing types from `./VoucherRepository.js` instead of `../types/index.js` (lines 13-17)
 - **Type Dependency**: Depends on types defined in VoucherRepository which should be centralized
 
 #### InternalVoucherRepository ✅
+
 **Status**: Appears correct - imports types from `../types/index.js`
 
 ### 2. Service Layer
 
 #### VoucherService (Public) ❌
+
 **Issues Found:**
+
 - **Type Definition**: `VoucherClaimData` and `VoucherRedeemData` defined in service (lines 37-51) instead of imported from types
 - **Inline Types**: `getUserVouchers` method uses inline type definition instead of `UserVoucherSearchParams`
 - **Import Missing**: Should import domain types from `../types/index.js`
 
 #### AdminVoucherService ❌
+
 **Issues Found:**
+
 - **Import Source**: Importing types from `../repositories/AdminVoucherRepository.js` (lines 19-24) instead of `../types/index.js`
 - **Type Duplication**: Defines its own types that should be in types folder:
   - `BulkUpdateData` (lines 27-30)
@@ -43,7 +53,9 @@ This document tracks the comprehensive validation of the voucher service archite
 - **Interface Design**: Uses proper interface design but types should be centralized
 
 #### InternalVoucherService ✅
+
 **Status**: Correctly implemented
+
 - Imports types from `../types/index.js`
 - Re-exports types for external use
 - Properly implements all interface methods
@@ -52,7 +64,9 @@ This document tracks the comprehensive validation of the voucher service archite
 ### 3. Controller Layer
 
 #### VoucherController (Public) ✅
+
 **Status**: Mostly correct with minor observations
+
 - Uses proper API schemas from `@pika/api`
 - Correctly transforms data using mappers
 - Properly implements caching decorators
@@ -60,14 +74,18 @@ This document tracks the comprehensive validation of the voucher service archite
 - **Note**: Building params object manually instead of using mapper pattern
 
 #### AdminVoucherController ✅
+
 **Status**: Correctly implemented
+
 - Uses proper API schemas
 - Implements all CRUD operations
 - Uses `paginatedResponse` helper
 - Proper error handling
 
 #### InternalVoucherController ✅
+
 **Status**: Correctly implemented after refactoring
+
 - No longer depends on IVoucherService (avoiding circular dependency)
 - Uses IInternalVoucherService exclusively
 - Properly handles `parsedIncludes` parameter
@@ -76,7 +94,9 @@ This document tracks the comprehensive validation of the voucher service archite
 ## Type Inconsistencies Found
 
 ### CreateVoucherData Mismatch
+
 **In VoucherRepository.ts:**
+
 ```typescript
 export interface CreateVoucherData {
   businessId: string
@@ -97,6 +117,7 @@ export interface CreateVoucherData {
 ```
 
 **In types/repository.ts:**
+
 ```typescript
 export interface CreateVoucherData {
   businessId: string
@@ -124,7 +145,9 @@ export interface CreateVoucherData {
 ```
 
 ### UpdateVoucherData Mismatch
+
 **In VoucherRepository.ts:**
+
 ```typescript
 export interface UpdateVoucherData {
   value?: number
@@ -138,6 +161,7 @@ export interface UpdateVoucherData {
 ```
 
 **In types/repository.ts:**
+
 ```typescript
 export interface UpdateVoucherData {
   nameKey?: string
@@ -165,20 +189,26 @@ export interface UpdateVoucherData {
 ## 4. Route Layer Analysis
 
 ### VoucherRoutes (Public) ❌
+
 **Status**: Missing dependencies
+
 - Properly initializes repositories and services
 - Correctly passes InternalVoucherService to VoucherService
 - **Issue**: Not passing UserServiceClient and BusinessServiceClient to VoucherService
 - These clients are defined as optional in VoucherService but may be needed for full functionality
 
 ### AdminVoucherRoutes ✅
+
 **Status**: Correctly wired
+
 - Properly initializes AdminVoucherRepository and AdminVoucherService
 - All dependencies properly injected
 - Uses requireAdmin() middleware
 
 ### InternalVoucherRoutes ✅
+
 **Status**: Correctly wired
+
 - Properly initializes both repositories (internal and public)
 - Correctly passes publicRepository to InternalVoucherService
 - Uses requireApiKey() middleware
@@ -186,16 +216,19 @@ export interface UpdateVoucherData {
 ## Summary of Issues Found
 
 ### Critical Issues:
+
 1. **Type Definition Duplication**: Types are defined in multiple places instead of centralized in `/types`
 2. **Type Inconsistencies**: CreateVoucherData and UpdateVoucherData have different fields in different files
 3. **Import Pattern Issues**: Services and repositories importing types from each other instead of from `/types`
 
 ### Medium Issues:
+
 1. **Inline Type Definitions**: Some methods use inline types instead of defined interfaces
 2. **Missing Type Exports**: Some types are defined but not properly exported
 3. **Inconsistent Naming**: Some types use different naming conventions
 
 ### Minor Issues:
+
 1. **Manual Parameter Mapping**: Controllers build params objects manually instead of using mappers
 2. **Mixed Type Sources**: Some files import from repository files instead of centralized types
 
@@ -227,6 +260,7 @@ export interface UpdateVoucherData {
 ## Detailed Implementation Status
 
 ### What's Working Well:
+
 1. **Clean Architecture**: The three-tier separation (Public/Admin/Internal) is properly implemented
 2. **Service Communication**: InternalVoucherService pattern is correctly implemented
 3. **Repository Pattern**: All repositories follow the correct interface pattern
@@ -236,6 +270,7 @@ export interface UpdateVoucherData {
 7. **Caching**: Proper use of caching decorators
 
 ### What Needs Fixing:
+
 1. **Type Organization**: Move all types to `/types` folder
 2. **Type Consistency**: Align CreateVoucherData and UpdateVoucherData across files
 3. **Import Patterns**: Update all imports to use centralized types
@@ -243,6 +278,7 @@ export interface UpdateVoucherData {
 5. **Parameter Mapping**: Consider using mappers instead of manual param building
 
 ### Migration Priority:
+
 1. **High**: Fix type inconsistencies (blocking issue)
 2. **High**: Centralize all type definitions
 3. **Medium**: Update import patterns

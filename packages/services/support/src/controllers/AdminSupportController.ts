@@ -1,7 +1,7 @@
 import { supportAdmin, supportCommon } from '@pika/api'
+import { getValidatedQuery } from '@pika/http'
 import type { ProblemDomain } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
-import { getValidatedQuery } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IProblemService } from '../services/ProblemService.js'
@@ -77,7 +77,9 @@ export class AdminSupportController {
         page: params.page,
         limit: params.limit,
         sortBy: params.sortBy,
-        sortOrder: params.sortOrder,
+        sortOrder: params.sortOrder
+          ? (params.sortOrder.toUpperCase() as 'ASC' | 'DESC')
+          : undefined,
         parsedIncludes,
       })
 
@@ -134,7 +136,11 @@ export class AdminSupportController {
    * Update ticket status
    */
   async updateTicketStatus(
-    req: Request<supportCommon.TicketIdParam, {}, supportAdmin.UpdateTicketStatusRequest>,
+    req: Request<
+      supportCommon.TicketIdParam,
+      {},
+      supportAdmin.UpdateTicketStatusRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -156,7 +162,11 @@ export class AdminSupportController {
    * Assign ticket to admin user
    */
   async assignTicket(
-    req: Request<supportCommon.TicketIdParam, {}, supportAdmin.AssignTicketRequest>,
+    req: Request<
+      supportCommon.TicketIdParam,
+      {},
+      supportAdmin.AssignTicketRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

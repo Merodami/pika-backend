@@ -1,9 +1,10 @@
-import { subscriptionInternal } from '@pika/api'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
+import type { NextFunction, Request, Response } from 'express'
+
 import type { ISubscriptionRepository } from '../repositories/SubscriptionRepository.js'
 import type { ISubscriptionService } from '../services/SubscriptionService.js'
-import type { NextFunction, Request, Response } from 'express'
+import { TEMPLATE_KEYS } from '../types/constants.js'
 
 /**
  * Handles internal subscription operations for service-to-service communication
@@ -28,7 +29,11 @@ export class InternalSubscriptionController {
    * Process subscription webhook events
    */
   async processWebhook(
-    request: Request<unknown, unknown, subscriptionInternal.ProcessSubscriptionWebhookRequest>,
+    request: Request<
+      unknown,
+      unknown,
+      subscriptionInternal.ProcessSubscriptionWebhookRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -89,7 +94,11 @@ export class InternalSubscriptionController {
    * Update subscription from payment service
    */
   async updateFromPayment(
-    request: Request<unknown, unknown, subscriptionInternal.UpdateSubscriptionFromPaymentRequest>,
+    request: Request<
+      unknown,
+      unknown,
+      subscriptionInternal.UpdateSubscriptionFromPaymentRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -133,7 +142,11 @@ export class InternalSubscriptionController {
    * Check subscription access for features
    */
   async checkAccess(
-    request: Request<unknown, unknown, subscriptionInternal.CheckSubscriptionAccessRequest>,
+    request: Request<
+      unknown,
+      unknown,
+      subscriptionInternal.CheckSubscriptionAccessRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -273,7 +286,11 @@ export class InternalSubscriptionController {
    * Send subscription notification
    */
   async sendNotification(
-    request: Request<unknown, unknown, subscriptionInternal.SendSubscriptionNotificationRequest>,
+    request: Request<
+      unknown,
+      unknown,
+      subscriptionInternal.SendSubscriptionNotificationRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -283,26 +300,26 @@ export class InternalSubscriptionController {
       logger.info('Sending subscription notification', { userId, type })
 
       // Map notification type to template key
-      let templateKey: string
+      let templateKey: z.infer<typeof communicationCommon.TemplateKey>
 
       switch (type) {
-        case 'CREATED':
-          templateKey = 'SUBSCRIPTION_ACTIVATED'
+        case 'created':
+          templateKey = TEMPLATE_KEYS.SUBSCRIPTION_ACTIVATED
           break
-        case 'CANCELLED':
-          templateKey = 'subscription-cancelled'
+        case 'cancelled':
+          templateKey = TEMPLATE_KEYS.SUBSCRIPTION_CANCELLED
           break
-        case 'PAYMENT_FAILED':
-          templateKey = 'PAYMENT_FAILED'
+        case 'paymentFailed':
+          templateKey = TEMPLATE_KEYS.PAYMENT_FAILED
           break
-        case 'CREDITS_ALLOCATED':
-          templateKey = 'subscription-credits-allocated'
+        case 'creditsAllocated':
+          templateKey = TEMPLATE_KEYS.CREDITS_ALLOCATED
           break
-        case 'RENEWAL_REMINDER':
-          templateKey = 'SUBSCRIPTION_EXPIRING'
+        case 'renewalReminder':
+          templateKey = TEMPLATE_KEYS.RENEWAL_REMINDER
           break
-        case 'TRIAL_ENDING':
-          templateKey = 'subscription-trial-ending'
+        case 'trialEnding':
+          templateKey = TEMPLATE_KEYS.TRIAL_ENDING
           break
         default:
           throw ErrorFactory.badRequest(`Unknown notification type: ${type}`)
@@ -312,6 +329,8 @@ export class InternalSubscriptionController {
         userId,
         templateKey,
         variables: subscriptionData,
+        trackOpens: true,
+        trackClicks: true,
       })
 
       response.json({ success: true })

@@ -365,6 +365,7 @@ yarn nx run @pika/database:prisma:seed
 The voucher service demonstrates a complete implementation of the translation pattern:
 
 1. **Database Storage** - Stores translation keys only:
+
    ```prisma
    model Voucher {
      titleKey               String  // e.g., "voucher.title.abc123"
@@ -374,22 +375,23 @@ The voucher service demonstrates a complete implementation of the translation pa
    ```
 
 2. **Domain Model** - Hybrid approach for translation handling:
+
    ```typescript
    interface VoucherDomain {
      // Translation keys from database
      titleKey: string
      descriptionKey: string
      termsAndConditionsKey: string
-     
+
      // Resolved content (populated by TranslationResolver in service layer)
-     title?: string  // Optional until resolved
+     title?: string // Optional until resolved
      description?: string
      terms?: string
-     
+
      // ... other fields
    }
    ```
-   
+
    **Why this hybrid approach?**
    - Domain objects carry both keys (for updates) and resolved content (for display)
    - TranslationResolver populates the resolved fields based on requested language
@@ -414,18 +416,18 @@ The voucher service demonstrates a complete implementation of the translation pa
 async createVoucher(data: CreateVoucherRequest) {
   // API receives multilingual content
   // data.title = { es: "Descuento", en: "Discount", gn: "..." }
-  
+
   // Generate unique keys
   const titleKey = `voucher.title.${uuid()}`
   const descriptionKey = `voucher.description.${uuid()}`
   const termsKey = `voucher.terms.${uuid()}`
-  
+
   // Store all translations
   for (const [lang, value] of Object.entries(data.title)) {
     await translationClient.set(titleKey, lang, value)
   }
   // ... same for description and terms
-  
+
   // Create voucher with keys only
   return repository.create({ titleKey, descriptionKey, termsKey, ... })
 }
@@ -437,7 +439,7 @@ async updateVoucherTranslations(voucherId: string, translations: {
   terms: Record<string, string>
 }) {
   const voucher = await repository.findById(voucherId)
-  
+
   // Update each language variant
   for (const [lang, value] of Object.entries(translations.title)) {
     await translationClient.set(voucher.titleKey, lang, value)
@@ -461,14 +463,14 @@ class VoucherMapper {
       title: domain.title, // Already resolved
       description: domain.description, // Already resolved
       terms: domain.terms, // Already resolved
-      
+
       // ... other fields
       discountType: domain.discountType,
       discountValue: domain.discountValue,
       // No translation keys exposed!
     }
   }
-  
+
   // Same for public responses - only resolved content
   static toPublicDTO(domain: VoucherDomain): VoucherDTO {
     return {
@@ -493,7 +495,7 @@ class VoucherMapper {
 
 ```
 voucher.title.{uuid}              # Voucher title
-voucher.description.{uuid}        # Voucher description  
+voucher.description.{uuid}        # Voucher description
 voucher.terms.{uuid}              # Terms and conditions
 voucher.book.title.{uuid}         # Voucher book title
 voucher.book.description.{uuid}   # Voucher book description

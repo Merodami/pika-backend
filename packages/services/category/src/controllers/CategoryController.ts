@@ -1,15 +1,11 @@
-import type {
-  CategoryQueryParams,
-  CategoryHierarchyQuery,
-  CategoryPathParams,
-} from '@pika/api/public'
+import { categoryPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { CategoryMapper } from '../mappers/CategoryMapper.js'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { ICategoryService } from '../services/CategoryService.js'
+import { CategoryMapper } from '../mappers/CategoryMapper.js'
+import type { ICategoryService } from '../types/interfaces.js'
 
 /**
  * Handles public category operations
@@ -39,7 +35,7 @@ export class CategoryController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<CategoryQueryParams>(req)
+      const query = getValidatedQuery<categoryPublic.CategoryQueryParams>(req)
 
       // Map API query to service params
       const params = {
@@ -104,7 +100,8 @@ export class CategoryController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<CategoryHierarchyQuery>(req)
+      const query =
+        getValidatedQuery<categoryPublic.CategoryHierarchyQuery>(req)
 
       const categories = await this.categoryService.getCategoryHierarchy(
         query.rootId,
@@ -128,7 +125,7 @@ export class CategoryController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getCategoryPath(
-    req: Request<CategoryPathParams>,
+    req: Request<categoryPublic.CategoryPathParams>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

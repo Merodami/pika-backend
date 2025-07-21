@@ -1,10 +1,4 @@
-import type { PrismaClient } from '@prisma/client'
-import {
-  CreateSubscriptionPlanRequest,
-  PlanIdParam,
-  SubscriptionPlanQueryParams,
-  UpdateSubscriptionPlanRequest,
-} from '@pika/api/public'
+import { subscriptionPublic } from '@pika/api'
 import {
   requireAdmin,
   validateBody,
@@ -13,10 +7,12 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { PaymentServiceClient } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
+import { Router } from 'express'
+
 import { PlanController } from '../controllers/PlanController.js'
 import { PlanRepository } from '../repositories/PlanRepository.js'
 import { PlanService } from '../services/PlanService.js'
-import { Router } from 'express'
 
 export function createPlanRouter(
   prisma: PrismaClient,
@@ -37,32 +33,36 @@ export function createPlanRouter(
   // Plan routes - public access for viewing
   router.get(
     '/',
-    validateQuery(SubscriptionPlanQueryParams),
+    validateQuery(subscriptionPublic.SubscriptionPlanQueryParams),
     controller.getPlans,
   )
 
-  router.get('/:id', validateParams(PlanIdParam), controller.getPlanById)
+  router.get(
+    '/:id',
+    validateParams(subscriptionPublic.PlanIdParam),
+    controller.getPlanById,
+  )
 
   // Admin routes
   router.post(
     '/',
     requireAdmin(),
-    validateBody(CreateSubscriptionPlanRequest),
+    validateBody(subscriptionPublic.CreateSubscriptionPlanRequest),
     controller.createPlan,
   )
 
   router.put(
     '/:id',
     requireAdmin(),
-    validateParams(PlanIdParam),
-    validateBody(UpdateSubscriptionPlanRequest),
+    validateParams(subscriptionPublic.PlanIdParam),
+    validateBody(subscriptionPublic.UpdateSubscriptionPlanRequest),
     controller.updatePlan,
   )
 
   router.delete(
     '/:id',
     requireAdmin(),
-    validateParams(PlanIdParam),
+    validateParams(subscriptionPublic.PlanIdParam),
     controller.deletePlan,
   )
 

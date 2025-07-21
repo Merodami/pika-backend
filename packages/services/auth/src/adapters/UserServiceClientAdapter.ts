@@ -1,7 +1,6 @@
+import type { CreateUserData, UserService, UserServiceUser } from '@pika/auth'
 import { UserServiceClient } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
-
-import type { CreateUserData, UserService, UserServiceUser } from '@pika/auth'
 
 /**
  * Adapter that implements UserService interface using UserServiceClient
@@ -56,7 +55,9 @@ export class UserServiceClientAdapter implements UserService {
   }
 
   async updateLastLogin(userId: string, loginTime: Date): Promise<void> {
-    await this.userServiceClient.updateLastLogin(userId, { lastLoginAt: loginTime.toISOString() })
+    await this.userServiceClient.updateLastLogin(userId, {
+      lastLoginAt: loginTime.toISOString(),
+    })
   }
 
   async emailExists(email: string): Promise<boolean> {

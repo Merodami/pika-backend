@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
 import type { FileStorageLogDomain } from '@pika/sdk'
 import { FileStorageLogMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface CreateFileStorageLogInput {
   fileId: string

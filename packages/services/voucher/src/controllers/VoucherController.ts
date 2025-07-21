@@ -1,15 +1,21 @@
-import { shared, voucherCommon, voucherPublic } from '@pika/api'
+import { businessCommon, shared, voucherCommon, voucherPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
-  getValidatedQuery,
-  getValidatedParams,
   getRequestLanguage,
-  RequestContext,
+  getValidatedParams,
+  getValidatedQuery,
   paginatedResponse,
+  RequestContext,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { VoucherMapper } from '@pika/sdk'
+import { VoucherDomain,VoucherMapper } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
+import {
+  PaginatedResult,
+  VoucherScanSource,
+  VoucherScanType,
+  VoucherState,
+} from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IVoucherService } from '../services/VoucherService.js'
@@ -19,9 +25,7 @@ import type { IVoucherService } from '../services/VoucherService.js'
  * Public routes for viewing and interacting with vouchers
  */
 export class VoucherController {
-  constructor(
-    private readonly voucherService: IVoucherService,
-  ) {
+  constructor(private readonly voucherService: IVoucherService) {
     // Bind methods to preserve 'this' context
     this.getAllVouchers = this.getAllVouchers.bind(this)
     this.getVoucherById = this.getVoucherById.bind(this)
@@ -44,33 +48,32 @@ export class VoucherController {
     condition: (result) => result && result.data && Array.isArray(result.data),
   })
   async getAllVouchers(
-    req: Request<{}, {}, {}, voucherPublic.VoucherQueryParams>,
-    res: Response<voucherPublic.VoucherListResponse>,
+    req: Request,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const query = getValidatedQuery<voucherPublic.VoucherQueryParams>(req)
       const language = getRequestLanguage(req)
       const parsedIncludes = query.include
-        ? parseIncludeParam(
-            query.include,
-            voucherCommon.VOUCHER_ALLOWED_RELATIONS,
-          )
+        ? parseIncludeParam(query.include, [
+            ...voucherCommon.VOUCHER_ALLOWED_RELATIONS,
+          ])
         : {}
 
       // Map API query to service params - only show published vouchers to public
       const params = {
         businessId: query.businessId,
         categoryId: query.categoryId,
-        state: 'published' as const, // Always filter by published for public routes
+        state: VoucherState.published, // Always filter by published for public routes
         type: query.type,
         minValue: query.minValue,
         maxValue: query.maxValue,
         minDiscount: query.minDiscount,
         maxDiscount: query.maxDiscount,
         currency: query.currency,
-        validFrom: query.validFrom,
-        validUntil: query.validUntil,
+        validFrom: query.validFrom ? new Date(query.validFrom) : undefined,
+        validUntil: query.validUntil ? new Date(query.validUntil) : undefined,
         search: query.search,
         page: query.page || 1,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
@@ -82,7 +85,8 @@ export class VoucherController {
         parsedIncludes,
       }
 
-      const result = await this.voucherService.getAllVouchers(params, language)
+      const result: PaginatedResult<VoucherDomain> =
+        await this.voucherService.getAllVouchers(params, language)
 
       res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
@@ -114,21 +118,20 @@ export class VoucherController {
       const query = getValidatedQuery<voucherPublic.GetVoucherByIdQuery>(req)
       const language = getRequestLanguage(req)
       const parsedIncludes = query.include
-        ? parseIncludeParam(
-            query.include,
-            voucherCommon.VOUCHER_ALLOWED_RELATIONS,
-          )
+        ? parseIncludeParam(query.include, [
+            ...voucherCommon.VOUCHER_ALLOWED_RELATIONS,
+          ])
         : {}
 
-      const voucher = await this.voucherService.getVoucherById(
+      const voucher: VoucherDomain = await this.voucherService.getVoucherById(
         voucherId,
         parsedIncludes,
         language,
       )
 
       // Check if voucher is published for public access
-      if (voucher.state !== 'published') {
-        throw ErrorFactory.notFound('Voucher', voucherId)
+      if (voucher.state !== VoucherState.published) {
+        throw ErrorFactory.resourceNotFound('Voucher', voucherId)
       }
 
       res.json(VoucherMapper.toDTO(voucher))
@@ -157,10 +160,25 @@ export class VoucherController {
       const userId = context?.userId
       const language = getRequestLanguage(req)
 
-      const scanResult = await this.voucherService.scanVoucher(voucherId, {
-        ...scanData,
-        userId,
-      }, language)
+      const scanResult = await this.voucherService.scanVoucher(
+        voucherId,
+        {
+          voucherId,
+          userId,
+          scanType: VoucherScanType.customer,
+          scanSource:
+            (scanData.scanSource as VoucherScanSource) ||
+            VoucherScanSource.camera,
+          location: scanData.location
+            ? {
+                lat: scanData.location.latitude,
+                lng: scanData.location.longitude,
+              }
+            : null,
+          deviceInfo: scanData.deviceInfo || null,
+        },
+        language,
+      )
 
       res.json(VoucherMapper.toScanResponseDTO(scanResult))
     } catch (error) {
@@ -227,10 +245,14 @@ export class VoucherController {
       const userId = context?.userId
       const language = getRequestLanguage(req)
 
-      const redeemResult = await this.voucherService.redeemVoucher(voucherId, {
-        ...redeemData,
-        userId,
-      }, language)
+      const redeemResult = await this.voucherService.redeemVoucher(
+        voucherId,
+        {
+          ...redeemData,
+          userId,
+        },
+        language,
+      )
 
       res.json(VoucherMapper.toRedeemResponseDTO(redeemResult))
     } catch (error) {
@@ -260,7 +282,10 @@ export class VoucherController {
       const language = getRequestLanguage(req)
 
       // Users can only see their own vouchers unless admin
-      if (context?.userId !== userId && context?.role !== 'admin') {
+      if (
+        context?.userId !== userId &&
+        context?.role?.toString().toLowerCase() !== 'admin'
+      ) {
         throw ErrorFactory.forbidden('You can only view your own vouchers')
       }
 
@@ -296,25 +321,23 @@ export class VoucherController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { id: businessId } = getValidatedParams<shared.BusinessIdParam>(req)
+      const { id: businessId } =
+        getValidatedParams<businessCommon.BusinessIdParam>(req)
       const query = getValidatedQuery<voucherPublic.VoucherQueryParams>(req)
       const language = getRequestLanguage(req)
       const parsedIncludes = query.include
-        ? parseIncludeParam(
-            query.include,
-            voucherCommon.VOUCHER_ALLOWED_RELATIONS,
-          )
+        ? parseIncludeParam(query.include, [
+            ...voucherCommon.VOUCHER_ALLOWED_RELATIONS,
+          ])
         : {}
 
       const params = {
         businessId,
-        state: 'published' as const, // Only show published vouchers
+        state: VoucherState.published, // Only show published vouchers
         categoryId: query.categoryId,
         discountType: query.discountType,
         minDiscount: query.minDiscount,
         maxDiscount: query.maxDiscount,
-        validNow: query.validNow,
-        expiringInDays: query.expiringInDays,
         hasAvailableUses: query.hasAvailableUses,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
@@ -326,7 +349,10 @@ export class VoucherController {
         parsedIncludes,
       }
 
-      const result = await this.voucherService.getVouchersByBusinessId(params, language)
+      const result = await this.voucherService.getVouchersByBusinessId(
+        params,
+        language,
+      )
 
       res.json(paginatedResponse(result, VoucherMapper.toDTO))
     } catch (error) {
@@ -353,16 +379,16 @@ export class VoucherController {
       const query = getValidatedQuery<voucherPublic.GetVoucherByIdQuery>(req)
       const language = getRequestLanguage(req)
       const parsedIncludes = query.include
-        ? parseIncludeParam(
-            query.include,
-            voucherCommon.VOUCHER_ALLOWED_RELATIONS,
-          )
+        ? parseIncludeParam(query.include, [
+            ...voucherCommon.VOUCHER_ALLOWED_RELATIONS,
+          ])
         : {}
 
-      const voucher = await this.voucherService.getVoucherByAnyCode(code, language)
+      const voucher: VoucherDomain =
+        await this.voucherService.getVoucherByAnyCode(code, language)
 
       // Apply includes if needed
-      let voucherWithIncludes = voucher
+      let voucherWithIncludes: VoucherDomain = voucher
 
       if (Object.keys(parsedIncludes).length > 0) {
         voucherWithIncludes = await this.voucherService.getVoucherById(

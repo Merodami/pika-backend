@@ -1,10 +1,10 @@
-import type { PrismaClient } from '@prisma/client'
-import { Prisma } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
 import type { SubscriptionPlanDomain } from '@pika/sdk'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { BillingIntervalType, PaginatedResult } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 export interface CreatePlanInput {
   name: string

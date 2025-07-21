@@ -9,13 +9,14 @@ This document describes the standardized HTTP-based communication patterns used 
 ### Core Infrastructure Components
 
 #### 1. **BaseServiceClient**
+
 Abstract base class providing common functionality for all service clients:
 
 ```typescript
 // packages/shared/src/services/BaseServiceClient.ts
 export abstract class BaseServiceClient {
   protected httpClient: HttpClient
-  
+
   constructor(config: ServiceClientConfig) {
     this.httpClient = new HttpClient({
       baseURL: config.serviceUrl,
@@ -24,7 +25,7 @@ export abstract class BaseServiceClient {
       timeout: config.timeout || 10000,
     })
   }
-  
+
   async healthCheck(): Promise<boolean>
   protected get<T>(path: string, options?: RequestOptions): Promise<T>
   protected post<T>(path: string, data: any, options?: RequestOptions): Promise<T>
@@ -34,7 +35,9 @@ export abstract class BaseServiceClient {
 ```
 
 #### 2. **HttpClient**
+
 Axios-based HTTP client with enterprise features:
+
 - Automatic retry logic with exponential backoff
 - Service authentication via headers
 - Context propagation for distributed tracing
@@ -42,6 +45,7 @@ Axios-based HTTP client with enterprise features:
 - Request/response interceptors
 
 #### 3. **Service Authentication**
+
 All internal service endpoints use API key authentication:
 
 ```typescript
@@ -78,14 +82,11 @@ export class UserServiceClient extends BaseServiceClient {
   }
 
   async getUserByEmail(email: string, context?: ServiceContext): Promise<UserDomain | null> {
-    const response = await this.get<{ user: UserDomain | null }>(
-      `/internal/users/by-email`,
-      {
-        context,
-        params: { email },
-        useServiceAuth: true,
-      }
-    )
+    const response = await this.get<{ user: UserDomain | null }>(`/internal/users/by-email`, {
+      context,
+      params: { email },
+      useServiceAuth: true,
+    })
     return response.user
   }
 }
@@ -124,6 +125,7 @@ export class UserServiceClient extends BaseServiceClient {
 ### Missing Service Clients (To Be Created)
 
 Based on service references in the codebase:
+
 - **BusinessServiceClient** - Referenced in VoucherService but not yet implemented
 - **CategoryServiceClient** - Referenced in CLAUDE.md but not yet implemented
 
@@ -137,18 +139,9 @@ Each service exposes internal endpoints at `/internal/*` paths:
 // Example: Voucher Service Internal Routes
 router.use(requireApiKey()) // Validates x-api-key header
 
-router.post(
-  '/internal/vouchers/by-ids',
-  validateBody(GetVouchersByIdsRequest),
-  controller.getVouchersByIds
-)
+router.post('/internal/vouchers/by-ids', validateBody(GetVouchersByIdsRequest), controller.getVouchersByIds)
 
-router.get(
-  '/internal/vouchers/user/:userId',
-  validateParams(UserIdParam),
-  validateQuery(SearchVouchersQuery),
-  controller.getUserVouchers
-)
+router.get('/internal/vouchers/user/:userId', validateParams(UserIdParam), validateQuery(SearchVouchersQuery), controller.getUserVouchers)
 ```
 
 ### 2. Request Context Propagation
@@ -184,6 +177,7 @@ try {
 ### 4. Retry Logic
 
 Built-in retry mechanism for transient failures:
+
 - Default: 3 retries with exponential backoff
 - Only retries on 5xx errors (server failures)
 - No retry on 4xx errors (client errors)
@@ -200,7 +194,7 @@ this.communicationClient
     templateKey: 'SESSION_CANCELLED',
     variables: { sessionName, date },
   })
-  .catch(error => {
+  .catch((error) => {
     logger.error('Failed to send cancellation email', { error, userId })
     // Continue processing - don't fail the main operation
   })
@@ -209,6 +203,7 @@ this.communicationClient
 ## Schema Organization for Internal APIs
 
 ### Structure
+
 ```
 packages/api/src/internal/
 ├── schemas/
@@ -335,15 +330,8 @@ export class BusinessServiceClient extends BaseServiceClient {
     })
   }
 
-  async getBusinessesByIds(
-    businessIds: string[],
-    context?: ServiceContext
-  ): Promise<BusinessDomain[]> {
-    const response = await this.post<{ businesses: BusinessDomain[] }>(
-      '/internal/businesses/by-ids',
-      { businessIds },
-      { context, useServiceAuth: true }
-    )
+  async getBusinessesByIds(businessIds: string[], context?: ServiceContext): Promise<BusinessDomain[]> {
+    const response = await this.post<{ businesses: BusinessDomain[] }>('/internal/businesses/by-ids', { businessIds }, { context, useServiceAuth: true })
     return response.businesses
   }
 }
@@ -359,11 +347,7 @@ export class InternalBusinessController {
     this.getBusinessesByIds = this.getBusinessesByIds.bind(this)
   }
 
-  async getBusiness(
-    request: Request<{ id: string }>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getBusiness(request: Request<{ id: string }>, response: Response, next: NextFunction): Promise<void> {
     try {
       const business = await this.businessService.getById(request.params.id)
       response.json(business)
@@ -372,11 +356,7 @@ export class InternalBusinessController {
     }
   }
 
-  async getBusinessesByIds(
-    request: Request<{}, {}, { businessIds: string[] }>,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async getBusinessesByIds(request: Request<{}, {}, { businessIds: string[] }>, response: Response, next: NextFunction): Promise<void> {
     try {
       const businesses = await this.businessService.getByIds(request.body.businessIds)
       response.json({ businesses })
@@ -397,21 +377,21 @@ export class VoucherService {
     private readonly userServiceClient: UserServiceClient,
     private readonly businessServiceClient: BusinessServiceClient,
     private readonly communicationServiceClient: CommunicationServiceClient,
-    private readonly cache: ICacheService
+    private readonly cache: ICacheService,
   ) {}
 
   async createVoucher(data: CreateVoucherData, context: ServiceContext): Promise<VoucherDomain> {
     // Validate business exists
     const business = await this.businessServiceClient.getBusiness(data.businessId, context)
-    
+
     // Validate user if provided
     if (data.userId) {
       const user = await this.userServiceClient.getUser(data.userId, context)
     }
-    
+
     // Create voucher
     const voucher = await this.repository.create(data)
-    
+
     // Send notification (fire-and-forget)
     this.communicationServiceClient
       .sendTransactionalEmail({
@@ -422,10 +402,10 @@ export class VoucherService {
           businessName: business.name,
         },
       })
-      .catch(error => {
+      .catch((error) => {
         logger.error('Failed to send voucher creation email', { error })
       })
-    
+
     return voucher
   }
 }
@@ -434,27 +414,32 @@ export class VoucherService {
 ## Best Practices
 
 ### 1. Service Isolation
+
 - Each service should only communicate through well-defined internal APIs
 - Never share database connections between services
 - Use service clients for all cross-service data access
 
 ### 2. Error Handling
+
 - Always use ErrorFactory for consistent error responses
 - Include correlation IDs in all error logs
 - Don't expose internal service errors to external clients
 
 ### 3. Performance
+
 - Use caching where appropriate (Redis via ICacheService)
 - Implement pagination for list endpoints
 - Consider batch operations for bulk data fetches
 
 ### 4. Security
+
 - Internal endpoints must validate `x-api-key` header
 - Never expose internal endpoints through the API Gateway
 - Rotate SERVICE_API_KEY regularly
 - Use environment-specific API keys
 
 ### 5. Monitoring
+
 - Log all service-to-service calls with correlation IDs
 - Monitor service health endpoints
 - Track retry attempts and failures
@@ -463,25 +448,32 @@ export class VoucherService {
 ## Future Enhancements
 
 ### 1. Contract-First Development
+
 Plan to implement auto-generation of service clients from OpenAPI schemas:
+
 - Define all internal APIs using OpenAPI/Zod schemas
 - Generate TypeScript clients automatically
 - Ensure type safety across service boundaries
 
 ### 2. Service Mesh Considerations
+
 For future scaling:
+
 - Circuit breakers for cascading failure prevention
 - Service discovery (currently using static URLs)
 - Load balancing between service instances
 - Advanced retry policies
 
 ### 3. Async Communication
+
 For long-running or non-critical operations:
+
 - Message queue integration (RabbitMQ/Kafka)
 - Event-driven architecture patterns
 - Eventual consistency handling
 
 ### 4. Enhanced Observability
+
 - OpenTelemetry integration for distributed tracing
 - Metrics collection for service performance
 - Centralized logging with correlation
@@ -490,6 +482,7 @@ For long-running or non-critical operations:
 ## Migration Notes
 
 This architecture represents the current state after migrating from Solo60 to Pika:
+
 - All "Solo60" references have been renamed to "Pika"
 - Service structure follows Clean Architecture principles
 - Consolidation of related services (e.g., voucher + redemptions)

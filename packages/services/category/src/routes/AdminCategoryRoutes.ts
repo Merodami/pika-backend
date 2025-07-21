@@ -1,14 +1,6 @@
+import { categoryAdmin, categoryCommon } from '@pika/api'
+import { validateBody,validateParams, validateQuery } from '@pika/http'
 import { Router } from 'express'
-import { validateQuery, validateParams, validateBody } from '@pika/http'
-import type {
-  AdminCategoryQueryParams,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-  MoveCategoryRequest,
-  UpdateCategorySortOrderRequest,
-  BulkDeleteCategoriesRequest,
-} from '@pika/api/admin'
-import { CategoryIdParam } from '@pika/api/common'
 
 import type { AdminCategoryController } from '../controllers/AdminCategoryController.js'
 
@@ -23,7 +15,7 @@ export function createAdminCategoryRoutes(
   // GET /admin/categories - List categories with admin filters
   router.get(
     '/',
-    validateQuery(AdminCategoryQueryParams),
+    validateQuery(categoryAdmin.AdminCategoryQueryParams),
     adminCategoryController.getAllCategories,
   )
 
@@ -33,59 +25,59 @@ export function createAdminCategoryRoutes(
   // GET /admin/categories/:id - Get category by ID for admin
   router.get(
     '/:id',
-    validateParams(CategoryIdParam),
+    validateParams(categoryCommon.CategoryIdParam),
     adminCategoryController.getCategoryById,
   )
 
   // POST /admin/categories - Create new category
   router.post(
     '/',
-    validateBody(CreateCategoryRequest),
+    validateBody(categoryAdmin.CreateCategoryRequest),
     adminCategoryController.createCategory,
   )
 
   // PATCH /admin/categories/:id - Update category
   router.patch(
     '/:id',
-    validateParams(CategoryIdParam),
-    validateBody(UpdateCategoryRequest),
+    validateParams(categoryCommon.CategoryIdParam),
+    validateBody(categoryAdmin.UpdateCategoryRequest),
     adminCategoryController.updateCategory,
   )
 
   // DELETE /admin/categories/:id - Delete category
   router.delete(
     '/:id',
-    validateParams(CategoryIdParam),
+    validateParams(categoryCommon.CategoryIdParam),
     adminCategoryController.deleteCategory,
   )
 
   // POST /admin/categories/:id/toggle-status - Toggle active/inactive
   router.post(
     '/:id/toggle-status',
-    validateParams(CategoryIdParam),
+    validateParams(categoryCommon.CategoryIdParam),
     adminCategoryController.toggleCategoryStatus,
   )
 
   // POST /admin/categories/:id/move - Move category to different parent
   router.post(
     '/:id/move',
-    validateParams(CategoryIdParam),
-    validateBody(MoveCategoryRequest),
+    validateParams(categoryCommon.CategoryIdParam),
+    validateBody(categoryAdmin.MoveCategoryRequest),
     adminCategoryController.moveCategory,
   )
 
   // POST /admin/categories/:id/sort-order - Update category sort order
   router.post(
     '/:id/sort-order',
-    validateParams(CategoryIdParam),
-    validateBody(UpdateCategorySortOrderRequest),
+    validateParams(categoryCommon.CategoryIdParam),
+    validateBody(categoryAdmin.UpdateCategorySortOrderRequest),
     adminCategoryController.updateCategorySortOrder,
   )
 
   // POST /admin/categories/bulk-delete - Bulk delete categories
   router.post(
     '/bulk-delete',
-    validateBody(BulkDeleteCategoriesRequest),
+    validateBody(categoryAdmin.BulkDeleteCategoriesRequest),
     adminCategoryController.bulkDeleteCategories,
   )
 

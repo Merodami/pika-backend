@@ -97,6 +97,7 @@ export class AdPlacementMapper {
     if (!value || typeof value !== 'object') {
       return undefined
     }
+
     return value
   }
 
@@ -126,6 +127,7 @@ export class AdPlacementMapper {
     endPos: number,
   ): boolean {
     const placementEnd = this.getEndPosition(placement)
+
     return !(endPos < placement.position || startPos > placementEnd)
   }
 
@@ -241,6 +243,7 @@ export class AdPlacementMapper {
     }
 
     const endPosition = dto.position + spacesUsed - 1
+
     if (endPosition > 8) {
       throw new Error('AdPlacement exceeds page boundaries')
     }
@@ -322,6 +325,7 @@ export class AdPlacementMapper {
       if ('page' in placement && placement.page) {
         const pageNumber = (placement.page as any).pageNumber
         const pagePlacements = pageMap.get(pageNumber) || []
+
         pagePlacements.push(this.toSimpleDTO(placement))
         pageMap.set(pageNumber, pagePlacements)
       }
@@ -357,6 +361,7 @@ export class AdPlacementMapper {
    */
   static getAvailableSpaces(placements: AdPlacement[]): number {
     const usedSpaces = this.calculatePageSpaceUsage(placements)
+
     return Math.max(0, 8 - usedSpaces)
   }
 

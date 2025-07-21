@@ -3,8 +3,8 @@
  * These define the shape of data sent over the API
  */
 
-import type { UserDTO } from './user.dto.js'
 import type { CategoryDTO } from './category.dto.js'
+import type { UserDTO } from './user.dto.js'
 
 // ============= Business DTO =============
 

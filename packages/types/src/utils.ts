@@ -3,7 +3,6 @@
  */
 
 import { UserRole, UserStatus } from './enum.js'
-import type { UserRoleType, UserStatusType } from './enum.js'
 
 /**
  * Maps any role value to UserRole enum

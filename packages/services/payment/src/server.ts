@@ -1,8 +1,8 @@
-import type { PrismaClient } from '@prisma/client'
 import { PAYMENT_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
 import type Stripe from 'stripe'
 
 import { createProductRouter } from './routes/ProductRoutes.js'

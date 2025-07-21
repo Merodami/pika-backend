@@ -1,10 +1,10 @@
-import { pdfCommon, pdfAdmin } from '@pika/api'
+import { pdfAdmin,pdfCommon } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, getValidatedBody, RequestContext } from '@pika/http'
+import { getValidatedBody, getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { VoucherBookMapper } from '../mappers/VoucherBookMapper.js'
 import type { NextFunction, Request, Response } from 'express'
 
+import { VoucherBookMapper } from '../mappers/VoucherBookMapper.js'
 import type { IAdminVoucherBookService } from '../services/AdminVoucherBookService.js'
 
 /**
@@ -60,6 +60,7 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toAdminListResponse(result)
+
       res.json(response)
     } catch (error) {
       next(error)
@@ -215,19 +216,17 @@ export class AdminVoucherBookController {
     try {
       const context = RequestContext.getContext(req)
       const { id } = req.params
-      const { regenerate } = getValidatedBody<pdfAdmin.GeneratePdfRequest>(req)
+      const { force, priority } =
+        getValidatedBody<pdfAdmin.GeneratePdfRequest>(req)
 
       const result = await this.voucherBookService.generatePDF(
         id,
         context.userId,
-        regenerate,
       )
 
       // Use mapper for proper response transformation
-      const response = VoucherBookMapper.toGeneratePDFResponse(
-        result,
-        regenerate,
-      )
+      const response = VoucherBookMapper.toGeneratePDFResponse(result, force)
+
       res.json(response)
     } catch (error) {
       next(error)
@@ -259,6 +258,7 @@ export class AdminVoucherBookController {
         processedCount: result.processedCount,
         operation: 'archived',
       })
+
       res.json(response)
     } catch (error) {
       next(error)
@@ -289,6 +289,7 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toStatisticsResponse(stats)
+
       res.json(response)
     } catch (error) {
       next(error)

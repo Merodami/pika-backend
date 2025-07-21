@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client'
 import { userAdmin, userPublic } from '@pika/api'
 import {
   createMulterMiddleware,
@@ -10,6 +9,7 @@ import {
 } from '@pika/http'
 import { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { UserController } from '../controllers/UserController.js'
