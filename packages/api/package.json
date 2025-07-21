@@ -33,7 +33,7 @@
     "@asteasolutions/zod-to-openapi": "^7.3.4",
     "@pika/environment": "workspace:^",
     "@pika/types": "workspace:^",
-    "@sinclair/typebox": "^0.34.37",
+    "@sinclair/typebox": "^0.34.38",
     "fs-extra": "^11.3.0",
     "lodash-es": "^4.17.21",
     "tsc-alias": "^1.8.16",
@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^12.0.0",
-    "@scalar/api-reference": "^1.32.7",
+    "@scalar/api-reference": "^1.32.9",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash-es": "^4.17.12",
     "dotenv": "^17.2.0",
