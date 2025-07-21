@@ -1,5 +1,5 @@
 import type { UserStatusType } from '@pika/types'
-import { mapUserRole, mapUserStatus,UserRole, UserStatus } from '@pika/types'
+import { mapUserRole, mapUserStatus, UserRole, UserStatus } from '@pika/types'
 
 import type {
   AddressDomain,

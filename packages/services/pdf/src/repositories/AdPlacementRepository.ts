@@ -4,7 +4,7 @@ import { AdPlacementMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, ContentType, AdSize } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -52,9 +52,9 @@ export interface IAdPlacementRepository {
  */
 export interface CreateAdPlacementInput {
   pageId: string
-  contentType: string
+  contentType: ContentType
   position: number
-  size: string
+  size: AdSize
   spacesUsed: number
   imageUrl?: string
   qrCodePayload?: string
@@ -66,9 +66,9 @@ export interface CreateAdPlacementInput {
 }
 
 export interface UpdateAdPlacementInput {
-  contentType?: string
+  contentType?: ContentType
   position?: number
-  size?: string
+  size?: AdSize
   spacesUsed?: number
   imageUrl?: string
   qrCodePayload?: string
@@ -89,9 +89,9 @@ export interface AdPlacementSearchParams {
   limit?: number
   pageId?: string
   bookId?: string
-  contentType?: string
+  contentType?: ContentType
   position?: number
-  size?: string
+  size?: AdSize
   createdBy?: string
   isActive?: boolean
   sortBy?: string

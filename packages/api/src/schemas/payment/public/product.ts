@@ -4,7 +4,7 @@ import { openapi } from '../../../common/utils/openapi.js'
 import { Money } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { Currency,PriceInterval, ProductType } from '../common/enums.js'
+import { Currency, PriceInterval, ProductType } from '../common/enums.js'
 
 /**
  * Product schemas for payment service

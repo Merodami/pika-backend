@@ -1,5 +1,4 @@
-import type { ParsedIncludes } from '@pika/shared'
-import type { SearchParams } from '@pika/types'
+import type { ParsedIncludes, SearchParams } from '@pika/types'
 
 /**
  * Voucher book search parameters

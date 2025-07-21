@@ -1,5 +1,5 @@
 import { categoryAdmin, categoryCommon } from '@pika/api'
-import { validateBody,validateParams, validateQuery } from '@pika/http'
+import { validateBody, validateParams, validateQuery } from '@pika/http'
 import { Router } from 'express'
 
 import type { AdminCategoryController } from '../controllers/AdminCategoryController.js'

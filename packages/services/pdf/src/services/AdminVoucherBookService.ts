@@ -69,13 +69,13 @@ export class AdminVoucherBookService
       }
 
       switch (status) {
-        case 'PUBLISHED':
+        case 'published':
           updateData = {
             ...updateData,
             publishedAt: new Date(),
           }
           break
-        case 'ARCHIVED':
+        case 'archived':
           updateData = {
             ...updateData,
             archivedAt: new Date(),
@@ -126,7 +126,7 @@ export class AdminVoucherBookService
       // Process each book individually for proper error handling
       for (const id of ids) {
         try {
-          await this.updateVoucherBookStatus(id, 'ARCHIVED', userId)
+          await this.updateVoucherBookStatus(id, 'archived', userId)
           results.push({ id, success: true })
         } catch (error) {
           logger.warn('Failed to archive voucher book', { id, error })
@@ -186,7 +186,7 @@ export class AdminVoucherBookService
     newStatus: VoucherBookStatus,
   ): void {
     // Allow admin to archive any book
-    if (newStatus === 'ARCHIVED') {
+    if (newStatus === 'archived') {
       return
     }
 
@@ -196,9 +196,9 @@ export class AdminVoucherBookService
     }
 
     const allowedTransitions: Record<VoucherBookStatus, VoucherBookStatus[]> = {
-      DRAFT: ['READY_FOR_PRINT', 'ARCHIVED'],
-      READY_FOR_PRINT: ['PUBLISHED', 'DRAFT', 'ARCHIVED'],
-      PUBLISHED: ['ARCHIVED'],
+      draft: ['ready_for_print', 'archived'],
+      ready_for_print: ['published', 'draft', 'archived'],
+      published: ['archived'],
       ARCHIVED: [], // Archived books cannot be changed
     }
 

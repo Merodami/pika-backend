@@ -10,9 +10,9 @@ import type { UserDomain } from './user.js'
 export interface VoucherBookDomain {
   id: string
   title: string
-  edition?: string | null
+  edition: string | null
   bookType: string
-  month?: number | null
+  month: number | null
   year: number
   status: string
   totalPages: number
@@ -21,9 +21,9 @@ export interface VoucherBookDomain {
   backImageUrl?: string | null
   pdfUrl?: string | null
   pdfGeneratedAt?: Date | null
-  metadata?: Record<string, any> | null
+  metadata: Record<string, any> | null
   createdBy: string
-  updatedBy?: string | null
+  updatedBy: string | null
   createdAt: Date
   updatedAt: Date
   deletedAt?: Date | null
@@ -41,7 +41,7 @@ export interface VoucherBookPageDomain {
   bookId: string
   pageNumber: number
   layoutType: string
-  metadata?: Record<string, any> | null
+  metadata: Record<string, any> | null
   createdAt: Date
   updatedAt: Date
   // Optional relations
@@ -63,9 +63,9 @@ export interface AdPlacementDomain {
   shortCode?: string | null
   title?: string | null
   description?: string | null
-  metadata?: Record<string, any> | null
+  metadata: Record<string, any> | null
   createdBy: string
-  updatedBy?: string | null
+  updatedBy: string | null
   createdAt: Date
   updatedAt: Date
   // Optional relations
@@ -95,11 +95,11 @@ export interface BookDistributionDomain {
   trackingNumber?: string | null
   shippingCarrier?: string | null
   notes?: string | null
-  metadata?: Record<string, any> | null
+  metadata: Record<string, any> | null
   createdAt: Date
   updatedAt: Date
   createdBy: string
-  updatedBy?: string | null
+  updatedBy: string | null
   // Optional relations
   book?: VoucherBookDomain
   createdByUser?: UserDomain

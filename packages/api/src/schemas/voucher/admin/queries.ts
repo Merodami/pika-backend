@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { SearchParams } from '../../shared/pagination.js'
-import { DateTime,UUID } from '../../shared/primitives.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
 import {
   AdminVoucherSortBy,
   AnalyticsGroupBy,

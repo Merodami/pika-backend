@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
-import { DateRangeParams,SearchParams } from '../../shared/pagination.js'
+import { DateRangeParams, SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {

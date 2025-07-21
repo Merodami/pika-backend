@@ -1,6 +1,6 @@
 import { createSortFieldMapper } from '@api/common/utils/sorting.js'
 
-import { AdminVoucherSortBy,VoucherSortBy } from './enums.js'
+import { AdminVoucherSortBy, VoucherSortBy } from './enums.js'
 
 /**
  * Maps public API sort fields to database column names

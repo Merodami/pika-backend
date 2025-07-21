@@ -104,11 +104,16 @@ export class VoucherBookController {
       const voucherBook = await this.voucherBookService.getVoucherBookById(id)
 
       if (!voucherBook.pdfUrl) {
-        return next(ErrorFactory.notFound('PDF', id))
+        return next(ErrorFactory.resourceNotFound('PDF', id))
       }
 
       // Use mapper for proper response transformation
-      const response = VoucherBookMapper.toPDFDownloadResponse(voucherBook)
+      const response = VoucherBookMapper.toPDFDownloadResponse({
+        url: voucherBook.pdfUrl,
+        filename: `voucher-book-${voucherBook.id}.pdf`,
+        contentType: 'application/pdf',
+        generatedAt: voucherBook.pdfGeneratedAt || voucherBook.updatedAt,
+      })
 
       res.json(response)
     } catch (error) {

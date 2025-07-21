@@ -76,13 +76,13 @@ export class AdPlacementMapper {
    */
   static getSpaceCount(size: AdSize): number {
     switch (size) {
-      case 'SINGLE':
+      case 'single':
         return 1
-      case 'QUARTER':
+      case 'quarter':
         return 2
-      case 'HALF':
+      case 'half':
         return 4
-      case 'FULL':
+      case 'full':
         return 8
       default:
         return 1
@@ -249,7 +249,7 @@ export class AdPlacementMapper {
     }
 
     // Validate content type specific requirements
-    if (dto.contentType === 'VOUCHER') {
+    if (dto.contentType === 'voucher') {
       if (!dto.qrCodePayload) {
         throw new Error(
           'AdPlacement qrCodePayload is required for VOUCHER content',

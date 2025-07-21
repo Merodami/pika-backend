@@ -186,10 +186,10 @@ export type CategorySortBy = z.infer<typeof CategorySortBy>
  * Voucher book status - matches database VoucherBookStatus enum exactly
  */
 export const VoucherBookStatus = z.enum([
-  'DRAFT',
-  'READY_FOR_PRINT',
-  'PUBLISHED',
-  'ARCHIVED',
+  'draft',
+  'ready_for_print',
+  'published',
+  'archived',
 ])
 
 export type VoucherBookStatus = z.infer<typeof VoucherBookStatus>
@@ -198,11 +198,11 @@ export type VoucherBookStatus = z.infer<typeof VoucherBookStatus>
  * Voucher book type - matches database VoucherBookType enum exactly
  */
 export const VoucherBookType = z.enum([
-  'MONTHLY',
-  'SPECIAL_EDITION',
-  'REGIONAL',
-  'SEASONAL',
-  'PROMOTIONAL',
+  'monthly',
+  'special_edition',
+  'regional',
+  'seasonal',
+  'promotional',
 ])
 
 export type VoucherBookType = z.infer<typeof VoucherBookType>
@@ -211,10 +211,10 @@ export type VoucherBookType = z.infer<typeof VoucherBookType>
  * Page layout type - matches database PageLayoutType enum exactly
  */
 export const PageLayoutType = z.enum([
-  'STANDARD',
-  'MIXED',
-  'FULL_PAGE',
-  'CUSTOM',
+  'standard',
+  'mixed',
+  'full_page',
+  'custom',
 ])
 
 export type PageLayoutType = z.infer<typeof PageLayoutType>
@@ -222,14 +222,14 @@ export type PageLayoutType = z.infer<typeof PageLayoutType>
 /**
  * Ad size - matches database AdSize enum exactly
  */
-export const AdSize = z.enum(['SINGLE', 'QUARTER', 'HALF', 'FULL'])
+export const AdSize = z.enum(['single', 'quarter', 'half', 'full'])
 
 export type AdSize = z.infer<typeof AdSize>
 
 /**
  * Content type - matches database ContentType enum exactly
  */
-export const ContentType = z.enum(['VOUCHER', 'IMAGE', 'AD', 'SPONSORED'])
+export const ContentType = z.enum(['voucher', 'image', 'ad', 'sponsored'])
 
 export type ContentType = z.infer<typeof ContentType>
 

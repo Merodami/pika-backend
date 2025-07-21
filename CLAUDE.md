@@ -618,6 +618,33 @@ import type { APISearchParams } from '@pika/api/public' // ❌ Breaks Clean Arch
 
 **Rule**: API types stay in Controllers. Service/Repository layers use internal domain types. Controllers act as translators using established DTO mappers.
 
+### Mapper Import Rules (CRITICAL)
+
+**NEVER import from @pika/api in Mapper classes!** Mappers should only use Prisma types and internal domain types.
+
+✅ **Correct Mapper Pattern**:
+
+```typescript
+// Mapper file - uses only Prisma types and internal DTOs
+import type { VoucherBook, VoucherBookStatus } from '@prisma/client'
+
+export class VoucherBookMapper {
+  static canBeEdited(status: VoucherBookStatus): boolean {
+    // Use Prisma enum values directly (lowercase)
+    return status === 'draft'
+  }
+}
+```
+
+❌ **Wrong Mapper Pattern**:
+
+```typescript
+// Mapper file - NEVER do this!
+import { VoucherBookStatus } from '@pika/api/shared' // ❌ Breaks architecture
+```
+
+**Rule**: Mappers work with database entities and domain objects only. They should never know about API schemas or Zod validation.
+
 ### Session Service Architecture (IMPORTANT)
 
 The Session Service uses denormalized data for performance optimization:

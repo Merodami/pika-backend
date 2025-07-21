@@ -11,9 +11,9 @@ import type {
 export interface VoucherBookDocument {
   id: string
   title: string
-  edition?: string | null
+  edition: string | null
   bookType: string
-  month?: number | null
+  month: number | null
   year: number
   status: string
   totalPages: number
@@ -22,9 +22,9 @@ export interface VoucherBookDocument {
   backImageUrl?: string | null
   pdfUrl?: string | null
   pdfGeneratedAt?: Date | null
-  metadata?: any | null
+  metadata: any | null
   createdBy: string
-  updatedBy?: string | null
+  updatedBy: string | null
   createdAt: Date
   updatedAt: Date
   deletedAt?: Date | null
@@ -43,7 +43,7 @@ export interface VoucherBookPageDocument {
   bookId: string
   pageNumber: number
   layoutType: string
-  metadata?: any | null
+  metadata: any | null
   createdAt: Date
   updatedAt: Date
   // Optional relations
@@ -66,9 +66,9 @@ export interface AdPlacementDocument {
   shortCode?: string | null
   title?: string | null
   description?: string | null
-  metadata?: any | null
+  metadata: any | null
   createdBy: string
-  updatedBy?: string | null
+  updatedBy: string | null
   createdAt: Date
   updatedAt: Date
   // Optional relations
@@ -99,11 +99,11 @@ export interface BookDistributionDocument {
   trackingNumber?: string | null
   shippingCarrier?: string | null
   notes?: string | null
-  metadata?: any | null
+  metadata: any | null
   createdAt: Date
   updatedAt: Date
   createdBy: string
-  updatedBy?: string | null
+  updatedBy: string | null
   // Optional relations
   book?: VoucherBookDocument
   createdByUser?: any
@@ -121,9 +121,9 @@ export class VoucherBookMapper {
     return {
       id: doc.id,
       title: doc.title,
-      edition: doc.edition,
+      edition: doc.edition ?? null,
       bookType: doc.bookType,
-      month: doc.month,
+      month: doc.month ?? null,
       year: doc.year,
       status: doc.status,
       totalPages: doc.totalPages,
@@ -132,9 +132,9 @@ export class VoucherBookMapper {
       backImageUrl: doc.backImageUrl,
       pdfUrl: doc.pdfUrl,
       pdfGeneratedAt: doc.pdfGeneratedAt,
-      metadata: doc.metadata,
+      metadata: doc.metadata ?? null,
       createdBy: doc.createdBy,
-      updatedBy: doc.updatedBy,
+      updatedBy: doc.updatedBy ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       deletedAt: doc.deletedAt,
@@ -189,7 +189,7 @@ export class VoucherBookPageMapper {
       bookId: doc.bookId,
       pageNumber: doc.pageNumber,
       layoutType: doc.layoutType,
-      metadata: doc.metadata,
+      metadata: doc.metadata ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       // Map relations if present
@@ -236,9 +236,9 @@ export class AdPlacementMapper {
       shortCode: doc.shortCode,
       title: doc.title,
       description: doc.description,
-      metadata: doc.metadata,
+      metadata: doc.metadata ?? null,
       createdBy: doc.createdBy,
-      updatedBy: doc.updatedBy,
+      updatedBy: doc.updatedBy ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       // Map relations if present
@@ -300,11 +300,11 @@ export class BookDistributionMapper {
       trackingNumber: doc.trackingNumber,
       shippingCarrier: doc.shippingCarrier,
       notes: doc.notes,
-      metadata: doc.metadata,
+      metadata: doc.metadata ?? null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       createdBy: doc.createdBy,
-      updatedBy: doc.updatedBy,
+      updatedBy: doc.updatedBy ?? null,
       // Map relations if present
       book: doc.book ? VoucherBookMapper.fromDocument(doc.book) : undefined,
       createdByUser: doc.createdByUser,

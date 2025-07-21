@@ -2,10 +2,7 @@ import type { IVoucherBookRepository } from '@pdf/repositories/VoucherBookReposi
 import { VoucherBookRepository } from '@pdf/repositories/VoucherBookRepository.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import {
-  cleanupTestDatabase,
-  createTestDatabase,
-} from '@pika/tests'
+import { cleanupTestDatabase, createTestDatabase } from '@pika/tests'
 import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

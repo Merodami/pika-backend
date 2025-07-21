@@ -63,6 +63,17 @@ export const UsageType = z.enum(['featureAccess', 'creditDeduction'])
 
 export type UsageType = z.infer<typeof UsageType>
 
+export const SubscriptionNotificationType = z.enum([
+  'created',
+  'cancelled',
+  'paymentFailed',
+  'creditsAllocated',
+  'renewalReminder',
+  'trialEnding',
+])
+
+export type SubscriptionNotificationType = z.infer<typeof SubscriptionNotificationType>
+
 // ============= Admin Enums =============
 
 export const BulkAction = z.enum(['cancel', 'suspend', 'reactivate'])

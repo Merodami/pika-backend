@@ -1,5 +1,5 @@
-import { categoryCommon,categoryInternal } from '@pika/api'
-import { validateBody,validateParams, validateQuery } from '@pika/http'
+import { categoryCommon, categoryInternal } from '@pika/api'
+import { validateBody, validateParams, validateQuery } from '@pika/http'
 import { Router } from 'express'
 
 import type { InternalCategoryController } from '../controllers/InternalCategoryController.js'

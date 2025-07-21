@@ -1,5 +1,5 @@
 import type { ITranslationService } from '@pika/translation'
-import type { NextFunction,Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 
 declare global {
   namespace Express {

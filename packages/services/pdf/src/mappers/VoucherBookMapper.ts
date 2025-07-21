@@ -4,6 +4,8 @@ import type {
   VoucherBookType,
 } from '@prisma/client'
 
+import type { VoucherBookStatistics } from '../types/domain.js'
+
 /**
  * DTOs for VoucherBook - defined within the service following established pattern
  */
@@ -178,7 +180,7 @@ export class VoucherBookMapper {
    * Business rule: Only DRAFT status can be edited
    */
   static canBeEdited(voucherBook: VoucherBookDTO): boolean {
-    return voucherBook.status === 'DRAFT'
+    return voucherBook.status === 'draft'
   }
 
   /**
@@ -186,7 +188,7 @@ export class VoucherBookMapper {
    * Business rule: Must be READY_FOR_PRINT and have PDF
    */
   static canBePublished(voucherBook: VoucherBookDTO): boolean {
-    return voucherBook.status === 'READY_FOR_PRINT' && this.hasPDF(voucherBook)
+    return voucherBook.status === 'ready_for_print' && this.hasPDF(voucherBook)
   }
 
   /**
@@ -352,7 +354,7 @@ export class VoucherBookMapper {
       totalPages: voucherBook.totalPages,
       publishedAt: voucherBook.publishedAt?.toISOString() || null,
       coverImageUrl: voucherBook.coverImageUrl,
-      pdfUrl: voucherBook.status === 'PUBLISHED' ? voucherBook.pdfUrl : null, // Only show PDF if published
+      pdfUrl: voucherBook.status === 'published' ? voucherBook.pdfUrl : null, // Only show PDF if published
       createdAt: voucherBook.createdAt.toISOString(),
     }
   }
@@ -462,10 +464,10 @@ export class VoucherBookMapper {
 
     // Initialize with all statuses
     const statuses: VoucherBookStatus[] = [
-      'DRAFT',
-      'READY_FOR_PRINT',
-      'PUBLISHED',
-      'ARCHIVED',
+      'draft',
+      'ready_for_print',
+      'published',
+      'archived',
     ]
 
     statuses.forEach((status) => {
@@ -513,7 +515,7 @@ export class VoucherBookMapper {
         if (a.month === null) return 1
         if (b.month === null) return -1
 
-        return b.month - a.month
+        return (b.month ?? 0) - (a.month ?? 0)
       }
 
       // Finally by title
@@ -569,47 +571,7 @@ export class VoucherBookMapper {
   /**
    * Map statistics to response DTO
    */
-  static toStatisticsResponse(stats: {
-    total: number
-    byStatus: {
-      draft: number
-      readyForPrint: number
-      published: number
-      archived: number
-    }
-    byType: { monthly: number; specialEdition: number; regional: number }
-    distributions: {
-      total: number
-      pending: number
-      shipped: number
-      delivered: number
-    }
-    recentActivity: {
-      booksCreatedThisMonth: number
-      pdfsGeneratedThisMonth: number
-      distributionsThisMonth: number
-    }
-  }): {
-    total: number
-    byStatus: {
-      draft: number
-      readyForPrint: number
-      published: number
-      archived: number
-    }
-    byType: { monthly: number; specialEdition: number; regional: number }
-    distributions: {
-      total: number
-      pending: number
-      shipped: number
-      delivered: number
-    }
-    recentActivity: {
-      booksCreatedThisMonth: number
-      pdfsGeneratedThisMonth: number
-      distributionsThisMonth: number
-    }
-  } {
+  static toStatisticsResponse(stats: VoucherBookStatistics): any {
     return {
       total: stats.total,
       byStatus: {
@@ -629,11 +591,11 @@ export class VoucherBookMapper {
         shipped: stats.distributions.shipped,
         delivered: stats.distributions.delivered,
       },
-      recentActivity: {
-        booksCreatedThisMonth: stats.recentActivity.booksCreatedThisMonth,
-        pdfsGeneratedThisMonth: stats.recentActivity.pdfsGeneratedThisMonth,
-        distributionsThisMonth: stats.recentActivity.distributionsThisMonth,
-      },
+      recentActivity: stats.recentActivity.map(activity => ({
+        date: activity.date.toISOString(),
+        action: activity.action,
+        count: activity.count,
+      })),
     }
   }
 

@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-
 /**
  * Common auth patterns and validators shared across all auth tiers
  */

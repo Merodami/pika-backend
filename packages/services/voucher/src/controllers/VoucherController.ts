@@ -8,7 +8,7 @@ import {
   RequestContext,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { VoucherDomain,VoucherMapper } from '@pika/sdk'
+import { VoucherDomain, VoucherMapper } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
 import {
   PaginatedResult,

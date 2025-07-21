@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import { AdSize, ContentType,PageLayoutType } from '../../shared/enums.js'
+import { AdSize, ContentType, PageLayoutType } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
 

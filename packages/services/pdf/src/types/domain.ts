@@ -1,4 +1,3 @@
-
 // Service operation types
 export interface VoucherBookValidationOptions {
   checkStatus?: boolean

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { DateTime,UUID } from '../../shared/primitives.js'
+import { DateTime, UUID } from '../../shared/primitives.js'
 import {
   CustomerVoucherStatus,
   VoucherCodeType,

@@ -1,5 +1,5 @@
-import { categoryCommon,categoryPublic } from '@pika/api'
-import { validateParams,validateQuery } from '@pika/http'
+import { categoryCommon, categoryPublic } from '@pika/api'
+import { validateParams, validateQuery } from '@pika/http'
 import { Router } from 'express'
 
 import type { CategoryController } from '../controllers/CategoryController.js'

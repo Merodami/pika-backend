@@ -1,3 +1,4 @@
+import { subscriptionInternal } from '@pika/api'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -30,8 +31,8 @@ export class InternalSubscriptionController {
    */
   async processWebhook(
     request: Request<
-      unknown,
-      unknown,
+      {},
+      {},
       subscriptionInternal.ProcessSubscriptionWebhookRequest
     >,
     response: Response,
@@ -95,8 +96,8 @@ export class InternalSubscriptionController {
    */
   async updateFromPayment(
     request: Request<
-      unknown,
-      unknown,
+      {},
+      {},
       subscriptionInternal.UpdateSubscriptionFromPaymentRequest
     >,
     response: Response,
@@ -143,8 +144,8 @@ export class InternalSubscriptionController {
    */
   async checkAccess(
     request: Request<
-      unknown,
-      unknown,
+      {},
+      {},
       subscriptionInternal.CheckSubscriptionAccessRequest
     >,
     response: Response,
@@ -219,7 +220,7 @@ export class InternalSubscriptionController {
    * Get subscription by Stripe ID
    */
   async getByStripeId(
-    request: Request<{ stripeSubscriptionId: string }>,
+    request: Request<subscriptionInternal.StripeSubscriptionIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -249,7 +250,7 @@ export class InternalSubscriptionController {
    * Get user's subscriptions
    */
   async getUserSubscriptions(
-    request: Request<{ userId: string }>,
+    request: Request<subscriptionInternal.SubscriptionByUserIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -287,8 +288,8 @@ export class InternalSubscriptionController {
    */
   async sendNotification(
     request: Request<
-      unknown,
-      unknown,
+      {},
+      {},
       subscriptionInternal.SendSubscriptionNotificationRequest
     >,
     response: Response,
@@ -300,7 +301,7 @@ export class InternalSubscriptionController {
       logger.info('Sending subscription notification', { userId, type })
 
       // Map notification type to template key
-      let templateKey: z.infer<typeof communicationCommon.TemplateKey>
+      let templateKey: typeof TEMPLATE_KEYS[keyof typeof TEMPLATE_KEYS]
 
       switch (type) {
         case 'created':

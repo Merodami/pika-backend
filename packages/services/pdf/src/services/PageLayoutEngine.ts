@@ -1,13 +1,13 @@
 import { ErrorFactory, logger } from '@pika/shared'
 
-export type AdSize = 'SINGLE' | 'QUARTER' | 'HALF' | 'FULL'
+export type AdSize = 'single' | 'quarter' | 'half' | 'full'
 
 export interface AdPlacementInfo {
   id: string
   position: number
   size: AdSize
   spacesUsed: number
-  contentType: 'VOUCHER' | 'IMAGE' | 'AD' | 'SPONSORED'
+  contentType: 'voucher' | 'image' | 'ad' | 'sponsored'
   voucherId?: string
   imageUrl?: string
   designUrl?: string // Deprecated, use imageUrl
@@ -34,13 +34,13 @@ export class PageLayoutEngine {
    */
   getRequiredSpaces(size: AdSize): number {
     switch (size) {
-      case 'SINGLE':
+      case 'single':
         return 1
-      case 'QUARTER':
+      case 'quarter':
         return 2
-      case 'HALF':
+      case 'half':
         return 4
-      case 'FULL':
+      case 'full':
         return 8
       default:
         return 1
@@ -72,17 +72,17 @@ export class PageLayoutEngine {
     }
 
     // Additional constraints for specific sizes
-    if (size === 'HALF') {
+    if (size === 'half') {
       // Half page must start at position 1 or 5 (top or bottom half)
       return startPosition === 1 || startPosition === 5
     }
 
-    if (size === 'FULL') {
+    if (size === 'full') {
       // Full page must start at position 1
       return startPosition === 1
     }
 
-    if (size === 'QUARTER') {
+    if (size === 'quarter') {
       // Quarter page must align properly (1, 3, 5, 7)
       return [1, 3, 5, 7].includes(startPosition)
     }
@@ -113,13 +113,13 @@ export class PageLayoutEngine {
    */
   private getPossibleStartPositions(size: AdSize): number[] {
     switch (size) {
-      case 'FULL':
+      case 'full':
         return [1]
-      case 'HALF':
+      case 'half':
         return [1, 5]
-      case 'QUARTER':
+      case 'quarter':
         return [1, 3, 5, 7]
-      case 'SINGLE':
+      case 'single':
         return Array.from({ length: this.SPACES_PER_PAGE }, (_, i) => i + 1)
       default:
         return []
@@ -238,14 +238,14 @@ export class PageLayoutEngine {
 
     // Adjust dimensions based on ad size
     switch (placement.size) {
-      case 'QUARTER':
+      case 'quarter':
         width = cellWidth * 2 // Spans 2 columns
         break
-      case 'HALF':
+      case 'half':
         width = cellWidth * 2 // Spans 2 columns
         height = cellHeight * 2 // Spans 2 rows
         break
-      case 'FULL':
+      case 'full':
         width = cellWidth * 2 // Spans 2 columns
         height = cellHeight * 4 // Spans 4 rows
         break

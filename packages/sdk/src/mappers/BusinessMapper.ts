@@ -8,8 +8,8 @@ import type {
   CreateBusinessDTO,
   UpdateBusinessDTO,
 } from '../dto/business.dto.js'
-import { type CategoryDocument,CategoryMapper } from './CategoryMapper.js'
-import { type UserDocument,UserMapper } from './UserMapper.js'
+import { type CategoryDocument, CategoryMapper } from './CategoryMapper.js'
+import { type UserDocument, UserMapper } from './UserMapper.js'
 
 /**
  * Interface representing a database Business document

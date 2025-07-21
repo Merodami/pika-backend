@@ -1,5 +1,5 @@
-import { pdfAdmin,pdfCommon } from '@pika/api'
-import { validateBody,validateParams, validateQuery } from '@pika/http'
+import { pdfAdmin, pdfCommon } from '@pika/api'
+import { validateBody, validateParams, validateQuery } from '@pika/http'
 import { Router } from 'express'
 
 import type { AdminVoucherBookController } from '../controllers/AdminVoucherBookController.js'

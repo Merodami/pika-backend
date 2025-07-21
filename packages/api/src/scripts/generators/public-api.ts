@@ -1,4 +1,3 @@
-
 import type { ZodRegistry } from '@api/common/registry/base.js'
 import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'

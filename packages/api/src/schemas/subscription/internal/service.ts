@@ -5,6 +5,7 @@ import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import {
   SubscriptionEvent,
+  SubscriptionNotificationType,
   SubscriptionStatus,
   UsageType,
 } from '../common/enums.js'
@@ -194,7 +195,7 @@ export type SubscriptionListResponse = z.infer<typeof SubscriptionListResponse>
 export const SendSubscriptionNotificationRequest = openapi(
   z.object({
     userId: UserId,
-    type: SubscriptionEvent,
+    type: SubscriptionNotificationType,
     subscriptionData: z.object({
       planName: z.string(),
       planType: z.string().optional(),

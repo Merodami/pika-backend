@@ -7,7 +7,7 @@ import type {
   IAdPlacementRepository,
   IVoucherBookRepository,
 } from '../repositories/index.js'
-import { AdSize,PageLayoutEngine } from './PageLayoutEngine.js'
+import { AdSize, PageLayoutEngine } from './PageLayoutEngine.js'
 
 export interface CreateAdPlacementData {
   voucherBookId: string
@@ -191,7 +191,7 @@ export class AdPlacementService implements IAdPlacementService {
       }
 
       const placements =
-        await this.placementRepository.findByVoucherBookId(voucherBookId)
+        await this.placementRepository.findByBookId(voucherBookId)
 
       return placements
     } catch (error) {

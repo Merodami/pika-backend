@@ -4,7 +4,7 @@ import { VoucherBookMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, VoucherBookStatus, VoucherBookType } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -31,7 +31,7 @@ export interface IVoucherBookRepository {
   ): Promise<PaginatedResult<VoucherBookDomain>>
   updateStatus(
     id: string,
-    status: string,
+    status: VoucherBookStatus,
     updatedBy: string,
   ): Promise<VoucherBookDomain>
   findBooksForGeneration(): Promise<VoucherBookDomain[]>
@@ -43,7 +43,7 @@ export interface IVoucherBookRepository {
 export interface CreateVoucherBookInput {
   title: string
   edition?: string
-  bookType: string
+  bookType: VoucherBookType
   month?: number
   year: number
   totalPages: number
@@ -56,11 +56,11 @@ export interface CreateVoucherBookInput {
 export interface UpdateVoucherBookInput {
   title?: string
   edition?: string
-  bookType?: string
+  bookType?: VoucherBookType
   month?: number
   year?: number
   totalPages?: number
-  status?: string
+  status?: VoucherBookStatus
   publishedAt?: Date
   coverImageUrl?: string
   backImageUrl?: string
@@ -74,8 +74,8 @@ export interface VoucherBookSearchParams {
   page?: number
   limit?: number
   search?: string
-  bookType?: string
-  status?: string
+  bookType?: VoucherBookType
+  status?: VoucherBookStatus
   year?: number
   month?: number
   createdBy?: string
@@ -91,7 +91,7 @@ export interface PublishedBookSearchParams {
   page?: number
   limit?: number
   search?: string
-  bookType?: string
+  bookType?: VoucherBookType
   year?: number
   month?: number
   sortBy?: string
@@ -126,7 +126,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
           month: data.month,
           year: data.year,
           totalPages: data.totalPages,
-          status: 'DRAFT',
+          status: 'draft',
           coverImageUrl: data.coverImageUrl,
           backImageUrl: data.backImageUrl,
           metadata: data.metadata || {},
@@ -429,7 +429,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
 
       // Build where clause - only published books
       const where: Prisma.VoucherBookWhereInput = {
-        status: 'PUBLISHED',
+        status: 'published',
       }
 
       if (search) {
@@ -500,16 +500,15 @@ export class VoucherBookRepository implements IVoucherBookRepository {
    */
   async updateStatus(
     id: string,
-    status: string,
+    status: VoucherBookStatus,
     updatedBy: string,
   ): Promise<VoucherBookDomain> {
     try {
       const updateData: Prisma.VoucherBookUpdateInput = {
         status,
-        updatedBy,
       }
 
-      if (status === 'PUBLISHED') {
+      if (status === 'published') {
         updateData.publishedAt = new Date()
       }
 
@@ -536,7 +535,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
     try {
       const voucherBooks = await this.prisma.voucherBook.findMany({
         where: {
-          status: 'READY_FOR_PRINT',
+          status: 'ready_for_print',
           pdfUrl: null,
         },
         orderBy: { createdAt: 'asc' },

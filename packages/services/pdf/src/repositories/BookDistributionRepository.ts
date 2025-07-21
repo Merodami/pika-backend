@@ -226,7 +226,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
 
       const distributions = await this.prisma.bookDistribution.findMany({
         where: { bookId },
-        orderBy: { distributionDate: 'desc' },
+        orderBy: { createdAt: 'desc' },
         include,
       })
 

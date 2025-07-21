@@ -1,4 +1,4 @@
-import { storageCommon,storagePublic } from '@pika/api'
+import { storageCommon, storagePublic } from '@pika/api'
 import {
   allowServiceOrUserAuth,
   requireAuth,

@@ -1,4 +1,4 @@
-import { storageCommon,storagePublic } from '@pika/api'
+import { storageCommon, storagePublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'

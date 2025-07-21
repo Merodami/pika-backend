@@ -232,7 +232,7 @@ export class BookDistributionService implements IBookDistributionService {
       }
 
       const distributions =
-        await this.distributionRepository.findByVoucherBookId(voucherBookId)
+        await this.distributionRepository.findByBookId(voucherBookId)
 
       return distributions
     } catch (error) {

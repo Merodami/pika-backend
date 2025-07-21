@@ -1,6 +1,8 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
+import type { VoucherBookDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 import type {
   BookFormat,
   Orientation,
@@ -34,14 +36,13 @@ export interface CreateVoucherBookData {
   format: BookFormat
   orientation: Orientation
   totalPages?: number
-  vouchersPerPage?: number
   isActive?: boolean
   providerId?: string
   edition?: string
   region?: string
   metadata?: Record<string, any>
   createdById: string
-  updatedById: string
+  updatedBy: string
 }
 
 export interface UpdateVoucherBookData {
@@ -50,13 +51,12 @@ export interface UpdateVoucherBookData {
   format?: BookFormat
   orientation?: Orientation
   totalPages?: number
-  vouchersPerPage?: number
   isActive?: boolean
   providerId?: string
   edition?: string
   region?: string
   metadata?: Record<string, any>
-  updatedById: string
+  updatedBy: string
 }
 
 export interface PaginatedResult<T> {
@@ -80,18 +80,18 @@ export interface GeneratePDFResult {
 }
 
 export interface IVoucherBookService {
-  createVoucherBook(data: CreateVoucherBookData): Promise<VoucherBook>
-  getVoucherBookById(id: string): Promise<VoucherBook>
+  createVoucherBook(data: CreateVoucherBookData): Promise<VoucherBookDomain>
+  getVoucherBookById(id: string): Promise<VoucherBookDomain>
   getAllVoucherBooks(
     params: VoucherBookSearchParams,
-  ): Promise<PaginatedResult<VoucherBook>>
+  ): Promise<PaginatedResult<VoucherBookDomain>>
   updateVoucherBook(
     id: string,
     data: UpdateVoucherBookData,
-  ): Promise<VoucherBook>
+  ): Promise<VoucherBookDomain>
   deleteVoucherBook(id: string): Promise<void>
-  publishVoucherBook(id: string, userId: string): Promise<VoucherBook>
-  archiveVoucherBook(id: string, userId: string): Promise<VoucherBook>
+  publishVoucherBook(id: string, userId: string): Promise<VoucherBookDomain>
+  archiveVoucherBook(id: string, userId: string): Promise<VoucherBookDomain>
   generatePDF(id: string, userId?: string): Promise<GeneratePDFResult>
   getVoucherBookStatistics(id: string): Promise<{
     totalPages: number
@@ -140,7 +140,7 @@ export class VoucherBookService implements IVoucherBookService {
     this.cryptoServiceAdapter = new CryptoServiceAdapter()
   }
 
-  async createVoucherBook(data: CreateVoucherBookData): Promise<VoucherBook> {
+  async createVoucherBook(data: CreateVoucherBookData): Promise<VoucherBookDomain> {
     try {
       logger.info('Creating voucher book', {
         title: data.title,
@@ -151,20 +151,13 @@ export class VoucherBookService implements IVoucherBookService {
       const bookData = {
         ...data,
         totalPages: data.totalPages || VoucherBookService.DEFAULT_PAGES,
-        vouchersPerPage:
-          data.vouchersPerPage || VoucherBookService.DEFAULT_VOUCHERS_PER_PAGE,
         isActive: data.isActive ?? true,
-        status: 'DRAFT' as VoucherBookStatus,
+        status: 'draft' as VoucherBookStatus,
       }
 
-      // Calculate total vouchers
-      const totalVouchers = bookData.totalPages * bookData.vouchersPerPage
 
       // Create the voucher book
-      const voucherBook = await this.voucherBookRepository.create({
-        ...bookData,
-        totalVouchers,
-      })
+      const voucherBook = await this.voucherBookRepository.create(bookData)
 
       // Create initial page structure with layout engine
       await this.createInitialPages(
@@ -191,7 +184,7 @@ export class VoucherBookService implements IVoucherBookService {
     prefix: 'service:voucher-book',
     keyGenerator: (id) => id,
   })
-  async getVoucherBookById(id: string): Promise<VoucherBook> {
+  async getVoucherBookById(id: string): Promise<VoucherBookDomain> {
     try {
       if (!isUuidV4(id)) {
         throw ErrorFactory.badRequest('Invalid voucher book ID format')
@@ -200,7 +193,7 @@ export class VoucherBookService implements IVoucherBookService {
       const voucherBook = await this.voucherBookRepository.findById(id)
 
       if (!voucherBook) {
-        throw ErrorFactory.notFound('Voucher book not found')
+        throw ErrorFactory.resourceNotFound('VoucherBook', id)
       }
 
       return voucherBook
@@ -217,7 +210,7 @@ export class VoucherBookService implements IVoucherBookService {
   })
   async getAllVoucherBooks(
     params: VoucherBookSearchParams,
-  ): Promise<PaginatedResult<VoucherBook>> {
+  ): Promise<PaginatedResult<VoucherBookDomain>> {
     try {
       const result = await this.voucherBookRepository.findAll(params)
 
@@ -231,7 +224,7 @@ export class VoucherBookService implements IVoucherBookService {
   async updateVoucherBook(
     id: string,
     data: UpdateVoucherBookData,
-  ): Promise<VoucherBook> {
+  ): Promise<VoucherBookDomain> {
     try {
       if (!isUuidV4(id)) {
         throw ErrorFactory.badRequest('Invalid voucher book ID format')
@@ -245,12 +238,8 @@ export class VoucherBookService implements IVoucherBookService {
       // Recalculate total vouchers if page structure changes
       const updateData = { ...data }
 
-      if (data.totalPages || data.vouchersPerPage) {
+      if (data.totalPages) {
         const totalPages = data.totalPages || currentBook.totalPages
-        const vouchersPerPage =
-          data.vouchersPerPage || currentBook.vouchersPerPage
-
-        updateData.totalVouchers = totalPages * vouchersPerPage
 
         // If increasing pages, create new page records
         if (data.totalPages && data.totalPages > currentBook.totalPages) {
@@ -258,7 +247,7 @@ export class VoucherBookService implements IVoucherBookService {
             id,
             currentBook.totalPages + 1,
             data.totalPages,
-            data.updatedById,
+            data.updatedBy,
           )
         }
       }
@@ -292,7 +281,7 @@ export class VoucherBookService implements IVoucherBookService {
       const voucherBook = await this.getVoucherBookById(id)
 
       // Only allow deletion of draft books
-      if (voucherBook.status !== 'DRAFT') {
+      if (voucherBook.status !== 'draft') {
         throw ErrorFactory.badRequest('Only draft voucher books can be deleted')
       }
 
@@ -308,12 +297,12 @@ export class VoucherBookService implements IVoucherBookService {
     }
   }
 
-  async publishVoucherBook(id: string, userId: string): Promise<VoucherBook> {
+  async publishVoucherBook(id: string, userId: string): Promise<VoucherBookDomain> {
     try {
       const voucherBook = await this.getVoucherBookById(id)
 
       // Validate state transition
-      if (voucherBook.status !== 'READY_FOR_PRINT') {
+      if (voucherBook.status !== 'ready_for_print') {
         throw ErrorFactory.badRequest(
           'Only books ready for print can be published',
         )
@@ -323,9 +312,9 @@ export class VoucherBookService implements IVoucherBookService {
       await this.validateBookReadyForPublication(id)
 
       const updatedBook = await this.voucherBookRepository.update(id, {
-        status: 'PUBLISHED',
+        status: 'published',
         publishedAt: new Date(),
-        updatedById: userId,
+        updatedBy: userId,
       })
 
       await this.cache.del(`service:voucher-book:${id}`)
@@ -339,18 +328,18 @@ export class VoucherBookService implements IVoucherBookService {
     }
   }
 
-  async archiveVoucherBook(id: string, userId: string): Promise<VoucherBook> {
+  async archiveVoucherBook(id: string, userId: string): Promise<VoucherBookDomain> {
     try {
       const voucherBook = await this.getVoucherBookById(id)
 
       // Can only archive published books
-      if (voucherBook.status !== 'PUBLISHED') {
+      if (voucherBook.status !== 'published') {
         throw ErrorFactory.badRequest('Only published books can be archived')
       }
 
       const updatedBook = await this.voucherBookRepository.update(id, {
-        status: 'ARCHIVED',
-        updatedById: userId,
+        status: 'archived',
+        updatedBy: userId,
       })
 
       await this.cache.del(`service:voucher-book:${id}`)
@@ -375,42 +364,90 @@ export class VoucherBookService implements IVoucherBookService {
       const voucherBook = await this.getVoucherBookById(id)
 
       // Validate book can be generated
-      if (voucherBook.status === 'ARCHIVED') {
+      if (voucherBook.status === 'archived') {
         throw ErrorFactory.badRequest('Cannot generate PDF for archived books')
       }
 
       // Get placements and build page layouts
-      const placements = await this.placementRepository.findByVoucherBookId(id)
+      const placements = await this.placementRepository.findByBookId(id)
       const pageLayouts = await this.buildPageLayouts(
         voucherBook.totalPages,
         placements,
       )
 
-      // Get voucher data for voucher placements
-      const voucherIds = placements
-        .filter((p) => p.contentType === 'VOUCHER' && p.isActive)
-        .map((p) => p.id) // This would be the voucher ID in real implementation
+      // Collect voucher IDs from placements with voucher content
+      const voucherIds = new Set<string>()
+      for (const placement of placements) {
+        if (placement.contentType === 'voucher' && placement.metadata) {
+          const voucherId = (placement.metadata as any).voucherId
+          if (voucherId) {
+            voucherIds.add(voucherId)
+          }
+        }
+      }
 
       const vouchers = new Map<string, VoucherData>()
       const qrPayloads = new Map<string, string>()
 
-      // In real implementation, fetch vouchers from voucher service
-      for (const voucherId of voucherIds) {
-        // Mock voucher data - in real implementation use voucherServiceClient
-        vouchers.set(voucherId, {
-          id: voucherId,
-          title: 'Sample Voucher',
-          description: '20% off all services',
-          discount: '20%',
-          businessName: 'Sample Business',
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-        })
+      if (voucherIds.size > 0) {
+        // Fetch vouchers from voucher service
+        const voucherDataMap = await this.voucherServiceClient.getVouchersByIds(
+          Array.from(voucherIds),
+        )
 
-        // Generate JWT payload using crypto service
-        const payload =
-          await this.cryptoServiceAdapter.generateVoucherPayload(voucherId)
+        // Generate short codes and QR payloads for each voucher
+        const voucherPayloadData = await Promise.all(
+          Array.from(voucherIds).map(async (voucherId) => {
+            const voucherData = voucherDataMap.get(voucherId)
+            if (!voucherData) {
+              logger.warn('Voucher not found for placement', { voucherId })
+              return null
+            }
 
-        qrPayloads.set(voucherId, payload)
+            // Generate short code
+            const shortCodeResult = await this.cryptoServiceAdapter.generateShortCode(
+              voucherId,
+            )
+
+            // Store voucher data for PDF rendering
+            vouchers.set(voucherId, {
+              id: voucherId,
+              title: voucherData.title,
+              description: voucherData.description,
+              discount: voucherData.discount_amount
+                ? `${voucherData.discount_amount}%`
+                : 'Special Offer',
+              businessName: voucherData.provider?.name || 'Partner Business',
+              expiresAt: voucherData.expires_at,
+            })
+
+            return {
+              voucherId,
+              providerId: voucherData.provider_id,
+              shortCode: shortCodeResult.shortCode,
+            }
+          }),
+        )
+
+        // Filter out null values
+        const validPayloadData = voucherPayloadData.filter(
+          (data): data is NonNullable<typeof data> => data !== null,
+        )
+
+        // Generate batch QR payloads
+        if (validPayloadData.length > 0) {
+          const batchId = `book-${id}-${Date.now()}`
+          const batchPayloadMap =
+            await this.cryptoServiceAdapter.generateBatchQRPayloads(
+              validPayloadData,
+              batchId,
+            )
+
+          // Map payloads - generateBatchQRPayloads returns a Map
+          for (const [voucherId, payload] of batchPayloadMap) {
+            qrPayloads.set(voucherId, payload)
+          }
+        }
       }
 
       // Generate PDF using the sophisticated PDF generation service
@@ -428,10 +465,10 @@ export class VoucherBookService implements IVoucherBookService {
         await this.pdfGenerationService.generateVoucherBookPDF(pdfOptions)
 
       // Update book status if it was draft
-      if (voucherBook.status === 'DRAFT') {
+      if (voucherBook.status === 'draft') {
         await this.voucherBookRepository.update(id, {
-          status: 'READY_FOR_PRINT',
-          updatedById: userId || 'system',
+          status: 'ready_for_print',
+          updatedBy: userId || 'system',
         })
       }
 
@@ -482,7 +519,7 @@ export class VoucherBookService implements IVoucherBookService {
   }> {
     try {
       const voucherBook = await this.getVoucherBookById(id)
-      const placements = await this.placementRepository.findByVoucherBookId(id)
+      const placements = await this.placementRepository.findByBookId(id)
 
       const totalSpaces =
         voucherBook.totalPages * VoucherBookService.SPACES_PER_PAGE
@@ -491,22 +528,18 @@ export class VoucherBookService implements IVoucherBookService {
       let usedSpaces = 0
 
       for (const placement of placements) {
-        if (placement.isActive) {
-          const spacesRequired = this.pageLayoutEngine.getRequiredSpaces(
-            placement.position as any,
-          )
+        const spacesRequired = this.pageLayoutEngine.getRequiredSpaces(
+          placement.size as any,
+        )
 
-          usedSpaces += spacesRequired
-        }
+        usedSpaces += spacesRequired
       }
 
       const availableSpaces = totalSpaces - usedSpaces
 
       const placementsByType = placements.reduce(
         (acc, placement) => {
-          if (placement.isActive) {
-            acc[placement.contentType] = (acc[placement.contentType] || 0) + 1
-          }
+          acc[placement.contentType] = (acc[placement.contentType] || 0) + 1
 
           return acc
         },
@@ -517,7 +550,7 @@ export class VoucherBookService implements IVoucherBookService {
         totalPages: voucherBook.totalPages,
         usedSpaces,
         availableSpaces,
-        totalPlacements: placements.filter((p) => p.isActive).length,
+        totalPlacements: placements.length,
         placementsByType,
       }
     } catch (error) {
@@ -537,12 +570,10 @@ export class VoucherBookService implements IVoucherBookService {
   ): Promise<void> {
     for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
       await this.pageRepository.create({
-        voucherBookId,
+        bookId: voucherBookId,
         pageNumber,
-        layout: this.pageLayoutEngine.getEmptyPageLayout(pageNumber),
-        isActive: true,
-        createdById,
-        updatedById: createdById,
+        layoutType: 'standard',
+        metadata: this.pageLayoutEngine.createEmptyPage(pageNumber),
       })
     }
   }
@@ -555,18 +586,16 @@ export class VoucherBookService implements IVoucherBookService {
   ): Promise<void> {
     for (let pageNumber = startPage; pageNumber <= endPage; pageNumber++) {
       await this.pageRepository.create({
-        voucherBookId,
+        bookId: voucherBookId,
         pageNumber,
-        layout: this.pageLayoutEngine.getEmptyPageLayout(pageNumber),
-        isActive: true,
-        createdById: userId,
-        updatedById: userId,
+        layoutType: 'standard',
+        metadata: this.pageLayoutEngine.createEmptyPage(pageNumber),
       })
     }
   }
 
   private validateBookModification(book: VoucherBook): void {
-    if (book.status === 'PUBLISHED' || book.status === 'ARCHIVED') {
+    if (book.status === 'published' || book.status === 'archived') {
       throw ErrorFactory.badRequest(
         `Cannot modify ${book.status.toLowerCase()} voucher book`,
       )
@@ -574,7 +603,7 @@ export class VoucherBookService implements IVoucherBookService {
   }
 
   private async validateBookReadyForPublication(id: string): Promise<void> {
-    const placements = await this.placementRepository.findByVoucherBookId(id)
+    const placements = await this.placementRepository.findByBookId(id)
 
     if (placements.length === 0) {
       throw ErrorFactory.badRequest(
@@ -584,9 +613,7 @@ export class VoucherBookService implements IVoucherBookService {
 
     // Validate all placements are properly configured
     for (const placement of placements) {
-      if (!placement.isActive) {
-        continue
-      }
+      // All placements are considered active
 
       if (placement.contentType === 'IMAGE' && !placement.imageUrl) {
         throw ErrorFactory.badRequest(
@@ -594,11 +621,7 @@ export class VoucherBookService implements IVoucherBookService {
         )
       }
 
-      if (placement.contentType === 'TEXT' && !placement.textContent) {
-        throw ErrorFactory.badRequest(
-          `Placement "${placement.title}" missing required text content`,
-        )
-      }
+      // Text content validation removed - not part of current schema
     }
   }
 
@@ -610,9 +633,7 @@ export class VoucherBookService implements IVoucherBookService {
 
     for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
       const pagePlacements = placements.filter(
-        (p) =>
-          p.isActive &&
-          this.getPageNumberFromPosition(p.position) === pageNumber,
+        (p) => this.getPageNumberFromPosition(p.position) === pageNumber,
       )
 
       const adPlacements: AdPlacementInfo[] = pagePlacements.map((p) => ({

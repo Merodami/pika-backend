@@ -52,7 +52,7 @@
       "@pikatorage": ["packages/services/storage/src"]
     }
   },
-  "exclude": ["**/dist", "node_modules", "previous-architecture", "ai"],
+  "exclude": ["**/dist", "node_modules", "previous-architecture", "ai", "pika-old"],
   "references": [
     // Core packages
     { "path": "packages/types" },

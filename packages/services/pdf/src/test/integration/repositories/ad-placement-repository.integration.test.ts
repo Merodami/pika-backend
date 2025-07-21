@@ -1,9 +1,6 @@
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import {
-  clearTestDatabase,
-  createTestDatabase,
-} from '@pika/tests'
+import { clearTestDatabase, createTestDatabase } from '@pika/tests'
 import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

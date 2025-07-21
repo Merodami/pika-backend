@@ -5,7 +5,7 @@ import { activeStatus, withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { BillingInterval, PlanSortBy,PlanType } from '../common/enums.js'
+import { BillingInterval, PlanSortBy, PlanType } from '../common/enums.js'
 
 /**
  * Subscription plan schemas for public API

@@ -9,7 +9,7 @@ import { UUID } from '../../shared/primitives.js'
 import { createByIdQuerySchema } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { PublicUserProfile } from '../../user/public/profile.js'
-import { BUSINESS_RELATIONS,BusinessSortBy } from '../common/enums.js'
+import { BUSINESS_RELATIONS, BusinessSortBy } from '../common/enums.js'
 
 /**
  * Public business schemas

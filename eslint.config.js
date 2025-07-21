@@ -33,6 +33,7 @@ export default [
       '**/packages/sdk/src/openapi/**',
       'api-microservices-sdk/**',
       'ai/**',
+      'pika-old/**',
     ],
   },
 

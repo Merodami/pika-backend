@@ -4,7 +4,7 @@ import { VoucherBookPageMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, PageLayoutType } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -43,13 +43,13 @@ export interface IVoucherBookPageRepository {
 export interface CreateVoucherBookPageInput {
   bookId: string
   pageNumber: number
-  layoutType: string
+  layoutType: PageLayoutType
   metadata?: Record<string, any>
 }
 
 export interface UpdateVoucherBookPageInput {
   pageNumber?: number
-  layoutType?: string
+  layoutType?: PageLayoutType
   metadata?: Record<string, any>
 }
 
@@ -57,7 +57,7 @@ export interface VoucherBookPageSearchParams {
   page?: number
   limit?: number
   bookId?: string
-  layoutType?: string
+  layoutType?: PageLayoutType
   hasContent?: boolean
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
@@ -212,9 +212,9 @@ export class VoucherBookPageRepository implements IVoucherBookPageRepository {
 
       if (hasContent !== undefined) {
         if (hasContent) {
-          where.placements = { some: {} }
+          where.adPlacements = { some: {} }
         } else {
-          where.placements = { none: {} }
+          where.adPlacements = { none: {} }
         }
       }
 
@@ -378,7 +378,7 @@ export class VoucherBookPageRepository implements IVoucherBookPageRepository {
           this.prisma.voucherBookPage.count({
             where: {
               bookId,
-              placements: { some: {} },
+              adPlacements: { some: {} },
             },
           }),
           this.prisma.adPlacement.count({

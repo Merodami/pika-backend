@@ -7,8 +7,6 @@ import { UUID } from '../../shared/primitives.js'
 import { createSearchSchema } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 
-
-
 /**
  * Public support comment schemas
  */

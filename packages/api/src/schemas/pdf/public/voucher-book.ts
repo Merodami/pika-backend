@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
-import {
-  VoucherBookType,
-} from '../../shared/enums.js'
+import { VoucherBookType } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
