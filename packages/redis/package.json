@@ -13,7 +13,7 @@
     "ioredis": "^5.6.1"
   },
   "devDependencies": {
-    "@types/node": "^24.0.13",
+    "@types/node": "^24.0.15",
     "tsc-alias": "^1.8.16",
     "typescript": "^5.8.3"
   },
