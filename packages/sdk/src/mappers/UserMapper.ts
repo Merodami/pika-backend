@@ -1,3 +1,4 @@
+import { formatDateToISO, formatDateToISOOrUndefined } from '@pika/shared'
 import type { UserStatusType } from '@pika/types'
 import { mapUserRole, mapUserStatus, UserRole, UserStatus } from '@pika/types'
 
@@ -128,16 +129,6 @@ export class UserMapper {
    * Transforms camelCase to snake_case and handles date formatting
    */
   static toDTO(domain: UserDomain): UserDTO {
-    const formatDate = (
-      date: Date | string | undefined | null,
-    ): string | undefined => {
-      if (!date) return undefined
-      if (typeof date === 'string') return date
-      if (date instanceof Date) return date.toISOString()
-
-      return undefined
-    }
-
     return {
       id: domain.id,
       email: domain.email,
@@ -149,11 +140,11 @@ export class UserMapper {
       avatarUrl: domain.avatarUrl || undefined,
       role: this.mapRoleToDTO(domain.role),
       status: this.mapStatusToDTO(domain.status),
-      lastLoginAt: formatDate(domain.lastLoginAt),
-      createdAt: formatDate(domain.createdAt) || new Date().toISOString(),
-      updatedAt: formatDate(domain.updatedAt) || new Date().toISOString(),
+      lastLoginAt: formatDateToISOOrUndefined(domain.lastLoginAt),
+      createdAt: formatDateToISO(domain.createdAt),
+      updatedAt: formatDateToISO(domain.updatedAt),
       // Additional fields
-      dateOfBirth: formatDate(domain.dateOfBirth),
+      dateOfBirth: formatDateToISOOrUndefined(domain.dateOfBirth),
       stripeUserId: domain.stripeUserId || undefined,
     }
   }

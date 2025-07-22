@@ -86,7 +86,7 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
     }
   }
 
-  protected getDistributedServiceUrl(serviceName: string): string {
+  protected getDistributedServiceUrl(): string {
     // In Vercel, all services go through the API gateway
     const apiGatewayUrl =
       process.env.API_GATEWAY_BASE_URL || 'https://pikaapi.vercel.app'

@@ -23,7 +23,7 @@ process.on('unhandledRejection', (reason, promise) => {
 })
 
 // Mock Redis module with Cache decorator
-vi.mock('@pika/redis', async (importOriginal) => {
+vi.mock('@pika/redis', async () => {
   // Create a simple in-memory cache for tests
   const cache = new Map()
 
@@ -39,21 +39,17 @@ vi.mock('@pika/redis', async (importOriginal) => {
       get(key: string) {
         return Promise.resolve(cache.get(key) || null)
       }
-      set(key: string, value: any, ttl?: number) {
+      set(key: string, value: any) {
         cache.set(key, value)
-        // Simple TTL implementation for tests
-        if (ttl && ttl > 0) {
-          setTimeout(() => cache.delete(key), ttl * 1000)
-        }
 
         return Promise.resolve(true)
       }
-      setNX(key: string, value: any, ttl?: number) {
+      setNX(key: string, value: any) {
         if (cache.has(key)) {
           return Promise.resolve(false)
         }
 
-        return this.set(key, value, ttl)
+        return this.set(key, value)
       }
       exists(key: string) {
         return Promise.resolve(cache.has(key))
@@ -62,7 +58,7 @@ vi.mock('@pika/redis', async (importOriginal) => {
         // Simplified TTL for tests - return -1 if exists without TTL
         return Promise.resolve(cache.has(key) ? -1 : -2)
       }
-      updateTTL(key: string, ttl: number) {
+      updateTTL(key: string) {
         return Promise.resolve(cache.has(key))
       }
       delete(key: string) {
@@ -74,7 +70,13 @@ vi.mock('@pika/redis', async (importOriginal) => {
       delPattern(pattern: string) {
         let count = 0
 
-        const regex = new RegExp(pattern.replace(/\*/g, '.*'))
+        // Convert wildcard pattern to regex safely
+        const escapedPattern = pattern
+          .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape special regex chars
+          .replace(/\\\*/g, '.*') // Replace escaped * with .*
+
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        const regex = new RegExp(`^${escapedPattern}$`)
 
         for (const key of cache.keys()) {
           if (regex.test(key)) {
@@ -122,7 +124,7 @@ vi.mock('@pika/redis', async (importOriginal) => {
 })
 
 // Mock HTTP middleware module
-vi.mock('@pika/http', async (importOriginal) => {
+vi.mock('@pika/http', async () => {
   return {
     requireAuth: () => (req: any, res: any, next: any) => next(),
     requireBusinessRole: () => (req: any, res: any, next: any) => next(),
@@ -130,19 +132,17 @@ vi.mock('@pika/http', async (importOriginal) => {
     requireInternalAuth: () => (req: any, res: any, next: any) => next(),
     requireServiceAuth: () => (req: any, res: any, next: any) => next(),
     allowServiceOrUserAuth: () => (req: any, res: any, next: any) => next(),
-    requirePermissions:
-      (...permissions: string[]) =>
-      (req: any, res: any, next: any) => {
-        // For tests, just pass through - auth is tested separately
-        next()
-      },
-    validateBody: (schema: any) => (req: any, res: any, next: any) => next(),
-    validateParams: (schema: any) => (req: any, res: any, next: any) => next(),
-    validateQuery: (schema: any) => (req: any, res: any, next: any) => next(),
+    requirePermissions: () => (req: any, res: any, next: any) => {
+      // For tests, just pass through - auth is tested separately
+      next()
+    },
+    validateBody: () => (req: any, res: any, next: any) => next(),
+    validateParams: () => (req: any, res: any, next: any) => next(),
+    validateQuery: () => (req: any, res: any, next: any) => next(),
     getValidatedQuery: (req: any) => req.query || {},
     getValidatedBody: (req: any) => req.body || {},
     getValidatedParams: (req: any) => req.params || {},
-    getRequestLanguage: (req: any) => 'en',
+    getRequestLanguage: () => 'en',
     paginatedResponse: (result: any, mapper?: any) => {
       if (mapper && result.data) {
         return {
@@ -153,7 +153,7 @@ vi.mock('@pika/http', async (importOriginal) => {
 
       return result
     },
-    createMulterMiddleware: (options?: any) => {
+    createMulterMiddleware: () => {
       // Return a multer-like object with single, array, etc. methods
       const middleware = (req: any, res: any, next: any) => {
         req.file = req.body?.file || undefined
@@ -162,9 +162,9 @@ vi.mock('@pika/http', async (importOriginal) => {
       }
 
       return {
-        single: (fieldName: string) => middleware,
-        array: (fieldName: string, maxCount?: number) => middleware,
-        fields: (fields: any[]) => middleware,
+        single: () => middleware,
+        array: () => middleware,
+        fields: () => middleware,
         none: () => middleware,
         any: () => middleware,
       }
@@ -202,7 +202,7 @@ vi.mock('@pika/translation', () => ({
 }))
 
 // Mock shared module
-vi.mock('@pika/shared', async (importOriginal) => {
+vi.mock('@pika/shared', async () => {
   // Create a BaseError class for the mock
   class BaseError extends Error {
     context: any
@@ -272,30 +272,26 @@ vi.mock('@pika/shared', async (importOriginal) => {
 
   // Mock BaseServiceClient class
   class BaseServiceClient {
-    constructor(config: any) {
+    constructor() {
       // Mock constructor
     }
 
-    protected async get(path: string, options?: any): Promise<any> {
+    protected async get(): Promise<any> {
       // Mock GET request
       return Promise.resolve({ data: 'mock data' })
     }
 
-    protected async post(
-      path: string,
-      data?: any,
-      options?: any,
-    ): Promise<any> {
+    protected async post(): Promise<any> {
       // Mock POST request
       return Promise.resolve({ data: 'mock data' })
     }
 
-    protected async put(path: string, data?: any, options?: any): Promise<any> {
+    protected async put(): Promise<any> {
       // Mock PUT request
       return Promise.resolve({ data: 'mock data' })
     }
 
-    protected async delete(path: string, options?: any): Promise<any> {
+    protected async delete(): Promise<any> {
       // Mock DELETE request
       return Promise.resolve({ data: 'mock data' })
     }

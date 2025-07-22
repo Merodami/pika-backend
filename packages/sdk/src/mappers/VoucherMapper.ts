@@ -1,3 +1,4 @@
+import { formatDateToISO } from '@pika/shared'
 import {
   CustomerVoucherStatus,
   VoucherDiscountType,
@@ -175,14 +176,6 @@ export class VoucherMapper {
    * Uses only resolved content, no translation keys
    */
   static toDTO(domain: VoucherDomain): VoucherDTO {
-    const formatDate = (date: Date | string | undefined | null): string => {
-      if (!date) return new Date().toISOString()
-      if (typeof date === 'string') return date
-      if (date instanceof Date) return date.toISOString()
-
-      return new Date().toISOString()
-    }
-
     return {
       id: domain.id,
       businessId: domain.businessId,
@@ -196,14 +189,14 @@ export class VoucherMapper {
       currency: domain.currency,
       location: domain.location ? this.mapLocationToDTO(domain.location) : null,
       imageUrl: domain.imageUrl || undefined,
-      validFrom: formatDate(domain.validFrom),
-      expiresAt: formatDate(domain.expiresAt),
+      validFrom: formatDateToISO(domain.validFrom),
+      expiresAt: formatDateToISO(domain.expiresAt),
       maxRedemptions: domain.maxRedemptions || undefined,
       maxRedemptionsPerUser: domain.maxRedemptionsPerUser,
       currentRedemptions: domain.currentRedemptions,
       metadata: domain.metadata || undefined,
-      createdAt: formatDate(domain.createdAt),
-      updatedAt: formatDate(domain.updatedAt),
+      createdAt: formatDateToISO(domain.createdAt),
+      updatedAt: formatDateToISO(domain.updatedAt),
       codes: domain.codes?.map((code) => this.mapCodeToDTO(code)),
     }
   }
@@ -492,9 +485,9 @@ export class VoucherMapper {
   }
 
   /**
-   * Maps voucher code from document format
+   * Common code mapping logic
    */
-  private static mapCodeFromDocument(code: any): VoucherCode {
+  private static mapCode(code: any): VoucherCode | VoucherCodeDTO {
     return {
       id: code.id,
       code: code.code,
@@ -502,32 +495,27 @@ export class VoucherMapper {
       isActive: code.isActive,
       metadata: code.metadata,
     }
+  }
+
+  /**
+   * Maps voucher code from document format
+   */
+  private static mapCodeFromDocument(code: any): VoucherCode {
+    return this.mapCode(code) as VoucherCode
   }
 
   /**
    * Maps voucher code to DTO format
    */
   private static mapCodeToDTO(code: VoucherCode): VoucherCodeDTO {
-    return {
-      id: code.id,
-      code: code.code,
-      type: code.type,
-      isActive: code.isActive,
-      metadata: code.metadata,
-    }
+    return this.mapCode(code) as VoucherCodeDTO
   }
 
   /**
    * Maps voucher code from DTO format
    */
   private static mapCodeFromDTO(code: VoucherCodeDTO): VoucherCode {
-    return {
-      id: code.id,
-      code: code.code,
-      type: code.type,
-      isActive: code.isActive,
-      metadata: code.metadata,
-    }
+    return this.mapCode(code) as VoucherCode
   }
 
   /**
@@ -640,14 +628,6 @@ export class VoucherMapper {
    * Admin responses include only resolved translations, no keys
    */
   static toAdminDTO(domain: VoucherDomain): any {
-    const formatDate = (date: Date | string | undefined | null): string => {
-      if (!date) return new Date().toISOString()
-      if (typeof date === 'string') return date
-      if (date instanceof Date) return date.toISOString()
-
-      return new Date().toISOString()
-    }
-
     const now = new Date()
     const expiresAt =
       domain.expiresAt instanceof Date
@@ -683,8 +663,8 @@ export class VoucherMapper {
       imageUrl: domain.imageUrl,
 
       // Validity period
-      validFrom: formatDate(domain.validFrom),
-      expiresAt: formatDate(domain.expiresAt),
+      validFrom: formatDateToISO(domain.validFrom),
+      expiresAt: formatDateToISO(domain.expiresAt),
 
       // Redemption limits
       maxRedemptions: domain.maxRedemptions,
@@ -699,9 +679,9 @@ export class VoucherMapper {
       metadata: domain.metadata,
 
       // Timestamps
-      createdAt: formatDate(domain.createdAt),
-      updatedAt: formatDate(domain.updatedAt),
-      deletedAt: domain.deletedAt ? formatDate(domain.deletedAt) : null,
+      createdAt: formatDateToISO(domain.createdAt),
+      updatedAt: formatDateToISO(domain.updatedAt),
+      deletedAt: domain.deletedAt ? formatDateToISO(domain.deletedAt) : null,
 
       // Computed fields
       isActive:

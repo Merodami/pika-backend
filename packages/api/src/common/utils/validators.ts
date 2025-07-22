@@ -27,7 +27,7 @@ export function validate<T extends z.ZodTypeAny>(
     } catch (error) {
       if (error instanceof z.ZodError) {
         // Create error message from issues
-        const errorMessage = `Validation failed: ${error.issues
+        const baseErrorMessage = `Validation failed: ${error.issues
           .slice(0, 3)
           .map((issue) => {
             const path =
@@ -35,9 +35,14 @@ export function validate<T extends z.ZodTypeAny>(
 
             return `${path}${issue.message}`
           })
-          .join(
-            '; ',
-          )}${error.issues.length > 3 ? `; and ${error.issues.length - 3} more errors` : ''}`
+          .join('; ')}`
+
+        const additionalErrors =
+          error.issues.length > 3
+            ? `; and ${error.issues.length - 3} more errors`
+            : ''
+
+        const errorMessage = baseErrorMessage + additionalErrors
 
         res.status(400).json({
           error: {
