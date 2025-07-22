@@ -1,6 +1,6 @@
 /**
  * Business Service - Public API Integration Tests
- * 
+ *
  * Tests for public-facing business endpoints that are accessible to all users.
  * These endpoints may or may not require authentication, but are not admin-only.
  */
@@ -16,7 +16,6 @@ vi.unmock('@pika/translation')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import type { TestDatabase } from '@pika/tests'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -81,6 +80,7 @@ async function seedTestBusinesses(
         totalReviews: Math.floor(Math.random() * 100),
       },
     })
+
     businesses.push(business)
   }
 
@@ -245,9 +245,7 @@ describe('Business Service - Public API Integration Tests', () => {
         .expect(200)
 
       // Should only return active businesses
-      expect(response.body.data.every((b: any) => b.active === true)).toBe(
-        true,
-      )
+      expect(response.body.data.every((b: any) => b.active === true)).toBe(true)
     })
 
     it('should sort businesses by specified field', async () => {
@@ -261,6 +259,7 @@ describe('Business Service - Public API Integration Tests', () => {
 
       const names = response.body.data.map((b: any) => b.businessName)
       const sortedNames = [...names].sort()
+
       expect(names).toEqual(sortedNames)
     })
 
@@ -342,7 +341,7 @@ describe('Business Service - Public API Integration Tests', () => {
     it('should return business by user ID', async () => {
       const userId = uuid()
       const { businesses } = await seedTestBusinesses(testDb.prisma)
-      
+
       // Update one business to have our test user ID
       await testDb.prisma.business.update({
         where: { id: businesses[0].id },
@@ -552,7 +551,7 @@ describe('Business Service - Public API Integration Tests', () => {
         where: { email: businessUser.email },
       })
 
-      const myBusiness = await testDb.prisma.business.create({
+      await testDb.prisma.business.create({
         data: {
           userId: businessUserFromDb!.id,
           businessName: 'Original Name',

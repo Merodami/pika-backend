@@ -1,6 +1,6 @@
 /**
  * Business Service - Internal API Integration Tests
- * 
+ *
  * Tests for internal service-to-service business endpoints.
  * These endpoints are only accessible by other services using API key authentication.
  */
@@ -16,12 +16,11 @@ vi.unmock('@pika/translation')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import type { TestDatabase } from '@pika/tests'
 import {
   cleanupTestDatabase,
   createTestDatabase,
-  TestDatabaseResult,
   InternalAPITestHelper,
+  TestDatabaseResult,
 } from '@pika/tests'
 import { TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
@@ -79,6 +78,7 @@ async function seedTestBusinesses(
         totalReviews: Math.floor(Math.random() * 100),
       },
     })
+
     businesses.push(business)
   }
 
@@ -95,7 +95,9 @@ describe('Business Service - Internal API Integration Tests', () => {
   let internalClient: any
 
   beforeAll(async () => {
-    logger.debug('Setting up Business Service Internal API integration tests...')
+    logger.debug(
+      'Setting up Business Service Internal API integration tests...',
+    )
 
     // Setup test database
     testDb = await createTestDatabase({
@@ -159,7 +161,7 @@ describe('Business Service - Internal API Integration Tests', () => {
   // Internal Service Discovery
   describe('GET /internal/businesses/by-category', () => {
     it('should get businesses by category for internal services', async () => {
-      const { businesses, category } = await seedTestBusinesses(testDb.prisma, {
+      const { category } = await seedTestBusinesses(testDb.prisma, {
         count: 5,
       })
 
@@ -178,8 +180,10 @@ describe('Business Service - Internal API Integration Tests', () => {
     it('should handle multiple categories', async () => {
       // Create businesses in multiple categories
       const results = []
+
       for (let i = 0; i < 3; i++) {
         const result = await seedTestBusinesses(testDb.prisma, { count: 2 })
+
         results.push(result)
       }
 
@@ -194,7 +198,7 @@ describe('Business Service - Internal API Integration Tests', () => {
       // Should have results for all 3 categories
       expect(Object.keys(response.body)).toHaveLength(3)
       categoryIds.forEach((categoryId) => {
-        expect(response.body[categoryId]).toHaveLength(2)
+        expect(response.body[`${categoryId}`]).toHaveLength(2)
       })
     })
 
@@ -451,11 +455,6 @@ describe('Business Service - Internal API Integration Tests', () => {
     })
 
     it('should reject invalid API keys', async () => {
-      const invalidClient = internalAPIHelper.createClient(
-        app,
-        'invalid-api-key',
-      )
-
       await request
         .get('/internal/businesses/by-category')
         .set('x-api-key', 'invalid-api-key')
@@ -483,10 +482,12 @@ describe('Business Service - Internal API Integration Tests', () => {
     it('should efficiently handle large batch requests', async () => {
       // Create many businesses
       const allBusinesses = []
+
       for (let i = 0; i < 5; i++) {
         const { businesses } = await seedTestBusinesses(testDb.prisma, {
           count: 10,
         })
+
         allBusinesses.push(...businesses)
       }
 
@@ -520,9 +521,7 @@ describe('Business Service - Internal API Integration Tests', () => {
         internalClient
           .post('/internal/businesses/batch')
           .send({ businessIds: businesses.map((b) => b.id) }),
-        internalClient.get(
-          `/internal/businesses/user/${businesses[0].userId}`,
-        ),
+        internalClient.get(`/internal/businesses/user/${businesses[0].userId}`),
       ]
 
       const results = await Promise.all(promises)

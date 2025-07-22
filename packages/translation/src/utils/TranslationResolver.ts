@@ -1,4 +1,5 @@
 import type { LanguageCode } from '@pika/types'
+import { set, unset } from 'lodash-es'
 
 import type { TranslationClient } from '../clients/TranslationClient.js'
 
@@ -228,15 +229,12 @@ export class TranslationResolver {
           const value =
             resolvedContent || (options.fallbackToKey ? translationKey : '')
 
-          ;(result as Record<string, any>)[targetField as keyof typeof result] =
-            value
+          set(result, targetField, value)
         }
 
         // Remove key field if not preserving
         if (!options.preserveKeys) {
-          delete (result as Record<string, any>)[
-            keyField as keyof typeof result
-          ]
+          unset(result, keyField)
         }
       }
     }

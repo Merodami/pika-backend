@@ -72,7 +72,7 @@ export class AuthenticatedRequestClient {
     overrideToken?: string | null, // null means explicitly no token for this request
   ): supertest.Test {
     let req: supertest.Test
-    
+
     switch (method) {
       case 'get':
         req = this.agent.get(url)
@@ -90,7 +90,7 @@ export class AuthenticatedRequestClient {
         req = this.agent.put(url)
         break
     }
-    
+
     req.set('Accept', 'application/json')
 
     const tokenToUse =

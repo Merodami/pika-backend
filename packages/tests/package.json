@@ -16,6 +16,7 @@
     "@pika/shared": "workspace:^",
     "@pika/types": "workspace:^",
     "@types/supertest": "^6.0.3",
+    "lodash-es": "^4.17.21",
     "node-fetch": "^3.3.2",
     "stripe": "^18.3.0",
     "supertest": "^7.1.3",

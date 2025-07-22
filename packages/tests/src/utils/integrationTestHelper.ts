@@ -6,24 +6,27 @@
  * RBAC-aware testing utilities.
  */
 
-import { logger } from '@pika/shared'
 import { type ICacheService, MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import { type Express } from 'express'
+import { get } from 'lodash-es'
 import supertest from 'supertest'
-import { vi } from 'vitest'
+
+import {
+  type InternalAPIClient,
+  InternalAPITestHelper,
+} from '../helpers/internal-api.js'
 import { createE2EAuthHelper, type E2EAuthHelper } from './e2eAuth.js'
 import {
-  createTestDatabase,
   cleanupTestDatabase,
-  clearTestDatabase,
+  createTestDatabase,
   type TestDatabaseResult,
 } from './testDatabaseHelper.js'
-import { InternalAPITestHelper, type InternalAPIClient } from '../helpers/internal-api.js'
 
 export interface IntegrationTestContext {
   testDb: TestDatabaseResult
   app: Express
-  request: supertest.SuperTest<supertest.Test>
+  request: ReturnType<typeof supertest>
   authHelper: E2EAuthHelper
   cacheService: ICacheService
   internalClient: InternalAPIClient
@@ -44,19 +47,19 @@ export interface IntegrationTestOptions {
 
 /**
  * Sets up integration test environment with proper unmocking and Express configuration
- * 
+ *
  * IMPORTANT: You must call vi.unmock() for required modules BEFORE importing this helper
  * or any modules that depend on the real implementations.
- * 
+ *
  * Example:
  * ```typescript
  * import { vi } from 'vitest'
- * 
+ *
  * // Unmock FIRST
  * vi.unmock('@pika/http')
  * vi.unmock('@pika/api')
  * vi.unmock('@pika/redis')
- * 
+ *
  * // Then import
  * import { setupIntegrationTest } from '@pika/tests'
  * ```
@@ -91,6 +94,7 @@ export async function setupIntegrationTest(
 
   // Step 3: Create cache service
   const cacheService = new MemoryCacheService()
+
   await cacheService.connect()
 
   // Step 4: Create the service server
@@ -180,13 +184,20 @@ export async function clearTestData(
   // Clear specified tables
   for (const table of tablesToClear) {
     try {
-      await (context.testDb.prisma as any)[table].deleteMany({})
-      logger.debug(`Cleared ${table} table`)
+      const prismaModel = get(context.testDb.prisma, table)
+
+      if (prismaModel && typeof prismaModel.deleteMany === 'function') {
+        await prismaModel.deleteMany({})
+        logger.debug(`Cleared ${table} table`)
+      }
     } catch (error) {
       logger.warn(`Failed to clear ${table}:`, error)
     }
   }
 }
+
+// HTTP method type for better type safety
+type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete'
 
 /**
  * RBAC Testing Utilities
@@ -195,19 +206,53 @@ export class RBACTestHelper {
   constructor(private context: IntegrationTestContext) {}
 
   /**
+   * Makes a request with the given client and method (type-safe)
+   */
+  private makeRequest(
+    client: any,
+    method: HttpMethod,
+    url: string,
+    data?: any,
+  ) {
+    let request
+
+    switch (method) {
+      case 'get':
+        request = client.get(url)
+        break
+      case 'post':
+        request = client.post(url)
+        break
+      case 'put':
+        request = client.put(url)
+        break
+      case 'patch':
+        request = client.patch(url)
+        break
+      case 'delete':
+        request = client.delete(url)
+        break
+      default:
+        throw new Error(`Unsupported HTTP method: ${method}`)
+    }
+
+    if (data && ['post', 'put', 'patch'].includes(method)) {
+      request.send(data)
+    }
+
+    return request
+  }
+
+  /**
    * Tests that a route requires authentication
    */
   async testRequiresAuth(
-    method: 'get' | 'post' | 'put' | 'patch' | 'delete',
+    method: HttpMethod,
     url: string,
     data?: any,
   ): Promise<void> {
     const unauthClient = this.context.authHelper.getUnauthenticatedClient()
-    const req = unauthClient[method](url)
-
-    if (data && ['post', 'put', 'patch'].includes(method)) {
-      req.send(data)
-    }
+    const req = this.makeRequest(unauthClient, method, url, data)
 
     await req.expect(401)
   }
@@ -216,7 +261,7 @@ export class RBACTestHelper {
    * Tests that a route requires specific permissions
    */
   async testRequiresPermission(
-    method: 'get' | 'post' | 'put' | 'patch' | 'delete',
+    method: HttpMethod,
     url: string,
     data: any,
     options: {
@@ -227,12 +272,10 @@ export class RBACTestHelper {
     // Test allowed roles
     for (const role of options.allowedRoles) {
       const client = this.getClientForRole(role)
+
       if (!client) continue
 
-      const req = client[method](url)
-      if (data && ['post', 'put', 'patch'].includes(method)) {
-        req.send(data)
-      }
+      const req = this.makeRequest(client, method, url, data)
 
       await req.expect((res: any) => {
         if (res.status >= 400 && res.status !== 404) {
@@ -244,12 +287,10 @@ export class RBACTestHelper {
     // Test denied roles
     for (const role of options.deniedRoles) {
       const client = this.getClientForRole(role)
+
       if (!client) continue
 
-      const req = client[method](url)
-      if (data && ['post', 'put', 'patch'].includes(method)) {
-        req.send(data)
-      }
+      const req = this.makeRequest(client, method, url, data)
 
       await req.expect(403) // Forbidden
     }
@@ -273,7 +314,7 @@ export class RBACTestHelper {
    * Tests ownership-based permissions (e.g., users can only access their own resources)
    */
   async testOwnershipPermission(
-    method: 'get' | 'put' | 'patch' | 'delete',
+    method: Exclude<HttpMethod, 'post'>,
     urlPattern: string,
     ownerId: string,
     otherId: string,
@@ -281,7 +322,9 @@ export class RBACTestHelper {
   ): Promise<void> {
     // Should succeed for own resource
     const ownUrl = urlPattern.replace(':id', ownerId)
-    await client[method](ownUrl).expect((res: any) => {
+    const ownReq = this.makeRequest(client, method, ownUrl)
+
+    await ownReq.expect((res: any) => {
       if (res.status >= 400 && res.status !== 404) {
         throw new Error(`User should access own resource but got ${res.status}`)
       }
@@ -289,7 +332,9 @@ export class RBACTestHelper {
 
     // Should fail for other's resource
     const otherUrl = urlPattern.replace(':id', otherId)
-    await client[method](otherUrl).expect(403) // Forbidden
+    const otherReq = this.makeRequest(client, method, otherUrl)
+
+    await otherReq.expect(403) // Forbidden
   }
 }
 

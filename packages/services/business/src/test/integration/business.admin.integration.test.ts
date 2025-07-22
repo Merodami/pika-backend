@@ -1,6 +1,6 @@
 /**
  * Business Service - Admin API Integration Tests
- * 
+ *
  * Tests for admin-only business endpoints that require admin privileges.
  * These endpoints are used for business management and administration.
  */
@@ -16,7 +16,6 @@ vi.unmock('@pika/translation')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import type { TestDatabase } from '@pika/tests'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -28,7 +27,6 @@ import {
 import { TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 import type { Express } from 'express'
-import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
@@ -81,6 +79,7 @@ async function seedTestBusinesses(
         totalReviews: Math.floor(Math.random() * 100),
       },
     })
+
     businesses.push(business)
   }
 
@@ -90,7 +89,6 @@ async function seedTestBusinesses(
 describe('Business Service - Admin API Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
-  let request: supertest.SuperTest<supertest.Test>
   let authHelper: E2EAuthHelper
   let cacheService: MemoryCacheService
   let translationClient: TranslationClient
@@ -124,9 +122,6 @@ describe('Business Service - Admin API Integration Tests', () => {
     })
 
     logger.debug('Express server ready for testing.')
-
-    // Initialize supertest with the Express server instance
-    request = supertest(app)
 
     // Initialize E2E Authentication Helper
     authHelper = createE2EAuthHelper(app)
@@ -181,13 +176,13 @@ describe('Business Service - Admin API Integration Tests', () => {
         .expect(200)
 
       expect(response.body.data).toHaveLength(5)
+
       // Admin should see both active and inactive businesses
-      const activeCount = response.body.data.filter(
-        (b: any) => b.active,
-      ).length
+      const activeCount = response.body.data.filter((b: any) => b.active).length
       const inactiveCount = response.body.data.filter(
         (b: any) => !b.active,
       ).length
+
       expect(activeCount).toBeGreaterThan(0)
       expect(inactiveCount).toBeGreaterThan(0)
     })
@@ -209,7 +204,7 @@ describe('Business Service - Admin API Integration Tests', () => {
     })
 
     it('should include related data when requested', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma)
+      await seedTestBusinesses(testDb.prisma)
 
       const response = await adminClient
         .get('/admin/businesses')
@@ -319,6 +314,7 @@ describe('Business Service - Admin API Integration Tests', () => {
       const updatedBusiness = await testDb.prisma.business.findUnique({
         where: { id: unverifiedBusiness.id },
       })
+
       expect(updatedBusiness?.verified).toBe(true)
     })
 
@@ -430,9 +426,7 @@ describe('Business Service - Admin API Integration Tests', () => {
     })
 
     it('should allow admin to change business category', async () => {
-      const { businesses, category: oldCategory } = await seedTestBusinesses(
-        testDb.prisma,
-      )
+      const { businesses } = await seedTestBusinesses(testDb.prisma)
       const business = businesses[0]
 
       // Create a new category
@@ -475,6 +469,7 @@ describe('Business Service - Admin API Integration Tests', () => {
       const deletedBusiness = await testDb.prisma.business.findUnique({
         where: { id: business.id },
       })
+
       expect(deletedBusiness?.active).toBe(false)
     })
 
@@ -521,6 +516,7 @@ describe('Business Service - Admin API Integration Tests', () => {
       const updatedBusinesses = await testDb.prisma.business.findMany({
         where: { id: { in: unverifiedIds } },
       })
+
       expect(updatedBusinesses.every((b) => b.verified)).toBe(true)
     })
 
@@ -547,6 +543,7 @@ describe('Business Service - Admin API Integration Tests', () => {
       const updatedBusinesses = await testDb.prisma.business.findMany({
         where: { id: { in: businessIds } },
       })
+
       expect(updatedBusinesses.every((b) => !b.active)).toBe(true)
     })
   })
@@ -585,7 +582,7 @@ describe('Business Service - Admin API Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toBeInstanceOf(Array)
-      expect(response.body.length).toBe(3) // 3 categories
+      expect(response.body).toHaveLength(3) // 3 categories
       expect(response.body[0]).toHaveProperty('categoryId')
       expect(response.body[0]).toHaveProperty('count')
     })
@@ -609,14 +606,20 @@ describe('Business Service - Admin API Integration Tests', () => {
 
       for (const endpoint of endpoints) {
         // Customer should get 403
-        const customerReq = customerClient[endpoint.method as 'get' | 'post' | 'put' | 'delete'](endpoint.url)
+        const customerReq = customerClient[
+          endpoint.method as 'get' | 'post' | 'put' | 'delete'
+        ](endpoint.url)
+
         if (endpoint.method !== 'get' && endpoint.method !== 'delete') {
           customerReq.send({ test: 'data' })
         }
         await customerReq.set('Accept', 'application/json').expect(403)
 
         // Business user should get 403
-        const businessReq = businessClient[endpoint.method as 'get' | 'post' | 'put' | 'delete'](endpoint.url)
+        const businessReq = businessClient[
+          endpoint.method as 'get' | 'post' | 'put' | 'delete'
+        ](endpoint.url)
+
         if (endpoint.method !== 'get' && endpoint.method !== 'delete') {
           businessReq.send({ test: 'data' })
         }
