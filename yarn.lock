@@ -4973,6 +4973,7 @@ __metadata:
     "@pika/shared": "workspace:^"
     "@pika/types": "workspace:^"
     "@types/supertest": "npm:^6.0.3"
+    lodash-es: "npm:^4.17.21"
     node-fetch: "npm:^3.3.2"
     stripe: "npm:^18.3.0"
     supertest: "npm:^7.1.3"
