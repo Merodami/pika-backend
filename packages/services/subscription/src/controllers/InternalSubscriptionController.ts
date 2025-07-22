@@ -301,7 +301,7 @@ export class InternalSubscriptionController {
       logger.info('Sending subscription notification', { userId, type })
 
       // Map notification type to template key
-      let templateKey: typeof TEMPLATE_KEYS[keyof typeof TEMPLATE_KEYS]
+      let templateKey: (typeof TEMPLATE_KEYS)[keyof typeof TEMPLATE_KEYS]
 
       switch (type) {
         case 'created':

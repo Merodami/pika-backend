@@ -3,7 +3,10 @@ import { z } from 'zod'
 import { UserId } from '../../../common/schemas/branded.js'
 import { CategorySortBy, SortOrder } from '../../../common/schemas/enums.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
-import { PaginationParams, SearchParams } from '../../../common/schemas/pagination.js'
+import {
+  PaginationParams,
+  SearchParams,
+} from '../../../common/schemas/pagination.js'
 import { CategoryIdParam } from '../../../common/schemas/parameters.js'
 import { UUID } from '../../../common/schemas/primitives.js'
 import { paginatedResponse } from '../../../common/schemas/responses.js'
@@ -109,7 +112,9 @@ export const CategoryHierarchyResponse = openapi(
   },
 )
 
-export type CategoryHierarchyResponse = z.infer<typeof CategoryHierarchyResponse>
+export type CategoryHierarchyResponse = z.infer<
+  typeof CategoryHierarchyResponse
+>
 
 /**
  * Category path response
@@ -124,4 +129,3 @@ export const CategoryPathResponse = openapi(
 )
 
 export type CategoryPathResponse = z.infer<typeof CategoryPathResponse>
-

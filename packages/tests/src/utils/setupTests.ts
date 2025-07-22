@@ -48,19 +48,53 @@ vi.mock('@pika/redis', async (importOriginal) => {
 
         return Promise.resolve(true)
       }
+      setNX(key: string, value: any, ttl?: number) {
+        if (cache.has(key)) {
+          return Promise.resolve(false)
+        }
+
+        return this.set(key, value, ttl)
+      }
+      exists(key: string) {
+        return Promise.resolve(cache.has(key))
+      }
+      getTTL(key: string) {
+        // Simplified TTL for tests - return -1 if exists without TTL
+        return Promise.resolve(cache.has(key) ? -1 : -2)
+      }
+      updateTTL(key: string, ttl: number) {
+        return Promise.resolve(cache.has(key))
+      }
       delete(key: string) {
         return Promise.resolve(cache.delete(key))
       }
       del(key: string) {
-        return Promise.resolve(cache.delete(key) ? 1 : 0)
+        return Promise.resolve(cache.delete(key))
       }
-      clear() {
+      delPattern(pattern: string) {
+        let count = 0
+
+        const regex = new RegExp(pattern.replace(/\*/g, '.*'))
+
+        for (const key of cache.keys()) {
+          if (regex.test(key)) {
+            cache.delete(key)
+            count++
+          }
+        }
+
+        return Promise.resolve(count)
+      }
+      clearAll() {
         cache.clear()
 
         return Promise.resolve()
       }
       checkHealth() {
-        return Promise.resolve({ status: 'healthy' })
+        return Promise.resolve({
+          status: 'healthy' as const,
+          details: {},
+        })
       }
     },
     RedisService: vi.fn(),
@@ -96,10 +130,12 @@ vi.mock('@pika/http', async (importOriginal) => {
     requireInternalAuth: () => (req: any, res: any, next: any) => next(),
     requireServiceAuth: () => (req: any, res: any, next: any) => next(),
     allowServiceOrUserAuth: () => (req: any, res: any, next: any) => next(),
-    requirePermissions: (...permissions: string[]) => (req: any, res: any, next: any) => {
-      // For tests, just pass through - auth is tested separately
-      next()
-    },
+    requirePermissions:
+      (...permissions: string[]) =>
+      (req: any, res: any, next: any) => {
+        // For tests, just pass through - auth is tested separately
+        next()
+      },
     validateBody: (schema: any) => (req: any, res: any, next: any) => next(),
     validateParams: (schema: any) => (req: any, res: any, next: any) => next(),
     validateQuery: (schema: any) => (req: any, res: any, next: any) => next(),
@@ -114,6 +150,7 @@ vi.mock('@pika/http', async (importOriginal) => {
           data: result.data.map(mapper),
         }
       }
+
       return result
     },
     createMulterMiddleware: (options?: any) => {
@@ -123,7 +160,7 @@ vi.mock('@pika/http', async (importOriginal) => {
         req.files = req.body?.files || []
         next()
       }
-      
+
       return {
         single: (fieldName: string) => middleware,
         array: (fieldName: string, maxCount?: number) => middleware,
@@ -145,7 +182,10 @@ vi.mock('@pika/http', async (importOriginal) => {
     errorMiddleware: vi.fn(),
     RequestContext: class MockRequestContext {
       constructor(public data: any) {}
-      static getContext: () => any = () => ({ userId: 'test-user', role: 'MEMBER' })
+      static getContext: () => any = () => ({
+        userId: 'test-user',
+        role: 'MEMBER',
+      })
     },
   }
 })

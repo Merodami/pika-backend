@@ -557,7 +557,7 @@ export class AdPlacementService implements IAdPlacementService {
   ): Set<number> {
     const occupiedSpaces = new Set<number>()
 
-    for (const placement of placements) {
+    for (const _ of placements) {
       const adSize = this.mapPositionToAdSize()
       const requiredSpaces = this.pageLayoutEngine.getRequiredSpaces(adSize)
 

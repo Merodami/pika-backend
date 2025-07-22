@@ -165,7 +165,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       if (this.businessServiceClient) {
         try {
           await this.businessServiceClient.getBusiness(data.businessId)
-        } catch (_error) {
+        } catch {
           throw ErrorFactory.resourceNotFound('Business', data.businessId)
         }
       }

@@ -74,7 +74,9 @@ export const CheckCategoryExistsRequest = openapi(
   },
 )
 
-export type CheckCategoryExistsRequest = z.infer<typeof CheckCategoryExistsRequest>
+export type CheckCategoryExistsRequest = z.infer<
+  typeof CheckCategoryExistsRequest
+>
 
 /**
  * Check category exists response
@@ -89,5 +91,6 @@ export const CheckCategoryExistsResponse = openapi(
   },
 )
 
-export type CheckCategoryExistsResponse = z.infer<typeof CheckCategoryExistsResponse>
-
+export type CheckCategoryExistsResponse = z.infer<
+  typeof CheckCategoryExistsResponse
+>

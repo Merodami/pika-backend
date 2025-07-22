@@ -127,9 +127,7 @@ export const AdminCategoryQueryParams = SearchParams.extend({
   sortBy: CategorySortBy.default('sortOrder'),
 })
 
-export type AdminCategoryQueryParams = z.infer<
-  typeof AdminCategoryQueryParams
->
+export type AdminCategoryQueryParams = z.infer<typeof AdminCategoryQueryParams>
 
 // ============= Response Types =============
 
@@ -244,4 +242,3 @@ export const BulkCategoryOperationResponse = openapi(
 export type BulkCategoryOperationResponse = z.infer<
   typeof BulkCategoryOperationResponse
 >
-

@@ -38,23 +38,65 @@ export async function seedLanguages(prisma: PrismaClient): Promise<void> {
   console.log('✅ Languages seeded successfully')
 }
 
-export async function seedInitialTranslations(prisma: PrismaClient): Promise<void> {
+export async function seedInitialTranslations(
+  prisma: PrismaClient,
+): Promise<void> {
   console.log('🔤 Seeding initial translations...')
 
   const translations = [
     // Email translations
-    { key: 'email.welcome.subject', en: 'Welcome to Pika!', es: '¡Bienvenido a Pika!', gn: 'Tereg̃ua Pika-pe!' },
-    { key: 'email.welcome.greeting', en: 'Hello {name}!', es: '¡Hola {name}!', gn: 'Mba\'éichapa {name}!' },
-    { key: 'email.welcome.body', en: 'Welcome to our fitness platform.', es: 'Bienvenido a nuestra plataforma de fitness.', gn: 'Tereg̃ua ore plataforma de ejercicio-pe.' },
+    {
+      key: 'email.welcome.subject',
+      en: 'Welcome to Pika!',
+      es: '¡Bienvenido a Pika!',
+      gn: 'Tereg̃ua Pika-pe!',
+    },
+    {
+      key: 'email.welcome.greeting',
+      en: 'Hello {name}!',
+      es: '¡Hola {name}!',
+      gn: "Mba'éichapa {name}!",
+    },
+    {
+      key: 'email.welcome.body',
+      en: 'Welcome to our fitness platform.',
+      es: 'Bienvenido a nuestra plataforma de fitness.',
+      gn: 'Tereg̃ua ore plataforma de ejercicio-pe.',
+    },
 
     // Common notifications
-    { key: 'notification.payment.success', en: 'Payment successful', es: 'Pago exitoso', gn: 'Jehepyme\'ẽ oĩ porã' },
-    { key: 'notification.payment.failed', en: 'Payment failed', es: 'Pago fallido', gn: 'Jehepyme\'ẽ ndoikói' },
+    {
+      key: 'notification.payment.success',
+      en: 'Payment successful',
+      es: 'Pago exitoso',
+      gn: "Jehepyme'ẽ oĩ porã",
+    },
+    {
+      key: 'notification.payment.failed',
+      en: 'Payment failed',
+      es: 'Pago fallido',
+      gn: "Jehepyme'ẽ ndoikói",
+    },
 
     // Error messages
-    { key: 'error.not_found', en: 'Not found', es: 'No encontrado', gn: 'Ndojejuhúi' },
-    { key: 'error.unauthorized', en: 'Unauthorized', es: 'No autorizado', gn: 'Ndaikatúi' },
-    { key: 'error.server_error', en: 'Server error', es: 'Error del servidor', gn: 'Servidor jejavy' },
+    {
+      key: 'error.not_found',
+      en: 'Not found',
+      es: 'No encontrado',
+      gn: 'Ndojejuhúi',
+    },
+    {
+      key: 'error.unauthorized',
+      en: 'Unauthorized',
+      es: 'No autorizado',
+      gn: 'Ndaikatúi',
+    },
+    {
+      key: 'error.server_error',
+      en: 'Server error',
+      es: 'Error del servidor',
+      gn: 'Servidor jejavy',
+    },
   ]
 
   for (const translation of translations) {

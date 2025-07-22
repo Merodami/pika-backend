@@ -203,24 +203,14 @@ export type PageLayoutType = z.infer<typeof PageLayoutType>
 /**
  * Ad size - matches database AdSize enum exactly
  */
-export const AdSize = z.enum([
-  'SINGLE',
-  'QUARTER',
-  'HALF',
-  'FULL',
-])
+export const AdSize = z.enum(['SINGLE', 'QUARTER', 'HALF', 'FULL'])
 
 export type AdSize = z.infer<typeof AdSize>
 
 /**
  * Content type - matches database ContentType enum exactly
  */
-export const ContentType = z.enum([
-  'VOUCHER',
-  'IMAGE',
-  'AD',
-  'SPONSORED',
-])
+export const ContentType = z.enum(['VOUCHER', 'IMAGE', 'AD', 'SPONSORED'])
 
 export type ContentType = z.infer<typeof ContentType>
 

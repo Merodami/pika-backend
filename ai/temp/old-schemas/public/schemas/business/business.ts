@@ -1,7 +1,10 @@
 import { z } from 'zod'
 
 import { UserId } from '../../../common/schemas/branded.js'
-import { BusinessSortBy, BUSINESS_RELATIONS } from '../../../schemas/business/common/enums.js'
+import {
+  BusinessSortBy,
+  BUSINESS_RELATIONS,
+} from '../../../schemas/business/common/enums.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { SearchParams } from '../../../common/schemas/pagination.js'
 import { UUID } from '../../../common/schemas/primitives.js'
@@ -36,10 +39,7 @@ export const BusinessResponse: z.ZodType<any> = z.lazy(() =>
         .boolean()
         .default(false)
         .describe('Whether business is verified'),
-      active: z
-        .boolean()
-        .default(true)
-        .describe('Whether business is active'),
+      active: z.boolean().default(true).describe('Whether business is active'),
       avgRating: z
         .number()
         .min(0)
@@ -83,7 +83,12 @@ export const BusinessQueryParams = SearchParams.extend({
   categoryId: UUID.optional().describe('Filter by category'),
   verified: z.boolean().optional().describe('Filter by verification status'),
   active: z.boolean().optional().describe('Filter by active status'),
-  minRating: z.number().min(0).max(5).optional().describe('Minimum rating filter'),
+  minRating: z
+    .number()
+    .min(0)
+    .max(5)
+    .optional()
+    .describe('Minimum rating filter'),
   sortBy: BusinessSortBy.default('businessName'),
 })
 
@@ -122,4 +127,6 @@ export const BusinessesByCategoryResponse = openapi(
   },
 )
 
-export type BusinessesByCategoryResponse = z.infer<typeof BusinessesByCategoryResponse>
+export type BusinessesByCategoryResponse = z.infer<
+  typeof BusinessesByCategoryResponse
+>

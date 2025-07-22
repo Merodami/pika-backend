@@ -304,9 +304,7 @@ export class E2EAuthHelper {
   /**
    * Get a business client (convenience method)
    */
-  async getBusinessClient(
-    prisma?: any,
-  ): Promise<AuthenticatedRequestClient> {
+  async getBusinessClient(prisma?: any): Promise<AuthenticatedRequestClient> {
     return this.getAuthenticatedClient('BUSINESS', prisma)
   }
 

@@ -36,7 +36,8 @@ export class VoucherBusinessRules {
       return
     }
 
-    const allowedForCurrentState = allowedTransitions[currentState] || []
+    const allowedForCurrentState =
+      allowedTransitions[currentState as keyof typeof allowedTransitions] || []
 
     if (!allowedForCurrentState.includes(newState)) {
       throw ErrorFactory.businessRuleViolation(

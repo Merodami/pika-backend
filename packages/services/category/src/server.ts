@@ -21,7 +21,7 @@ export interface ServerConfig {
 }
 
 export async function createCategoryServer(config: ServerConfig) {
-  const { prisma, cacheService, translationClient } = config
+  const { prisma, cacheService } = config
 
   // Create Express app with standard configuration
   const app = await createExpressServer({

@@ -39,6 +39,7 @@ Voucher Service     PDF Service       Booking Service
 ## Core Principles
 
 ### 1. Service Owns Its Domain
+
 Each service defines entities based on its needs:
 
 ```typescript
@@ -72,6 +73,7 @@ interface VoucherStub {
 ```
 
 ### 2. Share Contracts, Not Internals
+
 Services communicate using DTOs:
 
 ```typescript
@@ -85,6 +87,7 @@ interface VoucherDTO {
 ```
 
 ### 3. Transform at Boundaries
+
 Map between internal and external representations:
 
 ```typescript
@@ -106,7 +109,7 @@ class PDFVoucherMapper {
 packages/services/[service-name]/src/types/
 ├── index.ts           // Main export
 ├── entities.ts        // Core domain entities
-├── operations.ts      // Service operations & results  
+├── operations.ts      // Service operations & results
 ├── repositories.ts    // Repository interfaces
 ├── api-contracts.ts   // DTOs for external APIs
 └── enums.ts          // Service-specific enums
@@ -123,21 +126,25 @@ packages/services/[service-name]/src/types/
 ## Migration Path
 
 ### Phase 1: Pilot Service (PDF)
+
 - Create types/ folder structure
 - Copy only needed types from SDK
 - Update imports gradually
 
 ### Phase 2: Core Services
+
 - Voucher Service
-- User Service  
+- User Service
 - Booking Service
 
 ### Phase 3: Supporting Services
+
 - Payment Service
 - Communication Service
 - Others
 
 ### Phase 4: Cleanup
+
 - Remove domain objects from SDK
 - Keep only shared DTOs
 - Update documentation
@@ -145,11 +152,13 @@ packages/services/[service-name]/src/types/
 ## What Changes vs What Stays
 
 ### Changes
+
 - Domain entities: `@pika/sdk` → service-specific
 - Mappers: Shared → service-specific
 - Type imports: External → internal
 
 ### Stays the Same
+
 - Architecture pattern (Clean Architecture)
 - Folder structure (controllers/services/repositories)
 - Shared utilities (@pika/shared)
@@ -159,6 +168,7 @@ packages/services/[service-name]/src/types/
 ## Example: PDF Service Transformation
 
 ### Before
+
 ```typescript
 // Depends on shared domain
 import { VoucherBookDomain, UserDomain } from '@pika/sdk'
@@ -168,6 +178,7 @@ import { VoucherBookMapper } from '@pika/sdk'
 ```
 
 ### After
+
 ```typescript
 // Own domain types
 import { VoucherBook, UserReference } from './types/entities'

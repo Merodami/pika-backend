@@ -41,9 +41,7 @@ export class TranslationCache implements ITranslationCache {
 
   async warmup(language: string): Promise<void> {
     // Pre-load common translations
-    const commonKeys = await this.redis.smembers(
-      `${this.prefix}common:${language}`,
-    )
+    await this.redis.smembers(`${this.prefix}common:${language}`)
     // Implementation depends on your needs
   }
 }

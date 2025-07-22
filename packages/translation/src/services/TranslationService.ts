@@ -76,7 +76,7 @@ export class TranslationService implements ITranslationService {
       const cached = await this.cache.get(key, language)
 
       if (cached) {
-        results[key] = cached
+        results[key as keyof typeof results] = cached
       } else {
         uncachedKeys.push(key)
       }
@@ -90,20 +90,20 @@ export class TranslationService implements ITranslationService {
       )
 
       for (const trans of translations) {
-        results[trans.key] = trans.value
+        results[trans.key as keyof typeof results] = trans.value
         await this.cache.set(trans.key, language, trans.value)
       }
 
       // Handle missing keys with fallback
       for (const key of uncachedKeys) {
-        if (!results[key]) {
+        if (!results[key as keyof typeof results]) {
           // Try default language
           if (language !== this.defaultLanguage) {
             const defaultTrans = await this.get(key, this.defaultLanguage)
 
-            results[key] = defaultTrans
+            results[key as keyof typeof results] = defaultTrans
           } else {
-            results[key] = key // Return key as fallback
+            results[key as keyof typeof results] = key // Return key as fallback
           }
         }
       }

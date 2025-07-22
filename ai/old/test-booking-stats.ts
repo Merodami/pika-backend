@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:5500/api/v1'
 // Admin user credentials (from seed data)
 const adminCredentials = {
   email: 'admin@solo60.com',
-  password: 'Admin123!'
+  password: 'Admin123!',
 }
 
 interface TokenResponse {
@@ -20,17 +20,23 @@ async function getAdminToken(): Promise<string> {
   try {
     console.log('🔐 Getting admin token...')
 
-    const response = await axios.post<TokenResponse>(`${API_BASE_URL}/auth/token`, {
-      grantType: 'password',
-      username: adminCredentials.email,
-      password: adminCredentials.password
-    })
+    const response = await axios.post<TokenResponse>(
+      `${API_BASE_URL}/auth/token`,
+      {
+        grantType: 'password',
+        username: adminCredentials.email,
+        password: adminCredentials.password,
+      },
+    )
 
     console.log('✅ Token obtained successfully')
 
     return response.data.accessToken
   } catch (error: any) {
-    console.error('❌ Failed to get token:', error.response?.data || error.message)
+    console.error(
+      '❌ Failed to get token:',
+      error.response?.data || error.message,
+    )
     process.exit(1)
   }
 }
@@ -40,7 +46,7 @@ async function testRoute(
   path: string,
   token: string,
   data?: any,
-  description?: string
+  description?: string,
 ) {
   try {
     console.log(`\n📍 Testing: ${method} ${path}`)
@@ -50,10 +56,10 @@ async function testRoute(
       method,
       url: `${API_BASE_URL}${path}`,
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-      data
+      data,
     })
 
     console.log(`✅ Success (${response.status})`)
@@ -90,7 +96,7 @@ async function main() {
     '/users?page=1&limit=10&sortBy=CREATED_AT&sortOrder=DESC',
     token,
     undefined,
-    'Get users to test booking stats with'
+    'Get users to test booking stats with',
   )
 
   if (!usersResponse?.data || usersResponse.data.length === 0) {
@@ -117,9 +123,9 @@ async function main() {
     '/admin/sessions/stats/bookings',
     token,
     {
-      userIds: userIds
+      userIds: userIds,
     },
-    'Get booking stats for multiple users'
+    'Get booking stats for multiple users',
   )
 
   if (statsResponse?.stats) {
@@ -134,7 +140,9 @@ async function main() {
       console.log(`   Total Spent: $${(stat.totalSpent / 100).toFixed(2)}`)
 
       if (stat.lastBookingDate) {
-        console.log(`   Last Booking: ${stat.lastBookingDate} (${stat.lastBookingStatus})`)
+        console.log(
+          `   Last Booking: ${stat.lastBookingDate} (${stat.lastBookingStatus})`,
+        )
         console.log(`   Last Booking ID: ${stat.lastBookingId}`)
         console.log(`   Last Booking Gym: ${stat.lastBookingGymId}`)
       } else {
@@ -157,15 +165,17 @@ async function main() {
     {
       userIds: userIds,
       fromDate: fromDate,
-      toDate: toDate
+      toDate: toDate,
     },
-    `Filter stats from ${fromDate.split('T')[0]} to ${toDate.split('T')[0]}`
+    `Filter stats from ${fromDate.split('T')[0]} to ${toDate.split('T')[0]}`,
   )
 
   if (dateFilteredStats?.stats) {
     console.log(`\n📈 Date Filtered Stats Summary:`)
     dateFilteredStats.stats.forEach((stat: any) => {
-      console.log(`   User ${stat.userId}: ${stat.totalBookings} bookings in date range`)
+      console.log(
+        `   User ${stat.userId}: ${stat.totalBookings} bookings in date range`,
+      )
     })
   }
 
@@ -178,9 +188,9 @@ async function main() {
     '/admin/sessions/stats/bookings',
     token,
     {
-      userIds: [userIds[0]]
+      userIds: [userIds[0]],
     },
-    'Get booking stats for single user'
+    'Get booking stats for single user',
   )
 
   // Test 5: Test validation errors
@@ -193,22 +203,24 @@ async function main() {
     '/admin/sessions/stats/bookings',
     token,
     {
-      userIds: []
+      userIds: [],
     },
-    'Test validation with empty user IDs array (should fail)'
+    'Test validation with empty user IDs array (should fail)',
   )
 
   // Test too many user IDs (create 101 fake UUIDs)
-  const tooManyIds = Array(101).fill(0).map(() => 'f47ac10b-58cc-4372-a567-0e02b2c3d479')
+  const tooManyIds = Array(101)
+    .fill(0)
+    .map(() => 'f47ac10b-58cc-4372-a567-0e02b2c3d479')
 
   await testRoute(
     'POST',
     '/admin/sessions/stats/bookings',
     token,
     {
-      userIds: tooManyIds
+      userIds: tooManyIds,
     },
-    'Test validation with too many user IDs (should fail)'
+    'Test validation with too many user IDs (should fail)',
   )
 
   // Test 6: Test with non-existent users
@@ -217,7 +229,7 @@ async function main() {
 
   const fakeUserIds = [
     'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-    'f47ac10b-58cc-4372-a567-0e02b2c3d480'
+    'f47ac10b-58cc-4372-a567-0e02b2c3d480',
   ]
 
   const fakeUserStats = await testRoute(
@@ -225,15 +237,17 @@ async function main() {
     '/admin/sessions/stats/bookings',
     token,
     {
-      userIds: fakeUserIds
+      userIds: fakeUserIds,
     },
-    'Get stats for non-existent users (should return zero stats)'
+    'Get stats for non-existent users (should return zero stats)',
   )
 
   if (fakeUserStats?.stats) {
     console.log(`\n📊 Non-existent User Stats:`)
     fakeUserStats.stats.forEach((stat: any) => {
-      console.log(`   User ${stat.userId}: ${stat.totalBookings} bookings (should be 0)`)
+      console.log(
+        `   User ${stat.userId}: ${stat.totalBookings} bookings (should be 0)`,
+      )
     })
   }
 

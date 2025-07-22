@@ -31,7 +31,7 @@ export function createLanguageMiddleware(
       res.setHeader('Content-Language', language)
 
       next()
-    } catch (error) {
+    } catch {
       // If language detection fails, use default and continue
       req.language = 'en'
       res.locals.t = (key: string, fallback?: string) =>

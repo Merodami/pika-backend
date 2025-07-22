@@ -42,7 +42,9 @@ export const InternalBusinessQueryParams = z.object({
   categoryId: UUID.optional(),
 })
 
-export type InternalBusinessQueryParams = z.infer<typeof InternalBusinessQueryParams>
+export type InternalBusinessQueryParams = z.infer<
+  typeof InternalBusinessQueryParams
+>
 
 // ============= Get Businesses by IDs =============
 
@@ -87,7 +89,8 @@ export const ValidateBusinessRequest = openapi(
     checkVerified: z.boolean().default(false),
   }),
   {
-    description: 'Validate businesses exist and optionally check if active/verified',
+    description:
+      'Validate businesses exist and optionally check if active/verified',
   },
 )
 
@@ -129,7 +132,9 @@ export const GetBusinessesByUserRequest = openapi(
   },
 )
 
-export type GetBusinessesByUserRequest = z.infer<typeof GetBusinessesByUserRequest>
+export type GetBusinessesByUserRequest = z.infer<
+  typeof GetBusinessesByUserRequest
+>
 
 /**
  * Get businesses by user response
@@ -144,7 +149,9 @@ export const GetBusinessesByUserResponse = openapi(
   },
 )
 
-export type GetBusinessesByUserResponse = z.infer<typeof GetBusinessesByUserResponse>
+export type GetBusinessesByUserResponse = z.infer<
+  typeof GetBusinessesByUserResponse
+>
 
 // ============= Get Businesses by Category =============
 
@@ -163,7 +170,9 @@ export const GetBusinessesByCategoryRequest = openapi(
   },
 )
 
-export type GetBusinessesByCategoryRequest = z.infer<typeof GetBusinessesByCategoryRequest>
+export type GetBusinessesByCategoryRequest = z.infer<
+  typeof GetBusinessesByCategoryRequest
+>
 
 /**
  * Get businesses by category response
@@ -178,7 +187,9 @@ export const GetBusinessesByCategoryResponse = openapi(
   },
 )
 
-export type GetBusinessesByCategoryResponse = z.infer<typeof GetBusinessesByCategoryResponse>
+export type GetBusinessesByCategoryResponse = z.infer<
+  typeof GetBusinessesByCategoryResponse
+>
 
 // ============= Check Business Exists =============
 
@@ -194,7 +205,9 @@ export const CheckBusinessExistsRequest = openapi(
   },
 )
 
-export type CheckBusinessExistsRequest = z.infer<typeof CheckBusinessExistsRequest>
+export type CheckBusinessExistsRequest = z.infer<
+  typeof CheckBusinessExistsRequest
+>
 
 /**
  * Check business exists response
@@ -211,4 +224,6 @@ export const CheckBusinessExistsResponse = openapi(
   },
 )
 
-export type CheckBusinessExistsResponse = z.infer<typeof CheckBusinessExistsResponse>
+export type CheckBusinessExistsResponse = z.infer<
+  typeof CheckBusinessExistsResponse
+>

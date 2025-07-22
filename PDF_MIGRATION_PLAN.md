@@ -9,6 +9,7 @@ This document outlines the migration of the PDF service from the old Pika CQRS a
 ### Analysis Update (2024-01-21)
 
 After deep analysis of pika-old, we discovered significant gaps between the original implementation and our current approach. The original system had:
+
 - Rich domain entities with business logic
 - State machine pattern for voucher book lifecycle
 - Complex page and ad placement management
@@ -85,6 +86,7 @@ validateMonth(month: number | null): void
 ```
 
 **State Machine Rules:**
+
 ```
 DRAFT → READY_FOR_PRINT → PUBLISHED → ARCHIVED
 ```
@@ -117,18 +119,21 @@ DRAFT → READY_FOR_PRINT → PUBLISHED → ARCHIVED
 **Current Services Status:**
 
 #### VoucherBookService
+
 - ✅ Basic CRUD operations
 - ❌ Missing domain logic
 - ❌ No state transitions
 - ❌ No business validations
 
 #### AdPlacementService
+
 - ✅ Placement validation
 - ✅ PageLayoutEngine integration
 - ❌ Not integrated with VoucherBook pages
 - ❌ Missing page-level constraints
 
 #### BookDistributionService
+
 - ✅ Complete implementation
 - ✅ Status tracking
 - ✅ Analytics ready
@@ -137,12 +142,12 @@ DRAFT → READY_FOR_PRINT → PUBLISHED → ARCHIVED
 
 **Database Schema Differences:**
 
-| pika-old Field | Current Field | Status | Notes |
-|----------------|---------------|---------|--------|
-| providerId | - | ❌ Missing | Needed for multi-tenant |
-| generatedAt | pdfGeneratedAt | ✅ Mapped | Different name |
-| - | deletedAt | ✅ Added | Soft delete support |
-| - | updatedBy | ✅ Added | Better audit trail |
+| pika-old Field | Current Field  | Status     | Notes                   |
+| -------------- | -------------- | ---------- | ----------------------- |
+| providerId     | -              | ❌ Missing | Needed for multi-tenant |
+| generatedAt    | pdfGeneratedAt | ✅ Mapped  | Different name          |
+| -              | deletedAt      | ✅ Added   | Soft delete support     |
+| -              | updatedBy      | ✅ Added   | Better audit trail      |
 
 ---
 
@@ -151,11 +156,13 @@ DRAFT → READY_FOR_PRINT → PUBLISHED → ARCHIVED
 ### Phase 1: Domain Entity Implementation 🚧
 
 **Files to Read Before Implementation:**
+
 1. `/pika-old/.../write/domain/entities/VoucherBook.ts` - Full domain logic
 2. `/pika-old/.../write/domain/value-objects/` - Value object patterns
 3. `/pika-old/.../write/application/commands/` - Business rule implementations
 
 **Tasks:**
+
 1. Create `/src/domain/entities/VoucherBook.ts` with all business methods
 2. Implement state machine pattern for transitions
 3. Add validation rules and business constraints
@@ -164,11 +171,13 @@ DRAFT → READY_FOR_PRINT → PUBLISHED → ARCHIVED
 ### Phase 2: Service Enhancement 🚧
 
 **Files to Read Before Implementation:**
+
 1. `/pika-old/.../CreateVoucherBookCommandHandler.ts` - Creation logic
 2. `/pika-old/.../UpdateVoucherBookStatusCommandHandler.ts` - State transitions
 3. `/pika-old/.../PublishVoucherBookCommandHandler.ts` - Publishing logic
 
 **Tasks:**
+
 1. Refactor VoucherBookService to use domain entities
 2. Implement proper state transitions through domain methods
 3. Add authorization checks (creator/provider/admin)
@@ -177,11 +186,13 @@ DRAFT → READY_FOR_PRINT → PUBLISHED → ARCHIVED
 ### Phase 3: Page Management System 🚧
 
 **Files to Read Before Implementation:**
+
 1. `/pika-old/.../write/domain/entities/VoucherBookPage.ts`
 2. `/pika-old/.../write/application/commands/placements/`
 3. `/pika-old/.../infrastructure/services/PageLayoutEngine.ts`
 
 **Tasks:**
+
 1. Implement VoucherBookPage domain entity
 2. Create page management methods in VoucherBook
 3. Integrate AdPlacementService with pages
@@ -190,11 +201,13 @@ DRAFT → READY_FOR_PRINT → PUBLISHED → ARCHIVED
 ### Phase 4: PDF Generation Integration 🚧
 
 **Files to Read Before Implementation:**
+
 1. `/pika-old/.../GeneratePDFCommandHandler.ts` - Generation orchestration
 2. `/pika-old/.../infrastructure/services/PDFGenerationService.ts`
 3. `/pika-old/.../infrastructure/services/QRCodeService.ts`
 
 **Tasks:**
+
 1. Integrate PDF generation with state machine
 2. Implement rate limiting for generation
 3. Add batch voucher data fetching
@@ -240,10 +253,10 @@ export class VoucherBookService {
   async updateStatus(id: string, newStatus: VoucherBookStatus) {
     const book = await this.repository.findById(id)
     const domainBook = VoucherBook.fromPersistence(book)
-    
+
     // Use domain method for business logic
     domainBook.transitionTo(newStatus)
-    
+
     await this.repository.update(id, domainBook.toPersistence())
   }
 }
@@ -289,20 +302,20 @@ export class VoucherBookService {
 // Domain Entity (rich behavior)
 class VoucherBook {
   private constructor(private props: VoucherBookProps) {}
-  
+
   // Business methods...
-  
+
   toPersistence(): VoucherBookPersistence {
     return {
       ...this.props,
-      status: this.props.status.toString()
+      status: this.props.status.toString(),
     }
   }
-  
+
   static fromPersistence(data: VoucherBookPersistence): VoucherBook {
     return new VoucherBook({
       ...data,
-      status: VoucherBookStatus[data.status]
+      status: VoucherBookStatus[data.status],
     })
   }
 }
@@ -322,6 +335,7 @@ interface VoucherBookPersistence {
 ### Domain Testing Priority
 
 1. **State Machine Tests**
+
    ```typescript
    describe('VoucherBook State Transitions', () => {
      test('should transition from DRAFT to READY_FOR_PRINT')
@@ -331,6 +345,7 @@ interface VoucherBookPersistence {
    ```
 
 2. **Business Rule Tests**
+
    ```typescript
    describe('VoucherBook Business Rules', () => {
      test('should only allow edits in DRAFT state')

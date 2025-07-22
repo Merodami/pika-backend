@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
 import { UserId } from '../../../common/schemas/branded.js'
-import { VoucherBookStatus, VoucherBookType, VoucherBookSortBy, SortOrder } from '../../../common/schemas/enums.js'
+import {
+  VoucherBookStatus,
+  VoucherBookType,
+  VoucherBookSortBy,
+  SortOrder,
+} from '../../../common/schemas/enums.js'
 import { withTimestamps, withAudit } from '../../../common/schemas/metadata.js'
 import { SearchParams } from '../../../common/schemas/pagination.js'
 import { UUID } from '../../../common/schemas/primitives.js'
@@ -21,39 +26,81 @@ export const AdminVoucherBookResponse = openapi(
   withAudit({
     id: UUID,
     title: z.string().max(255).describe('Voucher book title'),
-    edition: z.string().max(100).optional().describe('Book edition (e.g., "January 2024")'),
+    edition: z
+      .string()
+      .max(100)
+      .optional()
+      .describe('Book edition (e.g., "January 2024")'),
     bookType: VoucherBookType.describe('Type of voucher book'),
-    month: z.number().int().min(1).max(12).optional().describe('Month for monthly books (1-12)'),
+    month: z
+      .number()
+      .int()
+      .min(1)
+      .max(12)
+      .optional()
+      .describe('Month for monthly books (1-12)'),
     year: z.number().int().min(2020).max(2100).describe('Year of publication'),
     status: VoucherBookStatus.describe('Current status of the book'),
-    totalPages: z.number().int().min(1).max(100).default(24).describe('Total number of pages'),
-    publishedAt: z.string().datetime().optional().describe('When the book was published'),
-    coverImageUrl: z.string().url().optional().describe('URL of the cover image'),
-    backImageUrl: z.string().url().optional().describe('URL of the back cover image'),
+    totalPages: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(24)
+      .describe('Total number of pages'),
+    publishedAt: z
+      .string()
+      .datetime()
+      .optional()
+      .describe('When the book was published'),
+    coverImageUrl: z
+      .string()
+      .url()
+      .optional()
+      .describe('URL of the cover image'),
+    backImageUrl: z
+      .string()
+      .url()
+      .optional()
+      .describe('URL of the back cover image'),
     pdfUrl: z.string().url().optional().describe('URL of the generated PDF'),
-    pdfGeneratedAt: z.string().datetime().optional().describe('When the PDF was generated'),
+    pdfGeneratedAt: z
+      .string()
+      .datetime()
+      .optional()
+      .describe('When the PDF was generated'),
     metadata: z.record(z.any()).optional().describe('Additional book metadata'),
-    deletedAt: z.string().datetime().optional().describe('Soft delete timestamp'),
+    deletedAt: z
+      .string()
+      .datetime()
+      .optional()
+      .describe('Soft delete timestamp'),
     // Computed fields
-    computed: z.object({
-      displayName: z.string().describe('Title with edition if available'),
-      displayPeriod: z.string().describe('Formatted month/year display'),
-      ageInDays: z.number().describe('Days since creation'),
-      isRecent: z.boolean().describe('Created within last 7 days'),
-      canBeEdited: z.boolean().describe('Whether book can be edited'),
-      canBePublished: z.boolean().describe('Whether book can be published'),
-      hasPDF: z.boolean().describe('Whether PDF has been generated'),
-    }).optional(),
+    computed: z
+      .object({
+        displayName: z.string().describe('Title with edition if available'),
+        displayPeriod: z.string().describe('Formatted month/year display'),
+        ageInDays: z.number().describe('Days since creation'),
+        isRecent: z.boolean().describe('Created within last 7 days'),
+        canBeEdited: z.boolean().describe('Whether book can be edited'),
+        canBePublished: z.boolean().describe('Whether book can be published'),
+        hasPDF: z.boolean().describe('Whether PDF has been generated'),
+      })
+      .optional(),
     // Statistics
-    statistics: z.object({
-      totalPages: z.number().describe('Total pages in book'),
-      pagesWithPlacements: z.number().describe('Pages with content'),
-      completionPercentage: z.number().describe('Content completion percentage'),
-      totalDistributions: z.number().describe('Total distributions'),
-      pendingDistributions: z.number().describe('Pending distributions'),
-      shippedDistributions: z.number().describe('Shipped distributions'),
-      deliveredDistributions: z.number().describe('Delivered distributions'),
-    }).optional(),
+    statistics: z
+      .object({
+        totalPages: z.number().describe('Total pages in book'),
+        pagesWithPlacements: z.number().describe('Pages with content'),
+        completionPercentage: z
+          .number()
+          .describe('Content completion percentage'),
+        totalDistributions: z.number().describe('Total distributions'),
+        pendingDistributions: z.number().describe('Pending distributions'),
+        shippedDistributions: z.number().describe('Shipped distributions'),
+        deliveredDistributions: z.number().describe('Delivered distributions'),
+      })
+      .optional(),
   }),
   {
     description: 'Voucher book information for admin management',
@@ -71,10 +118,24 @@ export const CreateVoucherBookRequest = openapi(
   z.object({
     title: z.string().min(1).max(255).describe('Voucher book title'),
     edition: z.string().max(100).optional().describe('Book edition'),
-    bookType: VoucherBookType.default('MONTHLY').describe('Type of voucher book'),
-    month: z.number().int().min(1).max(12).optional().describe('Month for monthly books'),
+    bookType: VoucherBookType.default('MONTHLY').describe(
+      'Type of voucher book',
+    ),
+    month: z
+      .number()
+      .int()
+      .min(1)
+      .max(12)
+      .optional()
+      .describe('Month for monthly books'),
     year: z.number().int().min(2020).max(2100).describe('Year of publication'),
-    totalPages: z.number().int().min(1).max(100).default(24).describe('Total pages'),
+    totalPages: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(24)
+      .describe('Total pages'),
     coverImageUrl: z.string().url().optional().describe('Cover image URL'),
     backImageUrl: z.string().url().optional().describe('Back cover image URL'),
     metadata: z.record(z.any()).optional().describe('Additional metadata'),
@@ -104,9 +165,27 @@ export const UpdateVoucherBookRequest = openapi(
     title: z.string().min(1).max(255).optional().describe('Voucher book title'),
     edition: z.string().max(100).optional().describe('Book edition'),
     bookType: VoucherBookType.optional().describe('Type of voucher book'),
-    month: z.number().int().min(1).max(12).optional().describe('Month for monthly books'),
-    year: z.number().int().min(2020).max(2100).optional().describe('Year of publication'),
-    totalPages: z.number().int().min(1).max(100).optional().describe('Total pages'),
+    month: z
+      .number()
+      .int()
+      .min(1)
+      .max(12)
+      .optional()
+      .describe('Month for monthly books'),
+    year: z
+      .number()
+      .int()
+      .min(2020)
+      .max(2100)
+      .optional()
+      .describe('Year of publication'),
+    totalPages: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .describe('Total pages'),
     coverImageUrl: z.string().url().optional().describe('Cover image URL'),
     backImageUrl: z.string().url().optional().describe('Back cover image URL'),
     metadata: z.record(z.any()).optional().describe('Additional metadata'),
@@ -135,7 +214,9 @@ export const UpdateVoucherBookStatusRequest = openapi(
   },
 )
 
-export type UpdateVoucherBookStatusRequest = z.infer<typeof UpdateVoucherBookStatusRequest>
+export type UpdateVoucherBookStatusRequest = z.infer<
+  typeof UpdateVoucherBookStatusRequest
+>
 
 // ============= Generate PDF =============
 
@@ -144,7 +225,10 @@ export type UpdateVoucherBookStatusRequest = z.infer<typeof UpdateVoucherBookSta
  */
 export const GeneratePDFRequest = openapi(
   z.object({
-    regenerate: z.boolean().default(false).describe('Force regeneration of existing PDF'),
+    regenerate: z
+      .boolean()
+      .default(false)
+      .describe('Force regeneration of existing PDF'),
   }),
   {
     description: 'Generate PDF for voucher book',
@@ -178,14 +262,20 @@ export type GeneratePDFResponse = z.infer<typeof GeneratePDFResponse>
  */
 export const BulkArchiveVoucherBooksRequest = openapi(
   z.object({
-    voucherBookIds: z.array(UUID).min(1).max(100).describe('List of voucher book IDs to archive'),
+    voucherBookIds: z
+      .array(UUID)
+      .min(1)
+      .max(100)
+      .describe('List of voucher book IDs to archive'),
   }),
   {
     description: 'Archive multiple voucher books',
   },
 )
 
-export type BulkArchiveVoucherBooksRequest = z.infer<typeof BulkArchiveVoucherBooksRequest>
+export type BulkArchiveVoucherBooksRequest = z.infer<
+  typeof BulkArchiveVoucherBooksRequest
+>
 
 // ============= Search/Filter =============
 
@@ -195,13 +285,21 @@ export type BulkArchiveVoucherBooksRequest = z.infer<typeof BulkArchiveVoucherBo
 export const AdminVoucherBookQueryParams = SearchParams.extend({
   bookType: VoucherBookType.optional().describe('Filter by book type'),
   status: VoucherBookStatus.optional().describe('Filter by book status'),
-  year: z.number().int().min(2020).max(2100).optional().describe('Filter by year'),
+  year: z
+    .number()
+    .int()
+    .min(2020)
+    .max(2100)
+    .optional()
+    .describe('Filter by year'),
   month: z.number().int().min(1).max(12).optional().describe('Filter by month'),
   createdBy: UserId.optional().describe('Filter by creator'),
   sortBy: VoucherBookSortBy.default('createdAt'),
 })
 
-export type AdminVoucherBookQueryParams = z.infer<typeof AdminVoucherBookQueryParams>
+export type AdminVoucherBookQueryParams = z.infer<
+  typeof AdminVoucherBookQueryParams
+>
 
 // ============= Statistics =============
 
@@ -209,11 +307,25 @@ export type AdminVoucherBookQueryParams = z.infer<typeof AdminVoucherBookQueryPa
  * Voucher book statistics query params
  */
 export const VoucherBookStatsQueryParams = z.object({
-  year: z.number().int().min(2020).max(2100).optional().describe('Filter stats by year'),
-  month: z.number().int().min(1).max(12).optional().describe('Filter stats by month'),
+  year: z
+    .number()
+    .int()
+    .min(2020)
+    .max(2100)
+    .optional()
+    .describe('Filter stats by year'),
+  month: z
+    .number()
+    .int()
+    .min(1)
+    .max(12)
+    .optional()
+    .describe('Filter stats by month'),
 })
 
-export type VoucherBookStatsQueryParams = z.infer<typeof VoucherBookStatsQueryParams>
+export type VoucherBookStatsQueryParams = z.infer<
+  typeof VoucherBookStatsQueryParams
+>
 
 /**
  * Voucher book statistics response
@@ -249,13 +361,19 @@ export const VoucherBookStatisticsResponse = openapi(
   },
 )
 
-export type VoucherBookStatisticsResponse = z.infer<typeof VoucherBookStatisticsResponse>
+export type VoucherBookStatisticsResponse = z.infer<
+  typeof VoucherBookStatisticsResponse
+>
 
 // ============= Response Types =============
 
 /**
  * Paginated admin voucher book list
  */
-export const AdminVoucherBookListResponse = paginatedResponse(AdminVoucherBookResponse)
+export const AdminVoucherBookListResponse = paginatedResponse(
+  AdminVoucherBookResponse,
+)
 
-export type AdminVoucherBookListResponse = z.infer<typeof AdminVoucherBookListResponse>
+export type AdminVoucherBookListResponse = z.infer<
+  typeof AdminVoucherBookListResponse
+>

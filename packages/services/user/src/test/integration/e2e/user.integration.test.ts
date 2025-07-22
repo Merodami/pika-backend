@@ -19,21 +19,21 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
+import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import {
   AuthenticatedRequestClient,
   CommunicationServiceClientMock,
   createE2EAuthHelper,
   E2EAuthHelper,
 } from '@pika/tests'
-import { MemoryCacheService } from '@pika/redis'
-import { logger } from '@pika/shared'
-import { PrismaClient, UserRole } from '@prisma/client'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
+import { PrismaClient, UserRole } from '@prisma/client'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

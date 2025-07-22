@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:5500/api/v1'
 // Admin user credentials (from seed data)
 const adminCredentials = {
   email: 'admin@solo60.com',
-  password: 'Admin123!'
+  password: 'Admin123!',
 }
 
 interface TokenResponse {
@@ -20,17 +20,23 @@ async function getAdminToken(): Promise<string> {
   try {
     console.log('🔐 Getting admin token...')
 
-    const response = await axios.post<TokenResponse>(`${API_BASE_URL}/auth/token`, {
-      grantType: 'password',
-      username: adminCredentials.email,
-      password: adminCredentials.password
-    })
+    const response = await axios.post<TokenResponse>(
+      `${API_BASE_URL}/auth/token`,
+      {
+        grantType: 'password',
+        username: adminCredentials.email,
+        password: adminCredentials.password,
+      },
+    )
 
     console.log('✅ Token obtained successfully')
 
     return response.data.accessToken
   } catch (error: any) {
-    console.error('❌ Failed to get token:', error.response?.data || error.message)
+    console.error(
+      '❌ Failed to get token:',
+      error.response?.data || error.message,
+    )
     process.exit(1)
   }
 }
@@ -40,7 +46,7 @@ async function testRoute(
   path: string,
   token: string,
   data?: any,
-  description?: string
+  description?: string,
 ) {
   try {
     console.log(`\n📍 Testing: ${method} ${path}`)
@@ -50,10 +56,10 @@ async function testRoute(
       method,
       url: `${API_BASE_URL}${path}`,
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-      data
+      data,
     })
 
     console.log(`✅ Success (${response.status})`)
@@ -93,7 +99,7 @@ async function main() {
       `/users?page=1&limit=5&status=${status}&sortBy=CREATED_AT&sortOrder=DESC`,
       token,
       undefined,
-      `Filter by status: ${status}`
+      `Filter by status: ${status}`,
     )
 
     if (result?.data) {
@@ -101,16 +107,26 @@ async function main() {
       console.log(`   Total found: ${result.data.length} users`)
 
       // Check if all returned users have the requested status
-      const correctStatus = result.data.filter((user: any) => user.status === status).length
-      const wrongStatus = result.data.filter((user: any) => user.status !== status)
+      const correctStatus = result.data.filter(
+        (user: any) => user.status === status,
+      ).length
+      const wrongStatus = result.data.filter(
+        (user: any) => user.status !== status,
+      )
 
       if (wrongStatus.length > 0) {
-        console.log(`   ⚠️  WARNING: Found ${wrongStatus.length} users with WRONG status!`)
+        console.log(
+          `   ⚠️  WARNING: Found ${wrongStatus.length} users with WRONG status!`,
+        )
         wrongStatus.forEach((user: any) => {
-          console.log(`      ❌ ${user.email} has status ${user.status} (expected ${status})`)
+          console.log(
+            `      ❌ ${user.email} has status ${user.status} (expected ${status})`,
+          )
         })
       } else {
-        console.log(`   ✅ All ${correctStatus} users have correct status: ${status}`)
+        console.log(
+          `   ✅ All ${correctStatus} users have correct status: ${status}`,
+        )
       }
 
       result.data.forEach((user: any) => {
@@ -128,7 +144,7 @@ async function main() {
     '/users?page=1&limit=10&sortBy=CREATED_AT&sortOrder=DESC',
     token,
     undefined,
-    'Get all users without status filter'
+    'Get all users without status filter',
   )
 
   if (allUsers?.data) {
@@ -149,8 +165,8 @@ async function main() {
   console.log('=================================')
 
   // Find a test user to ban/unban
-  const testUser = allUsers?.data?.find((u: any) =>
-    u.email.includes('test') || u.email.includes('member')
+  const testUser = allUsers?.data?.find(
+    (u: any) => u.email.includes('test') || u.email.includes('member'),
   )
 
   if (testUser) {
@@ -162,7 +178,7 @@ async function main() {
       `/users/${testUser.id}/ban`,
       token,
       {}, // Empty body since all fields are optional
-      'Ban user with empty body'
+      'Ban user with empty body',
     )
 
     // Check user status
@@ -171,7 +187,7 @@ async function main() {
       `/users/${testUser.id}`,
       token,
       undefined,
-      'Check user status after ban'
+      'Check user status after ban',
     )
 
     // Unban user
@@ -180,7 +196,7 @@ async function main() {
       `/users/${testUser.id}/unban`,
       token,
       {}, // Empty body since all fields are optional
-      'Unban user with empty body'
+      'Unban user with empty body',
     )
 
     // Check user status again
@@ -189,7 +205,7 @@ async function main() {
       `/users/${testUser.id}`,
       token,
       undefined,
-      'Check user status after unban'
+      'Check user status after unban',
     )
   }
 

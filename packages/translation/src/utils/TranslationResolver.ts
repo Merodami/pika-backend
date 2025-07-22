@@ -85,7 +85,7 @@ export class TranslationResolver {
 
       // Extract translation keys
       const translationKeys = keyFields
-        .map((field) => object[field])
+        .map((field) => object[field as keyof typeof object])
         .filter((key) => typeof key === 'string' && key.length > 0)
 
       if (translationKeys.length === 0) {
@@ -148,7 +148,7 @@ export class TranslationResolver {
 
         // Collect translation keys
         keyFields.forEach((field) => {
-          const key = object[field]
+          const key = object[field as keyof typeof object]
 
           if (typeof key === 'string' && key.length > 0) {
             allTranslationKeys.add(key)
@@ -209,10 +209,11 @@ export class TranslationResolver {
     const result = { ...object }
 
     for (const keyField of keyFields) {
-      const translationKey = object[keyField]
+      const translationKey = object[keyField as keyof typeof object]
 
       if (typeof translationKey === 'string') {
-        const resolvedContent = translations[translationKey]
+        const resolvedContent =
+          translations[translationKey as keyof typeof translations]
 
         if (resolvedContent || options.fallbackToKey) {
           // Determine target field name by removing the key pattern
@@ -227,12 +228,15 @@ export class TranslationResolver {
           const value =
             resolvedContent || (options.fallbackToKey ? translationKey : '')
 
-          ;(result as any)[targetField] = value
+          ;(result as Record<string, any>)[targetField as keyof typeof result] =
+            value
         }
 
         // Remove key field if not preserving
         if (!options.preserveKeys) {
-          delete (result as any)[keyField]
+          delete (result as Record<string, any>)[
+            keyField as keyof typeof result
+          ]
         }
       }
     }

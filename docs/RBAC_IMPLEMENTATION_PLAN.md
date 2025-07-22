@@ -1,17 +1,20 @@
 # RBAC Implementation Plan
 
 ## Overview
+
 Implement a comprehensive Role-Based Access Control (RBAC) system with fine-grained permissions, following industry standards used by AWS IAM, Google Cloud IAM, and other modern platforms.
 
 ## Current State Analysis
 
 ### Pika-old had:
+
 1. **Fine-grained permission mapping** - Each role mapped to specific permissions (e.g., `users:read`, `vouchers:write:own`)
 2. **Permission-based middleware** - `requirePermissions('categories:write')`
 3. **Role-based middleware** - `requireAdmin()`, `requireProvider()`, `requireCustomer()`
 4. **Auth testing pattern** - Test both functionality AND authorization in the same test
 
 ### New architecture has:
+
 1. **Basic role-based middleware** - `requireAdmin()`, `requireUser()`, `requireRole()`
 2. **Missing permission mapping** - No fine-grained permissions yet
 3. **E2EAuthHelper** - Good for testing different roles
@@ -137,39 +140,33 @@ export function requirePermissions(...permissions: string[]): RequestHandler {
     }
 
     const userPermissions = req.user.permissions || []
-    
+
     const hasAllPermissions = permissions.every((permission) => {
       // Check exact permission
       if (userPermissions.includes(permission)) {
         return true
       }
-      
+
       // Check wildcard permissions (e.g., 'admin:*' matches 'admin:dashboard')
       const permissionParts = permission.split(':')
       const wildcardPermission = permissionParts[0] + ':*'
-      
+
       if (userPermissions.includes(wildcardPermission)) {
         return true
       }
-      
+
       // For ':own' permissions, we'll need to check ownership in the controller
       // This middleware just checks if user has the permission type
       if (permission.endsWith(':own')) {
         const basePermission = permission.replace(':own', '')
-        return userPermissions.includes(permission) || 
-               userPermissions.includes(basePermission) ||
-               userPermissions.includes(wildcardPermission)
+        return userPermissions.includes(permission) || userPermissions.includes(basePermission) || userPermissions.includes(wildcardPermission)
       }
-      
+
       return false
     })
 
     if (!hasAllPermissions) {
-      return next(
-        new NotAuthorizedError(
-          `Missing required permissions: ${permissions.join(', ')}`,
-        ),
-      )
+      return next(new NotAuthorizedError(`Missing required permissions: ${permissions.join(', ')}`))
     }
 
     next()
@@ -198,7 +195,7 @@ interface RBACTestCase {
 export class RBACTestHelper {
   constructor(
     private authHelper: E2EAuthHelper,
-    private request: supertest.SuperTest<supertest.Test>
+    private request: supertest.SuperTest<supertest.Test>,
   ) {}
 
   async testPermissionMatrix(testCases: RBACTestCase[]) {
@@ -231,11 +228,7 @@ export class RBACTestHelper {
   }
 
   // Helper for testing ownership-based permissions
-  async testOwnershipPermissions(
-    endpoint: string,
-    ownerId: string,
-    otherUserId: string
-  ) {
+  async testOwnershipPermissions(endpoint: string, ownerId: string, otherUserId: string) {
     describe('Ownership permissions', () => {
       it('should allow owner to access their resource', async () => {
         const ownerClient = await this.authHelper.getClientForUser(ownerId)
@@ -265,32 +258,17 @@ Example for business routes:
 
 ```typescript
 // Public routes
-router.get('/businesses', 
-  requirePermissions('businesses:read'),
-  businessController.getAll
-)
+router.get('/businesses', requirePermissions('businesses:read'), businessController.getAll)
 
 // Business-only routes
-router.get('/businesses/me', 
-  requirePermissions('businesses:read:own'),
-  businessController.getMyBusiness
-)
+router.get('/businesses/me', requirePermissions('businesses:read:own'), businessController.getMyBusiness)
 
-router.put('/businesses/me', 
-  requirePermissions('businesses:write:own'),
-  businessController.updateMyBusiness
-)
+router.put('/businesses/me', requirePermissions('businesses:write:own'), businessController.updateMyBusiness)
 
 // Admin routes
-router.post('/admin/businesses/:id/verify',
-  requirePermissions('businesses:verify'),
-  adminBusinessController.verifyBusiness
-)
+router.post('/admin/businesses/:id/verify', requirePermissions('businesses:verify'), adminBusinessController.verifyBusiness)
 
-router.delete('/admin/businesses/:id',
-  requirePermissions('businesses:delete'),
-  adminBusinessController.deleteBusiness
-)
+router.delete('/admin/businesses/:id', requirePermissions('businesses:delete'), adminBusinessController.deleteBusiness)
 ```
 
 ### 5. Implement Permission Matrix Testing
@@ -345,36 +323,27 @@ describe('Business API RBAC Tests', () => {
       const businessData = {
         name: 'Test Business',
         categoryId: 'test-category-id',
-        description: 'Test Description'
+        description: 'Test Description',
       }
 
       it('should create business for BUSINESS role user', async () => {
         const businessClient = await authHelper.getBusinessClient()
-        const response = await businessClient
-          .post('/businesses/me')
-          .send(businessData)
-          .expect(201)
+        const response = await businessClient.post('/businesses/me').send(businessData).expect(201)
 
         expect(response.body).toMatchObject({
           name: businessData.name,
           categoryId: businessData.categoryId,
-          userId: expect.any(String)
+          userId: expect.any(String),
         })
       })
 
       it('should reject CUSTOMER role', async () => {
         const customerClient = await authHelper.getUserClient()
-        await customerClient
-          .post('/businesses/me')
-          .send(businessData)
-          .expect(403)
+        await customerClient.post('/businesses/me').send(businessData).expect(403)
       })
 
       it('should reject unauthenticated requests', async () => {
-        await request
-          .post('/businesses/me')
-          .send(businessData)
-          .expect(401)
+        await request.post('/businesses/me').send(businessData).expect(401)
       })
     })
   })
@@ -393,11 +362,13 @@ describe('Business API RBAC Tests', () => {
 ## Security Patterns
 
 ### Permission Naming Convention
+
 - `resource:action` - Basic permission (e.g., `users:read`)
 - `resource:action:own` - Ownership-based permission (e.g., `users:read:own`)
 - `resource:*` - Wildcard permission for all actions on a resource
 
 ### Ownership Checks
+
 For `:own` permissions, controllers must verify ownership:
 
 ```typescript
@@ -408,6 +379,7 @@ if (permission.endsWith(':own') && resource.userId !== req.user.id) {
 ```
 
 ### Audit Logging
+
 All permission checks should be logged:
 
 ```typescript
@@ -416,7 +388,7 @@ logger.info('Permission check', {
   requiredPermissions: permissions,
   userPermissions: req.user.permissions,
   result: hasAllPermissions ? 'allowed' : 'denied',
-  correlationId: req.correlationId
+  correlationId: req.correlationId,
 })
 ```
 

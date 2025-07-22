@@ -26,10 +26,10 @@
     "express": "^5.1.0",
     "http-proxy-middleware": "^3.0.5",
     "zod": "^4.0.5",
-    "zod-validation-error": "^3.5.3"
+    "zod-validation-error": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.13",
+    "@types/node": "^24.1.0",
     "typescript": "^5.8.3"
   },
   "depcheck": {

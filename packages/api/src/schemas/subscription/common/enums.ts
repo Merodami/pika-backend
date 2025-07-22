@@ -72,7 +72,9 @@ export const SubscriptionNotificationType = z.enum([
   'trialEnding',
 ])
 
-export type SubscriptionNotificationType = z.infer<typeof SubscriptionNotificationType>
+export type SubscriptionNotificationType = z.infer<
+  typeof SubscriptionNotificationType
+>
 
 // ============= Admin Enums =============
 

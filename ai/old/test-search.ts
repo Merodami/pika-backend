@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:5500/api/v1'
 // Admin user credentials
 const adminCredentials = {
   email: 'admin@solo60.com',
-  password: 'Admin123!'
+  password: 'Admin123!',
 }
 
 async function getAdminToken(): Promise<string> {
@@ -15,12 +15,15 @@ async function getAdminToken(): Promise<string> {
     const response = await axios.post(`${API_BASE_URL}/auth/token`, {
       grantType: 'password',
       username: adminCredentials.email,
-      password: adminCredentials.password
+      password: adminCredentials.password,
     })
 
     return response.data.accessToken
   } catch (error: any) {
-    console.error('❌ Failed to get token:', error.response?.data || error.message)
+    console.error(
+      '❌ Failed to get token:',
+      error.response?.data || error.message,
+    )
     process.exit(1)
   }
 }
@@ -39,11 +42,11 @@ async function testSearch(token: string) {
         limit: 10,
         search: 'Zoila',
         sortBy: 'CREATED_AT',
-        sortOrder: 'DESC'
+        sortOrder: 'DESC',
       },
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
 
     console.log(`✅ Found ${response.data.data.length} users`)
@@ -67,11 +70,11 @@ async function testSearch(token: string) {
           limit: 5,
           search: term,
           sortBy: 'CREATED_AT',
-          sortOrder: 'DESC'
+          sortOrder: 'DESC',
         },
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       })
 
       console.log(`\n   Search term: "${term}"`)
@@ -80,7 +83,10 @@ async function testSearch(token: string) {
         console.log(`     - ${user.firstName} ${user.lastName} (${user.email})`)
       })
     } catch (error: any) {
-      console.error(`   ❌ Failed to search for "${term}":`, error.response?.status)
+      console.error(
+        `   ❌ Failed to search for "${term}":`,
+        error.response?.status,
+      )
     }
   }
 
@@ -93,19 +99,24 @@ async function testSearch(token: string) {
         limit: 5,
         search: 'solo60.com',
         sortBy: 'CREATED_AT',
-        sortOrder: 'DESC'
+        sortOrder: 'DESC',
       },
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
 
-    console.log(`   Found ${response.data.data.length} users with "solo60.com" in email`)
+    console.log(
+      `   Found ${response.data.data.length} users with "solo60.com" in email`,
+    )
     response.data.data.forEach((user: any) => {
       console.log(`     - ${user.email} (${user.firstName} ${user.lastName})`)
     })
   } catch (error: any) {
-    console.error('❌ Email search failed:', error.response?.data || error.message)
+    console.error(
+      '❌ Email search failed:',
+      error.response?.data || error.message,
+    )
   }
 
   // Test 4: Check search parameter details

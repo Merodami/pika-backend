@@ -90,4 +90,6 @@ export const VoucherBookPlacementParams = openapi(
   },
 )
 
-export type VoucherBookPlacementParams = z.infer<typeof VoucherBookPlacementParams>
+export type VoucherBookPlacementParams = z.infer<
+  typeof VoucherBookPlacementParams
+>

@@ -154,7 +154,12 @@ export type NotificationCategory = z.infer<typeof NotificationCategory>
 /**
  * SMS message types
  */
-export const SMSType = z.enum(['VERIFICATION', 'ALERT', 'REMINDER', 'MARKETING'])
+export const SMSType = z.enum([
+  'VERIFICATION',
+  'ALERT',
+  'REMINDER',
+  'MARKETING',
+])
 export type SMSType = z.infer<typeof SMSType>
 
 /**
@@ -194,7 +199,9 @@ export const TransactionalEmailTemplate = z.enum([
   'SUBSCRIPTION_EXPIRING',
   'SUBSCRIPTION_EXPIRED',
 ])
-export type TransactionalEmailTemplate = z.infer<typeof TransactionalEmailTemplate>
+export type TransactionalEmailTemplate = z.infer<
+  typeof TransactionalEmailTemplate
+>
 
 /**
  * Communication event types for tracking
@@ -217,7 +224,9 @@ export const CommunicationProcessingStatus = z.enum([
   'SENT',
   'FAILED',
 ])
-export type CommunicationProcessingStatus = z.infer<typeof CommunicationProcessingStatus>
+export type CommunicationProcessingStatus = z.infer<
+  typeof CommunicationProcessingStatus
+>
 
 // ============= Sort Fields =============
 
@@ -282,4 +291,6 @@ export const NotificationStatusUpdateType = z.enum([
   'BOUNCED',
   'FAILED',
 ])
-export type NotificationStatusUpdateType = z.infer<typeof NotificationStatusUpdateType>
+export type NotificationStatusUpdateType = z.infer<
+  typeof NotificationStatusUpdateType
+>

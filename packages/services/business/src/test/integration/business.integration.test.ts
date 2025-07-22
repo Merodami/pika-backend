@@ -1,9 +1,14 @@
-// For integration tests, we want to test with real modules
-// The shared mocks from setupTests.ts will be used automatically
+// For integration tests, we unmock the modules we need for real Express server
+import { vi } from 'vitest'
+
+// IMPORTANT: Unmock before any imports to ensure we get real implementations
+vi.unmock('@pika/http')
+vi.unmock('@pika/api')
+vi.unmock('@pika/redis')
+vi.unmock('@pika/translation')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { TranslationClient } from '@pika/translation'
 import type { TestDatabase } from '@pika/tests'
 import {
   AuthenticatedRequestClient,
@@ -13,6 +18,7 @@ import {
   E2EAuthHelper,
   InternalAPITestHelper,
 } from '@pika/tests'
+import { TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 import type { Express } from 'express'
 import supertest from 'supertest'
@@ -129,8 +135,9 @@ describe('Business Integration Tests', () => {
 
     // Create server
     cacheService = new MemoryCacheService()
+
     const translationClient = new TranslationClient()
-    
+
     app = await createBusinessServer({
       prisma: testDb.prisma,
       cacheService,
@@ -390,10 +397,12 @@ describe('Business Integration Tests', () => {
       // The business client is associated with a specific test user
       // We need to check which business belongs to this user
       const businessUser = await testDb.prisma.user.findFirst({
-        where: { email: 'business@e2etest.com' }
+        where: { email: 'business@e2etest.com' },
       })
-      const userBusiness = testBusinesses.find(b => b.userId === businessUser?.id)
-      
+      const userBusiness = testBusinesses.find(
+        (b) => b.userId === businessUser?.id,
+      )
+
       if (userBusiness) {
         expect(response.body.id).toBe(userBusiness.id)
         expect(response.body.userId).toBe(businessUser?.id)
@@ -437,6 +446,7 @@ describe('Business Integration Tests', () => {
   describe('POST /businesses/me', () => {
     it('should create a new business for current user', async () => {
       // First create a category
+      const adminUserId = uuid() // Create a dummy admin user ID for test data
       const category = await testDb.prisma.category.create({
         data: {
           nameKey: `category.name.${uuid()}`,
@@ -445,6 +455,7 @@ describe('Business Integration Tests', () => {
           level: 1,
           path: '/',
           active: true,
+          createdBy: adminUserId,
         },
       })
 
@@ -489,6 +500,7 @@ describe('Business Integration Tests', () => {
 
     it('should prevent user from creating multiple businesses', async () => {
       // First create a category
+      const adminUserId = uuid() // Create a dummy admin user ID for test data
       const category = await testDb.prisma.category.create({
         data: {
           nameKey: `category.name.${uuid()}`,
@@ -497,6 +509,7 @@ describe('Business Integration Tests', () => {
           level: 1,
           path: '/',
           active: true,
+          createdBy: adminUserId,
         },
       })
 
@@ -529,6 +542,7 @@ describe('Business Integration Tests', () => {
     })
 
     it('should require BUSINESS role for POST', async () => {
+      const adminUserId = uuid() // Create a dummy admin user ID for test data
       const category = await testDb.prisma.category.create({
         data: {
           nameKey: `category.name.${uuid()}`,
@@ -537,6 +551,7 @@ describe('Business Integration Tests', () => {
           level: 1,
           path: '/',
           active: true,
+          createdBy: adminUserId,
         },
       })
 

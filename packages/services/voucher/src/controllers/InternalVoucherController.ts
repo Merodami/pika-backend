@@ -336,7 +336,7 @@ export class InternalVoucherController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { updates, context } = req.body
+      const { updates } = req.body
 
       const updateResults = []
 

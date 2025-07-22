@@ -51,12 +51,12 @@ export function mapUserStatus(status: any): UserStatus {
 /**
  * Maps UserRole to permissions array for RBAC
  * Used by auth middleware and controllers for consistent permissions
- * 
+ *
  * Permission format: resource:action:scope
  * - resource: The resource being accessed (users, businesses, vouchers, etc.)
  * - action: The action being performed (read, write, delete, etc.)
  * - scope: Optional scope limitation (own, all, specific)
- * 
+ *
  * Special permissions:
  * - resource:* - All actions on a resource
  * - resource:action:own - Action limited to owned resources

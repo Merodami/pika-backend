@@ -1,7 +1,10 @@
 import { z } from 'zod'
 
 import { UserId } from '../../../common/schemas/branded.js'
-import { BusinessSortBy, BusinessStatusFilter } from '../../../schemas/business/common/enums.js'
+import {
+  BusinessSortBy,
+  BusinessStatusFilter,
+} from '../../../schemas/business/common/enums.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { SearchParams } from '../../../common/schemas/pagination.js'
 import { UUID } from '../../../common/schemas/primitives.js'
@@ -36,10 +39,7 @@ export const AdminBusinessResponse: z.ZodType<any> = z.lazy(() =>
         .boolean()
         .default(false)
         .describe('Whether business is verified'),
-      active: z
-        .boolean()
-        .default(true)
-        .describe('Whether business is active'),
+      active: z.boolean().default(true).describe('Whether business is active'),
       avgRating: z
         .number()
         .min(0)
@@ -100,7 +100,10 @@ export const CreateBusinessRequest = openapi(
       .optional()
       .describe('Translation key for business description'),
     categoryId: UUID.describe('Category this business belongs to'),
-    verified: z.boolean().default(false).describe('Whether business is verified'),
+    verified: z
+      .boolean()
+      .default(false)
+      .describe('Whether business is verified'),
     active: z.boolean().default(true).describe('Whether business is active'),
   }),
   {
@@ -150,8 +153,16 @@ export const AdminBusinessQueryParams = SearchParams.extend({
   status: BusinessStatusFilter.optional().describe('Filter by status'),
   verified: z.boolean().optional().describe('Filter by verification status'),
   active: z.boolean().optional().describe('Filter by active status'),
-  minRating: z.number().min(0).max(5).optional().describe('Minimum rating filter'),
-  includeDeleted: z.boolean().optional().describe('Include soft deleted businesses'),
+  minRating: z
+    .number()
+    .min(0)
+    .max(5)
+    .optional()
+    .describe('Minimum rating filter'),
+  includeDeleted: z
+    .boolean()
+    .optional()
+    .describe('Include soft deleted businesses'),
   sortBy: BusinessSortBy.default('businessName'),
 })
 
@@ -162,9 +173,13 @@ export type AdminBusinessQueryParams = z.infer<typeof AdminBusinessQueryParams>
 /**
  * Admin paginated business list response
  */
-export const AdminBusinessListResponse = paginatedResponse(AdminBusinessResponse)
+export const AdminBusinessListResponse = paginatedResponse(
+  AdminBusinessResponse,
+)
 
-export type AdminBusinessListResponse = z.infer<typeof AdminBusinessListResponse>
+export type AdminBusinessListResponse = z.infer<
+  typeof AdminBusinessListResponse
+>
 
 // ============= Business Management Actions =============
 
@@ -180,7 +195,9 @@ export const ToggleBusinessVerificationRequest = openapi(
   },
 )
 
-export type ToggleBusinessVerificationRequest = z.infer<typeof ToggleBusinessVerificationRequest>
+export type ToggleBusinessVerificationRequest = z.infer<
+  typeof ToggleBusinessVerificationRequest
+>
 
 /**
  * Toggle business activation request
@@ -194,7 +211,9 @@ export const ToggleBusinessActivationRequest = openapi(
   },
 )
 
-export type ToggleBusinessActivationRequest = z.infer<typeof ToggleBusinessActivationRequest>
+export type ToggleBusinessActivationRequest = z.infer<
+  typeof ToggleBusinessActivationRequest
+>
 
 /**
  * Bulk business update request
@@ -213,7 +232,9 @@ export const BulkBusinessUpdateRequest = openapi(
   },
 )
 
-export type BulkBusinessUpdateRequest = z.infer<typeof BulkBusinessUpdateRequest>
+export type BulkBusinessUpdateRequest = z.infer<
+  typeof BulkBusinessUpdateRequest
+>
 
 /**
  * Bulk operation response
@@ -236,7 +257,9 @@ export const BulkBusinessOperationResponse = openapi(
   },
 )
 
-export type BulkBusinessOperationResponse = z.infer<typeof BulkBusinessOperationResponse>
+export type BulkBusinessOperationResponse = z.infer<
+  typeof BulkBusinessOperationResponse
+>
 
 // ============= Bulk Delete Businesses =============
 
@@ -252,4 +275,6 @@ export const BulkDeleteBusinessesRequest = openapi(
   },
 )
 
-export type BulkDeleteBusinessesRequest = z.infer<typeof BulkDeleteBusinessesRequest>
+export type BulkDeleteBusinessesRequest = z.infer<
+  typeof BulkDeleteBusinessesRequest
+>

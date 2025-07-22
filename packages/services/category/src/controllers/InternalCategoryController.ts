@@ -105,7 +105,7 @@ export class InternalCategoryController {
                   isActive: category.isActive,
                   valid: category.isActive,
                 }
-              } catch (error) {
+              } catch {
                 return {
                   categoryId,
                   exists: false,

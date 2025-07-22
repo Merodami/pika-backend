@@ -63,7 +63,9 @@ class VercelDeploymentTester {
         'JWT_REFRESH_SECRET',
       ]
 
-      const missingVars = requiredEnvVars.filter((v) => !process.env[v])
+      const missingVars = requiredEnvVars.filter(
+        (v) => !process.env[v as keyof typeof process.env],
+      )
 
       if (missingVars.length > 0) {
         console.warn(
@@ -111,6 +113,7 @@ class VercelDeploymentTester {
       ]
 
       for (const file of criticalFiles) {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         if (!existsSync(join(this.rootDir, file))) {
           throw new Error(`Missing critical build output: ${file}`)
         }
@@ -144,6 +147,7 @@ class VercelDeploymentTester {
       ]
 
       const missingFiles = requiredFiles.filter(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         (f) => !existsSync(join(this.rootDir, f)),
       )
 
@@ -152,9 +156,8 @@ class VercelDeploymentTester {
       }
 
       // Validate vercel.json
-      const vercelConfig = JSON.parse(
-        readFileSync(join(this.rootDir, 'vercel.json'), 'utf-8'),
-      )
+      const vercelConfigPath = join(this.rootDir, 'vercel.json')
+      const vercelConfig = JSON.parse(readFileSync(vercelConfigPath, 'utf-8'))
 
       if (!vercelConfig.functions?.['api/index.js']) {
         throw new Error('vercel.json missing function configuration')
@@ -193,6 +196,7 @@ class VercelDeploymentTester {
 
       // Validate function size won't exceed limits
       const functionPath = join(this.rootDir, 'api/index.js')
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const stats = require('fs').statSync(functionPath)
 
       // Vercel limit is 50MB for compressed function
@@ -232,6 +236,7 @@ class VercelDeploymentTester {
       })
 
       // Check .vercel/output directory
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       if (!existsSync(join(this.rootDir, '.vercel/output'))) {
         throw new Error('Vercel build output not created')
       }

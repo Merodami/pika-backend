@@ -36,12 +36,14 @@ This project is migrating from the old Pika codebase (pika-old) to a modern micr
 ### 🔄 IN PROGRESS
 
 #### PDF Service - TypeScript Error Fixes
+
 - **Status**: Fixing remaining TypeScript compilation errors
 - **Progress**: 70% complete - major interface fixes done, remaining detail fixes
 - **Current Tasks**: Implementing missing repository methods, fixing enum mismatches
 - **Next**: Complete getBusinessStats implementation, final typecheck pass
 
 #### Technical Debt Items
+
 - **TODO**: Calculate shipped quantity in BookDistributionRepository.getBusinessStats when we have that data
 - **TODO**: Review and complete PDF service domain logic migration from pika-old
 - **TODO**: Implement proper position mapping in VoucherBookService.getPositionOnPage() method

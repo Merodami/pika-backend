@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { VoucherBookStatus, VoucherBookType, VoucherBookSortBy } from '../../../common/schemas/enums.js'
+import {
+  VoucherBookStatus,
+  VoucherBookType,
+  VoucherBookSortBy,
+} from '../../../common/schemas/enums.js'
 import { withTimestamps } from '../../../common/schemas/metadata.js'
 import { SearchParams } from '../../../common/schemas/pagination.js'
 import { UUID } from '../../../common/schemas/primitives.js'
@@ -20,17 +24,49 @@ export const VoucherBookResponse = openapi(
   withTimestamps({
     id: UUID,
     title: z.string().max(255).describe('Voucher book title'),
-    edition: z.string().max(100).optional().describe('Book edition (e.g., "January 2024")'),
+    edition: z
+      .string()
+      .max(100)
+      .optional()
+      .describe('Book edition (e.g., "January 2024")'),
     bookType: VoucherBookType.describe('Type of voucher book'),
-    month: z.number().int().min(1).max(12).optional().describe('Month for monthly books (1-12)'),
+    month: z
+      .number()
+      .int()
+      .min(1)
+      .max(12)
+      .optional()
+      .describe('Month for monthly books (1-12)'),
     year: z.number().int().min(2020).max(2100).describe('Year of publication'),
     status: VoucherBookStatus.describe('Current status of the book'),
-    totalPages: z.number().int().min(1).max(100).default(24).describe('Total number of pages'),
-    publishedAt: z.string().datetime().optional().describe('When the book was published'),
-    coverImageUrl: z.string().url().optional().describe('URL of the cover image'),
-    backImageUrl: z.string().url().optional().describe('URL of the back cover image'),
+    totalPages: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(24)
+      .describe('Total number of pages'),
+    publishedAt: z
+      .string()
+      .datetime()
+      .optional()
+      .describe('When the book was published'),
+    coverImageUrl: z
+      .string()
+      .url()
+      .optional()
+      .describe('URL of the cover image'),
+    backImageUrl: z
+      .string()
+      .url()
+      .optional()
+      .describe('URL of the back cover image'),
     pdfUrl: z.string().url().optional().describe('URL of the generated PDF'),
-    pdfGeneratedAt: z.string().datetime().optional().describe('When the PDF was generated'),
+    pdfGeneratedAt: z
+      .string()
+      .datetime()
+      .optional()
+      .describe('When the PDF was generated'),
     metadata: z.record(z.any()).optional().describe('Additional book metadata'),
   }),
   {
@@ -48,7 +84,13 @@ export type VoucherBookResponse = z.infer<typeof VoucherBookResponse>
 export const VoucherBookQueryParams = SearchParams.extend({
   bookType: VoucherBookType.optional().describe('Filter by book type'),
   status: VoucherBookStatus.optional().describe('Filter by book status'),
-  year: z.number().int().min(2020).max(2100).optional().describe('Filter by year'),
+  year: z
+    .number()
+    .int()
+    .min(2020)
+    .max(2100)
+    .optional()
+    .describe('Filter by year'),
   month: z.number().int().min(1).max(12).optional().describe('Filter by month'),
   sortBy: VoucherBookSortBy.default('createdAt'),
 })
@@ -76,7 +118,9 @@ export const VoucherBookDetailResponse = openapi(
   },
 )
 
-export type VoucherBookDetailResponse = z.infer<typeof VoucherBookDetailResponse>
+export type VoucherBookDetailResponse = z.infer<
+  typeof VoucherBookDetailResponse
+>
 
 // ============= PDF Download =============
 

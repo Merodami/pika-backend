@@ -47,7 +47,7 @@ export class MockTranslationClient {
     const result: Record<string, string> = {}
 
     for (const key of keys) {
-      result[key] = await this.get(key, language)
+      result[key as keyof typeof result] = await this.get(key, language)
     }
 
     return result
@@ -56,13 +56,7 @@ export class MockTranslationClient {
   /**
    * Set translation for a key in a specific language
    */
-  async set(
-    key: string,
-    language: string,
-    value: string,
-    context?: string,
-    service?: string,
-  ): Promise<void> {
+  async set(key: string, language: string, value: string): Promise<void> {
     if (!this.mockTranslations.has(key)) {
       this.mockTranslations.set(key, new Map())
     }
