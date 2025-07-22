@@ -131,18 +131,6 @@ describe('PDF Voucher Book Integration Tests', () => {
     }
   }, 120000)
 
-  afterAll(async () => {
-    logger.debug('Cleaning up PDF service test resources...')
-
-    if (authHelper) {
-      authHelper.clearTokens()
-    }
-
-    if (testDb) {
-      await cleanupTestDatabase(testDb)
-    }
-  })
-
   beforeEach(async () => {
     vi.clearAllMocks()
 
@@ -158,6 +146,18 @@ describe('PDF Voucher Book Integration Tests', () => {
       adminClient = await authHelper.getAdminClient(testDb.prisma)
       userClient = await authHelper.getUserClient(testDb.prisma)
       businessClient = await authHelper.getBusinessClient(testDb.prisma)
+    }
+  })
+
+  afterAll(async () => {
+    logger.debug('Cleaning up PDF service test resources...')
+
+    if (authHelper) {
+      authHelper.clearTokens()
+    }
+
+    if (testDb) {
+      await cleanupTestDatabase(testDb)
     }
   })
 

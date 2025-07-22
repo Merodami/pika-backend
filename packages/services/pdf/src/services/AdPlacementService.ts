@@ -1,13 +1,13 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
+import type { AdPlacementDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { ContentType } from '@prisma/client'
-import type { AdPlacementDomain } from '@pika/sdk'
 
 import type {
   IAdPlacementRepository,
-  IVoucherBookRepository,
   IVoucherBookPageRepository,
+  IVoucherBookRepository,
 } from '../repositories/index.js'
 import { AdSize, PageLayoutEngine } from './PageLayoutEngine.js'
 
@@ -53,7 +53,9 @@ export interface PlacementValidation {
 export interface IAdPlacementService {
   createAdPlacement(data: CreateAdPlacementData): Promise<AdPlacementDomain>
   getAdPlacementById(id: string): Promise<AdPlacementDomain>
-  getAdPlacementsByVoucherBookId(voucherBookId: string): Promise<AdPlacementDomain[]>
+  getAdPlacementsByVoucherBookId(
+    voucherBookId: string,
+  ): Promise<AdPlacementDomain[]>
   updateAdPlacement(
     id: string,
     data: UpdateAdPlacementData,
@@ -102,7 +104,9 @@ export class AdPlacementService implements IAdPlacementService {
     this.pageLayoutEngine = new PageLayoutEngine()
   }
 
-  async createAdPlacement(data: CreateAdPlacementData): Promise<AdPlacementDomain> {
+  async createAdPlacement(
+    data: CreateAdPlacementData,
+  ): Promise<AdPlacementDomain> {
     try {
       logger.info('Creating ad placement', {
         pageId: data.pageId,
@@ -112,17 +116,25 @@ export class AdPlacementService implements IAdPlacementService {
       })
 
       // Validate placement using layout engine
-      const existingPlacements = await this.placementRepository.findByPageId(data.pageId)
+      const existingPlacements = await this.placementRepository.findByPageId(
+        data.pageId,
+      )
       const occupiedSpaces = new Set<number>()
-      
+
       for (const placement of existingPlacements) {
         for (let i = 0; i < placement.spacesUsed; i++) {
           occupiedSpaces.add(placement.position + i)
         }
       }
-      
+
       // Check if the placement can fit
-      if (!this.pageLayoutEngine.canPlaceAd(occupiedSpaces, data.position, data.size)) {
+      if (
+        !this.pageLayoutEngine.canPlaceAd(
+          occupiedSpaces,
+          data.position,
+          data.size,
+        )
+      ) {
         throw ErrorFactory.badRequest(
           `Cannot place ${data.size} ad at position ${data.position} - space occupied or invalid position`,
         )
@@ -130,7 +142,7 @@ export class AdPlacementService implements IAdPlacementService {
 
       // Calculate spaces used based on size
       const spacesUsed = this.pageLayoutEngine.getRequiredSpaces(data.size)
-      
+
       const placement = await this.placementRepository.create({
         pageId: data.pageId,
         contentType: data.contentType,
@@ -225,10 +237,14 @@ export class AdPlacementService implements IAdPlacementService {
 
       // Get page to find book ID
       const page = await this.pageRepository.findById(currentPlacement.pageId)
+
       if (!page) {
-        throw ErrorFactory.resourceNotFound('VoucherBookPage', currentPlacement.pageId)
+        throw ErrorFactory.resourceNotFound(
+          'VoucherBookPage',
+          currentPlacement.pageId,
+        )
       }
-      
+
       // Validate voucher book is modifiable
       await this.validateVoucherBookModifiable(page.bookId)
 
@@ -250,10 +266,12 @@ export class AdPlacementService implements IAdPlacementService {
       // Validate content type requirements
       if (data.contentType || data.imageUrl) {
         this.validateContentTypeData({
-          contentType: data.contentType || currentPlacement.contentType as ContentType,
+          contentType:
+            data.contentType || (currentPlacement.contentType as ContentType),
           imageUrl: data.imageUrl,
           title: data.title ?? currentPlacement.title ?? undefined,
-          description: data.description ?? currentPlacement.description ?? undefined,
+          description:
+            data.description ?? currentPlacement.description ?? undefined,
         })
       }
 
@@ -285,10 +303,11 @@ export class AdPlacementService implements IAdPlacementService {
 
       // Get page to find book ID
       const page = await this.pageRepository.findById(placement.pageId)
+
       if (!page) {
         throw ErrorFactory.resourceNotFound('VoucherBookPage', placement.pageId)
       }
-      
+
       // Validate voucher book is modifiable
       await this.validateVoucherBookModifiable(page.bookId)
 
@@ -368,12 +387,13 @@ export class AdPlacementService implements IAdPlacementService {
       const existingPlacements =
         await this.getAdPlacementsByVoucherBookId(voucherBookId)
       const activePlacements = existingPlacements.filter(
-        (p) => (!excludeId || p.id !== excludeId),
+        (p) => !excludeId || p.id !== excludeId,
       )
 
       // Map our position enum to the layout engine's AdSize
-      const adSize = this.mapPositionToAdSize(position)
-      const requiredSpaces = this.pageLayoutEngine.getRequiredSpaces(adSize)
+      const adSize = this.mapPositionToAdSize()
+
+      this.pageLayoutEngine.getRequiredSpaces(adSize)
 
       // Use the sophisticated layout engine for validation
       const canPlace = this.pageLayoutEngine.canPlaceAd(
@@ -383,7 +403,9 @@ export class AdPlacementService implements IAdPlacementService {
       )
 
       if (!canPlace) {
-        errors.push(`Cannot place ${adSize} ad at position ${position} - space is occupied or invalid`)
+        errors.push(
+          `Cannot place ${adSize} ad at position ${position} - space is occupied or invalid`,
+        )
 
         // Find conflicting placements
         for (const placement of activePlacements) {
@@ -395,9 +417,7 @@ export class AdPlacementService implements IAdPlacementService {
 
       // Add warnings for layout optimization
       if (activePlacements.length === 0 && position !== 8) {
-        warnings.push(
-          'Consider using position 1-8 for better placement',
-        )
+        warnings.push('Consider using position 1-8 for better placement')
       }
 
       return {
@@ -433,7 +453,7 @@ export class AdPlacementService implements IAdPlacementService {
 
       // Get occupied positions
       const occupiedPositions = new Set(
-        existingPlacements.map(p => p.position)
+        existingPlacements.map((p) => p.position),
       )
 
       // Test each position (1-8)
@@ -451,11 +471,7 @@ export class AdPlacementService implements IAdPlacementService {
       }
 
       // Prioritize based on content type and existing placements
-      return this.prioritizeSuggestions(
-        suggestions,
-        contentType,
-        existingPlacements.length,
-      )
+      return this.prioritizeSuggestions(suggestions, contentType)
     } catch (error) {
       logger.error('Failed to get optimal placement suggestions', {
         error,
@@ -489,7 +505,9 @@ export class AdPlacementService implements IAdPlacementService {
     }
   }
 
-  private validateContentTypeData(data: Partial<CreateAdPlacementData & UpdateAdPlacementData>): void {
+  private validateContentTypeData(
+    data: Partial<CreateAdPlacementData & UpdateAdPlacementData>,
+  ): void {
     switch (data.contentType) {
       case 'image':
         if (!data.imageUrl) {
@@ -528,7 +546,7 @@ export class AdPlacementService implements IAdPlacementService {
     ])
   }
 
-  private mapPositionToAdSize(position: number): AdSize {
+  private mapPositionToAdSize(): AdSize {
     // For the current implementation, we'll use a default size
     // In the future, this could be enhanced to determine size based on position
     return 'single'
@@ -540,7 +558,7 @@ export class AdPlacementService implements IAdPlacementService {
     const occupiedSpaces = new Set<number>()
 
     for (const placement of placements) {
-      const adSize = this.mapPositionToAdSize(placement.position)
+      const adSize = this.mapPositionToAdSize()
       const requiredSpaces = this.pageLayoutEngine.getRequiredSpaces(adSize)
 
       // Simplified space mapping - in real implementation would be more sophisticated
@@ -552,10 +570,7 @@ export class AdPlacementService implements IAdPlacementService {
     return occupiedSpaces
   }
 
-  private checkPositionConflict(
-    position1: number,
-    position2: number,
-  ): boolean {
+  private checkPositionConflict(position1: number, position2: number): boolean {
     // Simple position conflict check
     // Two placements conflict if they have the same position
     return position1 === position2
@@ -564,7 +579,6 @@ export class AdPlacementService implements IAdPlacementService {
   private prioritizeSuggestions(
     suggestions: number[],
     contentType: ContentType,
-    existingCount: number,
   ): number[] {
     // Position preferences based on content type
     // Different content types might prefer different positions on the page
@@ -579,22 +593,24 @@ export class AdPlacementService implements IAdPlacementService {
       sponsored: [1, 2, 3, 4, 5, 6, 7, 8],
     }
 
-    const preferredOrder = positionPreference[contentType] || [1, 2, 3, 4, 5, 6, 7, 8]
+    const preferredOrder = positionPreference[
+      contentType as keyof typeof positionPreference
+    ] || [1, 2, 3, 4, 5, 6, 7, 8]
 
     // Sort suggestions based on preferred order
     return suggestions.sort((a, b) => {
       const aIndex = preferredOrder.indexOf(a)
       const bIndex = preferredOrder.indexOf(b)
-      
+
       // If both are in preferred order, sort by preference
       if (aIndex !== -1 && bIndex !== -1) {
         return aIndex - bIndex
       }
-      
+
       // If only one is in preferred order, prefer it
       if (aIndex !== -1) return -1
       if (bIndex !== -1) return 1
-      
+
       // Otherwise, sort by position number
       return a - b
     })

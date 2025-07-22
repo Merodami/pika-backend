@@ -68,18 +68,18 @@ describe('BookDistributionRepository Integration Tests', () => {
     })
   }, 120000)
 
+  beforeEach(async () => {
+    if (testDb?.prisma) {
+      // Clear distribution tables
+      await testDb.prisma.bookDistribution.deleteMany()
+    }
+  })
+
   afterAll(async () => {
     logger.debug('Cleaning up BookDistributionRepository test resources...')
 
     if (testDb) {
       await cleanupTestDatabase(testDb)
-    }
-  })
-
-  beforeEach(async () => {
-    if (testDb?.prisma) {
-      // Clear distribution tables
-      await testDb.prisma.bookDistribution.deleteMany()
     }
   })
 

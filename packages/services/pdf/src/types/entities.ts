@@ -1,12 +1,18 @@
 /**
  * PDF Service Domain Entities
- * 
+ *
  * These are the PDF service's internal representations of business entities.
  * They are NOT shared with other services. Other services should communicate
  * with this service using DTOs defined in api-contracts.ts
  */
 
-import type { VoucherBookStatus, VoucherBookType, ContentType, AdSize, PageLayoutType } from '@prisma/client'
+import type {
+  AdSize,
+  ContentType,
+  PageLayoutType,
+  VoucherBookStatus,
+  VoucherBookType,
+} from '@prisma/client'
 
 // ============= Core Entities =============
 
@@ -34,7 +40,7 @@ export interface VoucherBook {
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
-  
+
   // Relations (optional, loaded when needed)
   pages?: VoucherBookPage[]
   distributions?: BookDistribution[]
@@ -53,7 +59,7 @@ export interface VoucherBookPage {
   metadata: Record<string, any> | null
   createdAt: Date
   updatedAt: Date
-  
+
   // Relations
   book?: VoucherBook
   adPlacements?: AdPlacement[]
@@ -79,7 +85,7 @@ export interface AdPlacement {
   updatedBy: string | null
   createdAt: Date
   updatedAt: Date
-  
+
   // Relations
   page?: VoucherBookPage
   createdByUser?: UserReference
@@ -111,7 +117,7 @@ export interface BookDistribution {
   updatedAt: Date
   createdBy: string
   updatedBy: string | null
-  
+
   // Relations
   book?: VoucherBook
   createdByUser?: UserReference

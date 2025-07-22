@@ -27,14 +27,6 @@ describe('AdPlacementRepository Integration Tests', () => {
     repository = new AdPlacementRepository(prisma, cache)
   })
 
-  afterAll(async () => {
-    try {
-      await testContext.cleanup()
-    } catch (error) {
-      logger.error('Failed to cleanup test database', { error })
-    }
-  })
-
   beforeEach(async () => {
     await clearTestDatabase(prisma)
 
@@ -66,6 +58,14 @@ describe('AdPlacementRepository Integration Tests', () => {
         updatedById: testUser.id,
       },
     })
+  })
+
+  afterAll(async () => {
+    try {
+      await testContext.cleanup()
+    } catch (error) {
+      logger.error('Failed to cleanup test database', { error })
+    }
   })
 
   describe('create', () => {

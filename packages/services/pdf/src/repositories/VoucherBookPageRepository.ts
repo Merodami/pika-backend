@@ -4,7 +4,7 @@ import { VoucherBookPageMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
-import type { PrismaClient, PageLayoutType } from '@prisma/client'
+import type { PageLayoutType, PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 /**

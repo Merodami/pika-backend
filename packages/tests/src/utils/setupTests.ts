@@ -96,6 +96,10 @@ vi.mock('@pika/http', async (importOriginal) => {
     requireInternalAuth: () => (req: any, res: any, next: any) => next(),
     requireServiceAuth: () => (req: any, res: any, next: any) => next(),
     allowServiceOrUserAuth: () => (req: any, res: any, next: any) => next(),
+    requirePermissions: (...permissions: string[]) => (req: any, res: any, next: any) => {
+      // For tests, just pass through - auth is tested separately
+      next()
+    },
     validateBody: (schema: any) => (req: any, res: any, next: any) => next(),
     validateParams: (schema: any) => (req: any, res: any, next: any) => next(),
     validateQuery: (schema: any) => (req: any, res: any, next: any) => next(),
@@ -145,6 +149,17 @@ vi.mock('@pika/http', async (importOriginal) => {
     },
   }
 })
+
+// Mock translation module
+vi.mock('@pika/translation', () => ({
+  TranslationClient: vi.fn().mockImplementation(() => ({
+    get: vi.fn().mockResolvedValue('mocked-translation'),
+    getBulk: vi.fn().mockResolvedValue({}),
+    set: vi.fn().mockResolvedValue(undefined),
+    getUserLanguage: vi.fn().mockResolvedValue('en'),
+    setUserLanguage: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
 
 // Mock shared module
 vi.mock('@pika/shared', async (importOriginal) => {

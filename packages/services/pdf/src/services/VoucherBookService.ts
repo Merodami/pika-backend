@@ -3,11 +3,7 @@ import { Cache, ICacheService } from '@pika/redis'
 import type { VoucherBookDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
-import type {
-  VoucherBook,
-  VoucherBookStatus,
-  VoucherBookType,
-} from '@prisma/client'
+import type { VoucherBookStatus, VoucherBookType } from '@prisma/client'
 
 import type {
   IAdPlacementRepository,
@@ -126,7 +122,9 @@ export class VoucherBookService implements IVoucherBookService {
     this.cryptoServiceAdapter = new CryptoServiceAdapter()
   }
 
-  async createVoucherBook(data: CreateVoucherBookData): Promise<VoucherBookDomain> {
+  async createVoucherBook(
+    data: CreateVoucherBookData,
+  ): Promise<VoucherBookDomain> {
     try {
       logger.info('Creating voucher book', {
         title: data.title,
@@ -145,16 +143,11 @@ export class VoucherBookService implements IVoucherBookService {
         createdBy: data.createdById,
       }
 
-
       // Create the voucher book
       const voucherBook = await this.voucherBookRepository.create(bookData)
 
       // Create initial page structure with layout engine
-      await this.createInitialPages(
-        voucherBook.id,
-        bookData.totalPages,
-        data.createdById,
-      )
+      await this.createInitialPages(voucherBook.id, bookData.totalPages)
 
       logger.info('Voucher book created successfully', {
         id: voucherBook.id,
@@ -202,7 +195,11 @@ export class VoucherBookService implements IVoucherBookService {
     params: VoucherBookSearchParams,
   ): Promise<PaginatedResult<VoucherBookDomain>> {
     try {
-      const result = await this.voucherBookRepository.findAll(params)
+      const result = await this.voucherBookRepository.findAll({
+        ...params,
+        bookType: params.bookType as VoucherBookType | undefined,
+        status: params.status as VoucherBookStatus | undefined,
+      })
 
       return result
     } catch (error) {
@@ -238,15 +235,12 @@ export class VoucherBookService implements IVoucherBookService {
       }
 
       if (data.totalPages) {
-        const totalPages = data.totalPages || currentBook.totalPages
-
         // If increasing pages, create new page records
         if (data.totalPages && data.totalPages > currentBook.totalPages) {
           await this.createAdditionalPages(
             id,
             currentBook.totalPages + 1,
             data.totalPages,
-            data.updatedById,
           )
         }
       }
@@ -296,7 +290,10 @@ export class VoucherBookService implements IVoucherBookService {
     }
   }
 
-  async publishVoucherBook(id: string, userId: string): Promise<VoucherBookDomain> {
+  async publishVoucherBook(
+    id: string,
+    userId: string,
+  ): Promise<VoucherBookDomain> {
     try {
       const voucherBook = await this.getVoucherBookById(id)
 
@@ -327,7 +324,10 @@ export class VoucherBookService implements IVoucherBookService {
     }
   }
 
-  async archiveVoucherBook(id: string, userId: string): Promise<VoucherBookDomain> {
+  async archiveVoucherBook(
+    id: string,
+    userId: string,
+  ): Promise<VoucherBookDomain> {
     try {
       const voucherBook = await this.getVoucherBookById(id)
 
@@ -376,9 +376,11 @@ export class VoucherBookService implements IVoucherBookService {
 
       // Collect voucher IDs from placements with voucher content
       const voucherIds = new Set<string>()
+
       for (const placement of placements) {
         if (placement.contentType === 'voucher' && placement.metadata) {
           const voucherId = (placement.metadata as any).voucherId
+
           if (voucherId) {
             voucherIds.add(voucherId)
           }
@@ -398,15 +400,16 @@ export class VoucherBookService implements IVoucherBookService {
         const voucherPayloadData = await Promise.all(
           Array.from(voucherIds).map(async (voucherId) => {
             const voucherData = voucherDataMap.get(voucherId)
+
             if (!voucherData) {
               logger.warn('Voucher not found for placement', { voucherId })
+
               return null
             }
 
             // Generate short code
-            const shortCodeResult = await this.cryptoServiceAdapter.generateShortCode(
-              voucherId,
-            )
+            const shortCodeResult =
+              await this.cryptoServiceAdapter.generateShortCode(voucherId)
 
             // Store voucher data for PDF rendering
             vouchers.set(voucherId, {
@@ -565,7 +568,6 @@ export class VoucherBookService implements IVoucherBookService {
   private async createInitialPages(
     voucherBookId: string,
     totalPages: number,
-    createdById: string,
   ): Promise<void> {
     for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
       await this.pageRepository.create({
@@ -581,7 +583,6 @@ export class VoucherBookService implements IVoucherBookService {
     voucherBookId: string,
     startPage: number,
     endPage: number,
-    userId: string,
   ): Promise<void> {
     for (let pageNumber = startPage; pageNumber <= endPage; pageNumber++) {
       await this.pageRepository.create({
@@ -632,12 +633,12 @@ export class VoucherBookService implements IVoucherBookService {
 
     for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
       const pagePlacements = placements.filter(
-        (p) => this.getPageNumberFromPosition(p.position) === pageNumber,
+        () => this.getPageNumberFromPosition() === pageNumber,
       )
 
       const adPlacements: AdPlacementInfo[] = pagePlacements.map((p) => ({
         id: p.id,
-        position: this.getPositionOnPage(p.position),
+        position: this.getPositionOnPage(),
         size: p.position as any, // This maps to our AdSize
         spacesUsed: this.pageLayoutEngine.getRequiredSpaces(p.position as any),
         contentType: p.contentType as any,
@@ -674,21 +675,15 @@ export class VoucherBookService implements IVoucherBookService {
     return pageLayouts
   }
 
-  private getPageNumberFromPosition(position: string): number {
+  private getPageNumberFromPosition(): number {
     // Simple mapping - in real implementation this would be more sophisticated
     return 1 // All placements on page 1 for now
   }
 
-  private getPositionOnPage(position: string): number {
+  private getPositionOnPage(): number {
     // Map our position enum to grid position
-    const positionMap: Record<string, number> = {
-      SINGLE: 1,
-      QUARTER: 1,
-      HALF: 1,
-      FULL: 1,
-    }
-
-    return positionMap[position] || 1
+    // Future implementation would use position mapping
+    return 1
   }
 
   private isSpaceOccupiedByPlacement(

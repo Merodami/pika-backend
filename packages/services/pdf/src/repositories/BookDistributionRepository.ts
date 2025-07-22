@@ -713,6 +713,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
           const statusMap = statusBreakdown.reduce(
             (acc, item) => {
               acc[item.status] = item._count._all
+
               return acc
             },
             {} as Record<string, number>,

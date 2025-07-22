@@ -341,7 +341,14 @@ export function requireOwnership(): RequestHandler {
 }
 
 /**
- * Require specific permissions
+ * Require specific permissions with support for wildcards and ownership
+ * 
+ * Permission format: resource:action:scope
+ * - Exact match: 'users:read' matches 'users:read'
+ * - Wildcard: 'admin:*' matches any 'admin:' permission
+ * - Ownership: 'users:read:own' requires ownership check in controller
+ * 
+ * @param permissions - Required permissions (ALL must be satisfied)
  */
 export function requirePermissions(...permissions: string[]): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -350,17 +357,69 @@ export function requirePermissions(...permissions: string[]): RequestHandler {
     }
 
     const userPermissions = req.user.permissions || []
-    const hasAllPermissions = permissions.every((permission) =>
-      userPermissions.includes(permission),
-    )
+    
+    const hasAllPermissions = permissions.every((permission) => {
+      // Check exact permission match
+      if (userPermissions.includes(permission)) {
+        return true
+      }
+      
+      // Check wildcard permissions (e.g., 'admin:*' matches 'admin:dashboard')
+      const permissionParts = permission.split(':')
+      const resource = permissionParts[0]
+      
+      // Check for resource-level wildcard
+      if (userPermissions.includes(`${resource}:*`)) {
+        return true
+      }
+      
+      // For admin users, check if they have admin:* which grants all permissions
+      if (req.user?.role === UserRole.ADMIN && userPermissions.includes('admin:*')) {
+        return true
+      }
+      
+      // For ':own' permissions, check if user has the base permission
+      // Ownership validation must be done in the controller
+      if (permission.endsWith(':own')) {
+        const basePermission = permission.replace(':own', '')
+        return (
+          userPermissions.includes(permission) || 
+          userPermissions.includes(basePermission) ||
+          userPermissions.includes(`${resource}:*`)
+        )
+      }
+      
+      return false
+    })
 
     if (!hasAllPermissions) {
+      logger.warn('Permission denied', {
+        userId: req.user.id,
+        requiredPermissions: permissions,
+        userPermissions: userPermissions,
+        correlationId: req.correlationId,
+      })
+      
       return next(
         new NotAuthorizedError(
           `Missing required permissions: ${permissions.join(', ')}`,
+          {
+            userId: req.user.id,
+            correlationId: req.correlationId,
+            metadata: {
+              required: permissions,
+              user: req.user.id,
+            }
+          }
         ),
       )
     }
+
+    logger.debug('Permission granted', {
+      userId: req.user.id,
+      requiredPermissions: permissions,
+      correlationId: req.correlationId,
+    })
 
     next()
   }

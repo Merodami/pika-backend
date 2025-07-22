@@ -44,6 +44,7 @@ This project is migrating from the old Pika codebase (pika-old) to a modern micr
 #### Technical Debt Items
 - **TODO**: Calculate shipped quantity in BookDistributionRepository.getBusinessStats when we have that data
 - **TODO**: Review and complete PDF service domain logic migration from pika-old
+- **TODO**: Implement proper position mapping in VoucherBookService.getPositionOnPage() method
 
 ## IMMEDIATE NEXT STEPS (Priority Order)
 

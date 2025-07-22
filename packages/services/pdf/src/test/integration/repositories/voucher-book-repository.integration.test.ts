@@ -45,14 +45,6 @@ describe('VoucherBookRepository Integration Tests', () => {
     })
   }, 120000)
 
-  afterAll(async () => {
-    logger.debug('Cleaning up VoucherBookRepository test resources...')
-
-    if (testDb) {
-      await cleanupTestDatabase(testDb)
-    }
-  })
-
   beforeEach(async () => {
     if (testDb?.prisma) {
       // Clear voucher book related tables
@@ -60,6 +52,14 @@ describe('VoucherBookRepository Integration Tests', () => {
       await testDb.prisma.adPlacement.deleteMany()
       await testDb.prisma.voucherBookPage.deleteMany()
       await testDb.prisma.voucherBook.deleteMany()
+    }
+  })
+
+  afterAll(async () => {
+    logger.debug('Cleaning up VoucherBookRepository test resources...')
+
+    if (testDb) {
+      await cleanupTestDatabase(testDb)
     }
   })
 

@@ -1,7 +1,7 @@
+import type { VoucherBookDomain } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 import type { VoucherBookStatus } from '@prisma/client'
-import type { VoucherBookDomain } from '@pika/sdk'
 
 import type {
   AdminVoucherBookSearchParams,
@@ -61,7 +61,10 @@ export class AdminVoucherBookService
       const existingBook = await this.getVoucherBookById(id)
 
       // 2. Validate state transition (following pika-old pattern)
-      this.validateStateTransition(existingBook.status as VoucherBookStatus, status)
+      this.validateStateTransition(
+        existingBook.status as VoucherBookStatus,
+        status,
+      )
 
       // 3. Apply status-specific business logic
       let updateData: any = {
@@ -203,7 +206,8 @@ export class AdminVoucherBookService
       archived: [], // Archived books cannot be changed
     }
 
-    const allowed = allowedTransitions[currentStatus] || []
+    const allowed =
+      allowedTransitions[currentStatus as keyof typeof allowedTransitions] || []
 
     if (!allowed.includes(newStatus)) {
       throw ErrorFactory.badRequest(

@@ -332,8 +332,8 @@ export class AdPlacementMapper {
     }
 
     // Sort placements within each page by position
-    pageMap.forEach((placements) => {
-      placements.sort((a, b) => a.position - b.position)
+    pageMap.forEach((pagePlacementList) => {
+      pagePlacementList.sort((a, b) => a.position - b.position)
     })
 
     return pageMap

@@ -214,8 +214,8 @@ export class AdminVoucherBookController {
     try {
       const context = RequestContext.getContext(req)
       const { id } = req.params
-      const { force, priority } =
-        getValidatedBody<pdfAdmin.GeneratePdfRequest>(req)
+
+      getValidatedBody<pdfAdmin.GeneratePdfRequest>(req)
 
       const result = await this.voucherBookService.generatePDF(
         id,
@@ -223,7 +223,7 @@ export class AdminVoucherBookController {
       )
 
       // Use mapper for proper response transformation
-      const response = VoucherBookMapper.toGeneratePDFResponse(result, force)
+      const response = VoucherBookMapper.toGeneratePDFResponse(result)
 
       res.json(response)
     } catch (error) {

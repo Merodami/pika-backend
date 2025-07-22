@@ -1,8 +1,8 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
+import type { BookDistributionDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
-import type { BookDistributionDomain } from '@pika/sdk'
 
 import type {
   IBookDistributionRepository,
@@ -458,15 +458,15 @@ export class BookDistributionService implements IBookDistributionService {
     currentStatus: string,
     newStatus: string,
   ): void {
-    const allowedTransitions: Record<string, string[]> =
-      {
-        pending: ['shipped', 'cancelled'],
-        shipped: ['delivered', 'cancelled'],
-        delivered: [], // Terminal state
-        cancelled: [], // Terminal state
-      }
+    const allowedTransitions: Record<string, string[]> = {
+      pending: ['shipped', 'cancelled'],
+      shipped: ['delivered', 'cancelled'],
+      delivered: [], // Terminal state
+      cancelled: [], // Terminal state
+    }
 
-    const allowed = allowedTransitions[currentStatus] || []
+    const allowed =
+      allowedTransitions[currentStatus as keyof typeof allowedTransitions] || []
 
     if (!allowed.includes(newStatus)) {
       throw ErrorFactory.badRequest(
@@ -477,7 +477,7 @@ export class BookDistributionService implements IBookDistributionService {
 
   private validateShippingData(
     data: UpdateBookDistributionData,
-    currentDistribution: BookDistribution,
+    currentDistribution: BookDistributionDomain,
   ): void {
     if (data.quantity && data.quantity <= 0) {
       throw ErrorFactory.badRequest('Shipped quantity must be greater than 0')
@@ -509,7 +509,7 @@ export class BookDistributionService implements IBookDistributionService {
 
   private isValidPhone(phone: string): boolean {
     // Basic phone validation - accepts various formats
-    const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/
+    const phoneRegex = /^[+]?[\d\s\-()]{10,}$/
 
     return phoneRegex.test(phone)
   }

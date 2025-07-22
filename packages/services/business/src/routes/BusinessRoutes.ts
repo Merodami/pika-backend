@@ -1,6 +1,7 @@
 import { businessPublic, shared } from '@pika/api'
 import {
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,
@@ -29,7 +30,7 @@ export function createBusinessRoutes(
   const service = new BusinessService(repository, translationClient, cache)
   const controller = new BusinessController(service)
 
-  // Public routes (no auth required)
+  // Public routes (anyone can browse businesses)
   // GET /businesses - List all active businesses
   router.get(
     '/',
@@ -53,11 +54,12 @@ export function createBusinessRoutes(
     controller.getBusinessByUserId,
   )
 
-  // Business owner routes (require auth and business role)
+  // Business owner routes (require auth and business permissions)
   // GET /businesses/me - Get current user's business
   router.get(
     '/me',
     requireAuth(),
+    requirePermissions('businesses:read:own'),
     validateQuery(businessPublic.BusinessDetailQueryParams),
     controller.getMyBusiness,
   )
@@ -66,6 +68,7 @@ export function createBusinessRoutes(
   router.post(
     '/me',
     requireAuth(),
+    requirePermissions('businesses:write:own'),
     validateBody(businessPublic.CreateMyBusinessRequest),
     controller.createMyBusiness,
   )
@@ -74,6 +77,7 @@ export function createBusinessRoutes(
   router.put(
     '/me',
     requireAuth(),
+    requirePermissions('businesses:write:own'),
     validateBody(businessPublic.UpdateMyBusinessRequest),
     controller.updateMyBusiness,
   )

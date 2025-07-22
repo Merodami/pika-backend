@@ -34,6 +34,7 @@ export async function createPDFServer(config: ServerConfig) {
         check: async () => {
           try {
             await prisma.$queryRaw`SELECT 1`
+
             return true
           } catch {
             return false
@@ -48,14 +49,18 @@ export async function createPDFServer(config: ServerConfig) {
             // Handle both RedisService and MemoryCacheService
             if (typeof cacheService.checkHealth === 'function') {
               const health = await cacheService.checkHealth()
+
               return health.status === 'healthy' || health.status === 'degraded'
             }
             // For MemoryCacheService that doesn't have checkHealth, do a simple operation test
             await cacheService.set('health_check', 'ok', 5)
+
             const result = await cacheService.get('health_check')
+
             return result === 'ok'
           } catch (error) {
             logger.error('Cache health check failed:', error)
+
             return false
           }
         },
@@ -80,9 +85,15 @@ export async function createPDFServer(config: ServerConfig) {
 
   // Initialize dependencies with dependency injection
   const voucherBookRepository = new VoucherBookRepository(prisma, cacheService)
-  const voucherBookPageRepository = new VoucherBookPageRepository(prisma, cacheService)
+  const voucherBookPageRepository = new VoucherBookPageRepository(
+    prisma,
+    cacheService,
+  )
   const adPlacementRepository = new AdPlacementRepository(prisma, cacheService)
-  const bookDistributionRepository = new BookDistributionRepository(prisma, cacheService)
+  const bookDistributionRepository = new BookDistributionRepository(
+    prisma,
+    cacheService,
+  )
 
   // Initialize services
   const voucherBookService = new VoucherBookService(

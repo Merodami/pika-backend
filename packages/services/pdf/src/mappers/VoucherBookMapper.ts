@@ -1,9 +1,9 @@
+import type { VoucherBookDomain } from '@pika/sdk'
 import type {
   VoucherBook,
   VoucherBookStatus,
   VoucherBookType,
 } from '@prisma/client'
-import type { VoucherBookDomain } from '@pika/sdk'
 
 import type { VoucherBookStatistics } from '../types/domain.js'
 
@@ -363,7 +363,9 @@ export class VoucherBookMapper {
   /**
    * Convert domain object to public DTO (limited fields)
    */
-  static toPublicDTOFromDomain(voucherBook: VoucherBookDomain): PublicVoucherBookDTO {
+  static toPublicDTOFromDomain(
+    voucherBook: VoucherBookDomain,
+  ): PublicVoucherBookDTO {
     return {
       id: voucherBook.id,
       title: voucherBook.title,
@@ -611,7 +613,7 @@ export class VoucherBookMapper {
         shipped: stats.distributions.shipped,
         delivered: stats.distributions.delivered,
       },
-      recentActivity: stats.recentActivity.map(activity => ({
+      recentActivity: stats.recentActivity.map((activity) => ({
         date: activity.date.toISOString(),
         action: activity.action,
         count: activity.count,

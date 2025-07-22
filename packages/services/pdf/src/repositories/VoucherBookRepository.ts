@@ -4,7 +4,11 @@ import { VoucherBookMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
-import type { PrismaClient, VoucherBookStatus, VoucherBookType } from '@prisma/client'
+import type {
+  PrismaClient,
+  VoucherBookStatus,
+  VoucherBookType,
+} from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -501,7 +505,6 @@ export class VoucherBookRepository implements IVoucherBookRepository {
   async updateStatus(
     id: string,
     status: VoucherBookStatus,
-    updatedBy: string,
   ): Promise<VoucherBookDomain> {
     try {
       const updateData: Prisma.VoucherBookUpdateInput = {

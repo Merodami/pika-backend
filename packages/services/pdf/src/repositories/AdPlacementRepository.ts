@@ -4,7 +4,7 @@ import { AdPlacementMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
-import type { PrismaClient, ContentType, AdSize } from '@prisma/client'
+import type { AdSize, ContentType, PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -596,10 +596,17 @@ export class AdPlacementRepository implements IAdPlacementRepository {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw ErrorFactory.resourceNotFound('AdPlacement', 'One or more placements not found')
+          throw ErrorFactory.resourceNotFound(
+            'AdPlacement',
+            'One or more placements not found',
+          )
         }
       }
-      throw ErrorFactory.databaseError('reorderPlacements', 'AdPlacement', error)
+      throw ErrorFactory.databaseError(
+        'reorderPlacements',
+        'AdPlacement',
+        error,
+      )
     }
   }
 }
