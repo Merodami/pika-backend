@@ -67,6 +67,14 @@ export class E2EAuthHelper {
       role: UserRole.CUSTOMER,
       phoneNumber: '+1234567893',
     },
+    BUSINESS: {
+      email: 'business@e2etest.com',
+      password: 'TestBusiness123!',
+      firstName: 'Test',
+      lastName: 'Business',
+      role: UserRole.BUSINESS,
+      phoneNumber: '+1234567894',
+    },
   }
 
   constructor(app: Express, baseUrl: string = '/api/v1') {
@@ -291,6 +299,15 @@ export class E2EAuthHelper {
     prisma?: any,
   ): Promise<AuthenticatedRequestClient> {
     return this.getAuthenticatedClient('PROFESSIONAL', prisma)
+  }
+
+  /**
+   * Get a business client (convenience method)
+   */
+  async getBusinessClient(
+    prisma?: any,
+  ): Promise<AuthenticatedRequestClient> {
+    return this.getAuthenticatedClient('BUSINESS', prisma)
   }
 
   /**

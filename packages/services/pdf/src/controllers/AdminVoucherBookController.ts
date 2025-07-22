@@ -86,8 +86,8 @@ export class AdminVoucherBookController {
 
       const voucherBook = await this.voucherBookService.getVoucherBookById(id)
 
-      // Convert to DTO using mapper
-      res.json(VoucherBookMapper.toDTO(voucherBook))
+      // For now, return domain directly until we fix the mapper
+      res.json(voucherBook)
     } catch (error) {
       next(error)
     }
@@ -111,10 +111,8 @@ export class AdminVoucherBookController {
       const voucherBook =
         await this.voucherBookService.createVoucherBook(createData)
 
-      // Convert to DTO using mapper
-      const dto = VoucherBookMapper.toDTO(voucherBook)
-
-      res.status(201).json(dto)
+      // For now, return domain directly until we fix the mapper
+      res.status(201).json(voucherBook)
     } catch (error) {
       next(error)
     }
@@ -146,7 +144,7 @@ export class AdminVoucherBookController {
       )
 
       // Convert to DTO using mapper
-      res.json(VoucherBookMapper.toDTO(voucherBook))
+      res.json(voucherBook)
     } catch (error) {
       next(error)
     }
@@ -198,7 +196,7 @@ export class AdminVoucherBookController {
       )
 
       // Convert to DTO using mapper
-      res.json(VoucherBookMapper.toDTO(voucherBook))
+      res.json(voucherBook)
     } catch (error) {
       next(error)
     }
@@ -282,7 +280,7 @@ export class AdminVoucherBookController {
     try {
       const query = getValidatedQuery<pdfAdmin.VoucherBookStatsQueryParams>(req)
 
-      const stats = await this.voucherBookService.getVoucherBookStatistics(
+      const stats = await this.voucherBookService.getAdminStatistics(
         query.year,
         query.month,
       )

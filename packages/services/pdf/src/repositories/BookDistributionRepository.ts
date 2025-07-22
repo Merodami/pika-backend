@@ -7,6 +7,8 @@ import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
+import type { BusinessDistributionStats } from '../services/BookDistributionService.js'
+
 /**
  * Book distribution repository interface
  */
@@ -50,6 +52,7 @@ export interface IBookDistributionRepository {
     id: string,
     deliveredBy: string,
   ): Promise<BookDistributionDomain>
+  getBusinessStats(): Promise<BusinessDistributionStats[]>
 }
 
 /**
@@ -673,6 +676,62 @@ export class BookDistributionRepository implements IBookDistributionRepository {
       }
       throw ErrorFactory.databaseError(
         'markAsDelivered',
+        'BookDistribution',
+        error,
+      )
+    }
+  }
+
+  /**
+   * Get business distribution statistics
+   */
+  async getBusinessStats(): Promise<BusinessDistributionStats[]> {
+    try {
+      const stats = await this.prisma.bookDistribution.groupBy({
+        by: ['businessId', 'businessName'],
+        _count: {
+          _all: true,
+        },
+        _sum: {
+          quantity: true,
+        },
+      })
+
+      const businessStats = await Promise.all(
+        stats.map(async (stat) => {
+          // Get status breakdown for this business
+          const statusBreakdown = await this.prisma.bookDistribution.groupBy({
+            by: ['status'],
+            where: {
+              businessId: stat.businessId,
+            },
+            _count: {
+              _all: true,
+            },
+          })
+
+          const statusMap = statusBreakdown.reduce(
+            (acc, item) => {
+              acc[item.status] = item._count._all
+              return acc
+            },
+            {} as Record<string, number>,
+          )
+
+          return {
+            businessName: stat.businessName,
+            totalDistributions: stat._count._all,
+            totalRequested: stat._sum.quantity || 0,
+            totalShipped: 0, // TODO: Calculate shipped quantity when we have that data
+            statusBreakdown: statusMap,
+          }
+        }),
+      )
+
+      return businessStats
+    } catch (error) {
+      throw ErrorFactory.databaseError(
+        'getBusinessStats',
         'BookDistribution',
         error,
       )

@@ -194,9 +194,9 @@ export class PDFGenerationService {
     // Draw border for placement (for debugging, remove in production)
     doc.rect(bounds.x, bounds.y, bounds.width, bounds.height).stroke('#CCCCCC')
 
-    if (placement.contentType === 'VOUCHER' && placement.voucherId) {
+    if (placement.contentType === 'voucher' && placement.voucherId) {
       await this.renderVoucherContent(doc, placement, bounds, options)
-    } else if (placement.contentType === 'IMAGE' && placement.designUrl) {
+    } else if (placement.contentType === 'image' && placement.designUrl) {
       await this.renderImageContent(doc, placement, bounds)
     } else {
       // Placeholder for other content types
@@ -286,7 +286,7 @@ export class PDFGenerationService {
     }
 
     // Expiration date (if space allows)
-    if (placement.size !== 'SINGLE') {
+    if (placement.size !== 'single') {
       doc
         .fontSize(8)
         .font('Helvetica')
@@ -470,14 +470,14 @@ export class PDFGenerationService {
    * Get appropriate font size based on ad size and text type
    */
   private getFontSize(
-    adSize: 'SINGLE' | 'QUARTER' | 'HALF' | 'FULL',
+    adSize: 'single' | 'quarter' | 'half' | 'full',
     textType: 'title' | 'discount' | 'body' | 'code',
   ): number {
     const sizes = {
-      SINGLE: { title: 10, discount: 14, body: 8, code: 10 },
-      QUARTER: { title: 14, discount: 20, body: 10, code: 12 },
-      HALF: { title: 18, discount: 28, body: 12, code: 14 },
-      FULL: { title: 24, discount: 36, body: 14, code: 16 },
+      single: { title: 10, discount: 14, body: 8, code: 10 },
+      quarter: { title: 14, discount: 20, body: 10, code: 12 },
+      half: { title: 18, discount: 28, body: 12, code: 14 },
+      full: { title: 24, discount: 36, body: 14, code: 16 },
     }
 
     return get(get(sizes, adSize), textType)

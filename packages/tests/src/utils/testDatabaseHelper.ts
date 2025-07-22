@@ -75,7 +75,9 @@ export async function createTestDatabase(
 
   // Add init.sql if requested and file exists
   if (useInitSql) {
-    const initSqlPath = path.resolve(__dirname, './dump/init.sql')
+    // Look for init.sql in the source directory instead of dist
+    const sourceDir = path.resolve(__dirname, '../../src/utils')
+    const initSqlPath = path.resolve(sourceDir, './dump/init.sql')
 
     logger.debug(`Looking for init.sql at: ${initSqlPath}`)
 

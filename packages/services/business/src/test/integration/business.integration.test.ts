@@ -1,5 +1,10 @@
 import { vi } from 'vitest'
 
+// Unmock modules that might interfere with real server setup for integration tests
+vi.unmock('@pika/http')
+vi.unmock('@pika/api')
+vi.unmock('@pika/redis')
+
 // Mock @pika/shared to provide service clients
 vi.mock('@pika/shared', async () => {
   const actualShared =
@@ -66,6 +71,7 @@ async function seedTestBusinesses(
 
   // Create a test category first
   const categorySlug = `test-category-${uuid().substring(0, 8)}`
+  const adminUserId = uuid() // Create a dummy admin user ID for test data
   const testCategory = await prismaClient.category.create({
     data: {
       nameKey: `category.name.${uuid()}`,
@@ -73,8 +79,9 @@ async function seedTestBusinesses(
       slug: categorySlug,
       level: 1,
       path: '/',
-      active: true,
+      isActive: true,
       sortOrder: 1,
+      createdBy: adminUserId,
     },
   })
 
@@ -185,7 +192,7 @@ describe('Business Integration Tests', () => {
 
     // Get authenticated clients for different user types
     adminClient = await authHelper.getAdminClient(testDb.prisma)
-    customerClient = await authHelper.getCustomerClient(testDb.prisma)
+    customerClient = await authHelper.getUserClient(testDb.prisma)
     businessClient = await authHelper.getBusinessClient(testDb.prisma)
 
     logger.debug('E2E authentication setup complete')
@@ -195,7 +202,7 @@ describe('Business Integration Tests', () => {
     vi.clearAllMocks()
 
     // Clear cache
-    await cacheService.clear()
+    await cacheService.clearAll()
 
     // Clean up only business-related data to preserve E2E auth users
     if (testDb?.prisma) {

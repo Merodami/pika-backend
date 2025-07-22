@@ -41,7 +41,7 @@ export class VoucherBookController {
       const params = {
         search: query.search,
         bookType: query.bookType,
-        status: 'PUBLISHED', // Force published status for public API
+        status: 'published', // Force published status for public API
         year: query.year,
         month: query.month,
         page: query.page || 1,
@@ -52,8 +52,8 @@ export class VoucherBookController {
 
       const result = await this.voucherBookService.getAllVoucherBooks(params)
 
-      // Use mapper for proper response transformation
-      const response = VoucherBookMapper.toPublicListResponse(result)
+      // Transform to API response format using mapper
+      const response = VoucherBookMapper.toPublicListResponseFromDomain(result)
 
       res.json(response)
     } catch (error) {
@@ -81,7 +81,7 @@ export class VoucherBookController {
       const voucherBook = await this.voucherBookService.getVoucherBookById(id)
 
       // Convert to public DTO using mapper
-      const response = VoucherBookMapper.toPublicDTO(voucherBook)
+      const response = VoucherBookMapper.toPublicDTOFromDomain(voucherBook)
 
       res.json(response)
     } catch (error) {

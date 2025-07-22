@@ -4,10 +4,9 @@ import type { VoucherBookDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 import type {
-  BookFormat,
-  Orientation,
   VoucherBook,
   VoucherBookStatus,
+  VoucherBookType,
 } from '@prisma/client'
 
 import type {
@@ -33,41 +32,28 @@ import { VoucherServiceClient } from './VoucherServiceClient.js'
 export interface CreateVoucherBookData {
   title: string
   description?: string
-  format: BookFormat
-  orientation: Orientation
+  bookType: VoucherBookType
+  year: number
+  month?: number
   totalPages?: number
-  isActive?: boolean
-  providerId?: string
   edition?: string
-  region?: string
   metadata?: Record<string, any>
   createdById: string
-  updatedBy: string
 }
 
 export interface UpdateVoucherBookData {
   title?: string
   description?: string
-  format?: BookFormat
-  orientation?: Orientation
+  bookType?: VoucherBookType
+  year?: number
+  month?: number
   totalPages?: number
-  isActive?: boolean
-  providerId?: string
   edition?: string
-  region?: string
   metadata?: Record<string, any>
-  updatedBy: string
+  updatedById: string
 }
 
-export interface PaginatedResult<T> {
-  data: T[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
-}
+// PaginatedResult is imported from @pika/types
 
 export interface GeneratePDFResult {
   success: boolean
@@ -149,10 +135,14 @@ export class VoucherBookService implements IVoucherBookService {
 
       // Validate and set defaults
       const bookData = {
-        ...data,
+        title: data.title,
+        edition: data.edition,
+        bookType: data.bookType,
+        month: data.month,
+        year: data.year,
         totalPages: data.totalPages || VoucherBookService.DEFAULT_PAGES,
-        isActive: data.isActive ?? true,
-        status: 'draft' as VoucherBookStatus,
+        metadata: data.metadata,
+        createdBy: data.createdById,
       }
 
 
@@ -235,8 +225,17 @@ export class VoucherBookService implements IVoucherBookService {
       // Validate state transition rules
       this.validateBookModification(currentBook)
 
-      // Recalculate total vouchers if page structure changes
-      const updateData = { ...data }
+      // Prepare update data with proper field mapping
+      const updateData = {
+        title: data.title,
+        edition: data.edition,
+        bookType: data.bookType,
+        month: data.month,
+        year: data.year,
+        totalPages: data.totalPages,
+        metadata: data.metadata,
+        updatedBy: data.updatedById,
+      }
 
       if (data.totalPages) {
         const totalPages = data.totalPages || currentBook.totalPages
@@ -247,7 +246,7 @@ export class VoucherBookService implements IVoucherBookService {
             id,
             currentBook.totalPages + 1,
             data.totalPages,
-            data.updatedBy,
+            data.updatedById,
           )
         }
       }
@@ -594,7 +593,7 @@ export class VoucherBookService implements IVoucherBookService {
     }
   }
 
-  private validateBookModification(book: VoucherBook): void {
+  private validateBookModification(book: VoucherBookDomain): void {
     if (book.status === 'published' || book.status === 'archived') {
       throw ErrorFactory.badRequest(
         `Cannot modify ${book.status.toLowerCase()} voucher book`,

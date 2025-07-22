@@ -1,6 +1,7 @@
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
-import type { VoucherBook, VoucherBookStatus } from '@prisma/client'
+import type { VoucherBookStatus } from '@prisma/client'
+import type { VoucherBookDomain } from '@pika/sdk'
 
 import type {
   AdminVoucherBookSearchParams,
@@ -12,22 +13,22 @@ import { VoucherBookService } from './VoucherBookService.js'
 export interface IAdminVoucherBookService {
   getAllVoucherBooks(
     params: AdminVoucherBookSearchParams,
-  ): Promise<PaginatedResult<VoucherBook>>
-  getVoucherBookById(id: string): Promise<VoucherBook>
-  createVoucherBook(data: any): Promise<VoucherBook>
-  updateVoucherBook(id: string, data: any): Promise<VoucherBook>
+  ): Promise<PaginatedResult<VoucherBookDomain>>
+  getVoucherBookById(id: string): Promise<VoucherBookDomain>
+  createVoucherBook(data: any): Promise<VoucherBookDomain>
+  updateVoucherBook(id: string, data: any): Promise<VoucherBookDomain>
   deleteVoucherBook(id: string): Promise<void>
   updateVoucherBookStatus(
     id: string,
     status: VoucherBookStatus,
     userId: string,
-  ): Promise<VoucherBook>
+  ): Promise<VoucherBookDomain>
   generatePDF(id: string, userId?: string): Promise<any>
   bulkArchiveVoucherBooks(
     ids: string[],
     userId: string,
   ): Promise<BatchVoucherBookResult>
-  getVoucherBookStatistics(
+  getAdminStatistics(
     year?: number,
     month?: number,
   ): Promise<VoucherBookStatistics>
@@ -52,7 +53,7 @@ export class AdminVoucherBookService
     id: string,
     status: VoucherBookStatus,
     userId: string,
-  ): Promise<VoucherBook> {
+  ): Promise<VoucherBookDomain> {
     try {
       logger.info('Updating voucher book status', { id, status, userId })
 
@@ -60,7 +61,7 @@ export class AdminVoucherBookService
       const existingBook = await this.getVoucherBookById(id)
 
       // 2. Validate state transition (following pika-old pattern)
-      this.validateStateTransition(existingBook.status, status)
+      this.validateStateTransition(existingBook.status as VoucherBookStatus, status)
 
       // 3. Apply status-specific business logic
       let updateData: any = {
@@ -81,7 +82,7 @@ export class AdminVoucherBookService
             archivedAt: new Date(),
           }
           break
-        case 'READY_FOR_PRINT':
+        case 'ready_for_print':
           // Mark as ready for print - could trigger PDF generation
           break
       }
@@ -199,7 +200,7 @@ export class AdminVoucherBookService
       draft: ['ready_for_print', 'archived'],
       ready_for_print: ['published', 'draft', 'archived'],
       published: ['archived'],
-      ARCHIVED: [], // Archived books cannot be changed
+      archived: [], // Archived books cannot be changed
     }
 
     const allowed = allowedTransitions[currentStatus] || []
@@ -209,9 +210,11 @@ export class AdminVoucherBookService
         `Invalid state transition from ${currentStatus} to ${newStatus}`,
         {
           source: 'AdminVoucherBookService.validateStateTransition',
-          currentStatus,
-          newStatus,
-          allowedTransitions: allowed,
+          metadata: {
+            currentStatus,
+            newStatus,
+            allowedTransitions: allowed,
+          },
         },
       )
     }
@@ -222,7 +225,7 @@ export class AdminVoucherBookService
    */
   async getAllVoucherBooks(
     params: AdminVoucherBookSearchParams,
-  ): Promise<PaginatedResult<VoucherBook>> {
+  ): Promise<PaginatedResult<VoucherBookDomain>> {
     // Convert admin params to base service params
     const baseParams = {
       ...params,
@@ -234,9 +237,9 @@ export class AdminVoucherBookService
   }
 
   /**
-   * Get voucher book statistics for admin dashboard
+   * Get admin dashboard statistics for voucher books
    */
-  async getVoucherBookStatistics(
+  async getAdminStatistics(
     year?: number,
     month?: number,
   ): Promise<VoucherBookStatistics> {

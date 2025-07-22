@@ -45,6 +45,11 @@ export interface IAdPlacementRepository {
     size: string,
     excludeId?: string,
   ): Promise<boolean>
+  reorderPlacements(
+    bookId: string,
+    reorderData: ReorderPlacementData[],
+    userId: string,
+  ): Promise<void>
 }
 
 /**
@@ -82,6 +87,11 @@ export interface UpdateAdPlacementInput {
 export interface BulkUpdateAdPlacementInput {
   isActive?: boolean
   updatedBy: string
+}
+
+export interface ReorderPlacementData {
+  id: string
+  position: number
 }
 
 export interface AdPlacementSearchParams {
@@ -554,6 +564,42 @@ export class AdPlacementRepository implements IAdPlacementRepository {
       })
 
       return false
+    }
+  }
+
+  /**
+   * Reorder placements by updating their display order
+   */
+  async reorderPlacements(
+    bookId: string,
+    reorderData: ReorderPlacementData[],
+    userId: string,
+  ): Promise<void> {
+    try {
+      // Use a transaction to ensure consistency
+      await this.prisma.$transaction(async (prisma) => {
+        for (const { id, position } of reorderData) {
+          await prisma.adPlacement.update({
+            where: { id },
+            data: {
+              position,
+              updatedBy: userId,
+            },
+          })
+        }
+      })
+
+      logger.info('Ad placements reordered', {
+        bookId,
+        count: reorderData.length,
+      })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw ErrorFactory.resourceNotFound('AdPlacement', 'One or more placements not found')
+        }
+      }
+      throw ErrorFactory.databaseError('reorderPlacements', 'AdPlacement', error)
     }
   }
 }

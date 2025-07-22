@@ -94,10 +94,40 @@ vi.mock('@pika/http', async (importOriginal) => {
     requireBusinessRole: () => (req: any, res: any, next: any) => next(),
     requireAdmin: () => (req: any, res: any, next: any) => next(),
     requireInternalAuth: () => (req: any, res: any, next: any) => next(),
+    requireServiceAuth: () => (req: any, res: any, next: any) => next(),
+    allowServiceOrUserAuth: () => (req: any, res: any, next: any) => next(),
     validateBody: (schema: any) => (req: any, res: any, next: any) => next(),
     validateParams: (schema: any) => (req: any, res: any, next: any) => next(),
     validateQuery: (schema: any) => (req: any, res: any, next: any) => next(),
     getValidatedQuery: (req: any) => req.query || {},
+    getValidatedBody: (req: any) => req.body || {},
+    getValidatedParams: (req: any) => req.params || {},
+    getRequestLanguage: (req: any) => 'en',
+    paginatedResponse: (result: any, mapper?: any) => {
+      if (mapper && result.data) {
+        return {
+          ...result,
+          data: result.data.map(mapper),
+        }
+      }
+      return result
+    },
+    createMulterMiddleware: (options?: any) => {
+      // Return a multer-like object with single, array, etc. methods
+      const middleware = (req: any, res: any, next: any) => {
+        req.file = req.body?.file || undefined
+        req.files = req.body?.files || []
+        next()
+      }
+      
+      return {
+        single: (fieldName: string) => middleware,
+        array: (fieldName: string, maxCount?: number) => middleware,
+        fields: (fields: any[]) => middleware,
+        none: () => middleware,
+        any: () => middleware,
+      }
+    },
     createExpressServer: vi.fn().mockResolvedValue({
       use: vi.fn(),
       get: vi.fn(),
@@ -111,6 +141,7 @@ vi.mock('@pika/http', async (importOriginal) => {
     errorMiddleware: vi.fn(),
     RequestContext: class MockRequestContext {
       constructor(public data: any) {}
+      static getContext: () => any = () => ({ userId: 'test-user', role: 'MEMBER' })
     },
   }
 })

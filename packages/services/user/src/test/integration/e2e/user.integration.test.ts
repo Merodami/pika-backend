@@ -24,7 +24,7 @@ import {
   CommunicationServiceClientMock,
   createE2EAuthHelper,
   E2EAuthHelper,
-} from '@pika'
+} from '@pika/tests'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -33,7 +33,7 @@ import {
   clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
-} from '@tests/utils/testDatabaseHelper.js'
+} from '@pika/tests'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

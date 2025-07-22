@@ -1,12 +1,8 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
-import type {
-  BookDistribution,
-  BusinessType,
-  DistributionStatus,
-  DistributionType,
-} from '@prisma/client'
+import type { PaginatedResult } from '@pika/types'
+import type { BookDistributionDomain } from '@pika/sdk'
 
 import type {
   IBookDistributionRepository,
@@ -14,38 +10,35 @@ import type {
 } from '../repositories/index.js'
 
 export interface CreateBookDistributionData {
-  voucherBookId: string
+  bookId: string
+  businessId: string
   businessName: string
-  businessType: BusinessType
+  locationId?: string
   locationName?: string
-  contactName?: string
+  contactName: string
   contactEmail?: string
   contactPhone?: string
-  address?: string
-  requestedQuantity: number
-  distributionType: DistributionType
+  deliveryAddress?: string
+  quantity: number
+  distributionType: string // 'initial', 'reorder', 'replacement'
   notes?: string
   createdById: string
-  updatedById: string
 }
 
 export interface UpdateBookDistributionData {
   businessName?: string
-  businessType?: BusinessType
   locationName?: string
   contactName?: string
   contactEmail?: string
   contactPhone?: string
-  address?: string
-  requestedQuantity?: number
-  shippedQuantity?: number
-  status?: DistributionStatus
-  distributionType?: DistributionType
+  deliveryAddress?: string
+  quantity?: number
+  status?: string // 'pending', 'shipped', 'delivered', 'cancelled'
+  distributionType?: string
   trackingNumber?: string
-  carrier?: string
+  shippingCarrier?: string
   shippedAt?: Date
   deliveredAt?: Date
-  deliveryConfirmedBy?: string
   notes?: string
   updatedById: string
 }
@@ -53,51 +46,42 @@ export interface UpdateBookDistributionData {
 export interface BookDistributionSearchParams {
   page?: number
   limit?: number
-  voucherBookId?: string
+  bookId?: string
+  businessId?: string
   businessName?: string
-  businessType?: BusinessType
-  status?: DistributionStatus
-  distributionType?: DistributionType
+  status?: string
+  distributionType?: string
   locationName?: string
   createdById?: string
-  sortBy?: 'createdAt' | 'updatedAt' | 'businessName' | 'requestedQuantity'
+  sortBy?: 'createdAt' | 'updatedAt' | 'businessName' | 'quantity'
   sortOrder?: 'asc' | 'desc'
 }
 
-export interface PaginatedResult<T> {
-  data: T[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
-}
+// Use PaginatedResult from @pika/types
 
 export interface BusinessDistributionStats {
   businessName: string
-  businessType: BusinessType
   totalDistributions: number
   totalRequested: number
   totalShipped: number
-  statusBreakdown: Record<DistributionStatus, number>
+  statusBreakdown: Record<string, number>
 }
 
 export interface IBookDistributionService {
   createDistribution(
     data: CreateBookDistributionData,
-  ): Promise<BookDistribution>
-  getDistributionById(id: string): Promise<BookDistribution>
+  ): Promise<BookDistributionDomain>
+  getDistributionById(id: string): Promise<BookDistributionDomain>
   getAllDistributions(
     params: BookDistributionSearchParams,
-  ): Promise<PaginatedResult<BookDistribution>>
+  ): Promise<PaginatedResult<BookDistributionDomain>>
   getDistributionsByVoucherBookId(
     voucherBookId: string,
-  ): Promise<BookDistribution[]>
+  ): Promise<BookDistributionDomain[]>
   updateDistribution(
     id: string,
     data: UpdateBookDistributionData,
-  ): Promise<BookDistribution>
+  ): Promise<BookDistributionDomain>
   deleteDistribution(id: string): Promise<void>
   shipDistribution(
     id: string,
@@ -108,7 +92,7 @@ export interface IBookDistributionService {
       notes?: string
       updatedById: string
     },
-  ): Promise<BookDistribution>
+  ): Promise<BookDistributionDomain>
   confirmDelivery(
     id: string,
     deliveryData: {
@@ -116,7 +100,7 @@ export interface IBookDistributionService {
       notes?: string
       updatedById: string
     },
-  ): Promise<BookDistribution>
+  ): Promise<BookDistributionDomain>
   getBusinessStats(): Promise<BusinessDistributionStats[]>
 }
 
@@ -140,16 +124,16 @@ export class BookDistributionService implements IBookDistributionService {
 
   async createDistribution(
     data: CreateBookDistributionData,
-  ): Promise<BookDistribution> {
+  ): Promise<BookDistributionDomain> {
     try {
       logger.info('Creating book distribution', {
-        voucherBookId: data.voucherBookId,
+        bookId: data.bookId,
         businessName: data.businessName,
-        requestedQuantity: data.requestedQuantity,
+        quantity: data.quantity,
       })
 
       // Validate voucher book exists and is published
-      await this.validateVoucherBookForDistribution(data.voucherBookId)
+      await this.validateVoucherBookForDistribution(data.bookId)
 
       // Validate business data
       this.validateBusinessData(data)
@@ -157,16 +141,16 @@ export class BookDistributionService implements IBookDistributionService {
       // Create distribution with default status
       const distribution = await this.distributionRepository.create({
         ...data,
-        status: 'PENDING' as DistributionStatus,
+        createdBy: data.createdById,
       })
 
       // Invalidate related cache
-      await this.invalidateRelatedCache(data.voucherBookId)
+      await this.invalidateRelatedCache(data.bookId)
 
       logger.info('Book distribution created successfully', {
         id: distribution.id,
         businessName: data.businessName,
-        requestedQuantity: data.requestedQuantity,
+        quantity: data.quantity,
       })
 
       return distribution
@@ -181,7 +165,7 @@ export class BookDistributionService implements IBookDistributionService {
     prefix: 'service:book-distribution',
     keyGenerator: (id) => id,
   })
-  async getDistributionById(id: string): Promise<BookDistribution> {
+  async getDistributionById(id: string): Promise<BookDistributionDomain> {
     try {
       if (!isUuidV4(id)) {
         throw ErrorFactory.badRequest('Invalid distribution ID format')
@@ -190,7 +174,7 @@ export class BookDistributionService implements IBookDistributionService {
       const distribution = await this.distributionRepository.findById(id)
 
       if (!distribution) {
-        throw ErrorFactory.notFound('Book distribution not found')
+        throw ErrorFactory.resourceNotFound('BookDistribution', id)
       }
 
       return distribution
@@ -207,7 +191,7 @@ export class BookDistributionService implements IBookDistributionService {
   })
   async getAllDistributions(
     params: BookDistributionSearchParams,
-  ): Promise<PaginatedResult<BookDistribution>> {
+  ): Promise<PaginatedResult<BookDistributionDomain>> {
     try {
       const result = await this.distributionRepository.findAll(params)
 
@@ -221,24 +205,24 @@ export class BookDistributionService implements IBookDistributionService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:book-distributions-by-book',
-    keyGenerator: (voucherBookId) => voucherBookId,
+    keyGenerator: (bookId) => bookId,
   })
   async getDistributionsByVoucherBookId(
-    voucherBookId: string,
-  ): Promise<BookDistribution[]> {
+    bookId: string,
+  ): Promise<BookDistributionDomain[]> {
     try {
-      if (!isUuidV4(voucherBookId)) {
+      if (!isUuidV4(bookId)) {
         throw ErrorFactory.badRequest('Invalid voucher book ID format')
       }
 
       const distributions =
-        await this.distributionRepository.findByBookId(voucherBookId)
+        await this.distributionRepository.findByBookId(bookId)
 
       return distributions
     } catch (error) {
       logger.error('Failed to get distributions by voucher book ID', {
         error,
-        voucherBookId,
+        bookId,
       })
       throw ErrorFactory.fromError(error)
     }
@@ -247,7 +231,7 @@ export class BookDistributionService implements IBookDistributionService {
   async updateDistribution(
     id: string,
     data: UpdateBookDistributionData,
-  ): Promise<BookDistribution> {
+  ): Promise<BookDistributionDomain> {
     try {
       if (!isUuidV4(id)) {
         throw ErrorFactory.badRequest('Invalid distribution ID format')
@@ -261,7 +245,7 @@ export class BookDistributionService implements IBookDistributionService {
       }
 
       // Validate shipping data if updating to shipped status
-      if (data.status === 'SHIPPED' || data.shippedQuantity) {
+      if (data.status === 'shipped' || data.quantity) {
         this.validateShippingData(data, currentDistribution)
       }
 
@@ -272,7 +256,7 @@ export class BookDistributionService implements IBookDistributionService {
 
       // Invalidate cache
       await this.cache.del(`service:book-distribution:${id}`)
-      await this.invalidateRelatedCache(currentDistribution.voucherBookId)
+      await this.invalidateRelatedCache(currentDistribution.bookId)
 
       logger.info('Distribution updated', {
         id,
@@ -295,7 +279,7 @@ export class BookDistributionService implements IBookDistributionService {
       const distribution = await this.getDistributionById(id)
 
       // Only allow deletion of pending distributions
-      if (distribution.status !== 'PENDING') {
+      if (distribution.status !== 'pending') {
         throw ErrorFactory.badRequest(
           'Only pending distributions can be deleted',
         )
@@ -305,7 +289,7 @@ export class BookDistributionService implements IBookDistributionService {
 
       // Invalidate cache
       await this.cache.del(`service:book-distribution:${id}`)
-      await this.invalidateRelatedCache(distribution.voucherBookId)
+      await this.invalidateRelatedCache(distribution.bookId)
 
       logger.info('Distribution deleted', { id })
     } catch (error) {
@@ -323,12 +307,12 @@ export class BookDistributionService implements IBookDistributionService {
       notes?: string
       updatedById: string
     },
-  ): Promise<BookDistribution> {
+  ): Promise<BookDistributionDomain> {
     try {
       const distribution = await this.getDistributionById(id)
 
       // Validate current status allows shipping
-      if (distribution.status !== 'PENDING') {
+      if (distribution.status !== 'pending') {
         throw ErrorFactory.badRequest(
           'Only pending distributions can be shipped',
         )
@@ -339,19 +323,19 @@ export class BookDistributionService implements IBookDistributionService {
         throw ErrorFactory.badRequest('Shipped quantity must be greater than 0')
       }
 
-      if (shippingData.shippedQuantity > distribution.requestedQuantity) {
+      if (shippingData.shippedQuantity > distribution.quantity) {
         throw ErrorFactory.badRequest(
           'Shipped quantity cannot exceed requested quantity',
         )
       }
 
       const updateData: UpdateBookDistributionData = {
-        status: 'SHIPPED',
-        shippedQuantity: shippingData.shippedQuantity,
+        status: 'shipped',
+        quantity: shippingData.shippedQuantity,
         trackingNumber: shippingData.trackingNumber,
-        carrier: shippingData.carrier,
+        shippingCarrier: shippingData.carrier,
         shippedAt: new Date(),
-        notes: shippingData.notes || distribution.notes,
+        notes: shippingData.notes || distribution.notes || undefined,
         updatedById: shippingData.updatedById,
       }
 
@@ -377,22 +361,21 @@ export class BookDistributionService implements IBookDistributionService {
       notes?: string
       updatedById: string
     },
-  ): Promise<BookDistribution> {
+  ): Promise<BookDistributionDomain> {
     try {
       const distribution = await this.getDistributionById(id)
 
       // Validate current status allows delivery confirmation
-      if (distribution.status !== 'SHIPPED') {
+      if (distribution.status !== 'shipped') {
         throw ErrorFactory.badRequest(
           'Only shipped distributions can be marked as delivered',
         )
       }
 
       const updateData: UpdateBookDistributionData = {
-        status: 'DELIVERED',
+        status: 'delivered',
         deliveredAt: new Date(),
-        deliveryConfirmedBy: deliveryData.deliveryConfirmedBy,
-        notes: deliveryData.notes || distribution.notes,
+        notes: deliveryData.notes || distribution.notes || undefined,
         updatedById: deliveryData.updatedById,
       }
 
@@ -431,27 +414,23 @@ export class BookDistributionService implements IBookDistributionService {
    */
 
   private async validateVoucherBookForDistribution(
-    voucherBookId: string,
+    bookId: string,
   ): Promise<void> {
-    if (!isUuidV4(voucherBookId)) {
+    if (!isUuidV4(bookId)) {
       throw ErrorFactory.badRequest('Invalid voucher book ID format')
     }
 
-    const voucherBook = await this.voucherBookRepository.findById(voucherBookId)
+    const voucherBook = await this.voucherBookRepository.findById(bookId)
 
     if (!voucherBook) {
-      throw ErrorFactory.notFound('Voucher book not found')
+      throw ErrorFactory.resourceNotFound('VoucherBook', bookId)
     }
 
     // Only allow distribution for published books
-    if (voucherBook.status !== 'PUBLISHED') {
+    if (voucherBook.status !== 'published') {
       throw ErrorFactory.badRequest(
         'Only published voucher books can be distributed',
       )
-    }
-
-    if (!voucherBook.isActive) {
-      throw ErrorFactory.badRequest('Cannot distribute inactive voucher books')
     }
   }
 
@@ -460,8 +439,8 @@ export class BookDistributionService implements IBookDistributionService {
       throw ErrorFactory.badRequest('Business name is required')
     }
 
-    if (data.requestedQuantity <= 0) {
-      throw ErrorFactory.badRequest('Requested quantity must be greater than 0')
+    if (data.quantity <= 0) {
+      throw ErrorFactory.badRequest('Quantity must be greater than 0')
     }
 
     // Validate contact email format if provided
@@ -476,15 +455,15 @@ export class BookDistributionService implements IBookDistributionService {
   }
 
   private validateStatusTransition(
-    currentStatus: DistributionStatus,
-    newStatus: DistributionStatus,
+    currentStatus: string,
+    newStatus: string,
   ): void {
-    const allowedTransitions: Record<DistributionStatus, DistributionStatus[]> =
+    const allowedTransitions: Record<string, string[]> =
       {
-        PENDING: ['SHIPPED', 'CANCELLED'],
-        SHIPPED: ['DELIVERED', 'CANCELLED'],
-        DELIVERED: [], // Terminal state
-        CANCELLED: [], // Terminal state
+        pending: ['shipped', 'cancelled'],
+        shipped: ['delivered', 'cancelled'],
+        delivered: [], // Terminal state
+        cancelled: [], // Terminal state
       }
 
     const allowed = allowedTransitions[currentStatus] || []
@@ -500,13 +479,14 @@ export class BookDistributionService implements IBookDistributionService {
     data: UpdateBookDistributionData,
     currentDistribution: BookDistribution,
   ): void {
-    if (data.shippedQuantity && data.shippedQuantity <= 0) {
+    if (data.quantity && data.quantity <= 0) {
       throw ErrorFactory.badRequest('Shipped quantity must be greater than 0')
     }
 
     if (
-      data.shippedQuantity &&
-      data.shippedQuantity > currentDistribution.requestedQuantity
+      data.quantity &&
+      currentDistribution.quantity &&
+      data.quantity > currentDistribution.quantity
     ) {
       throw ErrorFactory.badRequest(
         'Shipped quantity cannot exceed requested quantity',
@@ -514,9 +494,9 @@ export class BookDistributionService implements IBookDistributionService {
     }
   }
 
-  private async invalidateRelatedCache(voucherBookId: string): Promise<void> {
+  private async invalidateRelatedCache(bookId: string): Promise<void> {
     await Promise.all([
-      this.cache.del(`service:book-distributions-by-book:${voucherBookId}`),
+      this.cache.del(`service:book-distributions-by-book:${bookId}`),
       this.cache.del('service:business-stats:all'),
     ])
   }

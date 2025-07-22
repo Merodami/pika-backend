@@ -3,6 +3,7 @@ import type {
   VoucherBookStatus,
   VoucherBookType,
 } from '@prisma/client'
+import type { VoucherBookDomain } from '@pika/sdk'
 
 import type { VoucherBookStatistics } from '../types/domain.js'
 
@@ -360,6 +361,25 @@ export class VoucherBookMapper {
   }
 
   /**
+   * Convert domain object to public DTO (limited fields)
+   */
+  static toPublicDTOFromDomain(voucherBook: VoucherBookDomain): PublicVoucherBookDTO {
+    return {
+      id: voucherBook.id,
+      title: voucherBook.title,
+      edition: voucherBook.edition,
+      bookType: voucherBook.bookType as VoucherBookType,
+      month: voucherBook.month,
+      year: voucherBook.year,
+      totalPages: voucherBook.totalPages,
+      publishedAt: voucherBook.publishedAt?.toISOString() || null,
+      coverImageUrl: voucherBook.coverImageUrl,
+      pdfUrl: voucherBook.status === 'published' ? voucherBook.pdfUrl : null, // Only show PDF if published
+      createdAt: voucherBook.createdAt.toISOString(),
+    }
+  }
+
+  /**
    * Convert array to DTOs
    */
   static toDTOList(voucherBooks: VoucherBook[]): VoucherBookDTO[] {
@@ -395,10 +415,10 @@ export class VoucherBookMapper {
     return {
       title: dto.title,
       edition: dto.edition,
-      bookType: dto.bookType || 'MONTHLY',
+      bookType: dto.bookType || 'monthly',
       month: dto.month,
       year: dto.year,
-      status: 'DRAFT' as VoucherBookStatus,
+      status: 'draft' as VoucherBookStatus,
       totalPages,
       coverImageUrl: dto.coverImageUrl,
       backImageUrl: dto.backImageUrl,
@@ -611,6 +631,22 @@ export class VoucherBookMapper {
   } {
     return {
       data: result.data.map((book) => this.toPublicDTO(book)),
+      pagination: result.pagination,
+    }
+  }
+
+  /**
+   * Map paginated domain result to public list response
+   */
+  static toPublicListResponseFromDomain(result: {
+    data: VoucherBookDomain[]
+    pagination: any
+  }): {
+    data: PublicVoucherBookDTO[]
+    pagination: any
+  } {
+    return {
+      data: result.data.map((book) => this.toPublicDTOFromDomain(book)),
       pagination: result.pagination,
     }
   }

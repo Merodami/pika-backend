@@ -72,7 +72,7 @@ export class AuthenticatedRequestClient {
     url: string,
     overrideToken?: string | null, // null means explicitly no token for this request
   ): supertest.Test {
-    const req = get(this.agent, method)(url).set('Accept', 'application/json')
+    const req = this.agent[method](url).set('Accept', 'application/json')
 
     const tokenToUse =
       overrideToken === null ? undefined : overrideToken || this.token

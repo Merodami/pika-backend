@@ -1,37 +1,38 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
-import type { AdPlacement, AdPosition, ContentType } from '@prisma/client'
+import type { ContentType } from '@prisma/client'
+import type { AdPlacementDomain } from '@pika/sdk'
 
 import type {
   IAdPlacementRepository,
   IVoucherBookRepository,
+  IVoucherBookPageRepository,
 } from '../repositories/index.js'
 import { AdSize, PageLayoutEngine } from './PageLayoutEngine.js'
 
 export interface CreateAdPlacementData {
-  voucherBookId: string
-  position: AdPosition
+  pageId: string
+  position: number
+  size: AdSize
   contentType: ContentType
   title: string
   description?: string
   imageUrl?: string
-  linkUrl?: string
-  textContent?: string
-  displayOrder?: number
-  isActive?: boolean
+  voucherId?: string
+  qrCodePayload?: string
+  shortCode?: string
+  metadata?: Record<string, any>
   createdById: string
-  updatedById: string
 }
 
 export interface UpdateAdPlacementData {
-  position?: AdPosition
+  position?: number
   contentType?: ContentType
   title?: string
   description?: string
   imageUrl?: string
   linkUrl?: string
-  textContent?: string
   displayOrder?: number
   isActive?: boolean
   updatedById: string
@@ -39,7 +40,7 @@ export interface UpdateAdPlacementData {
 
 export interface ReorderPlacementData {
   id: string
-  displayOrder: number
+  position: number
 }
 
 export interface PlacementValidation {
@@ -50,13 +51,13 @@ export interface PlacementValidation {
 }
 
 export interface IAdPlacementService {
-  createAdPlacement(data: CreateAdPlacementData): Promise<AdPlacement>
-  getAdPlacementById(id: string): Promise<AdPlacement>
-  getAdPlacementsByVoucherBookId(voucherBookId: string): Promise<AdPlacement[]>
+  createAdPlacement(data: CreateAdPlacementData): Promise<AdPlacementDomain>
+  getAdPlacementById(id: string): Promise<AdPlacementDomain>
+  getAdPlacementsByVoucherBookId(voucherBookId: string): Promise<AdPlacementDomain[]>
   updateAdPlacement(
     id: string,
     data: UpdateAdPlacementData,
-  ): Promise<AdPlacement>
+  ): Promise<AdPlacementDomain>
   deleteAdPlacement(id: string): Promise<void>
   reorderPlacements(
     voucherBookId: string,
@@ -65,13 +66,13 @@ export interface IAdPlacementService {
   ): Promise<void>
   validatePlacement(
     voucherBookId: string,
-    position: AdPosition,
+    position: number,
     excludeId?: string,
   ): Promise<PlacementValidation>
   getOptimalPlacementSuggestions(
     voucherBookId: string,
     contentType: ContentType,
-  ): Promise<AdPosition[]>
+  ): Promise<number[]>
 }
 
 /**
@@ -95,54 +96,62 @@ export class AdPlacementService implements IAdPlacementService {
   constructor(
     private readonly placementRepository: IAdPlacementRepository,
     private readonly voucherBookRepository: IVoucherBookRepository,
+    private readonly pageRepository: IVoucherBookPageRepository,
     private readonly cache: ICacheService,
   ) {
     this.pageLayoutEngine = new PageLayoutEngine()
   }
 
-  async createAdPlacement(data: CreateAdPlacementData): Promise<AdPlacement> {
+  async createAdPlacement(data: CreateAdPlacementData): Promise<AdPlacementDomain> {
     try {
       logger.info('Creating ad placement', {
-        voucherBookId: data.voucherBookId,
+        pageId: data.pageId,
         position: data.position,
         contentType: data.contentType,
+        size: data.size,
       })
 
-      // Validate voucher book exists and is modifiable
-      await this.validateVoucherBookModifiable(data.voucherBookId)
-
-      // Validate content type requirements
-      this.validateContentTypeData(data)
-
-      // Validate placement using sophisticated layout engine
-      const validation = await this.validatePlacement(
-        data.voucherBookId,
-        data.position,
-      )
-
-      if (!validation.isValid) {
+      // Validate placement using layout engine
+      const existingPlacements = await this.placementRepository.findByPageId(data.pageId)
+      const occupiedSpaces = new Set<number>()
+      
+      for (const placement of existingPlacements) {
+        for (let i = 0; i < placement.spacesUsed; i++) {
+          occupiedSpaces.add(placement.position + i)
+        }
+      }
+      
+      // Check if the placement can fit
+      if (!this.pageLayoutEngine.canPlaceAd(occupiedSpaces, data.position, data.size)) {
         throw ErrorFactory.badRequest(
-          `Placement validation failed: ${validation.errors.join(', ')}`,
+          `Cannot place ${data.size} ad at position ${data.position} - space occupied or invalid position`,
         )
       }
 
-      // Set display order if not provided
-      const displayOrder =
-        data.displayOrder ??
-        (await this.getNextDisplayOrder(data.voucherBookId))
-
+      // Calculate spaces used based on size
+      const spacesUsed = this.pageLayoutEngine.getRequiredSpaces(data.size)
+      
       const placement = await this.placementRepository.create({
-        ...data,
-        displayOrder,
-        isActive: data.isActive ?? true,
+        pageId: data.pageId,
+        contentType: data.contentType,
+        position: data.position,
+        size: data.size,
+        spacesUsed,
+        imageUrl: data.imageUrl,
+        qrCodePayload: data.qrCodePayload,
+        shortCode: data.shortCode,
+        title: data.title,
+        description: data.description,
+        metadata: data.metadata,
+        createdBy: data.createdById,
       })
 
       // Invalidate cache
-      await this.invalidateRelatedCache(data.voucherBookId)
+      await this.invalidateRelatedCache(data.pageId)
 
       logger.info('Ad placement created successfully', {
         id: placement.id,
-        voucherBookId: data.voucherBookId,
+        pageId: data.pageId,
         position: data.position,
       })
 
@@ -158,7 +167,7 @@ export class AdPlacementService implements IAdPlacementService {
     prefix: 'service:ad-placement',
     keyGenerator: (id) => id,
   })
-  async getAdPlacementById(id: string): Promise<AdPlacement> {
+  async getAdPlacementById(id: string): Promise<AdPlacementDomain> {
     try {
       if (!isUuidV4(id)) {
         throw ErrorFactory.badRequest('Invalid ad placement ID format')
@@ -167,7 +176,7 @@ export class AdPlacementService implements IAdPlacementService {
       const placement = await this.placementRepository.findById(id)
 
       if (!placement) {
-        throw ErrorFactory.notFound('Ad placement not found')
+        throw ErrorFactory.resourceNotFound('AdPlacement', id)
       }
 
       return placement
@@ -184,7 +193,7 @@ export class AdPlacementService implements IAdPlacementService {
   })
   async getAdPlacementsByVoucherBookId(
     voucherBookId: string,
-  ): Promise<AdPlacement[]> {
+  ): Promise<AdPlacementDomain[]> {
     try {
       if (!isUuidV4(voucherBookId)) {
         throw ErrorFactory.badRequest('Invalid voucher book ID format')
@@ -206,7 +215,7 @@ export class AdPlacementService implements IAdPlacementService {
   async updateAdPlacement(
     id: string,
     data: UpdateAdPlacementData,
-  ): Promise<AdPlacement> {
+  ): Promise<AdPlacementDomain> {
     try {
       if (!isUuidV4(id)) {
         throw ErrorFactory.badRequest('Invalid ad placement ID format')
@@ -214,13 +223,19 @@ export class AdPlacementService implements IAdPlacementService {
 
       const currentPlacement = await this.getAdPlacementById(id)
 
+      // Get page to find book ID
+      const page = await this.pageRepository.findById(currentPlacement.pageId)
+      if (!page) {
+        throw ErrorFactory.resourceNotFound('VoucherBookPage', currentPlacement.pageId)
+      }
+      
       // Validate voucher book is modifiable
-      await this.validateVoucherBookModifiable(currentPlacement.voucherBookId)
+      await this.validateVoucherBookModifiable(page.bookId)
 
       // If position is changing, validate new position
       if (data.position && data.position !== currentPlacement.position) {
         const validation = await this.validatePlacement(
-          currentPlacement.voucherBookId,
+          page.bookId,
           data.position,
           id, // Exclude current placement from conflict check
         )
@@ -233,17 +248,19 @@ export class AdPlacementService implements IAdPlacementService {
       }
 
       // Validate content type requirements
-      if (data.contentType || data.imageUrl || data.textContent) {
+      if (data.contentType || data.imageUrl) {
         this.validateContentTypeData({
-          ...currentPlacement,
-          ...data,
+          contentType: data.contentType || currentPlacement.contentType as ContentType,
+          imageUrl: data.imageUrl,
+          title: data.title ?? currentPlacement.title ?? undefined,
+          description: data.description ?? currentPlacement.description ?? undefined,
         })
       }
 
       const updatedPlacement = await this.placementRepository.update(id, data)
 
       // Invalidate cache
-      await this.invalidateRelatedCache(currentPlacement.voucherBookId)
+      await this.invalidateRelatedCache(page.bookId)
       await this.cache.del(`service:ad-placement:${id}`)
 
       logger.info('Ad placement updated', {
@@ -266,13 +283,19 @@ export class AdPlacementService implements IAdPlacementService {
 
       const placement = await this.getAdPlacementById(id)
 
+      // Get page to find book ID
+      const page = await this.pageRepository.findById(placement.pageId)
+      if (!page) {
+        throw ErrorFactory.resourceNotFound('VoucherBookPage', placement.pageId)
+      }
+      
       // Validate voucher book is modifiable
-      await this.validateVoucherBookModifiable(placement.voucherBookId)
+      await this.validateVoucherBookModifiable(page.bookId)
 
       await this.placementRepository.delete(id)
 
       // Invalidate cache
-      await this.invalidateRelatedCache(placement.voucherBookId)
+      await this.invalidateRelatedCache(page.bookId)
       await this.cache.del(`service:ad-placement:${id}`)
 
       logger.info('Ad placement deleted', { id })
@@ -333,7 +356,7 @@ export class AdPlacementService implements IAdPlacementService {
 
   async validatePlacement(
     voucherBookId: string,
-    position: AdPosition,
+    position: number,
     excludeId?: string,
   ): Promise<PlacementValidation> {
     try {
@@ -345,7 +368,7 @@ export class AdPlacementService implements IAdPlacementService {
       const existingPlacements =
         await this.getAdPlacementsByVoucherBookId(voucherBookId)
       const activePlacements = existingPlacements.filter(
-        (p) => p.isActive && (!excludeId || p.id !== excludeId),
+        (p) => (!excludeId || p.id !== excludeId),
       )
 
       // Map our position enum to the layout engine's AdSize
@@ -355,12 +378,12 @@ export class AdPlacementService implements IAdPlacementService {
       // Use the sophisticated layout engine for validation
       const canPlace = this.pageLayoutEngine.canPlaceAd(
         this.buildOccupiedSpacesFromPlacements(activePlacements),
-        1, // Start position - simplified for now
+        position, // Use the actual position
         adSize,
       )
 
-      if (!canPlace.success) {
-        errors.push(`Cannot place ${position} ad: ${canPlace.reason}`)
+      if (!canPlace) {
+        errors.push(`Cannot place ${adSize} ad at position ${position} - space is occupied or invalid`)
 
         // Find conflicting placements
         for (const placement of activePlacements) {
@@ -371,9 +394,9 @@ export class AdPlacementService implements IAdPlacementService {
       }
 
       // Add warnings for layout optimization
-      if (activePlacements.length === 0 && position !== 'FULL') {
+      if (activePlacements.length === 0 && position !== 8) {
         warnings.push(
-          'Consider using FULL size for maximum impact on empty page',
+          'Consider using position 1-8 for better placement',
         )
       }
 
@@ -402,21 +425,24 @@ export class AdPlacementService implements IAdPlacementService {
   async getOptimalPlacementSuggestions(
     voucherBookId: string,
     contentType: ContentType,
-  ): Promise<AdPosition[]> {
+  ): Promise<number[]> {
     try {
       const existingPlacements =
         await this.getAdPlacementsByVoucherBookId(voucherBookId)
-      const suggestions: AdPosition[] = []
+      const suggestions: number[] = []
 
-      // Test each position size
-      const positionsToTest: AdPosition[] = [
-        'SINGLE',
-        'QUARTER',
-        'HALF',
-        'FULL',
-      ]
+      // Get occupied positions
+      const occupiedPositions = new Set(
+        existingPlacements.map(p => p.position)
+      )
 
-      for (const position of positionsToTest) {
+      // Test each position (1-8)
+      for (let position = 1; position <= 8; position++) {
+        // Skip if position is already occupied
+        if (occupiedPositions.has(position)) {
+          continue
+        }
+
         const validation = await this.validatePlacement(voucherBookId, position)
 
         if (validation.isValid) {
@@ -450,7 +476,7 @@ export class AdPlacementService implements IAdPlacementService {
     const voucherBook = await this.voucherBookRepository.findById(voucherBookId)
 
     if (!voucherBook) {
-      throw ErrorFactory.notFound('Voucher book not found')
+      throw ErrorFactory.resourceNotFound('VoucherBook', voucherBookId)
     }
 
     if (
@@ -463,26 +489,20 @@ export class AdPlacementService implements IAdPlacementService {
     }
   }
 
-  private validateContentTypeData(data: Partial<CreateAdPlacementData>): void {
+  private validateContentTypeData(data: Partial<CreateAdPlacementData & UpdateAdPlacementData>): void {
     switch (data.contentType) {
-      case 'IMAGE':
+      case 'image':
         if (!data.imageUrl) {
           throw ErrorFactory.badRequest(
             'Image URL is required for IMAGE content type',
           )
         }
         break
-      case 'TEXT':
-        if (!data.textContent) {
-          throw ErrorFactory.badRequest(
-            'Text content is required for TEXT content type',
-          )
-        }
-        break
-      case 'VOUCHER':
+      // 'text' is not a valid ContentType in the current schema
+      case 'voucher':
         // Voucher placements are validated separately
         break
-      case 'AD':
+      case 'ad':
         if (!data.title) {
           throw ErrorFactory.badRequest('Title is required for AD content type')
         }
@@ -490,15 +510,15 @@ export class AdPlacementService implements IAdPlacementService {
     }
   }
 
-  private async getNextDisplayOrder(voucherBookId: string): Promise<number> {
+  private async getNextPosition(voucherBookId: string): Promise<number> {
     const existingPlacements =
       await this.getAdPlacementsByVoucherBookId(voucherBookId)
-    const maxOrder = Math.max(
-      ...existingPlacements.map((p) => p.displayOrder),
+    const maxPosition = Math.max(
+      ...existingPlacements.map((p) => p.position),
       0,
     )
 
-    return maxOrder + 1
+    return maxPosition + 1
   }
 
   private async invalidateRelatedCache(voucherBookId: string): Promise<void> {
@@ -508,20 +528,14 @@ export class AdPlacementService implements IAdPlacementService {
     ])
   }
 
-  private mapPositionToAdSize(position: AdPosition): AdSize {
-    // Map our position enum to the layout engine's size system
-    const mapping: Record<AdPosition, AdSize> = {
-      SINGLE: 'SINGLE',
-      QUARTER: 'QUARTER',
-      HALF: 'HALF',
-      FULL: 'FULL',
-    }
-
-    return mapping[position] || 'SINGLE'
+  private mapPositionToAdSize(position: number): AdSize {
+    // For the current implementation, we'll use a default size
+    // In the future, this could be enhanced to determine size based on position
+    return 'single'
   }
 
   private buildOccupiedSpacesFromPlacements(
-    placements: AdPlacement[],
+    placements: AdPlacementDomain[],
   ): Set<number> {
     const occupiedSpaces = new Set<number>()
 
@@ -539,48 +553,50 @@ export class AdPlacementService implements IAdPlacementService {
   }
 
   private checkPositionConflict(
-    position1: AdPosition,
-    position2: AdPosition,
+    position1: number,
+    position2: number,
   ): boolean {
-    // If either is FULL, they conflict
-    if (position1 === 'FULL' || position2 === 'FULL') {
-      return true
-    }
-
-    // If both are HALF, they conflict
-    if (position1 === 'HALF' && position2 === 'HALF') {
-      return true
-    }
-
-    // More sophisticated conflict detection would use the layout engine
-    return false
+    // Simple position conflict check
+    // Two placements conflict if they have the same position
+    return position1 === position2
   }
 
   private prioritizeSuggestions(
-    suggestions: AdPosition[],
+    suggestions: number[],
     contentType: ContentType,
     existingCount: number,
-  ): AdPosition[] {
-    // Prioritize based on content type
-    const priority: Record<ContentType, AdPosition[]> = {
-      VOUCHER: ['SINGLE', 'QUARTER', 'HALF', 'FULL'],
-      AD: ['QUARTER', 'HALF', 'SINGLE', 'FULL'],
-      IMAGE: ['HALF', 'FULL', 'QUARTER', 'SINGLE'],
-      TEXT: ['SINGLE', 'QUARTER', 'HALF', 'FULL'],
+  ): number[] {
+    // Position preferences based on content type
+    // Different content types might prefer different positions on the page
+    const positionPreference: Record<ContentType, number[]> = {
+      // Vouchers: prefer top positions for visibility
+      voucher: [1, 2, 3, 4, 5, 6, 7, 8],
+      // Ads: prefer middle positions
+      ad: [3, 4, 5, 6, 1, 2, 7, 8],
+      // Images: prefer positions that work well for larger sizes
+      image: [1, 5, 3, 7, 2, 6, 4, 8],
+      // Sponsored: no preference, use natural order
+      sponsored: [1, 2, 3, 4, 5, 6, 7, 8],
     }
 
-    const preferredOrder = priority[contentType] || [
-      'SINGLE',
-      'QUARTER',
-      'HALF',
-      'FULL',
-    ]
+    const preferredOrder = positionPreference[contentType] || [1, 2, 3, 4, 5, 6, 7, 8]
 
+    // Sort suggestions based on preferred order
     return suggestions.sort((a, b) => {
       const aIndex = preferredOrder.indexOf(a)
       const bIndex = preferredOrder.indexOf(b)
-
-      return aIndex - bIndex
+      
+      // If both are in preferred order, sort by preference
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex
+      }
+      
+      // If only one is in preferred order, prefer it
+      if (aIndex !== -1) return -1
+      if (bIndex !== -1) return 1
+      
+      // Otherwise, sort by position number
+      return a - b
     })
   }
 }

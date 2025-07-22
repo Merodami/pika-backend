@@ -114,15 +114,15 @@ export class QRCodeService {
   /**
    * Get optimal QR size based on ad placement size
    */
-  getOptimalQRSize(adSize: 'SINGLE' | 'QUARTER' | 'HALF' | 'FULL'): number {
+  getOptimalQRSize(adSize: 'single' | 'quarter' | 'half' | 'full'): number {
     switch (adSize) {
-      case 'SINGLE':
+      case 'single':
         return 150 // Small QR for single space
-      case 'QUARTER':
+      case 'quarter':
         return 200 // Medium QR for quarter page
-      case 'HALF':
+      case 'half':
         return 250 // Larger QR for half page
-      case 'FULL':
+      case 'full':
         return 300 // Large QR for full page
       default:
         return 200
