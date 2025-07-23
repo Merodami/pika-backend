@@ -136,6 +136,9 @@ export interface Category {
   parentId?: string
   isActive: boolean
   sortOrder: number
+  slug: string
+  level: number
+  path: string
   createdBy: string
   updatedBy?: string
   createdAt: Date

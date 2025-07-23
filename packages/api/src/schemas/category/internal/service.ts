@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UUID } from '../../shared/primitives.js'
 
 /**
@@ -35,7 +36,7 @@ export type InternalCategoryData = z.infer<typeof InternalCategoryData>
  * Internal category query parameters
  */
 export const InternalCategoryQueryParams = z.object({
-  isActive: z.coerce.boolean().optional(),
+  isActive: optionalBoolean(),
 })
 
 export type InternalCategoryQueryParams = z.infer<
@@ -81,7 +82,7 @@ export type BulkCategoryResponse = z.infer<typeof BulkCategoryResponse>
 export const ValidateCategoryRequest = openapi(
   z.object({
     categoryIds: z.array(UUID).min(1).max(100),
-    checkActive: z.boolean().default(true),
+    checkActive: optionalBoolean().default(true),
   }),
   {
     description: 'Validate categories exist and optionally check if active',

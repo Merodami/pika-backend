@@ -30,3 +30,8 @@ export const categorySortFieldMapper = createSortFieldMapper(CategorySortBy, {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
 })
+
+// Category relations that can be included
+export const CATEGORY_RELATIONS = ['parent', 'children'] as const
+
+export type CategoryRelations = (typeof CATEGORY_RELATIONS)[number]

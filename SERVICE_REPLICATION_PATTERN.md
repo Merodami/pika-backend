@@ -58,7 +58,7 @@ packages/services/{service-name}/
 │   └── index.ts                                # Entry point
 ├── test/
 │   ├── integration/
-│   │   ├── {serviceName}.integration.test.ts   # Public endpoints
+│   │   ├── public.{serviceName}.integration.test.ts   # Public endpoints
 │   │   ├── admin.{serviceName}.integration.test.ts # Admin endpoints
 │   │   └── internal.{serviceName}.integration.test.ts # Internal endpoints
 │   └── fixtures/                               # Test data
@@ -184,7 +184,7 @@ export class {ServiceName}Controller {
   ): Promise<void> {
     try {
       const query = getValidatedQuery<Search{ServiceName}Request>(request)
-      const parsedIncludes = query.include ? parseIncludeParam(query.include, {SERVICE}_RELATIONS) : {}
+      const parsedIncludes = query.include ? parseIncludeParam(query.include, ['relation1', 'relation2']) : {}
 
       // Map API query parameters inline - avoid separate mapper utilities
       const params = {
@@ -223,7 +223,7 @@ export class {ServiceName}Controller {
     try {
       const { id } = request.params
       const query = getValidatedQuery<Get{ServiceName}ByIdQuery>(request)
-      const parsedIncludes = query.include ? parseIncludeParam(query.include, {SERVICE}_RELATIONS) : {}
+      const parsedIncludes = query.include ? parseIncludeParam(query.include, ['relation1', 'relation2']) : {}
 
       const entity = await this.{service}Service.getById(id, parsedIncludes)
       if (!entity) {
@@ -1521,7 +1521,161 @@ async getByIds(
 - ❌ Using DTOs instead of schema types in Response<>
 - ❌ Not using paginatedResponse() for list endpoints
 
-## 15. Checklist for New Services
+## 15. Include Relations Pattern (MANDATORY)
+
+### Overview
+
+The platform uses a standardized pattern for including related entities in API responses. This allows clients to request related data in a single API call, reducing the number of requests needed.
+
+### Schema Definition
+
+**1. Define Relations in Enums (Optional)**
+
+While you can define relations as a constant, it's often better to pass them directly to avoid circular dependencies:
+
+```typescript
+// packages/api/src/schemas/{service}/common/enums.ts
+// Optional - often better to pass relations directly in controller
+export const {SERVICE}_RELATIONS = ['relation1', 'relation2'] as const
+export type {Service}Relations = (typeof {SERVICE}_RELATIONS)[number]
+```
+
+**2. Add Include Parameter to Query Schemas**
+
+```typescript
+// packages/api/src/schemas/{service}/public/{feature}.ts
+import { createIncludeParam } from '../../shared/query.js'
+
+export const {ServiceName}QueryParams = SearchParams.extend({
+  // ... other params
+}).merge(createIncludeParam(['{SERVICE}_RELATIONS'])) // Or pass array directly
+
+export const Admin{ServiceName}QueryParams = SearchParams.extend({
+  // ... admin params
+}).merge(createIncludeParam(['{SERVICE}_RELATIONS']))
+```
+
+### Controller Implementation
+
+**IMPORTANT**: Pass relations array directly to avoid circular dependencies:
+
+```typescript
+// src/controllers/{ServiceName}Controller.ts
+import { parseIncludeParam } from '@pika/shared'
+
+async getAll(request: Request, response: Response, next: NextFunction): Promise<void> {
+  try {
+    const query = getValidatedQuery<{ServiceName}QueryParams>(request)
+    
+    // Pass relations directly - avoids circular dependencies
+    const parsedIncludes = parseIncludeParam(query.include, ['user', 'category'])
+    
+    const params = {
+      // ... other params
+      parsedIncludes,
+    }
+    
+    const result = await this.service.getAll(params)
+    // ...
+  } catch (error) {
+    next(error)
+  }
+}
+```
+
+### Service Implementation
+
+```typescript
+// src/services/{ServiceName}Service.ts
+async getAll(params: {ServiceName}SearchParams): Promise<PaginatedResult<{ServiceName}Domain>> {
+  // Pass includes to repository
+  return this.repository.findAll(params)
+}
+
+async getById(id: string, parsedIncludes?: ParsedIncludes): Promise<{ServiceName}Domain | null> {
+  return this.repository.findById(id, parsedIncludes)
+}
+```
+
+### Repository Implementation
+
+```typescript
+// src/repositories/{ServiceName}Repository.ts
+private buildInclude(parsedIncludes?: ParsedIncludes): any {
+  if (!parsedIncludes) return undefined
+  
+  const include: any = {}
+  
+  if (parsedIncludes.user) {
+    include.user = true
+  }
+  
+  if (parsedIncludes.category) {
+    include.category = true
+  }
+  
+  return Object.keys(include).length > 0 ? include : undefined
+}
+
+async findAll(params: {ServiceName}SearchParams): Promise<PaginatedResult<{ServiceName}Domain>> {
+  const include = this.buildInclude(params.parsedIncludes)
+  
+  const entities = await this.prisma.{service}.findMany({
+    where,
+    include,
+    // ... other options
+  })
+  
+  return {
+    data: {ServiceName}Mapper.toDomainArray(entities),
+    pagination,
+  }
+}
+```
+
+### Response Schema Pattern
+
+Include optional relations in response schemas:
+
+```typescript
+// Admin response with optional relations
+export const Admin{ServiceName}Response = openapi(
+  withTimestamps({
+    id: UUID,
+    // ... required fields
+    
+    // Optional relations - included when requested
+    user: AdminUserDetailResponse.optional().describe(
+      'User details when ?include=user'
+    ),
+    category: CategoryResponse.optional().describe(
+      'Category information when ?include=category'
+    ),
+  }),
+  {
+    description: '{ServiceName} with optional relations',
+  },
+)
+```
+
+### Best Practices
+
+1. **Pass Relations Directly**: Avoid importing relation constants to prevent circular dependencies
+2. **Use parseIncludeParam**: This utility parses comma-separated includes and validates them
+3. **Optional Relations**: Mark related entities as optional in response schemas
+4. **Document Includes**: Use `.describe()` to document when relations are included
+5. **Validate Relations**: parseIncludeParam only allows relations you specify
+6. **Repository Pattern**: Build include objects dynamically based on parsed includes
+
+### Common Mistakes
+
+- ❌ Importing RELATIONS constant in controllers (causes circular deps)
+- ❌ Not passing parsedIncludes through service to repository
+- ❌ Forgetting to mark relations as optional in response schemas
+- ❌ Not documenting when relations are included
+- ❌ Including relations by default (should be opt-in via query param)
+
+## 16. Checklist for New Services
 
 When creating a new service, verify ALL of these items:
 

@@ -79,6 +79,7 @@ export function mapRoleToPermissions(role: UserRole): string[] {
         'categories:read',
         'categories:write',
         'categories:delete',
+        'admin:categories', // Admin-specific category management
         // Voucher management
         'vouchers:read',
         'vouchers:write',

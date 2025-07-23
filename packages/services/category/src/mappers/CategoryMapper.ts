@@ -21,6 +21,9 @@ export interface CategoryDocument {
   parentId: string | null
   isActive: boolean
   sortOrder: number
+  slug: string
+  level: number
+  path: string
   createdBy: string
   updatedBy: string | null
   createdAt: Date
@@ -38,6 +41,9 @@ export interface CategoryDTO {
   parentId?: string
   isActive: boolean
   sortOrder: number
+  slug: string
+  level: number
+  path: string
   createdBy: string
   updatedBy?: string
   createdAt: string
@@ -116,6 +122,9 @@ export class CategoryMapper {
       parentId: doc.parentId || undefined,
       isActive: doc.isActive,
       sortOrder: doc.sortOrder,
+      slug: doc.slug,
+      level: doc.level,
+      path: doc.path,
       createdBy: doc.createdBy,
       updatedBy: doc.updatedBy || undefined,
       createdAt:
@@ -149,6 +158,9 @@ export class CategoryMapper {
       parentId: domain.parentId,
       isActive: domain.isActive,
       sortOrder: domain.sortOrder,
+      slug: domain.slug,
+      level: domain.level,
+      path: domain.path,
       createdBy: domain.createdBy,
       updatedBy: domain.updatedBy,
       createdAt: formatDate(domain.createdAt),
@@ -172,6 +184,9 @@ export class CategoryMapper {
       parentId: dto.parentId,
       isActive: dto.isActive,
       sortOrder: dto.sortOrder,
+      slug: dto.slug,
+      level: dto.level,
+      path: dto.path,
       createdBy: dto.createdBy,
       updatedBy: dto.updatedBy,
       createdAt: new Date(dto.createdAt),
@@ -289,6 +304,9 @@ export class CategoryMapper {
       parentId: category.parentId,
       isActive: category.isActive,
       sortOrder: category.sortOrder,
+      slug: category.slug,
+      level: category.level,
+      path: category.path,
       createdBy: category.createdBy,
       updatedBy: category.updatedBy,
       createdAt: category.createdAt,

@@ -1,5 +1,5 @@
 import { categoryCommon, categoryInternal } from '@pika/api'
-import { validateBody, validateParams, validateQuery } from '@pika/http'
+import { requireServiceAuth, validateBody, validateParams, validateQuery } from '@pika/http'
 import { Router } from 'express'
 
 import type { InternalCategoryController } from '../controllers/InternalCategoryController.js'
@@ -11,6 +11,9 @@ export function createInternalCategoryRoutes(
   internalCategoryController: InternalCategoryController,
 ): Router {
   const router = Router()
+  
+  // All routes require internal authentication
+  router.use(requireServiceAuth())
 
   // GET /internal/categories - List categories for internal use
   router.get(
@@ -18,6 +21,10 @@ export function createInternalCategoryRoutes(
     validateQuery(categoryInternal.InternalCategoryQueryParams),
     internalCategoryController.getAllCategories,
   )
+
+  // GET /internal/categories/hierarchy - Get category hierarchy for internal use
+  // IMPORTANT: This must come BEFORE /:id route to avoid route matching issues
+  router.get('/hierarchy', internalCategoryController.getCategoryHierarchy)
 
   // GET /internal/categories/:id - Get category by ID for internal use
   router.get(
@@ -39,9 +46,6 @@ export function createInternalCategoryRoutes(
     validateBody(categoryInternal.BulkCategoryRequest),
     internalCategoryController.getCategoriesByIds,
   )
-
-  // GET /internal/categories/hierarchy - Get category hierarchy for internal use
-  router.get('/hierarchy', internalCategoryController.getCategoryHierarchy)
 
   return router
 }

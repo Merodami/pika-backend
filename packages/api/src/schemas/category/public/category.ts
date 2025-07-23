@@ -1,12 +1,15 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
 import { CategorySortBy } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
+import { createIncludeParam } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import { CATEGORY_RELATIONS } from '../common/enums.js'
 
 /**
  * Public category schemas
@@ -68,9 +71,9 @@ export type CategoryResponse = z.infer<typeof CategoryResponse>
  */
 export const CategoryQueryParams = SearchParams.extend({
   parentId: UUID.optional().describe('Filter by parent category'),
-  isActive: z.coerce.boolean().optional().describe('Filter by active status'),
+  isActive: optionalBoolean().describe('Filter by active status'),
   sortBy: CategorySortBy.default('sortOrder'),
-})
+}).merge(createIncludeParam(CATEGORY_RELATIONS))
 
 export type CategoryQueryParams = z.infer<typeof CategoryQueryParams>
 
