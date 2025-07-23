@@ -135,7 +135,6 @@ async function startGateway(): Promise<Express> {
   // This validates tokens and adds user context headers for backend services
   app.use(
     authMiddleware({
-      secret: JWT_SECRET,
       cacheService: redisService,
       excludePaths: [
         '/health',
