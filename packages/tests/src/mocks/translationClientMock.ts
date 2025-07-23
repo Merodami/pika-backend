@@ -3,6 +3,7 @@ import { vi } from 'vitest'
 /**
  * MockTranslationClient - Direct mock for TranslationClient
  * Provides a simpler interface for testing without requiring the service layer
+ * Implements the same public interface as TranslationClient for type compatibility
  */
 export class MockTranslationClient {
   private mockTranslations = new Map<string, Map<string, string>>()
@@ -56,11 +57,18 @@ export class MockTranslationClient {
   /**
    * Set translation for a key in a specific language
    */
-  async set(key: string, language: string, value: string): Promise<void> {
+  async set(
+    key: string,
+    language: string,
+    value: string,
+    context?: string,
+    service?: string,
+  ): Promise<void> {
     if (!this.mockTranslations.has(key)) {
       this.mockTranslations.set(key, new Map())
     }
     this.mockTranslations.get(key)!.set(language, value)
+    // Note: context and service are ignored in the mock
   }
 
   /**
@@ -83,6 +91,23 @@ export class MockTranslationClient {
   clear(): void {
     this.mockTranslations.clear()
     this.mockUserLanguages.clear()
+  }
+
+  /**
+   * Set bulk translations
+   */
+  async setBulk(
+    translations: Array<{
+      key: string
+      value: string
+      context?: string
+      service?: string
+    }>,
+    language: string,
+  ): Promise<void> {
+    for (const { key, value } of translations) {
+      await this.set(key, language, value)
+    }
   }
 
   /**

@@ -2,6 +2,7 @@ import { businessCommon, businessInternal, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { BusinessMapper } from '@pika/sdk'
+import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IBusinessService } from '../services/BusinessService.js'
@@ -30,12 +31,13 @@ export class InternalBusinessController {
     try {
       const { id: businessId } = req.params
       const query = getValidatedQuery<businessInternal.GetBusinessRequest>(req)
-      const { includeUser, includeCategory } = query
 
-      const business = await this.businessService.getBusinessById(businessId, {
-        user: includeUser,
-        category: includeCategory,
-      })
+      const includes = parseIncludeParam(query.include, ['user', 'category'])
+
+      const business = await this.businessService.getBusinessById(
+        businessId,
+        includes,
+      )
 
       res.json(BusinessMapper.toDTO(business))
     } catch (error) {
@@ -55,12 +57,13 @@ export class InternalBusinessController {
     try {
       const { id: userId } = req.params
       const query = getValidatedQuery<businessInternal.GetBusinessRequest>(req)
-      const { includeUser, includeCategory } = query
 
-      const business = await this.businessService.getBusinessByUserId(userId, {
-        user: !!includeUser,
-        category: !!includeCategory,
-      })
+      const includes = parseIncludeParam(query.include, ['user', 'category'])
+
+      const business = await this.businessService.getBusinessByUserId(
+        userId,
+        includes,
+      )
 
       res.json(BusinessMapper.toDTO(business))
     } catch (error) {
@@ -78,16 +81,12 @@ export class InternalBusinessController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { businessIds, includeUser, includeCategory } = req.body
+      const { businessIds, include } = req.body
+      const includes = parseIncludeParam(include, ['user', 'category'])
 
       const businesses = await Promise.all(
         businessIds.map((id) =>
-          this.businessService
-            .getBusinessById(id, {
-              user: includeUser,
-              category: includeCategory,
-            })
-            .catch(() => null),
+          this.businessService.getBusinessById(id, includes).catch(() => null),
         ),
       )
 
@@ -117,21 +116,15 @@ export class InternalBusinessController {
       const { id: categoryId } = req.params
       const query =
         getValidatedQuery<businessInternal.GetBusinessesByCategoryRequest>(req)
-      const {
-        limit = PAGINATION_DEFAULT_LIMIT,
-        includeUser,
-        includeCategory,
-      } = query
+      const { limit = PAGINATION_DEFAULT_LIMIT } = query
+      const includes = parseIncludeParam(query.include, ['user', 'category'])
 
       const result = await this.businessService.getAllBusinesses({
         categoryId,
-        active: true,
-        verified: true,
+        active: query.onlyActive,
+        verified: query.onlyVerified,
         limit,
-        parsedIncludes: {
-          user: !!includeUser,
-          category: !!includeCategory,
-        },
+        parsedIncludes: includes,
       })
 
       res.json({

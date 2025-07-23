@@ -68,7 +68,7 @@ describe('VoucherBookRepository Integration Tests', () => {
       const bookData = {
         title: 'January 2024 Voucher Book',
         edition: 'January 2024',
-        bookType: 'MONTHLY',
+        bookType: 'monthly',
         month: 1,
         year: 2024,
         totalPages: 24,
@@ -80,7 +80,7 @@ describe('VoucherBookRepository Integration Tests', () => {
       expect(result).toBeDefined()
       expect(result.id).toBeDefined()
       expect(result.title).toBe(bookData.title)
-      expect(result.status).toBe('DRAFT')
+      expect(result.status).toBe('draft')
       expect(result.createdBy).toBe(testUserId)
     })
 
@@ -128,7 +128,7 @@ describe('VoucherBookRepository Integration Tests', () => {
     beforeEach(async () => {
       createdBook = await repository.create({
         title: 'Test Book',
-        bookType: 'MONTHLY',
+        bookType: 'monthly',
         month: 2,
         year: 2024,
         totalPages: 24,
@@ -174,36 +174,36 @@ describe('VoucherBookRepository Integration Tests', () => {
       const books = [
         {
           title: 'January Book',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 1,
           year: 2024,
-          status: 'PUBLISHED',
+          status: 'published',
         },
         {
           title: 'February Book',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 2,
           year: 2024,
-          status: 'DRAFT',
+          status: 'draft',
         },
         {
           title: 'March Book',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 3,
           year: 2024,
-          status: 'PUBLISHED',
+          status: 'published',
         },
         {
           title: 'Special Edition',
           bookType: 'SPECIAL',
           year: 2024,
-          status: 'DRAFT',
+          status: 'draft',
         },
         {
           title: 'Annual Book',
           bookType: 'ANNUAL',
           year: 2023,
-          status: 'PUBLISHED',
+          status: 'published',
         },
       ]
 
@@ -214,7 +214,7 @@ describe('VoucherBookRepository Integration Tests', () => {
             totalPages: 24,
             createdBy: testUserId,
             updatedBy: testUserId,
-            publishedAt: book.status === 'PUBLISHED' ? new Date() : null,
+            publishedAt: book.status === 'published' ? new Date() : null,
           },
         })
       }
@@ -235,10 +235,10 @@ describe('VoucherBookRepository Integration Tests', () => {
     })
 
     it('should filter by status', async () => {
-      const result = await repository.findAll({ status: 'PUBLISHED' })
+      const result = await repository.findAll({ status: 'published' })
 
       expect(result.data).toHaveLength(3)
-      expect(result.data.every((book) => book.status === 'PUBLISHED')).toBe(
+      expect(result.data.every((book) => book.status === 'published')).toBe(
         true,
       )
     })
@@ -258,10 +258,10 @@ describe('VoucherBookRepository Integration Tests', () => {
     })
 
     it('should filter by bookType', async () => {
-      const result = await repository.findAll({ bookType: 'MONTHLY' })
+      const result = await repository.findAll({ bookType: 'monthly' })
 
       expect(result.data).toHaveLength(3)
-      expect(result.data.every((book) => book.bookType === 'MONTHLY')).toBe(
+      expect(result.data.every((book) => book.bookType === 'monthly')).toBe(
         true,
       )
     })
@@ -354,12 +354,12 @@ describe('VoucherBookRepository Integration Tests', () => {
 
     it('should update status and set publishedAt', async () => {
       const result = await repository.update(bookToUpdate.id, {
-        status: 'PUBLISHED',
+        status: 'published',
         publishedAt: new Date(),
         updatedBy: testUserId,
       })
 
-      expect(result.status).toBe('PUBLISHED')
+      expect(result.status).toBe('published')
       expect(result.publishedAt).toBeDefined()
     })
 
@@ -390,7 +390,7 @@ describe('VoucherBookRepository Integration Tests', () => {
     it('should cascade delete related pages', async () => {
       const book = await repository.create({
         title: 'Book with Pages',
-        bookType: 'MONTHLY',
+        bookType: 'monthly',
         month: 5,
         year: 2024,
         totalPages: 10,
@@ -421,7 +421,7 @@ describe('VoucherBookRepository Integration Tests', () => {
       for (let month = 1; month <= 6; month++) {
         await repository.create({
           title: `${getMonthName(month)} 2024 Book`,
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month,
           year: 2024,
           totalPages: 24,
@@ -432,7 +432,7 @@ describe('VoucherBookRepository Integration Tests', () => {
       // Create books for different year
       await repository.create({
         title: 'December 2023 Book',
-        bookType: 'MONTHLY',
+        bookType: 'monthly',
         month: 12,
         year: 2023,
         totalPages: 24,
@@ -460,9 +460,9 @@ describe('VoucherBookRepository Integration Tests', () => {
     beforeEach(async () => {
       // Create mix of published and draft books
       const books = [
-        { title: 'Published Jan', status: 'PUBLISHED', month: 1 },
-        { title: 'Draft Feb', status: 'DRAFT', month: 2 },
-        { title: 'Published Mar', status: 'PUBLISHED', month: 3 },
+        { title: 'Published Jan', status: 'published', month: 1 },
+        { title: 'Draft Feb', status: 'draft', month: 2 },
+        { title: 'Published Mar', status: 'published', month: 3 },
         { title: 'Ready Apr', status: 'READY_FOR_PRINT', month: 4 },
       ]
 
@@ -470,10 +470,10 @@ describe('VoucherBookRepository Integration Tests', () => {
         await testDb.prisma.voucherBook.create({
           data: {
             ...book,
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
             year: 2024,
             totalPages: 24,
-            publishedAt: book.status === 'PUBLISHED' ? new Date() : null,
+            publishedAt: book.status === 'published' ? new Date() : null,
             createdBy: testUserId,
             updatedBy: testUserId,
           },
@@ -485,7 +485,7 @@ describe('VoucherBookRepository Integration Tests', () => {
       const result = await repository.findPublishedBooks({})
 
       expect(result.data).toHaveLength(2)
-      expect(result.data.every((book) => book.status === 'PUBLISHED')).toBe(
+      expect(result.data.every((book) => book.status === 'published')).toBe(
         true,
       )
     })
@@ -518,7 +518,7 @@ describe('VoucherBookRepository Integration Tests', () => {
         testUserId,
       )
 
-      expect(result.status).toBe('PUBLISHED')
+      expect(result.status).toBe('published')
       expect(result.publishedAt).toBeDefined()
       expect(result.updatedBy).toBe(testUserId)
     })
@@ -542,7 +542,7 @@ describe('VoucherBookRepository Integration Tests', () => {
         data: [
           {
             title: 'Ready Book 1',
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
             year: 2024,
             month: 1,
             status: 'READY_FOR_PRINT',
@@ -552,7 +552,7 @@ describe('VoucherBookRepository Integration Tests', () => {
           },
           {
             title: 'Ready Book 2',
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
             year: 2024,
             month: 2,
             status: 'READY_FOR_PRINT',
@@ -562,7 +562,7 @@ describe('VoucherBookRepository Integration Tests', () => {
           },
           {
             title: 'Already Generated',
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
             year: 2024,
             month: 3,
             status: 'READY_FOR_PRINT',
@@ -573,10 +573,10 @@ describe('VoucherBookRepository Integration Tests', () => {
           },
           {
             title: 'Draft Book',
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
             year: 2024,
             month: 4,
-            status: 'DRAFT',
+            status: 'draft',
             totalPages: 24,
             createdBy: testUserId,
             updatedBy: testUserId,

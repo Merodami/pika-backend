@@ -1,6 +1,15 @@
+import {
+  JWT_ALGORITHM,
+  JWT_AUDIENCE,
+  JWT_ISSUER,
+  JWT_PRIVATE_KEY,
+  JWT_PUBLIC_KEY,
+  JWT_SECRET,
+} from '@pika/environment'
 import { logger } from '@pika/shared'
 import { UserRole } from '@pika/types'
 import type { Express } from 'express'
+import type jwt from 'jsonwebtoken'
 import { get } from 'lodash-es'
 import supertest from 'supertest'
 
@@ -170,39 +179,78 @@ export class E2EAuthHelper {
   }
 
   /**
-   * Generate a valid JWT token for testing (matches database user)
+   * Generate a valid JWT token for testing
+   * Can be called with either userType/userId or custom user data
    */
-  private generateTestToken(
-    userType: keyof typeof this.testUsers,
-    userId: string,
+  generateTestToken(
+    userTypeOrData:
+      | keyof typeof this.testUsers
+      | { userId: string; email: string; role: string },
+    userId?: string,
   ): string {
-    const userData = get(this.testUsers, userType)
-    const jwtSecret = process.env.JWT_SECRET
+    const algorithm = JWT_ALGORITHM as jwt.Algorithm
 
-    if (!jwtSecret) {
-      throw new Error(
-        'JWT_SECRET environment variable is required for test tokens',
-      )
+    // Validate required configuration based on algorithm
+    if (algorithm.startsWith('HS')) {
+      if (!JWT_SECRET) {
+        throw new Error(
+          'JWT_SECRET environment variable is required for HMAC algorithms',
+        )
+      }
+    } else if (algorithm.startsWith('RS') || algorithm.startsWith('ES')) {
+      if (!JWT_PRIVATE_KEY || !JWT_PUBLIC_KEY) {
+        throw new Error(
+          'JWT_PRIVATE_KEY and JWT_PUBLIC_KEY environment variables are required for RSA/ECDSA algorithms',
+        )
+      }
     }
 
-    const payload = {
-      userId: userId,
-      email: userData.email,
-      role: userData.role,
-      status: 'ACTIVE',
-      type: 'access' as const,
-      iat: Math.floor(Date.now() / 1000),
+    let payload: any
+
+    if (typeof userTypeOrData === 'string') {
+      // Called with userType and userId
+      const userData = get(this.testUsers, userTypeOrData)
+
+      payload = {
+        userId: userId,
+        email: userData.email,
+        role: userData.role,
+        status: 'ACTIVE',
+        type: 'access' as const,
+        iat: Math.floor(Date.now() / 1000),
+      }
+    } else {
+      // Called with custom user data object
+      payload = {
+        userId: userTypeOrData.userId,
+        email: userTypeOrData.email,
+        role: userTypeOrData.role,
+        status: 'ACTIVE',
+        type: 'access' as const,
+        iat: Math.floor(Date.now() / 1000),
+      }
     }
 
     // Import jwt here to avoid circular dependencies
     const jwt = require('jsonwebtoken')
 
-    return jwt.sign(payload, jwtSecret, {
+    // Select appropriate signing key based on algorithm
+    let signingKey: string
+
+    if (algorithm.startsWith('HS')) {
+      signingKey = JWT_SECRET
+    } else {
+      // For RSA/ECDSA algorithms, use the key from environment (already unescaped)
+      signingKey = JWT_PRIVATE_KEY
+    }
+
+    return jwt.sign(payload, signingKey, {
+      algorithm,
       expiresIn: '1h', // 1 hour is plenty for tests
-      issuer: 'pika-api',
-      audience: 'pikapp',
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
       subject: payload.userId,
-      jwtid: `test-${userType.toLowerCase()}-${Date.now()}`,
+      jwtid: `test-${payload.role.toLowerCase()}-${Date.now()}`,
     })
   }
 
@@ -318,6 +366,13 @@ export class E2EAuthHelper {
   /**
    * Get a service-to-service authenticated client
    * This creates a special client that uses service authentication instead of JWT tokens
+   *
+   * @param serviceName - Name of the calling service (default: 'test-service')
+   * @returns AuthenticatedRequestClient configured for service-to-service auth
+   *
+   * @example
+   * const serviceClient = authHelper.getServiceClient('user-service')
+   * const response = await serviceClient.get('/internal/users/123')
    */
   getServiceClient(
     serviceName: string = 'test-service',

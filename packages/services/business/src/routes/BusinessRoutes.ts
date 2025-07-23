@@ -30,32 +30,17 @@ export function createBusinessRoutes(
   const service = new BusinessService(repository, translationClient, cache)
   const controller = new BusinessController(service)
 
-  // Public routes (anyone can browse businesses)
+  // Public routes (require authentication but available to all users)
   // GET /businesses - List all active businesses
   router.get(
     '/',
+    requireAuth(),
     validateQuery(businessPublic.BusinessQueryParams),
     controller.getAllBusinesses,
   )
 
-  // GET /businesses/:id - Get business by ID
-  router.get(
-    '/:id',
-    validateParams(businessPublic.BusinessPathParams),
-    validateQuery(businessPublic.BusinessDetailQueryParams),
-    controller.getBusinessById,
-  )
-
-  // GET /businesses/user/:id - Get business by user ID
-  router.get(
-    '/user/:id',
-    validateParams(shared.UserIdParam),
-    validateQuery(businessPublic.BusinessDetailQueryParams),
-    controller.getBusinessByUserId,
-  )
-
   // Business owner routes (require auth and business permissions)
-  // GET /businesses/me - Get current user's business
+  // GET /businesses/me - Get current user's business (must come before /:id)
   router.get(
     '/me',
     requireAuth(),
@@ -80,6 +65,24 @@ export function createBusinessRoutes(
     requirePermissions('businesses:write:own'),
     validateBody(businessPublic.UpdateMyBusinessRequest),
     controller.updateMyBusiness,
+  )
+
+  // GET /businesses/user/:id - Get business by user ID (must come before /:id)
+  router.get(
+    '/user/:id',
+    requireAuth(),
+    validateParams(shared.UserIdParam),
+    validateQuery(businessPublic.BusinessDetailQueryParams),
+    controller.getBusinessByUserId,
+  )
+
+  // GET /businesses/:id - Get business by ID (must come last to avoid conflicts)
+  router.get(
+    '/:id',
+    requireAuth(),
+    validateParams(businessPublic.BusinessPathParams),
+    validateQuery(businessPublic.BusinessDetailQueryParams),
+    controller.getBusinessById,
   )
 
   return router

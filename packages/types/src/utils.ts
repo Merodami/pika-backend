@@ -74,6 +74,7 @@ export function mapRoleToPermissions(role: UserRole): string[] {
         'businesses:write',
         'businesses:delete',
         'businesses:verify',
+        'admin:businesses', // Admin-specific business management
         // Category management
         'categories:read',
         'categories:write',

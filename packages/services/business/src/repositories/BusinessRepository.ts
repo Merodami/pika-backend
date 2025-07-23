@@ -63,8 +63,11 @@ export class BusinessRepository implements IBusinessRepository {
   private buildWhereClause(
     params: BusinessSearchParams,
   ): Prisma.BusinessWhereInput {
-    const where: Prisma.BusinessWhereInput = {
-      deletedAt: null, // Only fetch non-deleted businesses
+    const where: Prisma.BusinessWhereInput = {}
+
+    // Only include deleted filter if not explicitly requested by admin
+    if (!params.includeDeleted) {
+      where.deletedAt = null
     }
 
     // Filter by user ID

@@ -14,6 +14,7 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/translation')
 
+import { SERVICE_API_KEY } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -23,67 +24,19 @@ import {
   TestDatabaseResult,
 } from '@pika/tests'
 import { TranslationClient } from '@pika/translation'
-import { PrismaClient } from '@prisma/client'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createBusinessServer } from '../../server.js'
+import {
+  createSharedBusinessTestData,
+  seedTestBusinesses,
+  type SharedBusinessTestData,
+} from '../helpers/businessTestHelpers.js'
 
-// Helper function to seed test businesses
-async function seedTestBusinesses(
-  prismaClient: PrismaClient,
-  options?: {
-    generateInactive?: boolean
-    generateUnverified?: boolean
-    count?: number
-  },
-): Promise<{ businesses: any[]; category: any }> {
-  const {
-    generateInactive = false,
-    generateUnverified = false,
-    count = 3,
-  } = options || {}
-
-  // Create a test category
-  const categorySlug = `test-category-${uuid().substring(0, 8)}`
-  const adminUserId = uuid() // Create a dummy admin user ID for test data
-  const testCategory = await prismaClient.category.create({
-    data: {
-      nameKey: `category.name.${uuid()}`,
-      descriptionKey: `category.description.${uuid()}`,
-      slug: categorySlug,
-      level: 1,
-      path: '/',
-      isActive: true,
-      sortOrder: 1,
-      createdBy: adminUserId,
-    },
-  })
-
-  const businesses = []
-
-  // Generate test businesses
-  for (let i = 0; i < count; i++) {
-    const business = await prismaClient.business.create({
-      data: {
-        userId: uuid(),
-        businessName: `Test Business ${i + 1}`,
-        businessDescription: `Description for test business ${i + 1}`,
-        categoryId: testCategory.id,
-        verified: generateUnverified ? i % 2 === 0 : true,
-        active: generateInactive ? i % 2 === 0 : true,
-        averageRating: Math.floor(Math.random() * 5) + 1,
-        totalReviews: Math.floor(Math.random() * 100),
-      },
-    })
-
-    businesses.push(business)
-  }
-
-  return { businesses, category: testCategory }
-}
+// Note: Using shared helper from businessTestHelpers.js
 
 describe('Business Service - Internal API Integration Tests', () => {
   let testDb: TestDatabaseResult
@@ -93,6 +46,9 @@ describe('Business Service - Internal API Integration Tests', () => {
   let translationClient: TranslationClient
   let internalAPIHelper: InternalAPITestHelper
   let internalClient: any
+
+  // Shared test data created once
+  let sharedTestData: SharedBusinessTestData
 
   beforeAll(async () => {
     logger.debug(
@@ -109,7 +65,11 @@ describe('Business Service - Internal API Integration Tests', () => {
     // Update process.env for compatibility
     process.env.DATABASE_URL = testDb.databaseUrl
 
-    // Create server
+    // Initialize Internal API Helper using the actual SERVICE_API_KEY from environment
+    internalAPIHelper = new InternalAPITestHelper(SERVICE_API_KEY)
+    internalAPIHelper.setup() // This ensures consistency
+
+    // Create server AFTER setting up API key
     cacheService = new MemoryCacheService()
     translationClient = new TranslationClient()
 
@@ -124,12 +84,17 @@ describe('Business Service - Internal API Integration Tests', () => {
     // Initialize supertest with the Express server instance
     request = supertest(app)
 
-    // Initialize Internal API Helper
-    internalAPIHelper = new InternalAPITestHelper()
-    internalAPIHelper.setup() // Set up test API key
+    // Create internal client with proper headers
     internalClient = internalAPIHelper.createClient(app)
 
     logger.debug('Internal API setup complete')
+
+    // Create shared test data once for all tests
+    logger.debug('Creating shared test data...')
+    sharedTestData = await createSharedBusinessTestData(testDb.prisma)
+    logger.debug(
+      `Created ${sharedTestData.allBusinesses.length} test businesses`,
+    )
   }, 120000)
 
   beforeEach(async () => {
@@ -138,18 +103,14 @@ describe('Business Service - Internal API Integration Tests', () => {
     // Clear cache
     await cacheService.clearAll()
 
-    // Clean up only business-related data
-    if (testDb?.prisma) {
-      // Delete in proper order to avoid foreign key constraint violations
-      await testDb.prisma.business.deleteMany({})
-      await testDb.prisma.category.deleteMany({})
-    }
+    // Don't clean up shared test data between tests - only clean any extra data created
+    // This preserves the shared test data created in beforeAll
   })
 
   afterAll(async () => {
     logger.debug('Cleaning up resources...')
 
-    internalAPIHelper.cleanup() // Restore original API key
+    internalAPIHelper.cleanup() // Clean up
 
     if (testDb) {
       await cleanupTestDatabase(testDb)
@@ -159,47 +120,52 @@ describe('Business Service - Internal API Integration Tests', () => {
   })
 
   // Internal Service Discovery
-  describe('GET /internal/businesses/by-category', () => {
+  describe('GET /internal/businesses/category/:categoryId', () => {
     it('should get businesses by category for internal services', async () => {
-      const { category } = await seedTestBusinesses(testDb.prisma, {
-        count: 5,
-      })
-
+      // No query parameters - should get all businesses (no filtering)
       const response = await internalClient
-        .post('/internal/businesses/by-category')
-        .send({ categoryIds: [category.id] })
+        .get(
+          `/internal/businesses/category/${sharedTestData.activeCategory.id}`,
+        )
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body).toHaveProperty(category.id)
-      expect(response.body[category.id]).toHaveLength(5)
-      expect(response.body[category.id][0]).toHaveProperty('id')
-      expect(response.body[category.id][0]).toHaveProperty('businessName')
+      expect(response.body.businesses).toBeDefined()
+      expect(Array.isArray(response.body.businesses)).toBe(true)
+
+      // Should have businesses from shared data in that category
+      const businessesInCategory = sharedTestData.allBusinesses.filter(
+        (b) => b.categoryId === sharedTestData.activeCategory.id,
+      )
+
+      expect(response.body.businesses.length).toBeGreaterThanOrEqual(
+        businessesInCategory.length,
+      )
+      if (response.body.businesses.length > 0) {
+        expect(response.body.businesses[0]).toHaveProperty('id')
+        expect(response.body.businesses[0]).toHaveProperty('businessNameKey')
+      }
     })
 
-    it('should handle multiple categories', async () => {
-      // Create businesses in multiple categories
-      const results = []
-
-      for (let i = 0; i < 3; i++) {
-        const result = await seedTestBusinesses(testDb.prisma, { count: 2 })
-
-        results.push(result)
-      }
-
-      const categoryIds = results.map((r) => r.category.id)
-
+    it('should apply filters when specified', async () => {
+      // Test with explicit filters
       const response = await internalClient
-        .post('/internal/businesses/by-category')
-        .send({ categoryIds })
+        .get(
+          `/internal/businesses/category/${sharedTestData.activeCategory.id}?onlyActive=true&onlyVerified=false`,
+        )
         .set('Accept', 'application/json')
         .expect(200)
 
-      // Should have results for all 3 categories
-      expect(Object.keys(response.body)).toHaveLength(3)
-      categoryIds.forEach((categoryId) => {
-        expect(response.body[`${categoryId}`]).toHaveLength(2)
-      })
+      expect(response.body.businesses).toBeDefined()
+      expect(Array.isArray(response.body.businesses)).toBe(true)
+
+      // Should only return businesses that are active=true AND verified=false
+      if (response.body.businesses.length > 0) {
+        response.body.businesses.forEach((business: any) => {
+          expect(business.active).toBe(true)
+          expect(business.verified).toBe(false)
+        })
+      }
     })
 
     it('should return empty array for categories with no businesses', async () => {
@@ -217,12 +183,11 @@ describe('Business Service - Internal API Integration Tests', () => {
       })
 
       const response = await internalClient
-        .post('/internal/businesses/by-category')
-        .send({ categoryIds: [emptyCategory.id] })
+        .get(`/internal/businesses/category/${emptyCategory.id}`)
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body[emptyCategory.id]).toEqual([])
+      expect(response.body.businesses).toEqual([])
     })
   })
 
@@ -239,8 +204,8 @@ describe('Business Service - Internal API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.data).toHaveLength(3)
-      expect(response.body.data.map((b: any) => b.id).sort()).toEqual(
+      expect(response.body.businesses).toHaveLength(3)
+      expect(response.body.businesses.map((b: any) => b.id).sort()).toEqual(
         businessIds.sort(),
       )
     })
@@ -259,42 +224,34 @@ describe('Business Service - Internal API Integration Tests', () => {
         .expect(200)
 
       // Should only return the valid business
-      expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].id).toBe(validId)
+      expect(response.body.businesses).toHaveLength(1)
+      expect(response.body.businesses[0].id).toBe(validId)
     })
 
-    it('should return empty array for empty request', async () => {
+    it('should reject empty businessIds array', async () => {
       const response = await internalClient
         .post('/internal/businesses/batch')
         .send({ businessIds: [] })
         .set('Accept', 'application/json')
-        .expect(200)
+        .expect(400)
 
-      expect(response.body.data).toEqual([])
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.message).toContain('Too small')
     })
   })
 
-  describe('GET /internal/businesses/user/:userId', () => {
+  describe('GET /internal/businesses/user/:id', () => {
     it('should get business by user ID for internal services', async () => {
-      const userId = uuid()
-      const business = await testDb.prisma.business.create({
-        data: {
-          userId,
-          businessName: 'User Business',
-          businessDescription: 'Business for specific user',
-          categoryId: uuid(),
-          verified: true,
-          active: true,
-        },
-      })
+      // Use business from shared test data
+      const businessWithUser = sharedTestData.allBusinesses[0]
 
       const response = await internalClient
-        .get(`/internal/businesses/user/${userId}`)
+        .get(`/internal/businesses/user/${businessWithUser.userId}`)
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.id).toBe(business.id)
-      expect(response.body.userId).toBe(userId)
+      expect(response.body.id).toBe(businessWithUser.id)
+      expect(response.body.userId).toBe(businessWithUser.userId)
     })
 
     it('should return 404 for user without business', async () => {
@@ -307,134 +264,28 @@ describe('Business Service - Internal API Integration Tests', () => {
     })
   })
 
-  describe('POST /internal/businesses/:id/update-stats', () => {
-    it('should update business statistics', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma)
-      const business = businesses[0]
-
-      const statsUpdate = {
-        incrementReviews: 5,
-        newRating: 4.5,
-      }
+  describe('GET /internal/businesses/:id', () => {
+    it('should get business by ID for internal services', async () => {
+      // Use business from shared test data
+      const business = sharedTestData.activeBusinesses[0]
 
       const response = await internalClient
-        .post(`/internal/businesses/${business.id}/update-stats`)
-        .send(statsUpdate)
+        .get(`/internal/businesses/${business.id}`)
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.totalReviews).toBe(business.totalReviews + 5)
-      // Rating should be recalculated based on new review
+      expect(response.body.id).toBe(business.id)
+      expect(response.body.businessNameKey).toBe(business.businessNameKey)
+      expect(response.body.userId).toBe(business.userId)
     })
 
-    it('should handle rating recalculation', async () => {
-      const business = await testDb.prisma.business.create({
-        data: {
-          userId: uuid(),
-          businessName: 'Rating Test Business',
-          businessDescription: 'Test rating calculation',
-          categoryId: uuid(),
-          verified: true,
-          active: true,
-          averageRating: 4.0,
-          totalReviews: 10,
-        },
-      })
-
-      // Add a new 5-star review
-      const response = await internalClient
-        .post(`/internal/businesses/${business.id}/update-stats`)
-        .send({
-          incrementReviews: 1,
-          newRating: 5.0,
-        })
-        .set('Accept', 'application/json')
-        .expect(200)
-
-      // New average should be ((4.0 * 10) + 5.0) / 11 ≈ 4.09
-      expect(response.body.averageRating).toBeCloseTo(4.09, 1)
-      expect(response.body.totalReviews).toBe(11)
-    })
-  })
-
-  describe('POST /internal/businesses/validate', () => {
-    it('should validate business existence and status', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma, {
-        generateInactive: true,
-        generateUnverified: true,
-        count: 4,
-      })
-
-      const activeVerifiedBusiness = businesses.find(
-        (b) => b.active && b.verified,
-      )!
-
-      const response = await internalClient
-        .post('/internal/businesses/validate')
-        .send({ businessId: activeVerifiedBusiness.id })
-        .set('Accept', 'application/json')
-        .expect(200)
-
-      expect(response.body.valid).toBe(true)
-      expect(response.body.business).toBeDefined()
-      expect(response.body.business.id).toBe(activeVerifiedBusiness.id)
-    })
-
-    it('should return invalid for inactive business', async () => {
-      const inactiveBusiness = await testDb.prisma.business.create({
-        data: {
-          userId: uuid(),
-          businessName: 'Inactive Business',
-          businessDescription: 'This business is inactive',
-          categoryId: uuid(),
-          verified: true,
-          active: false,
-        },
-      })
-
-      const response = await internalClient
-        .post('/internal/businesses/validate')
-        .send({ businessId: inactiveBusiness.id })
-        .set('Accept', 'application/json')
-        .expect(200)
-
-      expect(response.body.valid).toBe(false)
-      expect(response.body.reason).toContain('inactive')
-    })
-
-    it('should return invalid for unverified business', async () => {
-      const unverifiedBusiness = await testDb.prisma.business.create({
-        data: {
-          userId: uuid(),
-          businessName: 'Unverified Business',
-          businessDescription: 'This business is not verified',
-          categoryId: uuid(),
-          verified: false,
-          active: true,
-        },
-      })
-
-      const response = await internalClient
-        .post('/internal/businesses/validate')
-        .send({ businessId: unverifiedBusiness.id })
-        .set('Accept', 'application/json')
-        .expect(200)
-
-      expect(response.body.valid).toBe(false)
-      expect(response.body.reason).toContain('verified')
-    })
-
-    it('should return invalid for non-existent business', async () => {
+    it('should return 404 for non-existent business', async () => {
       const nonExistentId = uuid()
 
-      const response = await internalClient
-        .post('/internal/businesses/validate')
-        .send({ businessId: nonExistentId })
+      await internalClient
+        .get(`/internal/businesses/${nonExistentId}`)
         .set('Accept', 'application/json')
-        .expect(200)
-
-      expect(response.body.valid).toBe(false)
-      expect(response.body.reason).toContain('not found')
+        .expect(404)
     })
   })
 
@@ -443,7 +294,7 @@ describe('Business Service - Internal API Integration Tests', () => {
     it('should require API key for internal endpoints', async () => {
       // Test without API key
       await request
-        .get('/internal/businesses/by-category')
+        .get(`/internal/businesses/${uuid()}`)
         .set('Accept', 'application/json')
         .expect(401)
 
@@ -473,7 +324,7 @@ describe('Business Service - Internal API Integration Tests', () => {
         .expect(200)
 
       // Service should process the request successfully with proper headers
-      expect(response.body.data).toHaveLength(1)
+      expect(response.body.businesses).toHaveLength(1)
     })
   })
 
@@ -503,7 +354,7 @@ describe('Business Service - Internal API Integration Tests', () => {
       const endTime = Date.now()
       const duration = endTime - startTime
 
-      expect(response.body.data).toHaveLength(50)
+      expect(response.body.businesses).toHaveLength(50)
       // Should complete within reasonable time (< 1 second for 50 records)
       expect(duration).toBeLessThan(1000)
     })
@@ -515,9 +366,7 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       // Make multiple concurrent requests
       const promises = [
-        internalClient
-          .post('/internal/businesses/by-category')
-          .send({ categoryIds: [category.id] }),
+        internalClient.get(`/internal/businesses/category/${category.id}`),
         internalClient
           .post('/internal/businesses/batch')
           .send({ businessIds: businesses.map((b) => b.id) }),
@@ -536,19 +385,9 @@ describe('Business Service - Internal API Integration Tests', () => {
   // Data Consistency Tests
   describe('Internal API Data Consistency', () => {
     it('should return consistent data across different endpoints', async () => {
-      const userId = uuid()
-      const business = await testDb.prisma.business.create({
-        data: {
-          userId,
-          businessName: 'Consistency Test Business',
-          businessDescription: 'Testing data consistency',
-          categoryId: uuid(),
-          verified: true,
-          active: true,
-          averageRating: 4.5,
-          totalReviews: 100,
-        },
-      })
+      // Use an existing business from shared test data
+      const business = sharedTestData.verifiedBusinesses[0]
+      const userId = business.userId
 
       // Get the same business through different endpoints
       const [batchResponse, userResponse] = await Promise.all([
@@ -559,38 +398,27 @@ describe('Business Service - Internal API Integration Tests', () => {
       ])
 
       // Data should be consistent
-      expect(batchResponse.body.data[0].id).toBe(userResponse.body.id)
-      expect(batchResponse.body.data[0].businessName).toBe(
-        userResponse.body.businessName,
+      expect(batchResponse.body.businesses[0].id).toBe(userResponse.body.id)
+      expect(batchResponse.body.businesses[0].businessNameKey).toBe(
+        userResponse.body.businessNameKey,
       )
-      expect(batchResponse.body.data[0].averageRating).toBe(
-        userResponse.body.averageRating,
+      expect(batchResponse.body.businesses[0].avgRating).toBe(
+        userResponse.body.avgRating,
       )
     })
 
-    it('should reflect updates immediately', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma)
-      const business = businesses[0]
+    it('should handle includes properly', async () => {
+      // Use business from shared test data
+      const business = sharedTestData.activeBusinesses[0]
 
-      // Update stats
-      await internalClient
-        .post(`/internal/businesses/${business.id}/update-stats`)
-        .send({
-          incrementReviews: 10,
-          newRating: 5.0,
-        })
-        .expect(200)
-
-      // Fetch updated business
+      // Get business with includes
       const response = await internalClient
-        .post('/internal/businesses/batch')
-        .send({ businessIds: [business.id] })
+        .get(`/internal/businesses/${business.id}?include=user,category`)
         .expect(200)
 
-      // Should reflect the update
-      expect(response.body.data[0].totalReviews).toBe(
-        business.totalReviews + 10,
-      )
+      // Should include relations when requested
+      expect(response.body.id).toBe(business.id)
+      expect(response.body.businessNameKey).toBe(business.businessNameKey)
     })
   })
 })

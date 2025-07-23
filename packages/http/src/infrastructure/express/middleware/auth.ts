@@ -3,15 +3,20 @@ import '../../../types/express.js'
 import { JwtTokenService, TokenValidationResult } from '@pika/auth'
 import {
   JWT_ACCESS_EXPIRY,
+  JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
+  JWT_PRIVATE_KEY,
+  JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
+  JWT_SECRET,
   NODE_ENV,
   SKIP_AUTH,
 } from '@pika/environment'
 import { logger, NotAuthenticatedError, NotAuthorizedError } from '@pika/shared'
 import { mapRoleToPermissions, UserRole } from '@pika/types'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
+import jwt from 'jsonwebtoken'
 
 import { ApiTokenOptions } from '../../../domain/types/server.js'
 
@@ -23,16 +28,20 @@ import { ApiTokenOptions } from '../../../domain/types/server.js'
  * Provides correlation IDs, security headers, and standardized user context.
  */
 export function authMiddleware(options: ApiTokenOptions): RequestHandler {
-  const { secret, headerName = 'Authorization', excludePaths = [] } = options
+  const { headerName = 'Authorization', excludePaths = [] } = options
 
-  // Initialize JWT service from @pikagle source of truth)
+  // Initialize JWT service from @pika/auth (single source of truth)
+  // Always use environment configuration - no overrides
   const jwtService = new JwtTokenService(
-    secret,
+    JWT_SECRET,
     JWT_ACCESS_EXPIRY,
     JWT_REFRESH_EXPIRY,
     JWT_ISSUER,
     JWT_AUDIENCE,
     options.cacheService, // Optional Redis service for token blacklisting
+    JWT_ALGORITHM as jwt.Algorithm,
+    JWT_PRIVATE_KEY,
+    JWT_PUBLIC_KEY,
   )
 
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -105,6 +114,16 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
         )
       }
 
+      // Debug logging for JWT issues
+      if (NODE_ENV === 'test') {
+        logger.debug('JWT verification attempt', {
+          algorithm: JWT_ALGORITHM,
+          hasPrivateKey: !!JWT_PRIVATE_KEY,
+          hasPublicKey: !!JWT_PUBLIC_KEY,
+          tokenPrefix: token.substring(0, 50),
+        })
+      }
+
       // Delegate token verification to @pikaice (single source of truth)
       const validation: TokenValidationResult = await jwtService.verifyToken(
         token,
@@ -115,6 +134,8 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
         logger.warn('Token validation failed', {
           correlationId: req.correlationId,
           error: validation.error,
+          algorithm: JWT_ALGORITHM,
+          hasKeys: { private: !!JWT_PRIVATE_KEY, public: !!JWT_PUBLIC_KEY },
         })
 
         throw new NotAuthenticatedError(

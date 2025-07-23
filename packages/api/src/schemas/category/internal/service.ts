@@ -35,7 +35,7 @@ export type InternalCategoryData = z.infer<typeof InternalCategoryData>
  * Internal category query parameters
  */
 export const InternalCategoryQueryParams = z.object({
-  isActive: z.boolean().optional(),
+  isActive: z.coerce.boolean().optional(),
 })
 
 export type InternalCategoryQueryParams = z.infer<

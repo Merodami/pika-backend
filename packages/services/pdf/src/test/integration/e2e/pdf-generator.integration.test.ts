@@ -204,12 +204,12 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
       await seedTestVoucherBooks(testDb.prisma)
 
       const response = await customerClient
-        .get('/pdf?status=PUBLISHED')
+        .get('/pdf?status=published')
         .set('Accept', 'application/json')
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].status).toBe('PUBLISHED')
+      expect(response.body.data[0].status).toBe('published')
     })
 
     it('should filter voucher books by book type', async () => {
@@ -301,7 +301,7 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
 
       expect(response.body.id).toBeDefined()
       expect(response.body.title).toBe(voucherBookData.title)
-      expect(response.body.status).toBe('DRAFT') // Default status
+      expect(response.body.status).toBe('draft') // Default status
 
       const savedBook = await testDb.prisma.voucherBook.findUnique({
         where: { id: response.body.id },
@@ -417,7 +417,7 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
       const draftBook = voucherBooks[1] // Draft book
 
       const statusUpdate = {
-        status: 'READY_FOR_PRINT',
+        status: 'ready_for_print',
       }
 
       const response = await adminClient
@@ -426,7 +426,7 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
         .send(statusUpdate)
         .expect(200)
 
-      expect(response.body.status).toBe('READY_FOR_PRINT')
+      expect(response.body.status).toBe('ready_for_print')
       expect(response.body.pdf_generated_at).toBeDefined()
     })
 
@@ -448,7 +448,7 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
       })
 
       const statusUpdate = {
-        status: 'PUBLISHED',
+        status: 'published',
         pdf_url: 'https://example.com/published-book.pdf',
       }
 
@@ -458,7 +458,7 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
         .send(statusUpdate)
         .expect(200)
 
-      expect(response.body.status).toBe('PUBLISHED')
+      expect(response.body.status).toBe('published')
       expect(response.body.pdf_url).toBe(
         'https://example.com/published-book.pdf',
       )
@@ -470,7 +470,7 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
       const draftBook = voucherBooks[1] // Draft book
 
       const invalidStatusUpdate = {
-        status: 'PUBLISHED', // Can't go directly from DRAFT to PUBLISHED
+        status: 'published', // Can't go directly from DRAFT to PUBLISHED
       }
 
       const response = await adminClient
@@ -500,7 +500,7 @@ describe('PDF Generator API Integration Tests with Supertest', () => {
       })
 
       const statusUpdate = {
-        status: 'PUBLISHED',
+        status: 'published',
         // Missing pdf_url
       }
 

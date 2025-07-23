@@ -116,7 +116,7 @@ export type UpdateCategoryRequest = z.infer<typeof UpdateCategoryRequest>
  */
 export const AdminCategoryQueryParams = SearchParams.extend({
   parentId: UUID.optional().describe('Filter by parent category'),
-  isActive: z.boolean().optional().describe('Filter by active status'),
+  isActive: z.coerce.boolean().optional().describe('Filter by active status'),
   createdBy: UserId.optional().describe('Filter by creator'),
   sortBy: CategorySortBy.default('sortOrder'),
 })

@@ -3,7 +3,7 @@ import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
-import type { ParsedIncludes } from '@pika/types'
+import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IBusinessService } from '../services/BusinessService.js'
@@ -58,10 +58,7 @@ export class AdminBusinessController {
         sortBy: query.sortBy || 'createdAt',
         sortOrder: mapSortOrder(query.sortOrder),
         includeDeleted: query.includeDeleted,
-        parsedIncludes: {
-          user: query.includeUser || false,
-          category: query.includeCategory || false,
-        },
+        parsedIncludes: parseIncludeParam(query.include, ['user', 'category']),
       }
 
       const result = await this.businessService.getAllBusinesses(params)
@@ -95,10 +92,7 @@ export class AdminBusinessController {
       const query =
         getValidatedQuery<businessAdmin.AdminBusinessQueryParams>(req)
 
-      const includes: ParsedIncludes = {}
-
-      if (query.includeUser) includes.user = true
-      if (query.includeCategory) includes.category = true
+      const includes = parseIncludeParam(query.include, ['user', 'category'])
 
       const business = await this.businessService.getBusinessById(
         businessId,
@@ -125,8 +119,8 @@ export class AdminBusinessController {
 
       const business = await this.businessService.createBusiness({
         userId: data.userId,
-        businessName: data.businessNameKey, // Service expects businessName, not businessNameKey
-        businessDescription: data.businessDescriptionKey,
+        businessName: data.businessName,
+        businessDescription: data.businessDescription,
         categoryId: data.categoryId,
         verified: data.verified,
         active: data.active,
@@ -203,8 +197,11 @@ export class AdminBusinessController {
   ): Promise<void> {
     try {
       const { id: businessId } = req.params
+      const { verified } = req.body
 
-      const business = await this.businessService.verifyBusiness(businessId)
+      const business = await this.businessService.updateBusiness(businessId, {
+        verified,
+      })
 
       res.json(BusinessMapper.toDTO(business))
     } catch (error) {

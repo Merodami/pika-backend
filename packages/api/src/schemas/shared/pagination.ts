@@ -12,8 +12,8 @@ import { openapi } from '../../common/utils/openapi.js'
  * Common pagination query parameters
  */
 export const PaginationParams = z.object({
-  page: z.number().int().positive().default(1).describe('Page number'),
-  limit: z
+  page: z.coerce.number().int().positive().default(1).describe('Page number'),
+  limit: z.coerce
     .number()
     .int()
     .positive()
@@ -66,7 +66,7 @@ export type SearchParams = z.infer<typeof SearchParams>
  */
 export const CursorPaginationParams = z.object({
   cursor: z.string().optional().describe('Cursor for pagination'),
-  limit: z
+  limit: z.coerce
     .number()
     .int()
     .positive()

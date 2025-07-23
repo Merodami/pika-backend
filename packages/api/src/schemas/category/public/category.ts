@@ -68,7 +68,7 @@ export type CategoryResponse = z.infer<typeof CategoryResponse>
  */
 export const CategoryQueryParams = SearchParams.extend({
   parentId: UUID.optional().describe('Filter by parent category'),
-  isActive: z.boolean().optional().describe('Filter by active status'),
+  isActive: z.coerce.boolean().optional().describe('Filter by active status'),
   sortBy: CategorySortBy.default('sortOrder'),
 })
 

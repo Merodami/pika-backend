@@ -1,6 +1,5 @@
 import { requestContextMiddleware } from '@http/infrastructure/express/middleware/requestContext.js'
 import {
-  JWT_SECRET,
   NODE_ENV,
   RATE_LIMIT_ENABLE,
   RATE_LIMIT_MAX,
@@ -143,7 +142,6 @@ export async function createExpressServer(
 
     app.use(
       authMiddleware({
-        secret: options.jwtSecret || JWT_SECRET,
         excludePaths,
         cacheService: options.cacheService,
       }),

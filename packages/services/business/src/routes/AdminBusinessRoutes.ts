@@ -36,7 +36,7 @@ export function createAdminBusinessRoutes(
   // GET /admin/businesses - List all businesses with admin filters
   router.get(
     '/',
-    requirePermissions('businesses:read'),
+    requirePermissions('admin:businesses'),
     validateQuery(businessAdmin.AdminBusinessQueryParams),
     controller.getAllBusinesses,
   )
@@ -44,7 +44,7 @@ export function createAdminBusinessRoutes(
   // GET /admin/businesses/:id - Get business by ID with full details
   router.get(
     '/:id',
-    requirePermissions('businesses:read'),
+    requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
     validateQuery(businessAdmin.AdminBusinessQueryParams),
     controller.getBusinessById,
@@ -53,7 +53,7 @@ export function createAdminBusinessRoutes(
   // POST /admin/businesses - Create new business
   router.post(
     '/',
-    requirePermissions('businesses:write'),
+    requirePermissions('admin:businesses'),
     validateBody(businessAdmin.CreateBusinessRequest),
     controller.createBusiness,
   )
@@ -61,7 +61,7 @@ export function createAdminBusinessRoutes(
   // PATCH /admin/businesses/:id - Update business
   router.patch(
     '/:id',
-    requirePermissions('businesses:write'),
+    requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
     validateBody(businessAdmin.UpdateBusinessRequest),
     controller.updateBusiness,
@@ -70,7 +70,7 @@ export function createAdminBusinessRoutes(
   // DELETE /admin/businesses/:id - Delete business
   router.delete(
     '/:id',
-    requirePermissions('businesses:delete'),
+    requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
     controller.deleteBusiness,
   )
@@ -78,7 +78,7 @@ export function createAdminBusinessRoutes(
   // POST /admin/businesses/:id/verify - Verify business
   router.post(
     '/:id/verify',
-    requirePermissions('businesses:verify'),
+    requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
     validateBody(businessAdmin.ToggleBusinessVerificationRequest),
     controller.verifyBusiness,
@@ -87,7 +87,7 @@ export function createAdminBusinessRoutes(
   // POST /admin/businesses/:id/deactivate - Deactivate business
   router.post(
     '/:id/deactivate',
-    requirePermissions('businesses:write'),
+    requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
     controller.deactivateBusiness,
   )
@@ -95,7 +95,7 @@ export function createAdminBusinessRoutes(
   // POST /admin/businesses/:id/activate - Activate business
   router.post(
     '/:id/activate',
-    requirePermissions('businesses:write'),
+    requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
     controller.activateBusiness,
   )
@@ -103,7 +103,7 @@ export function createAdminBusinessRoutes(
   // POST /admin/businesses/:id/rating - Update business rating
   router.post(
     '/:id/rating',
-    requirePermissions('businesses:write'),
+    requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
     validateBody(businessAdmin.UpdateBusinessRatingRequest),
     controller.updateBusinessRating,

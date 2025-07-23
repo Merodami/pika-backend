@@ -322,6 +322,23 @@ export function formatZodError(error: z.ZodError): {
   }
 }
 
+// ============= Custom Transformations =============
+
+/**
+ * Creates an optional boolean schema that properly handles string query parameters
+ * - "true" -> true
+ * - "false" -> false
+ * - undefined -> undefined
+ * - boolean values pass through unchanged
+ */
+export const optionalBoolean = () =>
+  z.preprocess((val) => {
+    if (val === 'true') return true
+    if (val === 'false') return false
+
+    return val
+  }, z.boolean().optional())
+
 // ============= Schema Helpers =============
 
 /**

@@ -166,7 +166,7 @@ describe('PDF Voucher Book Integration Tests', () => {
       const validBookData = {
         title: 'January 2024 Voucher Book',
         edition: 'January 2024',
-        bookType: 'MONTHLY',
+        bookType: 'monthly',
         month: 1,
         year: 2024,
         totalPages: 24,
@@ -190,7 +190,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           bookType: validBookData.bookType,
           month: validBookData.month,
           year: validBookData.year,
-          status: 'DRAFT',
+          status: 'draft',
           totalPages: validBookData.totalPages,
           createdBy: expect.any(String),
         })
@@ -201,7 +201,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           .post('/api/admin/pdf/voucher-books')
           .send({
             // Missing required fields
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
           })
           .expect(400)
 
@@ -257,7 +257,7 @@ describe('PDF Voucher Book Integration Tests', () => {
             .post('/api/admin/pdf/voucher-books')
             .send({
               title: `${getMonthName(month)} 2024 Voucher Book`,
-              bookType: 'MONTHLY',
+              bookType: 'monthly',
               month,
               year: 2024,
               totalPages: 24,
@@ -297,11 +297,11 @@ describe('PDF Voucher Book Integration Tests', () => {
 
         const response = await adminClient
           .get('/api/admin/pdf/voucher-books')
-          .query({ status: 'PUBLISHED' })
+          .query({ status: 'published' })
           .expect(200)
 
         expect(response.body.data).toHaveLength(1)
-        expect(response.body.data[0].status).toBe('PUBLISHED')
+        expect(response.body.data[0].status).toBe('published')
       })
 
       it('should filter by year and month', async () => {
@@ -395,7 +395,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           .post('/api/admin/pdf/voucher-books')
           .send({
             title: 'Test Book for Publishing',
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
             month: 5,
             year: 2024,
             totalPages: 24,
@@ -411,7 +411,7 @@ describe('PDF Voucher Book Integration Tests', () => {
           .send({ generatePdf: false })
           .expect(200)
 
-        expect(response.body.data.status).toBe('PUBLISHED')
+        expect(response.body.data.status).toBe('published')
         expect(response.body.data.publishedAt).toBeDefined()
       })
 
@@ -481,7 +481,7 @@ describe('PDF Voucher Book Integration Tests', () => {
         .post('/api/admin/pdf/voucher-books')
         .send({
           title: 'Test Book for Pages',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 6,
           year: 2024,
           totalPages: 24,
@@ -600,7 +600,7 @@ describe('PDF Voucher Book Integration Tests', () => {
         .post('/api/admin/pdf/voucher-books')
         .send({
           title: 'Test Book for Placements',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 7,
           year: 2024,
           totalPages: 24,
@@ -727,7 +727,7 @@ describe('PDF Voucher Book Integration Tests', () => {
         .post('/api/admin/pdf/voucher-books')
         .send({
           title: 'Test Book for Distribution',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 8,
           year: 2024,
           totalPages: 24,
@@ -981,7 +981,7 @@ describe('PDF Voucher Book Integration Tests', () => {
         .post('/api/admin/pdf/voucher-books')
         .send({
           title: 'Draft Book',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 9,
           year: 2024,
           totalPages: 24,
@@ -995,7 +995,7 @@ describe('PDF Voucher Book Integration Tests', () => {
         .post('/api/admin/pdf/voucher-books')
         .send({
           title: 'Published Book',
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           month: 10,
           year: 2024,
           totalPages: 24,
@@ -1019,7 +1019,7 @@ describe('PDF Voucher Book Integration Tests', () => {
 
         expect(response.body.data).toHaveLength(1)
         expect(response.body.data[0].id).toBe(publishedBook.id)
-        expect(response.body.data[0].status).toBe('PUBLISHED')
+        expect(response.body.data[0].status).toBe('published')
       })
 
       it('should not require authentication', async () => {

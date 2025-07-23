@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { optionalBoolean } from '../../../common/utils/validators.js'
 import { CategoryResponse } from '../../category/public/category.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
@@ -67,8 +68,8 @@ export type BusinessResponse = z.infer<typeof BusinessResponse>
  */
 export const BusinessQueryParams = SearchParams.extend({
   categoryId: UUID.optional().describe('Filter by category'),
-  verified: z.boolean().optional().describe('Filter by verification status'),
-  active: z.boolean().optional().describe('Filter by active status'),
+  verified: optionalBoolean().describe('Filter by verification status'),
+  active: optionalBoolean().describe('Filter by active status'),
   minRating: z
     .number()
     .min(0)

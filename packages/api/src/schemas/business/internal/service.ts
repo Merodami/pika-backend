@@ -1,8 +1,11 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
 import { UUID } from '../../shared/primitives.js'
+import { createIncludeParam } from '../../shared/query.js'
+import { BUSINESS_RELATIONS } from '../common/enums.js'
 
 /**
  * Internal business service schemas for service-to-service communication
@@ -37,8 +40,8 @@ export type InternalBusinessData = z.infer<typeof InternalBusinessData>
  * Internal business query parameters
  */
 export const InternalBusinessQueryParams = z.object({
-  verified: z.boolean().optional(),
-  active: z.boolean().optional(),
+  verified: optionalBoolean(),
+  active: optionalBoolean(),
   categoryId: UUID.optional(),
 })
 
@@ -52,11 +55,11 @@ export type InternalBusinessQueryParams = z.infer<
  * Bulk get businesses request
  */
 export const BulkBusinessRequest = openapi(
-  z.object({
-    businessIds: z.array(UUID).min(1).max(100),
-    includeUser: z.boolean().optional().default(false),
-    includeCategory: z.boolean().optional().default(false),
-  }),
+  z
+    .object({
+      businessIds: z.array(UUID).min(1).max(100),
+    })
+    .merge(createIncludeParam(BUSINESS_RELATIONS)),
   {
     description: 'Get multiple businesses by IDs',
   },
@@ -87,8 +90,8 @@ export type BulkBusinessResponse = z.infer<typeof BulkBusinessResponse>
 export const ValidateBusinessRequest = openapi(
   z.object({
     businessIds: z.array(UUID).min(1).max(100),
-    checkActive: z.boolean().default(true),
-    checkVerified: z.boolean().default(false),
+    checkActive: optionalBoolean().default(true),
+    checkVerified: optionalBoolean().default(false),
   }),
   {
     description:
@@ -126,8 +129,8 @@ export type ValidateBusinessResponse = z.infer<typeof ValidateBusinessResponse>
 export const GetBusinessesByUserRequest = openapi(
   z.object({
     userId: UserId,
-    includeInactive: z.boolean().default(false),
-    includeUnverified: z.boolean().default(true),
+    includeInactive: optionalBoolean().default(false),
+    includeUnverified: optionalBoolean().default(true),
   }),
   {
     description: 'Get all businesses owned by a user',
@@ -161,10 +164,7 @@ export type GetBusinessesByUserResponse = z.infer<
  * Get business request query parameters
  */
 export const GetBusinessRequest = openapi(
-  z.object({
-    includeUser: z.boolean().optional().default(false),
-    includeCategory: z.boolean().optional().default(false),
-  }),
+  createIncludeParam(BUSINESS_RELATIONS),
   {
     description: 'Query parameters for getting business details',
   },
@@ -175,19 +175,20 @@ export type GetBusinessRequest = z.infer<typeof GetBusinessRequest>
 // ============= Get Businesses by Category =============
 
 /**
- * Get businesses by category request
+ * Get businesses by category request query parameters
+ * Note: categoryId is passed as a path parameter, not in query
  */
 export const GetBusinessesByCategoryRequest = openapi(
-  z.object({
-    categoryId: UUID,
-    onlyActive: z.boolean().default(true),
-    onlyVerified: z.boolean().default(false),
-    limit: z.number().int().min(1).max(100).default(50),
-    includeUser: z.boolean().optional().default(false),
-    includeCategory: z.boolean().optional().default(false),
-  }),
+  z
+    .object({
+      onlyActive: optionalBoolean(),
+      onlyVerified: optionalBoolean(),
+      limit: z.number().int().min(1).max(100).default(50),
+    })
+    .merge(createIncludeParam(BUSINESS_RELATIONS)),
   {
-    description: 'Get businesses in a specific category',
+    description:
+      'Query parameters for getting businesses in a specific category',
   },
 )
 

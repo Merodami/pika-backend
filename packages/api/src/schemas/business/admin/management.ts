@@ -1,14 +1,20 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { optionalBoolean } from '../../../common/utils/validators.js'
 import { CategoryResponse } from '../../category/public/category.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
+import { createIncludeParam } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { AdminUserDetailResponse } from '../../user/admin/management.js'
-import { BusinessSortBy, BusinessStatusFilter } from '../common/enums.js'
+import {
+  BUSINESS_RELATIONS,
+  BusinessSortBy,
+  BusinessStatusFilter,
+} from '../common/enums.js'
 
 /**
  * Admin business management schemas
@@ -72,16 +78,12 @@ export type AdminBusinessResponse = z.infer<typeof AdminBusinessResponse>
 export const CreateBusinessRequest = openapi(
   z.object({
     userId: UserId.describe('User who will own this business'),
-    businessNameKey: z
+    businessName: z.string().min(1).max(255).describe('Business name'),
+    businessDescription: z
       .string()
-      .min(1)
-      .max(255)
-      .describe('Translation key for business name'),
-    businessDescriptionKey: z
-      .string()
-      .max(255)
+      .max(65535)
       .optional()
-      .describe('Translation key for business description'),
+      .describe('Business description'),
     categoryId: UUID.describe('Category this business belongs to'),
     verified: z
       .boolean()
@@ -103,17 +105,17 @@ export type CreateBusinessRequest = z.infer<typeof CreateBusinessRequest>
  */
 export const UpdateBusinessRequest = openapi(
   z.object({
-    businessNameKey: z
+    businessName: z
       .string()
       .min(1)
       .max(255)
       .optional()
-      .describe('Translation key for business name'),
-    businessDescriptionKey: z
+      .describe('Business name'),
+    businessDescription: z
       .string()
-      .max(255)
+      .max(65535)
       .optional()
-      .describe('Translation key for business description'),
+      .describe('Business description'),
     categoryId: UUID.optional().describe('Category this business belongs to'),
     verified: z.boolean().optional().describe('Whether business is verified'),
     active: z.boolean().optional().describe('Whether business is active'),
@@ -134,8 +136,8 @@ export const AdminBusinessQueryParams = SearchParams.extend({
   userId: UserId.optional().describe('Filter by owner'),
   categoryId: UUID.optional().describe('Filter by category'),
   status: BusinessStatusFilter.optional().describe('Filter by status'),
-  verified: z.boolean().optional().describe('Filter by verification status'),
-  active: z.boolean().optional().describe('Filter by active status'),
+  verified: optionalBoolean().describe('Filter by verification status'),
+  active: optionalBoolean().describe('Filter by active status'),
   minRating: z
     .number()
     .min(0)
@@ -148,18 +150,13 @@ export const AdminBusinessQueryParams = SearchParams.extend({
     .max(5)
     .optional()
     .describe('Maximum rating filter'),
-  includeDeleted: z
-    .boolean()
-    .optional()
-    .describe('Include soft deleted businesses'),
-  includeUser: z.boolean().optional().describe('Include user details'),
-  includeCategory: z.boolean().optional().describe('Include category details'),
+  includeDeleted: optionalBoolean().describe('Include soft deleted businesses'),
   createdFrom: z.string().datetime().optional().describe('Created date from'),
   createdTo: z.string().datetime().optional().describe('Created date to'),
   updatedFrom: z.string().datetime().optional().describe('Updated date from'),
   updatedTo: z.string().datetime().optional().describe('Updated date to'),
   sortBy: BusinessSortBy.default('businessName'),
-})
+}).merge(createIncludeParam(BUSINESS_RELATIONS))
 
 export type AdminBusinessQueryParams = z.infer<typeof AdminBusinessQueryParams>
 

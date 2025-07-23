@@ -96,7 +96,7 @@ describe('PDF Generator API Integration Tests', () => {
       expect(response.body.id).toBeDefined()
       expect(response.body.title).toBe(bookData.title)
       expect(response.body.year).toBe(bookData.year)
-      expect(response.body.status).toBe('DRAFT')
+      expect(response.body.status).toBe('draft')
     })
 
     it('should validate required fields', async () => {
@@ -183,10 +183,10 @@ describe('PDF Generator API Integration Tests', () => {
         }),
       ])
 
-      const response = await client.get('/pdf?status=DRAFT').expect(200)
+      const response = await client.get('/pdf?status=draft').expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].status).toBe('DRAFT')
+      expect(response.body.data[0].status).toBe('draft')
     })
   })
 

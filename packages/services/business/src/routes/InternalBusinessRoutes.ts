@@ -55,9 +55,9 @@ export function createInternalBusinessRoutes(
     controller.getBusinessesByIds,
   )
 
-  // GET /internal/businesses/category/:categoryId - Get businesses by category
+  // GET /internal/businesses/category/:id - Get businesses by category
   router.get(
-    '/category/:categoryId',
+    '/category/:id',
     validateParams(shared.CategoryIdParam),
     validateQuery(businessInternal.GetBusinessesByCategoryRequest),
     controller.getBusinessesByCategory,

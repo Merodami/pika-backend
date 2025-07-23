@@ -1,4 +1,3 @@
-import { formatDateToISO, formatDateToISOOrUndefined } from '../utils/dateUtils.js'
 import type { UserStatusType } from '@pika/types'
 import { mapUserRole, mapUserStatus, UserRole, UserStatus } from '@pika/types'
 
@@ -8,6 +7,10 @@ import type {
   UserDomain,
 } from '../domain/user.js'
 import type { AddressDTO, PaymentMethodDTO, UserDTO } from '../dto/user.dto.js'
+import {
+  formatDateToISO,
+  formatDateToISOOrUndefined,
+} from '../utils/dateUtils.js'
 
 /**
  * Interface representing a database User document
