@@ -1,4 +1,4 @@
-import { formatDateToISO, formatDateToISOOrNull, formatDateToISOOrUndefined } from '@pika/shared'
+import { formatDateToISO } from '@pika/shared'
 
 import type {
   BusinessDomain,
@@ -91,7 +91,7 @@ export class BusinessMapper {
       avgRating: domain.avgRating,
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
-      deletedAt: formatDateToISOOrNull(domain.deletedAt),
+      deletedAt: domain.deletedAt ? formatDateToISO(domain.deletedAt) : undefined,
       // Relations using existing mappers
       user: domain.user ? UserMapper.toDTO(domain.user) : undefined,
       category: domain.category

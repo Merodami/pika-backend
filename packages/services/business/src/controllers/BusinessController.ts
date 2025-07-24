@@ -64,7 +64,9 @@ export class BusinessController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessListResponse.parse(response)
+      const validatedResponse =
+        businessPublic.BusinessListResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -104,9 +106,10 @@ export class BusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
       const validatedResponse = businessPublic.BusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -146,9 +149,10 @@ export class BusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
       const validatedResponse = businessPublic.BusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -186,9 +190,10 @@ export class BusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
       const validatedResponse = businessPublic.BusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -224,9 +229,10 @@ export class BusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
       const validatedResponse = businessPublic.BusinessResponse.parse(response)
+
       res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -264,9 +270,10 @@ export class BusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
       const validatedResponse = businessPublic.BusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

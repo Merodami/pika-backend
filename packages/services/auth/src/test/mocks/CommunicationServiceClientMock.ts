@@ -39,11 +39,11 @@ export class CommunicationServiceClientMock extends CommunicationServiceClient {
   }
 
   getEmailsSentTo(email: string): EmailRecord[] {
-    return this.sentEmails.filter(record => record.to === email)
+    return this.sentEmails.filter((record) => record.to === email)
   }
 
   getEmailsByTemplate(templateId: string): EmailRecord[] {
-    return this.sentEmails.filter(record => record.templateId === templateId)
+    return this.sentEmails.filter((record) => record.templateId === templateId)
   }
 
   clearSentEmails(): void {
@@ -52,14 +52,16 @@ export class CommunicationServiceClientMock extends CommunicationServiceClient {
 
   // Check if an email was sent
   wasEmailSent(to: string, templateId?: string): boolean {
-    return this.sentEmails.some(record => 
-      record.to === to && (!templateId || record.templateId === templateId)
+    return this.sentEmails.some(
+      (record) =>
+        record.to === to && (!templateId || record.templateId === templateId),
     )
   }
 
   // Get the last email sent to a specific address
   getLastEmailTo(email: string): EmailRecord | undefined {
     const emails = this.getEmailsSentTo(email)
+
     return emails[emails.length - 1]
   }
 }

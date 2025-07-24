@@ -88,8 +88,9 @@ export class EmailController implements IEmailController {
       const result = await this.emailService.sendEmail(emailInput)
 
       const responseData = CommunicationLogMapper.toDTO(result)
-      const validatedResponse = communicationPublic.CommunicationLogResponse.parse(responseData)
-      
+      const validatedResponse =
+        communicationPublic.CommunicationLogResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -133,8 +134,9 @@ export class EmailController implements IEmailController {
         total: result.total,
         logs: result.logs.map(CommunicationLogMapper.toDTO),
       }
-      const validatedResponse = communicationPublic.SendBulkEmailResponse.parse(responseData)
-      
+      const validatedResponse =
+        communicationPublic.SendBulkEmailResponse.parse(responseData)
+
       response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -151,7 +153,12 @@ export class EmailController implements IEmailController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getEmailHistory(
-    request: Request<{}, {}, {}, communicationPublic.CommunicationLogSearchParams>,
+    request: Request<
+      {},
+      {},
+      {},
+      communicationPublic.CommunicationLogSearchParams
+    >,
     response: Response<communicationPublic.CommunicationLogListResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -182,8 +189,9 @@ export class EmailController implements IEmailController {
         data: result.data.map(CommunicationLogMapper.toDTO),
         pagination: result.pagination,
       }
-      const validatedResponse = communicationPublic.CommunicationLogListResponse.parse(responseData)
-      
+      const validatedResponse =
+        communicationPublic.CommunicationLogListResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -209,8 +217,9 @@ export class EmailController implements IEmailController {
       const email = await this.emailService.getEmailById(id, userId)
 
       const responseData = CommunicationLogMapper.toDTO(email)
-      const validatedResponse = communicationPublic.CommunicationLogResponse.parse(responseData)
-      
+      const validatedResponse =
+        communicationPublic.CommunicationLogResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)

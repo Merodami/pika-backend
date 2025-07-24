@@ -89,11 +89,7 @@ export class NotificationService implements INotificationService {
     }
 
     // Check access permissions if userId provided
-    if (
-      userId &&
-      notification.userId !== userId &&
-      !notification.global
-    ) {
+    if (userId && notification.userId !== userId && !notification.global) {
       throw ErrorFactory.forbidden('Access denied to this notification')
     }
 
@@ -151,7 +147,7 @@ export class NotificationService implements INotificationService {
 
     // Clear cache
     await this.clearUserNotificationCache(userId)
-    
+
     return count
   }
 
@@ -186,7 +182,7 @@ export class NotificationService implements INotificationService {
       isGlobal: true,
     })
   }
-  
+
   async getAllUsers(): Promise<Array<{ id: string }>> {
     // This is a placeholder - in real implementation, this would come from UserService
     // For now, return empty array to make tests pass

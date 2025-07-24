@@ -3,7 +3,7 @@
  *
  * Tests for admin-only communication endpoints that require admin privileges.
  * These endpoints are used for global notifications and communication management.
- * 
+ *
  * CURRENTLY EXCLUDED: Admin endpoints are not implemented yet, keeping tests for future implementation.
  */
 
@@ -14,8 +14,10 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 
 vi.mock('../../services/providers/ProviderFactory.js', async () => {
-  const { MockEmailProvider, MockSmsProvider } = await import('../helpers/communicationTestHelpers.js')
-  
+  const { MockEmailProvider, MockSmsProvider } = await import(
+    '../helpers/communicationTestHelpers.js'
+  )
+
   class MockProviderFactory {
     async getEmailProvider() {
       return new MockEmailProvider()
@@ -33,7 +35,6 @@ vi.mock('../../services/providers/ProviderFactory.js', async () => {
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { EmailTemplateId } from '@pika/types'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -42,8 +43,8 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
+import { EmailTemplateId } from '@pika/types'
 import type { Express } from 'express'
-import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createCommunicationServer } from '../../server.js'
@@ -62,7 +63,9 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
   let sharedTestData: SharedCommunicationTestData
 
   beforeAll(async () => {
-    logger.info('Setting up Communication Service Admin API integration tests...')
+    logger.info(
+      'Setting up Communication Service Admin API integration tests...',
+    )
 
     testDb = await createTestDatabase({
       databaseName: 'test_communication_admin_db',
@@ -87,7 +90,7 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
 
     authHelper = createE2EAuthHelper(app)
     await authHelper.createAllTestUsers(testDb.prisma)
-    
+
     adminClient = await authHelper.getAdminClient(testDb.prisma)
     customerClient = await authHelper.getUserClient(testDb.prisma)
 
@@ -140,11 +143,13 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
           where: { title: 'System Maintenance' },
         })
 
-        expect(notifications.length).toBe(response.body.count)
-        
-        notifications.forEach(notification => {
+        expect(notifications).toHaveLength(response.body.count)
+
+        notifications.forEach((notification) => {
           expect(notification.title).toBe('System Maintenance')
-          expect(notification.description).toBe('System will be down for maintenance')
+          expect(notification.description).toBe(
+            'System will be down for maintenance',
+          )
           expect(notification.type).toBe('inApp')
           expect(notification.isRead).toBe(false)
         })
@@ -199,7 +204,6 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
         })
       })
     })
-
   })
 
   describe('Bulk Email Operations', () => {
@@ -277,24 +281,26 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
           .post('/emails/send-bulk')
           .send({
             recipients: [
-              { 
+              {
                 email: 'user1@example.com',
                 variables: {
                   firstName: 'John',
                   customField: 'Value1',
-                }
+                },
               },
-              { 
+              {
                 email: 'user2@example.com',
                 variables: {
                   firstName: 'Jane',
                   customField: 'Value2',
-                }
+                },
               },
             ],
             subject: 'Personalized Email',
-            htmlContent: '<p>Hello {{firstName}}, your custom field is {{customField}}</p>',
-            textContent: 'Hello {{firstName}}, your custom field is {{customField}}',
+            htmlContent:
+              '<p>Hello {{firstName}}, your custom field is {{customField}}</p>',
+            textContent:
+              'Hello {{firstName}}, your custom field is {{customField}}',
           })
           .expect(201)
 
@@ -307,9 +313,7 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
   describe('Communication Analytics', () => {
     describe('GET /emails/analytics', () => {
       it('should get email analytics (admin only)', async () => {
-        const response = await adminClient
-          .get('/emails/analytics')
-          .expect(200)
+        const response = await adminClient.get('/emails/analytics').expect(200)
 
         expect(response.body).toMatchObject({
           total: expect.any(Number),
@@ -321,17 +325,18 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
       })
 
       it('should require admin role', async () => {
-        await customerClient
-          .get('/emails/analytics')
-          .expect(403)
+        await customerClient.get('/emails/analytics').expect(403)
       })
 
       it('should support date range filtering', async () => {
         const startDate = new Date()
+
         startDate.setDate(startDate.getDate() - 7)
-        
+
         const response = await adminClient
-          .get(`/emails/analytics?startDate=${startDate.toISOString()}&endDate=${new Date().toISOString()}`)
+          .get(
+            `/emails/analytics?startDate=${startDate.toISOString()}&endDate=${new Date().toISOString()}`,
+          )
           .expect(200)
 
         expect(response.body).toHaveProperty('total')
@@ -354,9 +359,7 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
       })
 
       it('should require admin role', async () => {
-        await customerClient
-          .get('/notifications/analytics')
-          .expect(403)
+        await customerClient.get('/notifications/analytics').expect(403)
       })
     })
   })
@@ -370,14 +373,12 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
 
         expect(response.body.data).toBeDefined()
         expect(response.body.pagination).toBeDefined()
-        
+
         expect(response.body.data.length).toBeGreaterThan(0)
       })
 
       it('should require admin role', async () => {
-        await customerClient
-          .get('/communications/logs')
-          .expect(403)
+        await customerClient.get('/communications/logs').expect(403)
       })
 
       it('should filter by type', async () => {
@@ -402,7 +403,7 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
 
       it('should filter by user', async () => {
         const userId = sharedTestData.testUsers[0].id
-        
+
         const response = await adminClient
           .get(`/communications/logs?userId=${userId}`)
           .expect(200)

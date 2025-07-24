@@ -70,7 +70,9 @@ export class AdminBusinessController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessListResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessListResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -105,9 +107,11 @@ export class AdminBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -137,9 +141,11 @@ export class AdminBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessResponse.parse(response)
+
       res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -170,9 +176,11 @@ export class AdminBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -223,9 +231,11 @@ export class AdminBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -248,9 +258,11 @@ export class AdminBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -275,9 +287,11 @@ export class AdminBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -308,9 +322,11 @@ export class AdminBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

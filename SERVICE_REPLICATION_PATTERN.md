@@ -788,7 +788,7 @@ export class {ServiceName}Service implements I{ServiceName}Service {
   async getByIds(ids: string[]): Promise<PaginatedResult<{ServiceName}Domain>> {
     // Validate IDs if needed
     const validIds = ids.filter(id => this.isValidId(id))
-    
+
     // Repository handles pagination structure, service passes through
     return this.repository.findByIds(validIds)
   }
@@ -849,7 +849,7 @@ export class {ServiceName}Service implements I{ServiceName}Service {
 
 ## 7. Repository Pattern (MANDATORY)
 
-```typescript
+````typescript
 // src/repositories/{ServiceName}Repository.ts
 import type {
   {ServiceName}SearchParams,
@@ -988,16 +988,16 @@ export class {ServiceName}Service {
 export class Internal{ServiceName}Controller {
   async getByIds(req: Request, res: Response): Promise<void> {
     const result = await this.service.getByIds(ids)
-    
+
     const response = {
       data: result.data.map({ServiceName}Mapper.toInternalDTO),
       pagination: result.pagination, // Preserve pagination
     }
-    
+
     res.json(response)
   }
 }
-```
+````
 
 #### Key Rules:
 
@@ -1653,15 +1653,15 @@ import { parseIncludeParam } from '@pika/shared'
 async getAll(request: Request, response: Response, next: NextFunction): Promise<void> {
   try {
     const query = getValidatedQuery<{ServiceName}QueryParams>(request)
-    
+
     // Pass relations directly - avoids circular dependencies
     const parsedIncludes = parseIncludeParam(query.include, ['user', 'category'])
-    
+
     const params = {
       // ... other params
       parsedIncludes,
     }
-    
+
     const result = await this.service.getAll(params)
     // ...
   } catch (error) {
@@ -1690,29 +1690,29 @@ async getById(id: string, parsedIncludes?: ParsedIncludes): Promise<{ServiceName
 // src/repositories/{ServiceName}Repository.ts
 private buildInclude(parsedIncludes?: ParsedIncludes): any {
   if (!parsedIncludes) return undefined
-  
+
   const include: any = {}
-  
+
   if (parsedIncludes.user) {
     include.user = true
   }
-  
+
   if (parsedIncludes.category) {
     include.category = true
   }
-  
+
   return Object.keys(include).length > 0 ? include : undefined
 }
 
 async findAll(params: {ServiceName}SearchParams): Promise<PaginatedResult<{ServiceName}Domain>> {
   const include = this.buildInclude(params.parsedIncludes)
-  
+
   const entities = await this.prisma.{service}.findMany({
     where,
     include,
     // ... other options
   })
-  
+
   return {
     data: {ServiceName}Mapper.toDomainArray(entities),
     pagination,
@@ -1730,7 +1730,7 @@ export const Admin{ServiceName}Response = openapi(
   withTimestamps({
     id: UUID,
     // ... required fields
-    
+
     // Optional relations - included when requested
     user: AdminUserDetailResponse.optional().describe(
       'User details when ?include=user'

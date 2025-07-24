@@ -167,7 +167,6 @@ export class UserService implements IUserService {
         password = await bcrypt.hash(data.password, 10)
       }
 
-
       const user = await this.repository.create({
         ...data,
         password,

@@ -1,6 +1,6 @@
 /**
  * Internal Category Integration Tests
- * 
+ *
  * Tests internal category endpoints for service-to-service communication
  * Following SERVICE_REPLICATION_PATTERN.md
  */
@@ -12,12 +12,14 @@ vi.unmock('@pika/http')
 vi.mock('@pika/api', async () => {
   const actualApi =
     await vi.importActual<typeof import('@pika/api')>('@pika/api')
+
   return actualApi
 })
 
 vi.mock('@pika/shared', async () => {
   const actualShared =
     await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
+
   return actualShared
 })
 // --- END MOCKING CONFIGURATION ---
@@ -26,13 +28,11 @@ import { SERVICE_API_KEY } from '@pika/environment'
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
-  clearTestDatabase,
   createTestDatabase,
   InternalAPITestHelper,
   type TestDatabaseResult,
 } from '@pika/tests'
 import { MockCacheService } from '@pika/tests'
-import { PrismaClient } from '@prisma/client'
 import { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -42,7 +42,6 @@ import { createCategoryServer } from '../../../server.js'
 import {
   cleanupCategoryTestData,
   createSharedCategoryTestData,
-  createTestCategory,
   type SharedCategoryTestData,
 } from '../../helpers/categoryTestHelpers.js'
 
@@ -78,13 +77,13 @@ describe('Internal Category Integration Tests', () => {
     app = serverResult.app
 
     logger.debug('Express server ready for testing.')
-    
+
     // Initialize supertest with the Express server instance
     request = supertest(app)
-    
+
     // Create internal client with proper headers
     internalClient = internalAPIHelper.createClient(app)
-    
+
     // Create shared test data once for all tests
     sharedTestData = await createSharedCategoryTestData(testDb.prisma)
   }, 120000)
@@ -95,7 +94,7 @@ describe('Internal Category Integration Tests', () => {
     if (testDb?.prisma) {
       await cleanupCategoryTestData(testDb.prisma, {
         preserveSharedData: true,
-        sharedCategoryIds: sharedTestData.allCategories.map(c => c.id),
+        sharedCategoryIds: sharedTestData.allCategories.map((c) => c.id),
       })
     }
   })
@@ -156,7 +155,7 @@ describe('Internal Category Integration Tests', () => {
 
         expect(response.body.data).toHaveLength(2)
         expect(response.body.data.map((c: any) => c.id)).toEqual(
-          expect.arrayContaining(categoryIds)
+          expect.arrayContaining(categoryIds),
         )
       })
 
@@ -223,7 +222,9 @@ describe('Internal Category Integration Tests', () => {
         expect(response.body).toHaveProperty('data')
         expect(Array.isArray(response.body.data)).toBe(true)
         // The hierarchy endpoint returns root categories only (tree structure)
-        expect(response.body.data).toHaveLength(sharedTestData.rootCategories.length)
+        expect(response.body.data).toHaveLength(
+          sharedTestData.rootCategories.length,
+        )
       })
 
       it('should filter internal category list by active status', async () => {
@@ -233,8 +234,10 @@ describe('Internal Category Integration Tests', () => {
           .set('Accept', 'application/json')
           .expect(200)
 
-        const expectedActiveCount = sharedTestData.activeParentCategories.length + sharedTestData.activeChildCategories.length
-        
+        const expectedActiveCount =
+          sharedTestData.activeParentCategories.length +
+          sharedTestData.activeChildCategories.length
+
         // Response now includes pagination
         expect(response.body).toHaveProperty('data')
         expect(response.body).toHaveProperty('pagination')

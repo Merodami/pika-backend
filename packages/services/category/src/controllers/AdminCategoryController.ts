@@ -65,7 +65,9 @@ export class AdminCategoryController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryListResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryListResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -93,9 +95,11 @@ export class AdminCategoryController {
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -124,9 +128,11 @@ export class AdminCategoryController {
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryResponse.parse(response)
+
       res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -138,7 +144,11 @@ export class AdminCategoryController {
    * Update category information
    */
   async updateCategory(
-    req: Request<categoryCommon.CategoryIdParam, {}, categoryAdmin.UpdateCategoryRequest>,
+    req: Request<
+      categoryCommon.CategoryIdParam,
+      {},
+      categoryAdmin.UpdateCategoryRequest
+    >,
     res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -156,9 +166,11 @@ export class AdminCategoryController {
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -202,9 +214,11 @@ export class AdminCategoryController {
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -216,7 +230,11 @@ export class AdminCategoryController {
    * Move category to different parent
    */
   async moveCategory(
-    req: Request<categoryCommon.CategoryIdParam, {}, categoryAdmin.MoveCategoryRequest>,
+    req: Request<
+      categoryCommon.CategoryIdParam,
+      {},
+      categoryAdmin.MoveCategoryRequest
+    >,
     res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -231,9 +249,11 @@ export class AdminCategoryController {
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -264,9 +284,11 @@ export class AdminCategoryController {
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -295,9 +317,11 @@ export class AdminCategoryController {
         message: `Successfully deleted ${categoryIds.length} categories`,
         deletedCount: categoryIds.length,
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.BulkCategoryOperationResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.BulkCategoryOperationResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -329,9 +353,11 @@ export class AdminCategoryController {
       const response = {
         data: categories.map((category) => CategoryMapper.toDTO(category)),
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryAdmin.AdminCategoryTreeResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryTreeResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

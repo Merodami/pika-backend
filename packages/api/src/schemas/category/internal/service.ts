@@ -172,7 +172,8 @@ export type CheckCategoryExistsResponse = z.infer<
 /**
  * Internal category list response with pagination
  */
-export const InternalCategoryListResponse = paginatedResponse(InternalCategoryData)
+export const InternalCategoryListResponse =
+  paginatedResponse(InternalCategoryData)
 
 export type InternalCategoryListResponse = z.infer<
   typeof InternalCategoryListResponse

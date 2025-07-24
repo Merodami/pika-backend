@@ -2,9 +2,6 @@ import {
   BatchCreateNotificationsRequest,
   BulkEmailRequest,
   CreateNotificationRequest,
-  GetUnreadCountParams,
-  InternalEmailHistoryParams,
-  InternalNotificationsParams,
   SendEmailRequest,
   SendSystemNotificationRequest,
   SendTransactionalEmailRequest,
@@ -98,15 +95,9 @@ export function createInternalCommunicationRouter(
     controller.createBatchNotifications,
   )
 
-  router.get(
-    '/notifications',
-    controller.getNotifications,
-  )
+  router.get('/notifications', controller.getNotifications)
 
-  router.get(
-    '/notifications/unread-count',
-    controller.getUnreadCount,
-  )
+  router.get('/notifications/unread-count', controller.getUnreadCount)
 
   return router
 }

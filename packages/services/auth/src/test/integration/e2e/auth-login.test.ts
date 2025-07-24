@@ -16,12 +16,11 @@ import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
-  createTestDatabase,
-  TestDatabaseResult,
   createE2EAuthHelper,
+  createTestDatabase,
   E2EAuthHelper,
+  TestDatabaseResult,
 } from '@pika/tests'
-import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -31,8 +30,8 @@ import {
   createSharedAuthTestData,
   type SharedAuthTestData,
 } from '../../helpers/authTestHelpers.js'
-import { UserServiceClientMock } from '../../mocks/UserServiceClientMock.js'
 import { CommunicationServiceClientMock } from '../../mocks/CommunicationServiceClientMock.js'
+import { UserServiceClientMock } from '../../mocks/UserServiceClientMock.js'
 
 describe('Auth Login Integration Tests', () => {
   let testDb: TestDatabaseResult
@@ -83,9 +82,7 @@ describe('Auth Login Integration Tests', () => {
     logger.debug('Creating shared test data...')
     sharedTestData = await createSharedAuthTestData(testDb.prisma)
 
-    logger.debug(
-      `Created ${sharedTestData.allUsers.length} test users`,
-    )
+    logger.debug(`Created ${sharedTestData.allUsers.length} test users`)
 
     logger.debug('Auth login setup complete')
   }, 120000)
@@ -95,7 +92,7 @@ describe('Auth Login Integration Tests', () => {
 
     // Clear cache between tests
     await cacheService.clearAll()
-    
+
     // Note: We do NOT clear the database between tests
     // Test data is created once and reused
   })
@@ -214,7 +211,7 @@ describe('Auth Login Integration Tests', () => {
     it('should update last login time on successful authentication', async () => {
       // Test with an active user
       const testEmail = 'active1@example.com'
-      
+
       // Get the user from mock
       const userBefore = await userServiceClient.getUserByEmail(testEmail)
       const beforeLoginTime = userBefore?.lastLoginAt

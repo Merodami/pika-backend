@@ -40,11 +40,9 @@ export async function createBusinessServer({
     },
     authOptions: {
       excludePaths: [
-        '/businesses', // Public business list endpoint
-        '/businesses/*', // Public business detail endpoints
         '/health',
         '/metrics',
-        '/internal/*', // Internal service-to-service communication
+        '/internal/*',
       ],
     },
     healthChecks: [

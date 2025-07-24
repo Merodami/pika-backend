@@ -1,6 +1,5 @@
 import { UserServiceClient } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
-import bcrypt from 'bcrypt'
 
 interface MockUser {
   id: string
@@ -33,7 +32,8 @@ export class UserServiceClientMock extends UserServiceClient {
 
   private initializeMockData(): void {
     // Predefined test users with hashed passwords
-    const testPassword = '$2b$10$m3.YrysIB6FA8kkJAZRCjelwB7m1zhK1RatTx45xlS3I0I21gOURe' // Password123! (bcrypt hash)
+    const testPassword =
+      '$2b$10$m3.YrysIB6FA8kkJAZRCjelwB7m1zhK1RatTx45xlS3I0I21gOURe' // Password123! (bcrypt hash)
 
     const testUsers: MockUser[] = [
       {
@@ -111,7 +111,7 @@ export class UserServiceClientMock extends UserServiceClient {
     ]
 
     // Populate the maps
-    testUsers.forEach(user => {
+    testUsers.forEach((user) => {
       this.users.set(user.id, user)
       this.emailToUserId.set(user.email.toLowerCase(), user.id)
     })
@@ -120,36 +120,46 @@ export class UserServiceClientMock extends UserServiceClient {
   // Override UserServiceClient methods
   async getUser(userId: string): Promise<any> {
     const user = this.users.get(userId)
+
     if (!user) {
       throw new Error('User not found')
     }
+
     return this.mapUserToResponse(user)
   }
 
   async getUserByEmail(email: string): Promise<any> {
     const userId = this.emailToUserId.get(email.toLowerCase())
+
     if (!userId) {
       return null
     }
+
     const user = this.users.get(userId)
+
     return user ? this.mapUserToResponse(user) : null
   }
 
   // Methods used by UserServiceClientAdapter
   async getUserAuthDataByEmail(email: string): Promise<any> {
     const userId = this.emailToUserId.get(email.toLowerCase())
+
     if (!userId) {
       return null
     }
+
     const user = this.users.get(userId)
+
     return user ? this.mapUserToAuthData(user) : null
   }
 
   async getUserAuthData(userId: string): Promise<any> {
     const user = this.users.get(userId)
+
     if (!user) {
       return null
     }
+
     return this.mapUserToAuthData(user)
   }
 
@@ -178,6 +188,7 @@ export class UserServiceClientMock extends UserServiceClient {
 
   async updateUser(userId: string, data: any): Promise<any> {
     const user = this.users.get(userId)
+
     if (!user) {
       throw new Error('User not found')
     }
@@ -189,11 +200,16 @@ export class UserServiceClientMock extends UserServiceClient {
     }
 
     this.users.set(userId, updatedUser)
+
     return this.mapUserToResponse(updatedUser)
   }
 
-  async updateLastLogin(userId: string, data: { lastLoginAt: string }): Promise<void> {
+  async updateLastLogin(
+    userId: string,
+    data: { lastLoginAt: string },
+  ): Promise<void> {
     const user = this.users.get(userId)
+
     if (user) {
       user.lastLoginAt = new Date(data.lastLoginAt)
       user.updatedAt = new Date()
@@ -206,11 +222,17 @@ export class UserServiceClientMock extends UserServiceClient {
 
   async phoneExists(phoneNumber: string): Promise<boolean> {
     // Simple check - in real implementation would be more sophisticated
-    return Array.from(this.users.values()).some(user => user.phoneNumber === phoneNumber)
+    return Array.from(this.users.values()).some(
+      (user) => user.phoneNumber === phoneNumber,
+    )
   }
 
-  async updatePassword(data: { userId: string; passwordHash: string }): Promise<void> {
+  async updatePassword(data: {
+    userId: string
+    passwordHash: string
+  }): Promise<void> {
     const user = this.users.get(data.userId)
+
     if (user) {
       user.password = data.passwordHash
       user.updatedAt = new Date()
@@ -219,6 +241,7 @@ export class UserServiceClientMock extends UserServiceClient {
 
   async verifyEmail(data: { userId: string }): Promise<void> {
     const user = this.users.get(data.userId)
+
     if (user) {
       user.emailVerified = true
       user.updatedAt = new Date()
@@ -227,11 +250,15 @@ export class UserServiceClientMock extends UserServiceClient {
 
   async createPasswordResetToken(userId: string): Promise<string> {
     const token = `reset-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
     this.passwordResetTokens.set(token, userId)
+
     return token
   }
 
-  async validatePasswordResetToken(data: { token: string }): Promise<string | null> {
+  async validatePasswordResetToken(data: {
+    token: string
+  }): Promise<string | null> {
     return this.passwordResetTokens.get(data.token) || null
   }
 
@@ -241,7 +268,9 @@ export class UserServiceClientMock extends UserServiceClient {
 
   async createEmailVerificationToken(userId: string): Promise<string> {
     const token = `verify-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
     this.emailVerificationTokens.set(token, userId)
+
     return token
   }
 
@@ -288,6 +317,7 @@ export class UserServiceClientMock extends UserServiceClient {
       dateOfBirth: user.dateOfBirth,
       avatarUrl: user.avatarUrl,
     }
+
     return authData
   }
 

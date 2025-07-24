@@ -17,10 +17,10 @@ import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
-  createTestDatabase,
-  TestDatabaseResult,
   createE2EAuthHelper,
+  createTestDatabase,
   E2EAuthHelper,
+  TestDatabaseResult,
 } from '@pika/tests'
 import { UserRole } from '@pika/types'
 import type { Express } from 'express'
@@ -32,8 +32,8 @@ import {
   createSharedAuthTestData,
   type SharedAuthTestData,
 } from '../../helpers/authTestHelpers.js'
-import { UserServiceClientMock } from '../../mocks/UserServiceClientMock.js'
 import { CommunicationServiceClientMock } from '../../mocks/CommunicationServiceClientMock.js'
+import { UserServiceClientMock } from '../../mocks/UserServiceClientMock.js'
 
 describe('OAuth 2.0 Endpoints Integration Tests', () => {
   let testDb: TestDatabaseResult
@@ -84,9 +84,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
     logger.debug('Creating shared test data...')
     sharedTestData = await createSharedAuthTestData(testDb.prisma)
 
-    logger.debug(
-      `Created ${sharedTestData.allUsers.length} test users`,
-    )
+    logger.debug(`Created ${sharedTestData.allUsers.length} test users`)
 
     logger.debug('OAuth setup complete')
   }, 120000)
@@ -96,7 +94,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
 
     // Clear cache between tests
     await cacheService.clearAll()
-    
+
     // Note: We do NOT clear the database between tests
     // Test data is created once and reused
   })
@@ -210,7 +208,9 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
         })
 
         // New access token should be different, refresh token may be the same
-        expect(response.body.accessToken).not.toBe(loginResponse.body.accessToken)
+        expect(response.body.accessToken).not.toBe(
+          loginResponse.body.accessToken,
+        )
         // Note: In this implementation, refresh token is not rotated
       })
 
@@ -466,9 +466,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
     })
 
     it('should require authentication', async () => {
-      const response = await request
-        .get('/auth/userinfo')
-        .expect(401)
+      const response = await request.get('/auth/userinfo').expect(401)
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({

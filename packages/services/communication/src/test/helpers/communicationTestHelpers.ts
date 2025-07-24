@@ -11,8 +11,8 @@
  * - Handles mock email/SMS provider setup
  */
 
-import type { PrismaClient } from '@prisma/client'
 import { EmailTemplateId } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 
 export interface CommunicationTestData {
@@ -28,17 +28,17 @@ export interface CommunicationTestData {
 export interface SharedCommunicationTestData {
   // Users
   testUsers: any[]
-  
+
   // Communication logs by type
   emailLogs: any[]
   sentEmails: any[]
   failedEmails: any[]
-  
+
   // Notifications by state
   unreadNotifications: any[]
   readNotifications: any[]
   allNotifications: any[]
-  
+
   // Quick access
   communicationLogById: Map<string, any>
   notificationById: Map<string, any>
@@ -64,12 +64,12 @@ export async function seedTestCommunicationLogs(
   } = {},
 ): Promise<any[]> {
   const { count = 3, includeFailures = true } = options
-  
+
   const logs = []
-  
+
   for (let i = 0; i < count; i++) {
     const status = includeFailures && i === count - 1 ? 'failed' : 'sent'
-    
+
     const log = await prismaClient.communicationLog.create({
       data: {
         userId,
@@ -78,19 +78,19 @@ export async function seedTestCommunicationLogs(
         recipient: `test${i + 1}@example.com`,
         subject: `Test Email ${i + 1}`,
         provider: 'mock',
-        metadata: { 
+        metadata: {
           body: `Content ${i + 1}`,
           templateId: i === 0 ? EmailTemplateId.WELCOME : undefined,
-          ...(status === 'failed' ? { error: 'Failed to send' } : {})
+          ...(status === 'failed' ? { error: 'Failed to send' } : {}),
         },
         ...(status === 'failed' ? { errorMessage: 'Failed to send' } : {}),
         ...(status === 'sent' ? { sentAt: new Date() } : {}),
       },
     })
-    
+
     logs.push(log)
   }
-  
+
   return logs
 }
 
@@ -106,12 +106,12 @@ export async function seedTestNotifications(
   } = {},
 ): Promise<any[]> {
   const { count = 3, includeRead = true } = options
-  
+
   const notifications = []
-  
+
   for (let i = 0; i < count; i++) {
     const isRead = includeRead && i === count - 1
-    
+
     const notification = await prismaClient.notification.create({
       data: {
         userId,
@@ -126,10 +126,10 @@ export async function seedTestNotifications(
         },
       },
     })
-    
+
     notifications.push(notification)
   }
-  
+
   return notifications
 }
 
@@ -147,9 +147,10 @@ export async function createSharedCommunicationTestData(
     includeFailedEmails = true,
     includeReadNotifications = true,
   } = options
-  
+
   // Create test users
   const testUsers: any[] = []
+
   for (let i = 0; i < userCount; i++) {
     const user = await prismaClient.user.create({
       data: {
@@ -161,39 +162,48 @@ export async function createSharedCommunicationTestData(
         status: 'ACTIVE',
       },
     })
+
     testUsers.push(user)
   }
-  
+
   // Create communication logs
   const allEmailLogs: any[] = []
+
   for (const user of testUsers) {
     const userLogs = await seedTestCommunicationLogs(prismaClient, user.id, {
       count: Math.floor(emailCount / userCount),
       includeFailures: includeFailedEmails,
     })
+
     allEmailLogs.push(...userLogs)
   }
-  
+
   // Create notifications
   const allNotifications: any[] = []
+
   for (const user of testUsers) {
-    const userNotifications = await seedTestNotifications(prismaClient, user.id, {
-      count: Math.floor(notificationCount / userCount),
-      includeRead: includeReadNotifications,
-    })
+    const userNotifications = await seedTestNotifications(
+      prismaClient,
+      user.id,
+      {
+        count: Math.floor(notificationCount / userCount),
+        includeRead: includeReadNotifications,
+      },
+    )
+
     allNotifications.push(...userNotifications)
   }
-  
+
   // Organize data for easy access
-  const sentEmails = allEmailLogs.filter(log => log.status === 'sent')
-  const failedEmails = allEmailLogs.filter(log => log.status === 'failed')
-  const unreadNotifications = allNotifications.filter(n => !n.isRead)
-  const readNotifications = allNotifications.filter(n => n.isRead)
-  
+  const sentEmails = allEmailLogs.filter((log) => log.status === 'sent')
+  const failedEmails = allEmailLogs.filter((log) => log.status === 'failed')
+  const unreadNotifications = allNotifications.filter((n) => !n.isRead)
+  const readNotifications = allNotifications.filter((n) => n.isRead)
+
   // Create lookup maps
-  const communicationLogById = new Map(allEmailLogs.map(log => [log.id, log]))
-  const notificationById = new Map(allNotifications.map(n => [n.id, n]))
-  
+  const communicationLogById = new Map(allEmailLogs.map((log) => [log.id, log]))
+  const notificationById = new Map(allNotifications.map((n) => [n.id, n]))
+
   return {
     testUsers,
     emailLogs: allEmailLogs,
@@ -211,25 +221,40 @@ export async function createSharedCommunicationTestData(
  * Mock Email Provider for testing
  */
 export class MockEmailProvider {
+  getProviderName(): string {
+    return 'mock'
+  }
+
+  async isAvailable(): Promise<boolean> {
+    return true
+  }
+
   async sendEmail(data: any) {
     return {
-      id: uuid(),
-      status: 'sent',
+      success: true,
+      messageId: uuid(),
       provider: 'mock',
       timestamp: new Date(),
     }
   }
-  
-  async sendBulkEmails(data: any) {
+
+  async sendBulkEmail(data: any) {
     const results = []
-    for (const recipient of data.recipients) {
+
+    for (const recipient of data.recipients || data.to) {
       results.push({
-        email: recipient.email,
-        status: recipient.email.includes('invalid') ? 'failed' : 'sent',
+        email: recipient.email || recipient,
+        success: recipient.email?.includes('invalid') ? false : true,
         messageId: uuid(),
+        provider: 'mock',
       })
     }
-    return results
+
+    return {
+      results,
+      sent: results.filter(r => r.success).length,
+      failed: results.filter(r => !r.success).length,
+    }
   }
 }
 

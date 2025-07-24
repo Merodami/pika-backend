@@ -198,9 +198,8 @@ export type GetBusinessesByCategoryRequest = z.infer<
 /**
  * Get businesses by category response with pagination
  */
-export const GetBusinessesByCategoryResponse = paginatedResponse(
-  InternalBusinessData,
-)
+export const GetBusinessesByCategoryResponse =
+  paginatedResponse(InternalBusinessData)
 
 export type GetBusinessesByCategoryResponse = z.infer<
   typeof GetBusinessesByCategoryResponse

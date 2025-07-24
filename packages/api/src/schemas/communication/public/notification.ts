@@ -162,7 +162,6 @@ export type MarkNotificationsReadRequest = z.infer<
   typeof MarkNotificationsReadRequest
 >
 
-
 // ============= Search Notifications =============
 
 /**

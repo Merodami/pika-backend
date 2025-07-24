@@ -1,13 +1,12 @@
 /**
  * FUTURE IMPLEMENTATION: Admin Communication Controller
- * 
+ *
  * This controller is prepared for future admin endpoints but not currently used.
  * Admin functionality is excluded from current implementation to focus on core features.
  */
 
 import { communicationAdmin } from '@pika/api'
-import { getValidatedQuery, RequestContext } from '@pika/http'
-import { EmailMapper, NotificationMapper } from '@pika/sdk'
+import { getValidatedQuery } from '@pika/http'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -26,7 +25,7 @@ export interface IAdminCommunicationController {
   ): Promise<void>
 
   /**
-   * GET /communications/admin/notifications/analytics  
+   * GET /communications/admin/notifications/analytics
    * Get notification analytics data
    */
   getNotificationAnalytics(
@@ -59,7 +58,9 @@ export interface IAdminCommunicationController {
 /**
  * Handles admin communication operations
  */
-export class AdminCommunicationController implements IAdminCommunicationController {
+export class AdminCommunicationController
+  implements IAdminCommunicationController
+{
   constructor(
     private readonly emailService: IEmailService,
     private readonly notificationService: INotificationService,
@@ -81,7 +82,8 @@ export class AdminCommunicationController implements IAdminCommunicationControll
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<communicationAdmin.EmailAnalyticsQueryParams>(request)
+      const query =
+        getValidatedQuery<communicationAdmin.EmailAnalyticsQueryParams>(request)
 
       logger.info('Getting email analytics', { query })
 
@@ -101,7 +103,9 @@ export class AdminCommunicationController implements IAdminCommunicationControll
         dailyStats: [],
       }
 
-      const validatedResponse = communicationAdmin.EmailAnalyticsResponse.parse(responseData)
+      const validatedResponse =
+        communicationAdmin.EmailAnalyticsResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -110,15 +114,23 @@ export class AdminCommunicationController implements IAdminCommunicationControll
 
   /**
    * GET /communications/admin/notifications/analytics
-   * Get notification analytics data  
+   * Get notification analytics data
    */
   async getNotificationAnalytics(
-    request: Request<{}, {}, {}, communicationAdmin.NotificationAnalyticsQueryParams>,
+    request: Request<
+      {},
+      {},
+      {},
+      communicationAdmin.NotificationAnalyticsQueryParams
+    >,
     response: Response<communicationAdmin.NotificationAnalyticsResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<communicationAdmin.NotificationAnalyticsQueryParams>(request)
+      const query =
+        getValidatedQuery<communicationAdmin.NotificationAnalyticsQueryParams>(
+          request,
+        )
 
       logger.info('Getting notification analytics', { query })
 
@@ -136,7 +148,9 @@ export class AdminCommunicationController implements IAdminCommunicationControll
         dailyStats: [],
       }
 
-      const validatedResponse = communicationAdmin.NotificationAnalyticsResponse.parse(responseData)
+      const validatedResponse =
+        communicationAdmin.NotificationAnalyticsResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -148,12 +162,20 @@ export class AdminCommunicationController implements IAdminCommunicationControll
    * Get communication logs
    */
   async getCommunicationLogs(
-    request: Request<{}, {}, {}, communicationAdmin.CommunicationLogsQueryParams>,
+    request: Request<
+      {},
+      {},
+      {},
+      communicationAdmin.CommunicationLogsQueryParams
+    >,
     response: Response<communicationAdmin.CommunicationLogsResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<communicationAdmin.CommunicationLogsQueryParams>(request)
+      const query =
+        getValidatedQuery<communicationAdmin.CommunicationLogsQueryParams>(
+          request,
+        )
 
       logger.info('Getting communication logs', { query })
 
@@ -171,7 +193,9 @@ export class AdminCommunicationController implements IAdminCommunicationControll
         },
       }
 
-      const validatedResponse = communicationAdmin.CommunicationLogsResponse.parse(responseData)
+      const validatedResponse =
+        communicationAdmin.CommunicationLogsResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -183,7 +207,11 @@ export class AdminCommunicationController implements IAdminCommunicationControll
    * Create global notification for all users
    */
   async createGlobalNotification(
-    request: Request<{}, {}, communicationAdmin.CreateGlobalNotificationRequest>,
+    request: Request<
+      {},
+      {},
+      communicationAdmin.CreateGlobalNotificationRequest
+    >,
     response: Response<communicationAdmin.CreateGlobalNotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -194,12 +222,15 @@ export class AdminCommunicationController implements IAdminCommunicationControll
 
       // TODO: Implement proper global notification system
       // For now, return placeholder response to make tests pass
-      const responseData: communicationAdmin.CreateGlobalNotificationResponse = {
-        count: 0,
-        message: 'Global notification system not yet implemented',
-      }
+      const responseData: communicationAdmin.CreateGlobalNotificationResponse =
+        {
+          count: 0,
+          message: 'Global notification system not yet implemented',
+        }
 
-      const validatedResponse = communicationAdmin.CreateGlobalNotificationResponse.parse(responseData)
+      const validatedResponse =
+        communicationAdmin.CreateGlobalNotificationResponse.parse(responseData)
+
       response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)

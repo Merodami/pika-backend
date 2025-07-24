@@ -1,6 +1,6 @@
 /**
  * Admin Category Integration Tests
- * 
+ *
  * Tests admin category endpoints with RBAC authentication
  * Following SERVICE_REPLICATION_PATTERN.md
  */
@@ -12,12 +12,14 @@ vi.unmock('@pika/http')
 vi.mock('@pika/api', async () => {
   const actualApi =
     await vi.importActual<typeof import('@pika/api')>('@pika/api')
+
   return actualApi
 })
 
 vi.mock('@pika/shared', async () => {
   const actualShared =
     await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
+
   return actualShared
 })
 // --- END MOCKING CONFIGURATION ---
@@ -25,7 +27,6 @@ vi.mock('@pika/shared', async () => {
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
-  clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
@@ -43,7 +44,6 @@ import { createCategoryServer } from '../../../server.js'
 import {
   cleanupCategoryTestData,
   createSharedCategoryTestData,
-  createTestCategory,
   type SharedCategoryTestData,
 } from '../../helpers/categoryTestHelpers.js'
 
@@ -85,7 +85,7 @@ describe('Admin Category Integration Tests', () => {
 
     // Create shared test data once for all tests
     sharedTestData = await createSharedCategoryTestData(testDb.prisma)
-    
+
     // Get authenticated clients for different user types
     adminClient = await authHelper.getAdminClient(testDb.prisma)
     customerClient = await authHelper.getUserClient(testDb.prisma)
@@ -97,7 +97,7 @@ describe('Admin Category Integration Tests', () => {
     if (testDb?.prisma) {
       await cleanupCategoryTestData(testDb.prisma, {
         preserveSharedData: true,
-        sharedCategoryIds: sharedTestData.allCategories.map(c => c.id),
+        sharedCategoryIds: sharedTestData.allCategories.map((c) => c.id),
       })
     }
   })
@@ -149,12 +149,12 @@ describe('Admin Category Integration Tests', () => {
         expect(response.body.icon).toBe(categoryData.icon)
         expect(response.body.isActive).toBe(true)
         expect(response.body.sortOrder).toBe(categoryData.sortOrder)
-        
+
         // Verify computed fields
         expect(response.body.slug).toBe('categories-new-name')
         expect(response.body.level).toBe(1)
         expect(response.body.path).toBe('')
-        
+
         // Verify metadata fields
         expect(response.body).toHaveProperty('createdBy')
         expect(response.body).toHaveProperty('createdAt')
@@ -213,7 +213,7 @@ describe('Admin Category Integration Tests', () => {
             createdBy: uuid(),
           },
         })
-        
+
         const updateData = {
           nameKey: 'categories.updated.name',
           isActive: false,
@@ -245,7 +245,7 @@ describe('Admin Category Integration Tests', () => {
             createdBy: uuid(),
           },
         })
-        
+
         const updateData = {
           nameKey: 'categories.updated.name',
           isActive: false,
@@ -282,6 +282,7 @@ describe('Admin Category Integration Tests', () => {
         const deletedCategory = await testDb.prisma.category.findUnique({
           where: { id: category.id },
         })
+
         expect(deletedCategory?.deletedAt).not.toBeNull()
       })
 
@@ -315,9 +316,13 @@ describe('Admin Category Integration Tests', () => {
 
         expect(response.body).toHaveProperty('data')
         expect(response.body).toHaveProperty('pagination')
-        
+
         // Should return all inactive categories from shared data
-        const expectedInactiveCount = [...sharedTestData.inactiveParentCategories, ...sharedTestData.inactiveChildCategories].length
+        const expectedInactiveCount = [
+          ...sharedTestData.inactiveParentCategories,
+          ...sharedTestData.inactiveChildCategories,
+        ].length
+
         expect(response.body.data).toHaveLength(expectedInactiveCount)
         expect(response.body.data.every((cat: any) => !cat.isActive)).toBe(true)
       })

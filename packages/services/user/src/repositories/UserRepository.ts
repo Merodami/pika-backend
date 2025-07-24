@@ -277,8 +277,6 @@ export class UserRepository implements IUserRepository {
   async create(data: any): Promise<UserDomain> {
     try {
       const {
-        description,
-        specialties,
         password,
         acceptTerms: _acceptTerms,
         marketingConsent: _marketingConsent,

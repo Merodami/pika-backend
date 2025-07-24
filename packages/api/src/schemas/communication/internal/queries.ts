@@ -33,7 +33,9 @@ export const InternalEmailHistoryParams = openapi(
   },
 )
 
-export type InternalEmailHistoryParams = z.infer<typeof InternalEmailHistoryParams>
+export type InternalEmailHistoryParams = z.infer<
+  typeof InternalEmailHistoryParams
+>
 
 // ============= Notification Queries =============
 
@@ -52,7 +54,9 @@ export const InternalNotificationsParams = openapi(
   },
 )
 
-export type InternalNotificationsParams = z.infer<typeof InternalNotificationsParams>
+export type InternalNotificationsParams = z.infer<
+  typeof InternalNotificationsParams
+>
 
 /**
  * Get unread count query parameters

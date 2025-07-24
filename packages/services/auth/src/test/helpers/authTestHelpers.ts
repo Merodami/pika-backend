@@ -30,18 +30,18 @@ export interface SharedAuthTestData {
   inactiveUsers: any[]
   adminUsers: any[]
   oauthUsers: any[]
-  
+
   // Specific test users
   testUser: any
   adminUser: any
   inactiveUser: any
   oauthOnlyUser: any
-  
+
   // Quick access
   allUsers: any[]
   userById: Map<string, any>
   userByEmail: Map<string, any>
-  
+
   // Test password (plaintext)
   testPassword: string
 }
@@ -90,6 +90,7 @@ export async function seedTestAuthUsers(
         emailVerified: true,
       },
     })
+
     users.push(user)
   }
 
@@ -107,6 +108,7 @@ export async function seedTestAuthUsers(
         emailVerified: true,
       },
     })
+
     users.push(inactiveUser)
   }
 
@@ -124,6 +126,7 @@ export async function seedTestAuthUsers(
         // No password field
       },
     })
+
     users.push(oauthUser)
   }
 
@@ -141,6 +144,7 @@ export async function seedTestAuthUsers(
         emailVerified: true,
       },
     })
+
     users.push(adminUser)
   }
 
@@ -159,7 +163,7 @@ export async function createSharedAuthTestData(
 ): Promise<SharedAuthTestData> {
   const testPassword = 'Password123!'
   const hashedPassword = await bcrypt.hash(testPassword, 10)
-  
+
   // Create specific test users
   const testUser = await prismaClient.user.create({
     data: {
@@ -215,6 +219,7 @@ export async function createSharedAuthTestData(
 
   // Create additional test users
   const additionalActiveUsers = []
+
   for (let i = 0; i < 3; i++) {
     const user = await prismaClient.user.create({
       data: {
@@ -228,6 +233,7 @@ export async function createSharedAuthTestData(
         emailVerified: true,
       },
     })
+
     additionalActiveUsers.push(user)
   }
 
@@ -236,11 +242,16 @@ export async function createSharedAuthTestData(
   const inactiveUsers = [inactiveUser]
   const adminUsers = [adminUser]
   const oauthUsers = [oauthOnlyUser]
-  const allUsers = [...activeUsers, ...inactiveUsers, ...adminUsers, ...oauthUsers]
+  const allUsers = [
+    ...activeUsers,
+    ...inactiveUsers,
+    ...adminUsers,
+    ...oauthUsers,
+  ]
 
   // Create lookup maps
-  const userById = new Map(allUsers.map(user => [user.id, user]))
-  const userByEmail = new Map(allUsers.map(user => [user.email, user]))
+  const userById = new Map(allUsers.map((user) => [user.id, user]))
+  const userByEmail = new Map(allUsers.map((user) => [user.email, user]))
 
   return {
     // Users by type
@@ -248,18 +259,18 @@ export async function createSharedAuthTestData(
     inactiveUsers,
     adminUsers,
     oauthUsers,
-    
+
     // Specific test users
     testUser,
     adminUser,
     inactiveUser,
     oauthOnlyUser,
-    
+
     // Quick access
     allUsers,
     userById,
     userByEmail,
-    
+
     // Test password
     testPassword,
   }

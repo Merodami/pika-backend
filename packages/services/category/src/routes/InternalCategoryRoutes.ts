@@ -1,5 +1,10 @@
 import { categoryCommon, categoryInternal } from '@pika/api'
-import { requireServiceAuth, validateBody, validateParams, validateQuery } from '@pika/http'
+import {
+  requireServiceAuth,
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '@pika/http'
 import { Router } from 'express'
 
 import type { InternalCategoryController } from '../controllers/InternalCategoryController.js'
@@ -11,7 +16,7 @@ export function createInternalCategoryRoutes(
   internalCategoryController: InternalCategoryController,
 ): Router {
   const router = Router()
-  
+
   // All routes require internal authentication
   router.use(requireServiceAuth())
 

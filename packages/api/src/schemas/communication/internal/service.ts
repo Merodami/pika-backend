@@ -329,6 +329,7 @@ export const SendEmailRequest = openapi(
     replyTo: EmailAddress.optional(),
     cc: z.array(EmailAddress).optional(),
     bcc: z.array(EmailAddress).optional(),
+    userId: UserId.optional().describe('User ID for tracking and logging'),
   }),
   {
     description: 'Send email request',
@@ -511,7 +512,9 @@ export const InternalEmailHistoryResponse = paginatedResponse(
   },
 )
 
-export type InternalEmailHistoryResponse = z.infer<typeof InternalEmailHistoryResponse>
+export type InternalEmailHistoryResponse = z.infer<
+  typeof InternalEmailHistoryResponse
+>
 
 // ============= Batch Notifications =============
 
@@ -574,7 +577,9 @@ export const InternalNotificationsResponse = paginatedResponse(
   },
 )
 
-export type InternalNotificationsResponse = z.infer<typeof InternalNotificationsResponse>
+export type InternalNotificationsResponse = z.infer<
+  typeof InternalNotificationsResponse
+>
 
 // ============= Unread Count =============
 

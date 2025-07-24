@@ -42,9 +42,11 @@ export class InternalCategoryController {
 
       // Return minimal data for internal use
       const response = CategoryMapper.toInternalDTO(category)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryInternal.InternalCategoryData.parse(response)
+      const validatedResponse =
+        categoryInternal.InternalCategoryData.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -68,8 +70,7 @@ export class InternalCategoryController {
     try {
       const { categoryIds } = req.body
 
-      const result =
-        await this.categoryService.getCategoriesByIds(categoryIds)
+      const result = await this.categoryService.getCategoriesByIds(categoryIds)
 
       // Transform to DTOs using pagination structure
       const response = {
@@ -78,9 +79,11 @@ export class InternalCategoryController {
         ),
         pagination: result.pagination,
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryInternal.BulkCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.BulkCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -134,9 +137,11 @@ export class InternalCategoryController {
         valid: allValid,
         results: validationResults,
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryInternal.ValidateCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.ValidateCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -175,9 +180,11 @@ export class InternalCategoryController {
         ),
         pagination: result.pagination,
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.InternalCategoryListResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -219,9 +226,11 @@ export class InternalCategoryController {
         ),
         pagination: result.pagination,
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.InternalCategoryListResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -251,9 +260,11 @@ export class InternalCategoryController {
           CategoryMapper.toInternalDTO(category),
         ),
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryInternal.InternalCategoryHierarchyResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.InternalCategoryHierarchyResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

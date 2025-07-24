@@ -41,7 +41,9 @@ describe('Communication Service - Public API Integration Tests', () => {
   let sharedTestData: SharedCommunicationTestData
 
   beforeAll(async () => {
-    logger.info('Setting up Communication Service Public API integration tests...')
+    logger.info(
+      'Setting up Communication Service Public API integration tests...',
+    )
 
     testDb = await createTestDatabase({
       databaseName: 'test_communication_public_db',
@@ -71,6 +73,7 @@ describe('Communication Service - Public API Integration Tests', () => {
     const regularUser = await testDb.prisma.user.findFirst({
       where: { email: 'user@e2etest.com' },
     })
+
     regularUserId = regularUser!.id
 
     sharedTestData = await createSharedCommunicationTestData(testDb.prisma, {
@@ -107,6 +110,7 @@ describe('Communication Service - Public API Integration Tests', () => {
   describe('Health Check', () => {
     it('should return health status', async () => {
       const response = await customerClient.get('/api/v1/health').expect(200)
+
       expect(response.body).toHaveProperty('status')
     })
   })
@@ -140,7 +144,7 @@ describe('Communication Service - Public API Integration Tests', () => {
 
         expect(response.body.data).toBeDefined()
         expect(response.body.pagination).toBeDefined()
-        
+
         response.body.data.forEach((notification: any) => {
           expect(notification.userId).toBe(regularUserId)
         })
@@ -171,7 +175,10 @@ describe('Communication Service - Public API Integration Tests', () => {
           .get('/notifications?sortBy=createdAt&sortOrder=desc')
           .expect(200)
 
-        const dates = response.body.data.map((n: any) => new Date(n.createdAt).getTime())
+        const dates = response.body.data.map((n: any) =>
+          new Date(n.createdAt).getTime(),
+        )
+
         expect(dates).toEqual([...dates].sort((a, b) => b - a))
       })
     })
@@ -210,7 +217,9 @@ describe('Communication Service - Public API Integration Tests', () => {
           },
         })
 
-        await customerClient.get(`/notifications/${notification.id}`).expect(200)
+        await customerClient
+          .get(`/notifications/${notification.id}`)
+          .expect(200)
 
         const updated = await testDb.prisma.notification.findUnique({
           where: { id: notification.id },
@@ -222,6 +231,7 @@ describe('Communication Service - Public API Integration Tests', () => {
 
       it('should return 404 for non-existent notification', async () => {
         const fakeId = uuid()
+
         await customerClient.get(`/notifications/${fakeId}`).expect(404)
       })
 
@@ -247,7 +257,9 @@ describe('Communication Service - Public API Integration Tests', () => {
           },
         })
 
-        await customerClient.get(`/notifications/${notification.id}`).expect(403)
+        await customerClient
+          .get(`/notifications/${notification.id}`)
+          .expect(403)
       })
     })
 
@@ -336,8 +348,10 @@ describe('Communication Service - Public API Integration Tests', () => {
           },
         })
 
-        await customerClient.put(`/notifications/${notification.id}/read`).expect(200)
-        
+        await customerClient
+          .put(`/notifications/${notification.id}/read`)
+          .expect(200)
+
         const response = await customerClient
           .put(`/notifications/${notification.id}/read`)
           .expect(200)
@@ -439,7 +453,9 @@ describe('Communication Service - Public API Integration Tests', () => {
           },
         })
 
-        await customerClient.delete(`/notifications/${notification.id}`).expect(204)
+        await customerClient
+          .delete(`/notifications/${notification.id}`)
+          .expect(204)
 
         const deleted = await testDb.prisma.notification.findUnique({
           where: { id: notification.id },
@@ -450,6 +466,7 @@ describe('Communication Service - Public API Integration Tests', () => {
 
       it('should return 404 for non-existent notification', async () => {
         const fakeId = uuid()
+
         await customerClient.delete(`/notifications/${fakeId}`).expect(404)
       })
 
@@ -475,7 +492,9 @@ describe('Communication Service - Public API Integration Tests', () => {
           },
         })
 
-        await customerClient.delete(`/notifications/${notification.id}`).expect(403)
+        await customerClient
+          .delete(`/notifications/${notification.id}`)
+          .expect(403)
       })
     })
   })

@@ -199,7 +199,7 @@ export class NotificationRepository implements INotificationRepository {
           updatedAt: new Date(),
         },
       })
-      
+
       return result.count
     } catch (error) {
       throw ErrorFactory.databaseError('markAllAsRead', 'Notification', error)

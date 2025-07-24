@@ -121,7 +121,7 @@ export async function createTestCategory(
   } = options
 
   const slug = `test-category-${uuid().substring(0, 8)}`
-  
+
   return await prismaClient.category.create({
     data: {
       nameKey,
@@ -286,6 +286,7 @@ export async function createSharedCategoryTestData(
 
   // Create some inactive children for active parents
   const activeParent = activeParentCategories[0]
+
   for (let i = 0; i < 2; i++) {
     const inactiveChild = await createTestCategory(prismaClient, {
       nameKey: `test.category.inactive.child.${i + 1}`,

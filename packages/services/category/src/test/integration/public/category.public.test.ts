@@ -1,6 +1,6 @@
 /**
  * Public Category Integration Tests
- * 
+ *
  * Tests public category endpoints that don't require authentication
  * Following SERVICE_REPLICATION_PATTERN.md
  */
@@ -12,12 +12,14 @@ vi.unmock('@pika/http')
 vi.mock('@pika/api', async () => {
   const actualApi =
     await vi.importActual<typeof import('@pika/api')>('@pika/api')
+
   return actualApi
 })
 
 vi.mock('@pika/shared', async () => {
   const actualShared =
     await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
+
   return {
     ...actualShared,
     PermissionResource: actualShared.PermissionResource,
@@ -29,7 +31,6 @@ vi.mock('@pika/shared', async () => {
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
-  clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
@@ -44,7 +45,6 @@ import {
   cleanupCategoryTestData,
   createSharedCategoryTestData,
   createTestCategory,
-  seedTestCategories,
   type SharedCategoryTestData,
 } from '../../helpers/categoryTestHelpers.js'
 
@@ -84,7 +84,7 @@ describe('Public Category Integration Tests', () => {
     if (testDb?.prisma) {
       await cleanupCategoryTestData(testDb.prisma, {
         preserveSharedData: true,
-        sharedCategoryIds: sharedTestData.allCategories.map(c => c.id),
+        sharedCategoryIds: sharedTestData.allCategories.map((c) => c.id),
       })
     }
   })
@@ -114,7 +114,9 @@ describe('Public Category Integration Tests', () => {
       expect(response.body).toHaveProperty('data')
       expect(response.body).toHaveProperty('pagination')
       expect(response.body.data.length).toBeGreaterThan(0)
-      expect(response.body.pagination.total).toBe(sharedTestData.allCategories.length)
+      expect(response.body.pagination.total).toBe(
+        sharedTestData.allCategories.length,
+      )
     })
 
     it('should filter categories by parentId', async () => {
@@ -127,10 +129,15 @@ describe('Public Category Integration Tests', () => {
 
       // Should return all children of this parent (active + inactive)
       const expectedChildren = sharedTestData.allCategories.filter(
-        cat => cat.parentId === parentCategory.id
+        (cat) => cat.parentId === parentCategory.id,
       )
+
       expect(response.body.data).toHaveLength(expectedChildren.length)
-      expect(response.body.data.every((cat: any) => cat.parentId === parentCategory.id)).toBe(true)
+      expect(
+        response.body.data.every(
+          (cat: any) => cat.parentId === parentCategory.id,
+        ),
+      ).toBe(true)
     })
 
     it('should filter categories by isActive status', async () => {
@@ -140,7 +147,11 @@ describe('Public Category Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      const activeCount = [...sharedTestData.activeParentCategories, ...sharedTestData.activeChildCategories].length
+      const activeCount = [
+        ...sharedTestData.activeParentCategories,
+        ...sharedTestData.activeChildCategories,
+      ].length
+
       expect(response.body.data).toHaveLength(activeCount)
       expect(response.body.data.every((cat: any) => cat.isActive)).toBe(true)
 
@@ -150,9 +161,15 @@ describe('Public Category Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      const inactiveCount = [...sharedTestData.inactiveParentCategories, ...sharedTestData.inactiveChildCategories].length
+      const inactiveCount = [
+        ...sharedTestData.inactiveParentCategories,
+        ...sharedTestData.inactiveChildCategories,
+      ].length
+
       expect(inactiveResponse.body.data).toHaveLength(inactiveCount)
-      expect(inactiveResponse.body.data.every((cat: any) => !cat.isActive)).toBe(true)
+      expect(
+        inactiveResponse.body.data.every((cat: any) => !cat.isActive),
+      ).toBe(true)
     })
 
     it('should sort categories by specified field', async () => {
@@ -202,7 +219,9 @@ describe('Public Category Integration Tests', () => {
       expect(response.body.pagination.limit).toBe(5)
       expect(response.body.data).toHaveLength(5)
       // Total should include shared data + new test data
-      expect(response.body.pagination.total).toBeGreaterThan(sharedTestData.allCategories.length)
+      expect(response.body.pagination.total).toBeGreaterThan(
+        sharedTestData.allCategories.length,
+      )
     })
   })
 
@@ -247,10 +266,10 @@ describe('Public Category Integration Tests', () => {
 
       // Should have hierarchical structure with parent categories
       const rootCategories = response.body.data.filter(
-        (cat: any) => !cat.parentId
+        (cat: any) => !cat.parentId,
       )
 
-      expect(rootCategories.length).toBe(sharedTestData.rootCategories.length)
+      expect(rootCategories).toHaveLength(sharedTestData.rootCategories.length)
       expect(rootCategories.length).toBeGreaterThan(0)
     })
   })

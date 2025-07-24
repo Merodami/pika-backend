@@ -24,7 +24,11 @@ export type CreateGlobalNotificationRequest = z.infer<
  */
 export const CreateGlobalNotificationResponse = openapi(
   z.object({
-    count: z.number().int().nonnegative().describe('Number of notifications created'),
+    count: z
+      .number()
+      .int()
+      .nonnegative()
+      .describe('Number of notifications created'),
     message: z.string().optional().describe('Success message'),
   }),
   {

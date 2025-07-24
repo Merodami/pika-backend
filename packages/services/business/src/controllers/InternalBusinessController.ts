@@ -41,9 +41,11 @@ export class InternalBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessInternal.InternalBusinessData.parse(response)
+      const validatedResponse =
+        businessInternal.InternalBusinessData.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -72,9 +74,11 @@ export class InternalBusinessController {
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessInternal.InternalBusinessData.parse(response)
+      const validatedResponse =
+        businessInternal.InternalBusinessData.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -109,9 +113,11 @@ export class InternalBusinessController {
           BusinessMapper.toDTO(business!),
         ),
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessInternal.BulkBusinessResponse.parse(response)
+      const validatedResponse =
+        businessInternal.BulkBusinessResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -146,14 +152,14 @@ export class InternalBusinessController {
 
       // Transform to DTOs with pagination
       const response = {
-        data: result.data.map((business) =>
-          BusinessMapper.toDTO(business),
-        ),
+        data: result.data.map((business) => BusinessMapper.toDTO(business)),
         pagination: result.pagination,
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = businessInternal.GetBusinessesByCategoryResponse.parse(response)
+      const validatedResponse =
+        businessInternal.GetBusinessesByCategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

@@ -13,8 +13,10 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 
 vi.mock('../../services/providers/ProviderFactory.js', async () => {
-  const { MockEmailProvider, MockSmsProvider } = await import('../helpers/communicationTestHelpers.js')
-  
+  const { MockEmailProvider, MockSmsProvider } = await import(
+    '../helpers/communicationTestHelpers.js'
+  )
+
   class MockProviderFactory {
     async getEmailProvider() {
       return new MockEmailProvider()
@@ -33,16 +35,15 @@ vi.mock('../../services/providers/ProviderFactory.js', async () => {
 import { SERVICE_API_KEY } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { EmailTemplateId } from '@pika/types'
 import {
   cleanupTestDatabase,
   createTestDatabase,
   InternalAPITestHelper,
   TestDatabaseResult,
 } from '@pika/tests'
+import { EmailTemplateId } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
-import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createCommunicationServer } from '../../server.js'
@@ -62,7 +63,9 @@ describe('Communication Service - Internal API Integration Tests', () => {
   let testUserId: string
 
   beforeAll(async () => {
-    logger.debug('Setting up Communication Service Internal API integration tests...')
+    logger.debug(
+      'Setting up Communication Service Internal API integration tests...',
+    )
 
     testDb = await createTestDatabase({
       databaseName: 'test_communication_internal_db',
@@ -86,7 +89,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
     })
 
     request = supertest(app)
-    
+
     internalAPIHelper = new InternalAPITestHelper(SERVICE_API_KEY)
     internalClient = internalAPIHelper.createClient(app)
 
@@ -251,7 +254,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
           .expect(200)
 
         expect(response.body.status).toBe('sent')
-        
+
         const log = await testDb.prisma.communicationLog.findUnique({
           where: { id: response.body.id },
         })
@@ -290,8 +293,14 @@ describe('Communication Service - Internal API Integration Tests', () => {
           .post('/internal/emails/send-bulk')
           .send({
             recipients: [
-              { email: 'user1@example.com', userId: sharedTestData.testUsers[0].id },
-              { email: 'user2@example.com', userId: sharedTestData.testUsers[1].id },
+              {
+                email: 'user1@example.com',
+                userId: sharedTestData.testUsers[0].id,
+              },
+              {
+                email: 'user2@example.com',
+                userId: sharedTestData.testUsers[1].id,
+              },
             ],
             subject: 'Bulk Email',
             templateId: EmailTemplateId.PURCHASE_CONFIRMATION,
@@ -314,12 +323,12 @@ describe('Communication Service - Internal API Integration Tests', () => {
           .post('/internal/emails/send-bulk')
           .send({
             recipients: [
-              { 
+              {
                 email: 'user1@example.com',
                 userId: sharedTestData.testUsers[0].id,
                 variables: { firstName: 'John' },
               },
-              { 
+              {
                 email: 'user2@example.com',
                 userId: sharedTestData.testUsers[1].id,
                 variables: { firstName: 'Jane' },
@@ -343,7 +352,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
 
         expect(response.body.data).toBeDefined()
         expect(response.body.pagination).toBeDefined()
-        
+
         response.body.data.forEach((log: any) => {
           expect(log.userId).toBe(testUserId)
         })
@@ -370,8 +379,9 @@ describe('Communication Service - Internal API Integration Tests', () => {
 
       it('should filter by date range', async () => {
         const startDate = new Date()
+
         startDate.setDate(startDate.getDate() - 7)
-        
+
         const response = await internalClient
           .get(`/internal/emails/history?startDate=${startDate.toISOString()}`)
           .expect(200)
@@ -390,7 +400,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
             userId: testUserId,
             title: 'New Order',
             description: 'Your order has been confirmed',
-            type: 'inApp',
+            type: 'info',
             metadata: {
               orderId: '12345',
               actionUrl: '/orders/12345',
@@ -402,7 +412,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
           userId: testUserId,
           title: 'New Order',
           description: 'Your order has been confirmed',
-          type: 'inApp',
+          type: 'info',
           isRead: false,
         })
       })
@@ -416,13 +426,13 @@ describe('Communication Service - Internal API Integration Tests', () => {
                 userId: sharedTestData.testUsers[0].id,
                 title: 'Notification 1',
                 description: 'Description 1',
-                type: 'inApp',
+                type: 'info',
               },
               {
                 userId: sharedTestData.testUsers[1].id,
                 title: 'Notification 2',
                 description: 'Description 2',
-                type: 'inApp',
+                type: 'info',
               },
             ],
           })
@@ -439,7 +449,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
             userId: testUserId,
             title: 'Important Update',
             description: 'This notification will also be sent via email',
-            type: 'inApp',
+            type: 'info',
             sendEmail: true,
             emailSubject: 'Important Update from Pika',
           })

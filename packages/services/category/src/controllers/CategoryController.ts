@@ -57,7 +57,9 @@ export class CategoryController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse = categoryPublic.CategoryListResponse.parse(response)
+      const validatedResponse =
+        categoryPublic.CategoryListResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -85,9 +87,10 @@ export class CategoryController {
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
-      
+
       // Validate response against Zod schema
       const validatedResponse = categoryPublic.CategoryResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -120,9 +123,11 @@ export class CategoryController {
       const response = {
         data: categories.map((category) => CategoryMapper.toDTO(category)),
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryPublic.CategoryHierarchyResponse.parse(response)
+      const validatedResponse =
+        categoryPublic.CategoryHierarchyResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -152,9 +157,11 @@ export class CategoryController {
       const response = {
         data: path.map((category) => CategoryMapper.toDTO(category)),
       }
-      
+
       // Validate response against Zod schema
-      const validatedResponse = categoryPublic.CategoryPathResponse.parse(response)
+      const validatedResponse =
+        categoryPublic.CategoryPathResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
