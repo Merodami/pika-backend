@@ -39,6 +39,7 @@ import {
 } from '@pika/tests'
 import { MockCacheService } from '@pika/tests'
 import { Express } from 'express'
+import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
@@ -54,6 +55,7 @@ describe('Public Category Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let server: any
+  let request: supertest.SuperTest<supertest.Test>
   let authHelper: E2EAuthHelper
   let customerClient: AuthenticatedRequestClient
   let sharedTestData: SharedCategoryTestData
@@ -77,6 +79,9 @@ describe('Public Category Integration Tests', () => {
     app = serverResult.app
 
     logger.debug('Express server ready for testing.')
+
+    // Initialize supertest with the Express server instance
+    request = supertest(app)
 
     // Initialize E2E Authentication Helper
     authHelper = createE2EAuthHelper(app)
@@ -301,6 +306,35 @@ describe('Public Category Integration Tests', () => {
       expect(response.body).toHaveProperty('data')
       expect(Array.isArray(response.body.data)).toBe(true)
       expect(response.body.data).toHaveLength(2) // Parent + child
+    })
+  })
+
+  // Authentication Boundary Tests
+  describe('Authentication Boundary Tests', () => {
+    it('should require authentication for all category endpoints', async () => {
+      const testCategory = sharedTestData.activeRootCategories[0]
+      
+      // Test all protected endpoints without authentication
+      const protectedEndpoints = [
+        { method: 'get', url: '/categories' },
+        { method: 'get', url: `/categories/${testCategory.id}` },
+        { method: 'get', url: '/categories/hierarchy' },
+        { method: 'get', url: `/categories/${testCategory.id}/path` },
+      ]
+
+      for (const endpoint of protectedEndpoints) {
+        await request[endpoint.method](endpoint.url)
+          .set('Accept', 'application/json')
+          .expect(401)
+      }
+    })
+
+    it('should reject invalid JWT tokens', async () => {
+      await request
+        .get('/categories')
+        .set('Authorization', 'Bearer invalid-token')
+        .set('Accept', 'application/json')
+        .expect(401)
     })
   })
 

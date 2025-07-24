@@ -173,12 +173,6 @@ export class BusinessController {
       const query =
         getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
 
-      // Only business owners can access this endpoint
-      if (context.role !== UserRole.BUSINESS) {
-        throw ErrorFactory.forbidden(
-          'Only business owners can access this endpoint',
-        )
-      }
 
       // Parse include parameter
       const includeRelations = query.include?.split(',') || []
@@ -212,12 +206,6 @@ export class BusinessController {
       const context = RequestContext.getContext(req)
       const authenticatedUserId = context.userId
 
-      // Only users with BUSINESS role can create a business
-      if (context.role !== UserRole.BUSINESS) {
-        throw ErrorFactory.forbidden(
-          'Only users with business role can create a business',
-        )
-      }
 
       const data = {
         ...req.body,
@@ -251,12 +239,6 @@ export class BusinessController {
       const context = RequestContext.getContext(req)
       const userId = context.userId
 
-      // Only business owners can update their business
-      if (context.role !== UserRole.BUSINESS) {
-        throw ErrorFactory.forbidden(
-          'Only business owners can update their business',
-        )
-      }
 
       // Get user's business first
       const existingBusiness =

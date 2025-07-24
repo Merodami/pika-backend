@@ -3,12 +3,18 @@ import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
+import * as businessSchemas from '@api/schemas/business/public/business.js'
+import * as businessParameters from '@api/schemas/business/common/parameters.js'
+import * as categorySchemas from '@api/schemas/category/public/category.js'
+import * as categoryParameters from '@api/schemas/category/common/parameters.js'
 import * as communicationNotificationSchemas from '@api/schemas/communication/public/notification.js'
 import * as paymentHeaderSchemas from '@api/schemas/payment/public/headers.js'
 import * as webhookSchemas from '@api/schemas/payment/public/webhooks.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import * as storageSchemas from '@api/schemas/storage/public/file.js'
+import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as subscriptionSchemas from '@api/schemas/subscription/public/index.js'
 import * as subscriptionPlanSchemas from '@api/schemas/subscription/public/index.js'
@@ -18,6 +24,8 @@ import * as supportProblemSchemas from '@api/schemas/support/public/problem.js'
 import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
+import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
+import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 
 /**
  * Register all public API schemas and routes
@@ -29,6 +37,125 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     'AuthTokensResponse',
     authLoginSchemas.AuthTokensResponse,
   )
+
+  // ============= Business Schemas =============
+  registry.registerSchema('BusinessResponse', businessSchemas.BusinessResponse)
+  registry.registerSchema('BusinessQueryParams', businessSchemas.BusinessQueryParams)
+  registry.registerSchema('BusinessPathParams', businessSchemas.BusinessPathParams)
+  registry.registerSchema('BusinessDetailQueryParams', businessSchemas.BusinessDetailQueryParams)
+  registry.registerSchema('BusinessListResponse', businessSchemas.BusinessListResponse)
+  registry.registerSchema('BusinessesByCategoryResponse', businessSchemas.BusinessesByCategoryResponse)
+  registry.registerSchema('CreateMyBusinessRequest', businessSchemas.CreateMyBusinessRequest)
+  registry.registerSchema('UpdateMyBusinessRequest', businessSchemas.UpdateMyBusinessRequest)
+  registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
+
+  // ============= Category Schemas =============
+  registry.registerSchema('CategoryResponse', categorySchemas.CategoryResponse)
+  registry.registerSchema(
+    'CategoryQueryParams',
+    categorySchemas.CategoryQueryParams,
+  )
+  registry.registerSchema(
+    'CategoryListResponse',
+    categorySchemas.CategoryListResponse,
+  )
+  registry.registerSchema(
+    'CategoryHierarchyResponse',
+    categorySchemas.CategoryHierarchyResponse,
+  )
+  registry.registerSchema(
+    'CategoryPathResponse',
+    categorySchemas.CategoryPathResponse,
+  )
+  registry.registerSchema(
+    'CategoryHierarchyQuery',
+    categorySchemas.CategoryHierarchyQuery,
+  )
+  registry.registerSchema(
+    'CategoryPathParams',
+    categorySchemas.CategoryPathParams,
+  )
+
+  // Category parameter schemas
+  registry.registerSchema('CategoryIdParam', categoryParameters.CategoryIdParam)
+
+  // ============= Storage Schemas =============
+  registry.registerSchema('FileStorageLog', storageSchemas.FileStorageLog)
+  registry.registerSchema(
+    'FileUploadResponse',
+    storageSchemas.FileUploadResponse,
+  )
+  registry.registerSchema(
+    'BatchUploadResponse',
+    storageSchemas.BatchUploadResponse,
+  )
+  registry.registerSchema('FileUrlResponse', storageSchemas.FileUrlResponse)
+  registry.registerSchema(
+    'GetFileHistoryQuery',
+    storageSchemas.GetFileHistoryQuery,
+  )
+  registry.registerSchema(
+    'FileHistoryResponse',
+    storageSchemas.FileHistoryResponse,
+  )
+  registry.registerSchema(
+    'FileUploadMetadata',
+    storageSchemas.FileUploadMetadata,
+  )
+  registry.registerSchema('FileUploadRequest', storageSchemas.FileUploadRequest)
+  registry.registerSchema(
+    'BatchFileUploadRequest',
+    storageSchemas.BatchFileUploadRequest,
+  )
+  registry.registerSchema('GetFileUrlQuery', storageSchemas.GetFileUrlQuery)
+
+  // Storage parameter schemas
+  registry.registerSchema('FileIdParam', storageParameters.FileIdParam)
+
+  // ============= Voucher Schemas =============
+  registry.registerSchema('VoucherResponse', voucherSchemas.VoucherResponse)
+  registry.registerSchema(
+    'VoucherCodeResponse',
+    voucherSchemas.VoucherCodeResponse,
+  )
+  registry.registerSchema('VoucherQueryParams', voucherSchemas.VoucherQueryParams)
+  registry.registerSchema(
+    'VoucherListResponse',
+    voucherSchemas.VoucherListResponse,
+  )
+  registry.registerSchema('VoucherScanRequest', voucherSchemas.VoucherScanRequest)
+  registry.registerSchema(
+    'VoucherScanResponse',
+    voucherSchemas.VoucherScanResponse,
+  )
+  registry.registerSchema(
+    'VoucherClaimRequest',
+    voucherSchemas.VoucherClaimRequest,
+  )
+  registry.registerSchema(
+    'VoucherClaimResponse',
+    voucherSchemas.VoucherClaimResponse,
+  )
+  registry.registerSchema(
+    'VoucherRedeemRequest',
+    voucherSchemas.VoucherRedeemRequest,
+  )
+  registry.registerSchema(
+    'VoucherRedeemResponse',
+    voucherSchemas.VoucherRedeemResponse,
+  )
+  registry.registerSchema(
+    'UserVoucherResponse',
+    voucherSchemas.UserVoucherResponse,
+  )
+  registry.registerSchema(
+    'UserVouchersListResponse',
+    voucherSchemas.UserVouchersListResponse,
+  )
+
+  // Voucher parameter schemas
+  registry.registerSchema('VoucherPathParams', voucherParameters.VoucherPathParams)
+
   registry.registerSchema('AuthUserResponse', authLoginSchemas.AuthUserResponse)
 
   // OAuth schemas
@@ -338,6 +465,614 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     'WebhookErrorResponse',
     webhookSchemas.WebhookErrorResponse,
   )
+
+  // ============= Business Public Routes =============
+
+  // Get all businesses (public listing)
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses',
+    summary: 'List all active businesses',
+    tags: ['Business'],
+    request: {
+      query: businessSchemas.BusinessQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of businesses',
+        content: {
+          'application/json': {
+            schema: businessSchemas.BusinessListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get business by ID (public view)
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses/{id}',
+    summary: 'Get business details',
+    tags: ['Business'],
+    request: {
+      params: businessSchemas.BusinessPathParams,
+      query: businessSchemas.BusinessDetailQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Business details',
+        content: {
+          'application/json': {
+            schema: businessSchemas.BusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get businesses by category
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/{categoryId}/businesses',
+    summary: 'Get businesses in a specific category',
+    tags: ['Business'],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+      query: businessSchemas.BusinessQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Businesses in category',
+        content: {
+          'application/json': {
+            schema: businessSchemas.BusinessesByCategoryResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Create my business (authenticated users)
+  registry.registerRoute({
+    method: 'post',
+    path: '/my/business',
+    summary: 'Create my business',
+    tags: ['My Business'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: businessSchemas.CreateMyBusinessRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Business created successfully',
+        content: {
+          'application/json': {
+            schema: businessSchemas.BusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get my business (authenticated users)
+  registry.registerRoute({
+    method: 'get',
+    path: '/my/business',
+    summary: 'Get my business details',
+    tags: ['My Business'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'My business details',
+        content: {
+          'application/json': {
+            schema: businessSchemas.BusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update my business (authenticated users)
+  registry.registerRoute({
+    method: 'put',
+    path: '/my/business',
+    summary: 'Update my business',
+    tags: ['My Business'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: businessSchemas.UpdateMyBusinessRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business updated successfully',
+        content: {
+          'application/json': {
+            schema: businessSchemas.BusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Delete my business (authenticated users)
+  registry.registerRoute({
+    method: 'delete',
+    path: '/my/business',
+    summary: 'Delete my business',
+    tags: ['My Business'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      204: {
+        description: 'Business deleted successfully',
+      },
+    },
+  })
+
+  // ============= Category Public Routes =============
+
+  // Get all categories (public, read-only)
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories',
+    summary: 'List all active categories',
+    tags: ['Categories'],
+    request: {
+      query: categorySchemas.CategoryQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of categories',
+        content: {
+          'application/json': {
+            schema: categorySchemas.CategoryListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get category by ID (public, read-only)
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/{id}',
+    summary: 'Get category details',
+    tags: ['Categories'],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+    },
+    responses: {
+      200: {
+        description: 'Category details',
+        content: {
+          'application/json': {
+            schema: categorySchemas.CategoryResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Category not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get category hierarchy
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/hierarchy',
+    summary: 'Get category hierarchy tree',
+    tags: ['Categories'],
+    request: {
+      query: categorySchemas.CategoryHierarchyQuery,
+    },
+    responses: {
+      200: {
+        description: 'Category hierarchy structure',
+        content: {
+          'application/json': {
+            schema: categorySchemas.CategoryHierarchyResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get category path
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/{id}/path',
+    summary: 'Get path from root to category',
+    tags: ['Categories'],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+    },
+    responses: {
+      200: {
+        description: 'Category path from root',
+        content: {
+          'application/json': {
+            schema: categorySchemas.CategoryPathResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Category not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Storage Public Routes =============
+
+  // Upload file
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/upload',
+    summary: 'Upload a file',
+    tags: ['Storage'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: storageSchemas.FileUploadRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'File uploaded successfully',
+        content: {
+          'application/json': {
+            schema: storageSchemas.FileUploadResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid file or request',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Batch upload files
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/batch-upload',
+    summary: 'Upload multiple files',
+    tags: ['Storage'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: storageSchemas.BatchFileUploadRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Batch upload completed',
+        content: {
+          'application/json': {
+            schema: storageSchemas.BatchUploadResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get file URL
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/files/{fileId}/url',
+    summary: 'Get presigned URL for file access',
+    tags: ['Storage'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: storageParameters.FileIdParam,
+      query: storageSchemas.GetFileUrlQuery,
+    },
+    responses: {
+      200: {
+        description: 'Presigned URL generated',
+        content: {
+          'application/json': {
+            schema: storageSchemas.FileUrlResponse,
+          },
+        },
+      },
+      404: {
+        description: 'File not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get user file history
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/history',
+    summary: 'Get user file upload history',
+    tags: ['Storage'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: storageSchemas.GetFileHistoryQuery,
+    },
+    responses: {
+      200: {
+        description: 'File history',
+        content: {
+          'application/json': {
+            schema: storageSchemas.FileHistoryResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Delete file
+  registry.registerRoute({
+    method: 'delete',
+    path: '/storage/files/{fileId}',
+    summary: 'Delete user file',
+    tags: ['Storage'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: storageParameters.FileIdParam,
+    },
+    responses: {
+      204: {
+        description: 'File deleted successfully',
+      },
+      404: {
+        description: 'File not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Voucher Public Routes =============
+
+  // Get all vouchers (public, read-only)
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers',
+    summary: 'List all active vouchers',
+    tags: ['Vouchers'],
+    request: {
+      query: voucherSchemas.VoucherQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of vouchers',
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher by ID (public, read-only)
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers/{id}',
+    summary: 'Get voucher details',
+    tags: ['Vouchers'],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher details',
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Scan voucher
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/{id}/scan',
+    summary: 'Scan a voucher',
+    tags: ['Vouchers'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherScanRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher scan result',
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherScanResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Claim voucher
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/{id}/claim',
+    summary: 'Claim a voucher',
+    tags: ['Vouchers'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherClaimRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher claimed successfully',
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherClaimResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Cannot claim voucher',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Redeem voucher
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/{id}/redeem',
+    summary: 'Redeem a voucher',
+    tags: ['Vouchers'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherRedeemRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher redeemed successfully',
+        content: {
+          'application/json': {
+            schema: voucherSchemas.VoucherRedeemResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Cannot redeem voucher',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get user vouchers
+  registry.registerRoute({
+    method: 'get',
+    path: '/users/vouchers',
+    summary: 'Get user claimed vouchers',
+    tags: ['Vouchers'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'User vouchers',
+        content: {
+          'application/json': {
+            schema: voucherSchemas.UserVouchersListResponse,
+          },
+        },
+      },
+    },
+  })
 
   // OAuth 2.0 Authentication routes
   registry.registerRoute({

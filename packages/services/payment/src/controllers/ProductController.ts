@@ -39,7 +39,8 @@ export class ProductController {
         metadata,
       })
 
-      response.status(201).json(product)
+      const validatedResponse = paymentPublic.Product.parse(product)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -71,7 +72,8 @@ export class ProductController {
         metadata,
       })
 
-      response.json(product)
+      const validatedResponse = paymentPublic.Product.parse(product)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -100,7 +102,8 @@ export class ProductController {
         intervalCount,
       })
 
-      response.status(201).json(price)
+      const validatedResponse = paymentPublic.Price.parse(price)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -122,7 +125,8 @@ export class ProductController {
 
       const price = await this.productService.deactivatePrice(id)
 
-      response.json(price)
+      const validatedResponse = paymentPublic.Price.parse(price)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -145,7 +149,8 @@ export class ProductController {
 
       const products = await this.productService.listProducts(limit)
 
-      response.json({ data: products })
+      const validatedResponse = paymentPublic.ProductListResponse.parse({ data: products })
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -168,7 +173,8 @@ export class ProductController {
 
       const prices = await this.productService.listPrices(productId, limit)
 
-      response.json({ data: prices })
+      const validatedResponse = paymentPublic.PriceListResponse.parse({ data: prices })
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

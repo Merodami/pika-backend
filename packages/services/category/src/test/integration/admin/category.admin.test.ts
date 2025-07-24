@@ -26,6 +26,7 @@ vi.mock('@pika/shared', async () => {
 
 import { logger } from '@pika/shared'
 import {
+  AuthenticatedRequestClient,
   cleanupTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
@@ -50,7 +51,10 @@ import {
 describe('Admin Category Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
-  let authHelper: E2EAuthHelper
+  let request: supertest.SuperTest<supertest.Test>
+  let authHelper: E2EAuthHelper  
+  let adminClient: AuthenticatedRequestClient
+  let customerClient: AuthenticatedRequestClient
   let server: any
   let sharedTestData: SharedCategoryTestData
 
@@ -74,6 +78,9 @@ describe('Admin Category Integration Tests', () => {
 
     logger.debug('Express server ready for testing.')
 
+    // Initialize supertest with the Express server instance
+    request = supertest(app)
+
     // Initialize E2E Authentication Helper
     authHelper = createE2EAuthHelper(app)
 
@@ -83,12 +90,12 @@ describe('Admin Category Integration Tests', () => {
 
     logger.debug('E2E authentication setup complete')
 
-    // Create shared test data once for all tests
-    sharedTestData = await createSharedCategoryTestData(testDb.prisma)
-
     // Get authenticated clients for different user types
     adminClient = await authHelper.getAdminClient(testDb.prisma)
     customerClient = await authHelper.getUserClient(testDb.prisma)
+
+    // Create shared test data once for all tests
+    sharedTestData = await createSharedCategoryTestData(testDb.prisma)
   }, 120000)
 
   beforeEach(async () => {
@@ -333,6 +340,47 @@ describe('Admin Category Integration Tests', () => {
           .set('Accept', 'application/json')
           .expect(403)
       })
+    })
+  })
+
+  // Authentication Boundary Tests
+  describe('Authentication Boundary Tests', () => {
+    it('should require authentication for all admin endpoints', async () => {
+      const testCategory = sharedTestData.activeRootCategories[0]
+      
+      // Test all admin endpoints without authentication
+      const adminEndpoints = [
+        { method: 'get', url: '/admin/categories' },
+        { method: 'post', url: '/admin/categories' },
+        { method: 'get', url: `/admin/categories/${testCategory.id}` },
+        { method: 'put', url: `/admin/categories/${testCategory.id}` },
+        { method: 'delete', url: `/admin/categories/${testCategory.id}` },
+      ]
+
+      for (const endpoint of adminEndpoints) {
+        await request[endpoint.method](endpoint.url)
+          .set('Accept', 'application/json')
+          .expect(401)
+      }
+    })
+
+    it('should require admin role for admin endpoints', async () => {
+      const testCategory = sharedTestData.activeRootCategories[0]
+      
+      // Test admin endpoints with customer token (should get 403)
+      const adminEndpoints = [
+        { method: 'get', url: '/admin/categories' },
+        { method: 'post', url: '/admin/categories' },
+        { method: 'get', url: `/admin/categories/${testCategory.id}` },
+        { method: 'put', url: `/admin/categories/${testCategory.id}` },
+        { method: 'delete', url: `/admin/categories/${testCategory.id}` },
+      ]
+
+      for (const endpoint of adminEndpoints) {
+        await customerClient[endpoint.method](endpoint.url)
+          .set('Accept', 'application/json')
+          .expect(403)
+      }
     })
   })
 

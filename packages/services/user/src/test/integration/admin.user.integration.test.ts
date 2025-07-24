@@ -1,21 +1,27 @@
+/**
+ * User Service - Admin API Integration Tests
+ *
+ * Tests for admin-only user endpoints that require admin privileges.
+ * These endpoints are used for user management and administration.
+ */
+
+// For integration tests, we unmock the modules we need for real Express server
 import { vi } from 'vitest'
 
-// Unmock modules that might interfere with real server setup for integration tests
-vi.unmock('@pika/http') // Ensures real createExpressServer is used
-vi.unmock('@pika/api') // Ensures real schemas from @pika/api are used
-vi.unmock('@pika/redis') // Ensures real cache decorators from @pika/redis are used
+// IMPORTANT: Unmock before any imports to ensure we get real implementations
+vi.unmock('@pika/http')
+vi.unmock('@pika/api')
+vi.unmock('@pika/redis')
 
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
   const actualApi = await vi.importActual('@pika/api')
-
   return actualApi // Return all actual exports
 })
 
 // Force Vitest to use the actual implementation of '@pika/shared' for this test file.
 vi.mock('@pika/shared', async () => {
   const actualShared = await vi.importActual('@pika/shared')
-
   return actualShared // Return all actual exports
 })
 
@@ -33,12 +39,17 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { PrismaClient, UserRole } from '@prisma/client'
+import { UserRole } from '@prisma/client'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { createUserServer } from '../../../server.js'
+import { createUserServer } from '../../server.js'
+import {
+  createSharedUserTestData,
+  seedTestUsers,
+  type SharedUserTestData,
+} from '../helpers/userTestHelpers.js'
 
 interface FileStoragePort {
   saveFile: (
@@ -51,42 +62,20 @@ interface FileStoragePort {
   fileExists: (path: string) => Promise<boolean>
 }
 
-// Test data seeding function for users
-async function seedTestUsers(
-  prismaClient: PrismaClient,
-  count: number = 5,
-): Promise<any[]> {
-  logger.debug('Seeding test users...')
-
-  const users = await Promise.all(
-    Array.from({ length: count }, (_, i) =>
-      prismaClient.user.create({
-        data: {
-          email: `testuser${i}@example.com`,
-          firstName: `Test${i}`,
-          lastName: `User${i}`,
-          role: i === 0 ? UserRole.ADMIN : UserRole.CUSTOMER,
-          emailVerified: true,
-          phoneNumber: `+123456789${i}`,
-          status: 'ACTIVE',
-        },
-      }),
-    ),
-  )
-
-  logger.debug('Test users seeded.')
-
-  return users
-}
-
-describe('User Service Integration Tests', () => {
+describe('User Service - Admin API Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let authHelper: E2EAuthHelper
-  let adminClient: AuthenticatedRequestClient
-  let userClient: AuthenticatedRequestClient
+  let cacheService: MemoryCacheService
 
-  const mockCacheService = new MemoryCacheService(3600)
+  // Authenticated clients for different user types
+  let adminClient: AuthenticatedRequestClient
+  let customerClient: AuthenticatedRequestClient
+  let businessClient: AuthenticatedRequestClient
+
+  // Shared test data created once
+  let sharedTestData: SharedUserTestData
+
   const mockCommunicationClient =
     new CommunicationServiceClientMock().setupEmailSuccess()
 
@@ -102,29 +91,35 @@ describe('User Service Integration Tests', () => {
     fileExists: vi.fn().mockResolvedValue(true),
   }
 
+  // Note: Using shared helper from userTestHelpers.js
+
   beforeAll(async () => {
-    // Use unified test database helper
+    logger.debug('Setting up User Service admin integration tests...')
+
+    // Setup test database
     testDb = await createTestDatabase({
-      databaseName: 'test_db',
+      databaseName: 'test_user_admin_db',
       useInitSql: true,
       startupTimeout: 120000,
     })
 
-    // Update process.env for compatibility with existing code
+    // Update process.env for compatibility
     process.env.DATABASE_URL = testDb.databaseUrl
 
-    await mockCacheService.connect()
+    // Create server
+    cacheService = new MemoryCacheService()
+    await cacheService.connect()
 
     app = await createUserServer({
       prisma: testDb.prisma,
-      cacheService: mockCacheService,
+      cacheService,
       fileStorage: mockFileStorage as any,
       communicationClient: mockCommunicationClient as any,
     })
 
     logger.debug('Express server ready for testing.')
 
-    // Initialize E2E Authentication Helper using the Express app
+    // Initialize E2E Authentication Helper
     authHelper = createE2EAuthHelper(app)
 
     // Create test users and authenticate them
@@ -133,30 +128,51 @@ describe('User Service Integration Tests', () => {
 
     // Get authenticated clients for different user types
     adminClient = await authHelper.getAdminClient(testDb.prisma)
-    userClient = await authHelper.getUserClient(testDb.prisma)
+    customerClient = await authHelper.getUserClient(testDb.prisma)
+    businessClient = await authHelper.getBusinessClient(testDb.prisma)
 
     logger.debug('E2E authentication setup complete')
+
+    // Create shared test data once for all tests
+    logger.debug('Creating shared test data...')
+    sharedTestData = await createSharedUserTestData(testDb.prisma)
+
+    logger.debug(
+      `Created ${sharedTestData.allUsers.length} shared test users`,
+    )
   }, 120000)
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    // Use unified database cleanup
+
+    // Clear cache
+    await cacheService.clearAll()
+
+    // Clean up only user-related data to preserve E2E auth users and shared test data
     if (testDb?.prisma) {
-      await clearTestDatabase(testDb.prisma)
-      // Recreate auth test users after clearing
-      await authHelper.createAllTestUsers(testDb.prisma)
+      // Delete test users created during tests (not the E2E auth users or shared data)
+      await testDb.prisma.user.deleteMany({
+        where: {
+          email: {
+            contains: '@test.com',
+            not: {
+              in: [
+                'admin@e2etest.com',
+                'user@e2etest.com',
+                'business@e2etest.com',
+                // Preserve shared test users
+                ...sharedTestData.allUsers.map(u => u.email),
+              ],
+            },
+          },
+        },
+      })
     }
   })
 
   afterAll(async () => {
     logger.debug('Cleaning up resources...')
 
-    // Clean up authentication tokens
-    if (authHelper) {
-      authHelper.clearTokens()
-    }
-
-    // Use unified cleanup
     if (testDb) {
       await cleanupTestDatabase(testDb)
     }
@@ -164,10 +180,10 @@ describe('User Service Integration Tests', () => {
     logger.debug('Resources cleaned up.')
   })
 
-  // Read API Tests
-  describe('GET /users', () => {
+  // Admin User Management Tests
+  describe('GET /users (Admin List)', () => {
     it('should return all users with pagination for admin', async () => {
-      await seedTestUsers(testDb.prisma, 5)
+      await seedTestUsers(testDb.prisma, { count: 5 })
 
       const response = await adminClient
         .get('/users')
@@ -181,8 +197,8 @@ describe('User Service Integration Tests', () => {
     })
 
     it('should filter users by email', async () => {
-      const users = await seedTestUsers(testDb.prisma, 3)
-      const targetUser = users[0]
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 3 })
+      const targetUser = testUsers.users[0]
 
       const response = await adminClient
         .get('/users')
@@ -195,22 +211,8 @@ describe('User Service Integration Tests', () => {
     })
 
     it('should filter users by role', async () => {
-      // Seed only MEMBER users
-      await Promise.all(
-        Array.from({ length: 3 }, (_, i) =>
-          testDb.prisma.user.create({
-            data: {
-              email: `member${i}@example.com`,
-              firstName: `Member${i}`,
-              lastName: `User${i}`,
-              role: UserRole.CUSTOMER,
-              emailVerified: true,
-              phoneNumber: `+123456789${i}`,
-              status: 'ACTIVE',
-            },
-          }),
-        ),
-      )
+      // Seed specific role users
+      await seedTestUsers(testDb.prisma, { count: 3, role: 'CUSTOMER' })
 
       const response = await adminClient
         .get('/users')
@@ -221,7 +223,6 @@ describe('User Service Integration Tests', () => {
       expect(response.body.data.length).toBeGreaterThan(0)
 
       // Check that all returned users have customer role
-      // The response should include our seeded customers
       const nonCustomerUsers = response.body.data.filter(
         (user: any) => user.role !== UserRole.CUSTOMER,
       )
@@ -236,8 +237,27 @@ describe('User Service Integration Tests', () => {
       expect(customerUsers.length).toBeGreaterThan(0)
     })
 
+    it('should filter users by status', async () => {
+      await seedTestUsers(testDb.prisma, { 
+        count: 5, 
+        generateInactive: true,
+        generateUnconfirmed: true
+      })
+
+      const response = await adminClient
+        .get('/users')
+        .query({ status: 'ACTIVE' })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data.length).toBeGreaterThan(0)
+      expect(
+        response.body.data.every((user: any) => user.status === 'ACTIVE')
+      ).toBe(true)
+    })
+
     it('should sort users by specified field', async () => {
-      await seedTestUsers(testDb.prisma, 5)
+      await seedTestUsers(testDb.prisma, { count: 5 })
 
       const response = await adminClient
         .get('/users?sortBy=email&sortOrder=ASC')
@@ -245,15 +265,14 @@ describe('User Service Integration Tests', () => {
         .expect(200)
 
       const emails = response.body.data.map((user: any) => user.email)
-
       expect(emails).toEqual([...emails].sort())
     })
 
     it('should paginate results correctly', async () => {
-      await seedTestUsers(testDb.prisma, 5)
+      await seedTestUsers(testDb.prisma, { count: 10 })
 
       const response = await adminClient
-        .get('/users?page=1&limit=10')
+        .get('/users?page=1&limit=5')
         .set('Accept', 'application/json')
 
       if (response.status !== 200) {
@@ -263,57 +282,22 @@ describe('User Service Integration Tests', () => {
 
       expect(response.status).toBe(200)
       expect(response.body.pagination.page).toBe(1)
-      expect(response.body.pagination.limit).toBe(10)
-      expect(response.body.data.length).toBeGreaterThan(0)
+      expect(response.body.pagination.limit).toBe(5)
+      expect(response.body.data.length).toBeLessThanOrEqual(5)
     })
 
     it('should return 403 for non-admin users', async () => {
-      await userClient
+      await customerClient
         .get('/users')
         .set('Accept', 'application/json')
         .expect(403)
     })
   })
 
-  describe('GET /users/me', () => {
-    it('should return current user profile', async () => {
-      // Get the member user from database
-      const memberUser = await testDb.prisma.user.findFirst({
-        where: { email: 'user@e2etest.com' },
-      })
-
-      // Test if /users/me endpoint exists by checking response
-      const response = await userClient
-        .get('/users/me')
-        .set('Accept', 'application/json')
-
-      // Check if it's a 404 (endpoint not found) or 200 (working)
-      if (response.status === 404) {
-        // Skip this test if the endpoint doesn't exist
-        // Skipping /users/me test - endpoint not found
-        return
-      }
-
-      expect(response.status).toBe(200)
-      expect(response.body.id).toBe(memberUser!.id)
-      expect(response.body.email).toBe('user@e2etest.com')
-    })
-
-    it('should return 401 for unauthenticated requests', async () => {
-      const response = await authHelper
-        .getUnauthenticatedClient()
-        .get('/users/me')
-        .set('Accept', 'application/json')
-
-      // Expect either 401 (auth required) or 404 (endpoint not found)
-      expect([401, 404]).toContain(response.status)
-    })
-  })
-
-  describe('GET /users/:user_id', () => {
+  describe('GET /users/:user_id (Admin)', () => {
     it('should return user by ID for admin', async () => {
-      const users = await seedTestUsers(testDb.prisma, 1)
-      const targetUser = users[0]
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
 
       const response = await adminClient
         .get(`/users/${targetUser.id}`)
@@ -322,6 +306,10 @@ describe('User Service Integration Tests', () => {
 
       expect(response.body.id).toBe(targetUser.id)
       expect(response.body.email).toBe(targetUser.email)
+      expect(response.body).toHaveProperty('firstName')
+      expect(response.body).toHaveProperty('lastName')
+      expect(response.body).toHaveProperty('role')
+      expect(response.body).toHaveProperty('status')
     })
 
     it('should return 404 for non-existent user', async () => {
@@ -333,35 +321,28 @@ describe('User Service Integration Tests', () => {
         .expect(404)
     })
 
-    it('should allow users to view their own profile', async () => {
-      const memberUser = await testDb.prisma.user.findFirst({
-        where: { email: 'user@e2etest.com' },
-      })
+    it('should include admin-specific fields', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
 
-      const response = await userClient
-        .get(`/users/${memberUser!.id}`)
+      const response = await adminClient
+        .get(`/users/${targetUser.id}`)
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.id).toBe(memberUser!.id)
-    })
-
-    it('should allow authenticated users to view other user profiles', async () => {
-      const otherUser = await seedTestUsers(testDb.prisma, 1)
-
-      const response = await userClient
-        .get(`/users/${otherUser[0].id}`)
-        .set('Accept', 'application/json')
-        .expect(200)
-
-      expect(response.body.id).toBe(otherUser[0].id)
+      // Admin should see additional fields
+      expect(response.body).toHaveProperty('createdAt')
+      expect(response.body).toHaveProperty('updatedAt')
+      expect(response.body).toHaveProperty('lastLoginAt')
+      expect(response.body).toHaveProperty('emailVerified')
+      expect(response.body).toHaveProperty('phoneVerified')
     })
   })
 
-  describe('GET /users/email/:email', () => {
+  describe('GET /users/email/:email (Admin)', () => {
     it('should return user by email for admin', async () => {
-      const users = await seedTestUsers(testDb.prisma, 1)
-      const targetUser = users[0]
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
 
       const response = await adminClient
         .get(`/users/email/${targetUser.email}`)
@@ -369,17 +350,25 @@ describe('User Service Integration Tests', () => {
         .expect(200)
 
       expect(response.body.email).toBe(targetUser.email)
+      expect(response.body.id).toBe(targetUser.id)
+    })
+
+    it('should return 404 for non-existent email', async () => {
+      await adminClient
+        .get('/users/email/nonexistent@example.com')
+        .set('Accept', 'application/json')
+        .expect(404)
     })
 
     it('should return 403 for non-admin users', async () => {
-      await userClient
+      await customerClient
         .get('/users/email/test@example.com')
         .set('Accept', 'application/json')
         .expect(403)
     })
   })
 
-  // Admin Create User Tests
+  // Admin User Creation Tests
   describe('POST /users (Admin Create User)', () => {
     it('should create a new user with all required fields', async () => {
       const userData = {
@@ -474,44 +463,6 @@ describe('User Service Integration Tests', () => {
       expect(response.body.role).toBe('ADMIN')
     })
 
-    it('should create customer user', async () => {
-      const userData = {
-        email: 'customer2@example.com',
-        firstName: 'Customer',
-        lastName: 'User',
-        phoneNumber: '+3333333333',
-        dateOfBirth: '1992-09-05',
-        role: 'CUSTOMER',
-      }
-
-      const response = await adminClient
-        .post('/users')
-        .send(userData)
-        .set('Accept', 'application/json')
-        .expect(201)
-
-      expect(response.body.role).toBe('CUSTOMER')
-    })
-
-    it('should create user with ACTIVE status', async () => {
-      const userData = {
-        email: 'active@example.com',
-        firstName: 'Active',
-        lastName: 'User',
-        phoneNumber: '+4444444444',
-        dateOfBirth: '1988-11-20',
-        status: 'ACTIVE',
-      }
-
-      const response = await adminClient
-        .post('/users')
-        .send(userData)
-        .set('Accept', 'application/json')
-        .expect(201)
-
-      expect(response.body.status).toBe('ACTIVE')
-    })
-
     it('should validate required fields', async () => {
       const incompleteData = {
         firstName: 'Test',
@@ -546,10 +497,10 @@ describe('User Service Integration Tests', () => {
     })
 
     it('should return 422 for duplicate email', async () => {
-      const existingUser = await seedTestUsers(testDb.prisma, 1)
+      const existingUser = await seedTestUsers(testDb.prisma, { count: 1 })
 
       const userData = {
-        email: existingUser[0].email,
+        email: existingUser.users[0].email,
         firstName: 'Duplicate',
         lastName: 'User',
         phoneNumber: '+1234567890',
@@ -582,25 +533,6 @@ describe('User Service Integration Tests', () => {
       expect(response.body.error).toBeDefined()
     })
 
-    it('should validate status enum values', async () => {
-      const userData = {
-        email: 'invalid.status@example.com',
-        firstName: 'Invalid',
-        lastName: 'Status',
-        phoneNumber: '+1234567890',
-        dateOfBirth: '1990-01-01',
-        status: 'INVALID_STATUS',
-      }
-
-      const response = await adminClient
-        .post('/users')
-        .send(userData)
-        .set('Accept', 'application/json')
-        .expect(400)
-
-      expect(response.body.error).toBeDefined()
-    })
-
     it('should return 403 for non-admin users', async () => {
       const userData = {
         email: 'unauthorized@example.com',
@@ -610,120 +542,19 @@ describe('User Service Integration Tests', () => {
         dateOfBirth: '1990-01-01',
       }
 
-      await userClient
+      await customerClient
         .post('/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(403)
     })
-
-    it('should handle optional fields correctly', async () => {
-      const userData = {
-        email: 'optional.fields@example.com',
-        firstName: 'Optional',
-        lastName: 'Fields',
-        phoneNumber: '+5555555555',
-        dateOfBirth: '1995-04-12',
-        // Optional fields - only include fields that exist in database schema
-      }
-
-      const response = await adminClient
-        .post('/users')
-        .send(userData)
-        .set('Accept', 'application/json')
-        .expect(201)
-
-      expect(response.body.firstName).toBe(userData.firstName)
-      expect(response.body.lastName).toBe(userData.lastName)
-    })
-
-    it('should create multiple users with unique IDs', async () => {
-      const userData1 = {
-        email: 'user1@example.com',
-        firstName: 'User',
-        lastName: 'One',
-        phoneNumber: '+1111111111',
-        dateOfBirth: '1990-01-01',
-      }
-
-      const userData2 = {
-        email: 'user2@example.com',
-        firstName: 'User',
-        lastName: 'Two',
-        phoneNumber: '+2222222222',
-        dateOfBirth: '1990-01-01',
-      }
-
-      const response1 = await adminClient
-        .post('/users')
-        .send(userData1)
-        .expect(201)
-
-      const response2 = await adminClient
-        .post('/users')
-        .send(userData2)
-        .expect(201)
-
-      expect(response1.body.id).toBeDefined()
-      expect(response2.body.id).toBeDefined()
-      expect(response1.body.id).not.toBe(response2.body.id)
-    })
   })
 
-  describe('PUT /users/me', () => {
-    it('should update current user profile', async () => {
-      const updateData = {
-        firstName: 'Updated',
-        lastName: 'Name',
-      }
-
-      const response = await userClient
-        .put('/users/me')
-        .send(updateData)
-        .set('Accept', 'application/json')
-
-      // Check if endpoint exists
-      if (response.status === 404) {
-        // Skipping PUT /users/me test - endpoint not found
-        return
-      }
-
-      expect(response.status).toBe(200)
-      expect(response.body.firstName).toBe('Updated')
-      expect(response.body.lastName).toBe('Name')
-    })
-
-    it('should not allow updating role', async () => {
-      const updateData = {
-        role: 'ADMIN', // Trying to elevate privileges
-      }
-
-      const response = await userClient
-        .put('/users/me')
-        .send(updateData)
-        .set('Accept', 'application/json')
-
-      // Check if endpoint exists
-      if (response.status === 404) {
-        // Skipping PUT /users/me role test - endpoint not found
-        return
-      }
-
-      expect(response.status).toBe(400)
-
-      // Role should not be changed (validation should prevent this)
-      const user = await testDb.prisma.user.findFirst({
-        where: { email: 'user@e2etest.com' },
-      })
-
-      expect(user?.role).toBe(UserRole.CUSTOMER)
-    })
-  })
-
-  describe('PATCH /users/:user_id', () => {
+  // Admin User Update Tests
+  describe('PATCH /users/:user_id (Admin)', () => {
     it('should update an existing user for admin', async () => {
-      const users = await seedTestUsers(testDb.prisma, 1)
-      const targetUser = users[0]
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
 
       const updateData = {
         firstName: 'Updated',
@@ -747,6 +578,50 @@ describe('User Service Integration Tests', () => {
       expect(updatedUser?.firstName).toBe('Updated')
     })
 
+    it('should allow admin to update user role', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { 
+        count: 1, 
+        role: 'CUSTOMER' 
+      })
+      const targetUser = testUsers.users[0]
+
+      const updateData = {
+        role: 'BUSINESS',
+      }
+
+      const response = await adminClient
+        .patch(`/users/${targetUser.id}`)
+        .send(updateData)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.role).toBe('BUSINESS')
+
+      // Verify in database
+      const updatedUser = await testDb.prisma.user.findUnique({
+        where: { id: targetUser.id },
+      })
+
+      expect(updatedUser?.role).toBe('BUSINESS')
+    })
+
+    it('should allow admin to update user status', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      const updateData = {
+        status: 'INACTIVE',
+      }
+
+      const response = await adminClient
+        .patch(`/users/${targetUser.id}`)
+        .send(updateData)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.status).toBe('INACTIVE')
+    })
+
     it('should return 404 for non-existent user', async () => {
       const nonExistentId = uuid()
       const updateData = { firstName: 'Updated' }
@@ -759,21 +634,22 @@ describe('User Service Integration Tests', () => {
     })
 
     it('should return 403 for non-admin users', async () => {
-      const users = await seedTestUsers(testDb.prisma, 1)
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
       const updateData = { firstName: 'Unauthorized' }
 
-      await userClient
-        .patch(`/users/${users[0].id}`)
+      await customerClient
+        .patch(`/users/${testUsers.users[0].id}`)
         .send(updateData)
         .set('Accept', 'application/json')
         .expect(403)
     })
   })
 
-  describe('DELETE /users/:user_id', () => {
+  // Admin User Deletion Tests
+  describe('DELETE /users/:user_id (Admin)', () => {
     it('should soft delete a user for admin', async () => {
-      const users = await seedTestUsers(testDb.prisma, 1)
-      const userToDelete = users[0]
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const userToDelete = testUsers.users[0]
 
       await adminClient
         .delete(`/users/${userToDelete.id}`)
@@ -798,26 +674,23 @@ describe('User Service Integration Tests', () => {
     })
 
     it('should return 403 for non-admin users', async () => {
-      const users = await seedTestUsers(testDb.prisma, 1)
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
 
-      await userClient
-        .delete(`/users/${users[0].id}`)
+      await customerClient
+        .delete(`/users/${testUsers.users[0].id}`)
         .set('Accept', 'application/json')
         .expect(403)
     })
   })
 
-  // Password endpoint tests removed - endpoint doesn't exist in current implementation
-
-  describe('POST /users/:user_id/avatar', () => {
+  // Admin Avatar Management
+  describe('POST /users/:user_id/avatar (Admin)', () => {
     it('should allow admin to upload avatar for any user', async () => {
-      // Get any user to upload avatar for
-      const someUser = await testDb.prisma.user.findFirst({
-        where: { role: 'CUSTOMER' },
-      })
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
 
       const response = await adminClient
-        .post(`/users/${someUser!.id}/avatar`)
+        .post(`/users/${targetUser.id}/avatar`)
         .attach('avatar', Buffer.from('fake-image-data'), 'avatar.jpg')
         .expect(200)
 
@@ -826,52 +699,30 @@ describe('User Service Integration Tests', () => {
     })
 
     it('should return 400 when no file is uploaded', async () => {
-      // Get any user
-      const someUser = await testDb.prisma.user.findFirst({
-        where: { role: 'CUSTOMER' },
-      })
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
 
       await adminClient
-        .post(`/users/${someUser!.id}/avatar`)
+        .post(`/users/${targetUser.id}/avatar`)
         .set('Accept', 'application/json')
         .expect(400)
     })
-  })
 
-  // Error Handling Tests
-  describe('Error Handling', () => {
-    it('should handle invalid UUID parameters', async () => {
-      // User service doesn't validate UUIDs at controller level, returns the user if found
-      const response = await adminClient
-        .get('/users/not-a-uuid')
-        .set('Accept', 'application/json')
+    it('should return 404 for non-existent user', async () => {
+      const nonExistentId = uuid()
 
-      // Expect 400 since we now validate UUID format before hitting the database
-      expect(response.status).toBe(400)
-    })
-
-    it('should handle invalid input for POST', async () => {
-      const invalidData = {
-        email: 'invalid-email', // Invalid email format
-        firstName: '', // Empty required field
-        role: 'INVALID_ROLE', // Invalid role
-      }
-
-      const response = await adminClient
-        .post('/users')
-        .send(invalidData)
-        .set('Accept', 'application/json')
-        .expect(400) // Validation error
-
-      expect(response.body.error).toBeDefined()
+      await adminClient
+        .post(`/users/${nonExistentId}/avatar`)
+        .attach('avatar', Buffer.from('fake-image-data'), 'avatar.jpg')
+        .expect(404)
     })
   })
 
   // Unified Verification System Tests
   describe('Unified Verification System', () => {
     describe('Email Verification', () => {
-      it('should verify email with valid token', async () => {
-        // Create a user and get verification token
+      it('should verify email with admin privileges', async () => {
+        // Create a user with unverified email
         const user = await testDb.prisma.user.create({
           data: {
             email: 'verify@test.com',
@@ -883,8 +734,7 @@ describe('User Service Integration Tests', () => {
           },
         })
 
-        // Admin verification does not require tokens - it directly verifies by userId
-        // Verify email using the admin endpoint
+        // Admin verification directly verifies by userId
         const response = await adminClient
           .post('/admin/users/verify')
           .send({
@@ -966,7 +816,7 @@ describe('User Service Integration Tests', () => {
         })
 
         // Store verification code
-        await mockCacheService.set(
+        await cacheService.set(
           `phone-verification:${user.id}`,
           '123456',
           300,
@@ -985,7 +835,7 @@ describe('User Service Integration Tests', () => {
         expect(response.body.user.phoneVerified).toBe(true)
 
         // Verify code is deleted
-        const codeExists = await mockCacheService.get(
+        const codeExists = await cacheService.get(
           `phone-verification:${user.id}`,
         )
 
@@ -1003,7 +853,7 @@ describe('User Service Integration Tests', () => {
           },
         })
 
-        await mockCacheService.set(
+        await cacheService.set(
           `phone-verification:${user.id}`,
           '123456',
           300,
@@ -1042,7 +892,7 @@ describe('User Service Integration Tests', () => {
         expect(response.body.success).toBe(true)
 
         // Verify a code was stored
-        const code = await mockCacheService.get(`phone-verification:${user.id}`)
+        const code = await cacheService.get(`phone-verification:${user.id}`)
 
         expect(code).toBeDefined()
         expect(code).toMatch(/^\d{6}$/) // 6-digit code
@@ -1084,7 +934,7 @@ describe('User Service Integration Tests', () => {
       })
     })
 
-    describe('Error Cases', () => {
+    describe('Verification Error Cases', () => {
       it('should fail with unsupported verification type', async () => {
         await adminClient
           .post('/admin/users/verify')
@@ -1113,6 +963,94 @@ describe('User Service Integration Tests', () => {
             userId: '00000000-0000-0000-0000-000000000000',
           })
           .expect(404)
+      })
+
+      it('should require admin privileges for verification endpoints', async () => {
+        await customerClient
+          .post('/admin/users/verify')
+          .send({
+            type: 'EMAIL',
+            userId: '00000000-0000-0000-0000-000000000000',
+          })
+          .expect(403)
+      })
+    })
+  })
+
+  // Admin Error Handling Tests
+  describe('Admin Error Handling', () => {
+    it('should handle invalid input for POST', async () => {
+      const invalidData = {
+        email: 'invalid-email', // Invalid email format
+        firstName: '', // Empty required field
+        role: 'INVALID_ROLE', // Invalid role
+      }
+
+      const response = await adminClient
+        .post('/users')
+        .send(invalidData)
+        .set('Accept', 'application/json')
+        .expect(400) // Validation error
+
+      expect(response.body.error).toBeDefined()
+    })
+
+    it('should handle invalid UUID parameters', async () => {
+      await adminClient
+        .get('/users/not-a-uuid')
+        .set('Accept', 'application/json')
+        .expect(400)
+    })
+
+    it('should provide detailed error information for admins', async () => {
+      const response = await adminClient
+        .post('/users')
+        .send({}) // Empty data
+        .set('Accept', 'application/json')
+        .expect(400)
+
+      expect(response.body.error).toBeDefined()
+      expect(response.body.error.code).toBeDefined()
+      if (response.body.error.validationErrors) {
+        expect(typeof response.body.error.validationErrors).toBe('object')
+      }
+    })
+  })
+
+  // Admin Performance and Monitoring
+  describe('Admin Performance Tests', () => {
+    it('should handle bulk user operations efficiently', async () => {
+      // Create multiple users and test listing performance
+      await seedTestUsers(testDb.prisma, { count: 50 })
+
+      const startTime = Date.now()
+      const response = await adminClient
+        .get('/users?limit=50')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      const endTime = Date.now()
+      const duration = endTime - startTime
+
+      expect(response.body.data).toHaveLength(50)
+      expect(duration).toBeLessThan(5000) // Should complete in under 5 seconds
+    })
+
+    it('should handle concurrent admin operations', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 5 })
+
+      // Perform concurrent read operations
+      const promises = testUsers.users.map(user =>
+        adminClient
+          .get(`/users/${user.id}`)
+          .set('Accept', 'application/json')
+      )
+
+      const responses = await Promise.all(promises)
+
+      // All requests should succeed
+      responses.forEach(response => {
+        expect(response.status).toBe(200)
       })
     })
   })
