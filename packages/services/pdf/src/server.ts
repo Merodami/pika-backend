@@ -75,7 +75,6 @@ export async function createPDFServer(config: ServerConfig) {
     },
     authOptions: {
       excludePaths: [
-        '/voucher-books*', // Public endpoints don't require auth
         '/health',
         '/metrics',
         '/internal/*', // Internal service-to-service communication

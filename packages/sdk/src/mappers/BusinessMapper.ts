@@ -91,7 +91,7 @@ export class BusinessMapper {
       avgRating: domain.avgRating,
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
-      deletedAt: domain.deletedAt ? formatDateToISO(domain.deletedAt) : undefined,
+      deletedAt: domain.deletedAt ? formatDateToISO(domain.deletedAt) : null,
       // Relations using existing mappers
       user: domain.user ? UserMapper.toDTO(domain.user) : undefined,
       category: domain.category

@@ -45,12 +45,13 @@ export function createEmailRouter(
     controller.sendEmail,
   )
 
-  router.post(
-    '/send-bulk',
-    requireAdmin(),
-    validateBody(communicationPublic.SendBulkEmailRequest),
-    controller.sendBulkEmail,
-  )
+  // ADMIN ENDPOINTS EXCLUDED - Bulk email functionality moved to internal routes
+  // router.post(
+  //   '/send-bulk',
+  //   requireAdmin(),
+  //   validateBody(communicationPublic.SendBulkEmailRequest),
+  //   controller.sendBulkEmail,
+  // )
 
   router.get(
     '/history',

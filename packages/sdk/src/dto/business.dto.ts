@@ -19,7 +19,7 @@ export interface BusinessDTO {
   avgRating: number
   createdAt: string
   updatedAt: string
-  deletedAt?: string
+  deletedAt: string | null
   // Optional relations
   user?: UserDTO
   category?: CategoryDTO

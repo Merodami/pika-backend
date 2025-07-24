@@ -27,6 +27,8 @@ export async function createPaymentServer(config: ServerConfig) {
     cacheService: config.cacheService,
     authOptions: {
       excludePaths: [
+        '/health',
+        '/metrics',
         '/webhooks/*', // Modern webhook endpoints (Stripe signature verification)
       ],
     },

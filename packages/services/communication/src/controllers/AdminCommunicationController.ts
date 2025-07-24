@@ -77,19 +77,18 @@ export class AdminCommunicationController
    * Get email analytics data
    */
   async getEmailAnalytics(
-    request: Request<{}, {}, {}, communicationAdmin.EmailAnalyticsQueryParams>,
-    response: Response<communicationAdmin.EmailAnalyticsResponse>,
+    request: Request<{}, {}, {}, any>, // TODO: communicationAdmin.EmailAnalyticsQueryParams when implemented
+    response: Response<any>, // TODO: communicationAdmin.EmailAnalyticsResponse when implemented
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query =
-        getValidatedQuery<communicationAdmin.EmailAnalyticsQueryParams>(request)
+      const query = getValidatedQuery<any>(request) // TODO: Use proper type when implemented
 
       logger.info('Getting email analytics', { query })
 
       // TODO: Implement actual analytics logic
       // For now, return mock data to make tests pass
-      const responseData: communicationAdmin.EmailAnalyticsResponse = {
+      const responseData: any = { // TODO: Use proper type when EmailAnalyticsResponse is implemented
         totalSent: 0,
         deliveryRate: 0,
         openRate: 0,
@@ -103,10 +102,8 @@ export class AdminCommunicationController
         dailyStats: [],
       }
 
-      const validatedResponse =
-        communicationAdmin.EmailAnalyticsResponse.parse(responseData)
-
-      response.json(validatedResponse)
+      // TODO: Add validation when EmailAnalyticsResponse schema is implemented
+      response.json(responseData)
     } catch (error) {
       next(error)
     }

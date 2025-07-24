@@ -75,8 +75,6 @@ export async function createCategoryServer(config: ServerConfig) {
     },
     authOptions: {
       excludePaths: [
-        '/categories', // Only exact public path doesn't require auth
-        '/categories/*', // Public sub-paths
         '/health',
         '/metrics',
         '/internal/*', // Internal service-to-service communication

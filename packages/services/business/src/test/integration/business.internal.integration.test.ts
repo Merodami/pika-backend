@@ -130,20 +130,20 @@ describe('Business Service - Internal API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.businesses).toBeDefined()
-      expect(Array.isArray(response.body.businesses)).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
 
       // Should have businesses from shared data in that category
       const businessesInCategory = sharedTestData.allBusinesses.filter(
         (b) => b.categoryId === sharedTestData.activeCategory.id,
       )
 
-      expect(response.body.businesses.length).toBeGreaterThanOrEqual(
+      expect(response.body.data.length).toBeGreaterThanOrEqual(
         businessesInCategory.length,
       )
-      if (response.body.businesses.length > 0) {
-        expect(response.body.businesses[0]).toHaveProperty('id')
-        expect(response.body.businesses[0]).toHaveProperty('businessNameKey')
+      if (response.body.data.length > 0) {
+        expect(response.body.data[0]).toHaveProperty('id')
+        expect(response.body.data[0]).toHaveProperty('businessNameKey')
       }
     })
 
@@ -156,12 +156,12 @@ describe('Business Service - Internal API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.businesses).toBeDefined()
-      expect(Array.isArray(response.body.businesses)).toBe(true)
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
 
       // Should only return businesses that are active=true AND verified=false
-      if (response.body.businesses.length > 0) {
-        response.body.businesses.forEach((business: any) => {
+      if (response.body.data.length > 0) {
+        response.body.data.forEach((business: any) => {
           expect(business.active).toBe(true)
           expect(business.verified).toBe(false)
         })
@@ -187,7 +187,7 @@ describe('Business Service - Internal API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.businesses).toEqual([])
+      expect(response.body.data).toEqual([])
     })
   })
 

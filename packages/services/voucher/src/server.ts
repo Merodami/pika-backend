@@ -41,6 +41,13 @@ export async function createVoucherServer({
     serviceName: VOUCHER_SERVICE_NAME,
     port: VOUCHER_SERVICE_PORT,
     cacheService,
+    authOptions: {
+      excludePaths: [
+        '/health',
+        '/metrics',
+        '/internal/*',
+      ],
+    },
     idempotencyOptions: {
       enabled: true,
       defaultTTL: 86400, // 24 hours

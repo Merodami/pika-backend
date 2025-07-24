@@ -19,6 +19,13 @@ export async function createSubscriptionServer(config: ServerConfig) {
     serviceName: 'subscription-service',
     port: SUBSCRIPTION_SERVICE_PORT,
     cacheService: config.cacheService,
+    authOptions: {
+      excludePaths: [
+        '/health',
+        '/metrics',
+        '/internal/*',
+      ],
+    },
     healthChecks: [
       {
         name: 'postgres',

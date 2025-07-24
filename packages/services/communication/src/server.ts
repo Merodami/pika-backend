@@ -22,6 +22,8 @@ export async function createCommunicationServer(config: ServerConfig) {
     cacheService: config.cacheService,
     authOptions: {
       excludePaths: [
+        '/health',
+        '/metrics',
         '/internal/*', // Internal routes use service authentication
       ],
     },

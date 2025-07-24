@@ -40,39 +40,13 @@ export const AdminUserDetailResponse = openapi(
     avatarUrl: z.string().url().optional(),
     status: UserStatus,
     role: UserRole,
-    flags: z.array(AccountFlag).default([]),
 
-    // Verification info
+    // Verification info (only fields that exist in database)
     emailVerified: z.boolean(),
     phoneVerified: z.boolean(),
-    identityVerified: z.boolean(),
-    verificationDate: DateTime.optional(),
 
-    // Account info
+    // Account info (only fields that exist in database)
     lastLoginAt: DateTime.optional(),
-    lastActivityAt: DateTime.optional(),
-    loginCount: z.number().int().nonnegative().default(0),
-    ipAddress: z.string().optional(),
-    userAgent: z.string().optional(),
-
-    // Stats
-    stats: z.object({
-      totalBookings: z.number().int().nonnegative(),
-      creditsBalance: z.number().int().nonnegative(),
-      friendsCount: z.number().int().nonnegative(),
-      followersCount: z.number().int().nonnegative(),
-      reportsCount: z.number().int().nonnegative(),
-    }),
-
-    // Admin notes
-    adminNotes: z.string().optional(),
-    suspensionReason: z.string().optional(),
-    suspendedAt: DateTime.optional(),
-    suspendedBy: UserId.optional(),
-
-    // Professional fields (if role is PROFESSIONAL)
-    description: z.string().optional(),
-    specialties: z.array(z.string()).optional(),
   }),
   {
     description: 'Detailed user information for admin',
@@ -91,10 +65,8 @@ export const AdminUserQueryParams = z.object({
   email: Email.optional(),
   status: UserStatus.optional(),
   role: UserRole.optional(),
-  flags: z.array(AccountFlag).optional(),
   emailVerified: z.boolean().optional(),
   phoneVerified: z.boolean().optional(),
-  identityVerified: z.boolean().optional(),
   registeredFrom: DateTime.optional(),
   registeredTo: DateTime.optional(),
   lastLoginFrom: DateTime.optional(),
@@ -222,8 +194,7 @@ export const BulkUserUpdateRequest = openapi(
     updates: z.object({
       status: UserStatus.optional(),
       role: UserRole.optional(),
-      flags: z.array(AccountFlag).optional(),
-    }),
+        }),
     reason: z.string().max(500),
   }),
   {
@@ -366,7 +337,6 @@ export const UpdateAdminProfileRequest = openapi(
     dateOfBirth: z.string().optional(),
     avatarUrl: z.string().url().optional(),
     // Admin-specific fields
-    adminNotes: z.string().max(2000).optional(),
   }),
   {
     description: 'Update current admin user profile',
@@ -412,7 +382,6 @@ export const UserVerificationStatusResponse = openapi(
     userId: UserId,
     emailVerified: z.boolean(),
     phoneVerified: z.boolean(),
-    identityVerified: z.boolean(),
     verificationDate: DateTime.optional(),
   }),
   {

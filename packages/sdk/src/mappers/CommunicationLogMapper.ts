@@ -44,7 +44,11 @@ export class CommunicationLogMapper {
       status: doc.status,
       provider: doc.provider || undefined,
       providerId: doc.providerId || undefined,
-      metadata: doc.metadata,
+      metadata: doc.metadata 
+        ? typeof doc.metadata === 'string' 
+          ? JSON.parse(doc.metadata)
+          : doc.metadata
+        : null,
       createdAt: doc.createdAt,
       sentAt: doc.sentAt || undefined,
       deliveredAt: doc.deliveredAt || undefined,

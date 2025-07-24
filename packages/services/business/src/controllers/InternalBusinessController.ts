@@ -145,7 +145,7 @@ export class InternalBusinessController {
         verified: query.onlyVerified,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: query.sortBy,
+        sortBy: query.sortBy as 'businessName' | 'avgRating' | 'verified' | 'active' | 'createdAt' | 'updatedAt' | undefined,
         sortOrder: query.sortOrder,
         parsedIncludes: includes,
       })

@@ -18,6 +18,13 @@ export async function createStorageServer(config: ServerConfig) {
     serviceName: 'storage-service',
     port: config.port,
     cacheService: config.cacheService,
+    authOptions: {
+      excludePaths: [
+        '/health',
+        '/metrics',
+        '/internal/*',
+      ],
+    },
     healthChecks: [
       {
         name: 'postgres',

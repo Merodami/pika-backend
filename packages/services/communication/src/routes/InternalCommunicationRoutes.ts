@@ -41,6 +41,7 @@ export function createInternalCommunicationRouter(
   )
   const notificationService = new NotificationService(
     notificationRepository,
+    emailService,
     cache,
   )
   const controller = new InternalCommunicationController(
@@ -98,6 +99,10 @@ export function createInternalCommunicationRouter(
   router.get('/notifications', controller.getNotifications)
 
   router.get('/notifications/unread-count', controller.getUnreadCount)
+
+  // Analytics endpoints (placeholder implementations)
+  router.get('/analytics/user-stats', controller.getUserAnalytics)
+  router.get('/analytics/service-stats', controller.getServiceAnalytics)
 
   return router
 }

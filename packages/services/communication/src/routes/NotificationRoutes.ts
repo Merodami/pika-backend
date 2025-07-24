@@ -91,13 +91,13 @@ export function createNotificationRouter(
     controller.deleteNotification,
   )
 
-  // Admin routes
-  router.post(
-    '/global',
-    requireAdmin(),
-    validateBody(communicationPublic.CreateNotificationRequest),
-    controller.createGlobalNotification,
-  )
+  // ADMIN ENDPOINTS EXCLUDED - Global notification functionality moved to internal routes
+  // router.post(
+  //   '/global',
+  //   requireAdmin(),
+  //   validateBody(communicationPublic.CreateNotificationRequest),
+  //   controller.createGlobalNotification,
+  // )
 
   return router
 }

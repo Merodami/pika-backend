@@ -197,7 +197,7 @@ export interface PaginatedResult<T> {
     total: number
     totalPages: number
     hasNext: boolean
-    hasPrevious: boolean
+    hasPrev: boolean
   }
 }
 

@@ -35,7 +35,11 @@ export class NotificationMapper {
       description: doc.description,
       global: false, // No longer in schema, default to false
       read: doc.isRead,
-      metadata: doc.metadata,
+      metadata: doc.metadata 
+        ? typeof doc.metadata === 'string' 
+          ? JSON.parse(doc.metadata)
+          : doc.metadata
+        : null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt || undefined,
     }

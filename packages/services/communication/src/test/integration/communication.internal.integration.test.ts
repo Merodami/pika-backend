@@ -292,29 +292,29 @@ describe('Communication Service - Internal API Integration Tests', () => {
         const response = await internalClient
           .post('/internal/emails/send-bulk')
           .send({
+            templateId: EmailTemplateId.PAYMENT_SUCCESS,
             recipients: [
               {
-                email: 'user1@example.com',
-                userId: sharedTestData.testUsers[0].id,
+                to: 'user1@example.com',
+                variables: {
+                  userId: sharedTestData.testUsers[0].id,
+                  appName: 'Pika',
+                },
               },
               {
-                email: 'user2@example.com',
-                userId: sharedTestData.testUsers[1].id,
+                to: 'user2@example.com',
+                variables: {
+                  userId: sharedTestData.testUsers[1].id,
+                  appName: 'Pika',
+                },
               },
             ],
-            subject: 'Bulk Email',
-            templateId: EmailTemplateId.PURCHASE_CONFIRMATION,
-            globalVariables: {
-              appName: 'Pika',
-            },
           })
           .expect(201)
 
         expect(response.body).toMatchObject({
           sent: 2,
           failed: 0,
-          total: 2,
-          logs: expect.any(Array),
         })
       })
 
@@ -322,21 +322,23 @@ describe('Communication Service - Internal API Integration Tests', () => {
         const response = await internalClient
           .post('/internal/emails/send-bulk')
           .send({
+            templateId: 'custom', // Need a template ID per schema
             recipients: [
               {
-                email: 'user1@example.com',
-                userId: sharedTestData.testUsers[0].id,
-                variables: { firstName: 'John' },
+                to: 'user1@example.com',
+                variables: { 
+                  firstName: 'John',
+                  userId: sharedTestData.testUsers[0].id,
+                },
               },
               {
-                email: 'user2@example.com',
-                userId: sharedTestData.testUsers[1].id,
-                variables: { firstName: 'Jane' },
+                to: 'user2@example.com',
+                variables: { 
+                  firstName: 'Jane',
+                  userId: sharedTestData.testUsers[1].id,
+                },
               },
             ],
-            subject: 'Personalized Bulk Email',
-            htmlContent: '<p>Hello {{firstName}}</p>',
-            textContent: 'Hello {{firstName}}',
           })
           .expect(201)
 

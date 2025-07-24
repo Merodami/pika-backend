@@ -97,7 +97,7 @@ export class CategoryRepository implements ICategoryRepository {
           total,
           totalPages,
           hasNext: page < totalPages,
-          hasPrevious: page > 1,
+          hasPrev: page > 1,
         },
       }
     } catch (error) {

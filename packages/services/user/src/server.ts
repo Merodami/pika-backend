@@ -33,6 +33,13 @@ export async function createUserServer({
     serviceName: USER_SERVICE_NAME,
     port: USER_SERVICE_PORT,
     cacheService,
+    authOptions: {
+      excludePaths: [
+        '/health',
+        '/metrics',
+        '/internal/*',
+      ],
+    },
     idempotencyOptions: {
       enabled: true,
       defaultTTL: 86400, // 24 hours
