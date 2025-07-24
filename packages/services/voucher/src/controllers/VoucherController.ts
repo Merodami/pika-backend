@@ -48,7 +48,7 @@ export class VoucherController {
     condition: (result) => result && result.data && Array.isArray(result.data),
   })
   async getAllVouchers(
-    req: Request<{}, {}, {}, voucherPublic.VoucherQueryParams>,
+    req: Request,
     res: Response<voucherPublic.VoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -295,12 +295,7 @@ export class VoucherController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getUserVouchers(
-    req: Request<
-      shared.UserIdParam,
-      {},
-      {},
-      voucherPublic.UserVouchersQueryParams
-    >,
+    req: Request<shared.UserIdParam>,
     res: Response<voucherPublic.UserVouchersListResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -354,12 +349,7 @@ export class VoucherController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getBusinessVouchers(
-    req: Request<
-      businessCommon.BusinessIdParam,
-      {},
-      {},
-      voucherPublic.VoucherQueryParams
-    >,
+    req: Request<businessCommon.BusinessIdParam>,
     res: Response<voucherPublic.VoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {

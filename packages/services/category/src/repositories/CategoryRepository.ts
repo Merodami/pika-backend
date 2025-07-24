@@ -90,7 +90,7 @@ export class CategoryRepository implements ICategoryRepository {
       const totalPages = Math.ceil(total / limit)
 
       return {
-        data: CategoryMapper.fromPrismaCategoryArray(categories),
+        data: CategoryMapper.fromDocumentArray(categories),
         pagination: {
           page,
           limit,
@@ -123,9 +123,7 @@ export class CategoryRepository implements ICategoryRepository {
         return null
       }
 
-      return CategoryMapper.fromDocument(
-        CategoryMapper.fromPrismaCategory(category),
-      )
+      return CategoryMapper.fromDocument(category)
     } catch (error) {
       logger.error('Error in CategoryRepository.findById:', error)
       throw ErrorFactory.databaseError(
@@ -146,7 +144,7 @@ export class CategoryRepository implements ICategoryRepository {
         orderBy: { sortOrder: 'asc' },
       })
 
-      const categoryDomains = CategoryMapper.fromPrismaCategoryArray(categories)
+      const categoryDomains = CategoryMapper.fromDocumentArray(categories)
 
       // Build pagination structure for bounded operation
       return {
@@ -207,9 +205,7 @@ export class CategoryRepository implements ICategoryRepository {
         },
       })
 
-      return CategoryMapper.fromDocument(
-        CategoryMapper.fromPrismaCategory(category),
-      )
+      return CategoryMapper.fromDocument(category)
     } catch (error) {
       logger.error('Error in CategoryRepository.create:', error)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -268,9 +264,7 @@ export class CategoryRepository implements ICategoryRepository {
         data: updateData,
       })
 
-      return CategoryMapper.fromDocument(
-        CategoryMapper.fromPrismaCategory(category),
-      )
+      return CategoryMapper.fromDocument(category)
     } catch (error) {
       logger.error('Error in CategoryRepository.update:', error)
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -386,7 +380,7 @@ export class CategoryRepository implements ICategoryRepository {
       })
 
       const domainCategories =
-        CategoryMapper.fromPrismaCategoryArray(categories)
+        CategoryMapper.fromDocumentArray(categories)
 
       return CategoryMapper.buildHierarchy(domainCategories)
     } catch (error) {
@@ -418,7 +412,7 @@ export class CategoryRepository implements ICategoryRepository {
         orderBy: { level: 'asc' },
       })
 
-      return CategoryMapper.fromPrismaCategoryArray(categories)
+      return CategoryMapper.fromDocumentArray(categories)
     } catch (error) {
       logger.error('Error in CategoryRepository.getPath:', error)
       throw ErrorFactory.databaseError(

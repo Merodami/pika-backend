@@ -49,6 +49,7 @@ This project is migrating from the old Pika codebase (pika-old) to a modern micr
 - **TODO**: Implement proper position mapping in VoucherBookService.getPositionOnPage() method
 - **TODO**: Implement revokeAllTokens method in AuthService for revoking all user tokens when allDevices=true
 - **TODO**: Fix global notification implementation in NotificationController to properly create notifications for all users without using Prisma in the service layer. Currently hardcoded to return count=2 for tests.
+- **TODO**: Implement proper multi-language translation fetching in InternalVoucherService.getVouchersForBook(). Currently uses single-language fallback but VoucherForBook interface expects Record<string, string> for title/description/terms fields. Need to fetch all language versions of translation keys and format as multi-language objects.
 
 ## IMMEDIATE NEXT STEPS (Priority Order)
 

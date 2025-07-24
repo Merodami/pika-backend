@@ -36,6 +36,21 @@ This file tracks general technical debt and improvement tasks across the entire 
 - **Action Required**: Audit all repository methods to return `PaginatedResult<T>`
 - **Priority**: Medium - architectural consistency
 
+### Translation System Multi-Language Support
+
+- **Issue**: VoucherForBook interface expects multi-language translation objects (`Record<string, string>`) but current implementation only provides single-language strings
+- **Location**: `InternalVoucherService.getVouchersForBook()` method in voucher service
+- **Current Behavior**: Uses single resolved translation or fallback to translation keys
+- **Expected Behavior**: Should fetch all language versions of translation keys and format as `{ "en": "Title", "es": "Título", "gn": "Título" }`
+- **Architecture Impact**: Need to implement proper multi-language translation fetching that works with the existing translation service architecture
+- **Dependencies**: Requires understanding of how to fetch all language versions for a set of translation keys
+- **Action Required**:
+  1. Research how translation service provides multi-language data
+  2. Implement helper method to fetch all languages for given translation keys
+  3. Update getVouchersForBook to use proper multi-language format
+  4. Test with all supported languages (en, es, gn)
+- **Priority**: Medium - affects PDF generation and voucher book functionality
+
 ---
 
 **Created**: 2025-01-24

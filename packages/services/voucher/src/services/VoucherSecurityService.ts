@@ -117,7 +117,6 @@ export class VoucherSecurityService {
     } catch (error) {
       throw ErrorFactory.fromError(error, 'Failed to generate voucher tokens', {
         source: 'VoucherSecurityService.generateVoucherTokens',
-        voucherId: options.voucherId,
       })
     }
   }
@@ -166,7 +165,6 @@ export class VoucherSecurityService {
         'Failed to generate batch voucher tokens',
         {
           source: 'VoucherSecurityService.generateBatchVoucherTokens',
-          voucherCount: vouchers.length,
         },
       )
     }
@@ -180,16 +178,13 @@ export class VoucherSecurityService {
   ): Promise<{ valid: boolean; voucherId?: string; batchId?: string }> {
     try {
       const publicKey = await this.getPublicKey()
-      const result = await this.voucherQRService.verifyPrintVoucherQR(
-        token,
-        publicKey,
-      )
+      const result = await this.voucherQRService.validateQR(token, publicKey)
 
-      if (result.valid && result.payload) {
+      if (result.isValid && result.payload) {
         return {
           valid: true,
-          voucherId: result.payload.voucherId,
-          batchId: result.payload.batchId,
+          voucherId: result.payload.vid, // vid is the voucher ID claim
+          batchId: result.payload.btc, // btc is the batch code claim
         }
       }
 

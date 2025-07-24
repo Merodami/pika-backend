@@ -2,7 +2,7 @@
 import type { ParsedIncludes } from '@pika/types'
 import type { SearchParams } from '@pika/types'
 
-import type { SubscriptionInterval, SubscriptionStatus } from './enums.js'
+import type { BillingInterval, SubscriptionStatus } from './enums.js'
 
 /**
  * Public search parameters
@@ -57,7 +57,7 @@ export interface InternalSubscriptionSearchParams extends SearchParams {
 export interface PlanSearchParams extends SearchParams {
   // Filters
   isActive?: boolean
-  interval?: SubscriptionInterval
+  interval?: BillingInterval
   minPrice?: number
   maxPrice?: number
   search?: string

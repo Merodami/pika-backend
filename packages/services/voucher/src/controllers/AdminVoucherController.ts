@@ -49,7 +49,7 @@ export class AdminVoucherController {
     condition: (result) => result && result.data && Array.isArray(result.data),
   })
   async getAllVouchers(
-    req: Request<{}, {}, {}, voucherAdmin.AdminVoucherQueryParams>,
+    req: Request,
     res: Response<voucherAdmin.AdminVoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {

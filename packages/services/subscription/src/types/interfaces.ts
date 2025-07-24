@@ -1,7 +1,7 @@
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import type {
-  SubscriptionInterval,
+  BillingInterval,
   SubscriptionStatus,
 } from '@subscription/types/enums.js'
 
@@ -44,7 +44,7 @@ export interface PlanCreationData {
   description?: string
   price: number
   currency: string
-  interval: SubscriptionInterval
+  interval: BillingInterval
   intervalCount: number
   trialPeriodDays?: number
   features: string[]

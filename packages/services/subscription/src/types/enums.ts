@@ -3,7 +3,7 @@
 
 // Re-export shared enums for convenience
 export {
-  BillingInterval as SubscriptionInterval,
+  BillingInterval,
   SubscriptionStatus,
 } from '@pika/types'
 

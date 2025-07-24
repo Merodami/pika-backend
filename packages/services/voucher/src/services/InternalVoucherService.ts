@@ -825,13 +825,21 @@ export class InternalVoucherService implements IInternalVoucherService {
           const voucherForBook: VoucherForBook = {
             id: voucher.id,
             businessId: voucher.businessId,
-            title: voucher.translations?.title || {},
-            description: voucher.translations?.description || {},
-            terms: voucher.translations?.termsAndConditions || {},
+            // TODO: Implement proper multi-language translation fetching
+            // For now, use resolved content or fallback to keys
+            title: voucher.title
+              ? { en: voucher.title }
+              : { en: voucher.titleKey },
+            description: voucher.description
+              ? { en: voucher.description }
+              : { en: voucher.descriptionKey },
+            terms: voucher.termsAndConditions
+              ? { en: voucher.termsAndConditions }
+              : { en: voucher.termsAndConditionsKey },
             discountType: voucher.discountType,
             discountValue: voucher.discountValue,
             validFrom: voucher.validFrom,
-            validTo: voucher.validTo,
+            validTo: voucher.expiresAt, // Use expiresAt instead of validTo
             businessName: '', // Would need to be populated from business service
             businessLogo: undefined,
             category: voucher.categoryId, // Would need category name from category service

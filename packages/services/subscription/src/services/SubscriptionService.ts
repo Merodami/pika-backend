@@ -100,7 +100,7 @@ export class SubscriptionService implements ISubscriptionService {
       const subscription = await this.subscriptionRepository.create({
         userId,
         planId: plan.id,
-        status: 'UNPAID' as any, // Will be updated by webhook
+        status: 'unpaid', // Will be updated by webhook
         stripeCustomerId: data.stripeCustomerId,
         trialEnd: data.trialEnd,
         metadata: data.metadata,
@@ -188,7 +188,7 @@ export class SubscriptionService implements ISubscriptionService {
 
     const updatedSubscription = await this.subscriptionRepository.update(
       id,
-      data as any,
+      data,
     )
 
     // Clear subscription cache
@@ -216,7 +216,7 @@ export class SubscriptionService implements ISubscriptionService {
     const updatedSubscription = await this.subscriptionRepository.update(id, {
       cancelAtPeriodEnd,
       cancelledAt: cancelAtPeriodEnd ? undefined : new Date(),
-      status: cancelAtPeriodEnd ? subscription.status : ('canceled' as any),
+      status: cancelAtPeriodEnd ? subscription.status : 'canceled',
     })
 
     // Clear subscription cache
@@ -293,7 +293,7 @@ export class SubscriptionService implements ISubscriptionService {
       const subscription = await this.subscriptionRepository.create({
         userId: data.userId,
         planId: data.planId,
-        status: data.status as any,
+        status: data.status,
         currentPeriodStart: data.currentPeriodStart,
         currentPeriodEnd: data.currentPeriodEnd,
         trialEnd: data.trialEnd,
