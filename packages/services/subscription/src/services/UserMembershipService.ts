@@ -2,9 +2,9 @@ import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
+import { SubscriptionStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
-import { SubscriptionStatus } from '@subscription/types/enums.js'
 import type { UserMembershipStatus } from '@subscription/types/interfaces.js'
 
 export interface IUserMembershipService {

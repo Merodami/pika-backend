@@ -1,6 +1,6 @@
 // src/types/repository.ts
 
-import type { SubscriptionInterval, SubscriptionStatus } from './enums.js'
+import type { BillingInterval, SubscriptionStatus } from '@pika/types'
 
 /**
  * Data types for repository operations
@@ -63,7 +63,7 @@ export interface CreatePlanData {
   name: string
   price: number
   currency: string
-  interval: SubscriptionInterval
+  interval: BillingInterval
   intervalCount: number
 
   // Optional fields

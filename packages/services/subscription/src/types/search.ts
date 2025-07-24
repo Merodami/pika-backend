@@ -1,8 +1,7 @@
 // src/types/search.ts
 import type { ParsedIncludes } from '@pika/types'
 import type { SearchParams } from '@pika/types'
-
-import type { BillingInterval, SubscriptionStatus } from './enums.js'
+import type { BillingInterval, SubscriptionStatus } from '@pika/types'
 
 /**
  * Public search parameters

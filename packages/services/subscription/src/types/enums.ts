@@ -1,11 +1,7 @@
 // Subscription-specific enums
 // Note: SubscriptionStatus and BillingInterval are now in @pika/types
 
-// Re-export shared enums for convenience
-export {
-  BillingInterval,
-  SubscriptionStatus,
-} from '@pika/types'
+// Service-specific enums only - common enums imported from @pika/types directly
 
 export enum MembershipType {
   FULL_ACCESS = 'FULL_ACCESS',

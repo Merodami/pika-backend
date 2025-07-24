@@ -85,7 +85,7 @@ describe('User Internal API Integration Tests', () => {
         firstName: 'Existing',
         lastName: 'User',
         password: await bcrypt.hash('ExistingPassword123!', 10),
-        role: 'MEMBER',
+        role: 'CUSTOMER',
         status: 'ACTIVE',
         emailVerified: true,
       },
@@ -100,7 +100,7 @@ describe('User Internal API Integration Tests', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
     // Clear cache
-    await cacheService.clear()
+    await cacheService.clearAll()
     // Note: Token management is handled internally by the service
   })
 
@@ -113,7 +113,7 @@ describe('User Internal API Integration Tests', () => {
       expect(response.body).toMatchObject({
         id: testUserIds.existing,
         email: 'existing@test.com',
-        role: 'MEMBER',
+        role: 'CUSTOMER',
         status: 'ACTIVE',
         emailVerified: true,
         password: expect.any(String),
@@ -136,7 +136,7 @@ describe('User Internal API Integration Tests', () => {
       expect(response.body).toMatchObject({
         id: testUserIds.existing,
         email: 'existing@test.com',
-        role: 'MEMBER',
+        role: 'CUSTOMER',
         status: 'ACTIVE',
         emailVerified: true,
         password: expect.any(String),
@@ -173,7 +173,7 @@ describe('User Internal API Integration Tests', () => {
         email: 'newuser@test.com',
         firstName: 'New',
         lastName: 'User',
-        role: 'MEMBER',
+        role: 'CUSTOMER',
         status: 'UNCONFIRMED',
         emailVerified: false,
       })
@@ -358,7 +358,7 @@ describe('User Internal API Integration Tests', () => {
           email: 'unverified@test.com',
           firstName: 'Unverified',
           lastName: 'User',
-          role: 'MEMBER',
+          role: 'CUSTOMER',
           status: 'ACTIVE',
           emailVerified: false,
         },

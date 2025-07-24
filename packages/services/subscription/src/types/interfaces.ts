@@ -1,9 +1,6 @@
 import type { ICacheService } from '@pika/redis'
+import type { BillingInterval, SubscriptionStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
-import type {
-  BillingInterval,
-  SubscriptionStatus,
-} from '@subscription/types/enums.js'
 
 // Service configuration interfaces
 export interface SubscriptionServiceConfig {

@@ -4,6 +4,7 @@ import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
+import type { BillingInterval } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IPlanService } from '../services/PlanService.js'
@@ -72,7 +73,7 @@ export class PlanController {
         page: query.page,
         limit: query.limit,
         isActive: query.isActive,
-        interval: query.interval,
+        interval: query.interval as BillingInterval, // Safe: validated by Zod
         search: undefined, // Not in API schema
         // Removed gym-related properties
       }

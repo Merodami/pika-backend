@@ -198,7 +198,7 @@ export class InternalCategoryController {
       const params = {
         isActive: query.isActive,
         page: 1,
-        limit: 1000, // High limit for internal use
+        limit: 100, // Max limit allowed by schema
         sortBy: 'sortOrder' as const,
         sortOrder: 'asc' as const,
       }

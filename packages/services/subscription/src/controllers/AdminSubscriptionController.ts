@@ -2,6 +2,7 @@ import { subscriptionAdmin, subscriptionCommon } from '@pika/api'
 import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { SubscriptionMapper, SubscriptionPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
+import type { BillingInterval, SubscriptionStatus } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IPlanService } from '../services/PlanService.js'
@@ -55,7 +56,7 @@ export class AdminSubscriptionController {
 
         // Filters
         userId: query.userId,
-        status: query.status,
+        status: query.status as SubscriptionStatus, // Safe: validated by Zod
         planId: query.planId,
         cancelAtPeriodEnd: query.cancelAtPeriodEnd,
 
@@ -296,14 +297,12 @@ export class AdminSubscriptionController {
 
         // Filters
         isActive: query.isActive,
-        interval: query.interval,
+        interval: query.interval as BillingInterval, // Safe: validated by Zod
         minPrice: query.minPrice,
         maxPrice: query.maxPrice,
         search: query.search,
 
-        // Admin-specific
-        includeDeleted: true,
-        includeInactive: true,
+        // Admin-specific properties removed (not in PlanSearchParams interface)
       }
 
       logger.info('Admin getting plans', { params })

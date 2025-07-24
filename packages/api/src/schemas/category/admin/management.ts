@@ -34,6 +34,16 @@ export const AdminCategoryResponse = withTimestamps({
   ),
   isActive: z.boolean().default(true).describe('Whether category is active'),
   sortOrder: z.number().int().default(0).describe('Sort order for display'),
+  slug: z.string().max(255).describe('URL-friendly category identifier'),
+  level: z
+    .number()
+    .int()
+    .min(1)
+    .describe('Hierarchy level (1 for root categories)'),
+  path: z
+    .string()
+    .max(1000)
+    .describe('Materialized path for hierarchy navigation'),
   createdBy: UserId.describe('User who created the category'),
   updatedBy: UserId.optional().describe('User who last updated the category'),
   children: z

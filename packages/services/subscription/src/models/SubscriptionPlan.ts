@@ -1,9 +1,11 @@
+import type { BillingInterval } from '@pika/types'
+
 export interface SubscriptionPlan {
   id: string
   name: string
   description?: string
   price: number
-  interval: SubscriptionInterval
+  interval: BillingInterval
   intervalCount: number
   trialPeriodDays?: number
   features: string[]
@@ -15,18 +17,11 @@ export interface SubscriptionPlan {
   updatedAt: Date
 }
 
-export enum SubscriptionInterval {
-  DAY = 'day',
-  WEEK = 'week',
-  MONTH = 'month',
-  YEAR = 'year',
-}
-
 export interface CreateSubscriptionPlanInput {
   name: string
   description?: string
   price: number
-  interval: SubscriptionInterval
+  interval: BillingInterval
   intervalCount: number
   trialPeriodDays?: number
   features: string[]

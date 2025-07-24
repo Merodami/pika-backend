@@ -1,4 +1,4 @@
-import { authPublic } from '@pika/api'
+import { authPublic, shared } from '@pika/api'
 import type { z } from 'zod'
 
 type ChangePasswordRequest = z.infer<typeof authPublic.ChangePasswordRequest>
@@ -89,7 +89,7 @@ export class AuthController {
           result.accessToken,
           result.refreshToken,
         )
-        const validatedResponse = authPublic.AuthResponse.parse(dto)
+        const validatedResponse = authPublic.AuthUserResponse.parse(dto)
 
         response.status(201).json(validatedResponse)
       }
@@ -117,7 +117,7 @@ export class AuthController {
           result.message ||
           'If an account exists with this email, a password reset link has been sent.',
       }
-      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      const validatedResponse = shared.MessageResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -148,7 +148,7 @@ export class AuthController {
       const responseData = {
         message: result.message || 'Password reset successfully',
       }
-      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      const validatedResponse = shared.MessageResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -206,7 +206,7 @@ export class AuthController {
           result.message ||
           'If an account exists with this email, a verification link has been sent.',
       }
-      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      const validatedResponse = shared.MessageResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -243,7 +243,7 @@ export class AuthController {
       const responseData = {
         message: 'Password changed successfully',
       }
-      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      const validatedResponse = shared.MessageResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {
