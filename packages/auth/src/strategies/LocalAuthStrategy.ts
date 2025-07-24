@@ -82,6 +82,13 @@ export class LocalAuthStrategy implements AuthStrategy {
   async authenticate(credentials: LoginCredentials): Promise<AuthResult> {
     const startTime = Date.now()
 
+    logger.info('LocalAuthStrategy.authenticate called', {
+      email: credentials.email,
+      hasPassword: !!credentials.password,
+      passwordLength: credentials.password?.length,
+    })
+    console.log('LocalAuthStrategy - authenticating:', credentials.email)
+
     try {
       // 1. Validate credentials format
       this.validateLoginCredentials(credentials)
@@ -91,12 +98,23 @@ export class LocalAuthStrategy implements AuthStrategy {
         credentials.email.toLowerCase().trim(),
       )
 
+      logger.info('User lookup result', {
+        email: credentials.email,
+        normalizedEmail: credentials.email.toLowerCase().trim(),
+        userFound: !!user,
+        userId: user?.id,
+        hasPassword: !!user?.password,
+        passwordLength: user?.password?.length,
+      })
+
       if (!user) {
+        console.log('LocalAuthStrategy - user not found')
         return {
           success: false,
           error: 'Invalid email or password',
         }
       }
+      console.log('LocalAuthStrategy - user found:', user.id, 'isActive:', user.isActive())
 
       // 3. Check if user is active
       if (!user.isActive()) {
@@ -118,6 +136,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         credentials.password,
         user.password,
       )
+      console.log('LocalAuthStrategy - password verification result:', isPasswordValid)
 
       if (!isPasswordValid) {
         return {
@@ -167,6 +186,8 @@ export class LocalAuthStrategy implements AuthStrategy {
         operation: 'authenticate',
         emailDomain: credentials.email?.split('@')?.[1] || 'unknown',
         duration: Date.now() - startTime,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
       })
 
       return {

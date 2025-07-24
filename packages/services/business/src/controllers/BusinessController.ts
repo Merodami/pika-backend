@@ -36,7 +36,7 @@ export class BusinessController {
   })
   async getAllBusinesses(
     req: Request,
-    res: Response,
+    res: Response<businessPublic.BusinessListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -78,7 +78,7 @@ export class BusinessController {
   })
   async getBusinessById(
     req: Request<businessPublic.BusinessPathParams>,
-    res: Response,
+    res: Response<businessPublic.BusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -115,7 +115,7 @@ export class BusinessController {
   })
   async getBusinessByUserId(
     req: Request<shared.UserIdParam>,
-    res: Response,
+    res: Response<businessPublic.BusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -147,7 +147,7 @@ export class BusinessController {
    */
   async getMyBusiness(
     req: Request,
-    res: Response,
+    res: Response<businessPublic.BusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -182,7 +182,7 @@ export class BusinessController {
    */
   async createMyBusiness(
     req: Request<{}, {}, businessPublic.CreateMyBusinessRequest>,
-    res: Response,
+    res: Response<businessPublic.BusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -217,7 +217,7 @@ export class BusinessController {
    */
   async updateMyBusiness(
     req: Request<{}, {}, businessPublic.UpdateMyBusinessRequest>,
-    res: Response,
+    res: Response<businessPublic.BusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {

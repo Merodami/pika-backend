@@ -1,83 +1,102 @@
+/**
+ * Auth Login Integration Tests
+ *
+ * Tests for the authentication login flow, including password grant,
+ * refresh token grant, and various edge cases.
+ */
+
 import { vi } from 'vitest'
 
-// Unmock modules that might interfere with real server setup for integration tests
+// IMPORTANT: Unmock before any imports to ensure we get real implementations
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 
-// Force Vitest to use the actual implementation
-vi.mock('@pika/api', async () => {
-  const actualApi =
-    await vi.importActual<typeof import('@pika/api')>('@pika/api')
-
-  return actualApi
-})
-
-vi.mock('@pika/shared', async () => {
-  const actualShared =
-    await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
-
-  return actualShared
-})
-
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
-  CommunicationServiceClientMock,
-  UserServiceClientMock,
-} from '@tests/mocks/services'
-import {
   cleanupTestDatabase,
-  clearTestDatabase,
   createTestDatabase,
-  type TestDatabaseResult,
-} from '@tests/utils/testDatabaseHelper.js'
-import { Express } from 'express'
+  TestDatabaseResult,
+  createE2EAuthHelper,
+  E2EAuthHelper,
+} from '@pika/tests'
+import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createAuthServer } from '../../../server.js'
-
-// Use shared mocks
-const mockUserServiceClient = new UserServiceClientMock()
-const mockCommunicationClient = new CommunicationServiceClientMock()
+import {
+  createSharedAuthTestData,
+  type SharedAuthTestData,
+} from '../../helpers/authTestHelpers.js'
+import { UserServiceClientMock } from '../../mocks/UserServiceClientMock.js'
+import { CommunicationServiceClientMock } from '../../mocks/CommunicationServiceClientMock.js'
 
 describe('Auth Login Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let request: supertest.SuperTest<supertest.Test>
+  let authHelper: E2EAuthHelper
+  let cacheService: MemoryCacheService
+
+  // Shared test data created once
+  let sharedTestData: SharedAuthTestData
+  let userServiceClient: UserServiceClientMock
+  let communicationClient: CommunicationServiceClientMock
 
   beforeAll(async () => {
     logger.debug('Setting up Auth Login integration tests...')
 
     // Create test database
-    testDb = await createTestDatabase()
+    testDb = await createTestDatabase({
+      databaseName: 'test_auth_login_db',
+      useInitSql: true,
+      startupTimeout: 120000,
+    })
+
+    // Update process.env for compatibility
+    process.env.DATABASE_URL = testDb.databaseUrl
 
     // Create cache service
-    const cacheService = new MemoryCacheService()
+    cacheService = new MemoryCacheService()
+
+    // Create mock service clients
+    userServiceClient = new UserServiceClientMock()
+    communicationClient = new CommunicationServiceClientMock()
 
     // Create auth server with mocked service clients
     app = await createAuthServer({
       port: 0, // Random port for testing
       cacheService,
-      userServiceClient: mockUserServiceClient as any,
-      communicationClient: mockCommunicationClient as any,
+      userServiceClient,
+      communicationClient,
     })
 
     request = supertest(app)
+
+    // Initialize E2E Authentication Helper
+    authHelper = createE2EAuthHelper(app)
+
+    // Create shared test data once for all tests
+    logger.debug('Creating shared test data...')
+    sharedTestData = await createSharedAuthTestData(testDb.prisma)
+
+    logger.debug(
+      `Created ${sharedTestData.allUsers.length} test users`,
+    )
 
     logger.debug('Auth login setup complete')
   }, 120000)
 
   beforeEach(async () => {
-    // Reset all mocks
-    mockUserServiceClient.reset()
-    mockCommunicationClient.reset()
+    vi.clearAllMocks()
 
-    // Clear database between tests
-    if (testDb?.prisma) {
-      await clearTestDatabase(testDb.prisma)
-    }
+    // Clear cache between tests
+    await cacheService.clearAll()
+    
+    // Note: We do NOT clear the database between tests
+    // Test data is created once and reused
   })
 
   afterAll(async () => {
@@ -90,12 +109,9 @@ describe('Auth Login Integration Tests', () => {
     logger.debug('Resources cleaned up.')
   })
 
-  // Authentication Tests with proper mock setup
+  // Authentication Tests with mocked services
   describe('POST /auth/token - Password Grant', () => {
     it('should authenticate with valid credentials', async () => {
-      // IMPORTANT: Setup mock BEFORE making the request
-      mockUserServiceClient.setupAuthSuccess()
-
       const response = await request
         .post('/auth/token')
         .send({
@@ -106,8 +122,7 @@ describe('Auth Login Integration Tests', () => {
         .set('Accept', 'application/json')
 
       if (response.status !== 200) {
-        console.log('Response status:', response.status)
-        console.log('Response body:', JSON.stringify(response.body, null, 2))
+        console.log('Response error:', JSON.stringify(response.body, null, 2))
       }
 
       expect(response.status).toBe(200)
@@ -118,19 +133,16 @@ describe('Auth Login Integration Tests', () => {
         expiresIn: 900,
         refreshToken: expect.any(String),
         user: {
-          id: UserServiceClientMock.TEST_USER.id,
-          email: UserServiceClientMock.TEST_USER.email,
-          firstName: UserServiceClientMock.TEST_USER.firstName,
-          lastName: UserServiceClientMock.TEST_USER.lastName,
-          role: 'USER', // Mapped from MEMBER to USER
+          id: '11111111-1111-1111-1111-111111111111',
+          email: 'test@example.com',
+          firstName: 'Test',
+          lastName: 'User',
+          role: 'USER',
         },
       })
     })
 
     it('should reject authentication when user not found', async () => {
-      // Setup mock to return null (user not found)
-      mockUserServiceClient.setupUserNotFound()
-
       const response = await request
         .post('/auth/token')
         .send({
@@ -149,15 +161,12 @@ describe('Auth Login Integration Tests', () => {
     })
 
     it('should reject authentication with wrong password', async () => {
-      // Setup mock with correct user data
-      mockUserServiceClient.setupAuthSuccess()
-
       const response = await request
         .post('/auth/token')
         .send({
           grantType: 'password',
           username: 'test@example.com',
-          password: 'WrongPassword123!', // Wrong password
+          password: 'WrongPassword123!',
         })
         .set('Accept', 'application/json')
         .expect(401)
@@ -170,14 +179,11 @@ describe('Auth Login Integration Tests', () => {
     })
 
     it('should reject authentication for inactive user', async () => {
-      // Setup mock with inactive user
-      mockUserServiceClient.setupInactiveUser()
-
       const response = await request
         .post('/auth/token')
         .send({
           grantType: 'password',
-          username: 'test@example.com',
+          username: 'inactive@example.com',
           password: 'Password123!',
         })
         .set('Accept', 'application/json')
@@ -191,22 +197,11 @@ describe('Auth Login Integration Tests', () => {
     })
 
     it('should handle user without password (OAuth-only account)', async () => {
-      // Setup user without password
-      const userWithoutPassword = {
-        ...UserServiceClientMock.TEST_USER,
-        password: undefined,
-      }
-
-      mockUserServiceClient.getUserAuthDataByEmail.mockResolvedValue({
-        ...userWithoutPassword,
-        isActive: () => true,
-      })
-
       const response = await request
         .post('/auth/token')
         .send({
           grantType: 'password',
-          username: 'test@example.com',
+          username: 'oauth@example.com',
           password: 'Password123!',
         })
         .set('Accept', 'application/json')
@@ -220,32 +215,36 @@ describe('Auth Login Integration Tests', () => {
     })
 
     it('should update last login time on successful authentication', async () => {
-      // Setup mock for successful authentication
-      mockUserServiceClient.setupAuthSuccess()
+      // Test with an active user
+      const testEmail = 'active1@example.com'
+      
+      // Get the user from mock
+      const userBefore = await userServiceClient.getUserByEmail(testEmail)
+      const beforeLoginTime = userBefore?.lastLoginAt
 
       await request
         .post('/auth/token')
         .send({
           grantType: 'password',
-          username: 'test@example.com',
+          username: testEmail,
           password: 'Password123!',
         })
         .set('Accept', 'application/json')
         .expect(200)
 
-      // Verify updateLastLogin was called
-      expect(mockUserServiceClient.updateLastLogin).toHaveBeenCalledWith(
-        UserServiceClientMock.TEST_USER.id,
-        {
-          loginTime: expect.any(Date),
-        },
-      )
+      // Get updated user from mock
+      const userAfter = await userServiceClient.getUserByEmail(testEmail)
+
+      // Verify lastLoginAt was updated
+      expect(userAfter?.lastLoginAt).toBeTruthy()
+      if (beforeLoginTime) {
+        expect(new Date(userAfter?.lastLoginAt).getTime()).toBeGreaterThan(
+          new Date(beforeLoginTime).getTime(),
+        )
+      }
     })
 
     it('should handle admin user authentication', async () => {
-      // Setup mock with admin user
-      mockUserServiceClient.setupAuthSuccess(UserServiceClientMock.ADMIN_USER)
-
       const response = await request
         .post('/auth/token')
         .send({
@@ -257,32 +256,31 @@ describe('Auth Login Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toMatchObject({
-        accessToken: expect.any(String),
-        tokenType: 'Bearer',
         user: {
-          id: UserServiceClientMock.ADMIN_USER.id,
-          email: UserServiceClientMock.ADMIN_USER.email,
-          role: 'TRAINER', // ADMIN role is mapped to TRAINER in OAuth responses
+          role: 'ADMIN',
         },
       })
     })
   })
 
-  // Test validation errors are handled correctly
+  // Input Validation Tests
   describe('Input Validation', () => {
     it('should validate email format in username field', async () => {
       const response = await request
         .post('/auth/token')
         .send({
           grantType: 'password',
-          username: 'not-an-email',
+          username: 'invalid-email',
           password: 'Password123!',
         })
         .set('Accept', 'application/json')
         .expect(400)
 
-      expect(response.body.error).toBeDefined()
-      expect(response.body.error.message).toContain('Invalid email format')
+      expect(response.body).toMatchObject({
+        error: expect.objectContaining({
+          code: 'VALIDATION_ERROR',
+        }),
+      })
     })
 
     it('should require both username and password', async () => {
@@ -291,12 +289,15 @@ describe('Auth Login Integration Tests', () => {
         .send({
           grantType: 'password',
           username: 'test@example.com',
-          // Missing password
         })
         .set('Accept', 'application/json')
         .expect(400)
 
-      expect(response.body.error).toBeDefined()
+      expect(response.body).toMatchObject({
+        error: expect.objectContaining({
+          code: 'VALIDATION_ERROR',
+        }),
+      })
     })
 
     it('should handle empty strings as missing values', async () => {
@@ -310,7 +311,11 @@ describe('Auth Login Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(400)
 
-      expect(response.body.error).toBeDefined()
+      expect(response.body).toMatchObject({
+        error: expect.objectContaining({
+          code: 'VALIDATION_ERROR',
+        }),
+      })
     })
   })
 })

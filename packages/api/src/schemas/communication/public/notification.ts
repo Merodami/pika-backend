@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
@@ -188,8 +189,8 @@ export const NotificationSearchParams = SearchParams.extend({
   type: NotificationType.optional(),
   status: NotificationStatus.optional(),
   priority: NotificationPriority.optional(),
-  isRead: z.boolean().optional(),
-  isGlobal: z.boolean().optional(),
+  isRead: optionalBoolean(),
+  isGlobal: optionalBoolean(),
   category: z.string().optional(),
   fromDate: DateTime.optional(),
   toDate: DateTime.optional(),
@@ -204,6 +205,13 @@ export type NotificationSearchParams = z.infer<typeof NotificationSearchParams>
 export const NotificationListResponse = paginatedResponse(Notification)
 
 export type NotificationListResponse = z.infer<typeof NotificationListResponse>
+
+/**
+ * Single notification response
+ */
+export const NotificationResponse = Notification
+
+export type NotificationResponse = z.infer<typeof NotificationResponse>
 
 // ============= Notification Settings =============
 

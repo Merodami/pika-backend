@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email as EmailAddress, UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import {
   DevicePlatform,
   EmailStatus,
@@ -13,6 +14,7 @@ import {
   NotificationType,
   TemplateKey,
 } from '../common/enums.js'
+import { InternalEmailData, InternalNotificationData } from './types.js'
 
 /**
  * Internal communication service schemas for service-to-service communication
@@ -479,3 +481,99 @@ export const BatchUpdateResponse = openapi(
 )
 
 export type BatchUpdateResponse = z.infer<typeof BatchUpdateResponse>
+
+// ============= Email History =============
+
+/**
+ * Email history response for internal services
+ * Using standardized pagination
+ */
+export const InternalEmailHistoryResponse = paginatedResponse(
+  InternalEmailData,
+  {
+    description: 'Paginated email history for internal services',
+  },
+)
+
+export type InternalEmailHistoryResponse = z.infer<typeof InternalEmailHistoryResponse>
+
+// ============= Batch Notifications =============
+
+/**
+ * Batch create notifications request
+ * This is a bounded operation (max 100) so no pagination needed
+ */
+export const BatchCreateNotificationsRequest = openapi(
+  z.object({
+    notifications: z
+      .array(
+        z.object({
+          userId: UserId,
+          title: z.string(),
+          description: z.string(),
+          type: InAppNotificationType.default('system'),
+          metadata: z.record(z.string(), z.any()).optional(),
+        }),
+      )
+      .min(1)
+      .max(100), // Bounded operation
+  }),
+  {
+    description: 'Create multiple notifications (max 100)',
+  },
+)
+
+export type BatchCreateNotificationsRequest = z.infer<
+  typeof BatchCreateNotificationsRequest
+>
+
+/**
+ * Batch create notifications response
+ * Bounded operation - direct array response
+ */
+export const BatchCreateNotificationsResponse = openapi(
+  z.object({
+    created: z.number().int().nonnegative(),
+    notifications: z.array(InternalNotificationData), // Always ≤ 100 items
+  }),
+  {
+    description: 'Batch notification creation result',
+  },
+)
+
+export type BatchCreateNotificationsResponse = z.infer<
+  typeof BatchCreateNotificationsResponse
+>
+
+// ============= Get Notifications =============
+
+/**
+ * Get notifications response for internal services
+ * Using standardized pagination
+ */
+export const InternalNotificationsResponse = paginatedResponse(
+  InternalNotificationData,
+  {
+    description: 'Paginated notifications for internal services',
+  },
+)
+
+export type InternalNotificationsResponse = z.infer<typeof InternalNotificationsResponse>
+
+// ============= Unread Count =============
+
+/**
+ * Get unread count response
+ * Single entity response - no pagination
+ */
+export const GetUnreadCountResponse = openapi(
+  z.object({
+    userId: UserId,
+    unreadCount: z.number().int().nonnegative(),
+  }),
+  {
+    description: 'Unread notification count',
+  },
+)
+
+export type GetUnreadCountResponse = z.infer<typeof GetUnreadCountResponse>

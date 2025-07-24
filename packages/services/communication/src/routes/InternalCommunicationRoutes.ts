@@ -1,4 +1,10 @@
 import {
+  BatchCreateNotificationsRequest,
+  BulkEmailRequest,
+  CreateNotificationRequest,
+  GetUnreadCountParams,
+  InternalEmailHistoryParams,
+  InternalNotificationsParams,
   SendEmailRequest,
   SendSystemNotificationRequest,
   SendTransactionalEmailRequest,
@@ -10,7 +16,9 @@ import { Router } from 'express'
 
 import { InternalCommunicationController } from '../controllers/InternalCommunicationController.js'
 import { CommunicationLogRepository } from '../repositories/CommunicationLogRepository.js'
+import { NotificationRepository } from '../repositories/NotificationRepository.js'
 import { type EmailConfig, EmailService } from '../services/EmailService.js'
+import { NotificationService } from '../services/NotificationService.js'
 
 /**
  * Internal API routes for service-to-service communication
@@ -28,12 +36,20 @@ export function createInternalCommunicationRouter(
     prisma,
     cache,
   )
+  const notificationRepository = new NotificationRepository(prisma, cache)
   const emailService = new EmailService(
     communicationLogRepository,
     cache,
     emailConfig,
   )
-  const controller = new InternalCommunicationController(emailService)
+  const notificationService = new NotificationService(
+    notificationRepository,
+    cache,
+  )
+  const controller = new InternalCommunicationController(
+    emailService,
+    notificationService,
+  )
 
   // Apply service auth to all internal routes
   router.use(requireServiceAuth())
@@ -43,6 +59,18 @@ export function createInternalCommunicationRouter(
     '/emails/send',
     validateBody(SendEmailRequest),
     controller.sendEmail,
+  )
+
+  router.post(
+    '/emails/send-bulk',
+    validateBody(BulkEmailRequest),
+    controller.sendBulkEmail,
+  )
+
+  router.get(
+    '/emails/history',
+    // Query params don't need validation, they're coerced by Zod
+    controller.getEmailHistory,
   )
 
   router.post(
@@ -56,6 +84,28 @@ export function createInternalCommunicationRouter(
     '/notifications/system',
     validateBody(SendSystemNotificationRequest),
     controller.sendSystemNotification,
+  )
+
+  router.post(
+    '/notifications',
+    validateBody(CreateNotificationRequest),
+    controller.createNotification,
+  )
+
+  router.post(
+    '/notifications/batch',
+    validateBody(BatchCreateNotificationsRequest),
+    controller.createBatchNotifications,
+  )
+
+  router.get(
+    '/notifications',
+    controller.getNotifications,
+  )
+
+  router.get(
+    '/notifications/unread-count',
+    controller.getUnreadCount,
   )
 
   return router

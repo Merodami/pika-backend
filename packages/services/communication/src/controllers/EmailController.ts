@@ -57,7 +57,7 @@ export class EmailController implements IEmailController {
    */
   async sendEmail(
     request: Request<{}, {}, communicationPublic.SendEmailRequest>,
-    response: Response,
+    response: Response<communicationPublic.SendEmailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -99,7 +99,7 @@ export class EmailController implements IEmailController {
    */
   async sendBulkEmail(
     request: Request<{}, {}, communicationPublic.SendBulkEmailRequest>,
-    response: Response,
+    response: Response<communicationPublic.SendBulkEmailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -145,8 +145,8 @@ export class EmailController implements IEmailController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getEmailHistory(
-    request: Request,
-    response: Response,
+    request: Request<{}, {}, {}, communicationPublic.CommunicationLogSearchParams>,
+    response: Response<communicationPublic.CommunicationLogListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -187,7 +187,7 @@ export class EmailController implements IEmailController {
    */
   async getEmailById(
     request: Request<communicationCommon.CommunicationLogIdParam>,
-    response: Response,
+    response: Response<communicationPublic.CommunicationLogResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {

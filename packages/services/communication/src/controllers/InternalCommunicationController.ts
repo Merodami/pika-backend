@@ -1,138 +1,238 @@
-import type {
-  SendEmailRequest,
-  SendEmailResponse,
-  SendSystemNotificationRequest,
-  SendSystemNotificationResponse,
-  SendTransactionalEmailRequest,
-  SendTransactionalEmailResponse,
-} from '@pika/api/internal'
+import { communicationInternal } from '@pika/api'
+import { CommunicationLogMapper, InternalCommunicationMapper, NotificationMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
+import { EmailTemplateId } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
-import { set } from 'lodash-es'
 
-import type { EmailService } from '../services/EmailService.js'
+import type { CommunicationLogSearchParams } from '../repositories/CommunicationLogRepository.js'
+import type { NotificationSearchParams } from '../repositories/NotificationRepository.js'
+import type { EmailService, SendEmailInput } from '../services/EmailService.js'
+import type { INotificationService } from '../services/NotificationService.js'
 
 /**
  * Controller for internal service-to-service communication
  * Handles email and notification requests from other microservices
  */
 export class InternalCommunicationController {
-  constructor(private readonly emailService: EmailService) {
+  constructor(
+    private readonly emailService: EmailService,
+    private readonly notificationService?: INotificationService,
+  ) {
     // Bind methods to preserve 'this' context
     this.sendEmail = this.sendEmail.bind(this)
+    this.sendBulkEmail = this.sendBulkEmail.bind(this)
+    this.getEmailHistory = this.getEmailHistory.bind(this)
     this.sendTransactionalEmail = this.sendTransactionalEmail.bind(this)
     this.sendSystemNotification = this.sendSystemNotification.bind(this)
+    this.createNotification = this.createNotification.bind(this)
+    this.createBatchNotifications = this.createBatchNotifications.bind(this)
+    this.getNotifications = this.getNotifications.bind(this)
+    this.getUnreadCount = this.getUnreadCount.bind(this)
   }
 
   /**
+   * POST /internal/emails/send
    * Send email via internal API
-   * Used by other services to send emails with flexible structure
    */
   async sendEmail(
-    request: Request<{}, {}, SendEmailRequest>,
-    response: Response<SendEmailResponse>,
+    request: Request<{}, {}, communicationInternal.SendEmailRequest>,
+    response: Response<communicationInternal.SendEmailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const {
-        to,
-        subject,
-        templateId,
-        templateParams,
-        body,
-        isHtml,
-        replyTo,
-        cc,
-        bcc,
-      } = request.body
+      const data = request.body
+      const { serviceAuth } = request
+      const userId = request.query.userId as string | undefined
 
-      // Log service request details
       logger.info('Internal email request', {
-        serviceName: request.headers['x-service-name'],
-        serviceId: request.headers['x-service-id'],
-        to,
-        templateId,
-        subject,
+        serviceName: serviceAuth?.serviceName,
+        serviceId: serviceAuth?.serviceId,
+        to: data.to,
+        templateId: data.templateId,
+        subject: data.subject,
+        userId,
       })
 
-      // Send email using the EmailService
-      const result = await this.emailService.sendEmail({
-        to,
-        subject,
-        templateId,
-        templateParams,
-        body,
-        isHtml,
-        replyTo,
-        cc,
-        bcc,
-      })
-
-      const responseData: SendEmailResponse = {
-        id: result.id,
-        status: result.status,
+      // Transform to service input
+      const emailInput: SendEmailInput = {
+        to: data.to,
+        subject: data.subject,
+        templateId: data.templateId as EmailTemplateId | undefined,
+        templateParams: data.templateParams,
+        body: data.body,
+        htmlContent: data.isHtml ? data.body : undefined,
+        textContent: !data.isHtml ? data.body : undefined,
+        isHtml: data.isHtml,
+        replyTo: data.replyTo,
+        cc: data.cc,
+        bcc: data.bcc,
+        userId,
+        attachments: undefined,
       }
 
-      response.json(responseData)
+      const result = await this.emailService.sendEmail(emailInput)
+      const dto = CommunicationLogMapper.toDTO(result)
+
+      response.json({
+        id: dto.id,
+        status: dto.status,
+      })
     } catch (error) {
       logger.error('Failed to send email', error as Error, {
-        serviceName: request.headers['x-service-name'],
-        serviceId: request.headers['x-service-id'],
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
       })
-      next(ErrorFactory.fromError(error))
+      next(error)
     }
   }
 
   /**
-   * Send transactional email via internal API
-   * Used by other services to send template-based transactional emails
+   * POST /internal/emails/send-bulk
+   * Send bulk emails via internal API
    */
-  async sendTransactionalEmail(
-    request: Request<{}, {}, SendTransactionalEmailRequest>,
-    response: Response<SendTransactionalEmailResponse>,
+  async sendBulkEmail(
+    request: Request<{}, {}, communicationInternal.BulkEmailRequest>,
+    response: Response<communicationInternal.BulkEmailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { userId, templateKey } = request.body
+      const { recipients, templateId } = request.body
+      const { serviceAuth } = request
 
-      // Log service request details
+      logger.info('Internal bulk email request', {
+        serviceName: serviceAuth?.serviceName,
+        serviceId: serviceAuth?.serviceId,
+        recipientCount: recipients.length,
+        templateId,
+      })
+
+      const logs = []
+      let sent = 0
+      let failed = 0
+
+      // Process each recipient
+      for (const recipient of recipients) {
+        try {
+          const result = await this.emailService.sendEmail({
+            to: recipient.to,
+            templateId: templateId as EmailTemplateId,
+            templateParams: {
+              ...recipient.variables,
+            },
+            subject: recipient.variables?.subject || 'Notification',
+            userId: recipient.variables?.userId,
+          })
+          logs.push(CommunicationLogMapper.toDTO(result))
+          sent++
+        } catch (error) {
+          logger.error(`Failed to send email to ${recipient.to}`, error as Error)
+          failed++
+        }
+      }
+
+      const responseData: communicationInternal.BulkEmailResponse & { total: number; logs: any[] } = {
+        sent,
+        failed,
+        total: recipients.length,
+        logs,
+      }
+
+      response.status(201).json(responseData)
+    } catch (error) {
+      logger.error('Failed to send bulk email', error as Error, {
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
+      })
+      next(error)
+    }
+  }
+
+  /**
+   * GET /internal/emails/history
+   * Get email history for internal services
+   */
+  async getEmailHistory(
+    request: Request<{}, {}, {}, communicationInternal.InternalEmailHistoryParams>,
+    response: Response<communicationInternal.InternalEmailHistoryResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { userId, status, page = 1, limit = 20, startDate, endDate } = request.query
+
+      const params: CommunicationLogSearchParams = {
+        page: Number(page),
+        limit: Number(limit),
+        userId: userId as string,
+        status: status as string,
+        startDate: startDate ? new Date(startDate as string) : undefined,
+        endDate: endDate ? new Date(endDate as string) : undefined,
+        type: 'email',
+      }
+
+      const result = await this.emailService.getEmailHistory(params)
+
+      response.json({
+        data: result.data.map(InternalCommunicationMapper.toInternalEmailDTO),
+        pagination: result.pagination,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /internal/emails/transactional
+   * Send transactional email via internal API
+   */
+  async sendTransactionalEmail(
+    request: Request<{}, {}, communicationInternal.SendTransactionalEmailRequest>,
+    response: Response<communicationInternal.SendTransactionalEmailResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { userId, templateKey, variables } = request.body
+      const { serviceAuth } = request
+
       logger.info('Internal transactional email request', {
-        serviceName: request.headers['x-service-name'],
-        serviceId: request.headers['x-service-id'],
+        serviceName: serviceAuth?.serviceName,
+        serviceId: serviceAuth?.serviceId,
         userId,
         templateKey,
       })
 
-      // TODO: In a full implementation, you would:
-      // 1. Fetch user details from user service
-      // 2. Load the appropriate template based on templateKey
-      // 3. Process the template with variables
-      // 4. Send the email
+      // For now, we'll use the regular email service
+      // In a full implementation, this would use user service to get email
+      const result = await this.emailService.sendEmail({
+        to: variables.email || 'placeholder@example.com', // This should come from user service
+        templateId: templateKey as EmailTemplateId,
+        templateParams: variables,
+        subject: variables.subject || 'Notification',
+        userId,
+      })
 
-      // For now, we'll return a mock response
-      const responseData: SendTransactionalEmailResponse = {
-        messageId: `msg-${Date.now()}`,
-        status: 'queued',
-        scheduledAt: new Date(),
+      const responseData: communicationInternal.SendTransactionalEmailResponse = {
+        messageId: result.id,
+        status: result.status === 'sent' ? 'queued' : 'failed',
+        scheduledAt: result.sentAt?.toISOString(),
       }
 
       response.json(responseData)
     } catch (error) {
       logger.error('Failed to send transactional email', error as Error, {
-        serviceName: request.headers['x-service-name'],
-        serviceId: request.headers['x-service-id'],
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
       })
-      next(ErrorFactory.fromError(error))
+      next(error)
     }
   }
 
   /**
+   * POST /internal/notifications/system
    * Send system notification via internal API
-   * Used by other services to create in-app notifications
    */
   async sendSystemNotification(
-    request: Request<{}, {}, SendSystemNotificationRequest>,
-    response: Response<SendSystemNotificationResponse>,
+    request: Request<{}, {}, communicationInternal.SendSystemNotificationRequest>,
+    response: Response<communicationInternal.SendSystemNotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -146,51 +246,249 @@ export class InternalCommunicationController {
         channels,
         metadata,
       } = request.body
+      const { serviceAuth } = request
 
       logger.info('Internal system notification request', {
-        serviceName: request.headers['x-service-name'],
-        serviceId: request.headers['x-service-id'],
+        serviceName: serviceAuth?.serviceName,
+        serviceId: serviceAuth?.serviceId,
         userIds: userIds?.length,
         broadcast,
         category,
         priority,
       })
 
-      // For now, we'll log the notification request
-      // In a full implementation, this would create notification records
-      logger.info('System notification would be sent', {
-        userIds,
-        broadcast,
-        title,
-        message,
-        category,
-        priority,
-        channels,
-        metadata,
-      })
+      // Create notifications if notification service is available
+      if (this.notificationService && (userIds || broadcast)) {
+        const targetUserIds = broadcast ? [] : userIds || []
+        
+        for (const userId of targetUserIds) {
+          await this.notificationService.createNotification({
+            userId,
+            title,
+            description: message,
+            type: 'inApp',
+            metadata: {
+              ...metadata,
+              category,
+              priority,
+            },
+          })
+        }
+      }
 
       const recipientCount = broadcast ? 100 : userIds?.length || 0
-      const responseData: SendSystemNotificationResponse = {
+      const responseData: communicationInternal.SendSystemNotificationResponse = {
         notificationId: `notification-${Date.now()}`,
         recipientCount,
-        channels: (channels || ['IN_APP']).reduce(
+        channels: (channels || ['inApp']).reduce(
           (acc, channel) => {
-            set(acc, channel, { sent: recipientCount, failed: 0 })
-
+            acc[channel] = { sent: recipientCount, failed: 0 }
             return acc
           },
           {} as Record<string, { sent: number; failed: number }>,
         ),
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       }
 
       response.json(responseData)
     } catch (error) {
       logger.error('Failed to send system notification', error as Error, {
-        serviceName: request.headers['x-service-name'],
-        serviceId: request.headers['x-service-id'],
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
       })
-      next(ErrorFactory.fromError(error))
+      next(error)
+    }
+  }
+
+  /**
+   * POST /internal/notifications
+   * Create a notification via internal API
+   */
+  async createNotification(
+    request: Request<{}, {}, communicationInternal.CreateNotificationRequest>,
+    response: Response<communicationInternal.CreateNotificationResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!this.notificationService) {
+        throw ErrorFactory.serviceUnavailable('Notification service not available')
+      }
+
+      const { userId, title, content, type, metadata } = request.body
+      const { serviceAuth } = request
+
+      logger.info('Internal notification create request', {
+        serviceName: serviceAuth?.serviceName,
+        serviceId: serviceAuth?.serviceId,
+        userId,
+        type,
+      })
+
+      const notification = await this.notificationService.createNotification({
+        userId,
+        title,
+        description: content,
+        type: type || 'inApp',
+        metadata,
+      })
+
+      const dto = NotificationMapper.toDTO(notification)
+
+      // Handle both email sending if requested
+      const extendedBody = request.body as any
+      if (extendedBody.sendEmail) {
+        try {
+          await this.emailService.sendEmail({
+            to: extendedBody.email || '',
+            subject: extendedBody.emailSubject || title,
+            body: content,
+            isHtml: true,
+            userId,
+          })
+          ;(dto as any).emailSent = true
+        } catch (error) {
+          logger.error('Failed to send notification email', error as Error)
+          ;(dto as any).emailSent = false
+        }
+      }
+
+      response.status(201).json(dto)
+    } catch (error) {
+      logger.error('Failed to create notification', error as Error, {
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
+      })
+      next(error)
+    }
+  }
+
+  /**
+   * POST /internal/notifications/batch
+   * Create batch notifications via internal API
+   */
+  async createBatchNotifications(
+    request: Request<{}, {}, communicationInternal.BatchCreateNotificationsRequest>,
+    response: Response<communicationInternal.BatchCreateNotificationsResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!this.notificationService) {
+        throw ErrorFactory.serviceUnavailable('Notification service not available')
+      }
+
+      const { notifications } = request.body
+      const { serviceAuth } = request
+
+      logger.info('Internal batch notification request', {
+        serviceName: serviceAuth?.serviceName,
+        serviceId: serviceAuth?.serviceId,
+        count: notifications.length,
+      })
+
+      const created = []
+      for (const notif of notifications) {
+        const notification = await this.notificationService.createNotification({
+          userId: notif.userId,
+          title: notif.title,
+          description: notif.description,
+          type: notif.type || 'inApp',
+          metadata: notif.metadata,
+        })
+        created.push(InternalCommunicationMapper.toInternalNotificationDTO(notification))
+      }
+
+      response.status(201).json({
+        created: created.length,
+        notifications: created,
+      })
+    } catch (error) {
+      logger.error('Failed to create batch notifications', error as Error, {
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
+      })
+      next(error)
+    }
+  }
+
+  /**
+   * GET /internal/notifications
+   * Get notifications for a user via internal API
+   */
+  async getNotifications(
+    request: Request<{}, {}, {}, communicationInternal.InternalNotificationsParams>,
+    response: Response<communicationInternal.InternalNotificationsResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!this.notificationService) {
+        throw ErrorFactory.serviceUnavailable('Notification service not available')
+      }
+
+      const { userId, page = 1, limit = 20, isRead } = request.query
+
+      if (!userId) {
+        throw ErrorFactory.badRequest('userId is required')
+      }
+
+      const params: NotificationSearchParams = {
+        page: Number(page),
+        limit: Number(limit),
+        isRead: isRead === 'true' ? true : isRead === 'false' ? false : undefined,
+      }
+
+      const result = await this.notificationService.getUserNotifications(
+        userId as string,
+        params,
+      )
+
+      response.json({
+        data: result.data.map(InternalCommunicationMapper.toInternalNotificationDTO),
+        pagination: result.pagination,
+      })
+    } catch (error) {
+      logger.error('Failed to get notifications', error as Error, {
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
+      })
+      next(error)
+    }
+  }
+
+  /**
+   * GET /internal/notifications/unread-count
+   * Get unread notification count for a user
+   */
+  async getUnreadCount(
+    request: Request<{}, {}, {}, communicationInternal.GetUnreadCountParams>,
+    response: Response<communicationInternal.GetUnreadCountResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!this.notificationService) {
+        throw ErrorFactory.serviceUnavailable('Notification service not available')
+      }
+
+      const { userId } = request.query
+
+      if (!userId) {
+        throw ErrorFactory.badRequest('userId is required')
+      }
+
+      const result = await this.notificationService.getUserNotifications(
+        userId as string,
+        { isRead: false, limit: 1000 },
+      )
+
+      response.json({
+        userId: userId as string,
+        unreadCount: result.pagination.total,
+      })
+    } catch (error) {
+      logger.error('Failed to get unread count', error as Error, {
+        serviceName: request.serviceAuth?.serviceName,
+        serviceId: request.serviceAuth?.serviceId,
+      })
+      next(error)
     }
   }
 }

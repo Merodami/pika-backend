@@ -276,6 +276,70 @@ This allows existing imports to continue working while new code uses the service
    - Remove credit/points systems
    - Keep only core business logic
 
+8. **Pagination Strategy (Standardized Across All Tiers)**:
+   
+   **Core Components**:
+   - `SearchParams` from `shared/pagination.js` - Provides page, limit, sortBy, sortOrder, search
+   - `paginatedResponse()` from `shared/responses.js` - Wraps data with pagination metadata
+   
+   **Universal Pattern - ALL Tiers (Public/Admin/Internal)**:
+   
+   All list endpoints MUST use pagination for consistency and future-proofing:
+   
+   ```typescript
+   // Query params ALWAYS extend SearchParams
+   export const ResourceQueryParams = SearchParams.extend({
+     status: ResourceStatus.optional(),
+     // ... other filters
+     sortBy: ResourceSortBy.default('createdAt'), // Override with service-specific enum
+   })
+   
+   // Response ALWAYS uses paginatedResponse
+   export const ResourceListResponse = paginatedResponse(ResourceSchema)
+   ```
+   
+   **This applies to**:
+   - Public endpoints (user-facing lists)
+   - Admin endpoints (management lists)
+   - Internal endpoints (service-to-service lists)
+   
+   **Benefits of Standardization**:
+   - Single pattern to learn and implement
+   - Consistent client code across all service calls
+   - Future-proof (no breaking changes when data grows)
+   - Reusable pagination utilities and types
+   - Predictable API behavior
+   
+   **Limited Exceptions** (direct arrays only when):
+   
+   1. **Bounded validation operations**:
+   ```typescript
+   // Input explicitly limits output
+   export const ValidateResourcesRequest = z.object({
+     resourceIds: z.array(UUID).min(1).max(100), // Max 100 enforced
+   })
+   
+   export const ValidateResourcesResponse = z.object({
+     results: z.array(ValidationResult), // Always ≤ 100 items
+   })
+   ```
+   
+   2. **Single-entity relationships**:
+   ```typescript
+   // One-to-one relationship, not a list
+   export const GetUserBusinessResponse = z.object({
+     business: BusinessData.optional(), // User has 0 or 1 business
+   })
+   ```
+   
+   **Implementation Guidelines**:
+   - Default to pagination for ANY endpoint returning arrays
+   - Question every exception - will this really never grow?
+   - Internal APIs are APIs too - treat them with same rigor
+   - Consider: "What happens when this service has 1M+ records?"
+   
+   **Migration Note**: Existing internal endpoints without pagination should be migrated in next major version to maintain consistency.
+
 ## Recent Implementation (2025-01-17)
 
 ### ✅ Service-First Organization Completed

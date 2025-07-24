@@ -85,7 +85,7 @@ export class NotificationController implements INotificationController {
    */
   async createNotification(
     request: Request<{}, {}, communicationPublic.CreateNotificationRequest>,
-    response: Response,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -119,8 +119,8 @@ export class NotificationController implements INotificationController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getNotifications(
-    request: Request,
-    response: Response,
+    request: Request<{}, {}, {}, communicationPublic.NotificationSearchParams>,
+    response: Response<communicationPublic.NotificationListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -160,7 +160,7 @@ export class NotificationController implements INotificationController {
    */
   async getNotificationById(
     request: Request<communicationCommon.NotificationIdParam>,
-    response: Response,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -191,7 +191,7 @@ export class NotificationController implements INotificationController {
       {},
       communicationPublic.UpdateNotificationStatusRequest
     >,
-    response: Response,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -220,7 +220,7 @@ export class NotificationController implements INotificationController {
    */
   async markAsRead(
     request: Request<communicationCommon.NotificationIdParam>,
-    response: Response,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -244,7 +244,7 @@ export class NotificationController implements INotificationController {
    */
   async markAllAsRead(
     request: Request,
-    response: Response,
+    response: Response<communicationPublic.MarkAllAsReadResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -267,7 +267,7 @@ export class NotificationController implements INotificationController {
    */
   async deleteNotification(
     request: Request<communicationCommon.NotificationIdParam>,
-    response: Response,
+    response: Response<communicationPublic.DeleteNotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -291,7 +291,7 @@ export class NotificationController implements INotificationController {
    */
   async createGlobalNotification(
     request: Request<{}, {}, communicationPublic.CreateNotificationRequest>,
-    response: Response,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
