@@ -29,6 +29,10 @@ export class InternalVoucherController {
     this.trackRedemption = this.trackRedemption.bind(this)
     this.batchProcessVouchers = this.batchProcessVouchers.bind(this)
     this.batchUpdateVoucherState = this.batchUpdateVoucherState.bind(this)
+    // Voucher book endpoints
+    this.getVouchersForBook = this.getVouchersForBook.bind(this)
+    this.generateVoucherTokens = this.generateVoucherTokens.bind(this)
+    this.validateBookStateTransition = this.validateBookStateTransition.bind(this)
   }
 
   /**
@@ -416,6 +420,120 @@ export class InternalVoucherController {
       }
       const validatedResponse = voucherInternal.BatchUpdateVoucherStateResponse.parse(responseData)
       res.status(200).json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /internal/vouchers/for-book
+   * Get vouchers for book generation with security tokens
+   */
+  async getVouchersForBook(
+    req: Request<{}, {}, voucherInternal.GetVouchersForBookRequest>,
+    res: Response<voucherInternal.GetVouchersForBookResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { businessIds, month, year } = req.body
+
+      // Get vouchers for the specified businesses
+      const vouchers = await this.internalVoucherService.getVouchersForBook(
+        businessIds,
+        month,
+        year,
+      )
+
+      // Generate security tokens in batch for better performance
+      const batchId = `book-${year}-${month}`
+      const tokenRequest = {
+        vouchers: vouchers.map(v => ({
+          voucherId: v.id,
+          providerId: v.businessId,
+        })),
+        batchId,
+      }
+
+      const tokensMap = await this.internalVoucherService.generateBatchVoucherTokens(tokenRequest)
+
+      // Merge tokens with voucher data
+      const vouchersWithTokens = vouchers.map(voucher => {
+        const tokenData = tokensMap.get(voucher.id)
+        return {
+          ...voucher,
+          qrPayload: tokenData?.qrPayload || '',
+          shortCode: tokenData?.shortCode || '',
+        }
+      })
+
+      const response = {
+        vouchers: vouchersWithTokens,
+        count: vouchersWithTokens.length,
+      }
+
+      const validatedResponse = voucherInternal.GetVouchersForBookResponse.parse(response)
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /internal/vouchers/generate-tokens
+   * Generate security tokens for vouchers
+   */
+  async generateVoucherTokens(
+    req: Request<{}, {}, voucherInternal.GenerateVoucherTokensRequest>,
+    res: Response<voucherInternal.GenerateVoucherTokensResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { vouchers, batchId } = req.body
+
+      const tokens = await this.internalVoucherService.generateBatchVoucherTokens({
+        vouchers,
+        batchId,
+      })
+
+      // Convert Map to array format for response
+      const tokenArray = Array.from(tokens.entries()).map(([voucherId, tokenData]) => ({
+        voucherId,
+        qrPayload: tokenData.qrPayload,
+        shortCode: tokenData.shortCode,
+        batchId: tokenData.batchId,
+      }))
+
+      const response = {
+        tokens: tokenArray,
+        count: tokenArray.length,
+      }
+
+      const validatedResponse = voucherInternal.GenerateVoucherTokensResponse.parse(response)
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /internal/vouchers/book/validate-transition
+   * Validate voucher book state transition
+   */
+  async validateBookStateTransition(
+    req: Request<{}, {}, voucherInternal.ValidateBookStateTransitionRequest>,
+    res: Response<voucherInternal.ValidateBookStateTransitionResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { currentStatus, newStatus } = req.body
+
+      const result = this.internalVoucherService.validateBookStateTransition(
+        currentStatus,
+        newStatus,
+      )
+
+      const validatedResponse = voucherInternal.ValidateBookStateTransitionResponse.parse(result)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

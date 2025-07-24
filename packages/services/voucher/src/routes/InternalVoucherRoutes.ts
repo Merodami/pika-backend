@@ -104,5 +104,28 @@ export function createInternalVoucherRoutes(
     controller.batchUpdateVoucherState,
   )
 
+  // ============= Voucher Book Routes =============
+  
+  // POST /internal/vouchers/for-book - Get vouchers for book generation
+  router.post(
+    '/for-book',
+    validateBody(voucherInternal.GetVouchersForBookRequest),
+    controller.getVouchersForBook,
+  )
+
+  // POST /internal/vouchers/generate-tokens - Generate security tokens
+  router.post(
+    '/generate-tokens',
+    validateBody(voucherInternal.GenerateVoucherTokensRequest),
+    controller.generateVoucherTokens,
+  )
+
+  // POST /internal/vouchers/book/validate-transition - Validate book state transition
+  router.post(
+    '/book/validate-transition',
+    validateBody(voucherInternal.ValidateBookStateTransitionRequest),
+    controller.validateBookStateTransition,
+  )
+
   return router
 }

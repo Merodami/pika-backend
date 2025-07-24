@@ -73,20 +73,22 @@ export class AuthController {
 
       // If email verification is required, return success message without tokens
       if (!result.accessToken || !result.refreshToken) {
-        response.status(201).json({
+        const responseData = {
           message:
             result.message ||
             'Registration successful. Please check your email to verify your account.',
           user: UserMapper.toDTO(result.user),
-        })
+        }
+        const validatedResponse = authPublic.RegisterResponse.parse(responseData)
+        response.status(201).json(validatedResponse)
       } else {
         const dto = AuthMapper.toAuthResponse(
           result.user,
           result.accessToken,
           result.refreshToken,
         )
-
-        response.status(201).json(dto)
+        const validatedResponse = authPublic.AuthResponse.parse(dto)
+        response.status(201).json(validatedResponse)
       }
     } catch (error) {
       next(error)
@@ -107,11 +109,13 @@ export class AuthController {
 
       const result = await this.authService.forgotPassword(email)
 
-      response.json({
+      const responseData = {
         message:
           result.message ||
           'If an account exists with this email, a password reset link has been sent.',
-      })
+      }
+      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -137,9 +141,11 @@ export class AuthController {
         )
       }
 
-      response.json({
+      const responseData = {
         message: result.message || 'Password reset successfully',
-      })
+      }
+      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -163,10 +169,12 @@ export class AuthController {
         throw ErrorFactory.badRequest('Invalid or expired verification token')
       }
 
-      response.json({
+      const responseData = {
         message: 'Email verified successfully',
         userId: result.userId,
-      })
+      }
+      const validatedResponse = authPublic.VerifyEmailResponse.parse(responseData)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -186,11 +194,13 @@ export class AuthController {
 
       const result = await this.authService.resendVerificationEmail(email)
 
-      response.json({
+      const responseData = {
         message:
           result.message ||
           'If an account exists with this email, a verification link has been sent.',
-      })
+      }
+      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -222,9 +232,11 @@ export class AuthController {
         throw ErrorFactory.badRequest('Failed to change password')
       }
 
-      response.json({
+      const responseData = {
         message: 'Password changed successfully',
-      })
+      }
+      const validatedResponse = authPublic.MessageResponse.parse(responseData)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -258,7 +270,8 @@ export class AuthController {
           user: AuthMapper.toUserResponse(result.user),
         }
 
-        response.json(oauthResponse)
+        const validatedResponse = authPublic.TokenResponse.parse(oauthResponse)
+        response.json(validatedResponse)
       } else if (grantType === 'refreshToken') {
         const { refreshToken } = request.body
         const result = await this.authService.refreshToken(refreshToken)
@@ -271,7 +284,8 @@ export class AuthController {
           scope: 'read write',
         }
 
-        response.json(oauthResponse)
+        const validatedResponse = authPublic.TokenResponse.parse(oauthResponse)
+        response.json(validatedResponse)
       } else {
         throw ErrorFactory.badRequest('Unsupported grant type')
       }
@@ -294,12 +308,13 @@ export class AuthController {
       const result = await this.authService.introspectToken(token)
 
       if (!result.valid) {
-        response.json({ active: false })
-
+        const responseData = { active: false }
+        const validatedResponse = authPublic.IntrospectResponse.parse(responseData)
+        response.json(validatedResponse)
         return
       }
 
-      response.json({
+      const responseData = {
         active: true,
         scope: 'read write',
         username: result.payload?.email,
@@ -310,10 +325,14 @@ export class AuthController {
         userId: result.payload?.userId,
         userEmail: result.payload?.email,
         userRole: result.payload?.role,
-      })
+      }
+      const validatedResponse = authPublic.IntrospectResponse.parse(responseData)
+      response.json(validatedResponse)
     } catch {
       // For introspection, always return active: false for invalid tokens
-      response.json({ active: false })
+      const responseData = { active: false }
+      const validatedResponse = authPublic.IntrospectResponse.parse(responseData)
+      response.json(validatedResponse)
     }
   }
 
@@ -336,26 +355,32 @@ export class AuthController {
         if (introspection.valid && introspection.payload) {
           await this.authService.logout(introspection.payload.userId, token)
 
-          response.json({
+          const responseData = {
             success: true,
             message: 'All tokens revoked successfully',
-          })
+          }
+          const validatedResponse = authPublic.RevokeTokenResponse.parse(responseData)
+          response.json(validatedResponse)
         } else {
           // Even if token is invalid, return success per OAuth spec
           // But still honor the allDevices flag for consistent messaging
-          response.json({
+          const responseData = {
             success: true,
             message: 'All tokens revoked successfully',
-          })
+          }
+          const validatedResponse = authPublic.RevokeTokenResponse.parse(responseData)
+          response.json(validatedResponse)
         }
       } else {
         // Revoke specific token
         await this.authService.revokeToken(token)
 
-        response.json({
+        const responseData = {
           success: true,
           message: 'Token revoked successfully',
-        })
+        }
+        const validatedResponse = authPublic.RevokeTokenResponse.parse(responseData)
+        response.json(validatedResponse)
       }
     } catch {
       // For revocation, always return success (OAuth 2.0 spec)
@@ -420,7 +445,8 @@ export class AuthController {
         updatedAt: user.updatedAt,
       }
 
-      response.json(userInfo)
+      const validatedResponse = authPublic.UserInfoResponse.parse(userInfo)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

@@ -168,3 +168,68 @@ export interface VoucherTranslations {
   description: Record<string, string>
   termsAndConditions: Record<string, string>
 }
+
+// ============= Voucher Security Types =============
+
+export interface VoucherTokenData {
+  voucherId: string
+  qrPayload: string
+  shortCode: string
+  batchId?: string
+}
+
+export interface GenerateTokenOptions {
+  voucherId: string
+  providerId: string
+  batchId?: string
+  ttl?: number
+  includeShortCode?: boolean
+}
+
+export interface BatchTokenGenerationRequest {
+  vouchers: Array<{
+    voucherId: string
+    providerId: string
+  }>
+  batchId?: string
+}
+
+// ============= Voucher Book Types =============
+
+export type VoucherBookStatus = 
+  | 'draft'
+  | 'ready_for_print'
+  | 'published'
+  | 'archived'
+
+export interface VoucherBookStateTransition {
+  allowed: boolean
+  reason?: string
+  requiredFields?: string[]
+}
+
+export interface VoucherBookValidation {
+  title?: string
+  description?: string
+  month?: string
+  year?: number
+  totalPages?: number
+  voucherCount?: number
+}
+
+export interface VoucherForBook {
+  id: string
+  businessId: string
+  title: Record<string, string>
+  description: Record<string, string>
+  terms: Record<string, string>
+  discountType: string
+  discountValue: number
+  validFrom?: Date
+  validTo?: Date
+  businessName: string
+  businessLogo?: string
+  category: string
+  qrPayload?: string
+  shortCode?: string
+}

@@ -1,6 +1,6 @@
 import { subscriptionCommon, subscriptionPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery } from '@pika/http'
+import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
@@ -91,12 +91,11 @@ export class PlanController {
 
       const result = await this.planService.getAllPlans(params)
 
-      const dtoResult = {
-        data: result.data.map(SubscriptionPlanMapper.toDTO),
-        pagination: result.pagination,
-      }
+      // Use standard pagination pattern
+      const responseData = paginatedResponse(result, SubscriptionPlanMapper.toDTO)
+      const validatedResponse = subscriptionPublic.SubscriptionPlanListResponse.parse(responseData)
 
-      response.json(dtoResult)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -119,8 +118,9 @@ export class PlanController {
       const plan = await this.planService.getPlanById(id)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
+      const validatedResponse = subscriptionPublic.SubscriptionPlanResponse.parse(dto)
 
-      response.json(dto)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -148,8 +148,9 @@ export class PlanController {
       const plan = await this.planService.updatePlan(id, data)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
+      const validatedResponse = subscriptionPublic.SubscriptionPlanResponse.parse(dto)
 
-      response.json(dto)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -191,7 +192,10 @@ export class PlanController {
 
       await this.planService.syncWithStripe()
 
-      response.json({ message: 'Plans synced successfully' })
+      const responseData = { message: 'Plans synced successfully' }
+      const validatedResponse = subscriptionPublic.PlanSyncResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

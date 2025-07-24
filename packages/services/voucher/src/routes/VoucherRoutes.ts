@@ -85,6 +85,8 @@ export async function createVoucherRoutes(
   )
 
   // GET /vouchers/by-code/:code - Get voucher by any code type (must be before /:id)
+  // SECURITY NOTE: No authentication required - vouchers can be viewed by anyone with the code
+  // This enables QR code scanning and public voucher sharing functionality
   router.get(
     '/by-code/:code',
     validateParams(voucherCommon.VoucherCodeParam),
@@ -120,6 +122,8 @@ export async function createVoucherRoutes(
   )
 
   // POST /vouchers/:id/redeem - Redeem voucher
+  // SECURITY NOTE: No authentication required - allows anonymous voucher redemption
+  // The redemption code in the request body serves as the authentication mechanism
   router.post(
     '/:id/redeem',
     validateParams(voucherCommon.VoucherIdParam),

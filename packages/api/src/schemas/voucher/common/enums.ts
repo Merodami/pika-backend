@@ -191,3 +191,18 @@ export const UserVoucherStatusFilterSchema = openapi(UserVoucherStatusFilter, {
   description: 'User voucher status filter including all option',
   example: 'all',
 })
+
+// Voucher book status enum
+export const VoucherBookStatus = z.enum([
+  'draft',
+  'ready_for_print',
+  'published',
+  'archived',
+])
+
+export type VoucherBookStatus = z.infer<typeof VoucherBookStatus>
+
+export const VoucherBookStatusSchema = openapi(VoucherBookStatus, {
+  description: 'Status of a voucher book in the publishing workflow',
+  example: 'draft',
+})

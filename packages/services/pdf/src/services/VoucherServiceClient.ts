@@ -20,18 +20,23 @@ export class VoucherServiceClient extends BaseServiceClient {
     context?: ServiceContext,
   ): Promise<Map<string, any>> {
     try {
-      // Call the batch endpoint with proper payload
-      const response = await this.post<Record<string, any>>(
-        '/vouchers/batch',
-        { voucher_ids: voucherIds },
+      // Call the internal endpoint with proper payload
+      const response = await this.post<{ vouchers: any[] }>(
+        '/internal/vouchers/by-ids',
+        { 
+          voucherIds,
+          include: ['business', 'category']
+        },
         { ...context, useServiceAuth: true },
       )
 
-      // Convert object response to Map
+      // Convert array response to Map
       const voucherMap = new Map<string, any>()
 
-      for (const [id, voucher] of Object.entries(response)) {
-        voucherMap.set(id, voucher)
+      if (response.vouchers) {
+        for (const voucher of response.vouchers) {
+          voucherMap.set(voucher.id, voucher)
+        }
       }
 
       logger.info('Fetched vouchers batch', {
@@ -86,6 +91,77 @@ export class VoucherServiceClient extends BaseServiceClient {
     } catch (error) {
       logger.error('Failed to fetch vouchers by provider', {
         providerId,
+        error,
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Get vouchers for book generation with security tokens
+   */
+  async getVouchersForBook(
+    businessIds: string[],
+    month: string,
+    year: number,
+    context?: ServiceContext,
+  ): Promise<{
+    vouchers: Array<{
+      id: string
+      businessId: string
+      title: Record<string, string>
+      description: Record<string, string>
+      terms: Record<string, string>
+      discountType: string
+      discountValue: number
+      validFrom?: string
+      validTo?: string
+      businessName: string
+      businessLogo?: string
+      category: string
+      qrPayload: string
+      shortCode: string
+    }>
+    count: number
+  }> {
+    try {
+      const response = await this.post<{
+        vouchers: Array<{
+          id: string
+          businessId: string
+          title: Record<string, string>
+          description: Record<string, string>
+          terms: Record<string, string>
+          discountType: string
+          discountValue: number
+          validFrom?: string
+          validTo?: string
+          businessName: string
+          businessLogo?: string
+          category: string
+          qrPayload: string
+          shortCode: string
+        }>
+        count: number
+      }>(
+        '/internal/vouchers/for-book',
+        { businessIds, month, year },
+        { ...context, useServiceAuth: true },
+      )
+
+      logger.info('Fetched vouchers for book', {
+        businessCount: businessIds.length,
+        voucherCount: response.count,
+        month,
+        year,
+      })
+
+      return response
+    } catch (error) {
+      logger.error('Failed to fetch vouchers for book', {
+        businessIds,
+        month,
+        year,
         error,
       })
       throw error

@@ -14,25 +14,24 @@ export function createProductRouter(productService: IProductService): Router {
   const router = Router()
   const controller = new ProductController(productService)
 
-  // All endpoints require service authentication (called by other services)
+  // IMPORTANT: Apply service authentication to ALL routes
+  // As per AUTHENTICATION_ARCHITECTURE.md, internal routes need explicit authentication
+  router.use(requireServiceAuth())
 
   // Product management
   router.post(
     '/products',
-    requireServiceAuth(),
     validateBody(paymentPublic.CreateProductRequest),
     controller.createProduct,
   )
   router.put(
     '/products/:id',
-    requireServiceAuth(),
     validateParams(paymentPublic.ProductIdParam),
     validateBody(paymentPublic.UpdateProductRequest),
     controller.updateProduct,
   )
   router.get(
     '/products',
-    requireServiceAuth(),
     validateQuery(paymentPublic.ListProductsQuery),
     controller.listProducts,
   )
@@ -40,19 +39,16 @@ export function createProductRouter(productService: IProductService): Router {
   // Price management
   router.post(
     '/prices',
-    requireServiceAuth(),
     validateBody(paymentPublic.CreatePriceRequest),
     controller.createPrice,
   )
   router.put(
     '/prices/:id/deactivate',
-    requireServiceAuth(),
     validateParams(paymentPublic.PriceIdParam),
     controller.deactivatePrice,
   )
   router.get(
     '/prices',
-    requireServiceAuth(),
     validateQuery(paymentPublic.ListPricesQuery),
     controller.listPrices,
   )

@@ -111,6 +111,20 @@ export type UpdateSubscriptionPlanRequest = z.infer<
   typeof UpdateSubscriptionPlanRequest
 >
 
+/**
+ * Plan sync success response
+ */
+export const PlanSyncResponse = openapi(
+  z.object({
+    message: z.string(),
+  }),
+  {
+    description: 'Plan sync success response',
+  },
+)
+
+export type PlanSyncResponse = z.infer<typeof PlanSyncResponse>
+
 // ============= Search Plans =============
 
 /**

@@ -71,8 +71,9 @@ Services analyzed against the three architectural documents:
 **Pattern**: Use `paginatedResponse` utility + `.parse()` validation for all paginated endpoints
 
 ### ✅ COMPLIANT SERVICES:
+
 - [x] **Business Service** - ✅ COMPLETED: All tiers (Public/Admin/Internal) use paginatedResponse utility + validation
-- [ ] **Auth Service** - Needs analysis and implementation  
+- [x] **Auth Service** - ✅ COMPLETED: Uses response validation with `.parse()` on all methods
 - [x] **Category Service** - ✅ COMPLETED: All tiers use paginatedResponse utility + validation + local mappers (future pattern)
 - [x] **User Service** - ✅ COMPLETED: Uses paginatedResponse utility + validation
 - [ ] **Payment Service** - BLOCKED: Requires architectural refactoring
@@ -83,12 +84,13 @@ Services analyzed against the three architectural documents:
   - This is a significant architectural change, not just a pattern update
 - [x] **Communication Service** - ✅ COMPLETED: Uses paginatedResponse utility + validation
 - [x] **Subscription Service** - ✅ COMPLETED: Uses paginatedResponse utility + validation
-- [x] **Voucher Service** - ✅ COMPLETED: All tiers use paginatedResponse utility + validation  
-- [ ] **Storage Service** - Needs analysis and implementation
-- [ ] **PDF Service** - Needs analysis and implementation
+- [x] **Voucher Service** - ✅ COMPLETED: All tiers use paginatedResponse utility + validation
+- [x] **Storage Service** - ✅ COMPLETED: Already compliant with paginatedResponse + validation
+- [x] **PDF Service** - ✅ COMPLETED: Both controllers now use response validation
 - [x] **Support Service** - ✅ COMPLETED: Uses paginatedResponse utility + validation + proper ProblemMapper
 
-**Target Pattern**: 
+**Target Pattern**:
+
 ```typescript
 const response = paginatedResponse(result, ResourceMapper.toDTO)
 const validatedResponse = resourcePublic.ResourceListResponse.parse(response)
@@ -100,8 +102,9 @@ res.json(validatedResponse)
 **Pattern**: Transitioning from shared SDK mappers to service-owned mappers (see DOMAIN_TYPES_REFACTORING.md)
 
 ### ✅ SDK MAPPERS (Current Standard - 8 Services):
+
 - [x] **Business Service** - Uses `@pika/sdk` mappers ✅
-- [x] **User Service** - Uses `@pika/sdk` mappers ✅ 
+- [x] **User Service** - Uses `@pika/sdk` mappers ✅
 - [x] **Support Service** - Uses `@pika/sdk` mappers ✅
 - [x] **Voucher Service** - Uses `@pika/sdk` mappers ✅
 - [x] **Communication Service** - Uses `@pika/sdk` mappers ✅
@@ -110,6 +113,7 @@ res.json(validatedResponse)
 - [x] **PDF Service** - Mixed pattern (needs standardization)
 
 ### 🔄 LOCAL MAPPERS (Future Standard - 3 Services):
+
 - [x] **Category Service** - Uses local `../mappers/` ✅ (pilot implementation)
 - [x] **Auth Service** - Uses local `../mappers/` ✅ (pilot implementation)
 - [ ] **Payment Service** - Needs analysis

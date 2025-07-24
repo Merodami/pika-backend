@@ -13,6 +13,9 @@ import { SubscriptionPlan } from './subscriptionPlan.js'
  * Subscription schemas for public API
  */
 
+// Re-export common types for backward compatibility
+export { CancelSubscriptionRequest } from '../common/types.js'
+
 // Enums are now imported from common/
 
 // ============= Subscription =============
@@ -114,29 +117,6 @@ export const UpdateSubscriptionRequest = openapi(
 
 export type UpdateSubscriptionRequest = z.infer<
   typeof UpdateSubscriptionRequest
->
-
-// ============= Cancel Subscription =============
-
-/**
- * Cancel subscription request
- */
-export const CancelSubscriptionRequest = openapi(
-  z.object({
-    cancelAtPeriodEnd: z
-      .boolean()
-      .default(true)
-      .describe('Whether to cancel at period end'),
-    reason: z.string().optional().describe('Cancellation reason'),
-    feedback: z.string().optional().describe('User feedback'),
-  }),
-  {
-    description: 'Cancel a subscription',
-  },
-)
-
-export type CancelSubscriptionRequest = z.infer<
-  typeof CancelSubscriptionRequest
 >
 
 // ============= Search Subscriptions =============

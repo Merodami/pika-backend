@@ -4,9 +4,10 @@ import type { ICacheService } from '@pika/redis'
 import { logger, PaymentServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
+import { createAdminSubscriptionRoutes, createAdminPlanRoutes } from './routes/AdminSubscriptionRoutes.js'
 import { createInternalSubscriptionRouter } from './routes/InternalSubscriptionRoutes.js'
 import { createPlanRouter } from './routes/PlanRoutes.js'
-import { createSubscriptionRouter } from './routes/SubscriptionRoutes.js'
+import { createPublicSubscriptionRoutes } from './routes/PublicSubscriptionRoutes.js'
 
 export interface ServerConfig {
   prisma: PrismaClient
@@ -76,14 +77,24 @@ export async function createSubscriptionServer(config: ServerConfig) {
   // Initialize payment client if not provided (for testing)
   const paymentClient = config.paymentClient || new PaymentServiceClient()
 
-  // Mount routes
+  // Public routes
   app.use(
     '/plans',
     createPlanRouter(config.prisma, config.cacheService, paymentClient),
   )
   app.use(
     '/subscriptions',
-    createSubscriptionRouter(config.prisma, config.cacheService),
+    createPublicSubscriptionRoutes(config.prisma, config.cacheService),
+  )
+
+  // Admin routes
+  app.use(
+    '/admin/subscriptions',
+    createAdminSubscriptionRoutes(config.prisma, config.cacheService),
+  )
+  app.use(
+    '/admin/subscription-plans',
+    createAdminPlanRoutes(config.prisma, config.cacheService),
   )
 
   // Internal API routes

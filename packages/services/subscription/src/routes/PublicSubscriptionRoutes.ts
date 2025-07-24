@@ -11,23 +11,25 @@ import { CommunicationServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
-import { SubscriptionController } from '../controllers/SubscriptionController.js'
+import { PublicSubscriptionController } from '../controllers/PublicSubscriptionController.js'
 import { PlanRepository } from '../repositories/PlanRepository.js'
 import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
 import { SubscriptionService } from '../services/SubscriptionService.js'
 
-export function createSubscriptionRouter(
+/**
+ * Creates public subscription routes
+ */
+export function createPublicSubscriptionRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
 ): Router {
   const router = Router()
 
-  // Initialize repositories
+  // Initialize dependencies
   const subscriptionRepository = new SubscriptionRepository(prisma, cache)
   const planRepository = new PlanRepository(prisma, cache)
-
-  // Initialize services
   const communicationClient = new CommunicationServiceClient()
+  
   const subscriptionService = new SubscriptionService(
     prisma,
     subscriptionRepository,
@@ -35,69 +37,40 @@ export function createSubscriptionRouter(
     cache,
     communicationClient,
   )
+  
+  const controller = new PublicSubscriptionController(subscriptionService)
 
-  // Initialize controller
-  const controller = new SubscriptionController(subscriptionService)
+  // All public subscription routes require authentication
+  router.use(requireAuth())
 
-  // User routes
+  // GET /subscriptions/me - Get current user's active subscription
   router.get(
     '/me',
-    requireAuth(),
     requirePermissions('subscriptions:read:own'),
     controller.getUserSubscription,
   )
 
+  // POST /subscriptions - Create subscription for current user
   router.post(
     '/',
-    requireAuth(),
     requirePermissions('subscriptions:write:own'),
     validateBody(subscriptionPublic.CreateSubscriptionRequest),
     controller.createSubscription,
   )
 
-  router.get(
-    '/:id',
-    requireAuth(),
-    requirePermissions('subscriptions:read:own'),
-    validateParams(subscriptionCommon.SubscriptionIdParam),
-    controller.getSubscriptionById,
-  )
-
-  router.put(
-    '/:id',
-    requireAuth(),
-    requirePermissions('subscriptions:write:own'),
-    validateParams(subscriptionCommon.SubscriptionIdParam),
-    validateBody(subscriptionPublic.UpdateSubscriptionRequest),
-    controller.updateSubscription,
-  )
-
+  // POST /subscriptions/me/cancel - Cancel current user's subscription
   router.post(
-    '/:id/cancel',
-    requireAuth(),
+    '/me/cancel',
     requirePermissions('subscriptions:write:own'),
-    validateParams(subscriptionCommon.SubscriptionIdParam),
     validateBody(subscriptionPublic.CancelSubscriptionRequest),
     controller.cancelSubscription,
   )
 
+  // POST /subscriptions/me/reactivate - Reactivate current user's cancelled subscription
   router.post(
-    '/:id/reactivate',
-    requireAuth(),
+    '/me/reactivate',
     requirePermissions('subscriptions:write:own'),
-    validateParams(subscriptionCommon.SubscriptionIdParam),
     controller.reactivateSubscription,
-  )
-
-  // Credit processing route removed - no credit tables in database
-
-  // Admin routes
-  router.get(
-    '/',
-    requireAuth(),
-    requirePermissions('admin:subscriptions'),
-    validateQuery(subscriptionPublic.SubscriptionQueryParams),
-    controller.getSubscriptions,
   )
 
   return router

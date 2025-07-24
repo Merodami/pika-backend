@@ -8,6 +8,7 @@ import {
   BatchOperationType,
   CustomerVoucherStatus,
   UserVoucherStatusFilter,
+  VoucherBookStatus,
   VoucherState,
 } from '../common/enums.js'
 
@@ -422,4 +423,147 @@ export const BatchUpdateVoucherStateResponse = openapi(
 
 export type BatchUpdateVoucherStateResponse = z.infer<
   typeof BatchUpdateVoucherStateResponse
+>
+
+// ============= Voucher Book Operations =============
+
+/**
+ * Get vouchers for book request
+ */
+export const GetVouchersForBookRequest = openapi(
+  z.object({
+    businessIds: z
+      .array(UUID)
+      .min(1)
+      .max(50)
+      .describe('List of business IDs to get vouchers from'),
+    month: z
+      .string()
+      .regex(/^\d{2}$/)
+      .describe('Month in MM format (01-12)'),
+    year: z
+      .number()
+      .int()
+      .min(2024)
+      .max(2030)
+      .describe('Year in YYYY format'),
+  }),
+  {
+    description: 'Get vouchers for voucher book generation',
+  },
+)
+
+export type GetVouchersForBookRequest = z.infer<typeof GetVouchersForBookRequest>
+
+/**
+ * Get vouchers for book response
+ */
+export const GetVouchersForBookResponse = openapi(
+  z.object({
+    vouchers: z.array(
+      z.object({
+        id: UUID,
+        businessId: UUID,
+        title: z.record(z.string(), z.string()),
+        description: z.record(z.string(), z.string()),
+        terms: z.record(z.string(), z.string()),
+        discountType: z.string(),
+        discountValue: z.number(),
+        validFrom: z.string().datetime().optional(),
+        validTo: z.string().datetime().optional(),
+        businessName: z.string(),
+        businessLogo: z.string().optional(),
+        category: z.string(),
+        qrPayload: z.string().describe('JWT token for QR code'),
+        shortCode: z.string().describe('Human-readable fallback code'),
+      }),
+    ),
+    count: z.number().int().describe('Total number of vouchers'),
+  }),
+  {
+    description: 'Vouchers with security tokens for book generation',
+  },
+)
+
+export type GetVouchersForBookResponse = z.infer<typeof GetVouchersForBookResponse>
+
+/**
+ * Generate voucher tokens request
+ */
+export const GenerateVoucherTokensRequest = openapi(
+  z.object({
+    vouchers: z
+      .array(
+        z.object({
+          voucherId: UUID,
+          providerId: UUID,
+        }),
+      )
+      .min(1)
+      .max(100)
+      .describe('Vouchers to generate tokens for'),
+    batchId: z.string().optional().describe('Batch identifier for print run'),
+  }),
+  {
+    description: 'Generate security tokens for multiple vouchers',
+  },
+)
+
+export type GenerateVoucherTokensRequest = z.infer<typeof GenerateVoucherTokensRequest>
+
+/**
+ * Generate voucher tokens response
+ */
+export const GenerateVoucherTokensResponse = openapi(
+  z.object({
+    tokens: z.array(
+      z.object({
+        voucherId: UUID,
+        qrPayload: z.string(),
+        shortCode: z.string(),
+        batchId: z.string().optional(),
+      }),
+    ),
+    count: z.number().int(),
+  }),
+  {
+    description: 'Generated security tokens for vouchers',
+  },
+)
+
+export type GenerateVoucherTokensResponse = z.infer<typeof GenerateVoucherTokensResponse>
+
+/**
+ * Validate book state transition request
+ */
+export const ValidateBookStateTransitionRequest = openapi(
+  z.object({
+    currentStatus: VoucherBookStatus,
+    newStatus: VoucherBookStatus,
+  }),
+  {
+    description: 'Validate if a voucher book state transition is allowed',
+  },
+)
+
+export type ValidateBookStateTransitionRequest = z.infer<
+  typeof ValidateBookStateTransitionRequest
+>
+
+/**
+ * Validate book state transition response
+ */
+export const ValidateBookStateTransitionResponse = openapi(
+  z.object({
+    allowed: z.boolean(),
+    reason: z.string().optional(),
+    requiredFields: z.array(z.string()).optional(),
+  }),
+  {
+    description: 'State transition validation result',
+  },
+)
+
+export type ValidateBookStateTransitionResponse = z.infer<
+  typeof ValidateBookStateTransitionResponse
 >

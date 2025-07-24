@@ -12,7 +12,6 @@ import type {
   IVoucherBookRepository,
 } from '../repositories/index.js'
 import type { VoucherBookSearchParams } from '../types/index.js'
-import { CryptoServiceAdapter } from './CryptoServiceAdapter.js'
 import {
   AdPlacementInfo,
   PageLayout,
@@ -107,7 +106,6 @@ export class VoucherBookService implements IVoucherBookService {
   private readonly pdfGenerationService: PDFGenerationService
   private readonly pageLayoutEngine: PageLayoutEngine
   private readonly voucherServiceClient: VoucherServiceClient
-  private readonly cryptoServiceAdapter: CryptoServiceAdapter
 
   constructor(
     private readonly voucherBookRepository: IVoucherBookRepository,
@@ -119,7 +117,6 @@ export class VoucherBookService implements IVoucherBookService {
     this.pdfGenerationService = new PDFGenerationService()
     this.pageLayoutEngine = new PageLayoutEngine()
     this.voucherServiceClient = new VoucherServiceClient()
-    this.cryptoServiceAdapter = new CryptoServiceAdapter()
   }
 
   async createVoucherBook(
@@ -391,64 +388,57 @@ export class VoucherBookService implements IVoucherBookService {
       const qrPayloads = new Map<string, string>()
 
       if (voucherIds.size > 0) {
-        // Fetch vouchers from voucher service
+        // Get unique business IDs from existing voucher data
         const voucherDataMap = await this.voucherServiceClient.getVouchersByIds(
           Array.from(voucherIds),
         )
 
-        // Generate short codes and QR payloads for each voucher
-        const voucherPayloadData = await Promise.all(
-          Array.from(voucherIds).map(async (voucherId) => {
-            const voucherData = voucherDataMap.get(voucherId)
-
-            if (!voucherData) {
-              logger.warn('Voucher not found for placement', { voucherId })
-
-              return null
-            }
-
-            // Generate short code
-            const shortCodeResult =
-              await this.cryptoServiceAdapter.generateShortCode(voucherId)
-
-            // Store voucher data for PDF rendering
-            vouchers.set(voucherId, {
-              id: voucherId,
-              title: voucherData.title,
-              description: voucherData.description,
-              discount: voucherData.discount_amount
-                ? `${voucherData.discount_amount}%`
-                : 'Special Offer',
-              businessName: voucherData.provider?.name || 'Partner Business',
-              expiresAt: voucherData.expires_at,
-            })
-
-            return {
-              voucherId,
-              providerId: voucherData.provider_id,
-              shortCode: shortCodeResult.shortCode,
-            }
-          }),
+        // Extract business IDs for the voucher book request
+        const businessIds = Array.from(
+          new Set(
+            Array.from(voucherDataMap.values())
+              .map(v => v.businessId)
+              .filter(Boolean)
+          )
         )
 
-        // Filter out null values
-        const validPayloadData = voucherPayloadData.filter(
-          (data): data is NonNullable<typeof data> => data !== null,
-        )
+        if (businessIds.length > 0) {
+          // Get vouchers with pre-generated security tokens from voucher service
+          const month = (voucherBook.month || new Date().getMonth() + 1).toString().padStart(2, '0')
+          const year = voucherBook.year || new Date().getFullYear()
+          
+          const vouchersWithTokens = await this.voucherServiceClient.getVouchersForBook(
+            businessIds,
+            month,
+            year,
+          )
 
-        // Generate batch QR payloads
-        if (validPayloadData.length > 0) {
-          const batchId = `book-${id}-${Date.now()}`
-          const batchPayloadMap =
-            await this.cryptoServiceAdapter.generateBatchQRPayloads(
-              validPayloadData,
-              batchId,
-            )
+          // Process vouchers that are placed in this book
+          for (const voucherData of vouchersWithTokens.vouchers) {
+            if (voucherIds.has(voucherData.id)) {
+              // Store voucher data for PDF rendering
+              vouchers.set(voucherData.id, {
+                id: voucherData.id,
+                title: voucherData.title.en || Object.values(voucherData.title)[0] || 'Special Offer',
+                description: voucherData.description.en || Object.values(voucherData.description)[0] || '',
+                discount: voucherData.discountType === 'percentage' 
+                  ? `${voucherData.discountValue}%` 
+                  : `$${voucherData.discountValue}`,
+                businessName: voucherData.businessName || 'Partner Business',
+                expiresAt: voucherData.validTo ? new Date(voucherData.validTo) : undefined,
+              })
 
-          // Map payloads - generateBatchQRPayloads returns a Map
-          for (const [voucherId, payload] of batchPayloadMap) {
-            qrPayloads.set(voucherId, payload)
+              // Store pre-generated QR payload
+              qrPayloads.set(voucherData.id, voucherData.qrPayload)
+            }
           }
+
+          logger.info('Loaded vouchers with security tokens for PDF generation', {
+            bookId: id,
+            totalVouchers: vouchersWithTokens.count,
+            placedVouchers: vouchers.size,
+            businessCount: businessIds.length,
+          })
         }
       }
 

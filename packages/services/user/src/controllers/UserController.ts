@@ -118,7 +118,9 @@ export class UserController {
         includeFriends: includeFriends,
       })
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -143,7 +145,9 @@ export class UserController {
 
       const user = await this.userService.getUserByEmail(email)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -164,8 +168,8 @@ export class UserController {
       const user = await this.userService.createUser(data)
 
       const dto = UserMapper.toDTO(user)
-
-      res.status(201).json(dto)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -186,8 +190,8 @@ export class UserController {
       const user = await this.userService.createAdminUser(data)
 
       const dto = UserMapper.toDTO(user)
-
-      res.status(201).json(dto)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -208,7 +212,9 @@ export class UserController {
 
       const user = await this.userService.updateUser(userId, data)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -265,7 +271,9 @@ export class UserController {
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
-      res.json({ avatarUrl: url })
+      const response = { avatarUrl: url }
+      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -289,7 +297,9 @@ export class UserController {
       const { subToken } = req.params
       const user = await this.userService.getUserBySubToken(subToken)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -309,7 +319,9 @@ export class UserController {
       const { status } = req.body
       const user = await this.userService.updateUserStatus(userId, status)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -329,7 +341,9 @@ export class UserController {
       // TODO: Update service method to accept reason, duration, and notifyUser from req.body
       const user = await this.userService.banUser(userId)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -349,7 +363,9 @@ export class UserController {
       // TODO: Update service method to accept reason and notifyUser from req.body
       const user = await this.userService.unbanUser(userId)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -368,7 +384,9 @@ export class UserController {
       const { id: userId } = req.params
       const friends = await this.userService.getUserFriends(userId)
 
-      res.json({ guests: friends })
+      const response = { guests: friends }
+      const validatedResponse = userPublic.UserFriendsResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -385,7 +403,9 @@ export class UserController {
 
       const user = await this.userService.getUserById(userId)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -406,7 +426,9 @@ export class UserController {
 
       const user = await this.userService.updateUser(userId, req.body)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserResponse.parse(dto)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

@@ -1,5 +1,6 @@
 import { userAdmin, userPublic } from '@pika/api'
 import { adaptMulterFile, RequestContext } from '@pika/http'
+import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -81,11 +82,13 @@ export class AdminUserController {
         updatedAt: user.updatedAt,
       }
 
-      res.json({
+      const response = {
         success: true,
         message: `User ${user.email} verified successfully`,
         user: adminResponse,
-      })
+      }
+      const validatedResponse = userAdmin.VerifyUserResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -112,10 +115,12 @@ export class AdminUserController {
 
       await this.userService.resendVerification(resendRequest)
 
-      res.json({
+      const response = {
         success: true,
         message: `Verification resent successfully`,
-      })
+      }
+      const validatedResponse = userAdmin.ResendVerificationResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -145,7 +150,9 @@ export class AdminUserController {
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
-      res.json({ avatarUrl: url })
+      const response = { avatarUrl: url }
+      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -215,7 +222,8 @@ export class AdminUserController {
         updatedAt: user.updatedAt,
       }
 
-      res.json(adminResponse)
+      const validatedResponse = userAdmin.AdminUserDetailResponse.parse(adminResponse)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -298,7 +306,8 @@ export class AdminUserController {
         updatedAt: updatedUser.updatedAt,
       }
 
-      res.json(adminResponse)
+      const validatedResponse = userAdmin.AdminUserDetailResponse.parse(adminResponse)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -331,7 +340,8 @@ export class AdminUserController {
           user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
       }
 
-      res.json(verificationStatus)
+      const validatedResponse = userAdmin.UserVerificationStatusResponse.parse(verificationStatus)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

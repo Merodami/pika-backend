@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import {
@@ -79,6 +80,22 @@ export const UpdateSubscriptionFromPaymentRequest = openapi(
 
 export type UpdateSubscriptionFromPaymentRequest = z.infer<
   typeof UpdateSubscriptionFromPaymentRequest
+>
+
+/**
+ * Update subscription response
+ */
+export const UpdateSubscriptionFromPaymentResponse = openapi(
+  z.object({
+    success: z.boolean(),
+  }),
+  {
+    description: 'Update subscription result',
+  },
+)
+
+export type UpdateSubscriptionFromPaymentResponse = z.infer<
+  typeof UpdateSubscriptionFromPaymentResponse
 >
 
 /**
@@ -161,29 +178,29 @@ export type GetUserSubscriptionsRequest = z.infer<
 >
 
 /**
- * Subscription list response
+ * Internal subscription data for arrays
  */
-export const SubscriptionListResponse = openapi(
+export const InternalSubscriptionListItem = openapi(
   z.object({
-    subscriptions: z.array(
-      z.object({
-        id: UUID,
-        userId: UserId,
-        planId: UUID,
-        planName: z.string(),
-        status: z.string(),
-        currentPeriodStart: DateTime.optional(),
-        currentPeriodEnd: DateTime.optional(),
-        cancelAtPeriodEnd: z.boolean(),
-        createdAt: DateTime,
-      }),
-    ),
-    total: z.number(),
+    id: UUID,
+    userId: UserId,
+    planId: UUID,
+    planName: z.string(),
+    status: z.string(),
+    currentPeriodStart: DateTime.optional(),
+    currentPeriodEnd: DateTime.optional(),
+    cancelAtPeriodEnd: z.boolean(),
+    createdAt: DateTime,
   }),
   {
-    description: 'User subscriptions',
+    description: 'Internal subscription list item',
   },
 )
+
+/**
+ * Subscription list response with standard pagination
+ */
+export const SubscriptionListResponse = paginatedResponse(InternalSubscriptionListItem)
 
 export type SubscriptionListResponse = z.infer<typeof SubscriptionListResponse>
 
@@ -213,6 +230,22 @@ export const SendSubscriptionNotificationRequest = openapi(
 
 export type SendSubscriptionNotificationRequest = z.infer<
   typeof SendSubscriptionNotificationRequest
+>
+
+/**
+ * Send notification response
+ */
+export const SendSubscriptionNotificationResponse = openapi(
+  z.object({
+    success: z.boolean(),
+  }),
+  {
+    description: 'Notification send result',
+  },
+)
+
+export type SendSubscriptionNotificationResponse = z.infer<
+  typeof SendSubscriptionNotificationResponse
 >
 
 // ============= Path Parameters =============

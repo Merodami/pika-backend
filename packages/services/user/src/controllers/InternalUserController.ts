@@ -45,7 +45,8 @@ export class InternalUserController {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
 
-      res.json(user)
+      const validatedResponse = userInternal.UserAuthData.parse(user)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -68,7 +69,8 @@ export class InternalUserController {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
 
-      res.json(user)
+      const validatedResponse = userInternal.UserAuthData.parse(user)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -87,7 +89,8 @@ export class InternalUserController {
       const data = req.body
       const user = await this.internalUserService.createUser(data)
 
-      res.status(201).json(user)
+      const validatedResponse = userInternal.UserAuthData.parse(user)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -129,7 +132,9 @@ export class InternalUserController {
       const { email } = req.params
       const exists = await this.internalUserService.checkEmailExists(email)
 
-      res.json({ exists })
+      const response = { exists }
+      const validatedResponse = userInternal.CheckExistsResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -148,7 +153,9 @@ export class InternalUserController {
       const { phone } = req.params
       const exists = await this.internalUserService.checkPhoneExists(phone)
 
-      res.json({ exists })
+      const response = { exists }
+      const validatedResponse = userInternal.CheckExistsResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -191,7 +198,9 @@ export class InternalUserController {
       const { id } = req.params
 
       await this.internalUserService.verifyEmail(id)
-      res.status(200).json({ success: true })
+      const response = { success: true }
+      const validatedResponse = userInternal.SuccessResponse.parse(response)
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -214,7 +223,9 @@ export class InternalUserController {
       const { id } = req.params
       const token = await this.internalUserService.createPasswordResetToken(id)
 
-      res.json({ token })
+      const response = { token }
+      const validatedResponse = userInternal.TokenResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -234,7 +245,9 @@ export class InternalUserController {
       const userId =
         await this.internalUserService.validatePasswordResetToken(token)
 
-      res.json({ userId })
+      const response = { userId }
+      const validatedResponse = userInternal.ValidateTokenResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -253,7 +266,9 @@ export class InternalUserController {
       const { token } = req.body
 
       await this.internalUserService.invalidatePasswordResetToken(token)
-      res.status(200).json({ success: true })
+      const response = { success: true }
+      const validatedResponse = userInternal.SuccessResponse.parse(response)
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -277,7 +292,9 @@ export class InternalUserController {
       const token =
         await this.internalUserService.createEmailVerificationToken(id)
 
-      res.json({ token })
+      const response = { token }
+      const validatedResponse = userInternal.TokenResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -297,7 +314,9 @@ export class InternalUserController {
       const userId =
         await this.internalUserService.validateEmailVerificationToken(token)
 
-      res.json({ userId })
+      const response = { userId }
+      const validatedResponse = userInternal.ValidateTokenResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

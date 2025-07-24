@@ -1,4 +1,5 @@
-import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
+import { ECDSAService, type JWTConfig, VoucherQRService } from '@pika/crypto'
+import { JWT_ISSUER, PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import type { UserVoucherData, VoucherDomain, VoucherScanData } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
@@ -10,16 +11,24 @@ import type { IVoucherRepository } from '../repositories/VoucherRepository.js'
 import type {
   BatchProcessOperation,
   BatchProcessResult,
+  BatchTokenGenerationRequest,
+  GenerateTokenOptions,
   InternalVoucherSearchParams,
   RedemptionTrackingData,
   RedemptionTrackingResult,
   UserVoucherSearchParams,
+  VoucherBookStatus,
+  VoucherBookStateTransition,
+  VoucherBookValidation,
   VoucherExistsOptions,
   VoucherExistsResult,
+  VoucherForBook,
   VoucherSearchParams,
+  VoucherTokenData,
   VoucherValidationOptions,
   VoucherValidationResult,
 } from '../types/index.js'
+import { generateBatchCode, generateSecureShortCode } from '../utils/codeGenerator.js'
 
 // Re-export types that are part of the service's public API
 export type {
@@ -92,14 +101,64 @@ export interface IInternalVoucherService {
   // Cleanup operations
   cleanupExpiredVouchers(): Promise<number>
   cleanupOrphanedCustomerVouchers(): Promise<number>
+
+  // Voucher Security operations
+  generateVoucherTokens(
+    options: GenerateTokenOptions,
+  ): Promise<VoucherTokenData>
+  generateBatchVoucherTokens(
+    request: BatchTokenGenerationRequest,
+  ): Promise<Map<string, VoucherTokenData>>
+
+  // Voucher Book operations
+  getVouchersForBook(
+    businessIds: string[],
+    month: string,
+    year: number,
+  ): Promise<VoucherForBook[]>
+  validateBookStateTransition(
+    currentStatus: VoucherBookStatus,
+    newStatus: VoucherBookStatus,
+  ): VoucherBookStateTransition
+  validateBookReadyForPublication(
+    book: VoucherBookValidation,
+  ): VoucherBookStateTransition
 }
 
 export class InternalVoucherService implements IInternalVoucherService {
+  private voucherQRService: VoucherQRService
+  private ecdsaService: ECDSAService
+  private keyPair: { privateKey: string; publicKey: string } | null = null
+  
+  // Allowed state transitions for voucher books
+  private readonly allowedBookTransitions: Record<VoucherBookStatus, VoucherBookStatus[]> = {
+    draft: ['ready_for_print', 'archived'],
+    ready_for_print: ['published', 'draft', 'archived'],
+    published: ['archived'],
+    archived: [],
+  }
+
   constructor(
     private readonly internalRepository: IInternalVoucherRepository,
     private readonly publicRepository: IVoucherRepository, // For methods that need full repository access
     private readonly cache: ICacheService,
-  ) {}
+  ) {
+    if (!JWT_ISSUER) {
+      throw new Error(
+        'JWT_ISSUER environment variable is required for voucher security',
+      )
+    }
+
+    const jwtConfig: JWTConfig = {
+      algorithm: 'ES256',
+      issuer: JWT_ISSUER,
+      audience: 'pika-vouchers',
+      keyId: 'voucher-security-key',
+    }
+
+    this.voucherQRService = new VoucherQRService(jwtConfig)
+    this.ecdsaService = new ECDSAService({ curve: 'P-256' })
+  }
 
   async getVoucherById(
     id: string,
@@ -620,5 +679,209 @@ export class InternalVoucherService implements IInternalVoucherService {
     } catch (error) {
       logger.warn('Failed to invalidate cache', { error })
     }
+  }
+
+  // ============= Voucher Security Methods =============
+
+  /**
+   * Initialize ECDSA key pair for voucher token generation
+   */
+  private async initializeKeyPair(): Promise<void> {
+    if (!this.keyPair) {
+      this.keyPair = await this.ecdsaService.generateKeyPair()
+      logger.info('Generated ECDSA key pair for voucher security')
+    }
+  }
+
+  /**
+   * Get the private key, generating it if necessary
+   */
+  private async getPrivateKey(): Promise<string> {
+    await this.initializeKeyPair()
+    return this.keyPair!.privateKey
+  }
+
+  async generateVoucherTokens(
+    options: GenerateTokenOptions,
+  ): Promise<VoucherTokenData> {
+    try {
+      const privateKey = await this.getPrivateKey()
+
+      // Generate QR payload using print voucher format for voucher books
+      const qrResult = await this.voucherQRService.generatePrintVoucherQR(
+        options.voucherId,
+        options.batchId || `batch-${Date.now()}`,
+        privateKey,
+        { ttl: options.ttl || 31536000 }, // 1 year default for printed vouchers
+      )
+
+      // Generate short code
+      const shortCode = await generateSecureShortCode({
+        length: 8,
+        includeDash: true,
+      })
+
+      logger.debug('Generated voucher tokens', {
+        voucherId: options.voucherId,
+        providerId: options.providerId,
+        shortCode,
+        batchId: options.batchId,
+      })
+
+      return {
+        voucherId: options.voucherId,
+        qrPayload: qrResult.qrPayload,
+        shortCode,
+        batchId: options.batchId,
+      }
+    } catch (error) {
+      throw ErrorFactory.fromError(error, 'Failed to generate voucher tokens', {
+        source: 'InternalVoucherService.generateVoucherTokens',
+        voucherId: options.voucherId,
+      })
+    }
+  }
+
+  async generateBatchVoucherTokens(
+    request: BatchTokenGenerationRequest,
+  ): Promise<Map<string, VoucherTokenData>> {
+    const tokensMap = new Map<string, VoucherTokenData>()
+
+    try {
+      // Generate batch ID if not provided
+      const finalBatchId = request.batchId || (await generateBatchCode())
+
+      // Generate tokens in parallel for better performance
+      const promises = request.vouchers.map(async (voucher) => {
+        const tokenData = await this.generateVoucherTokens({
+          ...voucher,
+          batchId: finalBatchId,
+        })
+        return tokenData
+      })
+
+      const results = await Promise.all(promises)
+
+      for (const tokenData of results) {
+        tokensMap.set(tokenData.voucherId, tokenData)
+      }
+
+      logger.info('Generated batch voucher tokens', {
+        batchId: finalBatchId,
+        count: tokensMap.size,
+      })
+
+      return tokensMap
+    } catch (error) {
+      throw ErrorFactory.fromError(
+        error,
+        'Failed to generate batch voucher tokens',
+        {
+          source: 'InternalVoucherService.generateBatchVoucherTokens',
+          voucherCount: request.vouchers.length,
+        },
+      )
+    }
+  }
+
+  // ============= Voucher Book Methods =============
+
+  async getVouchersForBook(
+    businessIds: string[],
+    month: string,
+    year: number,
+  ): Promise<VoucherForBook[]> {
+    try {
+      const vouchersForBook: VoucherForBook[] = []
+
+      // Get all active vouchers for the specified businesses
+      for (const businessId of businessIds) {
+        const params: InternalVoucherSearchParams = {
+          businessId,
+          state: 'published' as VoucherState,
+          includeExpired: false,
+          page: 1,
+          limit: 100, // Adjust based on expected vouchers per business
+        }
+
+        const result = await this.internalRepository.findByBusinessId(businessId, params)
+
+        // Transform vouchers to book format
+        for (const voucher of result.data) {
+          const voucherForBook: VoucherForBook = {
+            id: voucher.id,
+            businessId: voucher.businessId,
+            title: voucher.translations?.title || {},
+            description: voucher.translations?.description || {},
+            terms: voucher.translations?.termsAndConditions || {},
+            discountType: voucher.discountType,
+            discountValue: voucher.discountValue,
+            validFrom: voucher.validFrom,
+            validTo: voucher.validTo,
+            businessName: '', // Would need to be populated from business service
+            businessLogo: undefined,
+            category: voucher.categoryId, // Would need category name from category service
+          }
+
+          vouchersForBook.push(voucherForBook)
+        }
+      }
+
+      logger.info('Retrieved vouchers for book', {
+        businessCount: businessIds.length,
+        voucherCount: vouchersForBook.length,
+        month,
+        year,
+      })
+
+      return vouchersForBook
+    } catch (error) {
+      logger.error('Failed to get vouchers for book', {
+        error,
+        businessIds,
+        month,
+        year,
+      })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  validateBookStateTransition(
+    currentStatus: VoucherBookStatus,
+    newStatus: VoucherBookStatus,
+  ): VoucherBookStateTransition {
+    const allowedStates = this.allowedBookTransitions[currentStatus]
+
+    if (!allowedStates.includes(newStatus)) {
+      return {
+        allowed: false,
+        reason: `Cannot transition from ${currentStatus} to ${newStatus}. Allowed transitions: ${allowedStates.join(', ')}`,
+      }
+    }
+
+    return { allowed: true }
+  }
+
+  validateBookReadyForPublication(
+    book: VoucherBookValidation,
+  ): VoucherBookStateTransition {
+    const missingFields: string[] = []
+
+    if (!book.title) missingFields.push('title')
+    if (!book.description) missingFields.push('description')
+    if (!book.month) missingFields.push('month')
+    if (!book.year) missingFields.push('year')
+    if (!book.totalPages || book.totalPages < 1) missingFields.push('totalPages')
+    if (!book.voucherCount || book.voucherCount < 1) missingFields.push('voucherCount')
+
+    if (missingFields.length > 0) {
+      return {
+        allowed: false,
+        reason: 'Book is missing required fields for publication',
+        requiredFields: missingFields,
+      }
+    }
+
+    return { allowed: true }
   }
 }
