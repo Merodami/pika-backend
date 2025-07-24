@@ -28,7 +28,7 @@ export class PostgresTestContainer {
     const initSqlPath = path.resolve(__dirname, './dump/init.sql')
 
     try {
-      const imageName = 'postgres:17.2'
+      const imageName = 'postgis/postgis:17-3.5'
 
       console.log(`ℹ️ [PostgresTestContainer] Using Docker image: ${imageName}`)
 

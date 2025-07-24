@@ -1,11 +1,12 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
-
+/* eslint-disable */
 /**
  * Permission check result
  */
 export type CheckUserPermissionResponse = {
-  allowed: boolean
-  reason?: string
-}
+    allowed: boolean;
+    reason?: string;
+};
+

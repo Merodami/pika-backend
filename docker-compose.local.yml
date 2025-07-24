@@ -2,7 +2,7 @@ services:
   postgres:
     container_name: pika_postgres
     hostname: postgres
-    image: postgres:17.2
+    image: postgis/postgis:17-3.5
     platform: linux/amd64
     restart: unless-stopped
     env_file:

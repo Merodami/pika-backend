@@ -9,6 +9,7 @@
   "dependencies": {
     "@pika/api": "workspace:^",
     "@pika/auth": "workspace:^",
+    "@pika/crypto": "workspace:^",
     "@pika/database": "workspace:^",
     "@pika/environment": "workspace:^",
     "@pika/http": "workspace:^",

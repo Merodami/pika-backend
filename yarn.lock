@@ -4666,7 +4666,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@pika/crypto@workspace:packages/crypto":
+"@pika/crypto@workspace:^, @pika/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@pika/crypto@workspace:packages/crypto"
   dependencies:
@@ -5046,6 +5046,7 @@ __metadata:
   dependencies:
     "@pika/api": "workspace:^"
     "@pika/auth": "workspace:^"
+    "@pika/crypto": "workspace:^"
     "@pika/database": "workspace:^"
     "@pika/environment": "workspace:^"
     "@pika/http": "workspace:^"
