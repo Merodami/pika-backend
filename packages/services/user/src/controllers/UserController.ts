@@ -1,6 +1,6 @@
 import { authPublic, userAdmin, userCommon, userPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
 import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
@@ -79,11 +79,11 @@ export class UserController {
 
       const result = await this.userService.getAllUsers(params)
 
-      // Convert to DTOs
-      res.json({
-        data: result.data.map((user: any) => UserMapper.toDTO(user)),
-        pagination: result.pagination,
-      })
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, UserMapper.toDTO)
+      const validatedResponse = userAdmin.AdminUserListResponse.parse(response)
+      
+      res.json(validatedResponse)
     } catch (error) {
       console.log('[USER_CONTROLLER] Caught error in getAllUsers:', {
         name: (error as any).name,

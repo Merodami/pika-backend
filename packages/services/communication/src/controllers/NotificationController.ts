@@ -1,10 +1,10 @@
 import {
-  communicationAdmin,
+  // communicationAdmin, // TODO: Uncomment when admin schemas are available
   communicationCommon,
   communicationPublic,
 } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { NotificationMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
@@ -60,11 +60,14 @@ export interface INotificationController {
     next: NextFunction,
   ): Promise<void>
 
+  // TODO: Uncomment when admin schemas are available
+  /*
   createGlobalNotification(
     request: Request,
     response: Response,
     next: NextFunction,
   ): Promise<void>
+  */
 }
 
 /**
@@ -80,7 +83,7 @@ export class NotificationController implements INotificationController {
     this.markAsRead = this.markAsRead.bind(this)
     this.markAllAsRead = this.markAllAsRead.bind(this)
     this.deleteNotification = this.deleteNotification.bind(this)
-    this.createGlobalNotification = this.createGlobalNotification.bind(this)
+    // this.createGlobalNotification = this.createGlobalNotification.bind(this) // TODO: Uncomment when admin functionality is ready
   }
 
   /**
@@ -127,7 +130,7 @@ export class NotificationController implements INotificationController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getNotifications(
-    request: Request<{}, {}, {}, communicationPublic.NotificationSearchParams>,
+    request: Request, // Standard pattern - don't use Query params on Request
     response: Response<communicationPublic.NotificationListResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -138,10 +141,10 @@ export class NotificationController implements INotificationController {
       const query =
         getValidatedQuery<communicationPublic.NotificationSearchParams>(request)
 
-      // Transform API params to service params
-      const params: NotificationSearchParams = {
-        page: query.page,
-        limit: query.limit,
+      // Map API query parameters inline - standard pattern
+      const params = {
+        page: query.page || 1,
+        limit: query.limit || 20,
         type: query.type,
         isRead: query.isRead,
       }
@@ -153,12 +156,9 @@ export class NotificationController implements INotificationController {
         params,
       )
 
-      const responseData = {
-        data: result.data.map(NotificationMapper.toDTO),
-        pagination: result.pagination,
-      }
-      const validatedResponse =
-        communicationPublic.NotificationListResponse.parse(responseData)
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, NotificationMapper.toDTO)
+      const validatedResponse = communicationPublic.NotificationListResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -316,7 +316,10 @@ export class NotificationController implements INotificationController {
   /**
    * POST /notifications/global
    * Create a global notification for all users
+   * 
+   * TODO: Uncomment when admin schemas are available
    */
+  /*
   async createGlobalNotification(
     request: Request<
       {},
@@ -350,4 +353,5 @@ export class NotificationController implements INotificationController {
       next(error)
     }
   }
+  */
 }

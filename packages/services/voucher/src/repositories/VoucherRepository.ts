@@ -23,7 +23,7 @@ export interface IVoucherRepository {
   findByIds(
     ids: string[],
     parsedIncludes?: ParsedIncludes,
-  ): Promise<VoucherDomain[]>
+  ): Promise<PaginatedResult<VoucherDomain>>
   findByBusinessId(
     businessId: string,
     params: VoucherSearchParams,
@@ -51,7 +51,7 @@ export interface IVoucherRepository {
   getCustomerVouchers(
     userId: string,
     status?: string,
-  ): Promise<CustomerVoucherDomain[]>
+  ): Promise<PaginatedResult<CustomerVoucherDomain>>
   // Code-based voucher lookup methods (critical for QR scanning)
   findByQRCode(qrCode: string): Promise<VoucherDomain | null>
   findByShortCode(shortCode: string): Promise<VoucherDomain | null>
@@ -219,8 +219,23 @@ export class VoucherRepository implements IVoucherRepository {
   async findByIds(
     ids: string[],
     parsedIncludes?: ParsedIncludes,
-  ): Promise<VoucherDomain[]> {
+  ): Promise<PaginatedResult<VoucherDomain>> {
     try {
+      if (ids.length === 0) {
+        // Repository builds pagination metadata for empty result
+        return {
+          data: [],
+          pagination: {
+            page: 1,
+            limit: 0,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          },
+        }
+      }
+
       const include = this.buildInclude(parsedIncludes)
 
       const vouchers = await this.prisma.voucher.findMany({
@@ -231,7 +246,20 @@ export class VoucherRepository implements IVoucherRepository {
         include,
       })
 
-      return vouchers.map((voucher) => VoucherMapper.fromDocument(voucher))
+      // Repository builds pagination metadata for bounded operation
+      const voucherDomains = vouchers.map((voucher) => VoucherMapper.fromDocument(voucher))
+      
+      return {
+        data: voucherDomains,
+        pagination: {
+          page: 1,
+          limit: ids.length,
+          total: vouchers.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+      }
     } catch (error) {
       logger.error('Failed to find vouchers by ids', { error, ids })
 
@@ -622,7 +650,7 @@ export class VoucherRepository implements IVoucherRepository {
   async getCustomerVouchers(
     userId: string,
     status?: string,
-  ): Promise<CustomerVoucherDomain[]> {
+  ): Promise<PaginatedResult<CustomerVoucherDomain>> {
     try {
       const whereClause: any = { customerId: userId }
 
@@ -640,7 +668,8 @@ export class VoucherRepository implements IVoucherRepository {
         },
       })
 
-      return customerVouchers.map((cv) => {
+      // Repository builds pagination metadata for bounded operation
+      const customerVoucherDomains = customerVouchers.map((cv) => {
         // Map Prisma result to CustomerVoucherDocument format
         const customerVoucherDoc: CustomerVoucherDocument = {
           id: cv.id,
@@ -660,6 +689,18 @@ export class VoucherRepository implements IVoucherRepository {
 
         return VoucherMapper.mapCustomerVoucherFromDocument(customerVoucherDoc)
       })
+      
+      return {
+        data: customerVoucherDomains,
+        pagination: {
+          page: 1,
+          limit: customerVouchers.length,
+          total: customerVouchers.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+      }
     } catch (error) {
       logger.error('Failed to get customer vouchers', {
         error,

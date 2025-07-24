@@ -4,7 +4,12 @@ import { openapi } from '../../../common/utils/openapi.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { AdminVoucherDetailResponse } from '../admin/management.js'
-import { VoucherState } from '../common/enums.js'
+import {
+  BatchOperationType,
+  CustomerVoucherStatus,
+  UserVoucherStatusFilter,
+  VoucherState,
+} from '../common/enums.js'
 
 /**
  * Internal voucher service schemas
@@ -251,7 +256,7 @@ export type GetVouchersByCategoryResponse = z.infer<
 export const GetUserVouchersRequest = openapi(
   z.object({
     userId: UUID,
-    status: z.enum(['claimed', 'redeemed', 'expired', 'all']).default('all'),
+    status: UserVoucherStatusFilter.default('all'),
     page: z.number().int().positive().default(1),
     limit: z.number().int().positive().max(100).default(20),
   }),
@@ -269,7 +274,7 @@ export const GetUserVouchersResponse = paginatedResponse(
   z.object({
     voucher: AdminVoucherDetailResponse,
     claimedAt: z.string().datetime(),
-    status: z.enum(['claimed', 'redeemed', 'expired']),
+    status: CustomerVoucherStatus,
     redeemedAt: z.string().datetime().nullable(),
   }),
 )
@@ -320,7 +325,7 @@ export type TrackRedemptionResponse = z.infer<typeof TrackRedemptionResponse>
 export const BatchVoucherProcessRequest = openapi(
   z.object({
     voucherIds: z.array(UUID).min(1).max(100),
-    operation: z.enum(['publish', 'expire', 'validate', 'refresh']),
+    operation: BatchOperationType,
     context: z.object({
       serviceId: z.string().min(1),
       requestId: z.string().optional(),

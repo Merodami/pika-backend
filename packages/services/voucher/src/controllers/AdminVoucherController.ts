@@ -4,10 +4,11 @@ import {
   getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
+  RequestContext,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { VoucherMapper } from '@pika/sdk'
-import { ErrorFactory, parseIncludeParam } from '@pika/shared'
+import { ErrorFactory, parseIncludeParam, logger } from '@pika/shared'
 import { VoucherState } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -48,7 +49,7 @@ export class AdminVoucherController {
     condition: (result) => result && result.data && Array.isArray(result.data),
   })
   async getAllVouchers(
-    req: Request,
+    req: Request<{}, {}, {}, voucherAdmin.AdminVoucherQueryParams>,
     res: Response<voucherAdmin.AdminVoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -94,11 +95,12 @@ export class AdminVoucherController {
 
       const result = await this.voucherService.getAllVouchers(params, language)
 
-      res.json(
-        paginatedResponse(result, (voucher) =>
-          VoucherMapper.toAdminDTO(voucher),
-        ),
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, (voucher) =>
+        VoucherMapper.toAdminDTO(voucher),
       )
+      const validatedResponse = voucherAdmin.AdminVoucherListResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -134,7 +136,10 @@ export class AdminVoucherController {
         language,
       )
 
-      res.json(VoucherMapper.toAdminDTO(voucher))
+      // Transform and validate single entity response
+      const responseData = VoucherMapper.toAdminDTO(voucher)
+      const validatedResponse = voucherAdmin.AdminVoucherDetailResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -150,12 +155,22 @@ export class AdminVoucherController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
       const data = VoucherMapper.fromCreateRequestData(req.body)
       const language = getRequestLanguage(req)
 
+      logger.info('Admin creating voucher', { 
+        adminUserId, 
+        voucherData: { title: data.title, businessId: data.businessId } 
+      })
+
       const voucher = await this.voucherService.createVoucher(data, language)
 
-      res.status(201).json(VoucherMapper.toAdminDTO(voucher))
+      // Transform and validate create response
+      const responseData = VoucherMapper.toAdminDTO(voucher)
+      const validatedResponse = voucherAdmin.AdminVoucherDetailResponse.parse(responseData)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -176,8 +191,15 @@ export class AdminVoucherController {
   ): Promise<void> {
     try {
       const { id: voucherId } = req.params
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
       const data = VoucherMapper.fromUpdateRequestData(req.body)
       const language = getRequestLanguage(req)
+
+      logger.info('Admin updating voucher', { 
+        voucherId, 
+        adminUserId 
+      })
 
       const voucher = await this.voucherService.updateVoucher(
         voucherId,
@@ -185,7 +207,10 @@ export class AdminVoucherController {
         language,
       )
 
-      res.json(VoucherMapper.toAdminDTO(voucher))
+      // Transform and validate update response
+      const responseData = VoucherMapper.toAdminDTO(voucher)
+      const validatedResponse = voucherAdmin.AdminVoucherDetailResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -202,6 +227,13 @@ export class AdminVoucherController {
   ): Promise<void> {
     try {
       const { id: voucherId } = req.params
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
+
+      logger.info('Admin deleting voucher', { 
+        voucherId, 
+        adminUserId 
+      })
 
       await this.voucherService.deleteVoucher(voucherId)
 
@@ -227,7 +259,15 @@ export class AdminVoucherController {
     try {
       const { id: voucherId } = req.params
       const { state, reason: _reason } = req.body
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
       const language = getRequestLanguage(req)
+
+      logger.info('Admin updating voucher state', { 
+        voucherId, 
+        state, 
+        adminUserId 
+      })
 
       const voucher = await this.voucherService.updateVoucherState(
         voucherId,
@@ -235,7 +275,10 @@ export class AdminVoucherController {
         language,
       )
 
-      res.json(VoucherMapper.toAdminDTO(voucher))
+      // Transform and validate state update response
+      const responseData = VoucherMapper.toAdminDTO(voucher)
+      const validatedResponse = voucherAdmin.AdminVoucherDetailResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -267,7 +310,10 @@ export class AdminVoucherController {
       // Get the updated voucher with the new codes
       const voucher = await this.voucherService.getVoucherById(voucherId)
 
-      res.json(VoucherMapper.toAdminDTO(voucher))
+      // Transform and validate generate codes response
+      const responseData = VoucherMapper.toAdminDTO(voucher)
+      const validatedResponse = voucherAdmin.AdminVoucherDetailResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -297,7 +343,10 @@ export class AdminVoucherController {
         file,
       )
 
-      res.json({ imageUrl })
+      // Transform and validate upload image response
+      const responseData = { imageUrl }
+      const validatedResponse = voucherAdmin.UploadVoucherImageResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -328,14 +377,17 @@ export class AdminVoucherController {
         domainTranslations,
       )
 
-      res.json({
+      // Transform and validate translations update response
+      const responseData = {
         voucherId,
         translations: {
           title: translations.title || {},
           description: translations.description || {},
           terms: translations.terms || {},
         },
-      })
+      }
+      const validatedResponse = voucherAdmin.VoucherTranslationsResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -359,10 +411,13 @@ export class AdminVoucherController {
       // Map domain 'termsAndConditions' back to API 'terms'
       const apiTranslations = VoucherMapper.toTranslationsDTO(translations)
 
-      res.json({
+      // Transform and validate get translations response
+      const responseData = {
         voucherId,
         translations: apiTranslations,
-      })
+      }
+      const validatedResponse = voucherAdmin.VoucherTranslationsResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -405,7 +460,10 @@ export class AdminVoucherController {
         language,
       )
 
-      res.json(VoucherMapper.toBulkUpdateResponseDTO(result))
+      // Transform and validate bulk update response
+      const responseData = VoucherMapper.toBulkUpdateResponseDTO(result)
+      const validatedResponse = voucherAdmin.BulkVoucherOperationResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -430,12 +488,13 @@ export class AdminVoucherController {
         endDate: query.endDate,
       })
 
-      res.json(
-        VoucherMapper.toVoucherAnalyticsDTO(analytics, voucherId, {
-          startDate: query.startDate,
-          endDate: query.endDate,
-        }),
-      )
+      // Transform and validate analytics response
+      const responseData = VoucherMapper.toVoucherAnalyticsDTO(analytics, voucherId, {
+        startDate: query.startDate,
+        endDate: query.endDate,
+      })
+      const validatedResponse = voucherAdmin.VoucherAnalyticsResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -458,7 +517,10 @@ export class AdminVoucherController {
       const stats =
         await this.voucherService.getBusinessVoucherStats(businessId)
 
-      res.json(VoucherMapper.toBusinessVoucherStatsDTO(stats))
+      // Transform and validate business stats response
+      const responseData = VoucherMapper.toBusinessVoucherStatsDTO(stats)
+      const validatedResponse = voucherAdmin.BusinessVoucherStatsResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -480,7 +542,9 @@ export class AdminVoucherController {
       const voucher = await this.voucherService.publishVoucher(id, language)
       const dto = VoucherMapper.toAdminDTO(voucher)
 
-      res.status(200).json(dto)
+      // Transform and validate publish response
+      const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -502,7 +566,9 @@ export class AdminVoucherController {
       const voucher = await this.voucherService.expireVoucher(id, language)
       const dto = VoucherMapper.toAdminDTO(voucher)
 
-      res.status(200).json(dto)
+      // Transform and validate expire response
+      const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }

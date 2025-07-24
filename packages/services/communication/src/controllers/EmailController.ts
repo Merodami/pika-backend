@@ -1,6 +1,6 @@
 import { communicationCommon, communicationPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { CommunicationLogMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
@@ -153,12 +153,7 @@ export class EmailController implements IEmailController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getEmailHistory(
-    request: Request<
-      {},
-      {},
-      {},
-      communicationPublic.CommunicationLogSearchParams
-    >,
+    request: Request, // Standard pattern - don't use Query params on Request
     response: Response<communicationPublic.CommunicationLogListResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -171,24 +166,23 @@ export class EmailController implements IEmailController {
           request,
         )
 
-      // Transform API params to service params
-      const params: CommunicationLogSearchParams = {
-        page: query.page,
-        limit: query.limit,
+      // Map API query parameters inline - standard pattern
+      const params = {
+        page: query.page || 1,
+        limit: query.limit || 20,
         status: query.status,
         recipient: query.recipient,
         fromDate: query.fromDate ? new Date(query.fromDate) : undefined,
         toDate: query.toDate ? new Date(query.toDate) : undefined,
+        sortBy: query.sortBy || 'createdAt',
+        sortOrder: query.sortOrder || 'desc',
       }
 
       logger.info('Getting email history', { userId, params })
 
       const result = await this.emailService.getEmailHistory(userId, params)
 
-      const responseData = {
-        data: result.data.map(CommunicationLogMapper.toDTO),
-        pagination: result.pagination,
-      }
+      const responseData = paginatedResponse(result, CommunicationLogMapper.toDTO)
       const validatedResponse =
         communicationPublic.CommunicationLogListResponse.parse(responseData)
 

@@ -160,13 +160,13 @@ export class EmailService implements IEmailService {
           : undefined,
         provider: emailProvider.getProviderName(),
         externalId: result.messageId,
-        metadata: JSON.stringify({
+        metadata: {
           ...(result.metadata || {}),
           templateId: templateId,
           templateParams: input.templateParams,
           cc: input.cc,
           bcc: input.bcc,
-        }),
+        },
         sentAt: result.success ? new Date() : undefined,
         errorMessage: result.error,
         processingTimeMs: Date.now() - startTime,
@@ -206,12 +206,12 @@ export class EmailService implements IEmailService {
             ? JSON.stringify(input.templateParams)
             : undefined,
           provider: emailProvider?.getProviderName() || 'unknown',
-          metadata: JSON.stringify({
+          metadata: {
             templateId: input.templateId,
             templateParams: input.templateParams,
             cc: input.cc,
             bcc: input.bcc,
-          }),
+          },
           errorMessage:
             error instanceof Error ? error.message : 'Unknown error',
           processingTimeMs: Date.now() - startTime,
@@ -323,9 +323,7 @@ export class EmailService implements IEmailService {
           variables: variables ? JSON.stringify(variables) : undefined,
           provider: emailProvider.getProviderName(),
           externalId: recipientResult.messageId,
-          metadata: recipientResult.metadata
-            ? JSON.stringify(recipientResult.metadata)
-            : undefined,
+          metadata: recipientResult.metadata,
           sentAt: recipientResult.success ? new Date() : undefined,
           errorMessage: recipientResult.error,
           processingTimeMs: Date.now() - startTime,

@@ -48,8 +48,8 @@ export class VoucherController {
     condition: (result) => result && result.data && Array.isArray(result.data),
   })
   async getAllVouchers(
-    req: Request,
-    res: Response,
+    req: Request<{}, {}, {}, voucherPublic.VoucherQueryParams>,
+    res: Response<voucherPublic.VoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -88,7 +88,10 @@ export class VoucherController {
       const result: PaginatedResult<VoucherDomain> =
         await this.voucherService.getAllVouchers(params, language)
 
-      res.json(paginatedResponse(result, VoucherMapper.toDTO))
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, VoucherMapper.toDTO)
+      const validatedResponse = voucherPublic.VoucherListResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -134,7 +137,10 @@ export class VoucherController {
         throw ErrorFactory.resourceNotFound('Voucher', voucherId)
       }
 
-      res.json(VoucherMapper.toDTO(voucher))
+      // Transform and validate single entity response
+      const responseData = VoucherMapper.toDTO(voucher)
+      const validatedResponse = voucherPublic.VoucherResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -180,7 +186,10 @@ export class VoucherController {
         language,
       )
 
-      res.json(VoucherMapper.toScanResponseDTO(scanResult))
+      // Transform and validate scan response
+      const responseData = VoucherMapper.toScanResponseDTO(scanResult)
+      const validatedResponse = voucherPublic.VoucherScanResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -219,7 +228,10 @@ export class VoucherController {
         language,
       )
 
-      res.json(VoucherMapper.toClaimResponseDTO(claimResult))
+      // Transform and validate claim response
+      const responseData = VoucherMapper.toClaimResponseDTO(claimResult)
+      const validatedResponse = voucherPublic.VoucherClaimResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -254,7 +266,10 @@ export class VoucherController {
         language,
       )
 
-      res.json(VoucherMapper.toRedeemResponseDTO(redeemResult))
+      // Transform and validate redeem response
+      const responseData = VoucherMapper.toRedeemResponseDTO(redeemResult)
+      const validatedResponse = voucherPublic.VoucherRedeemResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -270,8 +285,8 @@ export class VoucherController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getUserVouchers(
-    req: Request,
-    res: Response,
+    req: Request<shared.UserIdParam, {}, {}, voucherPublic.UserVouchersQueryParams>,
+    res: Response<voucherPublic.UserVouchersListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -300,7 +315,10 @@ export class VoucherController {
 
       const result = await this.voucherService.getUserVouchers(params, language)
 
-      res.json(paginatedResponse(result, VoucherMapper.toUserVoucherDTO))
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, VoucherMapper.toUserVoucherDTO)
+      const validatedResponse = voucherPublic.UserVouchersListResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -316,8 +334,8 @@ export class VoucherController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getBusinessVouchers(
-    req: Request,
-    res: Response,
+    req: Request<businessCommon.BusinessIdParam, {}, {}, voucherPublic.VoucherQueryParams>,
+    res: Response<voucherPublic.VoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -354,7 +372,10 @@ export class VoucherController {
         language,
       )
 
-      res.json(paginatedResponse(result, VoucherMapper.toDTO))
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, VoucherMapper.toDTO)
+      const validatedResponse = voucherPublic.VoucherListResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -398,7 +419,10 @@ export class VoucherController {
         )
       }
 
-      res.json(VoucherMapper.toDTO(voucherWithIncludes))
+      // Transform and validate single entity response
+      const responseData = VoucherMapper.toDTO(voucherWithIncludes)
+      const validatedResponse = voucherPublic.VoucherResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

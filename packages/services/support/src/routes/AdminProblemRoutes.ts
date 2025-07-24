@@ -1,6 +1,6 @@
 import { supportAdmin, supportCommon } from '@pika/api'
 import {
-  requireAdmin,
+  requirePermissions,
   requireAuth,
   validateBody,
   validateParams,
@@ -29,7 +29,7 @@ export function createAdminProblemRouter(
   router.get(
     '/',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateQuery(supportAdmin.AdminTicketQueryParams),
     controller.getAllProblems,
   )
@@ -37,7 +37,7 @@ export function createAdminProblemRouter(
   router.get(
     '/:id',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.ProblemIdParam),
     controller.getProblemById,
   )
@@ -45,7 +45,7 @@ export function createAdminProblemRouter(
   router.put(
     '/:id',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.ProblemIdParam),
     validateBody(supportAdmin.AdminUpdateProblemRequest),
     controller.updateProblem,
@@ -54,7 +54,7 @@ export function createAdminProblemRouter(
   router.delete(
     '/:id',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.ProblemIdParam),
     controller.deleteProblem,
   )

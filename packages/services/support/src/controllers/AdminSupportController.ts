@@ -1,7 +1,7 @@
 import { supportAdmin, supportCommon } from '@pika/api'
-import { getValidatedQuery } from '@pika/http'
-import type { ProblemDomain } from '@pika/sdk'
-import { ErrorFactory, parseIncludeParam } from '@pika/shared'
+import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
+import { ProblemMapper } from '@pika/sdk'
+import { ErrorFactory, parseIncludeParam, logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IProblemService } from '../services/ProblemService.js'
@@ -18,35 +18,6 @@ export class AdminSupportController {
     this.assignTicket = this.assignTicket.bind(this)
   }
 
-  /**
-   * Transform ProblemDomain to AdminTicketDetailResponse
-   */
-  private toAdminTicketResponse(
-    problem: ProblemDomain,
-  ): supportAdmin.AdminTicketDetailResponse {
-    return {
-      id: problem.id as any,
-      ticketNumber: problem.ticketNumber || undefined,
-      userId: problem.userId as any,
-      userName: problem.user
-        ? `${problem.user.firstName} ${problem.user.lastName}`
-        : '',
-      userEmail: problem.user?.email || '',
-      title: problem.title,
-      description: problem.description,
-      type: problem.type as any,
-      status: problem.status as any,
-      priority: problem.priority as any,
-      resolvedAt: problem.resolvedAt || undefined,
-      assignedTo: (problem.assignedTo as any) || undefined,
-      assignedToName: problem.assignedUser
-        ? `${problem.assignedUser.firstName} ${problem.assignedUser.lastName}`
-        : undefined,
-      files: problem.files,
-      createdAt: problem.createdAt,
-      updatedAt: problem.updatedAt || new Date(),
-    }
-  }
 
   /**
    * GET /admin/support/tickets
@@ -83,13 +54,11 @@ export class AdminSupportController {
         parsedIncludes,
       })
 
-      // Map to admin response format
-      const response: supportAdmin.AdminTicketListResponse = {
-        data: result.data.map((problem) => this.toAdminTicketResponse(problem)),
-        pagination: result.pagination,
-      }
-
-      res.json(response)
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, ProblemMapper.toAdminDTO)
+      const validatedResponse = supportAdmin.AdminTicketListResponse.parse(response)
+      
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -123,9 +92,11 @@ export class AdminSupportController {
         throw ErrorFactory.resourceNotFound('Ticket', id)
       }
 
-      const response = this.toAdminTicketResponse(problem)
-
-      res.json(response)
+      // Transform and validate single entity response
+      const responseData = ProblemMapper.toAdminDTO(problem)
+      const validatedResponse = supportAdmin.AdminTicketDetailResponse.parse(responseData)
+      
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -147,11 +118,22 @@ export class AdminSupportController {
     try {
       const { id } = req.params
       const { status } = req.body
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
+
+      logger.info('Admin updating ticket status', { 
+        ticketId: id, 
+        status, 
+        adminUserId 
+      })
 
       const updated = await this.problemService.updateProblem(id, { status })
-      const response = this.toAdminTicketResponse(updated)
-
-      res.json(response)
+      
+      // Transform and validate update response
+      const responseData = ProblemMapper.toAdminDTO(updated)
+      const validatedResponse = supportAdmin.AdminTicketDetailResponse.parse(responseData)
+      
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -173,6 +155,15 @@ export class AdminSupportController {
     try {
       const { id } = req.params
       const { assigneeId, priority } = req.body
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
+
+      logger.info('Admin assigning ticket', { 
+        ticketId: id, 
+        assigneeId, 
+        priority, 
+        adminUserId 
+      })
 
       const updates: any = { assignedTo: assigneeId }
 
@@ -181,9 +172,12 @@ export class AdminSupportController {
       }
 
       const updated = await this.problemService.updateProblem(id, updates)
-      const response = this.toAdminTicketResponse(updated)
-
-      res.json(response)
+      
+      // Transform and validate assign response
+      const responseData = ProblemMapper.toAdminDTO(updated)
+      const validatedResponse = supportAdmin.AdminTicketDetailResponse.parse(responseData)
+      
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

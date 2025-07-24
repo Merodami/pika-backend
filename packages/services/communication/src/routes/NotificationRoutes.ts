@@ -1,6 +1,5 @@
 import { communicationCommon, communicationPublic } from '@pika/api'
 import {
-  requireAdmin,
   requireAuth,
   validateBody,
   validateParams,

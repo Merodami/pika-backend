@@ -6,11 +6,12 @@ import type { PaginatedResult } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface CreateNotificationInput {
-  userId: string
+  userId?: string // Optional for global notifications
   type?: string
   title: string
   description: string
   metadata?: any
+  isGlobal?: boolean
 }
 
 export interface UpdateNotificationInput {
@@ -59,11 +60,12 @@ export class NotificationRepository implements INotificationRepository {
     try {
       const notification = await this.prisma.notification.create({
         data: {
-          userId: data.userId,
+          userId: data.userId || null, // Allow null for global notifications
           type: data.type || 'general',
           title: data.title,
           description: data.description,
           isRead: false,
+          isGlobal: data.isGlobal || false,
           metadata: data.metadata,
         },
       })

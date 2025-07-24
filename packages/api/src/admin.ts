@@ -6,7 +6,7 @@
 export * from './schemas/auth/admin/index.js'
 export * from './schemas/business/admin/index.js'
 export * from './schemas/category/admin/index.js'
-export * from './schemas/communication/admin/index.js'
+// export * from './schemas/communication/admin/index.js' // TODO: Uncomment when admin routes are implemented
 export * from './schemas/discovery/admin/index.js'
 export * from './schemas/payment/admin/index.js'
 export * from './schemas/pdf/admin/index.js'

@@ -44,18 +44,26 @@ export class InternalVoucherController {
       const { voucherIds, include } = req.body
 
       const parsedIncludes = include ? parseIncludeParam(include) : undefined
-      const vouchers = await this.internalVoucherService.getVouchersByIds(
+      
+      // Get paginated result from service (following Repository Pagination Pattern)
+      const result = await this.internalVoucherService.getVouchersByIds(
         voucherIds,
         parsedIncludes,
       )
+      
       const notFound = voucherIds.filter(
-        (id) => !vouchers.find((v) => v.id === id),
+        (id) => !result.data.find((v) => v.id === id),
       )
 
-      res.json({
-        vouchers: vouchers.map((voucher) => VoucherMapper.toAdminDTO(voucher)),
-        notFound,
-      })
+      // Controller uses service result directly (lines 387-400 pattern)
+      const response = {
+        data: result.data.map(VoucherMapper.toInternalDTO), // Use toInternalDTO for internal tier
+        pagination: result.pagination, // Pass through pagination
+        notFound, // Additional bulk-specific field
+      }
+      
+      const validatedResponse = voucherInternal.GetVouchersByIdsResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -89,13 +97,16 @@ export class InternalVoucherController {
         },
       )
 
-      res.json({
+      // Transform and validate voucher validation response
+      const responseData = {
         isValid: validation.isValid,
         reason: validation.reason,
         voucher: validation.voucher
           ? VoucherMapper.toAdminDTO(validation.voucher)
           : undefined,
-      })
+      }
+      const validatedResponse = voucherInternal.ValidateVoucherResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -130,11 +141,14 @@ export class InternalVoucherController {
           reason,
         )
 
-      res.json({
+      // Transform and validate state update response
+      const responseData = {
         success: true,
         previousState,
         newState: updatedVoucher.state,
-      })
+      }
+      const validatedResponse = voucherInternal.InternalUpdateVoucherStateResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -157,10 +171,13 @@ export class InternalVoucherController {
         code,
       })
 
-      res.json({
+      // Transform and validate voucher exists response
+      const responseData = {
         exists: exists.exists,
         voucherId: exists.voucherId,
-      })
+      }
+      const validatedResponse = voucherInternal.CheckVoucherExistsResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -194,7 +211,10 @@ export class InternalVoucherController {
           params,
         )
 
-      res.json(paginatedResponse(result, VoucherMapper.toAdminDTO))
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, VoucherMapper.toAdminDTO)
+      const validatedResponse = voucherInternal.GetVouchersByBusinessResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -226,7 +246,10 @@ export class InternalVoucherController {
           params,
         )
 
-      res.json(paginatedResponse(result, VoucherMapper.toAdminDTO))
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, VoucherMapper.toAdminDTO)
+      const validatedResponse = voucherInternal.GetVouchersByCategoryResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -253,7 +276,10 @@ export class InternalVoucherController {
 
       const result = await this.internalVoucherService.getUserVouchers(params)
 
-      res.json(paginatedResponse(result, VoucherMapper.toUserVoucherDTO))
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, VoucherMapper.toUserVoucherDTO)
+      const validatedResponse = voucherInternal.GetUserVouchersResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -278,12 +304,15 @@ export class InternalVoucherController {
         metadata,
       })
 
-      res.json({
+      // Transform and validate track redemption response
+      const responseData = {
         redemptionId: result.redemptionId,
         success: result.success,
         currentRedemptions: result.currentRedemptions,
         maxRedemptions: result.maxRedemptions ?? null,
-      })
+      }
+      const validatedResponse = voucherInternal.TrackRedemptionResponse.parse(responseData)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -310,7 +339,8 @@ export class InternalVoucherController {
       const result =
         await this.internalVoucherService.batchProcessVouchers(batchOperation)
 
-      res.status(200).json({
+      // Transform and validate batch process response
+      const responseData = {
         successful: result.successCount,
         failed: result.failedCount,
         total: result.processedCount,
@@ -320,7 +350,9 @@ export class InternalVoucherController {
           error: r.error,
         })),
         processingTime: 0, // The internal service doesn't track this, but we need it for API compatibility
-      })
+      }
+      const validatedResponse = voucherInternal.BatchVoucherProcessResponse.parse(responseData)
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -375,12 +407,15 @@ export class InternalVoucherController {
         }
       }
 
-      res.status(200).json({
+      // Transform and validate batch state update response
+      const responseData = {
         successful,
         failed,
         total: updates.length,
         updates: updateResults,
-      })
+      }
+      const validatedResponse = voucherInternal.BatchUpdateVoucherStateResponse.parse(responseData)
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }

@@ -1,7 +1,7 @@
 import { subscriptionAdmin, subscriptionPublic } from '@pika/api'
 import {
-  requireAdmin,
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,
@@ -84,7 +84,7 @@ export function createSubscriptionRouter(
   // Admin routes
   router.get(
     '/',
-    requireAdmin(),
+    requirePermissions('admin:subscriptions'),
     validateQuery(subscriptionAdmin.AdminGetSubscriptionsQuery),
     controller.getSubscriptions,
   )

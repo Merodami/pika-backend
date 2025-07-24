@@ -21,7 +21,7 @@ export interface IInternalVoucherRepository {
   findByIds(
     ids: string[],
     parsedIncludes?: ParsedIncludes,
-  ): Promise<VoucherDomain[]>
+  ): Promise<PaginatedResult<VoucherDomain>>
   // State management for internal services
   updateState(id: string, state: VoucherState): Promise<VoucherDomain>
   // Increment redemptions for internal tracking
@@ -61,10 +61,21 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
   async findByIds(
     ids: string[],
     parsedIncludes?: ParsedIncludes,
-  ): Promise<VoucherDomain[]> {
+  ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       if (ids.length === 0) {
-        return []
+        // Repository builds pagination metadata for empty result
+        return {
+          data: [],
+          pagination: {
+            page: 1,
+            limit: 0,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          },
+        }
       }
 
       const include =
@@ -84,7 +95,20 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
         include,
       })
 
-      return vouchers.map((voucher) => VoucherMapper.fromDocument(voucher))
+      // Repository builds pagination metadata for bounded operation
+      const voucherDomains = vouchers.map((voucher) => VoucherMapper.fromDocument(voucher))
+      
+      return {
+        data: voucherDomains,
+        pagination: {
+          page: 1,
+          limit: ids.length,
+          total: vouchers.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+      }
     } catch (error) {
       logger.error('Failed to find vouchers by ids', { error, ids })
 

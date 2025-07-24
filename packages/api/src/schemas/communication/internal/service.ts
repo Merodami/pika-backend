@@ -5,20 +5,122 @@ import { Email as EmailAddress, UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
+  CommunicationLogSortBy,
   DevicePlatform,
   EmailStatus,
   InAppNotificationType,
   MessageType,
   NotificationCategory,
   NotificationPriority,
+  NotificationSortBy,
   NotificationType,
   TemplateKey,
 } from '../common/enums.js'
-import { InternalEmailData, InternalNotificationData } from './types.js'
+import { SearchParams } from '../../shared/pagination.js'
 
 /**
  * Internal communication service schemas for service-to-service communication
  */
+
+// ============= Internal Data Types =============
+
+/**
+ * Internal email data (minimal fields for service consumption)
+ */
+export const InternalEmailData = openapi(
+  z.object({
+    id: UUID,
+    userId: UserId.optional(),
+    type: z.string(),
+    recipient: EmailAddress,
+    subject: z.string().optional(),
+    templateId: z.string().optional(),
+    status: EmailStatus,
+    sentAt: DateTime.optional(),
+    errorMessage: z.string().optional(),
+  }),
+  {
+    description: 'Internal email data for services',
+  },
+)
+
+export type InternalEmailData = z.infer<typeof InternalEmailData>
+
+/**
+ * Internal notification data
+ */
+export const InternalNotificationData = openapi(
+  z.object({
+    id: UUID,
+    userId: UserId,
+    type: z.string(),
+    title: z.string(),
+    description: z.string(),
+    isRead: z.boolean(),
+    isGlobal: z.boolean(),
+    metadata: z.record(z.string(), z.any()).optional(),
+    createdAt: DateTime,
+    updatedAt: DateTime.optional(),
+  }),
+  {
+    description: 'Internal notification data',
+  },
+)
+
+export type InternalNotificationData = z.infer<typeof InternalNotificationData>
+
+// ============= Query Parameters =============
+
+/**
+ * Internal email history query parameters
+ * Following standardized pagination pattern
+ */
+export const InternalEmailHistoryParams = openapi(
+  SearchParams.extend({
+    userId: UserId.optional(),
+    status: EmailStatus.optional(),
+    startDate: DateTime.optional(),
+    endDate: DateTime.optional(),
+    sortBy: CommunicationLogSortBy.default('createdAt'),
+  }),
+  {
+    description: 'Query parameters for internal email history',
+  },
+)
+
+export type InternalEmailHistoryParams = z.infer<typeof InternalEmailHistoryParams>
+
+/**
+ * Get notifications query parameters for internal services
+ * Following standardized pagination pattern
+ */
+export const InternalNotificationsParams = openapi(
+  SearchParams.extend({
+    userId: UserId,
+    isRead: z.boolean().optional(),
+    sortBy: NotificationSortBy.default('createdAt'),
+  }),
+  {
+    description: 'Query parameters for internal notifications',
+  },
+)
+
+export type InternalNotificationsParams = z.infer<typeof InternalNotificationsParams>
+
+/**
+ * Get unread count query parameters
+ * Single value request - no pagination needed
+ */
+export const GetUnreadCountParams = openapi(
+  z.object({
+    userId: UserId,
+  }),
+  {
+    description: 'Query parameters for unread count',
+  },
+)
+
+export type GetUnreadCountParams = z.infer<typeof GetUnreadCountParams>
 
 // ============= System Notifications =============
 
@@ -329,7 +431,7 @@ export const SendEmailRequest = openapi(
     replyTo: EmailAddress.optional(),
     cc: z.array(EmailAddress).optional(),
     bcc: z.array(EmailAddress).optional(),
-    userId: UserId.optional().describe('User ID for tracking and logging'),
+    userId: UserId.nullish().describe('User ID for tracking and logging'),
   }),
   {
     description: 'Send email request',
@@ -406,7 +508,7 @@ export const CreateNotificationRequest = openapi(
     title: z.string(),
     description: z.string(),
     type: InAppNotificationType.optional(),
-    metadata: z.record(z.string(), z.any()).optional(),
+    metadata: z.record(z.string(), z.any()).nullish(),
   }),
   {
     description: 'Create in-app notification',
@@ -531,7 +633,7 @@ export const BatchCreateNotificationsRequest = openapi(
           title: z.string(),
           description: z.string(),
           type: InAppNotificationType.default('info'),
-          metadata: z.record(z.string(), z.any()).optional(),
+          metadata: z.record(z.string(), z.any()).nullish(),
         }),
       )
       .min(1)

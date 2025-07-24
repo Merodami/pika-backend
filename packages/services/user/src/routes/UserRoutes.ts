@@ -1,8 +1,8 @@
 import { userAdmin, userPublic } from '@pika/api'
 import {
   createMulterMiddleware,
-  requireAdmin,
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,
@@ -44,7 +44,7 @@ export async function createUserRouter(
   // GET /users - Get all users with filters (admin only)
   router.get(
     '/',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateQuery(userAdmin.AdminUserQueryParams),
     controller.getAllUsers,
   )
@@ -63,7 +63,7 @@ export async function createUserRouter(
   // GET /users/email/:email - Get user by email (admin only)
   router.get(
     '/email/:email',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.EmailParam),
     controller.getUserByEmail,
   )
@@ -80,7 +80,7 @@ export async function createUserRouter(
   // POST /users - Create new user (admin only)
   router.post(
     '/',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateBody(userAdmin.AdminCreateUserRequest),
     controller.createAdminUser,
   )
@@ -88,7 +88,7 @@ export async function createUserRouter(
   // PATCH /users/:id - Update user (admin only)
   router.patch(
     '/:id',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     validateBody(userAdmin.AdminUpdateUserRequest),
     controller.updateUser,
@@ -97,7 +97,7 @@ export async function createUserRouter(
   // DELETE /users/:id - Delete user (admin only)
   router.delete(
     '/:id',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     controller.deleteUser,
   )
@@ -113,7 +113,7 @@ export async function createUserRouter(
   // PUT /users/:id/status - Update user status (admin only)
   router.put(
     '/:id/status',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     validateBody(userAdmin.UpdateUserStatusRequest),
     controller.updateUserStatus,
@@ -122,7 +122,7 @@ export async function createUserRouter(
   // PUT /users/:id/ban - Ban user (admin only)
   router.put(
     '/:id/ban',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     validateBody(userAdmin.BanUserRequest),
     controller.banUser,
@@ -131,7 +131,7 @@ export async function createUserRouter(
   // PUT /users/:id/unban - Unban user (admin only)
   router.put(
     '/:id/unban',
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     validateBody(userAdmin.UnbanUserRequest),
     controller.unbanUser,

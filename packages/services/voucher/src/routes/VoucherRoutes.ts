@@ -57,10 +57,11 @@ export async function createVoucherRoutes(
   )
   const controller = new VoucherController(service)
 
-  // Public routes (no auth required)
+  // Public routes (JWT auth required - available to all authenticated users)
   // GET /vouchers - List all published vouchers
   router.get(
     '/',
+    requireAuth(),
     validateQuery(voucherPublic.VoucherQueryParams),
     controller.getAllVouchers,
   )
@@ -68,6 +69,7 @@ export async function createVoucherRoutes(
   // GET /vouchers/:id - Get voucher by ID
   router.get(
     '/:id',
+    requireAuth(),
     validateParams(voucherCommon.VoucherIdParam),
     validateQuery(voucherPublic.GetVoucherByIdQuery),
     controller.getVoucherById,
@@ -76,15 +78,16 @@ export async function createVoucherRoutes(
   // GET /vouchers/business/:id - Get business vouchers
   router.get(
     '/business/:id',
+    requireAuth(),
     validateParams(businessCommon.BusinessIdParam),
     validateQuery(voucherPublic.VoucherQueryParams),
     controller.getBusinessVouchers,
   )
 
-  // Authentication required routes
   // POST /vouchers/:id/scan - Track voucher scan
   router.post(
     '/:id/scan',
+    requireAuth(),
     validateParams(voucherCommon.VoucherIdParam),
     validateBody(voucherPublic.VoucherScanRequest),
     controller.scanVoucher,

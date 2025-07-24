@@ -1,7 +1,7 @@
 import { businessCommon, voucherAdmin, voucherCommon } from '@pika/api'
 import {
   createMulterMiddleware,
-  requireAdmin,
+  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,
@@ -46,8 +46,8 @@ export function createAdminVoucherRoutes(
   )
   const controller = new AdminVoucherController(service)
 
-  // All admin routes require admin authentication
-  router.use(requireAdmin())
+  // All admin routes require admin permissions
+  router.use(requirePermissions('admin:vouchers'))
 
   // GET /admin/vouchers - Get all vouchers with admin filters
   router.get(

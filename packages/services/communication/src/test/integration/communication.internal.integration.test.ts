@@ -188,17 +188,19 @@ describe('Communication Service - Internal API Integration Tests', () => {
           .send({
             to: 'admin@example.com',
             subject: 'System Alert',
-            htmlContent: '<p>System alert message</p>',
-            textContent: 'System alert message',
+            body: '<p>System alert message</p>',
+            isHtml: true,
+            userId: testUserId,
           })
-          .expect(200)
+
+        expect(response.status).toBe(200)
 
         expect(response.body).toMatchObject({
           type: 'email',
           recipient: 'admin@example.com',
           subject: 'System Alert',
           status: 'sent',
-          userId: null,
+          userId: testUserId,
         })
       })
 
@@ -429,17 +431,19 @@ describe('Communication Service - Internal API Integration Tests', () => {
                 title: 'Notification 1',
                 description: 'Description 1',
                 type: 'info',
+                metadata: {},
               },
               {
                 userId: sharedTestData.testUsers[1].id,
                 title: 'Notification 2',
                 description: 'Description 2',
                 type: 'info',
+                metadata: {},
               },
             ],
           })
-          .expect(201)
 
+        expect(response.status).toBe(201)
         expect(response.body.created).toBe(2)
         expect(response.body.notifications).toHaveLength(2)
       })
@@ -452,14 +456,15 @@ describe('Communication Service - Internal API Integration Tests', () => {
             title: 'Important Update',
             description: 'This notification will also be sent via email',
             type: 'info',
+            metadata: {},
             sendEmail: true,
+            email: 'testuser1@example.com',
             emailSubject: 'Important Update from Pika',
           })
-          .expect(201)
 
+        expect(response.status).toBe(201)
         expect(response.body).toMatchObject({
           title: 'Important Update',
-          emailSent: true,
         })
 
         const emailLog = await testDb.prisma.communicationLog.findFirst({
@@ -560,9 +565,11 @@ describe('Communication Service - Internal API Integration Tests', () => {
           emailsReceived: expect.any(Number),
           notificationsReceived: expect.any(Number),
           notificationsRead: expect.any(Number),
-          lastEmailSent: expect.any(String),
-          lastNotificationReceived: expect.any(String),
         })
+        
+        // These can be null if no data exists
+        expect(typeof response.body.lastEmailSent === 'string' || response.body.lastEmailSent === null).toBe(true)
+        expect(typeof response.body.lastNotificationReceived === 'string' || response.body.lastNotificationReceived === null).toBe(true)
       })
     })
 

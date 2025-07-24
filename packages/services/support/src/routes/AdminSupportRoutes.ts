@@ -1,6 +1,6 @@
 import { supportAdmin, supportCommon } from '@pika/api'
 import {
-  requireAdmin,
+  requirePermissions,
   requireAuth,
   validateBody,
   validateParams,
@@ -29,7 +29,7 @@ export function createAdminSupportRouter(
   router.get(
     '/tickets',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateQuery(supportAdmin.AdminTicketQueryParams),
     controller.getAllTickets,
   )
@@ -37,7 +37,7 @@ export function createAdminSupportRouter(
   router.get(
     '/tickets/:id',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.TicketIdParam),
     controller.getTicketById,
   )
@@ -45,7 +45,7 @@ export function createAdminSupportRouter(
   router.put(
     '/tickets/:id/status',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.TicketIdParam),
     validateBody(supportAdmin.UpdateTicketStatusRequest),
     controller.updateTicketStatus,
@@ -54,7 +54,7 @@ export function createAdminSupportRouter(
   router.post(
     '/tickets/:id/assign',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.TicketIdParam),
     validateBody(supportAdmin.AssignTicketRequest),
     controller.assignTicket,

@@ -1,7 +1,7 @@
 import { userAdmin, userPublic } from '@pika/api'
 import {
-  requireAdmin,
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
 } from '@pika/http'
@@ -55,7 +55,7 @@ export function createAdminUserRouter(
   router.post(
     '/verify',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateBody(userPublic.UnifiedVerificationRequest),
     controller.verifyUser,
   )
@@ -64,7 +64,7 @@ export function createAdminUserRouter(
   router.post(
     '/resend-verification',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateBody(userPublic.UnifiedResendVerificationRequest),
     controller.resendVerification,
   )
@@ -73,7 +73,7 @@ export function createAdminUserRouter(
   router.post(
     '/:id/avatar',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     upload.single('file'),
     controller.uploadUserAvatar,
@@ -81,13 +81,13 @@ export function createAdminUserRouter(
 
   // Admin profile routes
   // GET /admin/users/me - Get current admin user profile
-  router.get('/me', requireAuth(), requireAdmin(), controller.getMyProfile)
+  router.get('/me', requireAuth(), requirePermissions('admin:users'), controller.getMyProfile)
 
   // PATCH /admin/users/me - Update current admin user profile
   router.patch(
     '/me',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateBody(userAdmin.UpdateAdminProfileRequest),
     controller.updateMyProfile,
   )
@@ -96,7 +96,7 @@ export function createAdminUserRouter(
   router.get(
     '/:id/verification-status',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     controller.getUserVerificationStatus,
   )

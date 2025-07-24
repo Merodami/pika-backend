@@ -1,6 +1,6 @@
 import { categoryCommon, categoryInternal } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery } from '@pika/http'
+import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -72,17 +72,9 @@ export class InternalCategoryController {
 
       const result = await this.categoryService.getCategoriesByIds(categoryIds)
 
-      // Transform to DTOs using pagination structure
-      const response = {
-        data: result.data.map((category) =>
-          CategoryMapper.toInternalDTO(category),
-        ),
-        pagination: result.pagination,
-      }
-
-      // Validate response against Zod schema
-      const validatedResponse =
-        categoryInternal.BulkCategoryResponse.parse(response)
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
+      const validatedResponse = categoryInternal.BulkCategoryResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {
@@ -173,17 +165,9 @@ export class InternalCategoryController {
 
       const result = await this.categoryService.getAllCategories(params)
 
-      // Transform to DTOs with pagination
-      const response = {
-        data: result.data.map((category) =>
-          CategoryMapper.toInternalDTO(category),
-        ),
-        pagination: result.pagination,
-      }
-
-      // Validate response against Zod schema
-      const validatedResponse =
-        categoryInternal.InternalCategoryListResponse.parse(response)
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
+      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {
@@ -219,17 +203,9 @@ export class InternalCategoryController {
 
       const result = await this.categoryService.getAllCategories(params)
 
-      // Transform to DTOs with pagination
-      const response = {
-        data: result.data.map((category) =>
-          CategoryMapper.toInternalDTO(category),
-        ),
-        pagination: result.pagination,
-      }
-
-      // Validate response against Zod schema
-      const validatedResponse =
-        categoryInternal.InternalCategoryListResponse.parse(response)
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
+      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

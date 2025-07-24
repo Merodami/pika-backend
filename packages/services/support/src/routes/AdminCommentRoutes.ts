@@ -1,6 +1,6 @@
 import { supportCommon, supportPublic } from '@pika/api'
 import {
-  requireAdmin,
+  requirePermissions,
   requireAuth,
   validateBody,
   validateParams,
@@ -25,12 +25,12 @@ export function createAdminCommentRouter(
   const controller = new AdminCommentController(service)
 
   // Admin comment management routes
-  router.get('/', requireAuth(), requireAdmin(), controller.getAllComments)
+  router.get('/', requireAuth(), requirePermissions('admin:support'), controller.getAllComments)
 
   router.get(
     '/problem/:problemId',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.ProblemIdForCommentsParam),
     controller.getCommentsByProblemId,
   )
@@ -38,7 +38,7 @@ export function createAdminCommentRouter(
   router.post(
     '/',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateBody(supportPublic.CreateSupportCommentRequest),
     controller.createInternalComment,
   )
@@ -46,7 +46,7 @@ export function createAdminCommentRouter(
   router.put(
     '/:id',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.SupportCommentIdParam),
     validateBody(supportPublic.UpdateSupportCommentRequest),
     controller.updateAnyComment,
@@ -55,7 +55,7 @@ export function createAdminCommentRouter(
   router.delete(
     '/:id',
     requireAuth(),
-    requireAdmin(),
+    requirePermissions('admin:support'),
     validateParams(supportCommon.SupportCommentIdParam),
     controller.deleteAnyComment,
   )

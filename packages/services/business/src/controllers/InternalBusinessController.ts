@@ -1,6 +1,6 @@
 import { businessCommon, businessInternal, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import { getValidatedQuery } from '@pika/http'
+import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { BusinessMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -150,15 +150,9 @@ export class InternalBusinessController {
         parsedIncludes: includes,
       })
 
-      // Transform to DTOs with pagination
-      const response = {
-        data: result.data.map((business) => BusinessMapper.toDTO(business)),
-        pagination: result.pagination,
-      }
-
-      // Validate response against Zod schema
-      const validatedResponse =
-        businessInternal.GetBusinessesByCategoryResponse.parse(response)
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, BusinessMapper.toDTO)
+      const validatedResponse = businessInternal.GetBusinessesByCategoryResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

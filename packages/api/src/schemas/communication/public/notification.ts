@@ -285,3 +285,37 @@ export const UnregisterPushTokenRequest = openapi(
 export type UnregisterPushTokenRequest = z.infer<
   typeof UnregisterPushTokenRequest
 >
+
+// ============= Operation Responses =============
+
+/**
+ * Mark all as read response
+ */
+export const MarkAllAsReadResponse = openapi(
+  z.object({
+    updated: z
+      .number()
+      .int()
+      .nonnegative()
+      .describe('Number of notifications marked as read'),
+  }),
+  {
+    description: 'Response when all notifications are marked as read',
+  },
+)
+
+export type MarkAllAsReadResponse = z.infer<typeof MarkAllAsReadResponse>
+
+/**
+ * Delete notification response
+ */
+export const DeleteNotificationResponse = openapi(
+  z.object({
+    message: z.string().default('Notification deleted successfully'),
+  }),
+  {
+    description: 'Response when a notification is deleted',
+  },
+)
+
+export type DeleteNotificationResponse = z.infer<typeof DeleteNotificationResponse>

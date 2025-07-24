@@ -42,7 +42,7 @@ export interface IInternalVoucherService {
   getVouchersByIds(
     ids: string[],
     parsedIncludes?: ParsedIncludes,
-  ): Promise<VoucherDomain[]>
+  ): Promise<PaginatedResult<VoucherDomain>>
   getUserVouchers(
     params: UserVoucherSearchParams,
   ): Promise<PaginatedResult<UserVoucherData>>
@@ -125,9 +125,11 @@ export class InternalVoucherService implements IInternalVoucherService {
   async getVouchersByIds(
     ids: string[],
     parsedIncludes?: ParsedIncludes,
-  ): Promise<VoucherDomain[]> {
+  ): Promise<PaginatedResult<VoucherDomain>> {
     try {
-      return await this.internalRepository.findByIds(ids, parsedIncludes)
+      // Service passes through repository result (Repository Pagination Pattern)
+      const result = await this.internalRepository.findByIds(ids, parsedIncludes)
+      return result // No modification needed
     } catch (error) {
       logger.error('Failed to get vouchers by ids', { error, ids })
       throw ErrorFactory.fromError(error)

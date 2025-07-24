@@ -1,6 +1,8 @@
 /**
  * Admin communication schemas
+ * 
+ * NOTE: Admin routes currently excluded per directive
  */
 
-// Export all admin communication schemas
-export * from './notification.js'
+// TODO: Uncomment when admin routes are needed
+// export * from './notification.js'

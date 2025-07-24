@@ -65,7 +65,7 @@ export class InternalCommunicationMapper {
   ): InternalNotificationDataDTO {
     return {
       id: domain.id,
-      userId: domain.userId!,
+      userId: domain.userId || '',
       type: domain.type || '',
       title: domain.title || '',
       description: domain.description || '',

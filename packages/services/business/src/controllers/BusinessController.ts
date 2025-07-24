@@ -1,6 +1,6 @@
 import { businessPublic, mapSortOrder, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
@@ -57,15 +57,9 @@ export class BusinessController {
 
       const result = await this.businessService.getAllBusinesses(params)
 
-      // Convert to DTOs
-      const response = {
-        data: result.data.map((business) => BusinessMapper.toDTO(business)),
-        pagination: result.pagination,
-      }
-
-      // Validate response against Zod schema
-      const validatedResponse =
-        businessPublic.BusinessListResponse.parse(response)
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, BusinessMapper.toDTO)
+      const validatedResponse = businessPublic.BusinessListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

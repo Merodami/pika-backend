@@ -6,6 +6,7 @@ import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
+  CustomerVoucherStatus,
   VoucherCodeTypeSchema,
   VoucherDiscountTypeSchema,
   VoucherScanSourceSchema,
@@ -255,7 +256,7 @@ export const UserVoucherResponse = openapi(
   z.object({
     voucher: VoucherResponse,
     claimedAt: z.string().datetime(),
-    status: z.enum(['claimed', 'redeemed', 'expired']),
+    status: CustomerVoucherStatus,
     redeemedAt: z.string().datetime().nullable().optional(),
   }),
   {

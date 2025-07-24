@@ -1,4 +1,5 @@
 import { communicationInternal } from '@pika/api'
+import { paginatedResponse } from '@pika/http'
 import {
   CommunicationLogMapper,
   InternalCommunicationMapper,
@@ -213,10 +214,7 @@ export class InternalCommunicationController {
         params,
       )
 
-      const responseData = {
-        data: result.data.map(InternalCommunicationMapper.toInternalEmailDTO),
-        pagination: result.pagination,
-      }
+      const responseData = paginatedResponse(result, InternalCommunicationMapper.toInternalEmailDTO)
       const validatedResponse =
         communicationInternal.InternalEmailHistoryResponse.parse(responseData)
 
@@ -531,12 +529,7 @@ export class InternalCommunicationController {
         params,
       )
 
-      const responseData = {
-        data: result.data.map(
-          InternalCommunicationMapper.toInternalNotificationDTO,
-        ),
-        pagination: result.pagination,
-      }
+      const responseData = paginatedResponse(result, InternalCommunicationMapper.toInternalNotificationDTO)
       const validatedResponse =
         communicationInternal.InternalNotificationsResponse.parse(responseData)
 

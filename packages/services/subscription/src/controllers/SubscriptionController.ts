@@ -1,6 +1,6 @@
 import { subscriptionAdmin, subscriptionPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
@@ -85,12 +85,11 @@ export class SubscriptionController {
 
       const result = await this.subscriptionService.getAllSubscriptions(params)
 
-      const dtoResult = {
-        data: result.data.map(SubscriptionMapper.toDTO),
-        pagination: result.pagination,
-      }
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, SubscriptionMapper.toDTO)
+      const validatedResponse = subscriptionAdmin.AdminGetSubscriptionsResponse.parse(responseData)
 
-      response.json(dtoResult)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
