@@ -1,6 +1,6 @@
-import { pdfCommon, pdfPublic } from '@pika/api'
+import { pdfPublic, voucherCommon, voucherPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery } from '@pika/http'
+import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -31,7 +31,7 @@ export class VoucherBookController {
   })
   async getAllVoucherBooks(
     req: Request,
-    res: Response,
+    res: Response<voucherPublic.VoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -52,10 +52,14 @@ export class VoucherBookController {
 
       const result = await this.voucherBookService.getAllVoucherBooks(params)
 
-      // Transform to API response format using mapper
-      const response = VoucherBookMapper.toPublicListResponseFromDomain(result)
+      const response = paginatedResponse(
+        result,
+        VoucherBookMapper.toPublicDTOFromDomain,
+      )
+      const validatedResponse =
+        voucherPublic.VoucherListResponse.parse(response)
 
-      res.json(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -71,8 +75,8 @@ export class VoucherBookController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getVoucherBookById(
-    req: Request<pdfCommon.VoucherBookIdParam>,
-    res: Response,
+    req: Request<voucherCommon.VoucherIdParam>,
+    res: Response<voucherPublic.VoucherResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -80,10 +84,10 @@ export class VoucherBookController {
 
       const voucherBook = await this.voucherBookService.getVoucherBookById(id)
 
-      // Convert to public DTO using mapper
       const response = VoucherBookMapper.toPublicDTOFromDomain(voucherBook)
+      const validatedResponse = voucherPublic.VoucherResponse.parse(response)
 
-      res.json(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -94,8 +98,8 @@ export class VoucherBookController {
    * Download PDF for published voucher book
    */
   async downloadPDF(
-    req: Request<pdfCommon.VoucherBookIdParam>,
-    res: Response,
+    req: Request<voucherCommon.VoucherIdParam>,
+    res: Response<voucherPublic.VoucherResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -115,7 +119,9 @@ export class VoucherBookController {
         generatedAt: voucherBook.pdfGeneratedAt || voucherBook.updatedAt,
       })
 
-      res.json(response)
+      const validatedResponse = voucherPublic.VoucherResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

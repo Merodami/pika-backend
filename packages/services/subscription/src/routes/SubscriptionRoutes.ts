@@ -40,11 +40,17 @@ export function createSubscriptionRouter(
   const controller = new SubscriptionController(subscriptionService)
 
   // User routes
-  router.get('/me', requireAuth(), controller.getUserSubscription)
+  router.get(
+    '/me',
+    requireAuth(),
+    requirePermissions('subscriptions:read:own'),
+    controller.getUserSubscription,
+  )
 
   router.post(
     '/',
     requireAuth(),
+    requirePermissions('subscriptions:write:own'),
     validateBody(subscriptionPublic.CreateSubscriptionRequest),
     controller.createSubscription,
   )
@@ -52,6 +58,7 @@ export function createSubscriptionRouter(
   router.get(
     '/:id',
     requireAuth(),
+    requirePermissions('subscriptions:read:own'),
     validateParams(subscriptionAdmin.SubscriptionIdParam),
     controller.getSubscriptionById,
   )
@@ -59,6 +66,7 @@ export function createSubscriptionRouter(
   router.put(
     '/:id',
     requireAuth(),
+    requirePermissions('subscriptions:write:own'),
     validateParams(subscriptionAdmin.SubscriptionIdParam),
     validateBody(subscriptionPublic.UpdateSubscriptionRequest),
     controller.updateSubscription,
@@ -67,6 +75,7 @@ export function createSubscriptionRouter(
   router.post(
     '/:id/cancel',
     requireAuth(),
+    requirePermissions('subscriptions:write:own'),
     validateParams(subscriptionAdmin.SubscriptionIdParam),
     validateBody(subscriptionPublic.CancelSubscriptionRequest),
     controller.cancelSubscription,
@@ -75,6 +84,7 @@ export function createSubscriptionRouter(
   router.post(
     '/:id/reactivate',
     requireAuth(),
+    requirePermissions('subscriptions:write:own'),
     validateParams(subscriptionAdmin.SubscriptionIdParam),
     controller.reactivateSubscription,
   )
@@ -84,6 +94,7 @@ export function createSubscriptionRouter(
   // Admin routes
   router.get(
     '/',
+    requireAuth(),
     requirePermissions('admin:subscriptions'),
     validateQuery(subscriptionAdmin.AdminGetSubscriptionsQuery),
     controller.getSubscriptions,

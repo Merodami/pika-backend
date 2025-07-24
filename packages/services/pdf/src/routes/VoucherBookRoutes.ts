@@ -1,5 +1,10 @@
 import { pdfCommon, pdfPublic } from '@pika/api'
-import { requireAuth, validateParams, validateQuery } from '@pika/http'
+import {
+  requireAuth,
+  requirePermissions,
+  validateParams,
+  validateQuery,
+} from '@pika/http'
 import { Router } from 'express'
 
 import type { VoucherBookController } from '../controllers/VoucherBookController.js'
@@ -16,6 +21,7 @@ export function createVoucherBookRoutes(
   router.get(
     '/',
     requireAuth(),
+    requirePermissions('voucher:read'),
     validateQuery(pdfPublic.VoucherBookQueryParams),
     voucherBookController.getAllVoucherBooks,
   )
@@ -24,6 +30,7 @@ export function createVoucherBookRoutes(
   router.get(
     '/:id',
     requireAuth(),
+    requirePermissions('voucher:read'),
     validateParams(pdfCommon.VoucherBookIdParam),
     voucherBookController.getVoucherBookById,
   )
@@ -32,6 +39,7 @@ export function createVoucherBookRoutes(
   router.get(
     '/:id/download',
     requireAuth(),
+    requirePermissions('voucher:read'),
     validateParams(pdfCommon.VoucherBookIdParam),
     voucherBookController.downloadPDF,
   )

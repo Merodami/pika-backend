@@ -44,12 +44,11 @@ export type GetVouchersByIdsRequest = z.infer<typeof GetVouchersByIdsRequest>
  * Get vouchers by IDs response
  */
 export const GetVouchersByIdsResponse = openapi(
-  z.object({
-    vouchers: z.array(AdminVoucherDetailResponse),
+  paginatedResponse(AdminVoucherDetailResponse).extend({
     notFound: z.array(UUID).describe('IDs of vouchers that were not found'),
   }),
   {
-    description: 'Batch fetch vouchers response',
+    description: 'Batch fetch vouchers response with pagination metadata',
   },
 )
 

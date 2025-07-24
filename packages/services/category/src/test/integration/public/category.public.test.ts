@@ -30,8 +30,11 @@ vi.mock('@pika/shared', async () => {
 
 import { logger } from '@pika/shared'
 import {
+  AuthenticatedRequestClient,
   cleanupTestDatabase,
+  createE2EAuthHelper,
   createTestDatabase,
+  E2EAuthHelper,
   type TestDatabaseResult,
 } from '@pika/tests'
 import { MockCacheService } from '@pika/tests'
@@ -52,6 +55,8 @@ describe('Public Category Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let server: any
+  let authHelper: E2EAuthHelper
+  let customerClient: AuthenticatedRequestClient
   let sharedTestData: SharedCategoryTestData
 
   const mockCacheService = new MockCacheService()
@@ -73,6 +78,16 @@ describe('Public Category Integration Tests', () => {
     app = serverResult.app
 
     logger.debug('Express server ready for testing.')
+
+    // Initialize E2E Authentication Helper
+    authHelper = createE2EAuthHelper(app)
+
+    // Create test users and authenticate them
+    logger.debug('Setting up E2E authentication...')
+    await authHelper.createAllTestUsers(testDb.prisma)
+
+    // Get authenticated client
+    customerClient = await authHelper.getUserClient(testDb.prisma)
 
     // Create shared test data once for all tests
     sharedTestData = await createSharedCategoryTestData(testDb.prisma)
@@ -106,7 +121,7 @@ describe('Public Category Integration Tests', () => {
   describe('GET /categories', () => {
     it('should return all categories with pagination', async () => {
       // Using shared test data - total categories created in beforeAll
-      const response = await supertest(app)
+      const response = await customerClient
         .get('/categories')
         .set('Accept', 'application/json')
         .expect(200)
@@ -122,7 +137,7 @@ describe('Public Category Integration Tests', () => {
     it('should filter categories by parentId', async () => {
       // Use shared test data parent
       const parentCategory = sharedTestData.activeParentCategories[0]
-      const response = await supertest(app)
+      const response = await customerClient
         .get(`/categories?parentId=${parentCategory.id}`)
         .set('Accept', 'application/json')
         .expect(200)
@@ -142,7 +157,7 @@ describe('Public Category Integration Tests', () => {
 
     it('should filter categories by isActive status', async () => {
       // Test active categories using shared test data
-      const response = await supertest(app)
+      const response = await customerClient
         .get('/categories?isActive=true')
         .set('Accept', 'application/json')
         .expect(200)
@@ -156,7 +171,7 @@ describe('Public Category Integration Tests', () => {
       expect(response.body.data.every((cat: any) => cat.isActive)).toBe(true)
 
       // Test inactive categories
-      const inactiveResponse = await supertest(app)
+      const inactiveResponse = await customerClient
         .get('/categories?isActive=false')
         .set('Accept', 'application/json')
         .expect(200)
@@ -174,7 +189,7 @@ describe('Public Category Integration Tests', () => {
 
     it('should sort categories by specified field', async () => {
       // Use shared test data for sorting test
-      const response = await supertest(app)
+      const response = await customerClient
         .get('/categories?sortBy=sortOrder&sortOrder=desc')
         .set('Accept', 'application/json')
         .expect(200)
@@ -188,7 +203,7 @@ describe('Public Category Integration Tests', () => {
     it('should return empty array when no categories match filter', async () => {
       // Test with a non-existent parent ID
       const nonExistentId = uuid()
-      const response = await supertest(app)
+      const response = await customerClient
         .get(`/categories?parentId=${nonExistentId}`)
         .set('Accept', 'application/json')
         .expect(200)
@@ -210,7 +225,7 @@ describe('Public Category Integration Tests', () => {
         ),
       )
 
-      const response = await supertest(app)
+      const response = await customerClient
         .get('/categories?page=2&limit=5')
         .set('Accept', 'application/json')
         .expect(200)
@@ -229,7 +244,7 @@ describe('Public Category Integration Tests', () => {
     it('should return a specific category by ID', async () => {
       // Use shared test data
       const testCategory = sharedTestData.activeParentCategories[0]
-      const response = await supertest(app)
+      const response = await customerClient
         .get(`/categories/${testCategory.id}`)
         .set('Accept', 'application/json')
         .expect(200)
@@ -246,7 +261,7 @@ describe('Public Category Integration Tests', () => {
     it('should return 404 for non-existent category ID', async () => {
       const nonExistentId = uuid()
 
-      await supertest(app)
+      await customerClient
         .get(`/categories/${nonExistentId}`)
         .set('Accept', 'application/json')
         .expect(404)
@@ -256,7 +271,7 @@ describe('Public Category Integration Tests', () => {
   describe('GET /categories/hierarchy', () => {
     it('should return hierarchical category tree', async () => {
       // Use shared test data for hierarchy test
-      const response = await supertest(app)
+      const response = await customerClient
         .get('/categories/hierarchy')
         .set('Accept', 'application/json')
         .expect(200)
@@ -279,7 +294,7 @@ describe('Public Category Integration Tests', () => {
       // Use shared test data
       const childCategory = sharedTestData.activeChildCategories[0]
 
-      const response = await supertest(app)
+      const response = await customerClient
         .get(`/categories/${childCategory.id}/path`)
         .set('Accept', 'application/json')
         .expect(200)
@@ -293,7 +308,7 @@ describe('Public Category Integration Tests', () => {
   // Error Handling Tests
   describe('Error Handling', () => {
     it('should handle invalid UUIDs in path parameters', async () => {
-      const response = await supertest(app)
+      const response = await customerClient
         .get('/categories/not-a-uuid')
         .set('Accept', 'application/json')
         .expect(400)

@@ -1,7 +1,7 @@
 import { supportCommon, supportPublic } from '@pika/api'
 import {
-  requirePermissions,
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
 } from '@pika/http'
@@ -25,7 +25,12 @@ export function createAdminCommentRouter(
   const controller = new AdminCommentController(service)
 
   // Admin comment management routes
-  router.get('/', requireAuth(), requirePermissions('admin:support'), controller.getAllComments)
+  router.get(
+    '/',
+    requireAuth(),
+    requirePermissions('admin:support'),
+    controller.getAllComments,
+  )
 
   router.get(
     '/problem/:problemId',

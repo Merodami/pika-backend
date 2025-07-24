@@ -106,16 +106,16 @@ export class InternalVoucherService implements IInternalVoucherService {
     parsedIncludes?: ParsedIncludes,
   ): Promise<VoucherDomain> {
     try {
-      const vouchers = await this.internalRepository.findByIds(
+      const result = await this.internalRepository.findByIds(
         [id],
         parsedIncludes,
       )
 
-      if (vouchers.length === 0) {
+      if (result.data.length === 0) {
         throw ErrorFactory.resourceNotFound('Voucher', id)
       }
 
-      return vouchers[0]
+      return result.data[0]
     } catch (error) {
       logger.error('Failed to get voucher by id', { error, id })
       throw ErrorFactory.fromError(error)
@@ -380,8 +380,8 @@ export class InternalVoucherService implements IInternalVoucherService {
       })
 
       // Get updated voucher for current redemption count
-      const vouchers = await this.internalRepository.findByIds([voucherId])
-      const updatedVoucher = vouchers[0]
+      const result = await this.internalRepository.findByIds([voucherId])
+      const updatedVoucher = result.data[0]
 
       logger.info('Redemption tracked', {
         redemptionId: scanId,

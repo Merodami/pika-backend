@@ -145,14 +145,22 @@ export class InternalBusinessController {
         verified: query.onlyVerified,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: query.sortBy as 'businessName' | 'avgRating' | 'verified' | 'active' | 'createdAt' | 'updatedAt' | undefined,
+        sortBy: query.sortBy as
+          | 'businessName'
+          | 'avgRating'
+          | 'verified'
+          | 'active'
+          | 'createdAt'
+          | 'updatedAt'
+          | undefined,
         sortOrder: query.sortOrder,
         parsedIncludes: includes,
       })
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
-      const validatedResponse = businessInternal.GetBusinessesByCategoryResponse.parse(response)
+      const validatedResponse =
+        businessInternal.GetBusinessesByCategoryResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

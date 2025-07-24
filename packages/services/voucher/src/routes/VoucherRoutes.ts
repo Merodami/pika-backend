@@ -66,22 +66,39 @@ export async function createVoucherRoutes(
     controller.getAllVouchers,
   )
 
-  // GET /vouchers/:id - Get voucher by ID
-  router.get(
-    '/:id',
-    requireAuth(),
-    validateParams(voucherCommon.VoucherIdParam),
-    validateQuery(voucherPublic.GetVoucherByIdQuery),
-    controller.getVoucherById,
-  )
-
-  // GET /vouchers/business/:id - Get business vouchers
+  // GET /vouchers/business/:id - Get business vouchers (must be before /:id)
   router.get(
     '/business/:id',
     requireAuth(),
     validateParams(businessCommon.BusinessIdParam),
     validateQuery(voucherPublic.VoucherQueryParams),
     controller.getBusinessVouchers,
+  )
+
+  // GET /vouchers/user/:id - Get user's vouchers (must be before /:id)
+  router.get(
+    '/user/:id',
+    requireAuth(),
+    validateParams(shared.UserIdParam),
+    validateQuery(voucherPublic.UserVouchersQueryParams),
+    controller.getUserVouchers,
+  )
+
+  // GET /vouchers/by-code/:code - Get voucher by any code type (must be before /:id)
+  router.get(
+    '/by-code/:code',
+    validateParams(voucherCommon.VoucherCodeParam),
+    validateQuery(voucherPublic.GetVoucherByIdQuery),
+    controller.getVoucherByCode,
+  )
+
+  // GET /vouchers/:id - Get voucher by ID (must be after all specific routes)
+  router.get(
+    '/:id',
+    requireAuth(),
+    validateParams(voucherCommon.VoucherIdParam),
+    validateQuery(voucherPublic.GetVoucherByIdQuery),
+    controller.getVoucherById,
   )
 
   // POST /vouchers/:id/scan - Track voucher scan
@@ -108,23 +125,6 @@ export async function createVoucherRoutes(
     validateParams(voucherCommon.VoucherIdParam),
     validateBody(voucherPublic.VoucherRedeemRequest),
     controller.redeemVoucher,
-  )
-
-  // GET /vouchers/user/:id - Get user's vouchers
-  router.get(
-    '/user/:id',
-    requireAuth(),
-    validateParams(shared.UserIdParam),
-    validateQuery(voucherPublic.UserVouchersQueryParams),
-    controller.getUserVouchers,
-  )
-
-  // GET /vouchers/by-code/:code - Get voucher by any code type
-  router.get(
-    '/by-code/:code',
-    validateParams(voucherCommon.VoucherCodeParam),
-    validateQuery(voucherPublic.GetVoucherByIdQuery),
-    controller.getVoucherByCode,
   )
 
   return router

@@ -56,6 +56,21 @@ export function createAdminVoucherRoutes(
     controller.getAllVouchers,
   )
 
+  // PUT /admin/vouchers/bulk - Bulk update vouchers (must be before /:id)
+  router.put(
+    '/bulk',
+    validateBody(voucherAdmin.BulkVoucherUpdateRequest),
+    controller.bulkUpdateVouchers,
+  )
+
+  // GET /admin/vouchers/business/:id/stats - Get business voucher statistics (must be before /:id)
+  router.get(
+    '/business/:id/stats',
+    validateParams(businessCommon.BusinessIdParam),
+    validateQuery(voucherAdmin.BusinessVoucherStatsQueryParams),
+    controller.getBusinessVoucherStats,
+  )
+
   // GET /admin/vouchers/:id - Get voucher by ID with full details
   router.get(
     '/:id',
@@ -132,27 +147,12 @@ export function createAdminVoucherRoutes(
     controller.getVoucherTranslations,
   )
 
-  // PUT /admin/vouchers/bulk - Bulk update vouchers
-  router.put(
-    '/bulk',
-    validateBody(voucherAdmin.BulkVoucherUpdateRequest),
-    controller.bulkUpdateVouchers,
-  )
-
   // GET /admin/vouchers/:id/analytics - Get voucher analytics
   router.get(
     '/:id/analytics',
     validateParams(voucherCommon.VoucherIdParam),
     validateQuery(voucherAdmin.VoucherAnalyticsQueryParams),
     controller.getVoucherAnalytics,
-  )
-
-  // GET /admin/vouchers/business/:id/stats - Get business voucher statistics
-  router.get(
-    '/business/:id/stats',
-    validateParams(businessCommon.BusinessIdParam),
-    validateQuery(voucherAdmin.BusinessVoucherStatsQueryParams),
-    controller.getBusinessVoucherStats,
   )
 
   // POST /admin/vouchers/:id/publish - Publish voucher

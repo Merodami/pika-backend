@@ -1,6 +1,11 @@
-import { pdfAdmin, pdfCommon } from '@pika/api'
+import { voucherAdmin, voucherCommon } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedBody, getValidatedQuery, RequestContext } from '@pika/http'
+import {
+  getValidatedBody,
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -36,20 +41,15 @@ export class AdminVoucherBookController {
   })
   async getAllVoucherBooks(
     req: Request,
-    res: Response,
+    res: Response<voucherAdmin.AdminVoucherListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<pdfAdmin.AdminVoucherBookQueryParams>(req)
+      const query = getValidatedQuery<voucherAdmin.AdminVoucherQueryParams>(req)
 
       // Map API query to service params
       const params = {
         search: query.search,
-        bookType: query.bookType,
-        status: query.status,
-        year: query.year,
-        month: query.month,
-        createdBy: query.createdBy,
         page: query.page || 1,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
         sortBy: query.sortBy,
@@ -59,9 +59,11 @@ export class AdminVoucherBookController {
       const result = await this.voucherBookService.getAllVoucherBooks(params)
 
       // Use mapper for proper response transformation
-      const response = VoucherBookMapper.toAdminListResponse(result)
+      const response = paginatedResponse(result, VoucherBookMapper.toDTO)
+      const validatedResponse =
+        voucherAdmin.AdminVoucherListResponse.parse(response)
 
-      res.json(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -77,8 +79,8 @@ export class AdminVoucherBookController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getVoucherBookById(
-    req: Request<pdfCommon.VoucherBookIdParam>,
-    res: Response,
+    req: Request<voucherCommon.VoucherIdParam>,
+    res: Response<voucherAdmin.AdminVoucherResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {

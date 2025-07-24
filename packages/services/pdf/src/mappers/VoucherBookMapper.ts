@@ -638,22 +638,6 @@ export class VoucherBookMapper {
   }
 
   /**
-   * Map paginated domain result to public list response
-   */
-  static toPublicListResponseFromDomain(result: {
-    data: VoucherBookDomain[]
-    pagination: any
-  }): {
-    data: PublicVoucherBookDTO[]
-    pagination: any
-  } {
-    return {
-      data: result.data.map((book) => this.toPublicDTOFromDomain(book)),
-      pagination: result.pagination,
-    }
-  }
-
-  /**
    * Map paginated result to admin list response
    */
   static toAdminListResponse(result: { data: any[]; pagination: any }): {

@@ -23,11 +23,7 @@ import { ADMIN_VOUCHER_ALLOWED_RELATIONS } from '../common/relations.js'
  * Admin voucher search parameters
  * Extends SearchParams with voucher-specific filters
  */
-export const AdminVoucherQueryParams = SearchParams.merge(
-  GeographicSearchParams,
-)
-  .merge(VoucherFilterParams)
-  .extend({
+export const AdminVoucherQueryParams = SearchParams.extend({
     // Voucher-specific filters
     businessId: UUID.optional(),
     categoryId: UUID.optional(),
@@ -65,6 +61,8 @@ export const AdminVoucherQueryParams = SearchParams.merge(
         `Comma-separated relations: ${ADMIN_VOUCHER_ALLOWED_RELATIONS.join(',')}`,
       ),
   })
+  .merge(GeographicSearchParams)
+  .merge(VoucherFilterParams)
 
 export type AdminVoucherQueryParams = z.infer<typeof AdminVoucherQueryParams>
 

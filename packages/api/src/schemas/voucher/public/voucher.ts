@@ -73,9 +73,7 @@ export type VoucherResponse = z.infer<typeof VoucherResponse>
 
 // ============= Search Vouchers =============
 
-export const VoucherQueryParams = SearchParams.merge(GeographicSearchParams)
-  .merge(VoucherFilterParams)
-  .extend({
+export const VoucherQueryParams = SearchParams.extend({
     // Filter parameters (from pika-old VoucherSearchQuerySchema)
     businessId: UUID.optional().describe('Filter by business ID'),
     categoryId: UUID.optional().describe('Filter by category ID'),
@@ -121,6 +119,8 @@ export const VoucherQueryParams = SearchParams.merge(GeographicSearchParams)
     // Override default sorting with voucher-specific sort fields
     sortBy: VoucherSortBy.default('createdAt'),
   })
+  .merge(GeographicSearchParams)
+  .merge(VoucherFilterParams)
 
 export type VoucherQueryParams = z.infer<typeof VoucherQueryParams>
 

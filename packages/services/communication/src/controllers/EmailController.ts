@@ -87,9 +87,14 @@ export class EmailController implements IEmailController {
 
       const result = await this.emailService.sendEmail(emailInput)
 
-      const responseData = CommunicationLogMapper.toDTO(result)
+      const responseData = {
+        messageId: result.id, // Use the communication log ID as messageId
+        status: result.status as any, // Cast to match EmailStatus
+        queuedAt: result.createdAt,
+        scheduledAt: result.sentAt || undefined,
+      }
       const validatedResponse =
-        communicationPublic.CommunicationLogResponse.parse(responseData)
+        communicationPublic.SendEmailResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {

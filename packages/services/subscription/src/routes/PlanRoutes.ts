@@ -1,5 +1,6 @@
 import { subscriptionPublic } from '@pika/api'
 import {
+  requireAuth,
   requirePermissions,
   validateBody,
   validateParams,
@@ -46,6 +47,7 @@ export function createPlanRouter(
   // Admin routes
   router.post(
     '/',
+    requireAuth(),
     requirePermissions('admin:subscriptions'),
     validateBody(subscriptionPublic.CreateSubscriptionPlanRequest),
     controller.createPlan,
@@ -53,6 +55,7 @@ export function createPlanRouter(
 
   router.put(
     '/:id',
+    requireAuth(),
     requirePermissions('admin:subscriptions'),
     validateParams(subscriptionPublic.PlanIdParam),
     validateBody(subscriptionPublic.UpdateSubscriptionPlanRequest),
@@ -61,12 +64,18 @@ export function createPlanRouter(
 
   router.delete(
     '/:id',
+    requireAuth(),
     requirePermissions('admin:subscriptions'),
     validateParams(subscriptionPublic.PlanIdParam),
     controller.deletePlan,
   )
 
-  router.post('/sync', requirePermissions('admin:subscriptions'), controller.syncPlans)
+  router.post(
+    '/sync',
+    requireAuth(),
+    requirePermissions('admin:subscriptions'),
+    controller.syncPlans,
+  )
 
   return router
 }

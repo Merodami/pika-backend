@@ -58,14 +58,17 @@ export class NotificationRepository implements INotificationRepository {
     })
 
     try {
+      if (!data.userId) {
+        throw ErrorFactory.badRequest('userId is required for notifications')
+      }
+
       const notification = await this.prisma.notification.create({
         data: {
-          userId: data.userId || null, // Allow null for global notifications
+          userId: data.userId,
           type: data.type || 'general',
           title: data.title,
           description: data.description,
           isRead: false,
-          isGlobal: data.isGlobal || false,
           metadata: data.metadata,
         },
       })

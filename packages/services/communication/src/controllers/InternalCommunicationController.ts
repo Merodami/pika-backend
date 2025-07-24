@@ -1,5 +1,5 @@
 import { communicationInternal } from '@pika/api'
-import { paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import {
   CommunicationLogMapper,
   InternalCommunicationMapper,
@@ -67,14 +67,11 @@ export class InternalCommunicationController {
         templateId: data.templateId as EmailTemplateId | undefined,
         templateParams: data.templateParams,
         body: data.body,
-        htmlContent: data.isHtml ? data.body : undefined,
-        textContent: !data.isHtml ? data.body : undefined,
         isHtml: data.isHtml,
         replyTo: data.replyTo,
         cc: data.cc,
         bcc: data.bcc,
-        userId,
-        attachments: undefined,
+        userId: userId || undefined,
       }
 
       const result = await this.emailService.sendEmail(emailInput)
@@ -85,7 +82,7 @@ export class InternalCommunicationController {
         status: dto.status,
         type: dto.type,
         recipient: dto.recipient,
-        userId: dto.userId || null,
+        userId: dto.userId || undefined,
         subject: dto.subject,
         templateId: dto.templateId,
         createdAt: dto.createdAt,
@@ -143,7 +140,7 @@ export class InternalCommunicationController {
             to: recipient.to,
             templateId: templateId as EmailTemplateId,
             templateParams: recipient.variables || {},
-            subject: request.body.subject || recipient.variables?.subject || 'Notification',
+            subject: recipient.variables?.subject || 'Notification',
             userId: recipient.variables?.userId,
           })
 
@@ -204,8 +201,8 @@ export class InternalCommunicationController {
         limit: Number(limit),
         userId: userId as string,
         status: status as string,
-        startDate: startDate ? new Date(startDate as string) : undefined,
-        endDate: endDate ? new Date(endDate as string) : undefined,
+        fromDate: startDate ? new Date(startDate) : undefined,
+        toDate: endDate ? new Date(endDate) : undefined,
         type: 'email',
       }
 
@@ -262,7 +259,7 @@ export class InternalCommunicationController {
         {
           messageId: result.id,
           status: result.status === 'sent' ? 'queued' : 'failed',
-          scheduledAt: result.sentAt?.toISOString(),
+          scheduledAt: result.sentAt,
         }
       const validatedResponse =
         communicationInternal.SendTransactionalEmailResponse.parse(responseData)
@@ -344,7 +341,7 @@ export class InternalCommunicationController {
             },
             {} as Record<string, { sent: number; failed: number }>,
           ),
-          timestamp: new Date().toISOString(),
+          timestamp: new Date(),
         }
       const validatedResponse =
         communicationInternal.SendSystemNotificationResponse.parse(responseData)
@@ -495,12 +492,7 @@ export class InternalCommunicationController {
    * Get notifications for a user via internal API
    */
   async getNotifications(
-    request: Request<
-      {},
-      {},
-      {},
-      communicationInternal.InternalNotificationsParams
-    >,
+    request: Request,
     response: Response<communicationInternal.InternalNotificationsResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -511,21 +503,20 @@ export class InternalCommunicationController {
         )
       }
 
-      const { userId, page = 1, limit = 20, isRead } = request.query
+      const query = getValidatedQuery<communicationInternal.InternalNotificationsParams>(request)
 
-      if (!userId) {
+      if (!query.userId) {
         throw ErrorFactory.badRequest('userId is required')
       }
 
       const params: NotificationSearchParams = {
-        page: Number(page),
-        limit: Number(limit),
-        isRead:
-          isRead === 'true' ? true : isRead === 'false' ? false : undefined,
+        page: query.page || 1,
+        limit: query.limit || 20,
+        isRead: query.isRead,
       }
 
       const result = await this.notificationService.getUserNotifications(
-        userId as string,
+        query.userId,
         params,
       )
 
@@ -609,7 +600,7 @@ export class InternalCommunicationController {
         limit: 1000,
       })
 
-      let notificationStats = { pagination: { total: 0 } }
+      let notificationStats: any = { data: [], pagination: { total: 0, page: 1, limit: 1000, totalPages: 0, hasNext: false, hasPrev: false } }
       if (this.notificationService) {
         notificationStats = await this.notificationService.getUserNotifications(
           userId,
@@ -625,7 +616,7 @@ export class InternalCommunicationController {
         notificationsRead: 0, // Would need additional query
         lastEmailSent: emailStats.data[0]?.sentAt?.toISOString() || null,
         lastNotificationReceived:
-          notificationStats.data?.[0]?.createdAt?.toISOString() || null,
+          notificationStats.data[0]?.createdAt?.toISOString() || null,
       }
 
       response.json(responseData)

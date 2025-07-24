@@ -62,7 +62,7 @@ export interface IVoucherService {
   getVouchersByIds(
     ids: string[],
     language?: LanguageCode,
-  ): Promise<VoucherDomain[]>
+  ): Promise<PaginatedResult<VoucherDomain>>
   claimVoucher(
     voucherId: string,
     userId: string,
@@ -325,7 +325,7 @@ export class VoucherService implements IVoucherService {
   async getVouchersByIds(
     ids: string[],
     language?: LanguageCode,
-  ): Promise<VoucherDomain[]> {
+  ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       // Validate all IDs are UUID format
       const invalidIds = ids.filter((id) => !isUuidV4(id))
@@ -336,14 +336,19 @@ export class VoucherService implements IVoucherService {
         )
       }
 
-      const vouchers = await this.repository.findByIds(ids)
+      // Service passes through repository result (Repository Pagination Pattern)
+      const result = await this.repository.findByIds(ids)
 
-      // Resolve translations if language is provided - one line!
+      // Resolve translations if language is provided
       if (language) {
-        return await this.translationResolver.resolveArray(vouchers, language)
+        const translatedData = await this.translationResolver.resolveArray(result.data, language)
+        return {
+          data: translatedData,
+          pagination: result.pagination, // Pass through pagination
+        }
       }
 
-      return vouchers
+      return result // No modification needed
     } catch (error) {
       logger.error('Failed to get vouchers by ids', { error, ids, language })
       throw ErrorFactory.fromError(error)
