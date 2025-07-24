@@ -1,6 +1,6 @@
 import { UserServiceClient } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 
 interface MockUser {
   id: string
@@ -33,7 +33,7 @@ export class UserServiceClientMock extends UserServiceClient {
 
   private initializeMockData(): void {
     // Predefined test users with hashed passwords
-    const testPassword = '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe' // Password123!
+    const testPassword = '$2b$10$m3.YrysIB6FA8kkJAZRCjelwB7m1zhK1RatTx45xlS3I0I21gOURe' // Password123! (bcrypt hash)
 
     const testUsers: MockUser[] = [
       {
@@ -137,17 +137,12 @@ export class UserServiceClientMock extends UserServiceClient {
 
   // Methods used by UserServiceClientAdapter
   async getUserAuthDataByEmail(email: string): Promise<any> {
-    console.log('getUserAuthDataByEmail called with:', email)
-    console.log('Available emails:', Array.from(this.emailToUserId.keys()))
     const userId = this.emailToUserId.get(email.toLowerCase())
     if (!userId) {
-      console.log('User not found for email:', email)
       return null
     }
     const user = this.users.get(userId)
-    const result = user ? this.mapUserToAuthData(user) : null
-    console.log('Returning user data:', result)
-    return result
+    return user ? this.mapUserToAuthData(user) : null
   }
 
   async getUserAuthData(userId: string): Promise<any> {
@@ -293,7 +288,6 @@ export class UserServiceClientMock extends UserServiceClient {
       dateOfBirth: user.dateOfBirth,
       avatarUrl: user.avatarUrl,
     }
-    console.log('Mapped auth data - role:', authData.role, 'status:', authData.status)
     return authData
   }
 

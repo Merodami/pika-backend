@@ -27,6 +27,7 @@ src/schemas/
 │   │   └── queries.ts        # Shared category queries if is used on admin only
 │   │   └── sorting.ts        # Shared category sorting if is used on admin only
 │   │   └── relations.ts        # Shared category relations if is used on admin only
+│   │   └── responses.ts        # Shared category responses  if is used on admin only
 │   ├── public/
 │   │   ├── category.ts
 │   │   └── index.ts
@@ -37,6 +38,7 @@ src/schemas/
 │   │   └── queries.ts        # Shared category queries if is used on public only
 │   │   └── sorting.ts        # Shared category sorting if is used on public only
 │   │   └── relations.ts        # Shared category relations if is used on public only
+│   │   └── responses.ts        # Shared category responses if is used on public only
 │   ├── internal/
 │   │   ├── service.ts
 │   │   └── index.ts
@@ -47,6 +49,7 @@ src/schemas/
 │   │   └── queries.ts        # Shared category queries if is used on internal only
 │   │   └── sorting.ts        # Shared category sorting if is used on internal only
 │   │   └── relations.ts        # Shared category relations if is used on internal only
+│   │   └── responses.ts        # Shared category responses
 │   ├── common/
 │   │   ├── parameters.ts    # CategoryIdParam, shared params
 │   │   ├── enums.ts        # Category-specific enums (REQUIRED)
@@ -55,6 +58,7 @@ src/schemas/
 │   │   └── queries.ts        # Shared category queries
 │   │   └── sorting.ts        # Shared category sorting
 │   │   └── relations.ts        # Shared category relations
+│   │   └── responses.ts        # Shared category responses
 │   └── index.ts            # Re-exports all tiers
 ├── user/
 │   ├── admin/
@@ -277,15 +281,15 @@ This allows existing imports to continue working while new code uses the service
    - Keep only core business logic
 
 8. **Pagination Strategy (Standardized Across All Tiers)**:
-   
+
    **Core Components**:
    - `SearchParams` from `shared/pagination.js` - Provides page, limit, sortBy, sortOrder, search
    - `paginatedResponse()` from `shared/responses.js` - Wraps data with pagination metadata
-   
+
    **Universal Pattern - ALL Tiers (Public/Admin/Internal)**:
-   
+
    All list endpoints MUST use pagination for consistency and future-proofing:
-   
+
    ```typescript
    // Query params ALWAYS extend SearchParams
    export const ResourceQueryParams = SearchParams.extend({
@@ -293,52 +297,157 @@ This allows existing imports to continue working while new code uses the service
      // ... other filters
      sortBy: ResourceSortBy.default('createdAt'), // Override with service-specific enum
    })
-   
+
    // Response ALWAYS uses paginatedResponse
    export const ResourceListResponse = paginatedResponse(ResourceSchema)
    ```
-   
+
    **This applies to**:
    - Public endpoints (user-facing lists)
    - Admin endpoints (management lists)
    - Internal endpoints (service-to-service lists)
-   
+
    **Benefits of Standardization**:
    - Single pattern to learn and implement
    - Consistent client code across all service calls
    - Future-proof (no breaking changes when data grows)
    - Reusable pagination utilities and types
    - Predictable API behavior
-   
+
    **Limited Exceptions** (direct arrays only when):
-   
    1. **Bounded validation operations**:
+
    ```typescript
    // Input explicitly limits output
    export const ValidateResourcesRequest = z.object({
      resourceIds: z.array(UUID).min(1).max(100), // Max 100 enforced
    })
-   
+
    export const ValidateResourcesResponse = z.object({
      results: z.array(ValidationResult), // Always ≤ 100 items
    })
    ```
-   
+
    2. **Single-entity relationships**:
+
    ```typescript
    // One-to-one relationship, not a list
    export const GetUserBusinessResponse = z.object({
      business: BusinessData.optional(), // User has 0 or 1 business
    })
    ```
-   
+
    **Implementation Guidelines**:
    - Default to pagination for ANY endpoint returning arrays
    - Question every exception - will this really never grow?
    - Internal APIs are APIs too - treat them with same rigor
    - Consider: "What happens when this service has 1M+ records?"
-   
+
    **Migration Note**: Existing internal endpoints without pagination should be migrated in next major version to maintain consistency.
+
+## Service/Repository Pagination Pattern (CRITICAL)
+
+### Core Rule: Repository Builds Pagination
+
+**The repository layer is responsible for building pagination metadata, not the service layer.** This ensures consistency and prevents duplication.
+
+#### ✅ Correct Pattern:
+
+```typescript
+// Repository builds complete pagination structure
+export class CategoryRepository {
+  async findByIds(ids: string[]): Promise<PaginatedResult<Category>> {
+    const categories = await this.prisma.category.findMany({
+      where: { id: { in: ids } },
+    })
+
+    // Repository builds pagination metadata for bounded operation
+    return {
+      data: CategoryMapper.fromPrismaCategoryArray(categories),
+      pagination: {
+        page: 1,
+        limit: ids.length,
+        total: categories.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      },
+    }
+  }
+}
+
+// Service passes through repository result
+export class CategoryService {
+  async getCategoriesByIds(ids: string[]): Promise<PaginatedResult<Category>> {
+    const result = await this.repository.findByIds(ids)
+    return result // No modification needed
+  }
+}
+
+// Controller uses service result directly
+export class InternalCategoryController {
+  async getCategoriesByIds(req: Request, res: Response): Promise<void> {
+    const result = await this.categoryService.getCategoriesByIds(categoryIds)
+    
+    const response = {
+      data: result.data.map(CategoryMapper.toInternalDTO),
+      pagination: result.pagination, // Pass through pagination
+    }
+    
+    const validatedResponse = BulkCategoryResponse.parse(response)
+    res.json(validatedResponse)
+  }
+}
+```
+
+#### ❌ Wrong Pattern:
+
+```typescript
+// DON'T build pagination in service layer
+export class CategoryService {
+  async getCategoriesByIds(ids: string[]): Promise<PaginatedResult<Category>> {
+    const categories = await this.repository.findByIds(ids) // Returns Category[]
+    
+    // ❌ Building pagination in service violates separation
+    return {
+      data: categories,
+      pagination: {
+        page: 1,
+        limit: ids.length,
+        total: categories.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      },
+    }
+  }
+}
+```
+
+### Key Benefits of Repository Pagination:
+
+1. **Single Responsibility**: Repository handles all data access concerns including pagination
+2. **Consistency**: Same pagination logic for bounded and unbounded operations
+3. **Clean Service Layer**: Services focus on business logic, not data formatting
+4. **Type Safety**: PaginatedResult type enforced at data access boundary
+5. **Future-Proof**: Easy to modify pagination logic in one place
+
+### Implementation Rules:
+
+1. **Repository Returns PaginatedResult**: ALL repository methods returning arrays should return `PaginatedResult<T>`
+2. **Service Passes Through**: Services return repository results without modification
+3. **Controller Transforms**: Controllers transform data using mappers, preserve pagination structure
+4. **Bounded Operations**: Even operations with known limits use pagination structure for consistency
+
+### Migration Strategy:
+
+When updating existing services:
+
+1. Update repository interface to return `PaginatedResult<T>`
+2. Update repository implementation to build pagination metadata
+3. Update service to pass through results (remove any pagination building)
+4. Update controller to handle new structure
+5. Update response schemas to use `paginatedResponse()`
 
 ## Recent Implementation (2025-01-17)
 
@@ -413,3 +522,157 @@ Successfully removed unused services from all generators:
 3. **Industry Standards**: SDK generation follows frontend development best practices
 4. **Zod v4 Ready**: Full compatibility with latest Zod features
 5. **Recursive Support**: Proper handling of hierarchical data structures
+
+## Response Validation Pattern (Industry Standard)
+
+### Overview
+
+Response validation using Zod's `.parse()` method is an industry standard practice that ensures API responses match their documented schemas at runtime. This pattern complements request validation and provides end-to-end type safety.
+
+### Why Response Validation?
+
+1. **Runtime Contract Enforcement**: Guarantees responses match OpenAPI/Zod schemas
+2. **Early Error Detection**: Catches mapper/transformation errors immediately
+3. **Type Safety**: TypeScript compile-time checks + Zod runtime validation
+4. **Schema Evolution Safety**: Breaking changes are caught during development
+5. **Developer Confidence**: What you send === what you documented
+
+### Implementation Pattern
+
+```typescript
+// Controllers should validate responses before sending
+export class ServiceController {
+  async getResource(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      // 1. Execute business logic
+      const result = await this.service.getResource(req.params.id)
+      
+      // 2. Transform to DTO
+      const response = ResourceMapper.toDTO(result)
+      
+      // 3. Validate against Zod schema
+      const validatedResponse = resourcePublic.ResourceResponse.parse(response)
+      
+      // 4. Send validated response
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async listResources(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await this.service.listResources(params)
+      
+      // Transform and validate paginated response
+      const response = {
+        data: result.data.map(ResourceMapper.toDTO),
+        pagination: result.pagination,
+      }
+      
+      const validatedResponse = resourcePublic.ResourceListResponse.parse(response)
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+}
+```
+
+### Key Benefits
+
+1. **Mapper Validation**: Ensures mappers produce correct data structure
+2. **Type Narrowing**: After `.parse()`, TypeScript knows exact response type
+3. **Detailed Errors**: Zod provides clear error messages for debugging
+4. **Consistency**: Same validation approach as request validation
+
+### Common Validation Issues Caught
+
+- Missing required fields
+- Incorrect date formats (Date vs ISO string)
+- Wrong number types (string vs number for decimals)
+- Null/undefined handling
+- Branded type mismatches (e.g., UserId vs string)
+- Enum value mismatches
+
+### Best Practices
+
+1. **Validate at Controller Level**: Keep validation in controllers, not services
+2. **Use Try-Catch**: Zod throws on validation failure - handle appropriately
+3. **Log Validation Errors**: In development, log what failed validation
+4. **Test Response Schemas**: Integration tests should verify response structure
+5. **Keep DTOs Aligned**: Ensure mapper DTOs match Zod schema expectations
+
+### Example with All Response Types
+
+```typescript
+// Single entity response
+const validatedResponse = businessPublic.BusinessResponse.parse(
+  BusinessMapper.toDTO(business)
+)
+
+// Paginated response
+const validatedResponse = businessPublic.BusinessListResponse.parse({
+  data: businesses.map(BusinessMapper.toDTO),
+  pagination: result.pagination,
+})
+
+// Admin response with extra fields
+const validatedResponse = businessAdmin.AdminBusinessResponse.parse(
+  BusinessMapper.toAdminDTO(business)
+)
+
+// Internal service response
+const validatedResponse = businessInternal.InternalBusinessData.parse(
+  BusinessMapper.toInternalDTO(business)
+)
+
+// Bulk/batch responses
+const validatedResponse = businessInternal.BulkBusinessResponse.parse({
+  businesses: validBusinesses.map(BusinessMapper.toInternalDTO),
+  notFound: missingIds,
+})
+```
+
+### Migration Strategy
+
+When adding response validation to existing controllers:
+
+1. Start with new endpoints first
+2. Add validation to existing endpoints gradually
+3. Fix mapper issues as they're discovered
+4. Update integration tests to expect validated responses
+5. Monitor for validation errors in staging/production
+
+### Performance Considerations
+
+- Zod parsing is fast but not free (~microseconds per object)
+- For high-throughput endpoints, consider:
+  - Validation sampling in production
+  - Development-only validation
+  - Caching validated responses
+- Most APIs benefit more from correctness than micro-optimizations
+
+### Error Handling
+
+```typescript
+try {
+  const validatedResponse = schema.parse(response)
+  res.json(validatedResponse)
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    // Log the validation error for debugging
+    logger.error('Response validation failed', {
+      errors: error.errors,
+      response: response,
+    })
+    // Still send response in production to avoid breaking clients
+    // But log/alert for immediate fixing
+    res.json(response)
+  } else {
+    next(error)
+  }
+}
+```
+
+This pattern ensures API reliability and maintains the contract between backend and frontend/clients

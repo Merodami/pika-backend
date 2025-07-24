@@ -39,7 +39,7 @@ export interface INotificationRepository {
   ): Promise<PaginatedResult<NotificationDomain>>
   update(id: string, data: UpdateNotificationInput): Promise<NotificationDomain>
   markAsRead(id: string): Promise<NotificationDomain>
-  markAllAsRead(userId: string): Promise<void>
+  markAllAsRead(userId: string): Promise<number>
   delete(id: string): Promise<void>
   findUserByEmail(email: string): Promise<{ id: string } | null>
 }
@@ -187,9 +187,9 @@ export class NotificationRepository implements INotificationRepository {
     return this.update(id, { isRead: true })
   }
 
-  async markAllAsRead(userId: string): Promise<void> {
+  async markAllAsRead(userId: string): Promise<number> {
     try {
-      await this.prisma.notification.updateMany({
+      const result = await this.prisma.notification.updateMany({
         where: {
           userId: userId,
           isRead: false,
@@ -199,6 +199,8 @@ export class NotificationRepository implements INotificationRepository {
           updatedAt: new Date(),
         },
       })
+      
+      return result.count
     } catch (error) {
       throw ErrorFactory.databaseError('markAllAsRead', 'Notification', error)
     }

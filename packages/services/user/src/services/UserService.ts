@@ -27,8 +27,6 @@ import type {
 import type { IInternalUserService } from './InternalUserService.js'
 
 export interface IncludeOptions {
-  includeProfessional?: boolean
-  includeParq?: boolean
   includeFriends?: boolean
 }
 
@@ -169,16 +167,6 @@ export class UserService implements IUserService {
         password = await bcrypt.hash(data.password, 10)
       }
 
-      // For PROFESSIONAL role, validate required fields
-      if (
-        data.role === 'PROFESSIONAL' &&
-        (!data.description || !data.specialties)
-      ) {
-        throw ErrorFactory.businessRuleViolation(
-          'Professional profile incomplete',
-          'Description and specialties are required for professionals',
-        )
-      }
 
       const user = await this.repository.create({
         ...data,
@@ -207,10 +195,6 @@ export class UserService implements IUserService {
         )
       }
 
-      // Generate unique alias if not provided
-      const alias =
-        data.alias || `user${Math.floor(100000 + Math.random() * 900000)}`
-
       // Admin creation - map schema fields to database fields
       const userData = {
         email: data.email,
@@ -218,11 +202,8 @@ export class UserService implements IUserService {
         lastName: data.lastName,
         phoneNumber: data.phoneNumber,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
-        role: data.role || 'MEMBER',
+        role: data.role || 'CUSTOMER',
         status: data.status || 'UNCONFIRMED',
-        appVersion: data.appVersion,
-        alias,
-        activeMembership: false,
       }
 
       const user = await this.repository.create(userData)
@@ -234,7 +215,6 @@ export class UserService implements IUserService {
         email: data.email,
         role: data.role,
         status: data.status,
-        alias,
       })
 
       return user

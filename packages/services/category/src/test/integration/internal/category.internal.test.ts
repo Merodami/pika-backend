@@ -234,8 +234,13 @@ describe('Internal Category Integration Tests', () => {
           .expect(200)
 
         const expectedActiveCount = sharedTestData.activeParentCategories.length + sharedTestData.activeChildCategories.length
+        
+        // Response now includes pagination
+        expect(response.body).toHaveProperty('data')
+        expect(response.body).toHaveProperty('pagination')
         expect(response.body.data).toHaveLength(expectedActiveCount)
         expect(response.body.data.every((cat: any) => cat.isActive)).toBe(true)
+        expect(response.body.pagination.total).toBe(expectedActiveCount)
       })
     })
   })

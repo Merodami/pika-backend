@@ -3,8 +3,10 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { createIncludeParam } from '../../shared/query.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import { BUSINESS_RELATIONS } from '../common/enums.js'
 
 /**
@@ -179,13 +181,10 @@ export type GetBusinessRequest = z.infer<typeof GetBusinessRequest>
  * Note: categoryId is passed as a path parameter, not in query
  */
 export const GetBusinessesByCategoryRequest = openapi(
-  z
-    .object({
-      onlyActive: optionalBoolean(),
-      onlyVerified: optionalBoolean(),
-      limit: z.number().int().min(1).max(100).default(50),
-    })
-    .merge(createIncludeParam(BUSINESS_RELATIONS)),
+  SearchParams.extend({
+    onlyActive: optionalBoolean(),
+    onlyVerified: optionalBoolean(),
+  }).merge(createIncludeParam(BUSINESS_RELATIONS)),
   {
     description:
       'Query parameters for getting businesses in a specific category',
@@ -197,16 +196,10 @@ export type GetBusinessesByCategoryRequest = z.infer<
 >
 
 /**
- * Get businesses by category response
+ * Get businesses by category response with pagination
  */
-export const GetBusinessesByCategoryResponse = openapi(
-  z.object({
-    businesses: z.array(InternalBusinessData),
-    totalCount: z.number().int().nonnegative(),
-  }),
-  {
-    description: 'Category businesses data',
-  },
+export const GetBusinessesByCategoryResponse = paginatedResponse(
+  InternalBusinessData,
 )
 
 export type GetBusinessesByCategoryResponse = z.infer<

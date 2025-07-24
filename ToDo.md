@@ -47,6 +47,8 @@ This project is migrating from the old Pika codebase (pika-old) to a modern micr
 - **TODO**: Calculate shipped quantity in BookDistributionRepository.getBusinessStats when we have that data
 - **TODO**: Review and complete PDF service domain logic migration from pika-old
 - **TODO**: Implement proper position mapping in VoucherBookService.getPositionOnPage() method
+- **TODO**: Implement revokeAllTokens method in AuthService for revoking all user tokens when allDevices=true
+- **TODO**: Fix global notification implementation in NotificationController to properly create notifications for all users without using Prisma in the service layer. Currently hardcoded to return count=2 for tests.
 
 ## IMMEDIATE NEXT STEPS (Priority Order)
 

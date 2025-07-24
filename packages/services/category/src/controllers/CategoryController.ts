@@ -31,7 +31,7 @@ export class CategoryController {
   })
   async getAllCategories(
     req: Request,
-    res: Response,
+    res: Response<categoryPublic.CategoryListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -51,10 +51,14 @@ export class CategoryController {
       const result = await this.categoryService.getAllCategories(params)
 
       // Convert to DTOs
-      res.json({
+      const response = {
         data: result.data.map((category) => CategoryMapper.toDTO(category)),
         pagination: result.pagination,
-      })
+      }
+
+      // Validate response against Zod schema
+      const validatedResponse = categoryPublic.CategoryListResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -70,8 +74,8 @@ export class CategoryController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getCategoryById(
-    req: Request<{ id: string }>,
-    res: Response,
+    req: Request<categoryPublic.CategoryPathParams>,
+    res: Response<categoryPublic.CategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -79,7 +83,12 @@ export class CategoryController {
 
       const category = await this.categoryService.getCategoryById(id)
 
-      res.json(CategoryMapper.toDTO(category))
+      // Transform to DTO
+      const response = CategoryMapper.toDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryPublic.CategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -96,7 +105,7 @@ export class CategoryController {
   })
   async getCategoryHierarchy(
     req: Request,
-    res: Response,
+    res: Response<categoryPublic.CategoryHierarchyResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -107,9 +116,14 @@ export class CategoryController {
         query.rootId,
       )
 
-      res.json({
+      // Transform to DTOs
+      const response = {
         data: categories.map((category) => CategoryMapper.toDTO(category)),
-      })
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryPublic.CategoryHierarchyResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -126,7 +140,7 @@ export class CategoryController {
   })
   async getCategoryPath(
     req: Request<categoryPublic.CategoryPathParams>,
-    res: Response,
+    res: Response<categoryPublic.CategoryPathResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -134,9 +148,14 @@ export class CategoryController {
 
       const path = await this.categoryService.getCategoryPath(id)
 
-      res.json({
+      // Transform to DTOs
+      const response = {
         data: path.map((category) => CategoryMapper.toDTO(category)),
-      })
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryPublic.CategoryPathResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

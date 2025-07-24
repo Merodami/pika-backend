@@ -148,6 +148,15 @@ export class UserMapper {
       updatedAt: formatDateToISO(domain.updatedAt),
       // Additional fields
       dateOfBirth: formatDateToISOOrUndefined(domain.dateOfBirth),
+      // Admin fields - default values when not available
+      identityVerified: false,
+      stats: {
+        totalBookings: 0,
+        creditsBalance: 0,
+        friendsCount: 0,
+        followersCount: 0,
+        reportsCount: 0,
+      },
       stripeUserId: domain.stripeUserId || undefined,
     }
   }

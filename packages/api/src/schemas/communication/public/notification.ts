@@ -162,23 +162,6 @@ export type MarkNotificationsReadRequest = z.infer<
   typeof MarkNotificationsReadRequest
 >
 
-/**
- * Mark all as read response
- */
-export const MarkAllAsReadResponse = openapi(
-  z.object({
-    updated: z
-      .number()
-      .int()
-      .nonnegative()
-      .describe('Number of notifications marked as read'),
-  }),
-  {
-    description: 'Response for marking notifications as read',
-  },
-)
-
-export type MarkAllAsReadResponse = z.infer<typeof MarkAllAsReadResponse>
 
 // ============= Search Notifications =============
 

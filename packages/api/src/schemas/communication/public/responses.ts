@@ -11,7 +11,7 @@ import { openapi } from '../../../common/utils/openapi.js'
  */
 export const MarkAllAsReadResponse = openapi(
   z.object({
-    message: z.string().default('All notifications marked as read'),
+    updated: z.number().int().nonnegative().describe('Number of notifications marked as read'),
   }),
   {
     description: 'Response when all notifications are marked as read',

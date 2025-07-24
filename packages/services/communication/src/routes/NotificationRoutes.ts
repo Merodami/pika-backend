@@ -99,13 +99,5 @@ export function createNotificationRouter(
     controller.createGlobalNotification,
   )
 
-  // Legacy admin notification endpoint for backward compatibility
-  router.post(
-    '/admin/notification',
-    requireAdmin(),
-    validateBody(communicationPublic.CreateNotificationRequest),
-    controller.createGlobalNotification,
-  )
-
   return router
 }

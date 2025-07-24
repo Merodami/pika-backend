@@ -25,7 +25,7 @@ export class InternalBusinessController {
    */
   async getBusinessById(
     req: Request<businessCommon.BusinessIdParam>,
-    res: Response,
+    res: Response<businessInternal.InternalBusinessData>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -39,7 +39,12 @@ export class InternalBusinessController {
         includes,
       )
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessInternal.InternalBusinessData.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -51,7 +56,7 @@ export class InternalBusinessController {
    */
   async getBusinessByUserId(
     req: Request<shared.UserIdParam>,
-    res: Response,
+    res: Response<businessInternal.InternalBusinessData>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -65,7 +70,12 @@ export class InternalBusinessController {
         includes,
       )
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessInternal.InternalBusinessData.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -77,7 +87,7 @@ export class InternalBusinessController {
    */
   async getBusinessesByIds(
     req: Request<{}, {}, businessInternal.BulkBusinessRequest>,
-    res: Response,
+    res: Response<businessInternal.BulkBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -93,11 +103,16 @@ export class InternalBusinessController {
       // Filter out null values (businesses that don't exist)
       const validBusinesses = businesses.filter((b) => b !== null)
 
-      res.json({
+      // Transform to DTOs
+      const response = {
         businesses: validBusinesses.map((business) =>
           BusinessMapper.toDTO(business!),
         ),
-      })
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessInternal.BulkBusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -109,29 +124,37 @@ export class InternalBusinessController {
    */
   async getBusinessesByCategory(
     req: Request<shared.CategoryIdParam>,
-    res: Response,
+    res: Response<businessInternal.GetBusinessesByCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: categoryId } = req.params
       const query =
         getValidatedQuery<businessInternal.GetBusinessesByCategoryRequest>(req)
-      const { limit = PAGINATION_DEFAULT_LIMIT } = query
       const includes = parseIncludeParam(query.include, ['user', 'category'])
 
       const result = await this.businessService.getAllBusinesses({
         categoryId,
         active: query.onlyActive,
         verified: query.onlyVerified,
-        limit,
+        page: query.page,
+        limit: query.limit || PAGINATION_DEFAULT_LIMIT,
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder,
         parsedIncludes: includes,
       })
 
-      res.json({
-        businesses: result.data.map((business) =>
+      // Transform to DTOs with pagination
+      const response = {
+        data: result.data.map((business) =>
           BusinessMapper.toDTO(business),
         ),
-      })
+        pagination: result.pagination,
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessInternal.GetBusinessesByCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

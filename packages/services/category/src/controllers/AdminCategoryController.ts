@@ -37,7 +37,7 @@ export class AdminCategoryController {
   })
   async getAllCategories(
     req: Request,
-    res: Response,
+    res: Response<categoryAdmin.AdminCategoryListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -59,10 +59,14 @@ export class AdminCategoryController {
       const result = await this.categoryService.getAllCategories(params)
 
       // Convert to DTOs
-      res.json({
+      const response = {
         data: result.data.map((category) => CategoryMapper.toDTO(category)),
         pagination: result.pagination,
-      })
+      }
+
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryListResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -78,8 +82,8 @@ export class AdminCategoryController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getCategoryById(
-    req: Request<{ id: string }>,
-    res: Response,
+    req: Request<categoryCommon.CategoryIdParam>,
+    res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -87,7 +91,12 @@ export class AdminCategoryController {
 
       const category = await this.categoryService.getCategoryById(id)
 
-      res.json(CategoryMapper.toDTO(category))
+      // Transform to DTO
+      const response = CategoryMapper.toDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -99,7 +108,7 @@ export class AdminCategoryController {
    */
   async createCategory(
     req: Request<{}, {}, categoryAdmin.CreateCategoryRequest>,
-    res: Response,
+    res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -113,9 +122,12 @@ export class AdminCategoryController {
 
       const category = await this.categoryService.createCategory(categoryData)
 
-      const dto = CategoryMapper.toDTO(category)
-
-      res.status(201).json(dto)
+      // Transform to DTO
+      const response = CategoryMapper.toDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -126,8 +138,8 @@ export class AdminCategoryController {
    * Update category information
    */
   async updateCategory(
-    req: Request<{ id: string }, {}, categoryAdmin.UpdateCategoryRequest>,
-    res: Response,
+    req: Request<categoryCommon.CategoryIdParam, {}, categoryAdmin.UpdateCategoryRequest>,
+    res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -142,7 +154,12 @@ export class AdminCategoryController {
 
       const category = await this.categoryService.updateCategory(id, updateData)
 
-      res.json(CategoryMapper.toDTO(category))
+      // Transform to DTO
+      const response = CategoryMapper.toDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -153,8 +170,8 @@ export class AdminCategoryController {
    * Delete category
    */
   async deleteCategory(
-    req: Request<{ id: string }>,
-    res: Response,
+    req: Request<categoryCommon.CategoryIdParam>,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -162,6 +179,7 @@ export class AdminCategoryController {
 
       await this.categoryService.deleteCategory(id)
 
+      // No content response - no validation needed
       res.status(204).send()
     } catch (error) {
       next(error)
@@ -173,8 +191,8 @@ export class AdminCategoryController {
    * Toggle category active/inactive status
    */
   async toggleCategoryStatus(
-    req: Request<{ id: string }>,
-    res: Response,
+    req: Request<categoryCommon.CategoryIdParam>,
+    res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -182,7 +200,12 @@ export class AdminCategoryController {
 
       const category = await this.categoryService.toggleCategoryStatus(id)
 
-      res.json(CategoryMapper.toDTO(category))
+      // Transform to DTO
+      const response = CategoryMapper.toDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -193,8 +216,8 @@ export class AdminCategoryController {
    * Move category to different parent
    */
   async moveCategory(
-    req: Request<{ id: string }, {}, categoryAdmin.MoveCategoryRequest>,
-    res: Response,
+    req: Request<categoryCommon.CategoryIdParam, {}, categoryAdmin.MoveCategoryRequest>,
+    res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -206,7 +229,12 @@ export class AdminCategoryController {
         parentId || null,
       )
 
-      res.json(CategoryMapper.toDTO(category))
+      // Transform to DTO
+      const response = CategoryMapper.toDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -222,7 +250,7 @@ export class AdminCategoryController {
       {},
       categoryAdmin.UpdateCategorySortOrderRequest
     >,
-    res: Response,
+    res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -234,7 +262,12 @@ export class AdminCategoryController {
         sortOrder,
       )
 
-      res.json(CategoryMapper.toDTO(category))
+      // Transform to DTO
+      const response = CategoryMapper.toDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -246,7 +279,7 @@ export class AdminCategoryController {
    */
   async bulkDeleteCategories(
     req: Request<{}, {}, categoryAdmin.BulkDeleteCategoriesRequest>,
-    res: Response,
+    res: Response<categoryAdmin.BulkCategoryOperationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -257,10 +290,15 @@ export class AdminCategoryController {
         await this.categoryService.deleteCategory(categoryId)
       }
 
-      res.json({
+      // Create response
+      const response = {
         message: `Successfully deleted ${categoryIds.length} categories`,
         deletedCount: categoryIds.length,
-      })
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.BulkCategoryOperationResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -277,7 +315,7 @@ export class AdminCategoryController {
   })
   async getCategoryHierarchy(
     req: Request,
-    res: Response,
+    res: Response<categoryAdmin.AdminCategoryTreeResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -287,9 +325,14 @@ export class AdminCategoryController {
         query.rootId,
       )
 
-      res.json({
+      // Transform to DTOs
+      const response = {
         data: categories.map((category) => CategoryMapper.toDTO(category)),
-      })
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryAdmin.AdminCategoryTreeResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

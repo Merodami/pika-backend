@@ -87,7 +87,6 @@ export class LocalAuthStrategy implements AuthStrategy {
       hasPassword: !!credentials.password,
       passwordLength: credentials.password?.length,
     })
-    console.log('LocalAuthStrategy - authenticating:', credentials.email)
 
     try {
       // 1. Validate credentials format
@@ -108,13 +107,11 @@ export class LocalAuthStrategy implements AuthStrategy {
       })
 
       if (!user) {
-        console.log('LocalAuthStrategy - user not found')
         return {
           success: false,
           error: 'Invalid email or password',
         }
       }
-      console.log('LocalAuthStrategy - user found:', user.id, 'isActive:', user.isActive())
 
       // 3. Check if user is active
       if (!user.isActive()) {
@@ -136,7 +133,6 @@ export class LocalAuthStrategy implements AuthStrategy {
         credentials.password,
         user.password,
       )
-      console.log('LocalAuthStrategy - password verification result:', isPasswordValid)
 
       if (!isPasswordValid) {
         return {

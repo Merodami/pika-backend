@@ -73,10 +73,20 @@ export class InternalCommunicationController {
       const result = await this.emailService.sendEmail(emailInput)
       const dto = CommunicationLogMapper.toDTO(result)
 
-      response.json({
+      const responseData: communicationInternal.SendEmailResponse = {
         id: dto.id,
         status: dto.status,
-      })
+        type: dto.type,
+        recipient: dto.recipient,
+        userId: dto.userId,
+        subject: dto.subject,
+        templateId: dto.templateId,
+        createdAt: dto.createdAt,
+        sentAt: dto.sentAt,
+      }
+      const validatedResponse = communicationInternal.SendEmailResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       logger.error('Failed to send email', error as Error, {
         serviceName: request.serviceAuth?.serviceName,
@@ -130,14 +140,13 @@ export class InternalCommunicationController {
         }
       }
 
-      const responseData: communicationInternal.BulkEmailResponse & { total: number; logs: any[] } = {
+      const responseData: communicationInternal.BulkEmailResponse = {
         sent,
         failed,
-        total: recipients.length,
-        logs,
       }
-
-      response.status(201).json(responseData)
+      const validatedResponse = communicationInternal.BulkEmailResponse.parse(responseData)
+      
+      response.status(201).json(validatedResponse)
     } catch (error) {
       logger.error('Failed to send bulk email', error as Error, {
         serviceName: request.serviceAuth?.serviceName,
@@ -169,12 +178,18 @@ export class InternalCommunicationController {
         type: 'email',
       }
 
-      const result = await this.emailService.getEmailHistory(params)
+      const result = await this.emailService.getEmailHistory(
+        params.userId || '',
+        params,
+      )
 
-      response.json({
+      const responseData = {
         data: result.data.map(InternalCommunicationMapper.toInternalEmailDTO),
         pagination: result.pagination,
-      })
+      }
+      const validatedResponse = communicationInternal.InternalEmailHistoryResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -215,8 +230,9 @@ export class InternalCommunicationController {
         status: result.status === 'sent' ? 'queued' : 'failed',
         scheduledAt: result.sentAt?.toISOString(),
       }
-
-      response.json(responseData)
+      const validatedResponse = communicationInternal.SendTransactionalEmailResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       logger.error('Failed to send transactional email', error as Error, {
         serviceName: request.serviceAuth?.serviceName,
@@ -289,8 +305,9 @@ export class InternalCommunicationController {
         ),
         timestamp: new Date().toISOString(),
       }
-
-      response.json(responseData)
+      const validatedResponse = communicationInternal.SendSystemNotificationResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       logger.error('Failed to send system notification', error as Error, {
         serviceName: request.serviceAuth?.serviceName,
@@ -314,7 +331,7 @@ export class InternalCommunicationController {
         throw ErrorFactory.serviceUnavailable('Notification service not available')
       }
 
-      const { userId, title, content, type, metadata } = request.body
+      const { userId, title, description, type, metadata } = request.body
       const { serviceAuth } = request
 
       logger.info('Internal notification create request', {
@@ -327,7 +344,7 @@ export class InternalCommunicationController {
       const notification = await this.notificationService.createNotification({
         userId,
         title,
-        description: content,
+        description,
         type: type || 'inApp',
         metadata,
       })
@@ -352,7 +369,8 @@ export class InternalCommunicationController {
         }
       }
 
-      response.status(201).json(dto)
+      const validatedResponse = communicationInternal.CreateNotificationResponse.parse(dto)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       logger.error('Failed to create notification', error as Error, {
         serviceName: request.serviceAuth?.serviceName,
@@ -397,10 +415,13 @@ export class InternalCommunicationController {
         created.push(InternalCommunicationMapper.toInternalNotificationDTO(notification))
       }
 
-      response.status(201).json({
+      const responseData = {
         created: created.length,
         notifications: created,
-      })
+      }
+      const validatedResponse = communicationInternal.BatchCreateNotificationsResponse.parse(responseData)
+      
+      response.status(201).json(validatedResponse)
     } catch (error) {
       logger.error('Failed to create batch notifications', error as Error, {
         serviceName: request.serviceAuth?.serviceName,
@@ -441,10 +462,13 @@ export class InternalCommunicationController {
         params,
       )
 
-      response.json({
+      const responseData = {
         data: result.data.map(InternalCommunicationMapper.toInternalNotificationDTO),
         pagination: result.pagination,
-      })
+      }
+      const validatedResponse = communicationInternal.InternalNotificationsResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       logger.error('Failed to get notifications', error as Error, {
         serviceName: request.serviceAuth?.serviceName,
@@ -479,10 +503,13 @@ export class InternalCommunicationController {
         { isRead: false, limit: 1000 },
       )
 
-      response.json({
+      const responseData = {
         userId: userId as string,
         unreadCount: result.pagination.total,
-      })
+      }
+      const validatedResponse = communicationInternal.GetUnreadCountResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       logger.error('Failed to get unread count', error as Error, {
         serviceName: request.serviceAuth?.serviceName,

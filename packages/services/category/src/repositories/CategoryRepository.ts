@@ -136,7 +136,7 @@ export class CategoryRepository implements ICategoryRepository {
     }
   }
 
-  async findByIds(ids: string[]): Promise<Category[]> {
+  async findByIds(ids: string[]): Promise<PaginatedResult<Category>> {
     try {
       const categories = await this.prisma.category.findMany({
         where: {
@@ -146,7 +146,20 @@ export class CategoryRepository implements ICategoryRepository {
         orderBy: { sortOrder: 'asc' },
       })
 
-      return CategoryMapper.fromPrismaCategoryArray(categories)
+      const categoryDomains = CategoryMapper.fromPrismaCategoryArray(categories)
+
+      // Build pagination structure for bounded operation
+      return {
+        data: categoryDomains,
+        pagination: {
+          page: 1,
+          limit: ids.length,
+          total: categoryDomains.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
+      }
     } catch (error) {
       logger.error('Error in CategoryRepository.findByIds:', error)
       throw ErrorFactory.databaseError(

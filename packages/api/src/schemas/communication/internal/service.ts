@@ -344,9 +344,16 @@ export const SendEmailResponse = openapi(
   z.object({
     id: z.string(),
     status: z.string(),
+    type: z.string().optional(),
+    recipient: z.string().optional(),
+    userId: z.string().optional(),
+    subject: z.string().optional(),
+    templateId: z.string().optional(),
+    createdAt: z.string().optional(),
+    sentAt: z.string().optional(),
   }),
   {
-    description: 'Send email result',
+    description: 'Send email result with communication log details',
   },
 )
 
@@ -396,8 +403,8 @@ export const CreateNotificationRequest = openapi(
   z.object({
     userId: UserId,
     title: z.string(),
-    content: z.string(),
-    type: InAppNotificationType,
+    description: z.string(),
+    type: InAppNotificationType.optional(),
     metadata: z.record(z.string(), z.any()).optional(),
   }),
   {
@@ -415,6 +422,15 @@ export type CreateNotificationRequest = z.infer<
 export const CreateNotificationResponse = openapi(
   z.object({
     id: z.string(),
+    userId: z.string(),
+    title: z.string(),
+    description: z.string(),
+    type: z.string(),
+    isRead: z.boolean(),
+    isGlobal: z.boolean().optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
+    createdAt: z.string(),
+    updatedAt: z.string().optional(),
   }),
   {
     description: 'Create notification result',
@@ -511,7 +527,7 @@ export const BatchCreateNotificationsRequest = openapi(
           userId: UserId,
           title: z.string(),
           description: z.string(),
-          type: InAppNotificationType.default('system'),
+          type: InAppNotificationType.default('info'),
           metadata: z.record(z.string(), z.any()).optional(),
         }),
       )

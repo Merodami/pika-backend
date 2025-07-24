@@ -65,7 +65,7 @@ async function seedTestUsers(
           email: `testuser${i}@example.com`,
           firstName: `Test${i}`,
           lastName: `User${i}`,
-          role: i === 0 ? UserRole.ADMIN : UserRole.MEMBER,
+          role: i === 0 ? UserRole.ADMIN : UserRole.CUSTOMER,
           emailVerified: true,
           phoneNumber: `+123456789${i}`,
           status: 'ACTIVE',
@@ -203,7 +203,7 @@ describe('User Service Integration Tests', () => {
               email: `member${i}@example.com`,
               firstName: `Member${i}`,
               lastName: `User${i}`,
-              role: UserRole.MEMBER,
+              role: UserRole.CUSTOMER,
               emailVerified: true,
               phoneNumber: `+123456789${i}`,
               status: 'ACTIVE',
@@ -214,33 +214,33 @@ describe('User Service Integration Tests', () => {
 
       const response = await adminClient
         .get('/users')
-        .query({ role: 'MEMBER' })
+        .query({ role: UserRole.CUSTOMER })
         .set('Accept', 'application/json')
         .expect(200)
 
       expect(response.body.data.length).toBeGreaterThan(0)
 
-      // Check that all returned users have MEMBER role
-      // The response should include our seeded members + auth test MEMBER users
-      const nonMemberUsers = response.body.data.filter(
-        (user: any) => user.role !== 'MEMBER',
+      // Check that all returned users have customer role
+      // The response should include our seeded customers
+      const nonCustomerUsers = response.body.data.filter(
+        (user: any) => user.role !== UserRole.CUSTOMER,
       )
 
-      expect(nonMemberUsers).toHaveLength(0)
+      expect(nonCustomerUsers).toHaveLength(0)
 
-      // Ensure we got some MEMBER users
-      const memberUsers = response.body.data.filter(
-        (user: any) => user.role === 'MEMBER',
+      // Ensure we got some customer users
+      const customerUsers = response.body.data.filter(
+        (user: any) => user.role === UserRole.CUSTOMER,
       )
 
-      expect(memberUsers.length).toBeGreaterThan(0)
+      expect(customerUsers.length).toBeGreaterThan(0)
     })
 
     it('should sort users by specified field', async () => {
       await seedTestUsers(testDb.prisma, 5)
 
       const response = await adminClient
-        .get('/users?sortBy=EMAIL&sortOrder=ASC')
+        .get('/users?sortBy=email&sortOrder=ASC')
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -388,10 +388,8 @@ describe('User Service Integration Tests', () => {
         lastName: 'Created',
         phoneNumber: '+1234567890',
         dateOfBirth: '1990-01-01',
-        role: 'MEMBER',
+        role: 'CUSTOMER',
         status: 'UNCONFIRMED',
-        appVersion: '1.0.0',
-        alias: 'admincreated123',
       }
 
       const response = await adminClient
@@ -406,7 +404,6 @@ describe('User Service Integration Tests', () => {
       expect(response.body.lastName).toBe(userData.lastName)
       expect(response.body.role).toBe(userData.role)
       expect(response.body.status).toBe(userData.status)
-      expect(response.body.alias).toBe(userData.alias)
 
       // Verify in database
       const savedUser = await testDb.prisma.user.findUnique({
@@ -415,8 +412,7 @@ describe('User Service Integration Tests', () => {
 
       expect(savedUser).not.toBeNull()
       expect(savedUser?.firstName).toBe(userData.firstName)
-      expect(savedUser?.alias).toBe(userData.alias)
-      expect(savedUser?.activeMembership).toBe(false)
+      expect(savedUser?.role).toBe(userData.role)
     })
 
     it('should create user with minimal required fields', async () => {
@@ -435,21 +431,18 @@ describe('User Service Integration Tests', () => {
         .expect(201)
 
       expect(response.body.email).toBe(userData.email)
-      expect(response.body.role).toBe('MEMBER') // Default value
+      expect(response.body.role).toBe('CUSTOMER') // Default value
       expect(response.body.status).toBe('UNCONFIRMED') // Default value
-      expect(response.body.alias).toMatch(/^user\d{6}$/) // Generated alias pattern
     })
 
-    it('should create PROFESSIONAL user', async () => {
+    it('should create business user', async () => {
       const userData = {
-        email: 'professional@example.com',
-        firstName: 'Pro',
-        lastName: 'Fessional',
+        email: 'business@example.com',
+        firstName: 'Business',
+        lastName: 'Owner',
         phoneNumber: '+1111111111',
         dateOfBirth: '1980-06-15',
-        role: 'PROFESSIONAL',
-        description: 'Experienced fitness trainer',
-        specialties: ['Personal Training', 'Weight Loss'],
+        role: 'BUSINESS',
       }
 
       const response = await adminClient
@@ -458,18 +451,18 @@ describe('User Service Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(201)
 
-      expect(response.body.role).toBe('PROFESSIONAL')
+      expect(response.body.role).toBe('BUSINESS')
       expect(response.body.email).toBe(userData.email)
     })
 
-    it('should create THERAPIST user', async () => {
+    it('should create admin user', async () => {
       const userData = {
-        email: 'therapist@example.com',
-        firstName: 'Physical',
-        lastName: 'Therapist',
+        email: 'admin2@example.com',
+        firstName: 'Admin',
+        lastName: 'User',
         phoneNumber: '+2222222222',
         dateOfBirth: '1975-03-10',
-        role: 'THERAPIST',
+        role: 'ADMIN',
       }
 
       const response = await adminClient
@@ -478,17 +471,17 @@ describe('User Service Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(201)
 
-      expect(response.body.role).toBe('THERAPIST')
+      expect(response.body.role).toBe('ADMIN')
     })
 
-    it('should create CONTENT_CREATOR user', async () => {
+    it('should create customer user', async () => {
       const userData = {
-        email: 'creator@example.com',
-        firstName: 'Content',
-        lastName: 'Creator',
+        email: 'customer2@example.com',
+        firstName: 'Customer',
+        lastName: 'User',
         phoneNumber: '+3333333333',
         dateOfBirth: '1992-09-05',
-        role: 'CONTENT_CREATOR',
+        role: 'CUSTOMER',
       }
 
       const response = await adminClient
@@ -497,7 +490,7 @@ describe('User Service Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(201)
 
-      expect(response.body.role).toBe('CONTENT_CREATOR')
+      expect(response.body.role).toBe('CUSTOMER')
     })
 
     it('should create user with ACTIVE status', async () => {
@@ -631,11 +624,7 @@ describe('User Service Integration Tests', () => {
         lastName: 'Fields',
         phoneNumber: '+5555555555',
         dateOfBirth: '1995-04-12',
-        // Optional fields
-        appVersion: '2.1.0',
-        alias: 'customalias',
-        description: 'User with optional fields',
-        specialties: ['Testing', 'Quality Assurance'],
+        // Optional fields - only include fields that exist in database schema
       }
 
       const response = await adminClient
@@ -644,11 +633,11 @@ describe('User Service Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(201)
 
-      expect(response.body.appVersion).toBe(userData.appVersion)
-      expect(response.body.alias).toBe(userData.alias)
+      expect(response.body.firstName).toBe(userData.firstName)
+      expect(response.body.lastName).toBe(userData.lastName)
     })
 
-    it('should generate unique alias when not provided', async () => {
+    it('should create multiple users with unique IDs', async () => {
       const userData1 = {
         email: 'user1@example.com',
         firstName: 'User',
@@ -675,9 +664,9 @@ describe('User Service Integration Tests', () => {
         .send(userData2)
         .expect(201)
 
-      expect(response1.body.alias).toMatch(/^user\d{6}$/)
-      expect(response2.body.alias).toMatch(/^user\d{6}$/)
-      expect(response1.body.alias).not.toBe(response2.body.alias)
+      expect(response1.body.id).toBeDefined()
+      expect(response2.body.id).toBeDefined()
+      expect(response1.body.id).not.toBe(response2.body.id)
     })
   })
 
@@ -727,7 +716,7 @@ describe('User Service Integration Tests', () => {
         where: { email: 'user@e2etest.com' },
       })
 
-      expect(user?.role).toBe(UserRole.MEMBER)
+      expect(user?.role).toBe(UserRole.CUSTOMER)
     })
   })
 
@@ -824,7 +813,7 @@ describe('User Service Integration Tests', () => {
     it('should allow admin to upload avatar for any user', async () => {
       // Get any user to upload avatar for
       const someUser = await testDb.prisma.user.findFirst({
-        where: { role: 'MEMBER' },
+        where: { role: 'CUSTOMER' },
       })
 
       const response = await adminClient
@@ -839,7 +828,7 @@ describe('User Service Integration Tests', () => {
     it('should return 400 when no file is uploaded', async () => {
       // Get any user
       const someUser = await testDb.prisma.user.findFirst({
-        where: { role: 'MEMBER' },
+        where: { role: 'CUSTOMER' },
       })
 
       await adminClient

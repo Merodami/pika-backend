@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 
 /**
  * Internal category service schemas for service-to-service communication
@@ -60,17 +61,9 @@ export const BulkCategoryRequest = openapi(
 export type BulkCategoryRequest = z.infer<typeof BulkCategoryRequest>
 
 /**
- * Bulk get categories response
+ * Bulk get categories response with pagination structure
  */
-export const BulkCategoryResponse = openapi(
-  z.object({
-    categories: z.array(InternalCategoryData),
-    notFound: z.array(UUID).optional(),
-  }),
-  {
-    description: 'Categories data with not found IDs',
-  },
-)
+export const BulkCategoryResponse = paginatedResponse(InternalCategoryData)
 
 export type BulkCategoryResponse = z.infer<typeof BulkCategoryResponse>
 
@@ -172,4 +165,15 @@ export const CheckCategoryExistsResponse = openapi(
 
 export type CheckCategoryExistsResponse = z.infer<
   typeof CheckCategoryExistsResponse
+>
+
+// ============= Internal Category List Response =============
+
+/**
+ * Internal category list response with pagination
+ */
+export const InternalCategoryListResponse = paginatedResponse(InternalCategoryData)
+
+export type InternalCategoryListResponse = z.infer<
+  typeof InternalCategoryListResponse
 >

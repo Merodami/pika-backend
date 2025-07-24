@@ -31,3 +31,18 @@ export function formatDateToISOOrUndefined(
 
   return undefined
 }
+
+/**
+ * Formats a date to ISO string with null fallback
+ * @param date - Date object, string, null or undefined
+ * @returns ISO string representation or null if no date
+ */
+export function formatDateToISOOrNull(
+  date: Date | string | undefined | null,
+): string | null {
+  if (!date) return null
+  if (typeof date === 'string') return date
+  if (date instanceof Date) return date.toISOString()
+
+  return null
+}

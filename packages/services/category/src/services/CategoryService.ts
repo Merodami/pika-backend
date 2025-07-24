@@ -74,7 +74,7 @@ export class CategoryService implements ICategoryService {
       return `${prefix}:${JSON.stringify(ids.sort())}`
     },
   })
-  async getCategoriesByIds(ids: string[]): Promise<Category[]> {
+  async getCategoriesByIds(ids: string[]): Promise<PaginatedResult<Category>> {
     try {
       // Validate all IDs are proper UUIDs
       const invalidIds = ids.filter((id) => !isUuidV4(id))
@@ -85,9 +85,9 @@ export class CategoryService implements ICategoryService {
         )
       }
 
-      const categories = await this.repository.findByIds(ids)
+      const result = await this.repository.findByIds(ids)
 
-      return categories
+      return result
     } catch (error) {
       logger.error('Failed to get categories by ids', { error, ids })
       throw ErrorFactory.fromError(error)

@@ -38,6 +38,15 @@ export async function createBusinessServer({
       methods: ['POST', 'PUT', 'PATCH'],
       excludeRoutes: ['/health', '/metrics'],
     },
+    authOptions: {
+      excludePaths: [
+        '/businesses', // Public business list endpoint
+        '/businesses/*', // Public business detail endpoints
+        '/health',
+        '/metrics',
+        '/internal/*', // Internal service-to-service communication
+      ],
+    },
     healthChecks: [
       {
         name: 'postgres',

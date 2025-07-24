@@ -87,7 +87,10 @@ export class EmailController implements IEmailController {
 
       const result = await this.emailService.sendEmail(emailInput)
 
-      response.json(CommunicationLogMapper.toDTO(result))
+      const responseData = CommunicationLogMapper.toDTO(result)
+      const validatedResponse = communicationPublic.CommunicationLogResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -124,12 +127,15 @@ export class EmailController implements IEmailController {
 
       const result = await this.emailService.sendBulkEmail(bulkEmailInput)
 
-      response.status(201).json({
+      const responseData = {
         sent: result.sent,
         failed: result.failed,
         total: result.total,
         logs: result.logs.map(CommunicationLogMapper.toDTO),
-      })
+      }
+      const validatedResponse = communicationPublic.SendBulkEmailResponse.parse(responseData)
+      
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -172,10 +178,13 @@ export class EmailController implements IEmailController {
 
       const result = await this.emailService.getEmailHistory(userId, params)
 
-      response.json({
+      const responseData = {
         data: result.data.map(CommunicationLogMapper.toDTO),
         pagination: result.pagination,
-      })
+      }
+      const validatedResponse = communicationPublic.CommunicationLogListResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -199,7 +208,10 @@ export class EmailController implements IEmailController {
 
       const email = await this.emailService.getEmailById(id, userId)
 
-      response.json(CommunicationLogMapper.toDTO(email))
+      const responseData = CommunicationLogMapper.toDTO(email)
+      const validatedResponse = communicationPublic.CommunicationLogResponse.parse(responseData)
+      
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

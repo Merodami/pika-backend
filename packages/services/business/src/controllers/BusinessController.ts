@@ -58,10 +58,14 @@ export class BusinessController {
       const result = await this.businessService.getAllBusinesses(params)
 
       // Convert to DTOs
-      res.json({
+      const response = {
         data: result.data.map((business) => BusinessMapper.toDTO(business)),
         pagination: result.pagination,
-      })
+      }
+
+      // Validate response against Zod schema
+      const validatedResponse = businessPublic.BusinessListResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -98,7 +102,12 @@ export class BusinessController {
         throw ErrorFactory.resourceNotFound('Business', businessId)
       }
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -135,7 +144,12 @@ export class BusinessController {
         throw ErrorFactory.resourceNotFound('Business', `user:${userId}`)
       }
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -170,7 +184,12 @@ export class BusinessController {
         category: includeRelations.includes('category'),
       })
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -203,9 +222,12 @@ export class BusinessController {
 
       const business = await this.businessService.createBusiness(data)
 
-      const dto = BusinessMapper.toDTO(business)
-
-      res.status(201).json(dto)
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -240,7 +262,12 @@ export class BusinessController {
         req.body,
       )
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

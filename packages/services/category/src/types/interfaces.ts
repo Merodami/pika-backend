@@ -21,7 +21,7 @@ export interface ICategoryRepository {
   /**
    * Get multiple categories by IDs
    */
-  findByIds(ids: string[]): Promise<Category[]>
+  findByIds(ids: string[]): Promise<PaginatedResult<Category>>
 
   /**
    * Create new category
@@ -75,7 +75,7 @@ export interface ICategoryService {
   /**
    * Get multiple categories by IDs
    */
-  getCategoriesByIds(ids: string[]): Promise<Category[]>
+  getCategoriesByIds(ids: string[]): Promise<PaginatedResult<Category>>
 
   /**
    * Create new category

@@ -112,11 +112,9 @@ export class UserController {
     try {
       const { id: userId } = req.params
       const query = getValidatedQuery<userPublic.GetUserByIdQuery>(req)
-      const { includeProfessional, includeParq, includeFriends } = query
+      const { includeFriends } = query
 
       const user = await this.userService.getUserById(userId, {
-        includeProfessional: includeProfessional,
-        includeParq: includeParq,
         includeFriends: includeFriends,
       })
 

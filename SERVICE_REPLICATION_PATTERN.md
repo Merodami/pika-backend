@@ -761,7 +761,7 @@ import type {
 export interface I{ServiceName}Service {
   getAll(params: {ServiceName}SearchParams): Promise<PaginatedResult<{ServiceName}Domain>>
   getById(id: string, parsedIncludes?: ParsedIncludes): Promise<{ServiceName}Domain | null>
-  getByIds(ids: string[]): Promise<{ServiceName}Domain[]>
+  getByIds(ids: string[]): Promise<PaginatedResult<{ServiceName}Domain>>
   create(data: Create{ServiceName}Data): Promise<{ServiceName}Domain>
   update(id: string, data: Update{ServiceName}Data): Promise<{ServiceName}Domain>
   delete(id: string): Promise<void>
@@ -783,6 +783,14 @@ export class {ServiceName}Service implements I{ServiceName}Service {
     }
 
     return this.repository.findAll(serviceParams)
+  }
+
+  async getByIds(ids: string[]): Promise<PaginatedResult<{ServiceName}Domain>> {
+    // Validate IDs if needed
+    const validIds = ids.filter(id => this.isValidId(id))
+    
+    // Repository handles pagination structure, service passes through
+    return this.repository.findByIds(validIds)
   }
 
   async create(data: Create{ServiceName}Data): Promise<{ServiceName}Domain> {
@@ -852,7 +860,7 @@ import type {
 export interface I{ServiceName}Repository {
   findAll(params: {ServiceName}SearchParams): Promise<PaginatedResult<{ServiceName}Domain>>
   findById(id: string, parsedIncludes?: ParsedIncludes): Promise<{ServiceName}Domain | null>
-  findByIds(ids: string[]): Promise<{ServiceName}Domain[]>
+  findByIds(ids: string[]): Promise<PaginatedResult<{ServiceName}Domain>>
   create(data: Create{ServiceName}Data): Promise<{ServiceName}Domain>
   update(id: string, data: Update{ServiceName}Data): Promise<{ServiceName}Domain>
   delete(id: string): Promise<void>
@@ -915,9 +923,88 @@ export class {ServiceName}Repository implements I{ServiceName}Repository {
     }
   }
 
+  async findByIds(ids: string[]): Promise<PaginatedResult<{ServiceName}Domain>> {
+    const entities = await this.prisma.{service}.findMany({
+      where: { id: { in: ids } },
+      orderBy: { createdAt: 'desc' },
+    })
+
+    // Repository builds pagination metadata for bounded operation
+    return {
+      data: {ServiceName}Mapper.toDomainArray(entities),
+      pagination: {
+        page: 1,
+        limit: ids.length,
+        total: entities.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      },
+    }
+  }
+
   // ... implement other methods
 }
+
+## 7.1 Pagination Pattern (CRITICAL)
+
+### Core Rule: Repository Builds Pagination
+
+**MANDATORY**: The repository layer builds all pagination metadata. Service layer passes through results without modification.
+
+#### ✅ Correct Implementation:
+
+```typescript
+// Repository builds complete pagination structure
+export class {ServiceName}Repository {
+  async findByIds(ids: string[]): Promise<PaginatedResult<{ServiceName}Domain>> {
+    const entities = await this.prisma.{service}.findMany({
+      where: { id: { in: ids } },
+    })
+
+    // Repository builds pagination metadata
+    return {
+      data: {ServiceName}Mapper.toDomainArray(entities),
+      pagination: {
+        page: 1,
+        limit: ids.length,
+        total: entities.length,
+        totalPages: 1,
+        hasNext: false,
+        hasPrev: false,
+      },
+    }
+  }
+}
+
+// Service passes through repository result
+export class {ServiceName}Service {
+  async getByIds(ids: string[]): Promise<PaginatedResult<{ServiceName}Domain>> {
+    return this.repository.findByIds(ids) // Direct pass-through
+  }
+}
+
+// Controller handles mapping with pagination
+export class Internal{ServiceName}Controller {
+  async getByIds(req: Request, res: Response): Promise<void> {
+    const result = await this.service.getByIds(ids)
+    
+    const response = {
+      data: result.data.map({ServiceName}Mapper.toInternalDTO),
+      pagination: result.pagination, // Preserve pagination
+    }
+    
+    res.json(response)
+  }
+}
 ```
+
+#### Key Rules:
+
+1. **Repository Returns PaginatedResult**: ALL array operations return `PaginatedResult<T>`
+2. **Service Pass-Through**: Services return repository results unchanged
+3. **Controller Transforms**: Use mappers to transform `data`, preserve `pagination`
+4. **Consistent Structure**: Even bounded operations use pagination for API consistency
 
 ## 8. Testing Pattern (MANDATORY)
 

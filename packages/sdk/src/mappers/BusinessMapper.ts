@@ -1,3 +1,5 @@
+import { formatDateToISO, formatDateToISOOrNull, formatDateToISOOrUndefined } from '@pika/shared'
+
 import type {
   BusinessDomain,
   CreateBusinessData,
@@ -78,16 +80,6 @@ export class BusinessMapper {
    * Maps a domain entity to an API DTO
    */
   static toDTO(domain: BusinessDomain): BusinessDTO {
-    const formatDate = (
-      date: Date | string | undefined | null,
-    ): string | undefined => {
-      if (!date) return undefined
-      if (typeof date === 'string') return date
-      if (date instanceof Date) return date.toISOString()
-
-      return undefined
-    }
-
     return {
       id: domain.id,
       userId: domain.userId,
@@ -97,9 +89,9 @@ export class BusinessMapper {
       verified: domain.verified,
       active: domain.active,
       avgRating: domain.avgRating,
-      createdAt: formatDate(domain.createdAt) || new Date().toISOString(),
-      updatedAt: formatDate(domain.updatedAt) || new Date().toISOString(),
-      deletedAt: formatDate(domain.deletedAt),
+      createdAt: formatDateToISO(domain.createdAt),
+      updatedAt: formatDateToISO(domain.updatedAt),
+      deletedAt: formatDateToISOOrNull(domain.deletedAt),
       // Relations using existing mappers
       user: domain.user ? UserMapper.toDTO(domain.user) : undefined,
       category: domain.category

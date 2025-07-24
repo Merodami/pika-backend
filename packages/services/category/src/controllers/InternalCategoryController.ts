@@ -1,4 +1,4 @@
-import { categoryInternal } from '@pika/api'
+import { categoryCommon, categoryInternal } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -31,8 +31,8 @@ export class InternalCategoryController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getCategoryById(
-    req: Request<{ id: string }>,
-    res: Response,
+    req: Request<categoryCommon.CategoryIdParam>,
+    res: Response<categoryInternal.InternalCategoryData>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -41,7 +41,11 @@ export class InternalCategoryController {
       const category = await this.categoryService.getCategoryById(id)
 
       // Return minimal data for internal use
-      res.json(CategoryMapper.toInternalDTO(category))
+      const response = CategoryMapper.toInternalDTO(category)
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryInternal.InternalCategoryData.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -58,20 +62,26 @@ export class InternalCategoryController {
   })
   async getCategoriesByIds(
     req: Request<{}, {}, categoryInternal.BulkCategoryRequest>,
-    res: Response,
+    res: Response<categoryInternal.BulkCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { categoryIds } = req.body
 
-      const categories =
+      const result =
         await this.categoryService.getCategoriesByIds(categoryIds)
 
-      res.json({
-        data: categories.map((category) =>
+      // Transform to DTOs using pagination structure
+      const response = {
+        data: result.data.map((category) =>
           CategoryMapper.toInternalDTO(category),
         ),
-      })
+        pagination: result.pagination,
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryInternal.BulkCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -119,10 +129,15 @@ export class InternalCategoryController {
 
       const allValid = validationResults.every((result) => result.valid)
 
-      res.json({
+      // Create response
+      const response = {
         valid: allValid,
         results: validationResults,
-      })
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryInternal.ValidateCategoryResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -139,7 +154,7 @@ export class InternalCategoryController {
   })
   async getActiveCategoriesOnly(
     req: Request,
-    res: Response,
+    res: Response<categoryInternal.InternalCategoryListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -153,12 +168,17 @@ export class InternalCategoryController {
 
       const result = await this.categoryService.getAllCategories(params)
 
-      res.json({
+      // Transform to DTOs with pagination
+      const response = {
         data: result.data.map((category) =>
           CategoryMapper.toInternalDTO(category),
         ),
-        total: result.pagination.total,
-      })
+        pagination: result.pagination,
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -175,7 +195,7 @@ export class InternalCategoryController {
   })
   async getAllCategories(
     req: Request,
-    res: Response,
+    res: Response<categoryInternal.InternalCategoryListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -192,12 +212,17 @@ export class InternalCategoryController {
 
       const result = await this.categoryService.getAllCategories(params)
 
-      res.json({
+      // Transform to DTOs with pagination
+      const response = {
         data: result.data.map((category) =>
           CategoryMapper.toInternalDTO(category),
         ),
-        total: result.pagination.total,
-      })
+        pagination: result.pagination,
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -214,17 +239,22 @@ export class InternalCategoryController {
   })
   async getCategoryHierarchy(
     req: Request,
-    res: Response,
+    res: Response<categoryInternal.InternalCategoryHierarchyResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const categories = await this.categoryService.getCategoryHierarchy()
 
-      res.json({
+      // Transform to DTOs
+      const response = {
         data: categories.map((category) =>
           CategoryMapper.toInternalDTO(category),
         ),
-      })
+      }
+      
+      // Validate response against Zod schema
+      const validatedResponse = categoryInternal.InternalCategoryHierarchyResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

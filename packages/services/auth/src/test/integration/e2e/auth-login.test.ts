@@ -21,6 +21,7 @@ import {
   createE2EAuthHelper,
   E2EAuthHelper,
 } from '@pika/tests'
+import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -120,10 +121,6 @@ describe('Auth Login Integration Tests', () => {
           password: 'Password123!',
         })
         .set('Accept', 'application/json')
-
-      if (response.status !== 200) {
-        console.log('Response error:', JSON.stringify(response.body, null, 2))
-      }
 
       expect(response.status).toBe(200)
 

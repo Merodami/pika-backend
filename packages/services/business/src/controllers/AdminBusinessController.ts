@@ -37,7 +37,7 @@ export class AdminBusinessController {
   })
   async getAllBusinesses(
     req: Request,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -64,10 +64,14 @@ export class AdminBusinessController {
       const result = await this.businessService.getAllBusinesses(params)
 
       // Convert to DTOs
-      res.json({
+      const response = {
         data: result.data.map((business) => BusinessMapper.toDTO(business)),
         pagination: result.pagination,
-      })
+      }
+
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessListResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -84,7 +88,7 @@ export class AdminBusinessController {
   })
   async getBusinessById(
     req: Request<businessPublic.BusinessPathParams>,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -99,7 +103,12 @@ export class AdminBusinessController {
         includes,
       )
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -111,7 +120,7 @@ export class AdminBusinessController {
    */
   async createBusiness(
     req: Request<{}, {}, businessAdmin.CreateBusinessRequest>,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -126,9 +135,12 @@ export class AdminBusinessController {
         active: data.active,
       })
 
-      const dto = BusinessMapper.toDTO(business)
-
-      res.status(201).json(dto)
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -144,7 +156,7 @@ export class AdminBusinessController {
       {},
       businessAdmin.UpdateBusinessRequest
     >,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -156,7 +168,12 @@ export class AdminBusinessController {
         data,
       )
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -168,7 +185,7 @@ export class AdminBusinessController {
    */
   async deleteBusiness(
     req: Request<businessPublic.BusinessPathParams>,
-    res: Response,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -176,6 +193,7 @@ export class AdminBusinessController {
 
       await this.businessService.deleteBusiness(businessId)
 
+      // No content response - no validation needed
       res.status(204).send()
     } catch (error) {
       next(error)
@@ -192,7 +210,7 @@ export class AdminBusinessController {
       {},
       businessAdmin.ToggleBusinessVerificationRequest
     >,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -203,7 +221,12 @@ export class AdminBusinessController {
         verified,
       })
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -215,7 +238,7 @@ export class AdminBusinessController {
    */
   async deactivateBusiness(
     req: Request<businessPublic.BusinessPathParams>,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -223,7 +246,12 @@ export class AdminBusinessController {
 
       const business = await this.businessService.deactivateBusiness(businessId)
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -235,7 +263,7 @@ export class AdminBusinessController {
    */
   async activateBusiness(
     req: Request<businessPublic.BusinessPathParams>,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -245,7 +273,12 @@ export class AdminBusinessController {
         active: true,
       })
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -261,7 +294,7 @@ export class AdminBusinessController {
       {},
       businessAdmin.UpdateBusinessRatingRequest
     >,
-    res: Response,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -273,7 +306,12 @@ export class AdminBusinessController {
         rating,
       )
 
-      res.json(BusinessMapper.toDTO(business))
+      // Transform to DTO
+      const response = BusinessMapper.toDTO(business)
+      
+      // Validate response against Zod schema
+      const validatedResponse = businessAdmin.AdminBusinessResponse.parse(response)
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

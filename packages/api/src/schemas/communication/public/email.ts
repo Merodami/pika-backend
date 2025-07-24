@@ -13,6 +13,7 @@ import {
   EmailSortBy,
   EmailStatus,
 } from '../common/enums.js'
+import { CommunicationLog } from './communicationLog.js'
 
 /**
  * Email communication schemas for public API
@@ -188,18 +189,10 @@ export type SendBulkEmailRequest = z.infer<typeof SendBulkEmailRequest>
  */
 export const SendBulkEmailResponse = openapi(
   z.object({
-    batchId: z.string(),
-    totalRecipients: z.number().int().nonnegative(),
-    queued: z.number().int().nonnegative(),
+    sent: z.number().int().nonnegative(),
     failed: z.number().int().nonnegative(),
-    failures: z
-      .array(
-        z.object({
-          email: EmailAddress,
-          reason: z.string(),
-        }),
-      )
-      .optional(),
+    total: z.number().int().nonnegative(),
+    logs: z.array(CommunicationLog),
   }),
   {
     description: 'Bulk email send result',

@@ -80,6 +80,13 @@ export const CommunicationLog = openapi(
 
 export type CommunicationLog = z.infer<typeof CommunicationLog>
 
+/**
+ * Single communication log response
+ */
+export const CommunicationLogResponse = CommunicationLog
+
+export type CommunicationLogResponse = z.infer<typeof CommunicationLogResponse>
+
 // ============= Log Entry Creation =============
 
 /**
