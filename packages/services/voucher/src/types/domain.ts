@@ -196,7 +196,7 @@ export interface BatchTokenGenerationRequest {
 
 // ============= Voucher Book Types =============
 
-export type VoucherBookStatus = 
+export type VoucherBookStatus =
   | 'draft'
   | 'ready_for_print'
   | 'published'

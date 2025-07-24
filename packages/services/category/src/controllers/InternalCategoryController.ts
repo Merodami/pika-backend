@@ -74,7 +74,8 @@ export class InternalCategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
-      const validatedResponse = categoryInternal.BulkCategoryResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.BulkCategoryResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {
@@ -167,7 +168,8 @@ export class InternalCategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
-      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.InternalCategoryListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {
@@ -205,7 +207,8 @@ export class InternalCategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
-      const validatedResponse = categoryInternal.InternalCategoryListResponse.parse(response)
+      const validatedResponse =
+        categoryInternal.InternalCategoryListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

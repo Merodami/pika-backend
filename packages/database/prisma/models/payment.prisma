@@ -3,7 +3,7 @@ model Subscription {
   id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId               String    @map("user_id") @db.Uuid
   planId               String?   @map("plan_id") @db.Uuid
-  status               SubscriptionStatus @default(ACTIVE)
+  status               SubscriptionStatus @default(active)
   currentPeriodStart   DateTime? @map("current_period_start") @db.Timestamptz(6)
   currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
   trialEnd             DateTime? @map("trial_end") @db.Timestamptz(6)

@@ -33,16 +33,6 @@ export interface VoucherBookDTO {
 }
 
 export interface VoucherBookDetailDTO extends VoucherBookDTO {
-  createdBy?: {
-    id: string
-    email: string
-    name: string
-  }
-  updatedBy?: {
-    id: string
-    email: string
-    name: string
-  }
   statistics?: {
     totalPages: number
     pagesWithPlacements: number
@@ -211,34 +201,17 @@ export class VoucherBookMapper {
   }
 
   /**
-   * Convert database entity to detailed DTO
+   * Convert domain entity to detailed DTO
    */
-  static toDTO(
-    voucherBook: VoucherBook & {
-      createdByUser?: {
-        id: string
-        email: string
-        firstName: string
-        lastName: string
-      } | null
-      updatedByUser?: {
-        id: string
-        email: string
-        firstName: string
-        lastName: string
-      } | null
-      pages?: Array<{ adPlacements?: Array<any> }>
-      distributions?: Array<{ status: string }>
-    },
-  ): VoucherBookDetailDTO {
+  static toDTO(voucherBook: VoucherBookDomain): VoucherBookDetailDTO {
     const dto: VoucherBookDetailDTO = {
       id: voucherBook.id,
       title: voucherBook.title,
       edition: voucherBook.edition,
-      bookType: voucherBook.bookType,
+      bookType: voucherBook.bookType as VoucherBookType,
       month: voucherBook.month,
       year: voucherBook.year,
-      status: voucherBook.status,
+      status: voucherBook.status as VoucherBookStatus,
       totalPages: voucherBook.totalPages,
       publishedAt: voucherBook.publishedAt?.toISOString() || null,
       coverImageUrl: voucherBook.coverImageUrl,
@@ -251,24 +224,6 @@ export class VoucherBookMapper {
       createdAt: voucherBook.createdAt.toISOString(),
       updatedAt: voucherBook.updatedAt.toISOString(),
       deletedAt: voucherBook.deletedAt?.toISOString() || null,
-    }
-
-    // Add creator info if available
-    if (voucherBook.createdByUser) {
-      dto.createdBy = {
-        id: voucherBook.createdByUser.id,
-        email: voucherBook.createdByUser.email,
-        name: `${voucherBook.createdByUser.firstName} ${voucherBook.createdByUser.lastName}`,
-      }
-    }
-
-    // Add updater info if available
-    if (voucherBook.updatedByUser) {
-      dto.updatedBy = {
-        id: voucherBook.updatedByUser.id,
-        email: voucherBook.updatedByUser.email,
-        name: `${voucherBook.updatedByUser.firstName} ${voucherBook.updatedByUser.lastName}`,
-      }
     }
 
     // Add statistics if relations are loaded

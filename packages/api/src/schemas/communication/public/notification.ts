@@ -318,4 +318,6 @@ export const DeleteNotificationResponse = openapi(
   },
 )
 
-export type DeleteNotificationResponse = z.infer<typeof DeleteNotificationResponse>
+export type DeleteNotificationResponse = z.infer<
+  typeof DeleteNotificationResponse
+>

@@ -21,11 +21,7 @@ export async function createSupportServer(config: ServerConfig) {
     port: config.port,
     cacheService: config.cacheService,
     authOptions: {
-      excludePaths: [
-        '/health',
-        '/metrics',
-        '/internal/*',
-      ],
+      excludePaths: ['/health', '/metrics', '/internal/*'],
     },
     healthChecks: [
       {

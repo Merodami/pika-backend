@@ -1,8 +1,4 @@
-import {
-  ECDSAService,
-  type JWTConfig,
-  VoucherQRService,
-} from '@pika/crypto'
+import { ECDSAService, type JWTConfig, VoucherQRService } from '@pika/crypto'
 import { JWT_ISSUER } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
 
@@ -69,6 +65,7 @@ export class VoucherSecurityService {
    */
   private async getPrivateKey(): Promise<string> {
     await this.initialize()
+
     return this.keyPair!.privateKey
   }
 
@@ -77,6 +74,7 @@ export class VoucherSecurityService {
    */
   async getPublicKey(): Promise<string> {
     await this.initialize()
+
     return this.keyPair!.publicKey
   }
 
@@ -146,6 +144,7 @@ export class VoucherSecurityService {
           ...voucher,
           batchId: finalBatchId,
         })
+
         return tokenData
       })
 
@@ -197,6 +196,7 @@ export class VoucherSecurityService {
       return { valid: false }
     } catch (error) {
       logger.error('Failed to verify voucher token', { error })
+
       return { valid: false }
     }
   }

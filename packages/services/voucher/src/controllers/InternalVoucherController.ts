@@ -32,7 +32,8 @@ export class InternalVoucherController {
     // Voucher book endpoints
     this.getVouchersForBook = this.getVouchersForBook.bind(this)
     this.generateVoucherTokens = this.generateVoucherTokens.bind(this)
-    this.validateBookStateTransition = this.validateBookStateTransition.bind(this)
+    this.validateBookStateTransition =
+      this.validateBookStateTransition.bind(this)
   }
 
   /**
@@ -48,25 +49,27 @@ export class InternalVoucherController {
       const { voucherIds, include } = req.body
 
       const parsedIncludes = include ? parseIncludeParam(include) : undefined
-      
+
       // Get paginated result from service (following Repository Pagination Pattern)
       const result = await this.internalVoucherService.getVouchersByIds(
         voucherIds,
         parsedIncludes,
       )
-      
+
       const notFound = voucherIds.filter(
         (id) => !result.data.find((v) => v.id === id),
       )
 
       // Controller uses service result directly (lines 387-400 pattern)
       const response = {
-        data: result.data.map(VoucherMapper.toInternalDTO), // Use toInternalDTO for internal tier
+        data: result.data.map(VoucherMapper.toDTO), // Use regular toDTO like business service pattern
         pagination: result.pagination, // Pass through pagination
         notFound, // Additional bulk-specific field
       }
-      
-      const validatedResponse = voucherInternal.GetVouchersByIdsResponse.parse(response)
+
+      const validatedResponse =
+        voucherInternal.GetVouchersByIdsResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -109,7 +112,9 @@ export class InternalVoucherController {
           ? VoucherMapper.toAdminDTO(validation.voucher)
           : undefined,
       }
-      const validatedResponse = voucherInternal.ValidateVoucherResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.ValidateVoucherResponse.parse(responseData)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -151,7 +156,9 @@ export class InternalVoucherController {
         previousState,
         newState: updatedVoucher.state,
       }
-      const validatedResponse = voucherInternal.InternalUpdateVoucherStateResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.InternalUpdateVoucherStateResponse.parse(responseData)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -180,7 +187,9 @@ export class InternalVoucherController {
         exists: exists.exists,
         voucherId: exists.voucherId,
       }
-      const validatedResponse = voucherInternal.CheckVoucherExistsResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.CheckVoucherExistsResponse.parse(responseData)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -217,7 +226,9 @@ export class InternalVoucherController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, VoucherMapper.toAdminDTO)
-      const validatedResponse = voucherInternal.GetVouchersByBusinessResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.GetVouchersByBusinessResponse.parse(responseData)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -252,7 +263,9 @@ export class InternalVoucherController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, VoucherMapper.toAdminDTO)
-      const validatedResponse = voucherInternal.GetVouchersByCategoryResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.GetVouchersByCategoryResponse.parse(responseData)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -281,8 +294,13 @@ export class InternalVoucherController {
       const result = await this.internalVoucherService.getUserVouchers(params)
 
       // Use paginatedResponse utility + validation
-      const responseData = paginatedResponse(result, VoucherMapper.toUserVoucherDTO)
-      const validatedResponse = voucherInternal.GetUserVouchersResponse.parse(responseData)
+      const responseData = paginatedResponse(
+        result,
+        VoucherMapper.toUserVoucherDTO,
+      )
+      const validatedResponse =
+        voucherInternal.GetUserVouchersResponse.parse(responseData)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -315,7 +333,9 @@ export class InternalVoucherController {
         currentRedemptions: result.currentRedemptions,
         maxRedemptions: result.maxRedemptions ?? null,
       }
-      const validatedResponse = voucherInternal.TrackRedemptionResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.TrackRedemptionResponse.parse(responseData)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -355,7 +375,9 @@ export class InternalVoucherController {
         })),
         processingTime: 0, // The internal service doesn't track this, but we need it for API compatibility
       }
-      const validatedResponse = voucherInternal.BatchVoucherProcessResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.BatchVoucherProcessResponse.parse(responseData)
+
       res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -418,7 +440,9 @@ export class InternalVoucherController {
         total: updates.length,
         updates: updateResults,
       }
-      const validatedResponse = voucherInternal.BatchUpdateVoucherStateResponse.parse(responseData)
+      const validatedResponse =
+        voucherInternal.BatchUpdateVoucherStateResponse.parse(responseData)
+
       res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -447,18 +471,22 @@ export class InternalVoucherController {
       // Generate security tokens in batch for better performance
       const batchId = `book-${year}-${month}`
       const tokenRequest = {
-        vouchers: vouchers.map(v => ({
+        vouchers: vouchers.map((v) => ({
           voucherId: v.id,
           providerId: v.businessId,
         })),
         batchId,
       }
 
-      const tokensMap = await this.internalVoucherService.generateBatchVoucherTokens(tokenRequest)
+      const tokensMap =
+        await this.internalVoucherService.generateBatchVoucherTokens(
+          tokenRequest,
+        )
 
       // Merge tokens with voucher data
-      const vouchersWithTokens = vouchers.map(voucher => {
+      const vouchersWithTokens = vouchers.map((voucher) => {
         const tokenData = tokensMap.get(voucher.id)
+
         return {
           ...voucher,
           qrPayload: tokenData?.qrPayload || '',
@@ -471,7 +499,9 @@ export class InternalVoucherController {
         count: vouchersWithTokens.length,
       }
 
-      const validatedResponse = voucherInternal.GetVouchersForBookResponse.parse(response)
+      const validatedResponse =
+        voucherInternal.GetVouchersForBookResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -490,25 +520,30 @@ export class InternalVoucherController {
     try {
       const { vouchers, batchId } = req.body
 
-      const tokens = await this.internalVoucherService.generateBatchVoucherTokens({
-        vouchers,
-        batchId,
-      })
+      const tokens =
+        await this.internalVoucherService.generateBatchVoucherTokens({
+          vouchers,
+          batchId,
+        })
 
       // Convert Map to array format for response
-      const tokenArray = Array.from(tokens.entries()).map(([voucherId, tokenData]) => ({
-        voucherId,
-        qrPayload: tokenData.qrPayload,
-        shortCode: tokenData.shortCode,
-        batchId: tokenData.batchId,
-      }))
+      const tokenArray = Array.from(tokens.entries()).map(
+        ([voucherId, tokenData]) => ({
+          voucherId,
+          qrPayload: tokenData.qrPayload,
+          shortCode: tokenData.shortCode,
+          batchId: tokenData.batchId,
+        }),
+      )
 
       const response = {
         tokens: tokenArray,
         count: tokenArray.length,
       }
 
-      const validatedResponse = voucherInternal.GenerateVoucherTokensResponse.parse(response)
+      const validatedResponse =
+        voucherInternal.GenerateVoucherTokensResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -532,7 +567,9 @@ export class InternalVoucherController {
         newStatus,
       )
 
-      const validatedResponse = voucherInternal.ValidateBookStateTransitionResponse.parse(result)
+      const validatedResponse =
+        voucherInternal.ValidateBookStateTransitionResponse.parse(result)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

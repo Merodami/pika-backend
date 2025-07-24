@@ -149,7 +149,7 @@ export const AdminVoucherSortBySchema = openapi(AdminVoucherSortBy, {
 // User voucher sort fields (for user voucher queries)
 export const UserVoucherSortBy = z.enum([
   'claimedAt',
-  'redeemedAt', 
+  'redeemedAt',
   'expiresAt',
   'createdAt',
 ])
@@ -164,7 +164,7 @@ export const UserVoucherSortBySchema = openapi(UserVoucherSortBy, {
 // Batch operation types for internal API
 export const BatchOperationType = z.enum([
   'publish',
-  'expire', 
+  'expire',
   'validate',
   'refresh',
   'activate',
@@ -180,7 +180,7 @@ export const BatchOperationTypeSchema = openapi(BatchOperationType, {
 // User voucher status with 'all' option for filtering
 export const UserVoucherStatusFilter = z.enum([
   'claimed',
-  'redeemed', 
+  'redeemed',
   'expired',
   'all',
 ])

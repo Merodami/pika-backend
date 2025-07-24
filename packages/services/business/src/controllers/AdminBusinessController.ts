@@ -65,7 +65,8 @@ export class AdminBusinessController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
-      const validatedResponse = businessAdmin.AdminBusinessListResponse.parse(response)
+      const validatedResponse =
+        businessAdmin.AdminBusinessListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

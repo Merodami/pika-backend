@@ -3,9 +3,9 @@
  *
  * This controller is prepared for future admin endpoints but not currently used.
  * Admin functionality is excluded from current implementation to focus on core features.
- * 
+ *
  * NOTE: Entire file commented out to prevent lint/TypeScript errors until admin schemas are implemented
- * 
+ *
  * TODO: Uncomment when admin routes are needed
  */
 

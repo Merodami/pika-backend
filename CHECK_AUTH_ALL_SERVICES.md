@@ -17,9 +17,11 @@ This document analyzes the authentication and authorization implementation acros
 ## Service-by-Service Analysis
 
 ### 1. Auth Service ✅ COMPLIANT
+
 **File**: `packages/services/auth/src/server.ts`
 
 **Configuration**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -40,9 +42,11 @@ authOptions: {
 **✅ COMPLIANT**: Correctly excludes only authentication endpoints and health/metrics. Uses `skipAuthRegistration: true` for auth service.
 
 ### 2. Business Service ❌ NON-COMPLIANT
+
 **File**: `packages/services/business/src/server.ts`
 
 **Configuration**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -54,6 +58,7 @@ authOptions: {
 ```
 
 **Routes Analysis**:
+
 - **✅ Public Routes**: `/businesses` routes correctly use `requireAuth()` + `requirePermissions()`
 - **✅ Admin Routes**: `/admin/businesses` routes correctly protected
 - **✅ Internal Routes**: `/internal/businesses` correctly excluded
@@ -61,9 +66,11 @@ authOptions: {
 **✅ COMPLIANT**: Business service correctly implements the architecture.
 
 ### 3. Category Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/category/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -75,19 +82,23 @@ authOptions: {
 ```
 
 **Route Analysis**:
+
 - **✅ Public Routes**: `/categories` routes now properly use `requireAuth()` middleware
 - **✅ Admin Routes**: `/admin/categories` correctly use `requirePermissions('admin:categories')`
 - **✅ Internal Routes**: `/internal/categories` correctly excluded
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Removed `/categories` and `/categories/*` from excludePaths
 2. ✅ Added `requireAuth()` middleware to all public category routes
 3. ✅ Categories now available to all authenticated users (Zero Trust compliant)
 
 ### 4. Communication Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/communication/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -99,17 +110,21 @@ authOptions: {
 ```
 
 **Route Analysis**:
+
 - **✅ Public Routes**: `/emails` and `/notifications` routes properly require authentication
 - **✅ Internal Routes**: `/internal/*` correctly excluded
 - **✅ Infrastructure Routes**: Health and metrics properly excluded
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Added `/health` and `/metrics` to excludePaths
 
 ### 5. User Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/user/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -121,16 +136,20 @@ authOptions: {
 ```
 
 **Route Analysis**:
+
 - **✅ Routes**: User routes correctly implement role-based and permission-based checks
 - **✅ Configuration**: Now has proper excludePaths for health, metrics, and internal routes
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Added authOptions with proper excludePaths configuration
 
 ### 6. Payment Service ✅ COMPLIANT (ENHANCED)
+
 **File**: `packages/services/payment/src/server.ts`
 
 **✅ ENHANCED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -144,12 +163,15 @@ authOptions: {
 **✅ COMPLIANT**: Correctly implements webhook architecture pattern.
 
 **✅ ENHANCEMENTS IMPLEMENTED**:
+
 1. ✅ Added `/health` and `/metrics` to excludePaths for completeness
 
 ### 7. Subscription Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/subscription/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -161,12 +183,15 @@ authOptions: {
 ```
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Added authOptions with proper excludePaths configuration
 
 ### 8. Voucher Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/voucher/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -178,16 +203,20 @@ authOptions: {
 ```
 
 **Route Analysis**:
+
 - **✅ Routes**: Voucher routes correctly use authentication middleware
 - **✅ Configuration**: Now has proper excludePaths
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Added authOptions configuration with proper excludePaths
 
 ### 9. Storage Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/storage/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -199,12 +228,15 @@ authOptions: {
 ```
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Added authOptions configuration with proper excludePaths
 
 ### 10. PDF Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/pdf/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -218,14 +250,17 @@ authOptions: {
 **✅ ZERO TRUST COMPLIANCE**: Public voucher book endpoints now require authentication.
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Removed `/voucher-books*` from excludePaths
 2. ✅ Added `requireAuth()` middleware to all voucher book public routes
 3. ✅ Now complies with Zero Trust Security Model
 
 ### 11. Support Service ✅ COMPLIANT (FIXED)
+
 **File**: `packages/services/support/src/server.ts`
 
 **✅ FIXED CONFIGURATION**:
+
 ```typescript
 authOptions: {
   excludePaths: [
@@ -237,6 +272,7 @@ authOptions: {
 ```
 
 **✅ FIXES IMPLEMENTED**:
+
 1. ✅ Added authOptions configuration with proper excludePaths
 
 ## Route-Level Authentication Analysis
@@ -244,27 +280,32 @@ authOptions: {
 ### ✅ COMPLIANT PATTERNS FOUND:
 
 **Business Service Routes** (`packages/services/business/src/routes/BusinessRoutes.ts`):
+
 ```typescript
 // ✅ PERFECT IMPLEMENTATION
-router.get('/',
-  requireAuth(),                              // Layer 1: JWT validation
+router.get(
+  '/',
+  requireAuth(), // Layer 1: JWT validation
   validateQuery(businessPublic.BusinessQueryParams), // Layer 2: Schema validation
-  controller.getAllBusinesses,               // Layer 3: Business logic
+  controller.getAllBusinesses, // Layer 3: Business logic
 )
 
-router.get('/me',
-  requireAuth(),                              // Layer 1: JWT validation
-  requirePermissions('businesses:read:own'),  // Layer 2: Permission check
+router.get(
+  '/me',
+  requireAuth(), // Layer 1: JWT validation
+  requirePermissions('businesses:read:own'), // Layer 2: Permission check
   validateQuery(businessPublic.BusinessDetailQueryParams), // Layer 3: Schema validation
-  controller.getMyBusiness,                   // Layer 4: Business logic + ownership
+  controller.getMyBusiness, // Layer 4: Business logic + ownership
 )
 ```
 
 **Admin Category Routes** (`packages/services/category/src/routes/AdminCategoryRoutes.ts`):
+
 ```typescript
 // ✅ CORRECT ADMIN PATTERN
-router.get('/',
-  requirePermissions('admin:categories'),     // Permission-based check
+router.get(
+  '/',
+  requirePermissions('admin:categories'), // Permission-based check
   validateQuery(categoryAdmin.AdminCategoryQueryParams),
   adminCategoryController.getAllCategories,
 )
@@ -273,20 +314,24 @@ router.get('/',
 ### ✅ PREVIOUSLY NON-COMPLIANT PATTERNS (NOW FIXED):
 
 **Category Public Routes** (`packages/services/category/src/routes/CategoryRoutes.ts`):
+
 ```typescript
 // ✅ NOW COMPLIANT - ZERO TRUST IMPLEMENTED
-router.get('/',
-  requireAuth(),                                    // ✅ FIXED: JWT authentication required
+router.get(
+  '/',
+  requireAuth(), // ✅ FIXED: JWT authentication required
   validateQuery(categoryPublic.CategoryQueryParams),
   categoryController.getAllCategories,
 )
 ```
 
 **User Routes** (`packages/services/user/src/routes/UserRoutes.ts`):
+
 ```typescript
 // ⚠️ USES ROLE-BASED INSTEAD OF PERMISSION-BASED (should use requirePermissions)
-router.get('/',
-  requireAdmin(),    // ⚠️ Should be requirePermissions('users:read:all')
+router.get(
+  '/',
+  requireAdmin(), // ⚠️ Should be requirePermissions('users:read:all')
   validateQuery(userAdmin.AdminUserQueryParams),
   controller.getAllUsers,
 )
@@ -297,6 +342,7 @@ router.get('/',
 ### ✅ COMPLIANT PATTERNS:
 
 **Business Controller** (`packages/services/business/src/controllers/BusinessController.ts`):
+
 ```typescript
 // ✅ CORRECT CONTEXT USAGE
 const context = RequestContext.getContext(req)
@@ -316,6 +362,7 @@ const data = {
 ### ❌ NON-COMPLIANT PATTERNS:
 
 **Category Controller** (`packages/services/category/src/controllers/CategoryController.ts`):
+
 ```typescript
 // ❌ NO AUTHENTICATION CONTEXT USAGE
 async getAllCategories(req: Request, res: Response, next: NextFunction) {
@@ -327,23 +374,28 @@ async getAllCategories(req: Request, res: Response, next: NextFunction) {
 ## Permission System Analysis
 
 ### ✅ FOUND PROPER PERMISSIONS:
+
 - `'admin:categories'` in Category Admin routes
 - `'businesses:read:own'`, `'businesses:write:own'` in Business routes
 
 ### ❌ MISSING PERMISSION DEFINITIONS:
+
 Based on the architecture, services should implement these permissions:
 
 **Category Service**:
+
 - `'categories:read:all'` (for public access)
 - `'categories:write:all'` (for admin)
 - `'categories:manage:all'` (for admin)
 
 **User Service**:
+
 - `'users:read:all'` (instead of requireAdmin())
 - `'users:write:all'` (instead of requireAdmin())
 - `'users:manage:all'` (instead of requireAdmin())
 
 **Voucher Service**:
+
 - `'vouchers:read:all'`
 - `'vouchers:read:own'`
 - `'vouchers:write:own'`
@@ -401,18 +453,21 @@ Based on the architecture, services should implement these permissions:
 ## Compliance Checklist
 
 ### Server Configuration:
+
 - [x] ✅ JWT validation enabled for all routes except health/metrics/internal (ALL SERVICES NOW COMPLIANT)
 - [x] ✅ Internal routes use API key authentication
 - [x] ✅ Proper CORS and security headers configured
 - [x] ✅ Rate limiting and request size limits applied
 
 ### Route Configuration:
+
 - [x] ✅ `requireAuth()` middleware on all public routes (Category and PDF services FIXED)
 - [ ] ⚠️ `requirePermissions()` middleware on owner/admin routes (several services using role-based - FUTURE ENHANCEMENT)
 - [x] ✅ Schema validation middleware on all routes
 - [x] ✅ Proper middleware ordering (auth → permissions → validation → controller)
 
 ### Controller Implementation:
+
 - [ ] ⚠️ `RequestContext.getContext()` used for user information (some controllers missing - FUTURE ENHANCEMENT)
 - [x] ✅ Role validation in business logic
 - [x] ✅ Ownership enforcement through user context injection
@@ -420,12 +475,14 @@ Based on the architecture, services should implement these permissions:
 - [x] ✅ Proper error handling with correlation IDs
 
 ### Permission System:
+
 - [ ] ⚠️ Permissions follow `resource:action:scope` format (partially implemented - FUTURE ENHANCEMENT)
 - [ ] ⚠️ Role-to-permission mapping implemented (needs expansion - FUTURE ENHANCEMENT)
 - [ ] ⚠️ Permission validation in routes and controllers (mixed implementation - FUTURE ENHANCEMENT)
 - [ ] ⚠️ Clear documentation of required permissions (missing - FUTURE ENHANCEMENT)
 
 ### Testing:
+
 - [ ] ⚠️ Authentication failure tests (401 responses) - needs verification
 - [ ] ⚠️ Authorization failure tests (403 responses) - needs verification
 - [ ] ⚠️ Cross-user access prevention tests - needs verification

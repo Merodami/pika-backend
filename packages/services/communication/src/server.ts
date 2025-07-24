@@ -100,7 +100,7 @@ export async function createCommunicationServer(config: ServerConfig) {
 
   // TODO: Add admin routes when needed (currently excluded per directive)
   // app.use('/admin', createAdminRouter(config.prisma, config.cacheService, config.emailConfig))
-  
+
   // TODO: Add more routes when implemented
   // app.use('/sms', createSmsRouter(config.prisma, config.cacheService))
 

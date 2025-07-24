@@ -112,7 +112,9 @@ export class ProblemMapper {
       type: domain.type,
       status: domain.status,
       priority: domain.priority,
-      resolvedAt: domain.resolvedAt ? domain.resolvedAt.toISOString() : undefined,
+      resolvedAt: domain.resolvedAt
+        ? domain.resolvedAt.toISOString()
+        : undefined,
       assignedTo: domain.assignedTo || undefined,
       assignedToName: domain.assignedUser
         ? `${domain.assignedUser.firstName} ${domain.assignedUser.lastName}`

@@ -1,5 +1,5 @@
 import { paymentPublic } from '@pika/api'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery } from '@pika/http'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 

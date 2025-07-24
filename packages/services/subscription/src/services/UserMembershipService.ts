@@ -33,7 +33,7 @@ export class UserMembershipService implements IUserMembershipService {
         where: {
           userId,
           status: {
-            in: ['ACTIVE', 'TRIALING'],
+            in: ['active', 'trialing'],
           },
         },
         include: {
@@ -90,7 +90,7 @@ export class UserMembershipService implements IUserMembershipService {
     // Check if subscription is active
     const status = subscription.status as string
 
-    if (status !== 'ACTIVE' && status !== 'TRIALING') {
+    if (status !== 'active' && status !== 'trialing') {
       return false
     }
 

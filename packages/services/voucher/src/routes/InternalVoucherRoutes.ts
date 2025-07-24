@@ -105,7 +105,7 @@ export function createInternalVoucherRoutes(
   )
 
   // ============= Voucher Book Routes =============
-  
+
   // POST /internal/vouchers/for-book - Get vouchers for book generation
   router.post(
     '/for-book',

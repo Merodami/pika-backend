@@ -74,51 +74,43 @@ export type VoucherResponse = z.infer<typeof VoucherResponse>
 // ============= Search Vouchers =============
 
 export const VoucherQueryParams = SearchParams.extend({
-    // Filter parameters (from pika-old VoucherSearchQuerySchema)
-    businessId: UUID.optional().describe('Filter by business ID'),
-    categoryId: UUID.optional().describe('Filter by category ID'),
-    state: VoucherStateSchema.optional().describe('Filter by voucher state'),
-    discountType: VoucherDiscountTypeSchema.optional().describe(
-      'Filter by discount type',
-    ),
-    minDiscount: z
-      .number()
-      .min(0)
-      .optional()
-      .describe('Minimum discount value'),
-    maxDiscount: z
-      .number()
-      .min(0)
-      .optional()
-      .describe('Maximum discount value'),
-    minValue: z.number().min(0).optional().describe('Minimum voucher value'),
-    maxValue: z.number().min(0).optional().describe('Maximum voucher value'),
-    type: z.string().optional().describe('Voucher type filter'),
-    currency: z.string().optional().describe('Filter by currency'),
-    validFrom: z
-      .string()
-      .datetime()
-      .optional()
-      .describe('Valid from date filter'),
-    validUntil: z
-      .string()
-      .datetime()
-      .optional()
-      .describe('Valid until date filter'),
-    include: z
-      .string()
-      .optional()
-      .describe('Comma-separated relations to include'),
+  // Filter parameters (from pika-old VoucherSearchQuerySchema)
+  businessId: UUID.optional().describe('Filter by business ID'),
+  categoryId: UUID.optional().describe('Filter by category ID'),
+  state: VoucherStateSchema.optional().describe('Filter by voucher state'),
+  discountType: VoucherDiscountTypeSchema.optional().describe(
+    'Filter by discount type',
+  ),
+  minDiscount: z.number().min(0).optional().describe('Minimum discount value'),
+  maxDiscount: z.number().min(0).optional().describe('Maximum discount value'),
+  minValue: z.number().min(0).optional().describe('Minimum voucher value'),
+  maxValue: z.number().min(0).optional().describe('Maximum voucher value'),
+  type: z.string().optional().describe('Voucher type filter'),
+  currency: z.string().optional().describe('Filter by currency'),
+  validFrom: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('Valid from date filter'),
+  validUntil: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('Valid until date filter'),
+  include: z
+    .string()
+    .optional()
+    .describe('Comma-separated relations to include'),
 
-    // Additional public filters
-    hasAvailableUses: z
-      .boolean()
-      .optional()
-      .describe('Filter vouchers with available uses'),
+  // Additional public filters
+  hasAvailableUses: z
+    .boolean()
+    .optional()
+    .describe('Filter vouchers with available uses'),
 
-    // Override default sorting with voucher-specific sort fields
-    sortBy: VoucherSortBy.default('createdAt'),
-  })
+  // Override default sorting with voucher-specific sort fields
+  sortBy: VoucherSortBy.default('createdAt'),
+})
   .merge(GeographicSearchParams)
   .merge(VoucherFilterParams)
 

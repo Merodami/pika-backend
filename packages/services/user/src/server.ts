@@ -34,11 +34,7 @@ export async function createUserServer({
     port: USER_SERVICE_PORT,
     cacheService,
     authOptions: {
-      excludePaths: [
-        '/health',
-        '/metrics',
-        '/internal/*',
-      ],
+      excludePaths: ['/health', '/metrics', '/internal/*'],
     },
     idempotencyOptions: {
       enabled: true,

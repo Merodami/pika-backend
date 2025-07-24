@@ -4,7 +4,10 @@ import type { ICacheService } from '@pika/redis'
 import { logger, PaymentServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
-import { createAdminSubscriptionRoutes, createAdminPlanRoutes } from './routes/AdminSubscriptionRoutes.js'
+import {
+  createAdminPlanRoutes,
+  createAdminSubscriptionRoutes,
+} from './routes/AdminSubscriptionRoutes.js'
 import { createInternalSubscriptionRouter } from './routes/InternalSubscriptionRoutes.js'
 import { createPlanRouter } from './routes/PlanRoutes.js'
 import { createPublicSubscriptionRoutes } from './routes/PublicSubscriptionRoutes.js'
@@ -21,11 +24,7 @@ export async function createSubscriptionServer(config: ServerConfig) {
     port: SUBSCRIPTION_SERVICE_PORT,
     cacheService: config.cacheService,
     authOptions: {
-      excludePaths: [
-        '/health',
-        '/metrics',
-        '/internal/*',
-      ],
+      excludePaths: ['/health', '/metrics', '/internal/*'],
     },
     healthChecks: [
       {

@@ -13,6 +13,7 @@ import type { CommunicationLogSearchParams } from '../repositories/Communication
 import type { NotificationSearchParams } from '../repositories/NotificationRepository.js'
 import type { EmailService, SendEmailInput } from '../services/EmailService.js'
 import type { INotificationService } from '../services/NotificationService.js'
+import { createChannelResults } from '../utils/channelHelpers.js'
 
 /**
  * Controller for internal service-to-service communication
@@ -211,7 +212,10 @@ export class InternalCommunicationController {
         params,
       )
 
-      const responseData = paginatedResponse(result, InternalCommunicationMapper.toInternalEmailDTO)
+      const responseData = paginatedResponse(
+        result,
+        InternalCommunicationMapper.toInternalEmailDTO,
+      )
       const validatedResponse =
         communicationInternal.InternalEmailHistoryResponse.parse(responseData)
 
@@ -333,14 +337,7 @@ export class InternalCommunicationController {
         {
           notificationId: `notification-${Date.now()}`,
           recipientCount,
-          channels: (channels || ['inApp']).reduce(
-            (acc, channel) => {
-              acc[channel] = { sent: recipientCount, failed: 0 }
-
-              return acc
-            },
-            {} as Record<string, { sent: number; failed: number }>,
-          ),
+          channels: createChannelResults(channels, recipientCount),
           timestamp: new Date(),
         }
       const validatedResponse =
@@ -464,7 +461,9 @@ export class InternalCommunicationController {
           metadata: notif.metadata,
         })
 
-        const mappedNotification = InternalCommunicationMapper.toInternalNotificationDTO(notification)
+        const mappedNotification =
+          InternalCommunicationMapper.toInternalNotificationDTO(notification)
+
         created.push(mappedNotification)
       }
 
@@ -503,7 +502,10 @@ export class InternalCommunicationController {
         )
       }
 
-      const query = getValidatedQuery<communicationInternal.InternalNotificationsParams>(request)
+      const query =
+        getValidatedQuery<communicationInternal.InternalNotificationsParams>(
+          request,
+        )
 
       if (!query.userId) {
         throw ErrorFactory.badRequest('userId is required')
@@ -520,7 +522,10 @@ export class InternalCommunicationController {
         params,
       )
 
-      const responseData = paginatedResponse(result, InternalCommunicationMapper.toInternalNotificationDTO)
+      const responseData = paginatedResponse(
+        result,
+        InternalCommunicationMapper.toInternalNotificationDTO,
+      )
       const validatedResponse =
         communicationInternal.InternalNotificationsResponse.parse(responseData)
 
@@ -600,7 +605,18 @@ export class InternalCommunicationController {
         limit: 1000,
       })
 
-      let notificationStats: any = { data: [], pagination: { total: 0, page: 1, limit: 1000, totalPages: 0, hasNext: false, hasPrev: false } }
+      let notificationStats: any = {
+        data: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          limit: 1000,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+      }
+
       if (this.notificationService) {
         notificationStats = await this.notificationService.getUserNotifications(
           userId,

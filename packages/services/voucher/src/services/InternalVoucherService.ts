@@ -5,6 +5,7 @@ import type { UserVoucherData, VoucherDomain, VoucherScanData } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes, VoucherState } from '@pika/types'
 import { VoucherScanSource, VoucherScanType } from '@pika/types'
+import { get } from 'lodash-es'
 
 import type { IInternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
 import type { IVoucherRepository } from '../repositories/VoucherRepository.js'
@@ -17,8 +18,8 @@ import type {
   RedemptionTrackingData,
   RedemptionTrackingResult,
   UserVoucherSearchParams,
-  VoucherBookStatus,
   VoucherBookStateTransition,
+  VoucherBookStatus,
   VoucherBookValidation,
   VoucherExistsOptions,
   VoucherExistsResult,
@@ -28,7 +29,10 @@ import type {
   VoucherValidationOptions,
   VoucherValidationResult,
 } from '../types/index.js'
-import { generateBatchCode, generateSecureShortCode } from '../utils/codeGenerator.js'
+import {
+  generateBatchCode,
+  generateSecureShortCode,
+} from '../utils/codeGenerator.js'
 
 // Re-export types that are part of the service's public API
 export type {
@@ -129,9 +133,12 @@ export class InternalVoucherService implements IInternalVoucherService {
   private voucherQRService: VoucherQRService
   private ecdsaService: ECDSAService
   private keyPair: { privateKey: string; publicKey: string } | null = null
-  
+
   // Allowed state transitions for voucher books
-  private readonly allowedBookTransitions: Record<VoucherBookStatus, VoucherBookStatus[]> = {
+  private readonly allowedBookTransitions: Record<
+    VoucherBookStatus,
+    VoucherBookStatus[]
+  > = {
     draft: ['ready_for_print', 'archived'],
     ready_for_print: ['published', 'draft', 'archived'],
     published: ['archived'],
@@ -187,7 +194,11 @@ export class InternalVoucherService implements IInternalVoucherService {
   ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       // Service passes through repository result (Repository Pagination Pattern)
-      const result = await this.internalRepository.findByIds(ids, parsedIncludes)
+      const result = await this.internalRepository.findByIds(
+        ids,
+        parsedIncludes,
+      )
+
       return result // No modification needed
     } catch (error) {
       logger.error('Failed to get vouchers by ids', { error, ids })
@@ -698,6 +709,7 @@ export class InternalVoucherService implements IInternalVoucherService {
    */
   private async getPrivateKey(): Promise<string> {
     await this.initializeKeyPair()
+
     return this.keyPair!.privateKey
   }
 
@@ -737,7 +749,6 @@ export class InternalVoucherService implements IInternalVoucherService {
     } catch (error) {
       throw ErrorFactory.fromError(error, 'Failed to generate voucher tokens', {
         source: 'InternalVoucherService.generateVoucherTokens',
-        voucherId: options.voucherId,
       })
     }
   }
@@ -757,6 +768,7 @@ export class InternalVoucherService implements IInternalVoucherService {
           ...voucher,
           batchId: finalBatchId,
         })
+
         return tokenData
       })
 
@@ -778,7 +790,6 @@ export class InternalVoucherService implements IInternalVoucherService {
         'Failed to generate batch voucher tokens',
         {
           source: 'InternalVoucherService.generateBatchVoucherTokens',
-          voucherCount: request.vouchers.length,
         },
       )
     }
@@ -804,7 +815,10 @@ export class InternalVoucherService implements IInternalVoucherService {
           limit: 100, // Adjust based on expected vouchers per business
         }
 
-        const result = await this.internalRepository.findByBusinessId(businessId, params)
+        const result = await this.internalRepository.findByBusinessId(
+          businessId,
+          params,
+        )
 
         // Transform vouchers to book format
         for (const voucher of result.data) {
@@ -850,7 +864,11 @@ export class InternalVoucherService implements IInternalVoucherService {
     currentStatus: VoucherBookStatus,
     newStatus: VoucherBookStatus,
   ): VoucherBookStateTransition {
-    const allowedStates = this.allowedBookTransitions[currentStatus]
+    const allowedStates: VoucherBookStatus[] = get(
+      this.allowedBookTransitions,
+      currentStatus,
+      [],
+    )
 
     if (!allowedStates.includes(newStatus)) {
       return {
@@ -871,8 +889,10 @@ export class InternalVoucherService implements IInternalVoucherService {
     if (!book.description) missingFields.push('description')
     if (!book.month) missingFields.push('month')
     if (!book.year) missingFields.push('year')
-    if (!book.totalPages || book.totalPages < 1) missingFields.push('totalPages')
-    if (!book.voucherCount || book.voucherCount < 1) missingFields.push('voucherCount')
+    if (!book.totalPages || book.totalPages < 1)
+      missingFields.push('totalPages')
+    if (!book.voucherCount || book.voucherCount < 1)
+      missingFields.push('voucherCount')
 
     if (missingFields.length > 0) {
       return {

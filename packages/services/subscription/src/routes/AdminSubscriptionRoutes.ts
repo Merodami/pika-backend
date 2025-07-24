@@ -14,8 +14,8 @@ import { Router } from 'express'
 import { AdminSubscriptionController } from '../controllers/AdminSubscriptionController.js'
 import { PlanRepository } from '../repositories/PlanRepository.js'
 import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
-import { SubscriptionService } from '../services/SubscriptionService.js'
 import { PlanService } from '../services/PlanService.js'
+import { SubscriptionService } from '../services/SubscriptionService.js'
 
 /**
  * Creates admin subscription routes
@@ -31,7 +31,7 @@ export function createAdminSubscriptionRoutes(
   const planRepository = new PlanRepository(prisma, cache)
   const communicationClient = new CommunicationServiceClient()
   const paymentClient = new PaymentServiceClient()
-  
+
   const subscriptionService = new SubscriptionService(
     prisma,
     subscriptionRepository,
@@ -39,44 +39,43 @@ export function createAdminSubscriptionRoutes(
     cache,
     communicationClient,
   )
-  
-  const planService = new PlanService(
-    planRepository,
-    cache,
-    paymentClient,
+
+  const planService = new PlanService(planRepository, cache, paymentClient)
+
+  const controller = new AdminSubscriptionController(
+    subscriptionService,
+    planService,
   )
-  
-  const controller = new AdminSubscriptionController(subscriptionService, planService)
 
   // ========== Subscription Management ==========
-  
+
   // GET /admin/subscriptions - Get all subscriptions with admin filters
   router.get(
-    '/', 
-    requireAuth(),                                          // Layer 1: JWT validation
-    requirePermissions('subscriptions:read:all'),           // Layer 2: Admin permission check
+    '/',
+    requireAuth(), // Layer 1: JWT validation
+    requirePermissions('subscriptions:read:all'), // Layer 2: Admin permission check
     validateQuery(subscriptionAdmin.AdminGetSubscriptionsQuery), // Layer 3: Schema validation
-    controller.getAllSubscriptions                          // Layer 4: Admin business logic
+    controller.getAllSubscriptions, // Layer 4: Admin business logic
   )
-  
+
   // GET /admin/subscriptions/:id - Get subscription by ID
   router.get(
     '/:id',
     requireAuth(),
     requirePermissions('subscriptions:read:all'),
     validateParams(subscriptionCommon.SubscriptionIdParam),
-    controller.getSubscriptionById
+    controller.getSubscriptionById,
   )
-  
+
   // POST /admin/subscriptions - Create subscription for any user
   router.post(
     '/',
     requireAuth(),
     requirePermissions('subscriptions:write:all'),
     validateBody(subscriptionAdmin.AdminCreateSubscriptionRequest),
-    controller.createSubscription
+    controller.createSubscription,
   )
-  
+
   // PUT /admin/subscriptions/:id - Update subscription
   router.put(
     '/:id',
@@ -84,18 +83,18 @@ export function createAdminSubscriptionRoutes(
     requirePermissions('subscriptions:write:all'),
     validateParams(subscriptionCommon.SubscriptionIdParam),
     validateBody(subscriptionAdmin.AdminUpdateSubscriptionRequest),
-    controller.updateSubscription
+    controller.updateSubscription,
   )
-  
+
   // DELETE /admin/subscriptions/:id - Delete subscription
   router.delete(
     '/:id',
     requireAuth(),
     requirePermissions('subscriptions:manage:all'),
     validateParams(subscriptionCommon.SubscriptionIdParam),
-    controller.deleteSubscription
+    controller.deleteSubscription,
   )
-  
+
   // POST /admin/subscriptions/:id/cancel - Cancel subscription
   router.post(
     '/:id/cancel',
@@ -103,16 +102,16 @@ export function createAdminSubscriptionRoutes(
     requirePermissions('subscriptions:write:all'),
     validateParams(subscriptionCommon.SubscriptionIdParam),
     validateBody(subscriptionCommon.CancelSubscriptionRequest),
-    controller.cancelSubscription
+    controller.cancelSubscription,
   )
-  
+
   // POST /admin/subscriptions/:id/reactivate - Reactivate subscription
   router.post(
     '/:id/reactivate',
     requireAuth(),
     requirePermissions('subscriptions:write:all'),
     validateParams(subscriptionCommon.SubscriptionIdParam),
-    controller.reactivateSubscription
+    controller.reactivateSubscription,
   )
 
   return router
@@ -132,7 +131,7 @@ export function createAdminPlanRoutes(
   const planRepository = new PlanRepository(prisma, cache)
   const communicationClient = new CommunicationServiceClient()
   const paymentClient = new PaymentServiceClient()
-  
+
   const subscriptionService = new SubscriptionService(
     prisma,
     subscriptionRepository,
@@ -140,14 +139,13 @@ export function createAdminPlanRoutes(
     cache,
     communicationClient,
   )
-  
-  const planService = new PlanService(
-    planRepository,
-    cache,
-    paymentClient,
+
+  const planService = new PlanService(planRepository, cache, paymentClient)
+
+  const controller = new AdminSubscriptionController(
+    subscriptionService,
+    planService,
   )
-  
-  const controller = new AdminSubscriptionController(subscriptionService, planService)
 
   // GET /admin/subscription-plans - Get all plans
   router.get(
@@ -155,7 +153,7 @@ export function createAdminPlanRoutes(
     requireAuth(),
     requirePermissions('subscriptions:read:all'),
     validateQuery(subscriptionAdmin.AdminGetPlansQuery),
-    controller.getAllPlans
+    controller.getAllPlans,
   )
 
   // GET /admin/subscription-plans/:id - Get plan by ID
@@ -164,7 +162,7 @@ export function createAdminPlanRoutes(
     requireAuth(),
     requirePermissions('subscriptions:read:all'),
     validateParams(subscriptionCommon.PlanIdParam),
-    controller.getPlanById
+    controller.getPlanById,
   )
 
   // POST /admin/subscription-plans - Create plan
@@ -173,7 +171,7 @@ export function createAdminPlanRoutes(
     requireAuth(),
     requirePermissions('subscriptions:write:all'),
     validateBody(subscriptionAdmin.AdminCreatePlanRequest),
-    controller.createPlan
+    controller.createPlan,
   )
 
   // PUT /admin/subscription-plans/:id - Update plan
@@ -183,7 +181,7 @@ export function createAdminPlanRoutes(
     requirePermissions('subscriptions:write:all'),
     validateParams(subscriptionCommon.PlanIdParam),
     validateBody(subscriptionAdmin.AdminUpdatePlanRequest),
-    controller.updatePlan
+    controller.updatePlan,
   )
 
   // DELETE /admin/subscription-plans/:id - Delete plan
@@ -192,7 +190,7 @@ export function createAdminPlanRoutes(
     requireAuth(),
     requirePermissions('subscriptions:manage:all'),
     validateParams(subscriptionCommon.PlanIdParam),
-    controller.deletePlan
+    controller.deletePlan,
   )
 
   return router

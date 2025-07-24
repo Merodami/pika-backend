@@ -79,7 +79,9 @@ export class AuthController {
             'Registration successful. Please check your email to verify your account.',
           user: UserMapper.toDTO(result.user),
         }
-        const validatedResponse = authPublic.RegisterResponse.parse(responseData)
+        const validatedResponse =
+          authPublic.RegisterResponse.parse(responseData)
+
         response.status(201).json(validatedResponse)
       } else {
         const dto = AuthMapper.toAuthResponse(
@@ -88,6 +90,7 @@ export class AuthController {
           result.refreshToken,
         )
         const validatedResponse = authPublic.AuthResponse.parse(dto)
+
         response.status(201).json(validatedResponse)
       }
     } catch (error) {
@@ -115,6 +118,7 @@ export class AuthController {
           'If an account exists with this email, a password reset link has been sent.',
       }
       const validatedResponse = authPublic.MessageResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -145,6 +149,7 @@ export class AuthController {
         message: result.message || 'Password reset successfully',
       }
       const validatedResponse = authPublic.MessageResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -173,7 +178,9 @@ export class AuthController {
         message: 'Email verified successfully',
         userId: result.userId,
       }
-      const validatedResponse = authPublic.VerifyEmailResponse.parse(responseData)
+      const validatedResponse =
+        authPublic.VerifyEmailResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -200,6 +207,7 @@ export class AuthController {
           'If an account exists with this email, a verification link has been sent.',
       }
       const validatedResponse = authPublic.MessageResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -236,6 +244,7 @@ export class AuthController {
         message: 'Password changed successfully',
       }
       const validatedResponse = authPublic.MessageResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -271,6 +280,7 @@ export class AuthController {
         }
 
         const validatedResponse = authPublic.TokenResponse.parse(oauthResponse)
+
         response.json(validatedResponse)
       } else if (grantType === 'refreshToken') {
         const { refreshToken } = request.body
@@ -285,6 +295,7 @@ export class AuthController {
         }
 
         const validatedResponse = authPublic.TokenResponse.parse(oauthResponse)
+
         response.json(validatedResponse)
       } else {
         throw ErrorFactory.badRequest('Unsupported grant type')
@@ -309,8 +320,11 @@ export class AuthController {
 
       if (!result.valid) {
         const responseData = { active: false }
-        const validatedResponse = authPublic.IntrospectResponse.parse(responseData)
+        const validatedResponse =
+          authPublic.IntrospectResponse.parse(responseData)
+
         response.json(validatedResponse)
+
         return
       }
 
@@ -326,12 +340,16 @@ export class AuthController {
         userEmail: result.payload?.email,
         userRole: result.payload?.role,
       }
-      const validatedResponse = authPublic.IntrospectResponse.parse(responseData)
+      const validatedResponse =
+        authPublic.IntrospectResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch {
       // For introspection, always return active: false for invalid tokens
       const responseData = { active: false }
-      const validatedResponse = authPublic.IntrospectResponse.parse(responseData)
+      const validatedResponse =
+        authPublic.IntrospectResponse.parse(responseData)
+
       response.json(validatedResponse)
     }
   }
@@ -359,7 +377,9 @@ export class AuthController {
             success: true,
             message: 'All tokens revoked successfully',
           }
-          const validatedResponse = authPublic.RevokeTokenResponse.parse(responseData)
+          const validatedResponse =
+            authPublic.RevokeTokenResponse.parse(responseData)
+
           response.json(validatedResponse)
         } else {
           // Even if token is invalid, return success per OAuth spec
@@ -368,7 +388,9 @@ export class AuthController {
             success: true,
             message: 'All tokens revoked successfully',
           }
-          const validatedResponse = authPublic.RevokeTokenResponse.parse(responseData)
+          const validatedResponse =
+            authPublic.RevokeTokenResponse.parse(responseData)
+
           response.json(validatedResponse)
         }
       } else {
@@ -379,7 +401,9 @@ export class AuthController {
           success: true,
           message: 'Token revoked successfully',
         }
-        const validatedResponse = authPublic.RevokeTokenResponse.parse(responseData)
+        const validatedResponse =
+          authPublic.RevokeTokenResponse.parse(responseData)
+
         response.json(validatedResponse)
       }
     } catch {
@@ -446,6 +470,7 @@ export class AuthController {
       }
 
       const validatedResponse = authPublic.UserInfoResponse.parse(userInfo)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)

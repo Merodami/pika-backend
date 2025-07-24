@@ -1,6 +1,6 @@
 /**
  * Admin communication schemas
- * 
+ *
  * NOTE: Admin routes currently excluded per directive
  */
 

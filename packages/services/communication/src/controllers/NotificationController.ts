@@ -4,13 +4,16 @@ import {
   communicationPublic,
 } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { NotificationMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { NotificationSearchParams } from '../repositories/NotificationRepository.js'
 import type { INotificationService } from '../services/NotificationService.js'
 
 export interface INotificationController {
@@ -158,7 +161,8 @@ export class NotificationController implements INotificationController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, NotificationMapper.toDTO)
-      const validatedResponse = communicationPublic.NotificationListResponse.parse(responseData)
+      const validatedResponse =
+        communicationPublic.NotificationListResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -316,7 +320,7 @@ export class NotificationController implements INotificationController {
   /**
    * POST /notifications/global
    * Create a global notification for all users
-   * 
+   *
    * TODO: Uncomment when admin schemas are available
    */
   /*

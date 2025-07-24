@@ -1,6 +1,6 @@
 /**
  * Internal communication schemas exports
- * 
+ *
  * NOTE: Temporarily commented out due to duplicate exports after consolidation
  * TODO: Fix export conflicts and uncomment when resolved
  */

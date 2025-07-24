@@ -23,9 +23,9 @@ export class VoucherServiceClient extends BaseServiceClient {
       // Call the internal endpoint with proper payload
       const response = await this.post<{ vouchers: any[] }>(
         '/internal/vouchers/by-ids',
-        { 
+        {
           voucherIds,
-          include: ['business', 'category']
+          include: ['business', 'category'],
         },
         { ...context, useServiceAuth: true },
       )
@@ -162,6 +162,46 @@ export class VoucherServiceClient extends BaseServiceClient {
         businessIds,
         month,
         year,
+        error,
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Validate voucher book state transition
+   */
+  async validateBookStateTransition(
+    currentStatus: string,
+    newStatus: string,
+    context?: ServiceContext,
+  ): Promise<{
+    allowed: boolean
+    reason?: string
+    requiredFields?: string[]
+  }> {
+    try {
+      const response = await this.post<{
+        allowed: boolean
+        reason?: string
+        requiredFields?: string[]
+      }>(
+        '/internal/vouchers/book/validate-transition',
+        { currentStatus, newStatus },
+        { ...context, useServiceAuth: true },
+      )
+
+      logger.info('Validated book state transition', {
+        currentStatus,
+        newStatus,
+        allowed: response.allowed,
+      })
+
+      return response
+    } catch (error) {
+      logger.error('Failed to validate book state transition', {
+        currentStatus,
+        newStatus,
         error,
       })
       throw error

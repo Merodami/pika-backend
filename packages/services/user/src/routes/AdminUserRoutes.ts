@@ -81,7 +81,12 @@ export function createAdminUserRouter(
 
   // Admin profile routes
   // GET /admin/users/me - Get current admin user profile
-  router.get('/me', requireAuth(), requirePermissions('admin:users'), controller.getMyProfile)
+  router.get(
+    '/me',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    controller.getMyProfile,
+  )
 
   // PATCH /admin/users/me - Update current admin user profile
   router.patch(

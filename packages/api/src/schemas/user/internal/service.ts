@@ -506,3 +506,50 @@ export const PhoneParam = openapi(
 )
 
 export type PhoneParam = z.infer<typeof PhoneParam>
+
+// ============= Additional Missing Schemas =============
+
+/**
+ * Token response for password reset/email verification
+ */
+export const TokenResponse = openapi(
+  z.object({
+    token: z.string(),
+    expiresAt: DateTime,
+  }),
+  {
+    description: 'Token response',
+  },
+)
+
+export type TokenResponse = z.infer<typeof TokenResponse>
+
+/**
+ * Validate token response
+ */
+export const ValidateTokenResponse = openapi(
+  z.object({
+    valid: z.boolean(),
+    userId: UserId.optional(),
+  }),
+  {
+    description: 'Token validation response',
+  },
+)
+
+export type ValidateTokenResponse = z.infer<typeof ValidateTokenResponse>
+
+/**
+ * Success response for operations
+ */
+export const SuccessResponse = openapi(
+  z.object({
+    success: z.boolean().default(true),
+    message: z.string().optional(),
+  }),
+  {
+    description: 'Success response',
+  },
+)
+
+export type SuccessResponse = z.infer<typeof SuccessResponse>

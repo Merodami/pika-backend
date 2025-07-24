@@ -6,6 +6,8 @@ import type { BillingIntervalType, PaginatedResult } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
+import type { PlanSearchParams } from '../types/search.js'
+
 export interface CreatePlanInput {
   name: string
   description?: string
@@ -28,14 +30,6 @@ export interface UpdatePlanInput {
   features?: string[]
   isActive?: boolean
   metadata?: any
-}
-
-export interface PlanSearchParams {
-  page?: number
-  limit?: number
-  isActive?: boolean
-  interval?: string
-  search?: string
 }
 
 export interface IPlanRepository {

@@ -247,8 +247,10 @@ export class VoucherRepository implements IVoucherRepository {
       })
 
       // Repository builds pagination metadata for bounded operation
-      const voucherDomains = vouchers.map((voucher) => VoucherMapper.fromDocument(voucher))
-      
+      const voucherDomains = vouchers.map((voucher) =>
+        VoucherMapper.fromDocument(voucher),
+      )
+
       return {
         data: voucherDomains,
         pagination: {
@@ -689,7 +691,7 @@ export class VoucherRepository implements IVoucherRepository {
 
         return VoucherMapper.mapCustomerVoucherFromDocument(customerVoucherDoc)
       })
-      
+
       return {
         data: customerVoucherDomains,
         pagination: {

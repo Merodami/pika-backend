@@ -341,7 +341,11 @@ export class VoucherService implements IVoucherService {
 
       // Resolve translations if language is provided
       if (language) {
-        const translatedData = await this.translationResolver.resolveArray(result.data, language)
+        const translatedData = await this.translationResolver.resolveArray(
+          result.data,
+          language,
+        )
+
         return {
           data: translatedData,
           pagination: result.pagination, // Pass through pagination

@@ -1,6 +1,5 @@
 import { userAdmin, userPublic } from '@pika/api'
 import { adaptMulterFile, RequestContext } from '@pika/http'
-import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -54,30 +53,9 @@ export class AdminUserController {
         avatarUrl: user.avatarUrl || undefined,
         status: user.status as any,
         role: user.role as any,
-        flags: [],
         emailVerified: user.emailVerified,
         phoneVerified: user.phoneVerified,
-        identityVerified: false,
-        verificationDate:
-          user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
         lastLoginAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        lastActivityAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        loginCount: 0,
-        ipAddress: undefined,
-        userAgent: undefined,
-        stats: {
-          totalBookings: 0,
-          creditsBalance: 0,
-          friendsCount: 0,
-          followersCount: 0,
-          reportsCount: 0,
-        },
-        adminNotes: undefined,
-        suspensionReason: undefined,
-        suspendedAt: undefined,
-        suspendedBy: undefined,
-        description: undefined,
-        specialties: undefined,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
@@ -88,6 +66,7 @@ export class AdminUserController {
         user: adminResponse,
       }
       const validatedResponse = userAdmin.VerifyUserResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -119,7 +98,9 @@ export class AdminUserController {
         success: true,
         message: `Verification resent successfully`,
       }
-      const validatedResponse = userAdmin.ResendVerificationResponse.parse(response)
+      const validatedResponse =
+        userAdmin.ResendVerificationResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -152,6 +133,7 @@ export class AdminUserController {
 
       const response = { avatarUrl: url }
       const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -194,35 +176,16 @@ export class AdminUserController {
         avatarUrl: user.avatarUrl || undefined,
         status: user.status as any, // Status enum mapping
         role: user.role as any, // Role enum mapping
-        flags: [], // TODO: Implement flags if needed
         emailVerified: user.emailVerified,
         phoneVerified: user.phoneVerified,
-        identityVerified: false, // TODO: Implement identity verification
-        verificationDate:
-          user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
         lastLoginAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        lastActivityAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        loginCount: 0, // TODO: Implement login count tracking
-        ipAddress: undefined, // TODO: Track IP addresses if needed
-        userAgent: undefined, // TODO: Track user agents if needed
-        stats: {
-          totalBookings: 0, // TODO: Implement booking stats
-          creditsBalance: 0, // TODO: Implement credits
-          friendsCount: 0,
-          followersCount: 0, // TODO: Implement followers
-          reportsCount: 0, // TODO: Implement reports
-        },
-        adminNotes: undefined, // TODO: Implement admin notes
-        suspensionReason: undefined,
-        suspendedAt: undefined,
-        suspendedBy: undefined,
-        description: undefined,
-        specialties: undefined,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
 
-      const validatedResponse = userAdmin.AdminUserDetailResponse.parse(adminResponse)
+      const validatedResponse =
+        userAdmin.AdminUserDetailResponse.parse(adminResponse)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -272,41 +235,18 @@ export class AdminUserController {
         avatarUrl: updatedUser.avatarUrl || undefined,
         status: updatedUser.status as any,
         role: updatedUser.role as any,
-        flags: [],
         emailVerified: updatedUser.emailVerified,
         phoneVerified: updatedUser.phoneVerified,
-        identityVerified: false,
-        verificationDate:
-          updatedUser.emailVerified && updatedUser.updatedAt
-            ? updatedUser.updatedAt
-            : undefined,
         lastLoginAt: updatedUser.lastLoginAt
           ? updatedUser.lastLoginAt
           : undefined,
-        lastActivityAt: updatedUser.lastLoginAt
-          ? updatedUser.lastLoginAt
-          : undefined,
-        loginCount: 0,
-        ipAddress: undefined,
-        userAgent: undefined,
-        stats: {
-          totalBookings: 0,
-          creditsBalance: 0,
-          friendsCount: 0, // friends feature removed
-          followersCount: 0,
-          reportsCount: 0,
-        },
-        adminNotes: updateData.adminNotes,
-        suspensionReason: undefined,
-        suspendedAt: undefined,
-        suspendedBy: undefined,
-        description: undefined, // professional feature removed
-        specialties: undefined, // professional feature removed
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt,
       }
 
-      const validatedResponse = userAdmin.AdminUserDetailResponse.parse(adminResponse)
+      const validatedResponse =
+        userAdmin.AdminUserDetailResponse.parse(adminResponse)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -335,12 +275,13 @@ export class AdminUserController {
         userId: user.id as any,
         emailVerified: user.emailVerified,
         phoneVerified: user.phoneVerified,
-        identityVerified: false, // TODO: Implement identity verification
         verificationDate:
           user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
       }
 
-      const validatedResponse = userAdmin.UserVerificationStatusResponse.parse(verificationStatus)
+      const validatedResponse =
+        userAdmin.UserVerificationStatusResponse.parse(verificationStatus)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

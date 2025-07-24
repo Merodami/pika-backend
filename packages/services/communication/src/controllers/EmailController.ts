@@ -1,12 +1,15 @@
 import { communicationCommon, communicationPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { CommunicationLogMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { CommunicationLogSearchParams } from '../repositories/CommunicationLogRepository.js'
 import type {
   BulkEmailInput,
   IEmailService,
@@ -187,7 +190,10 @@ export class EmailController implements IEmailController {
 
       const result = await this.emailService.getEmailHistory(userId, params)
 
-      const responseData = paginatedResponse(result, CommunicationLogMapper.toDTO)
+      const responseData = paginatedResponse(
+        result,
+        CommunicationLogMapper.toDTO,
+      )
       const validatedResponse =
         communicationPublic.CommunicationLogListResponse.parse(responseData)
 

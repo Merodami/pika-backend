@@ -1,5 +1,5 @@
 // src/types/repository.ts
-import type { SubscriptionDomain, SubscriptionPlanDomain } from '@pika/sdk'
+
 import type { SubscriptionInterval, SubscriptionStatus } from './enums.js'
 
 /**
@@ -11,21 +11,21 @@ export interface CreateSubscriptionData {
   userId: string
   planId: string
   status: SubscriptionStatus
-  
+
   // Stripe fields
   stripeCustomerId?: string
   stripeSubscriptionId?: string
   stripePaymentMethodId?: string
-  
+
   // Billing period
   currentPeriodStart: Date
   currentPeriodEnd: Date
-  
+
   // Optional fields
   trialEnd?: Date
   cancelAtPeriodEnd?: boolean
   metadata?: Record<string, any>
-  
+
   // System fields
   createdBy?: string
 }
@@ -34,20 +34,20 @@ export interface UpdateSubscriptionData {
   // All fields optional for partial updates
   planId?: string
   status?: SubscriptionStatus
-  
+
   // Stripe fields
   stripePaymentMethodId?: string
-  
+
   // Billing period
   currentPeriodStart?: Date
   currentPeriodEnd?: Date
-  
+
   // Optional fields
   trialEnd?: Date
   cancelAtPeriodEnd?: boolean
   cancelledAt?: Date
   metadata?: Record<string, any>
-  
+
   // System fields
   updatedBy?: string
 }
@@ -65,18 +65,18 @@ export interface CreatePlanData {
   currency: string
   interval: SubscriptionInterval
   intervalCount: number
-  
+
   // Optional fields
   description?: string
   trialPeriodDays?: number
   features?: string[]
   metadata?: Record<string, any>
   isActive?: boolean
-  
+
   // Stripe fields
   stripePriceId?: string
   stripeProductId?: string
-  
+
   // System fields
   createdBy?: string
 }
@@ -88,7 +88,7 @@ export interface UpdatePlanData {
   features?: string[]
   isActive?: boolean
   metadata?: Record<string, any>
-  
+
   // System fields
   updatedBy?: string
 }

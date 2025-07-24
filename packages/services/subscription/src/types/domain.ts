@@ -1,6 +1,5 @@
 // src/types/domain.ts
 import type { SubscriptionDomain } from '@pika/sdk'
-import type { PaginatedResult } from '@pika/types'
 
 // Service operation types
 export interface SubscriptionClaimData {

@@ -217,7 +217,7 @@ export class VoucherBookService implements IVoucherBookService {
       const currentBook = await this.getVoucherBookById(id)
 
       // Validate state transition rules
-      this.validateBookModification(currentBook)
+      await this.validateBookModification(currentBook)
 
       // Prepare update data with proper field mapping
       const updateData = {
@@ -270,9 +270,17 @@ export class VoucherBookService implements IVoucherBookService {
 
       const voucherBook = await this.getVoucherBookById(id)
 
-      // Only allow deletion of draft books
-      if (voucherBook.status !== 'draft') {
-        throw ErrorFactory.badRequest('Only draft voucher books can be deleted')
+      // Validate deletion is allowed using voucher service
+      const stateValidation =
+        await this.voucherServiceClient.validateBookStateTransition(
+          voucherBook.status as any,
+          'deleted',
+        )
+
+      if (!stateValidation.allowed) {
+        throw ErrorFactory.badRequest(
+          stateValidation.reason || 'Deletion not allowed for this book status',
+        )
       }
 
       await this.voucherBookRepository.delete(id)
@@ -294,10 +302,16 @@ export class VoucherBookService implements IVoucherBookService {
     try {
       const voucherBook = await this.getVoucherBookById(id)
 
-      // Validate state transition
-      if (voucherBook.status !== 'ready_for_print') {
+      // Validate state transition using voucher service
+      const stateValidation =
+        await this.voucherServiceClient.validateBookStateTransition(
+          voucherBook.status as any,
+          'published',
+        )
+
+      if (!stateValidation.allowed) {
         throw ErrorFactory.badRequest(
-          'Only books ready for print can be published',
+          stateValidation.reason || 'State transition not allowed',
         )
       }
 
@@ -328,9 +342,17 @@ export class VoucherBookService implements IVoucherBookService {
     try {
       const voucherBook = await this.getVoucherBookById(id)
 
-      // Can only archive published books
-      if (voucherBook.status !== 'published') {
-        throw ErrorFactory.badRequest('Only published books can be archived')
+      // Validate state transition using voucher service
+      const stateValidation =
+        await this.voucherServiceClient.validateBookStateTransition(
+          voucherBook.status as any,
+          'archived',
+        )
+
+      if (!stateValidation.allowed) {
+        throw ErrorFactory.badRequest(
+          stateValidation.reason || 'State transition not allowed',
+        )
       }
 
       const updatedBook = await this.voucherBookRepository.update(id, {
@@ -359,8 +381,10 @@ export class VoucherBookService implements IVoucherBookService {
       // Get voucher book
       const voucherBook = await this.getVoucherBookById(id)
 
-      // Validate book can be generated
-      if (voucherBook.status === 'archived') {
+      // Validate PDF generation is allowed
+      const canGenerate = voucherBook.status !== 'archived'
+
+      if (!canGenerate) {
         throw ErrorFactory.badRequest('Cannot generate PDF for archived books')
       }
 
@@ -397,21 +421,24 @@ export class VoucherBookService implements IVoucherBookService {
         const businessIds = Array.from(
           new Set(
             Array.from(voucherDataMap.values())
-              .map(v => v.businessId)
-              .filter(Boolean)
-          )
+              .map((v) => v.businessId)
+              .filter(Boolean),
+          ),
         )
 
         if (businessIds.length > 0) {
           // Get vouchers with pre-generated security tokens from voucher service
-          const month = (voucherBook.month || new Date().getMonth() + 1).toString().padStart(2, '0')
+          const month = (voucherBook.month || new Date().getMonth() + 1)
+            .toString()
+            .padStart(2, '0')
           const year = voucherBook.year || new Date().getFullYear()
-          
-          const vouchersWithTokens = await this.voucherServiceClient.getVouchersForBook(
-            businessIds,
-            month,
-            year,
-          )
+
+          const vouchersWithTokens =
+            await this.voucherServiceClient.getVouchersForBook(
+              businessIds,
+              month,
+              year,
+            )
 
           // Process vouchers that are placed in this book
           for (const voucherData of vouchersWithTokens.vouchers) {
@@ -419,13 +446,22 @@ export class VoucherBookService implements IVoucherBookService {
               // Store voucher data for PDF rendering
               vouchers.set(voucherData.id, {
                 id: voucherData.id,
-                title: voucherData.title.en || Object.values(voucherData.title)[0] || 'Special Offer',
-                description: voucherData.description.en || Object.values(voucherData.description)[0] || '',
-                discount: voucherData.discountType === 'percentage' 
-                  ? `${voucherData.discountValue}%` 
-                  : `$${voucherData.discountValue}`,
+                title:
+                  voucherData.title.en ||
+                  Object.values(voucherData.title)[0] ||
+                  'Special Offer',
+                description:
+                  voucherData.description.en ||
+                  Object.values(voucherData.description)[0] ||
+                  '',
+                discount:
+                  voucherData.discountType === 'percentage'
+                    ? `${voucherData.discountValue}%`
+                    : `$${voucherData.discountValue}`,
                 businessName: voucherData.businessName || 'Partner Business',
-                expiresAt: voucherData.validTo ? new Date(voucherData.validTo) : undefined,
+                expiresAt: voucherData.validTo
+                  ? new Date(voucherData.validTo)
+                  : new Date(),
               })
 
               // Store pre-generated QR payload
@@ -433,12 +469,15 @@ export class VoucherBookService implements IVoucherBookService {
             }
           }
 
-          logger.info('Loaded vouchers with security tokens for PDF generation', {
-            bookId: id,
-            totalVouchers: vouchersWithTokens.count,
-            placedVouchers: vouchers.size,
-            businessCount: businessIds.length,
-          })
+          logger.info(
+            'Loaded vouchers with security tokens for PDF generation',
+            {
+              bookId: id,
+              totalVouchers: vouchersWithTokens.count,
+              placedVouchers: vouchers.size,
+              businessCount: businessIds.length,
+            },
+          )
         }
       }
 
@@ -584,8 +623,14 @@ export class VoucherBookService implements IVoucherBookService {
     }
   }
 
-  private validateBookModification(book: VoucherBookDomain): void {
-    if (book.status === 'published' || book.status === 'archived') {
+  private async validateBookModification(
+    book: VoucherBookDomain,
+  ): Promise<void> {
+    // Validate if the book status allows modification
+    const canModify =
+      book.status === 'draft' || book.status === 'ready_for_print'
+
+    if (!canModify) {
       throw ErrorFactory.badRequest(
         `Cannot modify ${book.status.toLowerCase()} voucher book`,
       )

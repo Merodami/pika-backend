@@ -2,10 +2,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { SearchParams } from '../../shared/pagination.js'
-import {
-  UserVoucherStatusFilter,
-  UserVoucherSortBy,
-} from '../common/enums.js'
+import { UserVoucherSortBy, UserVoucherStatusFilter } from '../common/enums.js'
 
 /**
  * Public voucher query parameters
@@ -16,9 +13,9 @@ import {
  * Extends SearchParams with user voucher specific filters
  */
 export const UserVouchersQueryParams = SearchParams.extend({
-  status: UserVoucherStatusFilter
-    .default('all')
-    .describe('Filter by voucher status'),
+  status: UserVoucherStatusFilter.default('all').describe(
+    'Filter by voucher status',
+  ),
   sortBy: UserVoucherSortBy.default('claimedAt'),
 })
 

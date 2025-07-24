@@ -96,8 +96,10 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
       })
 
       // Repository builds pagination metadata for bounded operation
-      const voucherDomains = vouchers.map((voucher) => VoucherMapper.fromDocument(voucher))
-      
+      const voucherDomains = vouchers.map((voucher) =>
+        VoucherMapper.fromDocument(voucher),
+      )
+
       return {
         data: voucherDomains,
         pagination: {

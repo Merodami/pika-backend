@@ -194,7 +194,7 @@ export const BulkUserUpdateRequest = openapi(
     updates: z.object({
       status: UserStatus.optional(),
       role: UserRole.optional(),
-        }),
+    }),
     reason: z.string().max(500),
   }),
   {
@@ -391,4 +391,38 @@ export const UserVerificationStatusResponse = openapi(
 
 export type UserVerificationStatusResponse = z.infer<
   typeof UserVerificationStatusResponse
+>
+
+// ============= Additional Missing Schemas =============
+
+/**
+ * Verify user response for admin operations
+ */
+export const VerifyUserResponse = openapi(
+  z.object({
+    success: z.boolean().default(true),
+    message: z.string().optional(),
+  }),
+  {
+    description: 'User verification response',
+  },
+)
+
+export type VerifyUserResponse = z.infer<typeof VerifyUserResponse>
+
+/**
+ * Resend verification response
+ */
+export const ResendVerificationResponse = openapi(
+  z.object({
+    success: z.boolean().default(true),
+    message: z.string().default('Verification email sent'),
+  }),
+  {
+    description: 'Resend verification response',
+  },
+)
+
+export type ResendVerificationResponse = z.infer<
+  typeof ResendVerificationResponse
 >

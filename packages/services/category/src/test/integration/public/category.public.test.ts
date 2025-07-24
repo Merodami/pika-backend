@@ -39,7 +39,6 @@ import {
 } from '@pika/tests'
 import { MockCacheService } from '@pika/tests'
 import { Express } from 'express'
-import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 

@@ -87,12 +87,13 @@ enum CommunicationMethod {
 }
 
 enum SubscriptionStatus {
-  ACTIVE
-  CANCELLED
-  EXPIRED
-  TRIALING
-  PAST_DUE
-  UNPAID
+  active
+  canceled
+  incomplete
+  incompleteExpired
+  pastDue
+  trialing
+  unpaid
 
   @@schema("payments")
 }

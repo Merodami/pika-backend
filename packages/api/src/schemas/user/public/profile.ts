@@ -265,3 +265,27 @@ export const DeleteAccountResponse = openapi(
 )
 
 export type DeleteAccountResponse = z.infer<typeof DeleteAccountResponse>
+
+// ============= Additional Missing Schemas =============
+
+/**
+ * User response for public endpoints
+ */
+export const UserResponse = CurrentUserProfile
+
+export type UserResponse = z.infer<typeof UserResponse>
+
+/**
+ * User friends response
+ */
+export const UserFriendsResponse = openapi(
+  z.object({
+    friends: z.array(PublicUserProfile),
+    totalCount: z.number().int().nonnegative(),
+  }),
+  {
+    description: 'User friends list',
+  },
+)
+
+export type UserFriendsResponse = z.infer<typeof UserFriendsResponse>

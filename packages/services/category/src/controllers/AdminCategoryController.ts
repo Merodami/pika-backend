@@ -1,6 +1,10 @@
 import { categoryAdmin, categoryCommon } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, RequestContext } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -60,7 +64,8 @@ export class AdminCategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)
-      const validatedResponse = categoryAdmin.AdminCategoryListResponse.parse(response)
+      const validatedResponse =
+        categoryAdmin.AdminCategoryListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

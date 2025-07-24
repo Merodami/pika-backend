@@ -1,11 +1,5 @@
-import { subscriptionPublic, subscriptionCommon } from '@pika/api'
-import {
-  requireAuth,
-  requirePermissions,
-  validateBody,
-  validateParams,
-  validateQuery,
-} from '@pika/http'
+import { subscriptionPublic } from '@pika/api'
+import { requireAuth, requirePermissions, validateBody } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
@@ -29,7 +23,7 @@ export function createPublicSubscriptionRoutes(
   const subscriptionRepository = new SubscriptionRepository(prisma, cache)
   const planRepository = new PlanRepository(prisma, cache)
   const communicationClient = new CommunicationServiceClient()
-  
+
   const subscriptionService = new SubscriptionService(
     prisma,
     subscriptionRepository,
@@ -37,7 +31,7 @@ export function createPublicSubscriptionRoutes(
     cache,
     communicationClient,
   )
-  
+
   const controller = new PublicSubscriptionController(subscriptionService)
 
   // All public subscription routes require authentication

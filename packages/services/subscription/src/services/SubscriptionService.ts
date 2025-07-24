@@ -46,6 +46,7 @@ export interface ISubscriptionService {
     cancelAtPeriodEnd: boolean,
   ): Promise<SubscriptionDomain>
   reactivateSubscription(id: string): Promise<SubscriptionDomain>
+  deleteSubscription(id: string): Promise<void>
   // Webhook-driven subscription creation
   createSubscriptionFromWebhook(
     data: CreateSubscriptionFromWebhookDTO,
@@ -111,7 +112,7 @@ export class SubscriptionService implements ISubscriptionService {
       await this.clearUserSubscriptionCache(userId)
 
       // Send welcome email notification
-      if (this.communicationClient && subscription.status === 'ACTIVE') {
+      if (this.communicationClient && subscription.status === 'active') {
         await this.sendSubscriptionCreatedEmail(userId, subscription, plan)
       }
 
@@ -204,7 +205,7 @@ export class SubscriptionService implements ISubscriptionService {
 
     const subscription = await this.getSubscriptionById(id)
 
-    if (subscription.status === 'CANCELED') {
+    if (subscription.status === 'canceled') {
       throw ErrorFactory.businessRuleViolation(
         'Subscription already cancelled',
         'This subscription is already cancelled',
@@ -215,7 +216,7 @@ export class SubscriptionService implements ISubscriptionService {
     const updatedSubscription = await this.subscriptionRepository.update(id, {
       cancelAtPeriodEnd,
       cancelledAt: cancelAtPeriodEnd ? undefined : new Date(),
-      status: cancelAtPeriodEnd ? subscription.status : ('CANCELLED' as any),
+      status: cancelAtPeriodEnd ? subscription.status : ('canceled' as any),
     })
 
     // Clear subscription cache
@@ -255,6 +256,20 @@ export class SubscriptionService implements ISubscriptionService {
     await this.clearSubscriptionCache(id, updatedSubscription.userId)
 
     return updatedSubscription
+  }
+
+  async deleteSubscription(id: string): Promise<void> {
+    logger.info('Deleting subscription', { id })
+
+    const subscription = await this.getSubscriptionById(id)
+
+    // Soft delete the subscription
+    await this.subscriptionRepository.delete(id)
+
+    // Clear subscription cache
+    await this.clearSubscriptionCache(id, subscription.userId)
+
+    logger.info('Successfully deleted subscription', { id })
   }
 
   async createSubscriptionFromWebhook(
@@ -298,7 +313,7 @@ export class SubscriptionService implements ISubscriptionService {
       })
 
       // Send welcome email notification
-      if (this.communicationClient && subscription.status === 'ACTIVE') {
+      if (this.communicationClient && subscription.status === 'active') {
         await this.sendSubscriptionCreatedEmail(data.userId, subscription, plan)
       }
 

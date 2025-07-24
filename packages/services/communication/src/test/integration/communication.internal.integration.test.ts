@@ -328,14 +328,14 @@ describe('Communication Service - Internal API Integration Tests', () => {
             recipients: [
               {
                 to: 'user1@example.com',
-                variables: { 
+                variables: {
                   firstName: 'John',
                   userId: sharedTestData.testUsers[0].id,
                 },
               },
               {
                 to: 'user2@example.com',
-                variables: { 
+                variables: {
                   firstName: 'Jane',
                   userId: sharedTestData.testUsers[1].id,
                 },
@@ -566,10 +566,16 @@ describe('Communication Service - Internal API Integration Tests', () => {
           notificationsReceived: expect.any(Number),
           notificationsRead: expect.any(Number),
         })
-        
+
         // These can be null if no data exists
-        expect(typeof response.body.lastEmailSent === 'string' || response.body.lastEmailSent === null).toBe(true)
-        expect(typeof response.body.lastNotificationReceived === 'string' || response.body.lastNotificationReceived === null).toBe(true)
+        expect(
+          typeof response.body.lastEmailSent === 'string' ||
+            response.body.lastEmailSent === null,
+        ).toBe(true)
+        expect(
+          typeof response.body.lastNotificationReceived === 'string' ||
+            response.body.lastNotificationReceived === null,
+        ).toBe(true)
       })
     })
 

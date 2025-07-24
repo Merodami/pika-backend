@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { openapi } from '../../../common/utils/openapi.js'
 
 /**

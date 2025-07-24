@@ -441,19 +441,16 @@ export const GetVouchersForBookRequest = openapi(
       .string()
       .regex(/^\d{2}$/)
       .describe('Month in MM format (01-12)'),
-    year: z
-      .number()
-      .int()
-      .min(2024)
-      .max(2030)
-      .describe('Year in YYYY format'),
+    year: z.number().int().min(2024).max(2030).describe('Year in YYYY format'),
   }),
   {
     description: 'Get vouchers for voucher book generation',
   },
 )
 
-export type GetVouchersForBookRequest = z.infer<typeof GetVouchersForBookRequest>
+export type GetVouchersForBookRequest = z.infer<
+  typeof GetVouchersForBookRequest
+>
 
 /**
  * Get vouchers for book response
@@ -485,7 +482,9 @@ export const GetVouchersForBookResponse = openapi(
   },
 )
 
-export type GetVouchersForBookResponse = z.infer<typeof GetVouchersForBookResponse>
+export type GetVouchersForBookResponse = z.infer<
+  typeof GetVouchersForBookResponse
+>
 
 /**
  * Generate voucher tokens request
@@ -509,7 +508,9 @@ export const GenerateVoucherTokensRequest = openapi(
   },
 )
 
-export type GenerateVoucherTokensRequest = z.infer<typeof GenerateVoucherTokensRequest>
+export type GenerateVoucherTokensRequest = z.infer<
+  typeof GenerateVoucherTokensRequest
+>
 
 /**
  * Generate voucher tokens response
@@ -531,7 +532,9 @@ export const GenerateVoucherTokensResponse = openapi(
   },
 )
 
-export type GenerateVoucherTokensResponse = z.infer<typeof GenerateVoucherTokensResponse>
+export type GenerateVoucherTokensResponse = z.infer<
+  typeof GenerateVoucherTokensResponse
+>
 
 /**
  * Validate book state transition request

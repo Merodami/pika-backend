@@ -1,6 +1,6 @@
 /**
  * Admin notification schemas
- * 
+ *
  * NOTE: Admin functionality temporarily disabled per directive
  * TODO: Uncomment when admin routes are needed
  */

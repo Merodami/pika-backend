@@ -1,16 +1,10 @@
 import { subscriptionPublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import {
-  getValidatedQuery,
-  paginatedResponse,
-  RequestContext,
-} from '@pika/http'
+import { RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { SubscriptionSearchParams } from '../types/search.js'
 import type { ISubscriptionService } from '../services/SubscriptionService.js'
 
 /**
@@ -47,7 +41,8 @@ export class PublicSubscriptionController {
       )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse = subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionResponse.parse(dto)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -75,15 +70,18 @@ export class PublicSubscriptionController {
 
       logger.info('Getting user active subscription', { userId })
 
-      const subscription = await this.subscriptionService.getUserActiveSubscription(userId)
+      const subscription =
+        await this.subscriptionService.getUserActiveSubscription(userId)
 
       if (!subscription) {
         response.json(null)
+
         return
       }
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse = subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionResponse.parse(dto)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -108,8 +106,9 @@ export class PublicSubscriptionController {
       logger.info('User cancelling subscription', { userId, cancelAtPeriodEnd })
 
       // Get user's active subscription
-      const activeSubscription = await this.subscriptionService.getUserActiveSubscription(userId)
-      
+      const activeSubscription =
+        await this.subscriptionService.getUserActiveSubscription(userId)
+
       if (!activeSubscription) {
         throw new Error('No active subscription found')
       }
@@ -120,7 +119,8 @@ export class PublicSubscriptionController {
       )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse = subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionResponse.parse(dto)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -155,12 +155,14 @@ export class PublicSubscriptionController {
         throw new Error('No cancelled subscription found')
       }
 
-      const subscription = await this.subscriptionService.reactivateSubscription(
-        subscriptions.data[0].id,
-      )
+      const subscription =
+        await this.subscriptionService.reactivateSubscription(
+          subscriptions.data[0].id,
+        )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse = subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionResponse.parse(dto)
 
       response.json(validatedResponse)
     } catch (error) {

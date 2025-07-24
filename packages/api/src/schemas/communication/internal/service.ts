@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email as EmailAddress, UserId } from '../../shared/branded.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
@@ -16,7 +17,6 @@ import {
   NotificationType,
   TemplateKey,
 } from '../common/enums.js'
-import { SearchParams } from '../../shared/pagination.js'
 
 /**
  * Internal communication service schemas for service-to-service communication
@@ -88,7 +88,9 @@ export const InternalEmailHistoryParams = openapi(
   },
 )
 
-export type InternalEmailHistoryParams = z.infer<typeof InternalEmailHistoryParams>
+export type InternalEmailHistoryParams = z.infer<
+  typeof InternalEmailHistoryParams
+>
 
 /**
  * Get notifications query parameters for internal services
@@ -105,7 +107,9 @@ export const InternalNotificationsParams = openapi(
   },
 )
 
-export type InternalNotificationsParams = z.infer<typeof InternalNotificationsParams>
+export type InternalNotificationsParams = z.infer<
+  typeof InternalNotificationsParams
+>
 
 /**
  * Get unread count query parameters

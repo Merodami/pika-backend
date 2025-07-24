@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
-import { paginatedResponse } from '../../shared/responses.js'
 import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
+import { paginatedResponse } from '../../shared/responses.js'
 import {
   SubscriptionEvent,
   SubscriptionNotificationType,
@@ -200,7 +200,9 @@ export const InternalSubscriptionListItem = openapi(
 /**
  * Subscription list response with standard pagination
  */
-export const SubscriptionListResponse = paginatedResponse(InternalSubscriptionListItem)
+export const SubscriptionListResponse = paginatedResponse(
+  InternalSubscriptionListItem,
+)
 
 export type SubscriptionListResponse = z.infer<typeof SubscriptionListResponse>
 

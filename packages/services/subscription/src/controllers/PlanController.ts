@@ -6,8 +6,8 @@ import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { PlanSearchParams } from '../repositories/PlanRepository.js'
 import type { IPlanService } from '../services/PlanService.js'
+import type { PlanSearchParams } from '../types/search.js'
 
 /**
  * Handles subscription plan management operations
@@ -37,17 +37,7 @@ export class PlanController {
 
       logger.info('Creating subscription plan', { name: data.name })
 
-      // Transform interval to uppercase format expected by service
-      const planData = {
-        ...data,
-        interval: data.interval.toUpperCase() as
-          | 'DAY'
-          | 'WEEK'
-          | 'MONTH'
-          | 'YEAR',
-      }
-
-      const plan = await this.planService.createPlan(planData)
+      const plan = await this.planService.createPlan(data)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
 
@@ -92,8 +82,12 @@ export class PlanController {
       const result = await this.planService.getAllPlans(params)
 
       // Use standard pagination pattern
-      const responseData = paginatedResponse(result, SubscriptionPlanMapper.toDTO)
-      const validatedResponse = subscriptionPublic.SubscriptionPlanListResponse.parse(responseData)
+      const responseData = paginatedResponse(
+        result,
+        SubscriptionPlanMapper.toDTO,
+      )
+      const validatedResponse =
+        subscriptionPublic.SubscriptionPlanListResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -118,7 +112,8 @@ export class PlanController {
       const plan = await this.planService.getPlanById(id)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
-      const validatedResponse = subscriptionPublic.SubscriptionPlanResponse.parse(dto)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -148,7 +143,8 @@ export class PlanController {
       const plan = await this.planService.updatePlan(id, data)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
-      const validatedResponse = subscriptionPublic.SubscriptionPlanResponse.parse(dto)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
 
       response.json(validatedResponse)
     } catch (error) {
@@ -193,7 +189,8 @@ export class PlanController {
       await this.planService.syncWithStripe()
 
       const responseData = { message: 'Plans synced successfully' }
-      const validatedResponse = subscriptionPublic.PlanSyncResponse.parse(responseData)
+      const validatedResponse =
+        subscriptionPublic.PlanSyncResponse.parse(responseData)
 
       response.json(validatedResponse)
     } catch (error) {

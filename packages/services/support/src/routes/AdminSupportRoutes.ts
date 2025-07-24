@@ -1,7 +1,7 @@
 import { supportAdmin, supportCommon } from '@pika/api'
 import {
-  requirePermissions,
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,

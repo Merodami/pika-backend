@@ -252,8 +252,8 @@ export class MockEmailProvider {
 
     return {
       results,
-      sent: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length,
+      sent: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length,
     }
   }
 }

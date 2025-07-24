@@ -76,10 +76,10 @@ export type SubscriptionStatusType = `${SubscriptionStatus}`
  * Used for recurring billing cycles
  */
 export enum BillingInterval {
-  DAY = 'DAY',
-  WEEK = 'WEEK',
-  MONTH = 'MONTH',
-  YEAR = 'YEAR',
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
 }
 
 /**

@@ -147,7 +147,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['ACTIVE', 'TRIALING', 'PAST_DUE'],
+            in: ['active', 'trialing', 'pastDue'],
           },
         },
       })
@@ -166,7 +166,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['ACTIVE', 'TRIALING', 'PAST_DUE'],
+            in: ['active', 'trialing', 'pastDue'],
           },
         },
         include: {
@@ -273,7 +273,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     try {
       const subscriptions = await this.prisma.subscription.findMany({
         where: {
-          status: 'ACTIVE',
+          status: 'active',
           cancelAtPeriodEnd: false,
         },
       })

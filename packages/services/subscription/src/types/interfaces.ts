@@ -61,25 +61,7 @@ export interface PlanUpdateData {
   metadata?: Record<string, any>
 }
 
-// Search and filtering interfaces
-export interface SubscriptionSearchParams {
-  page?: number
-  limit?: number
-  status?: SubscriptionStatus
-  userId?: string
-  planId?: string
-  cancelAtPeriodEnd?: boolean
-  fromDate?: Date
-  toDate?: Date
-}
-
-export interface PlanSearchParams {
-  page?: number
-  limit?: number
-  isActive?: boolean
-  // Removed gym-related properties
-  interval?: SubscriptionInterval
-}
+// Search and filtering interfaces moved to search.ts
 
 // User membership status interface
 export interface UserMembershipStatus {

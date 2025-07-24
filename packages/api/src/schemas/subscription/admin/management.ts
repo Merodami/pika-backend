@@ -9,7 +9,6 @@ import {
   SubscriptionSortBy,
   SubscriptionStatus,
 } from '../common/enums.js'
-import { SubscriptionIdParam, PlanIdParam } from '../common/parameters.js'
 
 /**
  * Admin subscription management schemas
@@ -89,9 +88,9 @@ export type AdminUpdateSubscriptionRequest = z.infer<
 
 // ============= Response Schemas =============
 
-import { Subscription, SubscriptionWithPlan } from '../public/subscription.js'
-import { SubscriptionPlan } from '../public/subscriptionPlan.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import { SubscriptionWithPlan } from '../public/subscription.js'
+import { SubscriptionPlan } from '../public/subscriptionPlan.js'
 
 /**
  * Admin subscription response with additional fields
@@ -107,12 +106,16 @@ export const AdminSubscriptionResponse = openapi(
   },
 )
 
-export type AdminSubscriptionResponse = z.infer<typeof AdminSubscriptionResponse>
+export type AdminSubscriptionResponse = z.infer<
+  typeof AdminSubscriptionResponse
+>
 
 /**
  * Admin subscription list response
  */
-export const AdminGetSubscriptionsResponse = paginatedResponse(AdminSubscriptionResponse)
+export const AdminGetSubscriptionsResponse = paginatedResponse(
+  AdminSubscriptionResponse,
+)
 
 export type AdminGetSubscriptionsResponse = z.infer<
   typeof AdminGetSubscriptionsResponse

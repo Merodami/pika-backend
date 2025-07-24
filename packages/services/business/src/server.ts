@@ -39,11 +39,7 @@ export async function createBusinessServer({
       excludeRoutes: ['/health', '/metrics'],
     },
     authOptions: {
-      excludePaths: [
-        '/health',
-        '/metrics',
-        '/internal/*',
-      ],
+      excludePaths: ['/health', '/metrics', '/internal/*'],
     },
     healthChecks: [
       {

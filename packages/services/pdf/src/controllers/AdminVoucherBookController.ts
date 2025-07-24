@@ -90,6 +90,7 @@ export class AdminVoucherBookController {
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
       const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -116,6 +117,7 @@ export class AdminVoucherBookController {
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
       const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+
       res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -149,6 +151,7 @@ export class AdminVoucherBookController {
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
       const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -202,6 +205,7 @@ export class AdminVoucherBookController {
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
       const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -231,6 +235,7 @@ export class AdminVoucherBookController {
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toGeneratePDFResponse(result)
       const validatedResponse = pdfAdmin.GeneratePdfResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -262,7 +267,9 @@ export class AdminVoucherBookController {
         processedCount: result.processedCount,
         operation: 'archived',
       })
-      const validatedResponse = pdfAdmin.BulkOperationResponse.parse(response)
+      const validatedResponse =
+        pdfAdmin.BulkVoucherBookOperationResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -293,7 +300,9 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toStatisticsResponse(stats)
-      const validatedResponse = pdfAdmin.VoucherBookStatisticsResponse.parse(response)
+      const validatedResponse =
+        pdfAdmin.VoucherBookStatsResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

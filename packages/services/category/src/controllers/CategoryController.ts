@@ -52,8 +52,9 @@ export class CategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)
-      const validatedResponse = categoryPublic.CategoryListResponse.parse(response)
-      
+      const validatedResponse =
+        categoryPublic.CategoryListResponse.parse(response)
+
       res.json(validatedResponse)
     } catch (error) {
       next(error)

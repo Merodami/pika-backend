@@ -1,8 +1,8 @@
 import { subscriptionInternal } from '@pika/api'
 import { paginatedResponse } from '@pika/http'
+import { SubscriptionMapper } from '@pika/sdk'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
-import { SubscriptionMapper } from '@pika/sdk'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { ISubscriptionRepository } from '../repositories/SubscriptionRepository.js'
@@ -87,8 +87,12 @@ export class InternalSubscriptionController {
         subscriptionId,
         action,
       }
-      
-      const validatedResponse = subscriptionInternal.ProcessSubscriptionWebhookResponse.parse(responseData)
+
+      const validatedResponse =
+        subscriptionInternal.ProcessSubscriptionWebhookResponse.parse(
+          responseData,
+        )
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -138,7 +142,11 @@ export class InternalSubscriptionController {
       })
 
       const responseData = { success: true }
-      const validatedResponse = subscriptionInternal.UpdateSubscriptionFromPaymentResponse.parse(responseData)
+      const validatedResponse =
+        subscriptionInternal.UpdateSubscriptionFromPaymentResponse.parse(
+          responseData,
+        )
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -169,7 +177,9 @@ export class InternalSubscriptionController {
           hasAccess: false,
           reason: 'No active subscription',
         }
-        const validatedResponse = subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+        const validatedResponse =
+          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
         response.json(validatedResponse)
 
         return
@@ -188,7 +198,9 @@ export class InternalSubscriptionController {
           },
           reason: `Required plan: ${requiredPlan}`,
         }
-        const validatedResponse = subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+        const validatedResponse =
+          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
         response.json(validatedResponse)
 
         return
@@ -207,7 +219,9 @@ export class InternalSubscriptionController {
           },
           reason: `Feature not included: ${feature}`,
         }
-        const validatedResponse = subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+        const validatedResponse =
+          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
         response.json(validatedResponse)
 
         return
@@ -223,7 +237,9 @@ export class InternalSubscriptionController {
           features: subscription.plan.features,
         },
       }
-      const validatedResponse = subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+      const validatedResponse =
+        subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -255,7 +271,9 @@ export class InternalSubscriptionController {
       }
 
       const responseData = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse = subscriptionInternal.InternalSubscriptionData.parse(responseData)
+      const validatedResponse =
+        subscriptionInternal.InternalSubscriptionData.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -277,12 +295,17 @@ export class InternalSubscriptionController {
 
       const subscriptions = await this.subscriptionRepository.findAll({
         userId,
-        status: includeInactive ? undefined : 'ACTIVE',
+        status: includeInactive ? undefined : 'active',
       })
 
       // Use standard pagination pattern like Business service
-      const responseData = paginatedResponse(subscriptions, SubscriptionMapper.toDTO)
-      const validatedResponse = subscriptionInternal.SubscriptionListResponse.parse(responseData)
+      const responseData = paginatedResponse(
+        subscriptions,
+        SubscriptionMapper.toDTO,
+      )
+      const validatedResponse =
+        subscriptionInternal.SubscriptionListResponse.parse(responseData)
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -342,7 +365,11 @@ export class InternalSubscriptionController {
       })
 
       const responseData = { success: true }
-      const validatedResponse = subscriptionInternal.SendSubscriptionNotificationResponse.parse(responseData)
+      const validatedResponse =
+        subscriptionInternal.SendSubscriptionNotificationResponse.parse(
+          responseData,
+        )
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
