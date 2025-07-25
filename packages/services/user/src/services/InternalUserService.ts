@@ -29,10 +29,10 @@ export interface IInternalUserService {
   checkPhoneExists(phone: string): Promise<boolean>
   updatePassword(id: string, hashedPassword: string): Promise<void>
   verifyEmail(id: string): Promise<void>
-  createPasswordResetToken(id: string): Promise<string>
+  createPasswordResetToken(id: string): Promise<{ token: string; expiresAt: Date }>
   validatePasswordResetToken(token: string): Promise<string>
   invalidatePasswordResetToken(token: string): Promise<void>
-  createEmailVerificationToken(id: string): Promise<string>
+  createEmailVerificationToken(id: string): Promise<{ token: string; expiresAt: Date }>
   validateEmailVerificationToken(token: string): Promise<string>
 }
 
@@ -224,14 +224,21 @@ export class InternalUserService implements IInternalUserService {
     }
   }
 
-  async createPasswordResetToken(id: string): Promise<string> {
+  async createPasswordResetToken(id: string): Promise<{ token: string; expiresAt: Date }> {
     try {
+      // Check if user exists first
+      const user = await this.repository.getRawUserById(id)
+      if (!user) {
+        throw ErrorFactory.resourceNotFound('User', 'User not found')
+      }
+
       const token = randomBytes(32).toString('hex')
       const key = `password-reset:${token}`
+      const expiresAt = new Date(Date.now() + PASSWORD_RESET_TOKEN_TTL * 1000)
 
       await this.cache.set(key, id, PASSWORD_RESET_TOKEN_TTL)
 
-      return token
+      return { token, expiresAt }
     } catch (error) {
       logger.error('Failed to create password reset token', { error, id })
       throw ErrorFactory.fromError(error)
@@ -270,14 +277,21 @@ export class InternalUserService implements IInternalUserService {
     }
   }
 
-  async createEmailVerificationToken(id: string): Promise<string> {
+  async createEmailVerificationToken(id: string): Promise<{ token: string; expiresAt: Date }> {
     try {
+      // Check if user exists first
+      const user = await this.repository.getRawUserById(id)
+      if (!user) {
+        throw ErrorFactory.resourceNotFound('User', 'User not found')
+      }
+
       const token = randomBytes(32).toString('hex')
       const key = `email-verification:${token}`
+      const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TOKEN_TTL * 1000)
 
       await this.cache.set(key, id, EMAIL_VERIFICATION_TOKEN_TTL)
 
-      return token
+      return { token, expiresAt }
     } catch (error) {
       logger.error('Failed to create email verification token', { error, id })
       throw ErrorFactory.fromError(error)

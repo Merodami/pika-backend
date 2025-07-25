@@ -4,11 +4,13 @@ import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import {
   SortOrder,
+  TimestampSortBy,
+} from '../../shared/enums.js'
+import {
   TicketPriority,
   TicketStatus,
   TicketType,
-  TimestampSortBy,
-} from '../../shared/enums.js'
+} from '../common/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { createIncludeParam } from '../../shared/query.js'

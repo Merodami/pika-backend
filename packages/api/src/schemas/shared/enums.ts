@@ -115,57 +115,6 @@ export type SortOrder = z.infer<typeof SortOrder>
 export const TimestampSortBy = z.enum(['CREATED_AT', 'UPDATED_AT'])
 export type TimestampSortBy = z.infer<typeof TimestampSortBy>
 
-// ============= Support Enums =============
-
-/**
- * Support ticket status - shared across public and admin APIs
- */
-export const TicketStatus = z.enum([
-  'OPEN',
-  'ASSIGNED',
-  'IN_PROGRESS',
-  'WAITING_CUSTOMER',
-  'WAITING_INTERNAL',
-  'RESOLVED',
-  'CLOSED',
-])
-export type TicketStatus = z.infer<typeof TicketStatus>
-
-/**
- * Support ticket priority - shared across public and admin APIs
- */
-export const TicketPriority = z.enum([
-  'LOW',
-  'MEDIUM',
-  'HIGH',
-  'URGENT',
-  'CRITICAL',
-])
-export type TicketPriority = z.infer<typeof TicketPriority>
-
-/**
- * Support ticket type - shared across public and admin APIs
- */
-export const TicketType = z.enum([
-  'BILLING',
-  'TECHNICAL',
-  'ACCOUNT',
-  'GENERAL',
-  'BUG_REPORT',
-  'FEATURE_REQUEST',
-])
-export type TicketType = z.infer<typeof TicketType>
-
-/**
- * Problem sort fields - shared across public and admin APIs
- */
-export const ProblemSortBy = z.enum([
-  'CREATED_AT',
-  'UPDATED_AT',
-  'PRIORITY',
-  'STATUS',
-])
-export type ProblemSortBy = z.infer<typeof ProblemSortBy>
 
 // ============= Category Enums =============
 

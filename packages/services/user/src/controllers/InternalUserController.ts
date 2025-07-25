@@ -228,9 +228,12 @@ export class InternalUserController {
   ): Promise<void> {
     try {
       const { id } = req.params
-      const token = await this.internalUserService.createPasswordResetToken(id)
+      const tokenData = await this.internalUserService.createPasswordResetToken(id)
 
-      const response = { token }
+      const response = { 
+        token: tokenData.token,
+        expiresAt: tokenData.expiresAt.toISOString()
+      }
       const validatedResponse = userInternal.TokenResponse.parse(response)
 
       res.json(validatedResponse)
@@ -253,7 +256,7 @@ export class InternalUserController {
       const userId =
         await this.internalUserService.validatePasswordResetToken(token)
 
-      const response = { userId }
+      const response = { valid: true, userId }
       const validatedResponse =
         userInternal.ValidateTokenResponse.parse(response)
 
@@ -301,10 +304,13 @@ export class InternalUserController {
   ): Promise<void> {
     try {
       const { id } = req.params
-      const token =
+      const tokenData =
         await this.internalUserService.createEmailVerificationToken(id)
 
-      const response = { token }
+      const response = { 
+        token: tokenData.token,
+        expiresAt: tokenData.expiresAt.toISOString()
+      }
       const validatedResponse = userInternal.TokenResponse.parse(response)
 
       res.json(validatedResponse)
@@ -327,7 +333,7 @@ export class InternalUserController {
       const userId =
         await this.internalUserService.validateEmailVerificationToken(token)
 
-      const response = { userId }
+      const response = { valid: true, userId }
       const validatedResponse =
         userInternal.ValidateTokenResponse.parse(response)
 

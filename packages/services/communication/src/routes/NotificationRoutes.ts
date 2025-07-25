@@ -59,6 +59,9 @@ export function createNotificationRouter(
     controller.getNotifications,
   )
 
+  // Place specific routes before parameterized routes
+  router.put('/read-all', requireAuth(), controller.markAllAsRead)
+
   router.get(
     '/:id',
     requireAuth(),
@@ -80,8 +83,6 @@ export function createNotificationRouter(
     validateParams(communicationCommon.NotificationIdParam),
     controller.markAsRead,
   )
-
-  router.put('/read-all', requireAuth(), controller.markAllAsRead)
 
   router.delete(
     '/:id',

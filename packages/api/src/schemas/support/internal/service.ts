@@ -4,9 +4,9 @@ import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import { UUID } from '../../shared/primitives.js'
 import {
-  TicketCategory,
   TicketPriority,
   TicketStatus,
+  TicketType,
 } from '../common/index.js'
 
 /**
@@ -78,7 +78,7 @@ export const UserTicketSummaryResponse = openapi(
     lastTicketDate: z.string().datetime().optional(),
     ticketsByCategory: z.object(
       Object.fromEntries(
-        TicketCategory.options.map((key) => [
+        TicketType.options.map((key) => [
           key,
           z.number().int().nonnegative().optional(),
         ]),
@@ -103,8 +103,8 @@ export const BulkCreateTicketsRequest = openapi(
           userId: UserId,
           title: z.string(),
           description: z.string(),
-          category: TicketCategory,
-          priority: TicketPriority.default('MEDIUM'),
+          category: TicketType,
+          priority: TicketPriority.default('medium'),
           metadata: z.record(z.string(), z.unknown()).optional(),
         }),
       )
@@ -202,7 +202,7 @@ export const TicketAnalyticsResponse = openapi(
       ),
       byCategory: z.object(
         Object.fromEntries(
-          TicketCategory.options.map((key) => [
+          TicketType.options.map((key) => [
             key,
             z.number().int().nonnegative().optional(),
           ]),

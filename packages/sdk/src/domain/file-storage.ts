@@ -21,3 +21,14 @@ export interface FileStorageLogDomain {
   createdAt: Date
   updatedAt: Date
 }
+
+export interface FileUploadDomain {
+  fileId: string
+  fileKey: string
+  fileName: string
+  fileSize: number
+  mimeType: string
+  fileType: 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | 'OTHER'
+  url?: string
+  uploadedAt: Date
+}

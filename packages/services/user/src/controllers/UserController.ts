@@ -89,12 +89,6 @@ export class UserController {
 
       res.json(validatedResponse)
     } catch (error) {
-      console.log('[USER_CONTROLLER] Caught error in getAllUsers:', {
-        name: (error as any).name,
-        message: (error as any).message,
-        code: (error as any).code,
-        isBaseError: error instanceof ErrorFactory.constructor,
-      })
       next(error)
     }
   }

@@ -93,12 +93,6 @@ export class UserService implements IUserService {
 
       return result
     } catch (error) {
-      console.log('[USER_SERVICE] Caught error in getAllUsers:', {
-        name: (error as any).name,
-        message: (error as any).message,
-        code: (error as any).code,
-        hasValidation: !!(error as any).validation,
-      })
       logger.error('Failed to get all users', { error, params })
       throw ErrorFactory.fromError(error)
     }

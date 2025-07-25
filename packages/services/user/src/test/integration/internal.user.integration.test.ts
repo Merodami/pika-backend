@@ -92,6 +92,7 @@ describe('User Service - Internal API Integration Tests', () => {
 
     // Create server
     cacheService = new MemoryCacheService()
+    
     app = await createUserServer({
       prisma: testDb.prisma,
       cacheService,
@@ -177,11 +178,18 @@ describe('User Service - Internal API Integration Tests', () => {
         .expect(404)
     })
 
-    it('should handle email case sensitivity correctly', async () => {
-      // Test with uppercase email
+    it('should handle email case insensitivity correctly', async () => {
+      // Test with uppercase email - should find the user (case-insensitive)
       const response = await internalClient
         .get('/internal/users/auth/by-email/EXISTING@TEST.COM')
-        .expect(404) // Should not find case-sensitive match
+        .expect(200)
+      
+      expect(response.body).toMatchObject({
+        id: testUserIds.existing,
+        email: 'existing@test.com', // Stored in lowercase
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
+      })
     })
   })
 

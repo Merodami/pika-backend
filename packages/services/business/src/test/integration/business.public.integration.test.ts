@@ -16,6 +16,7 @@ vi.unmock('@pika/translation')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { UserRole, UserStatus } from '@prisma/client'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -102,8 +103,8 @@ describe('Business Service - Public API Integration Tests', () => {
         email: 'business-without-business@test.com',
         firstName: 'Business',
         lastName: 'NoProfile',
-        role: 'BUSINESS',
-        status: 'ACTIVE',
+        role: UserRole.business,
+        status: UserStatus.active,
         emailVerified: true,
       },
     })
@@ -312,8 +313,8 @@ describe('Business Service - Public API Integration Tests', () => {
           lastName: 'Business',
           password:
             '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe',
-          role: 'BUSINESS',
-          status: 'ACTIVE',
+          role: UserRole.business,
+          status: UserStatus.active,
           emailVerified: true,
         },
       })

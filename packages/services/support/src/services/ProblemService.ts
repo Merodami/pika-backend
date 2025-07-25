@@ -32,7 +32,7 @@ export interface IProblemService {
   ): Promise<ProblemDomain>
   getProblemsByUserId(userId: string): Promise<ProblemDomain[]>
   createProblem(data: CreateProblemDTO): Promise<ProblemDomain>
-  updateProblem(id: string, data: UpdateProblemDTO): Promise<ProblemDomain>
+  updateProblem(id: string, data: UpdateProblemDTO, parsedIncludes?: ParsedIncludes): Promise<ProblemDomain>
   deleteProblem(id: string): Promise<void>
 }
 
@@ -112,7 +112,7 @@ export class ProblemService implements IProblemService {
     return problem
   }
 
-  async updateProblem(id: string, data: UpdateProblemDTO) {
+  async updateProblem(id: string, data: UpdateProblemDTO, parsedIncludes?: ParsedIncludes) {
     logger.info('Updating problem', { id })
 
     // Check if problem exists
@@ -136,7 +136,7 @@ export class ProblemService implements IProblemService {
       resolvedAt: domainData.resolvedAt,
     }
 
-    const problem = await this.repository.update(id, updateInput)
+    const problem = await this.repository.update(id, updateInput, parsedIncludes)
 
     // Invalidate cache
     await this.cache.delPattern('problems-list:*')

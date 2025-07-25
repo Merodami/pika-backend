@@ -189,7 +189,25 @@ export class NotificationRepository implements INotificationRepository {
   }
 
   async markAsRead(id: string): Promise<NotificationDomain> {
-    return this.update(id, { isRead: true })
+    try {
+      const notification = await this.prisma.notification.update({
+        where: { id },
+        data: {
+          isRead: true,
+          readAt: new Date(),
+          updatedAt: new Date(),
+        },
+      })
+
+      return NotificationMapper.fromDocument(notification)
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw ErrorFactory.resourceNotFound('Notification', id)
+        }
+      }
+      throw ErrorFactory.databaseError('markAsRead', 'Notification', error)
+    }
   }
 
   async markAllAsRead(userId: string): Promise<number> {
@@ -201,6 +219,7 @@ export class NotificationRepository implements INotificationRepository {
         },
         data: {
           isRead: true,
+          readAt: new Date(),
           updatedAt: new Date(),
         },
       })

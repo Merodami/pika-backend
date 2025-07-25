@@ -39,11 +39,18 @@ export interface NotificationDTO {
   id: string
   userId?: string
   type?: string
+  status?: string
+  priority?: string
   title?: string
   description?: string
   isGlobal: boolean
   isRead: boolean
+  readAt?: string
   metadata?: any
+  category?: string
+  actionUrl?: string
+  imageUrl?: string
+  expiresAt?: string
   createdAt: string
   updatedAt?: string
 }

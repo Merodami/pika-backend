@@ -9,7 +9,7 @@ import type {
   ProblemStatusType,
   ProblemTypeType,
 } from '@pika/types'
-import { ProblemPriority, ProblemStatus, ProblemType } from '@pika/types'
+import { ProblemPriority, ProblemStatus, ProblemType } from '@prisma/client'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { get } from 'lodash-es'
 
@@ -51,7 +51,7 @@ export interface IProblemRepository {
     parsedIncludes?: ParsedIncludes,
   ): Promise<ProblemDomain[]>
   create(data: CreateProblemInput): Promise<ProblemDomain>
-  update(id: string, data: UpdateProblemInput): Promise<ProblemDomain>
+  update(id: string, data: UpdateProblemInput, parsedIncludes?: ParsedIncludes): Promise<ProblemDomain>
   delete(id: string): Promise<void>
 }
 
@@ -237,9 +237,9 @@ export class ProblemRepository implements IProblemRepository {
           userId: data.userId,
           title: data.title,
           description: data.description,
-          priority: data.priority || ProblemPriority.MEDIUM,
-          status: ProblemStatus.OPEN,
-          type: data.type || ProblemType.GENERAL,
+          priority: data.priority || ProblemPriority.medium,
+          status: ProblemStatus.open,
+          type: data.type || ProblemType.general,
           files: data.files || [],
         },
       })
@@ -258,20 +258,23 @@ export class ProblemRepository implements IProblemRepository {
     }
   }
 
-  async update(id: string, data: UpdateProblemInput): Promise<ProblemDomain> {
+  async update(id: string, data: UpdateProblemInput, parsedIncludes?: ParsedIncludes): Promise<ProblemDomain> {
     try {
       // Set resolvedAt automatically when status changes to RESOLVED
       const updateData: any = { ...data }
 
-      if (data.status === 'RESOLVED' && !data.resolvedAt) {
+      if (data.status === ProblemStatus.resolved && !data.resolvedAt) {
         updateData.resolvedAt = new Date()
-      } else if (data.status && data.status !== 'RESOLVED') {
+      } else if (data.status && data.status !== ProblemStatus.resolved) {
         updateData.resolvedAt = null
       }
+
+      const include = this.buildInclude(parsedIncludes)
 
       const problem = await this.prisma.problem.update({
         where: { id },
         data: updateData,
+        include,
       })
 
       return ProblemMapper.fromDocument(problem)

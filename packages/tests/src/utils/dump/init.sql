@@ -563,12 +563,12 @@ CREATE TYPE analytics."VoucherScanType" AS ENUM (
 --
 
 CREATE TYPE audit."AuditAction" AS ENUM (
-    'CREATE',
-    'UPDATE',
-    'DELETE',
-    'LOGIN',
-    'LOGOUT',
-    'STATUS_CHANGE'
+    'create',
+    'update',
+    'delete',
+    'login',
+    'logout',
+    'status_change'
 );
 
 
@@ -647,11 +647,11 @@ CREATE TYPE files."ContentType" AS ENUM (
 --
 
 CREATE TYPE files."FileType" AS ENUM (
-    'IMAGE',
-    'VIDEO',
-    'DOCUMENT',
-    'AUDIO',
-    'OTHER'
+    'image',
+    'video',
+    'document',
+    'audio',
+    'other'
 );
 
 
@@ -672,9 +672,9 @@ CREATE TYPE files."PageLayoutType" AS ENUM (
 --
 
 CREATE TYPE files."StorageProvider" AS ENUM (
-    'AWS_S3',
-    'LOCAL',
-    'MINIO'
+    'aws_s3',
+    'local',
+    'minio'
 );
 
 
@@ -758,8 +758,8 @@ CREATE TYPE payments."SubscriptionStatus" AS ENUM (
     'active',
     'canceled',
     'incomplete',
-    'incompleteExpired',
-    'pastDue',
+    'incomplete_expired',
+    'past_due',
     'trialing',
     'unpaid'
 );
@@ -783,10 +783,10 @@ CREATE TYPE security."FraudCaseStatus" AS ENUM (
 --
 
 CREATE TYPE support."CommunicationMethod" AS ENUM (
-    'EMAIL',
-    'SMS',
-    'PUSH',
-    'IN_APP'
+    'email',
+    'sms',
+    'push',
+    'in_app'
 );
 
 
@@ -795,10 +795,10 @@ CREATE TYPE support."CommunicationMethod" AS ENUM (
 --
 
 CREATE TYPE support."NotificationStatus" AS ENUM (
-    'PENDING',
-    'SENT',
-    'FAILED',
-    'READ'
+    'pending',
+    'sent',
+    'failed',
+    'read'
 );
 
 
@@ -807,10 +807,10 @@ CREATE TYPE support."NotificationStatus" AS ENUM (
 --
 
 CREATE TYPE support."NotificationType" AS ENUM (
-    'EMAIL',
-    'SMS',
-    'PUSH',
-    'IN_APP'
+    'email',
+    'sms',
+    'push',
+    'in_app'
 );
 
 
@@ -819,11 +819,11 @@ CREATE TYPE support."NotificationType" AS ENUM (
 --
 
 CREATE TYPE support."ProblemPriority" AS ENUM (
-    'LOW',
-    'MEDIUM',
-    'HIGH',
-    'URGENT',
-    'CRITICAL'
+    'low',
+    'medium',
+    'high',
+    'urgent',
+    'critical'
 );
 
 
@@ -832,13 +832,13 @@ CREATE TYPE support."ProblemPriority" AS ENUM (
 --
 
 CREATE TYPE support."ProblemStatus" AS ENUM (
-    'OPEN',
-    'ASSIGNED',
-    'IN_PROGRESS',
-    'WAITING_CUSTOMER',
-    'WAITING_INTERNAL',
-    'RESOLVED',
-    'CLOSED'
+    'open',
+    'assigned',
+    'in_progress',
+    'waiting_customer',
+    'waiting_internal',
+    'resolved',
+    'closed'
 );
 
 
@@ -847,12 +847,12 @@ CREATE TYPE support."ProblemStatus" AS ENUM (
 --
 
 CREATE TYPE support."ProblemType" AS ENUM (
-    'BILLING',
-    'TECHNICAL',
-    'ACCOUNT',
-    'GENERAL',
-    'BUG_REPORT',
-    'FEATURE_REQUEST'
+    'billing',
+    'technical',
+    'account',
+    'general',
+    'bug_report',
+    'feature_request'
 );
 
 
@@ -1440,9 +1440,9 @@ CREATE TABLE support.problems (
     user_id uuid NOT NULL,
     title character varying(255) NOT NULL,
     description text NOT NULL,
-    status support."ProblemStatus" DEFAULT 'OPEN'::support."ProblemStatus" NOT NULL,
-    priority support."ProblemPriority" DEFAULT 'MEDIUM'::support."ProblemPriority" NOT NULL,
-    type support."ProblemType" DEFAULT 'GENERAL'::support."ProblemType" NOT NULL,
+    status support."ProblemStatus" DEFAULT 'open'::support."ProblemStatus" NOT NULL,
+    priority support."ProblemPriority" DEFAULT 'medium'::support."ProblemPriority" NOT NULL,
+    type support."ProblemType" DEFAULT 'general'::support."ProblemType" NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     resolved_at timestamp(6) with time zone,

@@ -34,9 +34,13 @@ export class AdminSupportController {
     try {
       const params = getValidatedQuery<supportAdmin.AdminTicketQueryParams>(req)
 
-      // Parse include parameter
+      // Parse include parameter - always include user for admin tickets since userEmail is required
+      const baseIncludes = 'user'
+      const requestedIncludes = params.include
+        ? `${baseIncludes},${params.include}`
+        : baseIncludes
       const parsedIncludes = parseIncludeParam(
-        params.include,
+        requestedIncludes,
         supportAdmin.ADMIN_PROBLEM_RELATIONS as unknown as string[],
       )
 
@@ -132,7 +136,7 @@ export class AdminSupportController {
         adminUserId,
       })
 
-      const updated = await this.problemService.updateProblem(id, { status })
+      const updated = await this.problemService.updateProblem(id, { status }, { user: true })
 
       // Transform and validate update response
       const responseData = ProblemMapper.toAdminDTO(updated)
@@ -177,7 +181,7 @@ export class AdminSupportController {
         updates.priority = priority
       }
 
-      const updated = await this.problemService.updateProblem(id, updates)
+      const updated = await this.problemService.updateProblem(id, updates, { user: true })
 
       // Transform and validate assign response
       const responseData = ProblemMapper.toAdminDTO(updated)

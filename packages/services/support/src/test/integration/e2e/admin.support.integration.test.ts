@@ -22,6 +22,7 @@ vi.mock('@pika/shared', async () => {
 })
 
 import { PrismaClient, UserRole, UserStatus, ProblemStatus, ProblemPriority, ProblemType } from '@prisma/client'
+import { SortOrder, supportAdmin, supportCommon } from '@pika/api'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
@@ -211,8 +212,12 @@ describe('Admin Support API Integration Tests', () => {
     it('should return all tickets for admin users', async () => {
       const response = await adminClient
         .get('/admin/support/tickets')
-        .expect(200)
-
+      
+      if (response.status !== 200) {
+        console.error('Error response:', response.status, response.body)
+      }
+      
+      expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('data')
       expect(response.body).toHaveProperty('pagination')
       expect(Array.isArray(response.body.data)).toBe(true)
@@ -303,7 +308,7 @@ describe('Admin Support API Integration Tests', () => {
     it('should sort tickets by different fields', async () => {
       const response = await adminClient
         .get('/admin/support/tickets')
-        .query({ sortBy: 'PRIORITY', sortOrder: 'DESC' })
+        .query({ sortBy: 'PRIORITY', sortOrder: 'desc' })
         .expect(200)
 
       expect(response.body.data[0].priority).toBe(ProblemPriority.high)
@@ -382,11 +387,11 @@ describe('Admin Support API Integration Tests', () => {
       const response = await adminClient
         .put(`/admin/support/tickets/${ticket.id}/status`)
         .send({
-          status: ProblemStatus.RESOLVED,
+          status: ProblemStatus.resolved,
         })
         .expect(200)
 
-      expect(response.body.status).toBe(ProblemStatus.RESOLVED)
+      expect(response.body.status).toBe(ProblemStatus.resolved)
       expect(response.body.resolvedAt).toBeTruthy()
 
       // Verify in database
@@ -403,11 +408,11 @@ describe('Admin Support API Integration Tests', () => {
       const response = await adminClient
         .put(`/admin/support/tickets/${ticket.id}/status`)
         .send({
-          status: ProblemStatus.OPEN,
+          status: ProblemStatus.open,
         })
         .expect(200)
 
-      expect(response.body.status).toBe(ProblemStatus.OPEN)
+      expect(response.body.status).toBe(ProblemStatus.open)
       expect(response.body.resolvedAt).toBeFalsy()
     })
 
@@ -416,7 +421,7 @@ describe('Admin Support API Integration Tests', () => {
 
       await userClient
         .put(`/admin/support/tickets/${ticket.id}/status`)
-        .send({ status: ProblemStatus.IN_PROGRESS })
+        .send({ status: ProblemStatus.in_progress })
         .expect(403)
     })
 
@@ -463,12 +468,12 @@ describe('Admin Support API Integration Tests', () => {
         .post(`/admin/support/tickets/${ticket.id}/assign`)
         .send({
           assigneeId,
-          priority: ProblemPriority.CRITICAL,
+          priority: ProblemPriority.critical,
         })
         .expect(200)
 
       expect(response.body.id).toBe(ticket.id)
-      expect(response.body.priority).toBe(ProblemPriority.CRITICAL)
+      expect(response.body.priority).toBe(ProblemPriority.critical)
     })
 
     it('should reassign already assigned ticket', async () => {
@@ -537,9 +542,9 @@ describe('Admin Support API Integration Tests', () => {
           userId: testData.testUser.id,
           title: 'Another Technical Issue',
           description: 'System crash',
-          status: ProblemStatus.OPEN,
-          priority: ProblemPriority.HIGH,
-          type: ProblemType.TECHNICAL,
+          status: ProblemStatus.open,
+          priority: ProblemPriority.high,
+          type: ProblemType.technical,
           assignedTo: testData.adminUser.id,
         },
       })
@@ -547,9 +552,9 @@ describe('Admin Support API Integration Tests', () => {
       const response = await adminClient
         .get('/admin/support/tickets')
         .query({
-          status: ProblemStatus.OPEN,
-          priority: ProblemPriority.HIGH,
-          type: ProblemType.TECHNICAL,
+          status: ProblemStatus.open,
+          priority: ProblemPriority.high,
+          type: ProblemType.technical,
           assignedTo: testData.adminUser.id,
         })
         .expect(200)
@@ -558,9 +563,9 @@ describe('Admin Support API Integration Tests', () => {
 
       const ticket = response.body.data[0]
 
-      expect(ticket.status).toBe(ProblemStatus.OPEN)
-      expect(ticket.priority).toBe(ProblemPriority.HIGH)
-      expect(ticket.type).toBe(ProblemType.TECHNICAL)
+      expect(ticket.status).toBe(ProblemStatus.open)
+      expect(ticket.priority).toBe(ProblemPriority.high)
+      expect(ticket.type).toBe(ProblemType.technical)
       expect(ticket.assignedTo).toBe(testData.adminUser.id)
     })
 
@@ -581,9 +586,9 @@ describe('Admin Support API Integration Tests', () => {
           userId: anotherUser.id,
           title: 'Different User Issue',
           description: 'Issue from another user',
-          status: ProblemStatus.OPEN,
-          priority: ProblemPriority.MEDIUM,
-          type: ProblemType.GENERAL,
+          status: ProblemStatus.open,
+          priority: ProblemPriority.medium,
+          type: ProblemType.general,
         },
       })
 
@@ -630,21 +635,21 @@ describe('Admin Support API Integration Tests', () => {
     it('should filter problems by status', async () => {
       const response = await adminClient
         .get('/admin/problems')
-        .query({ status: 'OPEN' })
+        .query({ status: ProblemStatus.open })
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].status).toBe('OPEN')
+      expect(response.body.data[0].status).toBe(ProblemStatus.open)
     })
 
     it('should filter problems by priority', async () => {
       const response = await adminClient
         .get('/admin/problems')
-        .query({ priority: 'HIGH' })
+        .query({ priority: ProblemPriority.high })
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].priority).toBe('HIGH')
+      expect(response.body.data[0].priority).toBe(ProblemPriority.high)
     })
   })
 
@@ -682,8 +687,8 @@ describe('Admin Support API Integration Tests', () => {
       const problemId = testData.tickets[0].id
 
       const updateData = {
-        status: 'RESOLVED',
-        priority: 'CRITICAL',
+        status: ProblemStatus.resolved,
+        priority: ProblemPriority.critical,
       }
 
       const response = await adminClient
@@ -692,8 +697,8 @@ describe('Admin Support API Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toHaveProperty('id', problemId)
-      expect(response.body).toHaveProperty('status', 'RESOLVED')
-      expect(response.body).toHaveProperty('priority', 'CRITICAL')
+      expect(response.body).toHaveProperty('status', ProblemStatus.resolved)
+      expect(response.body).toHaveProperty('priority', ProblemPriority.critical)
       expect(response.body).toHaveProperty('resolvedAt')
       expect(response.body.resolvedAt).not.toBeNull()
     })
@@ -703,7 +708,7 @@ describe('Admin Support API Integration Tests', () => {
 
       await userClient
         .put(`/admin/problems/${problemId}`)
-        .send({ status: 'RESOLVED' })
+        .send({ status: ProblemStatus.resolved })
         .expect(403)
     })
 
@@ -712,7 +717,7 @@ describe('Admin Support API Integration Tests', () => {
 
       await adminClient
         .put(`/admin/problems/${nonExistentId}`)
-        .send({ status: 'RESOLVED' })
+        .send({ status: ProblemStatus.resolved })
         .expect(404)
     })
   })

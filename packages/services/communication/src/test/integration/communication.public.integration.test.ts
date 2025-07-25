@@ -13,6 +13,7 @@ vi.unmock('@pika/redis')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { UserRole, UserStatus } from '@pika/types'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -242,8 +243,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 
@@ -293,8 +294,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 
@@ -412,8 +413,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 
@@ -477,8 +478,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 

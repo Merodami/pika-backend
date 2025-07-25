@@ -47,4 +47,5 @@ export interface NotificationDomain {
   metadata?: any
   createdAt: Date
   updatedAt?: Date
+  readAt?: Date
 }

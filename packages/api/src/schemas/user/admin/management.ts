@@ -4,7 +4,7 @@ import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { UserRole, UserStatus } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
-import { DateTime, UUID } from '../../shared/primitives.js'
+import { DateOnly, DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { AdminUserSortBy } from '../common/enums.js'
 
@@ -36,7 +36,7 @@ export const AdminUserDetailResponse = openapi(
     firstName: z.string(),
     lastName: z.string(),
     phoneNumber: z.string().optional(),
-    dateOfBirth: z.string().optional(),
+    dateOfBirth: DateOnly.optional(),
     avatarUrl: z.string().url().optional(),
     status: UserStatus,
     role: UserRole,
@@ -229,7 +229,7 @@ export const AdminCreateUserRequest = openapi(
     firstName: z.string().min(1).max(50),
     lastName: z.string().min(1).max(50),
     phoneNumber: z.string().min(1),
-    dateOfBirth: z.string(),
+    dateOfBirth: DateOnly.optional(),
     role: UserRole.default(UserRole.enum.customer),
     status: UserStatus.default(UserStatus.enum.unconfirmed),
     appVersion: z.string().optional(),
@@ -247,7 +247,7 @@ export const AdminUpdateUserRequest = openapi(
     firstName: z.string().min(1).max(50).optional(),
     lastName: z.string().min(1).max(50).optional(),
     phoneNumber: z.string().optional(),
-    dateOfBirth: z.string().optional(),
+    dateOfBirth: DateOnly.optional(),
     role: UserRole.optional(),
     status: UserStatus.optional(),
     appVersion: z.string().optional(),
@@ -334,7 +334,7 @@ export const UpdateAdminProfileRequest = openapi(
     firstName: z.string().min(1).max(50).optional(),
     lastName: z.string().min(1).max(50).optional(),
     phoneNumber: z.string().optional(),
-    dateOfBirth: z.string().optional(),
+    dateOfBirth: DateOnly.optional(),
     avatarUrl: z.string().url().optional(),
     // Admin-specific fields
   }),

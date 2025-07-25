@@ -10,6 +10,7 @@ import type { AddressDTO, PaymentMethodDTO, UserDTO } from '../dto/user.dto.js'
 import {
   formatDateToISO,
   formatDateToISOOrUndefined,
+  formatDateOnlyOrUndefined,
 } from '../utils/dateUtils.js'
 
 /**
@@ -147,7 +148,7 @@ export class UserMapper {
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
       // Additional fields
-      dateOfBirth: formatDateToISOOrUndefined(domain.dateOfBirth),
+      dateOfBirth: formatDateOnlyOrUndefined(domain.dateOfBirth),
       // Admin fields - default values when not available
       stripeUserId: domain.stripeUserId || undefined,
     }

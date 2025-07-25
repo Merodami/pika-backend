@@ -18,7 +18,7 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, UserRole, UserStatus, ProblemStatus, ProblemPriority, ProblemType } from '@prisma/client'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
@@ -41,7 +41,6 @@ import {
   createE2EAuthHelper,
   E2EAuthHelper,
 } from '@pika/tests'
-import { UserRole } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
 import { createSupportServer } from '../../../server.js'
@@ -59,8 +58,8 @@ async function seedTestProblems(
       email: 'testuser@example.com',
       firstName: 'Test',
       lastName: 'User',
-      role: UserRole.MEMBER,
-      status: 'ACTIVE',
+      role: UserRole.customer,
+      status: UserStatus.active,
       emailVerified: true,
       phoneVerified: false,
     },
@@ -72,8 +71,8 @@ async function seedTestProblems(
       userId: testUser.id,
       title: 'Test Problem 1',
       description: 'This is a test problem description',
-      status: 'OPEN',
-      priority: 'MEDIUM',
+      status: ProblemStatus.open,
+      priority: ProblemPriority.medium,
     },
   })
 
@@ -82,8 +81,8 @@ async function seedTestProblems(
       userId: testUser.id,
       title: 'Test Problem 2',
       description: 'This is another test problem description',
-      status: 'IN_PROGRESS',
-      priority: 'HIGH',
+      status: ProblemStatus.in_progress,
+      priority: ProblemPriority.high,
     },
   })
 
@@ -157,15 +156,15 @@ describe('Support Service Integration Tests', () => {
             userId: authenticatedUser.id,
             title: 'Test Problem 1',
             description: 'This is a test problem description',
-            status: 'OPEN',
-            priority: 'MEDIUM',
+            status: ProblemStatus.open,
+            priority: ProblemPriority.medium,
           },
           {
             userId: authenticatedUser.id,
             title: 'Test Problem 2',
             description: 'This is another test problem description',
-            status: 'IN_PROGRESS',
-            priority: 'HIGH',
+            status: ProblemStatus.in_progress,
+            priority: ProblemPriority.high,
           },
         ],
       })
@@ -199,7 +198,7 @@ describe('Support Service Integration Tests', () => {
       const newProblem = {
         title: 'New Test Problem',
         description: 'This is a new test problem',
-        priority: 'LOW',
+        priority: ProblemPriority.low,
       }
 
       const response = await userClient
@@ -214,7 +213,7 @@ describe('Support Service Integration Tests', () => {
         newProblem.description,
       )
       expect(response.body).toHaveProperty('priority', newProblem.priority)
-      expect(response.body).toHaveProperty('status', 'OPEN')
+      expect(response.body).toHaveProperty('status', ProblemStatus.open)
       expect(response.body).toHaveProperty('userId', authenticatedUser.id)
     })
 
@@ -229,7 +228,7 @@ describe('Support Service Integration Tests', () => {
         .send(newProblem)
         .expect(201)
 
-      expect(response.body).toHaveProperty('priority', 'MEDIUM')
+      expect(response.body).toHaveProperty('priority', ProblemPriority.medium)
     })
 
     it('should deny access for unauthenticated users', async () => {

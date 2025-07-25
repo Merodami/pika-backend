@@ -112,7 +112,10 @@ export class FileController implements IFileController {
         userId,
       })
 
-      const validatedResponse = storagePublic.FileUploadResponse.parse(result)
+      // Transform FileStorageLogDomain to FileUploadResponse using mapper
+      const fileUploadDomain = FileStorageLogMapper.toFileUploadDomain(result)
+      const responseData = FileStorageLogMapper.fileUploadToDTO(fileUploadDomain)
+      const validatedResponse = storagePublic.FileUploadResponse.parse(responseData)
 
       response.status(201).json(validatedResponse)
     } catch (error) {
