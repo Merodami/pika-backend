@@ -1,6 +1,6 @@
 import { supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { RequestContext } from '@pika/http'
+import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import type { NextFunction, Request, Response } from 'express'
@@ -42,8 +42,15 @@ export class SupportCommentController {
 
       // Transform to DTOs
       const dtos = comments.map(SupportCommentMapper.toDTO)
+      const responseData = { data: dtos }
 
-      response.json({ data: dtos })
+      const validatedResponse = validateResponse(
+        supportPublic.SupportCommentListResponse,
+        responseData,
+        'SupportCommentController.getCommentsByProblemId',
+      )
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -66,7 +73,13 @@ export class SupportCommentController {
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
 
-      response.json(dto)
+      const validatedResponse = validateResponse(
+        supportPublic.SupportCommentResponse,
+        dto,
+        'SupportCommentController.getCommentById',
+      )
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -94,7 +107,13 @@ export class SupportCommentController {
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
 
-      response.status(201).json(dto)
+      const validatedResponse = validateResponse(
+        supportPublic.SupportCommentResponse,
+        dto,
+        'SupportCommentController.createComment',
+      )
+
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -129,7 +148,13 @@ export class SupportCommentController {
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
 
-      response.json(dto)
+      const validatedResponse = validateResponse(
+        supportPublic.SupportCommentResponse,
+        dto,
+        'SupportCommentController.updateComment',
+      )
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

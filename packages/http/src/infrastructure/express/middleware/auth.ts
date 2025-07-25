@@ -402,14 +402,11 @@ export function requirePermissions(...permissions: string[]): RequestHandler {
         return true
       }
 
-      // For ':own' permissions, check if user has the base permission
+      // For ':own' permissions, only check for exact match or resource wildcard
       // Ownership validation must be done in the controller
       if (permission.endsWith(':own')) {
-        const basePermission = permission.replace(':own', '')
-
         return (
           userPermissions.includes(permission) ||
-          userPermissions.includes(basePermission) ||
           userPermissions.includes(`${resource}:*`)
         )
       }

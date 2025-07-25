@@ -38,6 +38,7 @@ export class NotificationMapper {
       metadata: doc.metadata,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt || undefined,
+      readAt: doc.readAt || undefined,
     }
   }
 
@@ -48,12 +49,19 @@ export class NotificationMapper {
     return {
       id: domain.id,
       userId: domain.userId,
-      type: domain.type,
+      type: domain.type || 'inApp',
+      status: 'delivered', // Default status for delivered notifications
+      priority: 'normal', // Default priority
       title: domain.title,
       description: domain.description,
       isGlobal: domain.global,
       isRead: domain.read,
+      readAt: domain.readAt?.toISOString(),
       metadata: domain.metadata,
+      category: domain.metadata?.category || undefined,
+      actionUrl: domain.metadata?.actionUrl || undefined,
+      imageUrl: domain.metadata?.imageUrl || undefined,
+      expiresAt: domain.metadata?.expiresAt || undefined,
       createdAt: domain.createdAt.toISOString(),
       updatedAt: domain.updatedAt?.toISOString(),
     }

@@ -11,7 +11,7 @@
  * - Handles mock email/SMS provider setup
  */
 
-import { EmailTemplateId } from '@pika/types'
+import { EmailTemplateId, UserRole, UserStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 
@@ -158,8 +158,8 @@ export async function createSharedCommunicationTestData(
         firstName: `Test${i + 1}`,
         lastName: 'User',
         emailVerified: true,
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
       },
     })
 
@@ -229,7 +229,7 @@ export class MockEmailProvider {
     return true
   }
 
-  async sendEmail(data: any) {
+  async sendEmail() {
     return {
       success: true,
       messageId: uuid(),
@@ -262,7 +262,7 @@ export class MockEmailProvider {
  * Mock SMS Provider for testing
  */
 export class MockSmsProvider {
-  async sendSms(data: any) {
+  async sendSms() {
     return {
       id: uuid(),
       status: 'sent',

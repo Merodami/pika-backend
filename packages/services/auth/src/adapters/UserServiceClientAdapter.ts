@@ -17,7 +17,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.passwordHash,
+      password: user.password ?? undefined,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -25,7 +25,7 @@ export class UserServiceClientAdapter implements UserService {
       emailVerified: user.emailVerified,
       createdAt: new Date(user.createdAt),
       lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
-      isActive: () => user.status === 'ACTIVE',
+      isActive: () => user.status === UserStatus.ACTIVE,
     }
   }
 
@@ -36,13 +36,17 @@ export class UserServiceClientAdapter implements UserService {
       firstName: data.firstName,
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
+      dateOfBirth: data.dateOfBirth,
+      acceptTerms: data.acceptTerms!,
+      marketingConsent: data.marketingConsent,
       role: data.role,
+      avatarUrl: data.avatarUrl,
     })
 
     return {
       id: user.id,
       email: user.email,
-      password: user.passwordHash,
+      password: user.password ?? undefined,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -50,7 +54,7 @@ export class UserServiceClientAdapter implements UserService {
       emailVerified: user.emailVerified,
       createdAt: new Date(user.createdAt),
       lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
-      isActive: () => user.status === 'ACTIVE',
+      isActive: () => user.status === UserStatus.ACTIVE,
     }
   }
 
@@ -76,7 +80,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.passwordHash,
+      password: user.password ?? undefined,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -84,7 +88,7 @@ export class UserServiceClientAdapter implements UserService {
       emailVerified: user.emailVerified,
       createdAt: new Date(user.createdAt),
       lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
-      isActive: () => user.status === 'ACTIVE',
+      isActive: () => user.status === UserStatus.ACTIVE,
     }
   }
 

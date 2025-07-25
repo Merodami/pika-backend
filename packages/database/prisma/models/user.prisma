@@ -9,8 +9,8 @@ model User {
   phoneNumber       String?           @map("phone_number") @db.VarChar(50)
   phoneVerified     Boolean           @default(false) @map("phone_verified")
   avatarUrl         String?           @map("avatar_url") @db.VarChar(1000)
-  role              UserRole          @default(CUSTOMER)
-  status            UserStatus        @default(ACTIVE)
+  role              UserRole          @default(customer)
+  status            UserStatus        @default(active)
   lastLoginAt       DateTime?         @map("last_login_at") @db.Timestamptz(6)
   createdAt         DateTime?         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime?         @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt

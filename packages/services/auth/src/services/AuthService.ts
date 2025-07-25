@@ -5,8 +5,11 @@ import {
 } from '@pika/auth'
 import {
   JWT_ACCESS_EXPIRY,
+  JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
+  JWT_PRIVATE_KEY,
+  JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
   JWT_SECRET,
 } from '@pika/environment'
@@ -116,6 +119,9 @@ export class AuthService implements IAuthService {
       JWT_ISSUER,
       JWT_AUDIENCE,
       this.cacheService,
+      JWT_ALGORITHM as any,
+      JWT_PRIVATE_KEY,
+      JWT_PUBLIC_KEY,
     )
   }
 

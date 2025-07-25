@@ -4,7 +4,7 @@
  * This file is currently empty as the PDF service does not expose any internal endpoints.
  * Internal endpoints would be service-to-service communication routes that bypass
  * standard authentication and are used for inter-service operations.
- * 
+ *
  * If internal routes are added in the future (e.g., /internal/voucher-books/generate),
  * this file should be updated to include appropriate integration tests.
  */

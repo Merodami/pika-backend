@@ -21,25 +21,25 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
-import { MemoryCacheService } from '@pika'
-import {
-  AuthenticatedRequestClient,
-  createE2EAuthHelper,
-  E2EAuthHelper,
-} from '@pika'
-import { logger } from '@pikad'
 import {
   AWS_S3_ACCESS_KEY_ID,
   AWS_S3_BUCKET,
   AWS_S3_REGION,
   AWS_S3_SECRET_ACCESS_KEY,
-} from '@pikaonment'
+} from '@pika/environment'
+import { logger } from '@pika/shared'
+import {
+  AuthenticatedRequestClient,
+  createE2EAuthHelper,
+  E2EAuthHelper,
+  MemoryCacheService,
+} from '@pika/tests'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
-} from '@tests/utils/testDatabaseHelper.js'
+} from '@pika/tests'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

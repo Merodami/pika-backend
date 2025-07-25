@@ -1,6 +1,10 @@
 import { subscriptionCommon, subscriptionPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  validateResponse,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
@@ -42,7 +46,12 @@ export class PlanController {
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
 
-      const validatedResponse = subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionPlanDetailResponse,
+        dto,
+        'PlanController.createPlan',
+      )
+
       response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -88,8 +97,11 @@ export class PlanController {
         result,
         SubscriptionPlanMapper.toDTO,
       )
-      const validatedResponse =
-        subscriptionPublic.SubscriptionPlanListResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionPlanListResponse,
+        responseData,
+        'PlanController.getPlans',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -114,8 +126,11 @@ export class PlanController {
       const plan = await this.planService.getPlanById(id)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
-      const validatedResponse =
-        subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionPlanDetailResponse,
+        dto,
+        'PlanController.getPlanById',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -145,8 +160,11 @@ export class PlanController {
       const plan = await this.planService.updatePlan(id, data)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
-      const validatedResponse =
-        subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionPlanDetailResponse,
+        dto,
+        'PlanController.updatePlan',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -191,8 +209,11 @@ export class PlanController {
       await this.planService.syncWithStripe()
 
       const responseData = { message: 'Plans synced successfully' }
-      const validatedResponse =
-        subscriptionPublic.PlanSyncResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.PlanSyncResponse,
+        responseData,
+        'PlanController.syncPlans',
+      )
 
       response.json(validatedResponse)
     } catch (error) {

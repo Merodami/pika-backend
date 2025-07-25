@@ -1,11 +1,32 @@
 import type { VoucherBookDomain } from '@pika/sdk'
-import type {
-  VoucherBook,
-  VoucherBookStatus,
-  VoucherBookType,
-} from '@prisma/client'
 
 import type { VoucherBookStatistics } from '../types/domain.js'
+
+/**
+ * Interface for VoucherBook document from database
+ * Follows clean architecture - no Prisma imports
+ */
+export interface VoucherBookDocument {
+  id: string
+  title: string
+  edition: string | null
+  bookType: string
+  month: number | null
+  year: number
+  status: string
+  totalPages: number
+  publishedAt: Date | null
+  coverImageUrl: string | null
+  backImageUrl: string | null
+  pdfUrl: string | null
+  pdfGeneratedAt: Date | null
+  metadata: any
+  createdBy: string
+  updatedBy: string | null
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date | null
+}
 
 /**
  * DTOs for VoucherBook - defined within the service following established pattern
@@ -14,10 +35,10 @@ export interface VoucherBookDTO {
   id: string
   title: string
   edition?: string | null
-  bookType: VoucherBookType
+  bookType: string
   month?: number | null
   year: number
-  status: VoucherBookStatus
+  status: string
   totalPages: number
   publishedAt?: string | null
   coverImageUrl?: string | null
@@ -25,11 +46,15 @@ export interface VoucherBookDTO {
   pdfUrl?: string | null
   pdfGeneratedAt?: string | null
   metadata?: Record<string, any>
-  createdById: string
-  updatedById?: string | null
+  createdBy: string
+  updatedBy?: string | null
   createdAt: string
   updatedAt: string
   deletedAt?: string | null
+  // Admin-specific fields
+  pageCount?: number
+  totalPlacements?: number
+  distributionCount?: number
 }
 
 export interface VoucherBookDetailDTO extends VoucherBookDTO {
@@ -57,7 +82,7 @@ export interface PublicVoucherBookDTO {
   id: string
   title: string
   edition?: string | null
-  bookType: VoucherBookType
+  bookType: string
   month?: number | null
   year: number
   totalPages: number
@@ -70,7 +95,7 @@ export interface PublicVoucherBookDTO {
 export interface CreateVoucherBookDTO {
   title: string
   edition?: string | null
-  bookType?: VoucherBookType
+  bookType?: string
   month?: number | null
   year: number
   totalPages?: number
@@ -82,11 +107,11 @@ export interface CreateVoucherBookDTO {
 export interface UpdateVoucherBookDTO {
   title?: string
   edition?: string | null
-  bookType?: VoucherBookType
+  bookType?: string
   month?: number | null
   year?: number
   totalPages?: number
-  status?: VoucherBookStatus
+  status?: string
   coverImageUrl?: string | null
   backImageUrl?: string | null
   metadata?: Record<string, any>
@@ -155,7 +180,7 @@ export class VoucherBookMapper {
    * Business rule from old system
    */
   static isRecent(createdAt: string): boolean {
-    return this.getAgeInDays(createdAt) <= 7
+    return VoucherBookMapper.getAgeInDays(createdAt) <= 7
   }
 
   /**
@@ -179,7 +204,10 @@ export class VoucherBookMapper {
    * Business rule: Must be READY_FOR_PRINT and have PDF
    */
   static canBePublished(voucherBook: VoucherBookDTO): boolean {
-    return voucherBook.status === 'ready_for_print' && this.hasPDF(voucherBook)
+    return (
+      voucherBook.status === 'ready_for_print' &&
+      VoucherBookMapper.hasPDF(voucherBook)
+    )
   }
 
   /**
@@ -208,19 +236,19 @@ export class VoucherBookMapper {
       id: voucherBook.id,
       title: voucherBook.title,
       edition: voucherBook.edition,
-      bookType: voucherBook.bookType as VoucherBookType,
+      bookType: voucherBook.bookType,
       month: voucherBook.month,
       year: voucherBook.year,
-      status: voucherBook.status as VoucherBookStatus,
+      status: voucherBook.status,
       totalPages: voucherBook.totalPages,
       publishedAt: voucherBook.publishedAt?.toISOString() || null,
       coverImageUrl: voucherBook.coverImageUrl,
       backImageUrl: voucherBook.backImageUrl,
       pdfUrl: voucherBook.pdfUrl,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || null,
-      metadata: this.ensureMetadata(voucherBook.metadata),
-      createdById: voucherBook.createdBy,
-      updatedById: voucherBook.updatedBy,
+      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata),
+      createdBy: voucherBook.createdBy,
+      updatedBy: voucherBook.updatedBy,
       createdAt: voucherBook.createdAt.toISOString(),
       updatedAt: voucherBook.updatedAt.toISOString(),
       deletedAt: voucherBook.deletedAt?.toISOString() || null,
@@ -257,14 +285,23 @@ export class VoucherBookMapper {
 
     // Add computed properties
     dto.computed = {
-      displayName: this.getDisplayName(dto),
-      displayPeriod: this.getDisplayPeriod(dto),
-      ageInDays: this.getAgeInDays(dto.createdAt),
-      isRecent: this.isRecent(dto.createdAt),
-      canBeEdited: this.canBeEdited(dto),
-      canBePublished: this.canBePublished(dto),
-      hasPDF: this.hasPDF(dto),
+      displayName: VoucherBookMapper.getDisplayName(dto),
+      displayPeriod: VoucherBookMapper.getDisplayPeriod(dto),
+      ageInDays: VoucherBookMapper.getAgeInDays(dto.createdAt),
+      isRecent: VoucherBookMapper.isRecent(dto.createdAt),
+      canBeEdited: VoucherBookMapper.canBeEdited(dto),
+      canBePublished: VoucherBookMapper.canBePublished(dto),
+      hasPDF: VoucherBookMapper.hasPDF(dto),
     }
+
+    // Add admin-specific fields (for compatibility with schema)
+    dto.pageCount = voucherBook.pages?.length || 0
+    dto.totalPlacements =
+      voucherBook.pages?.reduce(
+        (total, page) => total + (page.adPlacements?.length || 0),
+        0,
+      ) || 0
+    dto.distributionCount = voucherBook.distributions?.length || 0
 
     return dto
   }
@@ -272,7 +309,7 @@ export class VoucherBookMapper {
   /**
    * Convert to simple DTO without relations
    */
-  static toSimpleDTO(voucherBook: VoucherBook): VoucherBookDTO {
+  static toSimpleDTO(voucherBook: VoucherBookDocument): VoucherBookDTO {
     return {
       id: voucherBook.id,
       title: voucherBook.title,
@@ -287,9 +324,9 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl,
       pdfUrl: voucherBook.pdfUrl,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || null,
-      metadata: this.ensureMetadata(voucherBook.metadata),
-      createdById: voucherBook.createdBy,
-      updatedById: voucherBook.updatedBy,
+      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata),
+      createdBy: voucherBook.createdBy,
+      updatedBy: voucherBook.updatedBy,
       createdAt: voucherBook.createdAt.toISOString(),
       updatedAt: voucherBook.updatedAt.toISOString(),
       deletedAt: voucherBook.deletedAt?.toISOString() || null,
@@ -299,7 +336,7 @@ export class VoucherBookMapper {
   /**
    * Convert to public DTO (limited fields)
    */
-  static toPublicDTO(voucherBook: VoucherBook): PublicVoucherBookDTO {
+  static toPublicDTO(voucherBook: VoucherBookDocument): PublicVoucherBookDTO {
     return {
       id: voucherBook.id,
       title: voucherBook.title,
@@ -325,7 +362,7 @@ export class VoucherBookMapper {
       id: voucherBook.id,
       title: voucherBook.title,
       edition: voucherBook.edition,
-      bookType: voucherBook.bookType as VoucherBookType,
+      bookType: voucherBook.bookType,
       month: voucherBook.month,
       year: voucherBook.year,
       totalPages: voucherBook.totalPages,
@@ -339,15 +376,17 @@ export class VoucherBookMapper {
   /**
    * Convert array to DTOs
    */
-  static toDTOList(voucherBooks: VoucherBook[]): VoucherBookDTO[] {
-    return voucherBooks.map((vb) => this.toSimpleDTO(vb))
+  static toDTOList(voucherBooks: VoucherBookDocument[]): VoucherBookDTO[] {
+    return voucherBooks.map((vb) => VoucherBookMapper.toSimpleDTO(vb))
   }
 
   /**
    * Convert array to public DTOs
    */
-  static toPublicDTOList(voucherBooks: VoucherBook[]): PublicVoucherBookDTO[] {
-    return voucherBooks.map((vb) => this.toPublicDTO(vb))
+  static toPublicDTOList(
+    voucherBooks: VoucherBookDocument[],
+  ): PublicVoucherBookDTO[] {
+    return voucherBooks.map((vb) => VoucherBookMapper.toPublicDTO(vb))
   }
 
   /**
@@ -355,11 +394,11 @@ export class VoucherBookMapper {
    */
   static fromCreateDTO(dto: CreateVoucherBookDTO, createdById: string): any {
     // Validate business rules
-    if (!this.validateYear(dto.year)) {
+    if (!VoucherBookMapper.validateYear(dto.year)) {
       throw new Error('VoucherBook year must be between 2020 and 2100')
     }
 
-    if (!this.validateMonth(dto.month)) {
+    if (!VoucherBookMapper.validateMonth(dto.month)) {
       throw new Error('VoucherBook month must be between 1 and 12')
     }
 
@@ -375,7 +414,7 @@ export class VoucherBookMapper {
       bookType: dto.bookType || 'monthly',
       month: dto.month,
       year: dto.year,
-      status: 'draft' as VoucherBookStatus,
+      status: 'draft',
       totalPages,
       coverImageUrl: dto.coverImageUrl,
       backImageUrl: dto.backImageUrl,
@@ -396,7 +435,7 @@ export class VoucherBookMapper {
 
     // Validate year if changed
     if (dto.year !== undefined) {
-      if (!this.validateYear(dto.year)) {
+      if (!VoucherBookMapper.validateYear(dto.year)) {
         throw new Error('VoucherBook year must be between 2020 and 2100')
       }
       updates.year = dto.year
@@ -404,7 +443,7 @@ export class VoucherBookMapper {
 
     // Validate month if changed
     if (dto.month !== undefined) {
-      if (!this.validateMonth(dto.month)) {
+      if (!VoucherBookMapper.validateMonth(dto.month)) {
         throw new Error('VoucherBook month must be between 1 and 12')
       }
       updates.month = dto.month
@@ -435,12 +474,12 @@ export class VoucherBookMapper {
    * Group voucher books by status for dashboard views
    */
   static groupByStatus(
-    voucherBooks: VoucherBook[],
-  ): Map<VoucherBookStatus, VoucherBookDTO[]> {
-    const statusMap = new Map<VoucherBookStatus, VoucherBookDTO[]>()
+    voucherBooks: VoucherBookDocument[],
+  ): Map<string, VoucherBookDTO[]> {
+    const statusMap = new Map<string, VoucherBookDTO[]>()
 
     // Initialize with all statuses
-    const statuses: VoucherBookStatus[] = [
+    const statuses: string[] = [
       'draft',
       'ready_for_print',
       'published',
@@ -455,7 +494,7 @@ export class VoucherBookMapper {
     for (const book of voucherBooks) {
       const statusList = statusMap.get(book.status) || []
 
-      statusList.push(this.toSimpleDTO(book))
+      statusList.push(VoucherBookMapper.toSimpleDTO(book))
       statusMap.set(book.status, statusList)
     }
 
@@ -466,10 +505,10 @@ export class VoucherBookMapper {
    * Filter books by publication period
    */
   static filterByPeriod(
-    voucherBooks: VoucherBook[],
+    voucherBooks: VoucherBookDocument[],
     year: number,
     month?: number,
-  ): VoucherBook[] {
+  ): VoucherBookDocument[] {
     return voucherBooks.filter((book) => {
       if (book.year !== year) return false
       if (month && book.month !== month) return false
@@ -580,14 +619,14 @@ export class VoucherBookMapper {
    * Map paginated result to public list response
    */
   static toPublicListResponse(result: {
-    data: VoucherBook[]
+    data: VoucherBookDocument[]
     pagination: any
   }): {
     data: PublicVoucherBookDTO[]
     pagination: any
   } {
     return {
-      data: result.data.map((book) => this.toPublicDTO(book)),
+      data: result.data.map((book) => VoucherBookMapper.toPublicDTO(book)),
       pagination: result.pagination,
     }
   }
@@ -600,7 +639,7 @@ export class VoucherBookMapper {
     pagination: any
   } {
     return {
-      data: result.data.map((book) => this.toDTO(book)),
+      data: result.data.map((book) => VoucherBookMapper.toDTO(book)),
       pagination: result.pagination,
     }
   }

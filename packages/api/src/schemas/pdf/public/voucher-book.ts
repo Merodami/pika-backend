@@ -24,6 +24,7 @@ export const VoucherBookResponse = openapi(
     edition: z
       .string()
       .max(100)
+      .nullable()
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
     bookType: VoucherBookType.describe('Type of voucher book'),
@@ -36,7 +37,7 @@ export const VoucherBookResponse = openapi(
       .describe('Month for monthly books (1-12)'),
     year: z.number().int().min(2020).max(2100).describe('Year of publication'),
     status: z
-      .enum(['PUBLISHED'])
+      .enum(['published'])
       .describe('Only published books visible to public'),
     totalPages: z
       .number()
@@ -44,18 +45,30 @@ export const VoucherBookResponse = openapi(
       .min(1)
       .max(100)
       .describe('Total number of pages'),
-    publishedAt: z.string().datetime().describe('When the book was published'),
+    publishedAt: z
+      .string()
+      .datetime()
+      .nullable()
+      .optional()
+      .describe('When the book was published'),
     coverImageUrl: z
       .string()
       .url()
+      .nullable()
       .optional()
       .describe('URL of the cover image'),
     backImageUrl: z
       .string()
       .url()
+      .nullable()
       .optional()
       .describe('URL of the back cover image'),
-    pdfUrl: z.string().url().optional().describe('URL of the generated PDF'),
+    pdfUrl: z
+      .string()
+      .url()
+      .nullable()
+      .optional()
+      .describe('URL of the generated PDF'),
     // Note: No internal fields like createdBy, metadata, pdfGeneratedAt exposed to public
   }),
   {
@@ -72,14 +85,20 @@ export type VoucherBookResponse = z.infer<typeof VoucherBookResponse>
  */
 export const VoucherBookQueryParams = SearchParams.extend({
   bookType: VoucherBookType.optional().describe('Filter by book type'),
-  year: z
+  year: z.coerce
     .number()
     .int()
     .min(2020)
     .max(2100)
     .optional()
     .describe('Filter by year'),
-  month: z.number().int().min(1).max(12).optional().describe('Filter by month'),
+  month: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(12)
+    .optional()
+    .describe('Filter by month'),
   search: z.string().optional().describe('Search in title and edition'),
   sortBy: VoucherBookSortBy.default('publishedAt'),
   // Note: status is always PUBLISHED for public API - no status filtering needed

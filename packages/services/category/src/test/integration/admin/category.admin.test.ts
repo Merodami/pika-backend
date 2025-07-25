@@ -52,7 +52,7 @@ describe('Admin Category Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let request: supertest.SuperTest<supertest.Test>
-  let authHelper: E2EAuthHelper  
+  let authHelper: E2EAuthHelper
   let adminClient: AuthenticatedRequestClient
   let customerClient: AuthenticatedRequestClient
   let server: any
@@ -127,10 +127,6 @@ describe('Admin Category Integration Tests', () => {
 
     logger.debug('Resources cleaned up.')
   })
-
-  // Create authenticated clients
-  let adminClient: any
-  let customerClient: any
 
   describe('Admin Category Management', () => {
     describe('POST /admin/categories', () => {
@@ -346,8 +342,8 @@ describe('Admin Category Integration Tests', () => {
   // Authentication Boundary Tests
   describe('Authentication Boundary Tests', () => {
     it('should require authentication for all admin endpoints', async () => {
-      const testCategory = sharedTestData.activeRootCategories[0]
-      
+      const testCategory = sharedTestData.activeParentCategories[0]
+
       // Test all admin endpoints without authentication
       const adminEndpoints = [
         { method: 'get', url: '/admin/categories' },
@@ -365,14 +361,13 @@ describe('Admin Category Integration Tests', () => {
     })
 
     it('should require admin role for admin endpoints', async () => {
-      const testCategory = sharedTestData.activeRootCategories[0]
-      
+      const testCategory = sharedTestData.activeParentCategories[0]
+
       // Test admin endpoints with customer token (should get 403)
       const adminEndpoints = [
         { method: 'get', url: '/admin/categories' },
-        { method: 'post', url: '/admin/categories' },
         { method: 'get', url: `/admin/categories/${testCategory.id}` },
-        { method: 'put', url: `/admin/categories/${testCategory.id}` },
+        { method: 'patch', url: `/admin/categories/${testCategory.id}` },
         { method: 'delete', url: `/admin/categories/${testCategory.id}` },
       ]
 
@@ -381,6 +376,18 @@ describe('Admin Category Integration Tests', () => {
           .set('Accept', 'application/json')
           .expect(403)
       }
+
+      // Test POST endpoint separately with required body
+      await customerClient
+        .post('/admin/categories')
+        .set('Accept', 'application/json')
+        .send({
+          nameKey: 'test.category',
+          descriptionKey: 'test.description',
+          isActive: true,
+          sortOrder: 1,
+        })
+        .expect(403)
     })
   })
 

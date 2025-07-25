@@ -60,6 +60,20 @@ export async function createUserRouter(
     controller.updateMe,
   )
 
+  // POST /users/me/avatar - Upload avatar for current user
+  const upload = createMulterMiddleware({
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit for avatars
+    },
+  })
+
+  router.post(
+    '/me/avatar',
+    requireAuth(),
+    upload.single('avatar'),
+    controller.uploadMyAvatar,
+  )
+
   // GET /users/email/:email - Get user by email (admin only)
   router.get(
     '/email/:email',
@@ -145,12 +159,7 @@ export async function createUserRouter(
     controller.getUserFriends,
   )
 
-  // POST /users/:id/avatar - Upload user avatar
-  const upload = createMulterMiddleware({
-    limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB limit for avatars
-    },
-  })
+  // POST /users/:id/avatar - Upload user avatar (admin or self)
 
   router.post(
     '/:id/avatar',

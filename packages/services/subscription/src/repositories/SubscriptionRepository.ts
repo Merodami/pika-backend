@@ -148,7 +148,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['active', 'trialing', 'pastDue'],
+            in: ['active', 'trialing', 'past_due'],
           },
         },
       })
@@ -167,7 +167,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['active', 'trialing', 'pastDue'],
+            in: ['active', 'trialing', 'past_due'],
           },
         },
         include: {

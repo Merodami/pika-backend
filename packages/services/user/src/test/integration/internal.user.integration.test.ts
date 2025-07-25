@@ -27,7 +27,6 @@ vi.mock('@pika/shared', async () => {
 })
 
 import type {
-  CreateEmailVerificationTokenRequest,
   CreatePasswordResetTokenRequest,
   ValidatePasswordResetTokenRequest,
   VerifyEmailRequest,
@@ -40,6 +39,7 @@ import {
   createTestDatabase,
   InternalAPITestHelper,
 } from '@pika/tests'
+import { UserRole, UserStatus } from '@pika/types'
 import bcrypt from 'bcrypt'
 import type { Express } from 'express'
 import supertest from 'supertest'
@@ -49,7 +49,6 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { createUserServer } from '../../server.js'
 import {
   createSharedUserTestData,
-  seedTestUsers,
   type SharedUserTestData,
 } from '../helpers/userTestHelpers.js'
 
@@ -91,6 +90,7 @@ describe('User Service - Internal API Integration Tests', () => {
 
     // Create server
     cacheService = new MemoryCacheService()
+
     app = await createUserServer({
       prisma: testDb.prisma,
       cacheService,
@@ -108,8 +108,8 @@ describe('User Service - Internal API Integration Tests', () => {
         firstName: 'Existing',
         lastName: 'User',
         password: await bcrypt.hash('ExistingPassword123!', 10),
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
         emailVerified: true,
       },
     })
@@ -138,7 +138,7 @@ describe('User Service - Internal API Integration Tests', () => {
               in: [
                 'existing@test.com',
                 // Preserve shared test users
-                ...sharedTestData.allUsers.map(u => u.email),
+                ...sharedTestData.allUsers.map((u) => u.email),
               ],
             },
           },
@@ -163,8 +163,8 @@ describe('User Service - Internal API Integration Tests', () => {
       expect(response.body).toMatchObject({
         id: testUserIds.existing,
         email: 'existing@test.com',
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
         emailVerified: true,
         password: expect.any(String),
       })
@@ -176,11 +176,18 @@ describe('User Service - Internal API Integration Tests', () => {
         .expect(404)
     })
 
-    it('should handle email case sensitivity correctly', async () => {
-      // Test with uppercase email
+    it('should handle email case insensitivity correctly', async () => {
+      // Test with uppercase email - should find the user (case-insensitive)
       const response = await internalClient
         .get('/internal/users/auth/by-email/EXISTING@TEST.COM')
-        .expect(404) // Should not find case-sensitive match
+        .expect(200)
+
+      expect(response.body).toMatchObject({
+        id: testUserIds.existing,
+        email: 'existing@test.com', // Stored in lowercase
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
+      })
     })
   })
 
@@ -193,8 +200,8 @@ describe('User Service - Internal API Integration Tests', () => {
       expect(response.body).toMatchObject({
         id: testUserIds.existing,
         email: 'existing@test.com',
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
         emailVerified: true,
         password: expect.any(String),
       })
@@ -209,8 +216,9 @@ describe('User Service - Internal API Integration Tests', () => {
     })
 
     it('should handle invalid UUID format', async () => {
-      const response = await internalClient
-        .get('/internal/users/auth/invalid-uuid')
+      const response = await internalClient.get(
+        '/internal/users/auth/invalid-uuid',
+      )
 
       expect([400, 404]).toContain(response.status)
     })
@@ -224,7 +232,7 @@ describe('User Service - Internal API Integration Tests', () => {
         passwordHash: await bcrypt.hash('NewPassword123!', 10),
         firstName: 'New',
         lastName: 'User',
-        role: 'MEMBER' as const,
+        role: UserRole.CUSTOMER,
         acceptTerms: true,
       }
 
@@ -238,8 +246,8 @@ describe('User Service - Internal API Integration Tests', () => {
         email: 'newuser@test.com',
         firstName: 'New',
         lastName: 'User',
-        role: 'CUSTOMER',
-        status: 'UNCONFIRMED',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.UNCONFIRMED,
         emailVerified: false,
       })
 
@@ -260,7 +268,7 @@ describe('User Service - Internal API Integration Tests', () => {
         passwordHash: await bcrypt.hash('AnotherPassword123!', 10),
         firstName: 'Another',
         lastName: 'User',
-        role: 'MEMBER' as const,
+        role: UserRole.CUSTOMER,
         acceptTerms: true,
       }
 
@@ -276,7 +284,7 @@ describe('User Service - Internal API Integration Tests', () => {
         passwordHash: await bcrypt.hash('Password123!', 10),
         firstName: 'Test',
         lastName: 'User',
-        role: 'MEMBER' as const,
+        role: UserRole.CUSTOMER,
         acceptTerms: true,
       }
 
@@ -493,8 +501,8 @@ describe('User Service - Internal API Integration Tests', () => {
           email: 'unverified@test.com',
           firstName: 'Unverified',
           lastName: 'User',
-          role: 'CUSTOMER',
-          status: 'ACTIVE',
+          role: UserRole.CUSTOMER,
+          status: UserStatus.ACTIVE,
           emailVerified: false,
         },
       })
@@ -622,15 +630,11 @@ describe('User Service - Internal API Integration Tests', () => {
   describe('Email Verification Token Flow', () => {
     it('should create and validate email verification token', async () => {
       // 1. Create token
-      const createTokenRequest: CreateEmailVerificationTokenRequest = {
-        userId: testUserIds.existing,
-      }
-
       const createResponse = await internalClient
         .post(
           `/internal/users/${testUserIds.existing}/email-verification-token`,
         )
-        .send(createTokenRequest)
+        .send({})
         .expect(200)
 
       expect(createResponse.body).toMatchObject({
@@ -659,13 +663,10 @@ describe('User Service - Internal API Integration Tests', () => {
 
     it('should return 404 for non-existent user when creating token', async () => {
       const nonExistentId = uuid()
-      const createTokenRequest: CreateEmailVerificationTokenRequest = {
-        userId: nonExistentId,
-      }
 
       await internalClient
         .post(`/internal/users/${nonExistentId}/email-verification-token`)
-        .send(createTokenRequest)
+        .send({})
         .expect(404)
     })
   })
@@ -679,8 +680,8 @@ describe('User Service - Internal API Integration Tests', () => {
         'nonexistent2@test.com',
       ]
 
-      const promises = emails.map(email =>
-        internalClient.get(`/internal/users/check-email/${email}`)
+      const promises = emails.map((email) =>
+        internalClient.get(`/internal/users/check-email/${email}`),
       )
 
       const responses = await Promise.all(promises)
@@ -690,7 +691,7 @@ describe('User Service - Internal API Integration Tests', () => {
       expect(responses[2].body.exists).toBe(false)
 
       // All requests should complete successfully
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
       })
     })
@@ -704,7 +705,7 @@ describe('User Service - Internal API Integration Tests', () => {
             email: 'concurrent1@test.com',
             firstName: 'Concurrent',
             lastName: 'User1',
-            role: 'CUSTOMER',
+            role: UserRole.CUSTOMER,
             password: 'old-password',
           },
         }),
@@ -714,25 +715,23 @@ describe('User Service - Internal API Integration Tests', () => {
             email: 'concurrent2@test.com',
             firstName: 'Concurrent',
             lastName: 'User2',
-            role: 'CUSTOMER',
+            role: UserRole.CUSTOMER,
             password: 'old-password',
           },
         }),
       ])
 
-      const promises = users.map(user =>
-        internalClient
-          .post(`/internal/users/${user.id}/password`)
-          .send({
-            userId: user.id,
-            passwordHash: `new-password-${user.id}`,
-          })
+      const promises = users.map((user) =>
+        internalClient.post(`/internal/users/${user.id}/password`).send({
+          userId: user.id,
+          passwordHash: `new-password-${user.id}`,
+        }),
       )
 
       const responses = await Promise.all(promises)
 
       // All updates should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(204)
       })
     })
@@ -767,7 +766,7 @@ describe('User Service - Internal API Integration Tests', () => {
               passwordHash: await bcrypt.hash('password', 10),
               firstName: 'Test',
               lastName: 'User',
-              role: 'MEMBER' as const,
+              role: UserRole.CUSTOMER,
               acceptTerms: true,
             })
           } else if (endpoint.path.includes('last-login')) {
@@ -827,20 +826,21 @@ describe('User Service - Internal API Integration Tests', () => {
       const promises = Array.from({ length: 10 }, () =>
         internalClient
           .post(`/internal/users/${testUserIds.existing}/password-reset-token`)
-          .send({})
+          .send({}),
       )
 
       const responses = await Promise.all(promises)
 
       // All token creations should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
         expect(response.body.token).toBeDefined()
       })
 
       // All tokens should be unique
-      const tokens = responses.map(r => r.body.token)
+      const tokens = responses.map((r) => r.body.token)
       const uniqueTokens = new Set(tokens)
+
       expect(uniqueTokens.size).toBe(tokens.length)
     })
 
@@ -849,8 +849,9 @@ describe('User Service - Internal API Integration Tests', () => {
       await cacheService.disconnect()
 
       // Operations should still work (though may be slower)
-      const response = await internalClient
-        .get('/internal/users/check-email/existing@test.com')
+      const response = await internalClient.get(
+        '/internal/users/check-email/existing@test.com',
+      )
 
       expect([200, 500]).toContain(response.status) // May fail gracefully or continue
 
@@ -866,7 +867,7 @@ describe('User Service - Internal API Integration Tests', () => {
           email: 'consistency@test.com',
           firstName: 'Consistency',
           lastName: 'Test',
-          role: 'CUSTOMER',
+          role: UserRole.CUSTOMER,
           emailVerified: false,
         },
       })
@@ -876,18 +877,16 @@ describe('User Service - Internal API Integration Tests', () => {
         internalClient
           .post(`/internal/users/${user.id}/verify-email`)
           .send({ userId: user.id }),
-        internalClient
-          .post(`/internal/users/${user.id}/password`)
-          .send({
-            userId: user.id,
-            passwordHash: 'new-password-hash',
-          }),
+        internalClient.post(`/internal/users/${user.id}/password`).send({
+          userId: user.id,
+          passwordHash: 'new-password-hash',
+        }),
       ]
 
       const responses = await Promise.all(promises)
 
       // Both operations should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect([200, 204]).toContain(response.status)
       })
 

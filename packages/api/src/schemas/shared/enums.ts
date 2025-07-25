@@ -11,14 +11,14 @@ import { openapi } from '../../common/utils/openapi.js'
 /**
  * User roles - matches database UserRole enum exactly
  */
-export const UserRole = z.enum(['ADMIN', 'CUSTOMER', 'BUSINESS'])
+export const UserRole = z.enum(['admin', 'customer', 'business'])
 
 export type UserRole = z.infer<typeof UserRole>
 
 /**
  * User status - matches database UserStatus enum exactly
  */
-export const UserStatus = z.enum(['ACTIVE', 'SUSPENDED', 'UNCONFIRMED'])
+export const UserStatus = z.enum(['active', 'suspended', 'unconfirmed'])
 
 export type UserStatus = z.infer<typeof UserStatus>
 
@@ -115,58 +115,6 @@ export type SortOrder = z.infer<typeof SortOrder>
 export const TimestampSortBy = z.enum(['CREATED_AT', 'UPDATED_AT'])
 export type TimestampSortBy = z.infer<typeof TimestampSortBy>
 
-// ============= Support Enums =============
-
-/**
- * Support ticket status - shared across public and admin APIs
- */
-export const TicketStatus = z.enum([
-  'OPEN',
-  'ASSIGNED',
-  'IN_PROGRESS',
-  'WAITING_CUSTOMER',
-  'WAITING_INTERNAL',
-  'RESOLVED',
-  'CLOSED',
-])
-export type TicketStatus = z.infer<typeof TicketStatus>
-
-/**
- * Support ticket priority - shared across public and admin APIs
- */
-export const TicketPriority = z.enum([
-  'LOW',
-  'MEDIUM',
-  'HIGH',
-  'URGENT',
-  'CRITICAL',
-])
-export type TicketPriority = z.infer<typeof TicketPriority>
-
-/**
- * Support ticket type - shared across public and admin APIs
- */
-export const TicketType = z.enum([
-  'BILLING',
-  'TECHNICAL',
-  'ACCOUNT',
-  'GENERAL',
-  'BUG_REPORT',
-  'FEATURE_REQUEST',
-])
-export type TicketType = z.infer<typeof TicketType>
-
-/**
- * Problem sort fields - shared across public and admin APIs
- */
-export const ProblemSortBy = z.enum([
-  'CREATED_AT',
-  'UPDATED_AT',
-  'PRIORITY',
-  'STATUS',
-])
-export type ProblemSortBy = z.infer<typeof ProblemSortBy>
-
 // ============= Category Enums =============
 
 /**
@@ -240,7 +188,7 @@ export type ContentType = z.infer<typeof ContentType>
  */
 export const UserRoleSchema = openapi(UserRole, {
   description: 'User role in the system',
-  example: UserRole.enum.CUSTOMER,
+  example: UserRole.enum.customer,
 })
 
 /**
@@ -248,5 +196,5 @@ export const UserRoleSchema = openapi(UserRole, {
  */
 export const UserStatusSchema = openapi(UserStatus, {
   description: 'User account status',
-  example: 'ACTIVE',
+  example: 'active',
 })

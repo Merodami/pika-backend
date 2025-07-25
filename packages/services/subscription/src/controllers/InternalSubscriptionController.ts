@@ -1,5 +1,5 @@
 import { subscriptionInternal } from '@pika/api'
-import { paginatedResponse } from '@pika/http'
+import { paginatedResponse, validateResponse } from '@pika/http'
 import { SubscriptionMapper } from '@pika/sdk'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
@@ -88,10 +88,11 @@ export class InternalSubscriptionController {
         action,
       }
 
-      const validatedResponse =
-        subscriptionInternal.ProcessSubscriptionWebhookResponse.parse(
-          responseData,
-        )
+      const validatedResponse = validateResponse(
+        subscriptionInternal.ProcessSubscriptionWebhookResponse,
+        responseData,
+        'InternalSubscriptionController.processWebhook',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -142,10 +143,11 @@ export class InternalSubscriptionController {
       })
 
       const responseData = { success: true }
-      const validatedResponse =
-        subscriptionInternal.UpdateSubscriptionFromPaymentResponse.parse(
-          responseData,
-        )
+      const validatedResponse = validateResponse(
+        subscriptionInternal.UpdateSubscriptionFromPaymentResponse,
+        responseData,
+        'InternalSubscriptionController.updateFromPayment',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -177,8 +179,11 @@ export class InternalSubscriptionController {
           hasAccess: false,
           reason: 'No active subscription',
         }
-        const validatedResponse =
-          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+        const validatedResponse = validateResponse(
+          subscriptionInternal.SubscriptionAccessResponse,
+          responseData,
+          'InternalSubscriptionController.checkAccess',
+        )
 
         response.json(validatedResponse)
 
@@ -198,8 +203,11 @@ export class InternalSubscriptionController {
           },
           reason: `Required plan: ${requiredPlan}`,
         }
-        const validatedResponse =
-          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+        const validatedResponse = validateResponse(
+          subscriptionInternal.SubscriptionAccessResponse,
+          responseData,
+          'InternalSubscriptionController.checkAccess',
+        )
 
         response.json(validatedResponse)
 
@@ -219,8 +227,11 @@ export class InternalSubscriptionController {
           },
           reason: `Feature not included: ${feature}`,
         }
-        const validatedResponse =
-          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+        const validatedResponse = validateResponse(
+          subscriptionInternal.SubscriptionAccessResponse,
+          responseData,
+          'InternalSubscriptionController.checkAccess',
+        )
 
         response.json(validatedResponse)
 
@@ -237,8 +248,11 @@ export class InternalSubscriptionController {
           features: subscription.plan.features,
         },
       }
-      const validatedResponse =
-        subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        subscriptionInternal.SubscriptionAccessResponse,
+        responseData,
+        'InternalSubscriptionController.checkAccess',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -271,8 +285,11 @@ export class InternalSubscriptionController {
       }
 
       const responseData = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionInternal.InternalSubscriptionData.parse(responseData)
+      const validatedResponse = validateResponse(
+        subscriptionInternal.InternalSubscriptionData,
+        responseData,
+        'InternalSubscriptionController.getByStripeId',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -303,8 +320,11 @@ export class InternalSubscriptionController {
         subscriptions,
         SubscriptionMapper.toDTO,
       )
-      const validatedResponse =
-        subscriptionInternal.SubscriptionListResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        subscriptionInternal.SubscriptionListResponse,
+        responseData,
+        'InternalSubscriptionController.getUserSubscriptions',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -365,10 +385,11 @@ export class InternalSubscriptionController {
       })
 
       const responseData = { success: true }
-      const validatedResponse =
-        subscriptionInternal.SendSubscriptionNotificationResponse.parse(
-          responseData,
-        )
+      const validatedResponse = validateResponse(
+        subscriptionInternal.SendSubscriptionNotificationResponse,
+        responseData,
+        'InternalSubscriptionController.sendNotification',
+      )
 
       response.json(validatedResponse)
     } catch (error) {

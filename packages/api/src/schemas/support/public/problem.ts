@@ -2,16 +2,16 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import {
-  ProblemSortBy,
-  SortOrder,
-  TicketPriority,
-  TicketStatus,
-  TicketType,
-} from '../../shared/enums.js'
+import { SortOrder } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import {
+  ProblemSortBy,
+  TicketPriority,
+  TicketStatus,
+  TicketType,
+} from '../common/enums.js'
 
 /**
  * Public support problem schemas
@@ -23,8 +23,8 @@ export const CreateSupportProblemRequest = openapi(
   z.object({
     title: z.string().min(1).max(200),
     description: z.string().min(1).max(5000),
-    priority: TicketPriority.default('MEDIUM'),
-    type: TicketType.default('GENERAL'),
+    priority: TicketPriority.default('medium'),
+    type: TicketType.default('general'),
     files: z.array(z.string()).default([]),
   }),
   {

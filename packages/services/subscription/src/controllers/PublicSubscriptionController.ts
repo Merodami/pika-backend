@@ -1,5 +1,5 @@
 import { subscriptionPublic } from '@pika/api'
-import { RequestContext } from '@pika/http'
+import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
@@ -41,8 +41,11 @@ export class PublicSubscriptionController {
       )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionResponse,
+        dto,
+        'PublicSubscriptionController.createSubscription',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -80,8 +83,11 @@ export class PublicSubscriptionController {
       }
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionResponse,
+        dto,
+        'PublicSubscriptionController.getUserSubscription',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -119,8 +125,11 @@ export class PublicSubscriptionController {
       )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionResponse,
+        dto,
+        'PublicSubscriptionController.cancelSubscription',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -161,8 +170,11 @@ export class PublicSubscriptionController {
         )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionPublic.SubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionPublic.SubscriptionResponse,
+        dto,
+        'PublicSubscriptionController.reactivateSubscription',
+      )
 
       response.json(validatedResponse)
     } catch (error) {

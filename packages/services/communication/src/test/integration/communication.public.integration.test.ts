@@ -21,15 +21,13 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
+import { UserRole, UserStatus } from '@pika/types'
 import type { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createCommunicationServer } from '../../server.js'
-import {
-  createSharedCommunicationTestData,
-  type SharedCommunicationTestData,
-} from '../helpers/communicationTestHelpers.js'
+import { createSharedCommunicationTestData } from '../helpers/communicationTestHelpers.js'
 
 describe('Communication Service - Public API Integration Tests', () => {
   let testDb: TestDatabaseResult
@@ -38,7 +36,6 @@ describe('Communication Service - Public API Integration Tests', () => {
   let cacheService: MemoryCacheService
   let customerClient: AuthenticatedRequestClient
   let regularUserId: string
-  let sharedTestData: SharedCommunicationTestData
 
   beforeAll(async () => {
     logger.info(
@@ -242,8 +239,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 
@@ -293,8 +290,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 
@@ -412,8 +409,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 
@@ -477,8 +474,8 @@ describe('Communication Service - Public API Integration Tests', () => {
             firstName: 'Other',
             lastName: 'User',
             emailVerified: true,
-            role: 'CUSTOMER',
-            status: 'ACTIVE',
+            role: UserRole.CUSTOMER,
+            status: UserStatus.ACTIVE,
           },
         })
 

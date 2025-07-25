@@ -84,7 +84,26 @@ describe('PDF Service - Admin API Integration Tests', () => {
 
     // Create test users and authenticate them
     logger.debug('Setting up E2E authentication...')
-    await authHelper.createAllTestUsers(testDb.prisma)
+    try {
+      await authHelper.createAllTestUsers(testDb.prisma)
+    } catch (error) {
+      console.error('Error creating test users:', error)
+      throw error
+    }
+
+    // Check if users were created successfully
+    const userCount = await testDb.prisma.user.count()
+
+    logger.debug(
+      `Total users in database after createAllTestUsers: ${userCount}`,
+    )
+
+    const testUsers = await testDb.prisma.user.findMany({
+      where: { email: { contains: '@e2etest.com' } },
+      select: { id: true, email: true, role: true },
+    })
+
+    logger.debug(`Test users found: ${JSON.stringify(testUsers)}`)
 
     // Get authenticated clients for different user types
     adminClient = await authHelper.getAdminClient(testDb.prisma)
@@ -97,9 +116,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
     logger.debug('Creating shared test data...')
     sharedTestData = await createSharedPDFTestData(testDb.prisma)
 
-    logger.debug(
-      `Created ${sharedTestData.allBooks.length} test voucher books`,
-    )
+    logger.debug(`Created ${sharedTestData.allBooks.length} test voucher books`)
   }, 120000)
 
   beforeEach(async () => {
@@ -139,7 +156,12 @@ describe('PDF Service - Admin API Integration Tests', () => {
       const response = await adminClient
         .get('/admin/voucher-books')
         .set('Accept', 'application/json')
-        .expect(200)
+
+      if (response.status !== 200) {
+        console.log('Error response:', response.status, response.body)
+      }
+
+      expect(response.status).toBe(200)
 
       expect(response.body).toMatchObject({
         data: expect.any(Array),
@@ -174,6 +196,15 @@ describe('PDF Service - Admin API Integration Tests', () => {
     })
 
     it('should support pagination with sorting', async () => {
+      // Get a test user for foreign key references
+      const testUser = await testDb.prisma.user.findFirst({
+        where: { email: { contains: '@e2etest.com' } },
+      })
+
+      if (!testUser) {
+        throw new Error('No test users found')
+      }
+
       // Create multiple books
       for (let i = 1; i <= 5; i++) {
         await testDb.prisma.voucherBook.create({
@@ -185,8 +216,8 @@ describe('PDF Service - Admin API Integration Tests', () => {
             bookType: 'monthly',
             totalPages: 24,
             status: 'draft',
-            createdBy: 'test-admin',
-            updatedBy: 'test-admin',
+            createdBy: testUser.id,
+            updatedBy: testUser.id,
           },
         })
       }
@@ -217,9 +248,25 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toMatchObject({
-        totalBooks: expect.any(Number),
-        draftBooks: expect.any(Number),
-        publishedBooks: expect.any(Number),
+        total: expect.any(Number),
+        byStatus: {
+          draft: expect.any(Number),
+          readyForPrint: expect.any(Number),
+          published: expect.any(Number),
+          archived: expect.any(Number),
+        },
+        byType: {
+          monthly: expect.any(Number),
+          specialEdition: expect.any(Number),
+          regional: expect.any(Number),
+        },
+        distributions: {
+          total: expect.any(Number),
+          pending: expect.any(Number),
+          shipped: expect.any(Number),
+          delivered: expect.any(Number),
+        },
+        recentActivity: expect.any(Array),
       })
     })
 
@@ -324,10 +371,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
       }
 
       // Create first book
-      await adminClient
-        .post('/admin/voucher-books')
-        .send(bookData)
-        .expect(201)
+      await adminClient.post('/admin/voucher-books').send(bookData).expect(201)
 
       // Try to create duplicate
       const response = await adminClient
@@ -458,6 +502,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
       const deletedBook = await testDb.prisma.voucherBook.findUnique({
         where: { id: testBook.id },
       })
+
       expect(deletedBook).toBeNull() // Assuming soft delete removes from normal queries
     })
 
@@ -517,7 +562,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
   describe('Authentication Boundary Tests', () => {
     it('should require authentication for all admin endpoints', async () => {
       const testBook = await createTestVoucherBook(testDb.prisma, 'draft')
-      
+
       // Test all admin endpoints without authentication
       const adminEndpoints = [
         { method: 'get', url: '/admin/voucher-books' },
@@ -527,7 +572,10 @@ describe('PDF Service - Admin API Integration Tests', () => {
         { method: 'patch', url: `/admin/voucher-books/${testBook.id}` },
         { method: 'delete', url: `/admin/voucher-books/${testBook.id}` },
         { method: 'post', url: `/admin/voucher-books/${testBook.id}/status` },
-        { method: 'post', url: `/admin/voucher-books/${testBook.id}/generate-pdf` },
+        {
+          method: 'post',
+          url: `/admin/voucher-books/${testBook.id}/generate-pdf`,
+        },
         { method: 'post', url: '/admin/voucher-books/bulk-archive' },
       ]
 
@@ -540,7 +588,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
 
     it('should require admin role for admin endpoints', async () => {
       const testBook = await createTestVoucherBook(testDb.prisma, 'draft')
-      
+
       // Test admin endpoints with customer token (should get 403)
       const adminEndpoints = [
         { method: 'get', url: '/admin/voucher-books' },
@@ -550,7 +598,10 @@ describe('PDF Service - Admin API Integration Tests', () => {
         { method: 'patch', url: `/admin/voucher-books/${testBook.id}` },
         { method: 'delete', url: `/admin/voucher-books/${testBook.id}` },
         { method: 'post', url: `/admin/voucher-books/${testBook.id}/status` },
-        { method: 'post', url: `/admin/voucher-books/${testBook.id}/generate-pdf` },
+        {
+          method: 'post',
+          url: `/admin/voucher-books/${testBook.id}/generate-pdf`,
+        },
         { method: 'post', url: '/admin/voucher-books/bulk-archive' },
       ]
 
@@ -558,7 +609,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
         await customerClient[endpoint.method](endpoint.url)
           .set('Accept', 'application/json')
           .expect(403)
-          
+
         await businessClient[endpoint.method](endpoint.url)
           .set('Accept', 'application/json')
           .expect(403)

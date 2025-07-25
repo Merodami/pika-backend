@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { UserRole, UserStatus } from '../../shared/enums.js'
-import { DateTime } from '../../shared/primitives.js'
+import { DateOnly, DateTime } from '../../shared/primitives.js'
 
 /**
  * Internal user service schemas for service-to-service communication
@@ -289,9 +289,7 @@ export const CreateUserRequest = openapi(
     firstName: z.string(),
     lastName: z.string(),
     phoneNumber: z.string().optional(),
-    dateOfBirth: DateTime.optional(),
-    description: z.string().optional(),
-    specialties: z.array(z.string()).optional(),
+    dateOfBirth: DateOnly.optional(),
     acceptTerms: z.boolean(),
     marketingConsent: z.boolean().optional(),
     role: UserRole,

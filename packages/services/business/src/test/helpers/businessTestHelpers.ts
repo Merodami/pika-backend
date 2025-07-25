@@ -12,6 +12,7 @@
  */
 
 import type { PrismaClient } from '@prisma/client'
+import { UserRole, UserStatus } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 
 export interface BusinessTestData {
@@ -92,8 +93,8 @@ export async function seedTestBusinesses(
         lastName: `Owner ${i + 1}`,
         password:
           '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe', // hashed "password123"
-        role: 'BUSINESS',
-        status: 'ACTIVE',
+        role: UserRole.business,
+        status: UserStatus.active,
         emailVerified: true,
       },
     })
@@ -164,8 +165,8 @@ export async function createTestBusiness(
       firstName: 'Business',
       lastName: 'Owner',
       password: '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe',
-      role: 'BUSINESS',
-      status: 'ACTIVE',
+      role: UserRole.business,
+      status: UserStatus.active,
       emailVerified: true,
     },
   })
@@ -202,7 +203,7 @@ export async function cleanupBusinessTestData(
   await prismaClient.business.deleteMany({})
   await prismaClient.user.deleteMany({
     where: {
-      role: 'BUSINESS',
+      role: UserRole.business,
       email: {
         contains: '@test.com',
       },

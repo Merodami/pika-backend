@@ -4,11 +4,11 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
-import { UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IBusinessService } from '../services/BusinessService.js'
@@ -63,8 +63,11 @@ export class BusinessController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
-      const validatedResponse =
-        businessPublic.BusinessListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessListResponse,
+        response,
+        'BusinessController.getAllBusinesses',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -107,7 +110,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.getBusinessById',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -150,7 +157,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.getBusinessByUserId',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -173,7 +184,6 @@ export class BusinessController {
       const query =
         getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
 
-
       // Parse include parameter
       const includeRelations = query.include?.split(',') || []
       const business = await this.businessService.getBusinessByUserId(userId, {
@@ -185,7 +195,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.getMyBusiness',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -206,7 +220,6 @@ export class BusinessController {
       const context = RequestContext.getContext(req)
       const authenticatedUserId = context.userId
 
-
       const data = {
         ...req.body,
         userId: authenticatedUserId,
@@ -218,7 +231,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.createMyBusiness',
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -239,7 +256,6 @@ export class BusinessController {
       const context = RequestContext.getContext(req)
       const userId = context.userId
 
-
       // Get user's business first
       const existingBusiness =
         await this.businessService.getBusinessByUserId(userId)
@@ -253,7 +269,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.updateMyBusiness',
+      )
 
       res.json(validatedResponse)
     } catch (error) {

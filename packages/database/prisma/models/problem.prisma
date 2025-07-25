@@ -3,9 +3,9 @@ model Problem {
   userId      String          @map("user_id") @db.Uuid
   title       String          @db.VarChar(255)
   description String          @db.Text
-  status      ProblemStatus   @default(OPEN)
-  priority    ProblemPriority @default(MEDIUM)
-  type        ProblemType     @default(GENERAL)
+  status      ProblemStatus   @default(open)
+  priority    ProblemPriority @default(medium)
+  type        ProblemType     @default(general)
   createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime?       @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
   resolvedAt  DateTime?       @map("resolved_at") @db.Timestamptz(6)

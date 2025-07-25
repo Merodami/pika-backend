@@ -7,9 +7,9 @@
  * Must match Prisma schema definitions
  */
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  CUSTOMER = 'CUSTOMER',
-  BUSINESS = 'BUSINESS',
+  ADMIN = 'admin',
+  CUSTOMER = 'customer',
+  BUSINESS = 'business',
 }
 
 /**
@@ -22,10 +22,10 @@ export type UserRoleType = `${UserRole}`
  * Must match Prisma schema definitions
  */
 export enum UserStatus {
-  ACTIVE = 'ACTIVE',
-  SUSPENDED = 'SUSPENDED',
-  BANNED = 'BANNED',
-  UNCONFIRMED = 'UNCONFIRMED',
+  ACTIVE = 'active',
+  SUSPENDED = 'suspended',
+  BANNED = 'banned',
+  UNCONFIRMED = 'unconfirmed',
 }
 
 /**
@@ -140,13 +140,13 @@ export type VerificationStatusType = `${VerificationStatus}`
  * Must match Prisma schema definitions
  */
 export enum ProblemStatus {
-  OPEN = 'OPEN',
-  ASSIGNED = 'ASSIGNED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  WAITING_CUSTOMER = 'WAITING_CUSTOMER',
-  WAITING_INTERNAL = 'WAITING_INTERNAL',
-  RESOLVED = 'RESOLVED',
-  CLOSED = 'CLOSED',
+  OPEN = 'open',
+  ASSIGNED = 'assigned',
+  IN_PROGRESS = 'in_progress',
+  WAITING_CUSTOMER = 'waiting_customer',
+  WAITING_INTERNAL = 'waiting_internal',
+  RESOLVED = 'resolved',
+  CLOSED = 'closed',
 }
 
 /**
@@ -159,11 +159,11 @@ export type ProblemStatusType = `${ProblemStatus}`
  * Must match Prisma schema definitions
  */
 export enum ProblemPriority {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  URGENT = 'URGENT',
-  CRITICAL = 'CRITICAL',
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent',
+  CRITICAL = 'critical',
 }
 
 /**
@@ -176,12 +176,12 @@ export type ProblemPriorityType = `${ProblemPriority}`
  * Must match Prisma schema definitions
  */
 export enum ProblemType {
-  BILLING = 'BILLING',
-  TECHNICAL = 'TECHNICAL',
-  ACCOUNT = 'ACCOUNT',
-  GENERAL = 'GENERAL',
-  BUG_REPORT = 'BUG_REPORT',
-  FEATURE_REQUEST = 'FEATURE_REQUEST',
+  BILLING = 'billing',
+  TECHNICAL = 'technical',
+  ACCOUNT = 'account',
+  GENERAL = 'general',
+  BUG_REPORT = 'bug_report',
+  FEATURE_REQUEST = 'feature_request',
 }
 
 /**

@@ -14,7 +14,7 @@ export const UserSortBy = z.enum([
 
 export type UserSortBy = z.infer<typeof UserSortBy>
 
-export const UserRole = z.enum(['ADMIN', 'CUSTOMER', 'BUSINESS'])
+export const UserRole = z.enum(['admin', 'customer', 'business'])
 
 export type UserRole = z.infer<typeof UserRole>
 

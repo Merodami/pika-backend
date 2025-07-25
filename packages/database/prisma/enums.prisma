@@ -16,72 +16,72 @@ enum UserStatus {
 }
 
 enum AuditAction {
-  CREATE
-  UPDATE
-  DELETE
-  LOGIN
-  LOGOUT
-  STATUS_CHANGE
+  create
+  update
+  delete
+  login
+  logout
+  status_change
 
   @@schema("audit")
 }
 
 enum ProblemStatus {
-  OPEN
-  ASSIGNED
-  IN_PROGRESS
-  WAITING_CUSTOMER
-  WAITING_INTERNAL
-  RESOLVED
-  CLOSED
+  open
+  assigned
+  in_progress
+  waiting_customer
+  waiting_internal
+  resolved
+  closed
 
   @@schema("support")
 }
 
 enum ProblemPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-  CRITICAL
+  low
+  medium
+  high
+  urgent
+  critical
 
   @@schema("support")
 }
 
 enum ProblemType {
-  BILLING
-  TECHNICAL
-  ACCOUNT
-  GENERAL
-  BUG_REPORT
-  FEATURE_REQUEST
+  billing
+  technical
+  account
+  general
+  bug_report
+  feature_request
 
   @@schema("support")
 }
 
 enum NotificationStatus {
-  PENDING
-  SENT
-  FAILED
-  READ
+  pending
+  sent
+  failed
+  read
 
   @@schema("support")
 }
 
 enum NotificationType {
-  EMAIL
-  SMS
-  PUSH
-  IN_APP
+  email
+  sms
+  push
+  in_app
 
   @@schema("support")
 }
 
 enum CommunicationMethod {
-  EMAIL
-  SMS
-  PUSH
-  IN_APP
+  email
+  sms
+  push
+  in_app
 
   @@schema("support")
 }
@@ -90,8 +90,8 @@ enum SubscriptionStatus {
   active
   canceled
   incomplete
-  incompleteExpired
-  pastDue
+  incomplete_expired
+  past_due
   trialing
   unpaid
 
@@ -99,19 +99,19 @@ enum SubscriptionStatus {
 }
 
 enum FileType {
-  IMAGE
-  VIDEO
-  DOCUMENT
-  AUDIO
-  OTHER
+  image
+  video
+  document
+  audio
+  other
 
   @@schema("files")
 }
 
 enum StorageProvider {
-  AWS_S3
-  LOCAL
-  MINIO
+  aws_s3
+  local
+  minio
 
   @@schema("files")
 }

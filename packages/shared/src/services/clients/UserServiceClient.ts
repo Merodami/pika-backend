@@ -1,6 +1,7 @@
 import { USER_API_URL } from '@pika/environment'
 import type { UserDomain } from '@pika/sdk'
 import type { ServiceContext } from '@pika/types'
+import { UserRole } from '@prisma/client'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 
@@ -11,7 +12,11 @@ export interface CreateUserRequest {
   firstName: string
   lastName: string
   phoneNumber?: string
+  dateOfBirth?: string
+  acceptTerms: boolean
+  marketingConsent?: boolean
   role?: string
+  avatarUrl?: string
 }
 
 export interface UpdateLastLoginRequest {
@@ -96,7 +101,7 @@ export class UserServiceClient extends BaseServiceClient {
     try {
       const user = await this.getUser(userId, context)
 
-      return user !== null && user.role === 'ADMIN'
+      return user !== null && user.role === UserRole.admin
     } catch (error: any) {
       // Log error but return false instead of throwing
       console.error('Error checking if user is admin:', error)

@@ -1,4 +1,7 @@
-import type { FileStorageLogDomain } from '../domain/file-storage.js'
+import type {
+  FileStorageLogDomain,
+  FileUploadDomain,
+} from '../domain/file-storage.js'
 import type { FileStorageLogDTO } from '../dto/file-storage.dto.js'
 import type { UserDocument } from './UserMapper.js'
 
@@ -56,6 +59,59 @@ export class FileStorageLogMapper {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt || new Date(),
     }
+  }
+
+  /**
+   * Convert FileStorageLogDomain to FileUploadDomain for API responses
+   */
+  static toFileUploadDomain(log: FileStorageLogDomain): FileUploadDomain {
+    return {
+      fileId: log.fileId,
+      fileKey: log.storageKey || log.fileId,
+      fileName: log.fileName,
+      fileSize: log.size,
+      mimeType: log.contentType,
+      fileType: this.determineFileType(log.contentType),
+      url: log.url,
+      uploadedAt: log.uploadedAt || log.createdAt,
+    }
+  }
+
+  /**
+   * Convert FileUploadDomain to API DTO
+   */
+  static fileUploadToDTO(domain: FileUploadDomain) {
+    return {
+      fileId: domain.fileId,
+      fileKey: domain.fileKey,
+      fileName: domain.fileName,
+      fileSize: domain.fileSize,
+      mimeType: domain.mimeType,
+      fileType: domain.fileType,
+      url: domain.url,
+      uploadedAt: domain.uploadedAt.toISOString(),
+    }
+  }
+
+  /**
+   * Helper to determine file type from MIME type
+   */
+  private static determineFileType(
+    mimeType: string,
+  ): 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | 'OTHER' {
+    if (mimeType.startsWith('image/')) return 'IMAGE'
+    if (mimeType.startsWith('video/')) return 'VIDEO'
+    if (mimeType.startsWith('audio/')) return 'AUDIO'
+    if (
+      mimeType === 'application/pdf' ||
+      mimeType.includes('document') ||
+      mimeType.includes('spreadsheet') ||
+      mimeType.includes('word') ||
+      mimeType.includes('excel')
+    )
+      return 'DOCUMENT'
+
+    return 'OTHER'
   }
 
   /**

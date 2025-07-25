@@ -4,11 +4,13 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
+import { UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IUserService } from '../services/UserService.js'
@@ -34,6 +36,7 @@ export class UserController {
     this.getUserFriends = this.getUserFriends.bind(this)
     this.getMe = this.getMe.bind(this)
     this.updateMe = this.updateMe.bind(this)
+    this.uploadMyAvatar = this.uploadMyAvatar.bind(this)
   }
 
   /**
@@ -83,16 +86,14 @@ export class UserController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, UserMapper.toDTO)
-      const validatedResponse = userAdmin.AdminUserListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserListResponse,
+        response,
+        'UserController.getAllUsers',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
-      console.log('[USER_CONTROLLER] Caught error in getAllUsers:', {
-        name: (error as any).name,
-        message: (error as any).message,
-        code: (error as any).code,
-        isBaseError: error instanceof ErrorFactory.constructor,
-      })
       next(error)
     }
   }
@@ -121,7 +122,11 @@ export class UserController {
       })
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getUserById',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -149,7 +154,11 @@ export class UserController {
       const user = await this.userService.getUserByEmail(email)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getUserByEmail',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -172,7 +181,11 @@ export class UserController {
       const user = await this.userService.createUser(data)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.createUser',
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -195,7 +208,11 @@ export class UserController {
       const user = await this.userService.createAdminUser(data)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.createAdminUser',
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -219,7 +236,11 @@ export class UserController {
       const user = await this.userService.updateUser(userId, data)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.updateUser',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -262,7 +283,7 @@ export class UserController {
       const authenticatedUserId = context.userId
 
       // Authorization check: Users can only upload their own avatars (unless admin)
-      if (authenticatedUserId !== userId && context.role !== 'ADMIN') {
+      if (authenticatedUserId !== userId && context.role !== UserRole.ADMIN) {
         throw ErrorFactory.forbidden('You can only upload your own avatar')
       }
 
@@ -279,7 +300,11 @@ export class UserController {
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
       const response = { avatarUrl: url }
-      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userPublic.UploadAvatarResponse,
+        response,
+        'UserController.uploadAvatar',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -306,7 +331,11 @@ export class UserController {
       const user = await this.userService.getUserBySubToken(subToken)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getUserBySubToken',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -329,7 +358,11 @@ export class UserController {
       const user = await this.userService.updateUserStatus(userId, status)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.updateUserStatus',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -352,7 +385,11 @@ export class UserController {
       const user = await this.userService.banUser(userId)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.banUser',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -375,7 +412,11 @@ export class UserController {
       const user = await this.userService.unbanUser(userId)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.unbanUser',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -397,7 +438,11 @@ export class UserController {
       const friends = await this.userService.getUserFriends(userId)
 
       const response = { guests: friends }
-      const validatedResponse = userPublic.UserFriendsResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userPublic.UserFriendsResponse,
+        response,
+        'UserController.getUserFriends',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -417,7 +462,11 @@ export class UserController {
       const user = await this.userService.getUserById(userId)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getMe',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -441,7 +490,49 @@ export class UserController {
       const user = await this.userService.updateUser(userId, req.body)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.updateMe',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /users/me/avatar
+   * Upload avatar for current authenticated user
+   */
+  async uploadMyAvatar(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      // Get the uploaded file from Multer
+      const file = req.file
+
+      if (!file) {
+        throw ErrorFactory.badRequest('No file uploaded')
+      }
+
+      // Adapt the multer file to our FileUpload format
+      const adaptedFile = adaptMulterFile(file)
+
+      const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
+
+      const response = { avatarUrl: url }
+      const validatedResponse = validateResponse(
+        userPublic.UploadAvatarResponse,
+        response,
+        'UserController.uploadMyAvatar',
+      )
 
       res.json(validatedResponse)
     } catch (error) {

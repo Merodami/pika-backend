@@ -18,7 +18,6 @@ import {
   cleanupTestDatabase,
   createE2EAuthHelper,
   createTestDatabase,
-  E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
 import type { Express } from 'express'
@@ -37,7 +36,6 @@ describe('Auth Login Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let request: supertest.SuperTest<supertest.Test>
-  let authHelper: E2EAuthHelper
   let cacheService: MemoryCacheService
 
   // Shared test data created once

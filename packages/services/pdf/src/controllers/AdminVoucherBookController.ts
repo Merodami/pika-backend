@@ -1,10 +1,11 @@
-import { pdfAdmin, pdfCommon, voucherAdmin, voucherCommon } from '@pika/api'
+import { pdfAdmin, pdfCommon } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedBody,
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
@@ -41,11 +42,11 @@ export class AdminVoucherBookController {
   })
   async getAllVoucherBooks(
     req: Request,
-    res: Response<voucherAdmin.AdminVoucherListResponse>,
+    res: Response<pdfAdmin.AdminVoucherBookListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<voucherAdmin.AdminVoucherQueryParams>(req)
+      const query = getValidatedQuery<pdfAdmin.AdminVoucherBookQueryParams>(req)
 
       // Map API query to service params
       const params = {
@@ -60,8 +61,11 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = paginatedResponse(result, VoucherBookMapper.toDTO)
-      const validatedResponse =
-        voucherAdmin.AdminVoucherListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        pdfAdmin.AdminVoucherBookListResponse,
+        response,
+        'AdminVoucherBookController.getAllVoucherBooks',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -79,8 +83,8 @@ export class AdminVoucherBookController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getVoucherBookById(
-    req: Request<voucherCommon.VoucherIdParam>,
-    res: Response<voucherAdmin.AdminVoucherResponse>,
+    req: Request<pdfCommon.VoucherBookIdParam>,
+    res: Response<pdfAdmin.AdminVoucherBookResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -89,7 +93,11 @@ export class AdminVoucherBookController {
       const voucherBook = await this.voucherBookService.getVoucherBookById(id)
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
-      const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        pdfAdmin.AdminVoucherBookResponse,
+        dto,
+        'AdminVoucherBookController.getVoucherBookById',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -116,7 +124,11 @@ export class AdminVoucherBookController {
         await this.voucherBookService.createVoucherBook(createData)
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
-      const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        pdfAdmin.AdminVoucherBookResponse,
+        dto,
+        'AdminVoucherBookController.createVoucherBook',
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -150,7 +162,11 @@ export class AdminVoucherBookController {
       )
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
-      const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        pdfAdmin.AdminVoucherBookResponse,
+        dto,
+        'AdminVoucherBookController.updateVoucherBook',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -204,7 +220,11 @@ export class AdminVoucherBookController {
       )
 
       const dto = VoucherBookMapper.toDTO(voucherBook)
-      const validatedResponse = voucherAdmin.AdminVoucherResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        pdfAdmin.AdminVoucherBookResponse,
+        dto,
+        'AdminVoucherBookController.updateVoucherBookStatus',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -234,7 +254,11 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toGeneratePDFResponse(result)
-      const validatedResponse = pdfAdmin.GeneratePdfResponse.parse(response)
+      const validatedResponse = validateResponse(
+        pdfAdmin.GeneratePdfResponse,
+        response,
+        'AdminVoucherBookController.generatePDF',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -267,8 +291,11 @@ export class AdminVoucherBookController {
         processedCount: result.processedCount,
         operation: 'archived',
       })
-      const validatedResponse =
-        pdfAdmin.BulkVoucherBookOperationResponse.parse(response)
+      const validatedResponse = validateResponse(
+        pdfAdmin.BulkVoucherBookOperationResponse,
+        response,
+        'AdminVoucherBookController.bulkArchiveVoucherBooks',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -300,8 +327,11 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toStatisticsResponse(stats)
-      const validatedResponse =
-        pdfAdmin.VoucherBookStatsResponse.parse(response)
+      const validatedResponse = validateResponse(
+        pdfAdmin.VoucherBookStatsResponse,
+        response,
+        'AdminVoucherBookController.getVoucherBookStatistics',
+      )
 
       res.json(validatedResponse)
     } catch (error) {

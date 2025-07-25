@@ -14,21 +14,39 @@ export const AdminTicketSortBy = z.enum([
 export type AdminTicketSortBy = z.infer<typeof AdminTicketSortBy>
 
 export const TicketStatus = z.enum([
-  'OPEN',
-  'IN_PROGRESS',
-  'RESOLVED',
-  'CLOSED',
+  'open',
+  'assigned',
+  'in_progress',
+  'waiting_customer',
+  'waiting_internal',
+  'resolved',
+  'closed',
 ])
 export type TicketStatus = z.infer<typeof TicketStatus>
 
-export const TicketPriority = z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT'])
+export const TicketPriority = z.enum([
+  'low',
+  'medium',
+  'high',
+  'urgent',
+  'critical',
+])
 export type TicketPriority = z.infer<typeof TicketPriority>
 
-export const TicketCategory = z.enum([
-  'GENERAL',
-  'TECHNICAL',
-  'BILLING',
-  'ACCOUNT',
-  'OTHER',
+export const TicketType = z.enum([
+  'billing',
+  'technical',
+  'account',
+  'general',
+  'bug_report',
+  'feature_request',
 ])
-export type TicketCategory = z.infer<typeof TicketCategory>
+export type TicketType = z.infer<typeof TicketType>
+
+export const ProblemSortBy = z.enum([
+  'CREATED_AT',
+  'UPDATED_AT',
+  'PRIORITY',
+  'STATUS',
+])
+export type ProblemSortBy = z.infer<typeof ProblemSortBy>

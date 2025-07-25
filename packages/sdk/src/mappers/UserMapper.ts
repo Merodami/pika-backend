@@ -8,6 +8,7 @@ import type {
 } from '../domain/user.js'
 import type { AddressDTO, PaymentMethodDTO, UserDTO } from '../dto/user.dto.js'
 import {
+  formatDateOnlyOrUndefined,
   formatDateToISO,
   formatDateToISOOrUndefined,
 } from '../utils/dateUtils.js'
@@ -141,13 +142,13 @@ export class UserMapper {
       phoneNumber: domain.phoneNumber || undefined,
       phoneVerified: domain.phoneVerified,
       avatarUrl: domain.avatarUrl || undefined,
-      role: this.mapRoleToDTO(domain.role),
-      status: this.mapStatusToDTO(domain.status),
+      role: UserMapper.mapRoleToDTO(domain.role),
+      status: UserMapper.mapStatusToDTO(domain.status),
       lastLoginAt: formatDateToISOOrUndefined(domain.lastLoginAt),
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
       // Additional fields
-      dateOfBirth: formatDateToISOOrUndefined(domain.dateOfBirth),
+      dateOfBirth: formatDateOnlyOrUndefined(domain.dateOfBirth),
       // Admin fields - default values when not available
       stripeUserId: domain.stripeUserId || undefined,
     }
@@ -234,7 +235,7 @@ export class UserMapper {
     return {
       id: doc.id,
       userId: doc.userId,
-      paymentType: this.mapPaymentType(doc.paymentType),
+      paymentType: UserMapper.mapPaymentType(doc.paymentType),
       cardBrand: doc.cardBrand,
       lastFour: doc.lastFour,
       expiryMonth: doc.expiryMonth,

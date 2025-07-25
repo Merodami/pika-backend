@@ -1,5 +1,5 @@
 import { paymentPublic } from '@pika/api'
-import { getValidatedQuery } from '@pika/http'
+import { getValidatedQuery, validateResponse } from '@pika/http'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -39,7 +39,12 @@ export class ProductController {
         metadata,
       })
 
-      const validatedResponse = paymentPublic.Product.parse(product)
+      const validatedResponse = validateResponse(
+        paymentPublic.Product,
+        product,
+        'ProductController.createProduct',
+      )
+
       response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -72,7 +77,12 @@ export class ProductController {
         metadata,
       })
 
-      const validatedResponse = paymentPublic.Product.parse(product)
+      const validatedResponse = validateResponse(
+        paymentPublic.Product,
+        product,
+        'ProductController.updateProduct',
+      )
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -102,7 +112,12 @@ export class ProductController {
         intervalCount,
       })
 
-      const validatedResponse = paymentPublic.Price.parse(price)
+      const validatedResponse = validateResponse(
+        paymentPublic.Price,
+        price,
+        'ProductController.createPrice',
+      )
+
       response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
@@ -125,7 +140,12 @@ export class ProductController {
 
       const price = await this.productService.deactivatePrice(id)
 
-      const validatedResponse = paymentPublic.Price.parse(price)
+      const validatedResponse = validateResponse(
+        paymentPublic.Price,
+        price,
+        'ProductController.deactivatePrice',
+      )
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -149,7 +169,13 @@ export class ProductController {
 
       const products = await this.productService.listProducts(limit)
 
-      const validatedResponse = paymentPublic.ProductListResponse.parse({ data: products })
+      const responseData = { data: products }
+      const validatedResponse = validateResponse(
+        paymentPublic.ProductListResponse,
+        responseData,
+        'ProductController.listProducts',
+      )
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)
@@ -173,7 +199,13 @@ export class ProductController {
 
       const prices = await this.productService.listPrices(productId, limit)
 
-      const validatedResponse = paymentPublic.PriceListResponse.parse({ data: prices })
+      const responseData = { data: prices }
+      const validatedResponse = validateResponse(
+        paymentPublic.PriceListResponse,
+        responseData,
+        'ProductController.listPrices',
+      )
+
       response.json(validatedResponse)
     } catch (error) {
       next(error)

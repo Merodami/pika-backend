@@ -1,6 +1,7 @@
 import { DEFAULT_LANGUAGE } from '@pika/environment'
 import type { LanguageCode } from '@pika/types'
 import type { Request } from 'express'
+import { z } from 'zod'
 
 /**
  * Helper functions for handling validated request data after Zod middleware transformation
@@ -106,4 +107,48 @@ export function getValidatedData<TQuery = any, TParams = any, TBody = any>(
  */
 export function getRequestLanguage(request: Request): LanguageCode {
   return (request.language || DEFAULT_LANGUAGE) as LanguageCode
+}
+
+/**
+ * Safely validate response data against a Zod schema
+ *
+ * This helper properly transforms ZodErrors into the expected validation error format
+ * that the error middleware can handle, preventing 500 errors.
+ *
+ * @example
+ * ```typescript
+ * // Instead of:
+ * const validatedResponse = schema.parse(response) // Throws ZodError -> 500
+ *
+ * // Use:
+ * const validatedResponse = safeValidateResponse(schema, response)
+ * ```
+ */
+export function safeValidateResponse<T extends z.ZodTypeAny>(
+  schema: T,
+  data: unknown,
+): z.infer<T> {
+  try {
+    return schema.parse(data)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      // Create a validation error in the expected format
+      const validationError = new Error('Response validation failed') as any
+
+      validationError.code = 'VALIDATION_ERROR'
+      validationError.httpPart = 'response'
+      validationError.validation = error.issues.map((issue) => ({
+        instancePath: `/response/${issue.path.join('/')}`,
+        schemaPath: '',
+        keyword: issue.code,
+        params: {},
+        message: issue.message,
+        data: undefined,
+      }))
+
+      throw validationError
+    }
+
+    throw error
+  }
 }

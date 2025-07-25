@@ -202,7 +202,10 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   )
 
   // Voucher parameter schemas
-  registry.registerSchema('VoucherPathParams', voucherParameters.VoucherPathParams)
+  registry.registerSchema(
+    'VoucherPathParams',
+    voucherParameters.VoucherPathParams,
+  )
 
   // ============= Payment/Transaction Schemas =============
   registry.registerSchema(
@@ -397,7 +400,7 @@ export function registerAdminAPI(registry: ZodRegistry): void {
  */
 function registerAdminRoutes(registry: ZodRegistry): void {
   // ============= Category Management Routes =============
-  
+
   // Get all categories
   registry.registerRoute({
     method: 'get',

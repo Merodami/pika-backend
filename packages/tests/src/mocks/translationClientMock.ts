@@ -57,13 +57,7 @@ export class MockTranslationClient {
   /**
    * Set translation for a key in a specific language
    */
-  async set(
-    key: string,
-    language: string,
-    value: string,
-    context?: string,
-    service?: string,
-  ): Promise<void> {
+  async set(key: string, language: string, value: string): Promise<void> {
     if (!this.mockTranslations.has(key)) {
       this.mockTranslations.set(key, new Map())
     }

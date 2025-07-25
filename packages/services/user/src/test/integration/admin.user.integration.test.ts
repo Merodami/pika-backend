@@ -16,12 +16,14 @@ vi.unmock('@pika/redis')
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
   const actualApi = await vi.importActual('@pika/api')
+
   return actualApi // Return all actual exports
 })
 
 // Force Vitest to use the actual implementation of '@pika/shared' for this test file.
 vi.mock('@pika/shared', async () => {
   const actualShared = await vi.importActual('@pika/shared')
+
   return actualShared // Return all actual exports
 })
 
@@ -35,11 +37,10 @@ import {
 } from '@pika/tests'
 import {
   cleanupTestDatabase,
-  clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { UserRole } from '@prisma/client'
+import { UserRole, UserStatus } from '@pika/types'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -71,7 +72,6 @@ describe('User Service - Admin API Integration Tests', () => {
   // Authenticated clients for different user types
   let adminClient: AuthenticatedRequestClient
   let customerClient: AuthenticatedRequestClient
-  let businessClient: AuthenticatedRequestClient
 
   // Shared test data created once
   let sharedTestData: SharedUserTestData
@@ -137,9 +137,7 @@ describe('User Service - Admin API Integration Tests', () => {
     logger.debug('Creating shared test data...')
     sharedTestData = await createSharedUserTestData(testDb.prisma)
 
-    logger.debug(
-      `Created ${sharedTestData.allUsers.length} shared test users`,
-    )
+    logger.debug(`Created ${sharedTestData.allUsers.length} shared test users`)
   }, 120000)
 
   beforeEach(async () => {
@@ -161,7 +159,7 @@ describe('User Service - Admin API Integration Tests', () => {
                 'user@e2etest.com',
                 'business@e2etest.com',
                 // Preserve shared test users
-                ...sharedTestData.allUsers.map(u => u.email),
+                ...sharedTestData.allUsers.map((u) => u.email),
               ],
             },
           },
@@ -212,7 +210,7 @@ describe('User Service - Admin API Integration Tests', () => {
 
     it('should filter users by role', async () => {
       // Seed specific role users
-      await seedTestUsers(testDb.prisma, { count: 3, role: 'CUSTOMER' })
+      await seedTestUsers(testDb.prisma, { count: 3, role: UserRole.CUSTOMER })
 
       const response = await adminClient
         .get('/users')
@@ -238,21 +236,23 @@ describe('User Service - Admin API Integration Tests', () => {
     })
 
     it('should filter users by status', async () => {
-      await seedTestUsers(testDb.prisma, { 
-        count: 5, 
+      await seedTestUsers(testDb.prisma, {
+        count: 5,
         generateInactive: true,
-        generateUnconfirmed: true
+        generateUnconfirmed: true,
       })
 
       const response = await adminClient
         .get('/users')
-        .query({ status: 'ACTIVE' })
+        .query({ status: UserStatus.ACTIVE })
         .set('Accept', 'application/json')
         .expect(200)
 
       expect(response.body.data.length).toBeGreaterThan(0)
       expect(
-        response.body.data.every((user: any) => user.status === 'ACTIVE')
+        response.body.data.every(
+          (user: any) => user.status === UserStatus.ACTIVE,
+        ),
       ).toBe(true)
     })
 
@@ -264,7 +264,11 @@ describe('User Service - Admin API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      const emails = response.body.data.map((user: any) => user.email)
+      // Filter out e2e test users to avoid test interference
+      const emails = response.body.data
+        .map((user: any) => user.email)
+        .filter((email: string) => !email.endsWith('@e2etest.com'))
+
       expect(emails).toEqual([...emails].sort())
     })
 
@@ -377,15 +381,20 @@ describe('User Service - Admin API Integration Tests', () => {
         lastName: 'Created',
         phoneNumber: '+1234567890',
         dateOfBirth: '1990-01-01',
-        role: 'CUSTOMER',
-        status: 'UNCONFIRMED',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.UNCONFIRMED,
       }
 
       const response = await adminClient
         .post('/users')
         .send(userData)
         .set('Accept', 'application/json')
-        .expect(201)
+
+      if (response.status !== 201) {
+        console.error('User creation failed:', response.body)
+      }
+
+      expect(response.status).toBe(201)
 
       expect(response.body.id).toBeDefined()
       expect(response.body.email).toBe(userData.email)
@@ -420,8 +429,8 @@ describe('User Service - Admin API Integration Tests', () => {
         .expect(201)
 
       expect(response.body.email).toBe(userData.email)
-      expect(response.body.role).toBe('CUSTOMER') // Default value
-      expect(response.body.status).toBe('UNCONFIRMED') // Default value
+      expect(response.body.role).toBe('customer') // Default value
+      expect(response.body.status).toBe(UserStatus.UNCONFIRMED) // Default value
     })
 
     it('should create business user', async () => {
@@ -431,7 +440,7 @@ describe('User Service - Admin API Integration Tests', () => {
         lastName: 'Owner',
         phoneNumber: '+1111111111',
         dateOfBirth: '1980-06-15',
-        role: 'BUSINESS',
+        role: UserRole.BUSINESS,
       }
 
       const response = await adminClient
@@ -440,7 +449,7 @@ describe('User Service - Admin API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(201)
 
-      expect(response.body.role).toBe('BUSINESS')
+      expect(response.body.role).toBe('business')
       expect(response.body.email).toBe(userData.email)
     })
 
@@ -451,7 +460,7 @@ describe('User Service - Admin API Integration Tests', () => {
         lastName: 'User',
         phoneNumber: '+2222222222',
         dateOfBirth: '1975-03-10',
-        role: 'ADMIN',
+        role: UserRole.ADMIN,
       }
 
       const response = await adminClient
@@ -460,7 +469,7 @@ describe('User Service - Admin API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(201)
 
-      expect(response.body.role).toBe('ADMIN')
+      expect(response.body.role).toBe('admin')
     })
 
     it('should validate required fields', async () => {
@@ -579,14 +588,14 @@ describe('User Service - Admin API Integration Tests', () => {
     })
 
     it('should allow admin to update user role', async () => {
-      const testUsers = await seedTestUsers(testDb.prisma, { 
-        count: 1, 
-        role: 'CUSTOMER' 
+      const testUsers = await seedTestUsers(testDb.prisma, {
+        count: 1,
+        role: UserRole.CUSTOMER,
       })
       const targetUser = testUsers.users[0]
 
       const updateData = {
-        role: 'BUSINESS',
+        role: UserRole.BUSINESS,
       }
 
       const response = await adminClient
@@ -595,14 +604,14 @@ describe('User Service - Admin API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.role).toBe('BUSINESS')
+      expect(response.body.role).toBe('business')
 
       // Verify in database
       const updatedUser = await testDb.prisma.user.findUnique({
         where: { id: targetUser.id },
       })
 
-      expect(updatedUser?.role).toBe('BUSINESS')
+      expect(updatedUser?.role).toBe('business')
     })
 
     it('should allow admin to update user status', async () => {
@@ -610,7 +619,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const targetUser = testUsers.users[0]
 
       const updateData = {
-        status: 'INACTIVE',
+        status: UserStatus.SUSPENDED,
       }
 
       const response = await adminClient
@@ -619,7 +628,7 @@ describe('User Service - Admin API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.status).toBe('INACTIVE')
+      expect(response.body.status).toBe(UserStatus.SUSPENDED)
     })
 
     it('should return 404 for non-existent user', async () => {
@@ -729,7 +738,7 @@ describe('User Service - Admin API Integration Tests', () => {
             firstName: 'Verify',
             lastName: 'Test',
             password: 'hashedpassword',
-            status: 'UNCONFIRMED',
+            status: UserStatus.UNCONFIRMED,
             emailVerified: false,
           },
         })
@@ -744,8 +753,6 @@ describe('User Service - Admin API Integration Tests', () => {
           .expect(200)
 
         expect(response.body.success).toBe(true)
-        expect(response.body.user.emailVerified).toBe(true)
-        expect(response.body.user.status).toBe('ACTIVE')
 
         // Verify the user was actually updated in the database
         const updatedUser = await testDb.prisma.user.findUnique({
@@ -753,7 +760,7 @@ describe('User Service - Admin API Integration Tests', () => {
         })
 
         expect(updatedUser?.emailVerified).toBe(true)
-        expect(updatedUser?.status).toBe('ACTIVE')
+        expect(updatedUser?.status).toBe(UserStatus.ACTIVE)
       })
 
       it('should fail with invalid user ID', async () => {
@@ -773,7 +780,7 @@ describe('User Service - Admin API Integration Tests', () => {
             firstName: 'Resend',
             lastName: 'Test',
             password: 'hashedpassword',
-            status: 'UNCONFIRMED',
+            status: UserStatus.UNCONFIRMED,
             emailVerified: false,
           },
         })
@@ -816,11 +823,7 @@ describe('User Service - Admin API Integration Tests', () => {
         })
 
         // Store verification code
-        await cacheService.set(
-          `phone-verification:${user.id}`,
-          '123456',
-          300,
-        )
+        await cacheService.set(`phone-verification:${user.id}`, '123456', 300)
 
         const response = await adminClient
           .post('/admin/users/verify')
@@ -832,7 +835,13 @@ describe('User Service - Admin API Integration Tests', () => {
           .expect(200)
 
         expect(response.body.success).toBe(true)
-        expect(response.body.user.phoneVerified).toBe(true)
+
+        // Verify the user was actually updated in the database
+        const updatedUser = await testDb.prisma.user.findUnique({
+          where: { id: user.id },
+        })
+
+        expect(updatedUser?.phoneVerified).toBe(true)
 
         // Verify code is deleted
         const codeExists = await cacheService.get(
@@ -853,11 +862,7 @@ describe('User Service - Admin API Integration Tests', () => {
           },
         })
 
-        await cacheService.set(
-          `phone-verification:${user.id}`,
-          '123456',
-          300,
-        )
+        await cacheService.set(`phone-verification:${user.id}`, '123456', 300)
 
         await adminClient
           .post('/admin/users/verify')
@@ -907,7 +912,7 @@ describe('User Service - Admin API Integration Tests', () => {
             firstName: 'Confirm',
             lastName: 'Test',
             password: 'hashedpassword',
-            status: 'UNCONFIRMED',
+            status: UserStatus.UNCONFIRMED,
             emailVerified: true, // Already verified email
           },
         })
@@ -921,7 +926,13 @@ describe('User Service - Admin API Integration Tests', () => {
           .expect(200)
 
         expect(response.body.success).toBe(true)
-        expect(response.body.user.status).toBe('ACTIVE')
+
+        // Verify the user status was updated
+        const updatedUser = await testDb.prisma.user.findUnique({
+          where: { id: user.id },
+        })
+
+        expect(updatedUser?.status).toBe(UserStatus.ACTIVE)
       })
 
       it('should fail account confirmation without userId', async () => {
@@ -1040,16 +1051,14 @@ describe('User Service - Admin API Integration Tests', () => {
       const testUsers = await seedTestUsers(testDb.prisma, { count: 5 })
 
       // Perform concurrent read operations
-      const promises = testUsers.users.map(user =>
-        adminClient
-          .get(`/users/${user.id}`)
-          .set('Accept', 'application/json')
+      const promises = testUsers.users.map((user) =>
+        adminClient.get(`/users/${user.id}`).set('Accept', 'application/json'),
       )
 
       const responses = await Promise.all(promises)
 
       // All requests should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
       })
     })

@@ -114,7 +114,9 @@ export class AdPlacementMapper {
    * Business rule: endPosition = position + spaceCount - 1
    */
   static getEndPosition(placement: { position: number; size: AdSize }): number {
-    return placement.position + this.getSpaceCount(placement.size) - 1
+    return (
+      placement.position + AdPlacementMapper.getSpaceCount(placement.size) - 1
+    )
   }
 
   /**
@@ -126,7 +128,7 @@ export class AdPlacementMapper {
     startPos: number,
     endPos: number,
   ): boolean {
-    const placementEnd = this.getEndPosition(placement)
+    const placementEnd = AdPlacementMapper.getEndPosition(placement)
 
     return !(endPos < placement.position || startPos > placementEnd)
   }
@@ -163,7 +165,7 @@ export class AdPlacementMapper {
       shortCode: placement.shortCode,
       title: placement.title,
       description: placement.description,
-      metadata: this.ensureMetadata(placement.metadata),
+      metadata: AdPlacementMapper.ensureMetadata(placement.metadata),
       createdById: placement.createdBy,
       updatedById: placement.updatedBy,
       createdAt: placement.createdAt.toISOString(),
@@ -216,7 +218,7 @@ export class AdPlacementMapper {
       shortCode: placement.shortCode,
       title: placement.title,
       description: placement.description,
-      metadata: this.ensureMetadata(placement.metadata),
+      metadata: AdPlacementMapper.ensureMetadata(placement.metadata),
       createdById: placement.createdBy,
       updatedById: placement.updatedBy,
       createdAt: placement.createdAt.toISOString(),
@@ -228,17 +230,17 @@ export class AdPlacementMapper {
    * Convert array to DTOs
    */
   static toDTOList(placements: AdPlacement[]): AdPlacementDTO[] {
-    return placements.map((p) => this.toSimpleDTO(p))
+    return placements.map((p) => AdPlacementMapper.toSimpleDTO(p))
   }
 
   /**
    * Convert create DTO to database input
    */
   static fromCreateDTO(dto: CreateAdPlacementDTO, createdById: string): any {
-    const spacesUsed = this.getSpaceCount(dto.size)
+    const spacesUsed = AdPlacementMapper.getSpaceCount(dto.size)
 
     // Validate business rules
-    if (!this.validatePosition(dto.position)) {
+    if (!AdPlacementMapper.validatePosition(dto.position)) {
       throw new Error('AdPlacement position must be between 1 and 8')
     }
 
@@ -289,12 +291,12 @@ export class AdPlacementMapper {
     // Handle size changes
     if (dto.size !== undefined) {
       updates.size = dto.size
-      updates.spacesUsed = this.getSpaceCount(dto.size)
+      updates.spacesUsed = AdPlacementMapper.getSpaceCount(dto.size)
     }
 
     // Validate position if changed
     if (dto.position !== undefined) {
-      if (!this.validatePosition(dto.position)) {
+      if (!AdPlacementMapper.validatePosition(dto.position)) {
         throw new Error('AdPlacement position must be between 1 and 8')
       }
       updates.position = dto.position
@@ -326,7 +328,7 @@ export class AdPlacementMapper {
         const pageNumber = (placement.page as any).pageNumber
         const pagePlacements = pageMap.get(pageNumber) || []
 
-        pagePlacements.push(this.toSimpleDTO(placement))
+        pagePlacements.push(AdPlacementMapper.toSimpleDTO(placement))
         pageMap.set(pageNumber, pagePlacements)
       }
     }
@@ -345,7 +347,7 @@ export class AdPlacementMapper {
    */
   static calculatePageSpaceUsage(placements: AdPlacement[]): number {
     return placements.reduce((total, placement) => {
-      return total + this.getSpaceCount(placement.size)
+      return total + AdPlacementMapper.getSpaceCount(placement.size)
     }, 0)
   }
 
@@ -353,14 +355,14 @@ export class AdPlacementMapper {
    * Check if a page is full (8 spaces used)
    */
   static isPageFull(placements: AdPlacement[]): boolean {
-    return this.calculatePageSpaceUsage(placements) >= 8
+    return AdPlacementMapper.calculatePageSpaceUsage(placements) >= 8
   }
 
   /**
    * Get available spaces on a page
    */
   static getAvailableSpaces(placements: AdPlacement[]): number {
-    const usedSpaces = this.calculatePageSpaceUsage(placements)
+    const usedSpaces = AdPlacementMapper.calculatePageSpaceUsage(placements)
 
     return Math.max(0, 8 - usedSpaces)
   }
@@ -372,10 +374,10 @@ export class AdPlacementMapper {
     existingPlacements: AdPlacement[],
     proposedPlacement: { position: number; size: AdSize },
   ): AdPlacement[] {
-    const proposedEnd = this.getEndPosition(proposedPlacement)
+    const proposedEnd = AdPlacementMapper.getEndPosition(proposedPlacement)
 
     return existingPlacements.filter((existing) =>
-      this.overlapsWithPositions(
+      AdPlacementMapper.overlapsWithPositions(
         existing,
         proposedPlacement.position,
         proposedEnd,

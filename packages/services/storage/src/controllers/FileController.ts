@@ -4,6 +4,7 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { FileStorageLogMapper } from '@pika/sdk'
@@ -72,7 +73,7 @@ export class FileController implements IFileController {
    */
   async uploadFile(
     request: Request<{}, {}, storagePublic.FileUploadRequest>,
-    response: Response<storagePublic.FileUploadResponse>,
+    response: Response<storagePublic.FileStorageLog>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -112,7 +113,13 @@ export class FileController implements IFileController {
         userId,
       })
 
-      const validatedResponse = storagePublic.FileUploadResponse.parse(result)
+      // Transform FileStorageLogDomain to DTO and return full storage log
+      const responseData = FileStorageLogMapper.toDTO(result)
+      const validatedResponse = validateResponse(
+        storagePublic.FileStorageLog,
+        responseData,
+        'FileController.uploadFile',
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -165,7 +172,11 @@ export class FileController implements IFileController {
         userId,
       })
 
-      const validatedResponse = storagePublic.BatchUploadResponse.parse(result)
+      const validatedResponse = validateResponse(
+        storagePublic.BatchUploadResponse,
+        result,
+        'FileController.uploadBatch',
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -221,13 +232,18 @@ export class FileController implements IFileController {
         userId,
       )
 
-      const validatedResponse = storagePublic.FileUrlResponse.parse({
+      const responseData = {
         url,
         fileId,
         fileName: '',
         mimeType: '',
         expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString(),
-      })
+      }
+      const validatedResponse = validateResponse(
+        storagePublic.FileUrlResponse,
+        responseData,
+        'FileController.getFileUrl',
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -272,8 +288,11 @@ export class FileController implements IFileController {
       const result = await this.storageService.getFileHistory(userId, params)
 
       const response = paginatedResponse(result, FileStorageLogMapper.toDTO)
-      const validatedResponse =
-        storagePublic.FileHistoryResponse.parse(response)
+      const validatedResponse = validateResponse(
+        storagePublic.FileHistoryResponse,
+        response,
+        'FileController.getFileHistory',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -300,8 +319,11 @@ export class FileController implements IFileController {
       const file = await this.storageService.getFileById(id, userId)
 
       const response = FileStorageLogMapper.toDTO(file)
-      const validatedResponse =
-        storagePublic.FileHistoryResponse.parse(response)
+      const validatedResponse = validateResponse(
+        storagePublic.FileHistoryResponse,
+        response,
+        'FileController.getFileById',
+      )
 
       res.json(validatedResponse)
     } catch (error) {

@@ -312,8 +312,8 @@ describe('Public Category Integration Tests', () => {
   // Authentication Boundary Tests
   describe('Authentication Boundary Tests', () => {
     it('should require authentication for all category endpoints', async () => {
-      const testCategory = sharedTestData.activeRootCategories[0]
-      
+      const testCategory = sharedTestData.activeParentCategories[0]
+
       // Test all protected endpoints without authentication
       const protectedEndpoints = [
         { method: 'get', url: '/categories' },
