@@ -277,7 +277,8 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl || undefined,
       pdfUrl: voucherBook.pdfUrl || undefined,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || undefined,
-      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
+      metadata:
+        VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy || undefined,
       createdAt: voucherBook.createdAt.toISOString(),
@@ -359,7 +360,8 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl || undefined,
       pdfUrl: voucherBook.pdfUrl || undefined,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || undefined,
-      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
+      metadata:
+        VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy || undefined,
       createdAt: voucherBook.createdAt.toISOString(),
@@ -394,7 +396,8 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl,
       pdfUrl: voucherBook.pdfUrl,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || null,
-      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
+      metadata:
+        VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy || undefined,
       createdAt: voucherBook.createdAt.toISOString(),

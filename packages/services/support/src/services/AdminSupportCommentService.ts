@@ -59,7 +59,9 @@ export class AdminSupportCommentService implements IAdminSupportCommentService {
     params: CommentSearchParams,
     parsedIncludes?: ParsedIncludes,
   ): Promise<PaginatedResult<SupportCommentDomain>> {
-    logger.info('Admin fetching comments for problem', { problemId: params.problemId })
+    logger.info('Admin fetching comments for problem', {
+      problemId: params.problemId,
+    })
 
     // Admin sees all comments including internal ones
     return this.repository.findByProblemId(params, parsedIncludes)

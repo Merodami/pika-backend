@@ -1,4 +1,4 @@
-import { FileType, FileTypeType, StorageProvider } from '@pika/types'
+import { FileType, FileTypeType } from '@pika/types'
 
 import type {
   FileStorageLogDomain,
@@ -131,7 +131,6 @@ export class FileStorageLogMapper {
     }
   }
 
-
   /**
    * Helper to determine file type from MIME type using FileType enum
    */
@@ -187,7 +186,8 @@ export class FileStorageLogMapper {
       metadata: parsedMetadata,
       error: domain.errorMessage,
       createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
+      updatedAt:
+        domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
     }
   }
 
