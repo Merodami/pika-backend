@@ -39,6 +39,11 @@ export interface IVoucherBookRepository {
     updatedBy: string,
   ): Promise<VoucherBookDomain>
   findBooksForGeneration(): Promise<VoucherBookDomain[]>
+  findByTitleAndPeriod(
+    title: string,
+    year: number,
+    month?: number | null,
+  ): Promise<VoucherBookDomain[]>
 }
 
 /**
@@ -55,6 +60,7 @@ export interface CreateVoucherBookInput {
   backImageUrl?: string
   metadata?: Record<string, any>
   createdBy: string
+  updatedBy?: string
 }
 
 export interface UpdateVoucherBookInput {
@@ -135,7 +141,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
           backImageUrl: data.backImageUrl,
           metadata: data.metadata || {},
           createdBy: data.createdBy,
-          updatedBy: data.createdBy,
+          updatedBy: data.updatedBy || data.createdBy,
         },
       })
 
@@ -405,6 +411,40 @@ export class VoucherBookRepository implements IVoucherBookRepository {
   }
 
   /**
+   * Find voucher books by title and period (for duplicate validation)
+   */
+  async findByTitleAndPeriod(
+    title: string,
+    year: number,
+    month?: number | null,
+  ): Promise<VoucherBookDomain[]> {
+    try {
+      const where: Prisma.VoucherBookWhereInput = {
+        title,
+        year,
+        deletedAt: null, // Only check non-deleted books
+      }
+
+      if (month !== null && month !== undefined) {
+        where.month = month
+      }
+
+      const voucherBooks = await this.prisma.voucherBook.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+      })
+
+      return voucherBooks.map(VoucherBookMapper.fromDocument)
+    } catch (error) {
+      throw ErrorFactory.databaseError(
+        'findByTitleAndPeriod',
+        'VoucherBook',
+        error,
+      )
+    }
+  }
+
+  /**
    * Find published books for public API with optional relations
    */
   async findPublishedBooks(
@@ -505,10 +545,12 @@ export class VoucherBookRepository implements IVoucherBookRepository {
   async updateStatus(
     id: string,
     status: VoucherBookStatus,
+    updatedBy: string,
   ): Promise<VoucherBookDomain> {
     try {
-      const updateData: Prisma.VoucherBookUpdateInput = {
+      const updateData: any = {
         status,
+        updatedBy,
       }
 
       if (status === 'published') {

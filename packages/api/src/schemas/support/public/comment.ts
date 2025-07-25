@@ -2,9 +2,10 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
+import { SortOrder } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
-import { createSearchSchema } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 
 /**
@@ -67,14 +68,12 @@ export type SupportCommentListResponse = z.infer<
 
 // ProblemIdForCommentsParam is now imported from common/parameters.ts
 
-// Sort fields for comments
-const COMMENT_SORT_FIELDS = ['CREATED_AT', 'UPDATED_AT'] as const
+import { CommentSortBy } from '../common/enums.js'
 
-// Search schema using common utilities
-export const SupportCommentSearchParams = createSearchSchema({
-  sortFields: COMMENT_SORT_FIELDS,
-  includeRelations: [], // Public users don't get includes
-  defaultSortField: 'CREATED_AT',
+// Search schema following standard pattern
+export const SupportCommentSearchParams = SearchParams.extend({
+  sortBy: CommentSortBy.default('createdAt'),
+  sortOrder: SortOrder.default(SortOrder.enum.asc), // Comments should be chronological by default
 })
 export type SupportCommentSearchParams = z.infer<
   typeof SupportCommentSearchParams

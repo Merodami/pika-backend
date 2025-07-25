@@ -62,17 +62,6 @@ export const STORAGE_PROVIDER_FALLBACK = getEnvVariable(
   parseString,
   'console',
 )
-export const USE_LOCALSTACK_S3 = getEnvVariable(
-  'USE_LOCALSTACK_S3',
-  Boolean,
-  true, // Enable LocalStack by default for development
-)
-export const LOCALSTACK_S3_ENDPOINT = getEnvVariable(
-  'LOCALSTACK_S3_ENDPOINT',
-  parseString,
-  'http://localhost:4566',
-)
-
 // AWS Cognito
 export const COGNITO_USER_POOL_ID = getEnvVariable(
   'COGNITO_USER_POOL_ID',
@@ -83,14 +72,4 @@ export const COGNITO_CLIENT_ID = getEnvVariable(
   'COGNITO_CLIENT_ID',
   parseString,
   '',
-)
-export const COGNITO_CLIENT_SECRET = getEnvVariable(
-  'COGNITO_CLIENT_SECRET',
-  parseString,
-  '',
-)
-export const COGNITO_REGION = getEnvVariable(
-  'COGNITO_REGION',
-  parseString,
-  'us-east-1',
 )

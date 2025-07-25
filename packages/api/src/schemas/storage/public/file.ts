@@ -38,7 +38,7 @@ export const FileStorageLog = openapi(
     region: z.string().optional(),
     uploadedAt: DateTime.optional(),
     deletedAt: DateTime.optional(),
-    metadata: z.record(z.string(), z.string()).optional(),
+    metadata: z.record(z.string(), z.any()).optional(),
     error: z.string().optional(),
   }),
   {
@@ -55,14 +55,21 @@ export type FileStorageLog = z.infer<typeof FileStorageLog>
  */
 export const FileUploadResponse = openapi(
   z.object({
+    id: UUID.describe('Storage log ID'),
     fileId: UUID,
     fileKey: z.string(),
     fileName: z.string(),
     fileSize: z.number(),
     mimeType: z.string(),
     fileType: FileType,
+    status: FileStatus,
+    provider: StorageProvider,
     url: z.string().url().optional().describe('Presigned URL if applicable'),
     uploadedAt: DateTime,
+    metadata: z
+      .record(z.string(), z.any())
+      .optional()
+      .describe('File metadata'),
   }),
   {
     description: 'Response after successful file upload',

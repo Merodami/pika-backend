@@ -4,6 +4,7 @@ import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import { SortOrder, TimestampSortBy } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { createIncludeParam } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
@@ -78,7 +79,7 @@ export const AdminTicketQueryParams = z.object({
   type: TicketType.optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
-  sortBy: AdminTicketSortBy.default('CREATED_AT'),
+  sortBy: AdminTicketSortBy.default('createdAt'),
   sortOrder: SortOrder.default(SortOrder.enum.desc),
   ...createIncludeParam(ADMIN_PROBLEM_RELATIONS).shape,
 })
@@ -356,7 +357,7 @@ export const AdminGetAllCommentsQuery = openapi(
   z.object({
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(20),
-    sortBy: TimestampSortBy.default('CREATED_AT'),
+    sortBy: TimestampSortBy.default('createdAt'),
     sortOrder: SortOrder.default(SortOrder.enum.desc),
     search: z.string().optional(),
     problemId: z.string().optional(),
@@ -373,11 +374,12 @@ export type AdminGetAllCommentsQuery = z.infer<typeof AdminGetAllCommentsQuery>
  * Admin get comments by problem query parameters
  */
 export const AdminCommentsByProblemQuery = openapi(
-  z.object({
+  SearchParams.extend({
     ...createIncludeParam(ADMIN_COMMENT_RELATIONS).shape,
   }),
   {
-    description: 'Query parameters for getting comments by problem ID',
+    description:
+      'Query parameters for getting comments by problem ID with pagination',
   },
 )
 export type AdminCommentsByProblemQuery = z.infer<

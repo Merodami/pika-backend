@@ -37,7 +37,7 @@ export class UserServiceClientMock extends UserServiceClient {
 
     const testUsers: MockUser[] = [
       {
-        id: '11111111-1111-1111-1111-111111111111',
+        id: '123e4567-e89b-12d3-a456-426614174001',
         email: 'test@example.com',
         password: testPassword,
         firstName: 'Test',
@@ -49,7 +49,7 @@ export class UserServiceClientMock extends UserServiceClient {
         updatedAt: new Date('2024-01-01'),
       },
       {
-        id: '22222222-2222-2222-2222-222222222222',
+        id: '123e4567-e89b-12d3-a456-426614174002',
         email: 'admin@example.com',
         password: testPassword,
         firstName: 'Admin',
@@ -61,19 +61,19 @@ export class UserServiceClientMock extends UserServiceClient {
         updatedAt: new Date('2024-01-01'),
       },
       {
-        id: '33333333-3333-3333-3333-333333333333',
+        id: '123e4567-e89b-12d3-a456-426614174003',
         email: 'inactive@example.com',
         password: testPassword,
         firstName: 'Inactive',
         lastName: 'User',
         role: UserRole.CUSTOMER,
-        status: UserStatus.INACTIVE,
+        status: UserStatus.SUSPENDED,
         emailVerified: true,
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-01-01'),
       },
       {
-        id: '44444444-4444-4444-4444-444444444444',
+        id: '123e4567-e89b-12d3-a456-426614174004',
         email: 'oauth@example.com',
         password: undefined, // OAuth-only account
         firstName: 'OAuth',
@@ -85,7 +85,7 @@ export class UserServiceClientMock extends UserServiceClient {
         updatedAt: new Date('2024-01-01'),
       },
       {
-        id: '55555555-5555-5555-5555-555555555555',
+        id: '123e4567-e89b-12d3-a456-426614174005',
         email: 'active1@example.com',
         password: testPassword,
         firstName: 'Active',
@@ -97,7 +97,7 @@ export class UserServiceClientMock extends UserServiceClient {
         updatedAt: new Date('2024-01-01'),
       },
       {
-        id: '66666666-6666-6666-6666-666666666666',
+        id: '123e4567-e89b-12d3-a456-426614174006',
         email: 'active2@example.com',
         password: testPassword,
         firstName: 'Active',
@@ -170,7 +170,7 @@ export class UserServiceClientMock extends UserServiceClient {
       password: data.passwordHash || data.password,
       firstName: data.firstName,
       lastName: data.lastName,
-      role: data.role || UserRole.USER,
+      role: data.role || UserRole.CUSTOMER,
       status: UserStatus.ACTIVE,
       emailVerified: false,
       createdAt: new Date(),
@@ -304,7 +304,7 @@ export class UserServiceClientMock extends UserServiceClient {
     const authData = {
       id: user.id,
       email: user.email,
-      passwordHash: user.password,
+      password: user.password,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
@@ -329,7 +329,7 @@ export class UserServiceClientMock extends UserServiceClient {
       password: user.password,
       firstName: user.firstName || 'Test',
       lastName: user.lastName || 'User',
-      role: user.role || UserRole.USER,
+      role: user.role || UserRole.CUSTOMER,
       status: user.status || UserStatus.ACTIVE,
       emailVerified: user.emailVerified ?? true,
       createdAt: user.createdAt || new Date(),

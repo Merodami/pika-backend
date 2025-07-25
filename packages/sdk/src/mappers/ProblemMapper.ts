@@ -80,14 +80,16 @@ export class ProblemMapper {
       type: domain.type,
       createdAt: domain.createdAt.toISOString(),
       updatedAt: domain.updatedAt ? domain.updatedAt.toISOString() : null,
-      resolvedAt: domain.resolvedAt ? domain.resolvedAt.toISOString() : null,
-      ticketNumber: domain.ticketNumber,
-      assignedTo: domain.assignedTo,
+      resolvedAt: domain.resolvedAt
+        ? domain.resolvedAt.toISOString()
+        : undefined,
+      ticketNumber: domain.ticketNumber || undefined,
+      assignedTo: domain.assignedTo || undefined,
       files: domain.files,
-      user: domain.user ? UserMapper.toDTO(domain.user) : null,
+      user: domain.user ? UserMapper.toDTO(domain.user) : undefined,
       assignedUser: domain.assignedUser
         ? UserMapper.toDTO(domain.assignedUser)
-        : null,
+        : undefined,
       comments: domain.comments
         ? domain.comments.map((comment) => SupportCommentMapper.toDTO(comment))
         : undefined,
@@ -104,9 +106,9 @@ export class ProblemMapper {
       ticketNumber: domain.ticketNumber || undefined,
       userId: domain.userId,
       userName: domain.user
-        ? `${domain.user.firstName} ${domain.user.lastName}`
-        : '',
-      userEmail: domain.user?.email || '',
+        ? `${domain.user.firstName} ${domain.user.lastName}`.trim()
+        : 'Unknown User',
+      userEmail: domain.user?.email || 'unknown@example.com',
       title: domain.title,
       description: domain.description,
       type: domain.type,
@@ -117,11 +119,11 @@ export class ProblemMapper {
         : undefined,
       assignedTo: domain.assignedTo || undefined,
       assignedToName: domain.assignedUser
-        ? `${domain.assignedUser.firstName} ${domain.assignedUser.lastName}`
+        ? `${domain.assignedUser.firstName} ${domain.assignedUser.lastName}`.trim()
         : undefined,
       files: domain.files || [],
       createdAt: domain.createdAt.toISOString(),
-      updatedAt: (domain.updatedAt || new Date()).toISOString(),
+      updatedAt: (domain.updatedAt || domain.createdAt).toISOString(),
     }
   }
 

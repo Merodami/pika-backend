@@ -1,7 +1,19 @@
 import { NODE_ENV, VALIDATE_RESPONSES } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
-import { get, has, set } from 'lodash-es'
 import { z } from 'zod'
+
+/**
+ * Helper to properly display validation errors in tests (fixes [Array] display)
+ */
+function logValidationErrorsForTest(
+  validationErrors: Record<string, string[]>,
+  context?: string,
+): void {
+  if (NODE_ENV.includes('test')) {
+    console.log(`\n🔍 VALIDATION ERRORS (${context || 'Unknown'}):`)
+    console.log(JSON.stringify(validationErrors, null, 2))
+  }
+}
 
 /**
  * Validates response data against a Zod schema in non-production environments.
@@ -45,6 +57,7 @@ export function validateResponse<T extends z.ZodTypeAny>(
     logger.error('Response validation failed', {
       context: context || 'Unknown',
       errors: result.error.format(),
+      issues: result.error.issues,
       environment: NODE_ENV,
       // Only log actual data in development to avoid exposing sensitive info
       data: NODE_ENV === 'development' ? data : undefined,
@@ -54,14 +67,20 @@ export function validateResponse<T extends z.ZodTypeAny>(
     if (NODE_ENV !== 'production') {
       const validationErrors: Record<string, string[]> = {}
 
-      result.error.issues.forEach((issue) => {
-        const path = issue.path.join('.')
+      // Create a simple, flat structure that avoids prototype pollution
+      const errors: string[] = []
 
-        if (!has(validationErrors, path)) {
-          set(validationErrors, path, [])
-        }
-        get(validationErrors, path)?.push(issue.message)
+      result.error.issues.forEach((issue) => {
+        const pathStr = issue.path.length > 0 ? issue.path.join('.') : 'root'
+
+        errors.push(`${pathStr}: ${issue.message}`)
       })
+
+      // Use a single 'errors' key to avoid any path injection issues
+      validationErrors['validation_errors'] = errors
+
+      // Log detailed errors for test debugging (fixes [Array] display)
+      logValidationErrorsForTest(validationErrors, context)
 
       throw ErrorFactory.validationError(validationErrors, {
         source: context || 'response validation',

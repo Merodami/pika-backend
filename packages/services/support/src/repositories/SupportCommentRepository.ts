@@ -2,8 +2,10 @@ import type { ICacheService } from '@pika/redis'
 import type { SupportCommentDomain } from '@pika/sdk'
 import { SupportCommentMapper } from '@pika/sdk'
 import { ErrorFactory, toPrismaInclude } from '@pika/shared'
-import type { ParsedIncludes } from '@pika/types'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
+
+import type { CommentSearchParams } from '../services/SupportCommentService.js'
 
 export interface CreateSupportCommentInput {
   problemId: string
@@ -20,9 +22,9 @@ export interface UpdateSupportCommentInput {
 export interface ISupportCommentRepository {
   findAll(parsedIncludes?: ParsedIncludes): Promise<SupportCommentDomain[]>
   findByProblemId(
-    problemId: string,
+    params: CommentSearchParams,
     parsedIncludes?: ParsedIncludes,
-  ): Promise<SupportCommentDomain[]>
+  ): Promise<PaginatedResult<SupportCommentDomain>>
   findById(
     id: string,
     parsedIncludes?: ParsedIncludes,
@@ -70,21 +72,49 @@ export class SupportCommentRepository implements ISupportCommentRepository {
   }
 
   async findByProblemId(
-    problemId: string,
+    params: CommentSearchParams,
     parsedIncludes?: ParsedIncludes,
-  ): Promise<SupportCommentDomain[]> {
+  ): Promise<PaginatedResult<SupportCommentDomain>> {
+    const {
+      problemId,
+      page = 1,
+      limit = 20,
+      sortBy = 'createdAt',
+      sortOrder = 'ASC',
+    } = params
+
+    const skip = (page - 1) * limit
+
     try {
       const include = this.buildInclude(parsedIncludes)
 
-      const comments = await this.prisma.supportComment.findMany({
-        where: { problemId },
-        include,
-        orderBy: {
-          createdAt: 'asc',
-        },
-      })
+      const [comments, total] = await Promise.all([
+        this.prisma.supportComment.findMany({
+          where: { problemId },
+          include,
+          skip,
+          take: limit,
+          orderBy: {
+            [sortBy]: sortOrder.toLowerCase(),
+          },
+        }),
+        this.prisma.supportComment.count({ where: { problemId } }),
+      ])
 
-      return comments.map(SupportCommentMapper.fromDocument)
+      const data = comments.map(SupportCommentMapper.fromDocument)
+      const totalPages = Math.ceil(total / limit)
+
+      return {
+        data,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+        },
+      }
     } catch (error) {
       throw ErrorFactory.databaseError(
         'findByProblemId',

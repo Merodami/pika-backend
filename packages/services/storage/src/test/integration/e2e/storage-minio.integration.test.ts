@@ -19,12 +19,12 @@ import {
   AWS_S3_REGION,
   AWS_SECRET_ACCESS_KEY,
 } from '@pika/environment'
+import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
   AuthenticatedRequestClient,
   createE2EAuthHelper,
   E2EAuthHelper,
-  MemoryCacheService,
 } from '@pika/tests'
 import {
   cleanupTestDatabase,
@@ -32,6 +32,7 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
+import { FileStatus, StorageProvider } from '@pika/types'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import {
@@ -223,8 +224,8 @@ describe('Storage Service with MinIO Integration Tests', () => {
       expect(response.body).toHaveProperty('id')
       expect(response.body).toHaveProperty('fileId')
       expect(response.body).toHaveProperty('fileName', fileName)
-      expect(response.body).toHaveProperty('status', 'uploaded')
-      expect(response.body).toHaveProperty('provider', 'aws-s3')
+      expect(response.body).toHaveProperty('status', FileStatus.UPLOADED)
+      expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
       expect(response.body.url).toContain(TEST_BUCKET)
 
       // Verify file exists in MinIO
@@ -259,7 +260,7 @@ describe('Storage Service with MinIO Integration Tests', () => {
         .expect(200)
 
       expect(urlResponse.body).toHaveProperty('url')
-      expect(urlResponse.body).toHaveProperty('expiresIn', 3600)
+      expect(urlResponse.body).toHaveProperty('expiresAt')
       expect(urlResponse.body.url).toContain(TEST_BUCKET)
       expect(urlResponse.body.url).toContain('X-Amz-Signature')
       expect(urlResponse.body.url).toContain('X-Amz-Expires')
@@ -286,24 +287,24 @@ describe('Storage Service with MinIO Integration Tests', () => {
         JSON.stringify(response.body, null, 2),
       )
 
-      expect(response.body).toHaveProperty('uploaded', 3)
-      expect(response.body).toHaveProperty('failed', 0)
-      expect(response.body).toHaveProperty('total', 3)
-      expect(response.body.logs).toHaveLength(3)
+      expect(response.body).toHaveProperty('totalUploaded', 3)
+      expect(response.body).toHaveProperty('totalFailed', 0)
+      expect(response.body).toHaveProperty('successful')
+      expect(response.body.successful).toHaveLength(3)
+      expect(response.body.failed).toHaveLength(0)
 
-      // Verify that all files were successfully processed by the API
-      // (checking actual MinIO storage is prone to test isolation issues)
-      expect(response.body.uploaded).toBe(3)
-      expect(response.body.failed).toBe(0)
+      // Verify that all uploads used correct provider
+      response.body.successful.forEach((upload: any) => {
+        expect(upload.provider).toBe(StorageProvider.AWS_S3)
+      })
 
-      // Verify that each upload log has required properties
-      response.body.logs.forEach((log: any, index: number) => {
-        expect(log).toHaveProperty('fileId')
-        expect(log).toHaveProperty('fileName')
-        expect(log).toHaveProperty('status', 'uploaded')
-        expect(log).toHaveProperty('provider', 'aws-s3')
-        expect(log).toHaveProperty('url')
-        expect(log.fileName).toContain(`batch${index + 1}`)
+      // Additional verification that uploads have correct properties
+      response.body.successful.forEach((upload: any) => {
+        expect(upload).toHaveProperty('fileId')
+        expect(upload).toHaveProperty('fileName')
+        expect(upload).toHaveProperty('status', FileStatus.UPLOADED)
+        expect(upload).toHaveProperty('provider', StorageProvider.AWS_S3)
+        expect(upload).toHaveProperty('url')
       })
     })
 
@@ -325,7 +326,10 @@ describe('Storage Service with MinIO Integration Tests', () => {
       // Verify the upload was successful by checking the response
       expect(uploadResponse.body).toHaveProperty('fileId')
       expect(uploadResponse.body).toHaveProperty('status', 'uploaded')
-      expect(uploadResponse.body).toHaveProperty('provider', 'aws-s3')
+      expect(uploadResponse.body).toHaveProperty(
+        'provider',
+        StorageProvider.AWS_S3,
+      )
 
       // Delete the file via API
       await userClient.delete(`/files/${fileId}`).expect(204)
@@ -397,11 +401,8 @@ describe('Storage Service with MinIO Integration Tests', () => {
           .attach('file', testFile.content, testFile.name)
           .expect(201)
 
-        expect(response.body).toHaveProperty(
-          'contentType',
-          testFile.expectedType,
-        )
-        expect(response.body).toHaveProperty('provider', 'aws-s3')
+        expect(response.body).toHaveProperty('mimeType', testFile.expectedType)
+        expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
       }
     })
 
@@ -478,7 +479,7 @@ describe('Storage Service with MinIO Integration Tests', () => {
         .expect(201)
 
       expect(successResponse.body).toHaveProperty(
-        'size',
+        'fileSize',
         almostLimitFile.length,
       )
 
@@ -490,8 +491,9 @@ describe('Storage Service with MinIO Integration Tests', () => {
         .attach('file', overLimitFile, 'over-limit.bin')
         .expect(413)
 
-      expect(errorResponse.body).toHaveProperty('message')
-      expect(errorResponse.body.message).toContain('size')
+      expect(errorResponse.body).toHaveProperty('error')
+      expect(errorResponse.body.error).toHaveProperty('message')
+      expect(errorResponse.body.error.message).toContain('size')
     })
   })
 
@@ -512,7 +514,7 @@ describe('Storage Service with MinIO Integration Tests', () => {
 
       results.forEach((response) => {
         expect(response.status).toBe(201)
-        expect(response.body).toHaveProperty('provider', 'aws-s3')
+        expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
       })
 
       // Verify all files in MinIO
@@ -548,8 +550,8 @@ describe('Storage Service with MinIO Integration Tests', () => {
 
       expect(detailResponse.body).toHaveProperty('metadata')
 
-      // Metadata is stored as JSON string in the database
-      const parsedMetadata = JSON.parse(detailResponse.body.metadata)
+      // Metadata should already be parsed as an object
+      const parsedMetadata = detailResponse.body.metadata
 
       expect(parsedMetadata).toMatchObject(metadata)
     })

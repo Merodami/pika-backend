@@ -3,7 +3,7 @@ import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
+import { ErrorFactory, parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IProblemService } from '../services/ProblemService.js'
@@ -48,13 +48,17 @@ export class AdminProblemController {
         status: query.status,
         priority: query.priority,
         userId: query.userId,
+        assignedTo: query.assignedTo,
+        ticketNumber: query.ticketNumber,
+        type: query.type,
+        include: query.include,
       }
 
       const result = await this.problemService.getAllProblems(problemParams)
 
-      // Transform to DTOs
+      // Transform to Admin DTOs
       const dtoResult = {
-        data: result.data.map(ProblemMapper.toDTO),
+        data: result.data.map(ProblemMapper.toAdminDTO),
         pagination: result.pagination,
       }
 
@@ -86,15 +90,24 @@ export class AdminProblemController {
   ): Promise<void> {
     try {
       const { id } = request.params
+      const query =
+        getValidatedQuery<supportAdmin.AdminTicketByIdQuery>(request)
 
-      const problem = await this.problemService.getProblemById(id)
+      const parsedIncludes = query.include
+        ? parseIncludeParam(query.include)
+        : undefined
+
+      const problem = await this.problemService.getProblemById(
+        id,
+        parsedIncludes,
+      )
 
       if (!problem) {
         throw ErrorFactory.resourceNotFound('Problem', id)
       }
 
       // Transform to DTO
-      const dto = ProblemMapper.toDTO(problem)
+      const dto = ProblemMapper.toAdminDTO(problem)
 
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,
@@ -134,7 +147,7 @@ export class AdminProblemController {
       const problem = await this.problemService.updateProblem(id, data)
 
       // Transform to DTO
-      const dto = ProblemMapper.toDTO(problem)
+      const dto = ProblemMapper.toAdminDTO(problem)
 
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,

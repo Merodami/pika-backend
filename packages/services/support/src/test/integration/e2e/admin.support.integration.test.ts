@@ -313,7 +313,7 @@ describe('Admin Support API Integration Tests', () => {
     it('should sort tickets by different fields', async () => {
       const response = await adminClient
         .get('/admin/support/tickets')
-        .query({ sortBy: 'PRIORITY', sortOrder: 'desc' })
+        .query({ sortBy: 'priority', sortOrder: 'desc' })
         .expect(200)
 
       expect(response.body.data[0].priority).toBe(ProblemPriority.high)
@@ -671,7 +671,8 @@ describe('Admin Support API Integration Tests', () => {
         'title',
         'Technical Issue - Login Problem',
       )
-      expect(response.body).toHaveProperty('user')
+      expect(response.body).toHaveProperty('userName')
+      expect(response.body).toHaveProperty('userEmail')
     })
 
     it('should return 404 for non-existent problem', async () => {

@@ -36,6 +36,7 @@ describe('Communication Service - Public API Integration Tests', () => {
   let cacheService: MemoryCacheService
   let customerClient: AuthenticatedRequestClient
   let regularUserId: string
+  let sharedTestData: any
 
   beforeAll(async () => {
     logger.info(
@@ -359,6 +360,11 @@ describe('Communication Service - Public API Integration Tests', () => {
 
     describe('PUT /notifications/read-all', () => {
       it('should mark all unread notifications as read', async () => {
+        // Clean up existing notifications for this user to ensure test isolation
+        await testDb.prisma.notification.deleteMany({
+          where: { userId: regularUserId },
+        })
+
         await testDb.prisma.notification.createMany({
           data: [
             {

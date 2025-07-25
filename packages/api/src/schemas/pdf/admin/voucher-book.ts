@@ -461,14 +461,14 @@ export type BulkArchiveVoucherBooksRequest = z.infer<
  */
 export const VoucherBookStatsQueryParams = openapi(
   z.object({
-    year: z
+    year: z.coerce
       .number()
       .int()
       .min(2020)
       .max(2100)
       .optional()
       .describe('Filter statistics by year'),
-    month: z
+    month: z.coerce
       .number()
       .int()
       .min(1)

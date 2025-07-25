@@ -5,11 +5,11 @@ import { z } from 'zod'
  */
 
 export const AdminTicketSortBy = z.enum([
-  'CREATED_AT',
-  'UPDATED_AT',
-  'RESOLVED_AT',
-  'PRIORITY',
-  'STATUS',
+  'createdAt',
+  'updatedAt',
+  'resolvedAt',
+  'priority',
+  'status',
 ])
 export type AdminTicketSortBy = z.infer<typeof AdminTicketSortBy>
 
@@ -44,9 +44,12 @@ export const TicketType = z.enum([
 export type TicketType = z.infer<typeof TicketType>
 
 export const ProblemSortBy = z.enum([
-  'CREATED_AT',
-  'UPDATED_AT',
-  'PRIORITY',
-  'STATUS',
+  'createdAt',
+  'updatedAt',
+  'priority',
+  'status',
 ])
 export type ProblemSortBy = z.infer<typeof ProblemSortBy>
+
+export const CommentSortBy = z.enum(['createdAt', 'updatedAt'])
+export type CommentSortBy = z.infer<typeof CommentSortBy>

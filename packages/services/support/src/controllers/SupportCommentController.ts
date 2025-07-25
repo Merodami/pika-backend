@@ -1,6 +1,11 @@
 import { supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { RequestContext, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+  validateResponse,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import type { NextFunction, Request, Response } from 'express'
@@ -36,14 +41,21 @@ export class SupportCommentController {
   ): Promise<void> {
     try {
       const { problemId } = request.params
+      const query =
+        getValidatedQuery<supportPublic.SupportCommentSearchParams>(request)
 
-      const comments =
-        await this.commentService.getCommentsByProblemId(problemId)
+      const params = {
+        problemId,
+        page: query.page,
+        limit: query.limit,
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder.toUpperCase() as 'ASC' | 'DESC',
+      }
 
-      // Transform to DTOs
-      const dtos = comments.map(SupportCommentMapper.toDTO)
-      const responseData = { data: dtos }
+      const result = await this.commentService.getCommentsByProblemId(params)
 
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, SupportCommentMapper.toDTO)
       const validatedResponse = validateResponse(
         supportPublic.SupportCommentListResponse,
         responseData,

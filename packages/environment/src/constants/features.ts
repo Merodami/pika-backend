@@ -1,23 +1,5 @@
 import { getEnvVariable } from '../getEnvVariable.js'
-import { parseBoolean, parseNumber } from '../parsers.js'
-
-// Feature flags
-export const ENABLE_REVIEWS = getEnvVariable(
-  'ENABLE_REVIEWS',
-  parseBoolean,
-  true,
-)
-export const ENABLE_CHAT = getEnvVariable('ENABLE_CHAT', parseBoolean, false)
-export const ENABLE_VERIFICATION = getEnvVariable(
-  'ENABLE_VERIFICATION',
-  parseBoolean,
-  true,
-)
-export const MAINTENANCE_MODE = getEnvVariable(
-  'MAINTENANCE_MODE',
-  parseBoolean,
-  false,
-)
+import { parseNumber } from '../parsers.js'
 
 // Booking configuration
 export const MAX_BOOKING_DAYS_AHEAD = getEnvVariable(

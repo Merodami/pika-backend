@@ -11,6 +11,7 @@
  * - Handles proper test data cleanup and relationships
  */
 
+import { createVoucherServiceClientMock } from '@pika/tests'
 import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 
@@ -40,6 +41,14 @@ export interface SeedVoucherBooksOptions {
   addPages?: boolean
   addAds?: boolean
   createdBy?: string // UUID of the user who created the voucher books
+}
+
+/**
+ * Creates a VoucherServiceClient mock for testing
+ * This prevents 502 errors by mocking external service calls
+ */
+export function createMockedVoucherServiceClient() {
+  return createVoucherServiceClientMock()
 }
 
 /**
@@ -200,9 +209,10 @@ export async function createSharedPDFTestData(
  */
 export async function createTestVoucherBook(
   prisma: PrismaClient,
-  status: 'draft' | 'published' = 'published',
+  status: 'draft' | 'published' | 'ready_for_print' = 'published',
   title?: string,
   createdBy?: string,
+  withPlacements = false,
 ): Promise<any> {
   // Get a test user if createdBy not provided
   let userId = createdBy
@@ -218,7 +228,7 @@ export async function createTestVoucherBook(
     userId = testUser.id
   }
 
-  return await prisma.voucherBook.create({
+  const voucherBook = await prisma.voucherBook.create({
     data: {
       id: uuid(),
       title: title || `Test Voucher Book`,
@@ -238,4 +248,38 @@ export async function createTestVoucherBook(
       publishedAt: status === 'published' ? new Date() : null,
     },
   })
+
+  // Create pages and placements if requested
+  if (withPlacements) {
+    const page = await prisma.voucherBookPage.create({
+      data: {
+        id: uuid(),
+        book: {
+          connect: { id: voucherBook.id },
+        },
+        pageNumber: 1,
+        layoutType: 'standard',
+      },
+    })
+
+    await prisma.adPlacement.create({
+      data: {
+        id: uuid(),
+        page: {
+          connect: { id: page.id },
+        },
+        createdByUser: {
+          connect: { id: userId },
+        },
+        contentType: 'ad',
+        position: 1,
+        size: 'full',
+        spacesUsed: 8,
+        title: 'Sample Ad',
+        description: 'Sample ad placement',
+      },
+    })
+  }
+
+  return voucherBook
 }

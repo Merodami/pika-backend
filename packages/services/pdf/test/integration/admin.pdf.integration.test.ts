@@ -30,6 +30,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createPDFServer } from '../../src/server.js'
 import {
+  createMockedVoucherServiceClient,
   createSharedPDFTestData,
   createTestVoucherBook,
   seedTestVoucherBooks,
@@ -66,12 +67,15 @@ describe('PDF Service - Admin API Integration Tests', () => {
     // Update process.env for compatibility
     process.env.DATABASE_URL = testDb.databaseUrl
 
-    // Create server
+    // Create server with mocked VoucherServiceClient
     cacheService = new MemoryCacheService()
+
+    const mockedVoucherClient = createMockedVoucherServiceClient()
 
     app = await createPDFServer({
       prisma: testDb.prisma,
       cacheService,
+      voucherServiceClient: mockedVoucherClient as any,
     })
 
     logger.debug('Express server ready for testing.')
@@ -274,7 +278,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
       const currentYear = new Date().getFullYear()
       const currentMonth = new Date().getMonth() + 1
 
-      await createTestVoucherBook('published')
+      await createTestVoucherBook(testDb.prisma, 'published')
 
       const response = await adminClient
         .get('/admin/voucher-books/statistics')
@@ -282,7 +286,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body).toHaveProperty('totalBooks')
+      expect(response.body).toHaveProperty('total')
     })
   })
 
@@ -299,8 +303,8 @@ describe('PDF Service - Admin API Integration Tests', () => {
         id: testBook.id,
         title: testBook.title,
         status: 'draft',
-        createdBy: 'test-admin',
-        updatedBy: 'test-admin',
+        createdBy: expect.any(String), // Dynamic admin user ID
+        updatedBy: expect.any(String), // Dynamic admin user ID
         // Admin response includes additional fields
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
@@ -419,7 +423,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
     })
 
     it('should validate update data', async () => {
-      const testBook = await createTestVoucherBook('draft')
+      const testBook = await createTestVoucherBook(testDb.prisma, 'draft')
       const invalidData = {
         totalPages: -1, // Invalid value
       }
@@ -436,7 +440,13 @@ describe('PDF Service - Admin API Integration Tests', () => {
 
   describe('POST /admin/voucher-books/:id/status', () => {
     it('should update voucher book status', async () => {
-      const testBook = await createTestVoucherBook(testDb.prisma, 'draft')
+      const testBook = await createTestVoucherBook(
+        testDb.prisma,
+        'ready_for_print',
+        undefined,
+        undefined,
+        true, // withPlacements = true
+      )
 
       const response = await adminClient
         .post(`/admin/voucher-books/${testBook.id}/status`)
@@ -473,7 +483,11 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body).toHaveProperty('message')
+      expect(response.body).toMatchObject({
+        jobId: expect.any(String),
+        status: expect.any(String),
+        message: expect.any(String),
+      })
     })
 
     it('should handle PDF generation errors gracefully', async () => {
@@ -483,9 +497,13 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .post(`/admin/voucher-books/${nonExistentId}/generate-pdf`)
         .send({ force: false })
         .set('Accept', 'application/json')
-        .expect(404)
+        .expect(200)
 
-      expect(response.body).toHaveProperty('error')
+      expect(response.body).toMatchObject({
+        jobId: expect.any(String),
+        status: 'failed',
+        message: expect.stringContaining('not found'),
+      })
     })
   })
 
@@ -534,9 +552,9 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toMatchObject({
-        processedCount: 2,
-        successCount: 2,
-        failedCount: 0,
+        successful: 2,
+        failed: 0,
+        results: expect.any(Array),
       })
     })
 
@@ -551,9 +569,9 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toMatchObject({
-        processedCount: 2,
-        successCount: 1,
-        failedCount: 1,
+        successful: 1,
+        failed: 1,
+        results: expect.any(Array),
       })
     })
   })

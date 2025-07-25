@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import { SortOrder } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
+import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
@@ -84,16 +84,12 @@ export type SupportProblemListResponse = z.infer<
 
 // ProblemIdParam is now imported from common/parameters.ts
 
-// Search schema for public problems
-export const SupportProblemSearchParams = z.object({
-  search: z.string().optional(),
+// Search schema following standard pattern
+export const SupportProblemSearchParams = SearchParams.extend({
   status: TicketStatus.optional(),
   priority: TicketPriority.optional(),
   type: TicketType.optional(),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
-  sortBy: ProblemSortBy.default('CREATED_AT'),
-  sortOrder: SortOrder.default(SortOrder.enum.desc),
+  sortBy: ProblemSortBy.default('createdAt'),
 })
 export type SupportProblemSearchParams = z.infer<
   typeof SupportProblemSearchParams

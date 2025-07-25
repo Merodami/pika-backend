@@ -43,6 +43,7 @@ describe('PDF Service - Public API Integration Tests', () => {
 
   // Authenticated clients for different user types
   let customerClient: AuthenticatedRequestClient
+  let businessClient: AuthenticatedRequestClient
 
   // Note: Using helper from pdfTestHelpers.js
 

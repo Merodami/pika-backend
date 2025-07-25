@@ -9,6 +9,7 @@ type ResetPasswordRequest = z.infer<typeof authPublic.ResetPasswordRequest>
 type RevokeTokenRequest = z.infer<typeof authPublic.RevokeTokenRequest>
 type TokenRequest = z.infer<typeof authPublic.TokenRequest>
 type VerifyEmailRequest = z.infer<typeof authPublic.VerifyEmailRequest>
+
 import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
@@ -506,19 +507,23 @@ export class AuthController {
       // Get permissions based on user role
       const permissions = mapRoleToPermissions(user.role)
 
+      // Convert to DTO using mapper for proper date formatting
+      const userDTO = UserMapper.toDTO(user)
+
       const userInfo = {
-        id: user.id,
-        email: user.email,
-        emailVerified: user.emailVerified,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        fullName: `${user.firstName} ${user.lastName}`,
-        profilePicture: user.profilePicture,
-        role: user.role,
+        id: userDTO.id,
+        email: userDTO.email,
+        emailVerified: userDTO.emailVerified,
+        firstName: userDTO.firstName,
+        lastName: userDTO.lastName,
+        fullName: `${userDTO.firstName} ${userDTO.lastName}`,
+        profilePicture: userDTO.avatarUrl,
+        role: userDTO.role,
         permissions,
-        locale: user.language || 'en-US',
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        // Note: locale omitted - would require TranslationClient.getUserLanguage(userId)
+        // TODO: Add translation client dependency to auth service for proper locale support
+        createdAt: userDTO.createdAt,
+        updatedAt: userDTO.updatedAt,
       }
 
       const validatedResponse = validateResponse(

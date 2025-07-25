@@ -1,6 +1,11 @@
 import { supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { RequestContext, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+  validateResponse,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
 import type { NextFunction, Request, Response } from 'express'
@@ -18,8 +23,8 @@ export class ProblemController {
   }
 
   /**
-   * GET /problems/my-tickets
-   * Get authenticated user's support tickets
+   * GET /problems
+   * Get authenticated user's support tickets with pagination
    */
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
@@ -35,13 +40,26 @@ export class ProblemController {
       // Use authenticated user for security
       const context = RequestContext.getContext(request)
       const userId = context.userId
+      const query =
+        getValidatedQuery<supportPublic.SupportProblemSearchParams>(request)
 
-      const problems = await this.problemService.getProblemsByUserId(userId)
+      // Build search params with user filter
+      const params = {
+        userId,
+        page: query.page,
+        limit: query.limit,
+        sortBy: query.sortBy,
+        sortOrder: query.sortOrder.toUpperCase() as 'ASC' | 'DESC',
+        search: query.search,
+        status: query.status,
+        priority: query.priority,
+        type: query.type,
+      }
 
-      // Transform to DTOs
-      const dtos = problems.map(ProblemMapper.toDTO)
-      const responseData = { data: dtos }
+      const result = await this.problemService.getUserProblems(params)
 
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, ProblemMapper.toDTO)
       const validatedResponse = validateResponse(
         supportPublic.SupportProblemListResponse,
         responseData,

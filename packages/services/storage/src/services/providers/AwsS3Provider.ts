@@ -23,6 +23,7 @@ export class AwsS3Provider implements StorageProvider {
   private client!: S3Client
   private isConfigured: boolean
   private bucketName: string
+  private providerName: string
 
   constructor(
     private readonly config: {
@@ -31,9 +32,11 @@ export class AwsS3Provider implements StorageProvider {
       secretAccessKey?: string
       bucketName?: string
       endpoint?: string // For LocalStack/MinIO testing
+      providerName?: string // Actual provider name (aws_s3 or minio)
     },
   ) {
     this.bucketName = config.bucketName || 'pika-uploads'
+    this.providerName = config.providerName || 'aws_s3'
     this.isConfigured = !!(
       config.region &&
       config.accessKeyId &&
@@ -54,7 +57,7 @@ export class AwsS3Provider implements StorageProvider {
   }
 
   getProviderName(): string {
-    return 'aws-s3'
+    return this.providerName
   }
 
   async isAvailable(): Promise<boolean> {

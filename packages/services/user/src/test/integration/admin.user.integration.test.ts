@@ -72,6 +72,7 @@ describe('User Service - Admin API Integration Tests', () => {
   // Authenticated clients for different user types
   let adminClient: AuthenticatedRequestClient
   let customerClient: AuthenticatedRequestClient
+  let businessClient: AuthenticatedRequestClient
 
   // Shared test data created once
   let sharedTestData: SharedUserTestData

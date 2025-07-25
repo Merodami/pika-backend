@@ -1,3 +1,5 @@
+import { FileType, FileTypeType } from '@pika/types'
+
 import type {
   FileStorageLogDomain,
   FileUploadDomain,
@@ -71,7 +73,7 @@ export class FileStorageLogMapper {
       fileName: log.fileName,
       fileSize: log.size,
       mimeType: log.contentType,
-      fileType: this.determineFileType(log.contentType),
+      fileType: FileStorageLogMapper.determineFileType(log.contentType) as any,
       url: log.url,
       uploadedAt: log.uploadedAt || log.createdAt,
     }
@@ -94,14 +96,48 @@ export class FileStorageLogMapper {
   }
 
   /**
-   * Helper to determine file type from MIME type
+   * Convert FileStorageLogDomain to FileUploadResponse format
+   * Used for upload endpoints that return a different schema
    */
-  private static determineFileType(
-    mimeType: string,
-  ): 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | 'OTHER' {
-    if (mimeType.startsWith('image/')) return 'IMAGE'
-    if (mimeType.startsWith('video/')) return 'VIDEO'
-    if (mimeType.startsWith('audio/')) return 'AUDIO'
+  static toFileUploadResponse(domain: FileStorageLogDomain) {
+    // Parse metadata if it's a string (from database)
+    let parsedMetadata: Record<string, any> | undefined
+
+    if (domain.metadata) {
+      try {
+        if (typeof domain.metadata === 'string') {
+          parsedMetadata = JSON.parse(domain.metadata)
+        } else {
+          parsedMetadata = domain.metadata
+        }
+      } catch {
+        parsedMetadata = undefined
+      }
+    }
+
+    return {
+      id: domain.id,
+      fileId: domain.fileId,
+      fileKey: domain.storageKey || domain.fileId,
+      fileName: domain.fileName,
+      fileSize: domain.size,
+      mimeType: domain.contentType,
+      fileType: FileStorageLogMapper.determineFileType(domain.contentType),
+      status: domain.status,
+      provider: domain.provider || 'local',
+      url: domain.url,
+      uploadedAt: (domain.uploadedAt || domain.createdAt).toISOString(),
+      metadata: parsedMetadata,
+    }
+  }
+
+  /**
+   * Helper to determine file type from MIME type using FileType enum
+   */
+  private static determineFileType(mimeType: string): FileTypeType {
+    if (mimeType.startsWith('image/')) return FileType.IMAGE
+    if (mimeType.startsWith('video/')) return FileType.VIDEO
+    if (mimeType.startsWith('audio/')) return FileType.AUDIO
     if (
       mimeType === 'application/pdf' ||
       mimeType.includes('document') ||
@@ -109,35 +145,49 @@ export class FileStorageLogMapper {
       mimeType.includes('word') ||
       mimeType.includes('excel')
     )
-      return 'DOCUMENT'
+      return FileType.DOCUMENT
 
-    return 'OTHER'
+    return FileType.OTHER
   }
 
   /**
    * Convert domain entity to API DTO
    */
   static toDTO(domain: FileStorageLogDomain): FileStorageLogDTO {
+    // Parse metadata if it's a string (from database)
+    let parsedMetadata: Record<string, any> | undefined
+
+    if (domain.metadata) {
+      try {
+        if (typeof domain.metadata === 'string') {
+          parsedMetadata = JSON.parse(domain.metadata)
+        } else {
+          parsedMetadata = domain.metadata
+        }
+      } catch {
+        parsedMetadata = undefined
+      }
+    }
+
     return {
       id: domain.id,
-      fileId: domain.fileId,
+      userId: domain.userId || '',
+      fileKey: domain.storageKey || domain.fileId,
       fileName: domain.fileName,
-      contentType: domain.contentType,
-      size: domain.size,
-      folder: domain.folder,
-      isPublic: domain.isPublic,
-      url: domain.url,
-      storageKey: domain.storageKey,
+      fileSize: domain.size,
+      mimeType: domain.contentType,
+      fileType: FileStorageLogMapper.determineFileType(domain.contentType),
       status: domain.status,
-      userId: domain.userId,
-      metadata: domain.metadata,
-      provider: domain.provider,
+      provider: domain.provider || 'local',
+      bucketName: undefined,
+      region: undefined,
       uploadedAt: domain.uploadedAt?.toISOString(),
       deletedAt: domain.deletedAt?.toISOString(),
-      errorMessage: domain.errorMessage,
-      processingTimeMs: domain.processingTimeMs,
+      metadata: parsedMetadata,
+      error: domain.errorMessage,
       createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt.toISOString(),
+      updatedAt:
+        domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
     }
   }
 
@@ -147,22 +197,22 @@ export class FileStorageLogMapper {
   static fromDTO(dto: FileStorageLogDTO): FileStorageLogDomain {
     return {
       id: dto.id,
-      fileId: dto.fileId,
+      fileId: dto.fileKey, // API uses fileKey, domain uses fileId
       fileName: dto.fileName,
-      contentType: dto.contentType,
-      size: dto.size,
-      folder: dto.folder,
-      isPublic: dto.isPublic,
-      url: dto.url,
-      storageKey: dto.storageKey,
+      contentType: dto.mimeType, // API uses mimeType, domain uses contentType
+      size: dto.fileSize, // API uses fileSize, domain uses size
+      folder: undefined, // Not in API DTO
+      isPublic: true, // Default value, not in API DTO
+      url: '', // Not in API DTO, should come from different source
+      storageKey: dto.fileKey, // API uses fileKey
       status: dto.status,
-      userId: dto.userId,
+      userId: dto.userId || undefined,
       metadata: dto.metadata,
       provider: dto.provider,
       uploadedAt: dto.uploadedAt ? new Date(dto.uploadedAt) : undefined,
       deletedAt: dto.deletedAt ? new Date(dto.deletedAt) : undefined,
-      errorMessage: dto.errorMessage,
-      processingTimeMs: dto.processingTimeMs,
+      errorMessage: dto.error, // API uses error, domain uses errorMessage
+      processingTimeMs: undefined, // Not in API DTO
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),
     }

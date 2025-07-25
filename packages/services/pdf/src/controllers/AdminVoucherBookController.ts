@@ -8,6 +8,7 @@ import {
   validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import { VoucherBookMapper } from '../mappers/VoucherBookMapper.js'
@@ -51,6 +52,14 @@ export class AdminVoucherBookController {
       // Map API query to service params
       const params = {
         search: query.search,
+        bookType: query.bookType,
+        status: query.status,
+        year: query.year,
+        month: query.month,
+        createdBy: query.createdBy,
+        updatedBy: query.updatedBy,
+        hasContent: query.hasContent,
+        hasPdf: query.hasPdf,
         page: query.page || 1,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
         sortBy: query.sortBy,
@@ -60,7 +69,8 @@ export class AdminVoucherBookController {
       const result = await this.voucherBookService.getAllVoucherBooks(params)
 
       // Use mapper for proper response transformation
-      const response = paginatedResponse(result, VoucherBookMapper.toDTO)
+      const response = paginatedResponse(result, VoucherBookMapper.toAdminDTO)
+
       const validatedResponse = validateResponse(
         pdfAdmin.AdminVoucherBookListResponse,
         response,
@@ -117,6 +127,10 @@ export class AdminVoucherBookController {
     try {
       const context = RequestContext.getContext(req)
       const data = getValidatedBody<pdfAdmin.CreateVoucherBookRequest>(req)
+
+      if (!context.userId) {
+        throw ErrorFactory.unauthorized('User context not found')
+      }
 
       const createData = VoucherBookMapper.fromCreateDTO(data, context.userId)
 
@@ -245,6 +259,10 @@ export class AdminVoucherBookController {
       const context = RequestContext.getContext(req)
       const { id } = req.params
 
+      if (!context.userId) {
+        throw ErrorFactory.unauthorized('User context not found')
+      }
+
       getValidatedBody<pdfAdmin.GeneratePdfRequest>(req)
 
       const result = await this.voucherBookService.generatePDF(
@@ -288,8 +306,9 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toBulkOperationResponse({
-        processedCount: result.processedCount,
-        operation: 'archived',
+        successCount: result.successCount,
+        failedCount: result.failedCount,
+        results: result.results,
       })
       const validatedResponse = validateResponse(
         pdfAdmin.BulkVoucherBookOperationResponse,

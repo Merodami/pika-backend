@@ -39,6 +39,7 @@ export function createAdminProblemRouter(
     requireAuth(),
     requirePermissions('admin:support'),
     validateParams(supportCommon.ProblemIdParam),
+    validateQuery(supportAdmin.AdminTicketByIdQuery),
     controller.getProblemById,
   )
 

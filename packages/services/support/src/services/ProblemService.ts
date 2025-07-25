@@ -26,6 +26,10 @@ export interface IProblemService {
     data: ProblemDomain[]
     pagination: any
   }>
+  getUserProblems(params: ProblemSearchParams): Promise<{
+    data: ProblemDomain[]
+    pagination: any
+  }>
   getProblemById(
     id: string,
     parsedIncludes?: ParsedIncludes,
@@ -78,6 +82,17 @@ export class ProblemService implements IProblemService {
     }
 
     return problem
+  }
+
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'user-problems-paginated',
+    keyGenerator: httpRequestKeyGenerator,
+  })
+  async getUserProblems(params: ProblemSearchParams) {
+    logger.info('Fetching user problems with pagination', { params })
+
+    return this.repository.findAll(params)
   }
 
   @Cache({

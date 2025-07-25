@@ -1,23 +1,23 @@
 // File Storage DTOs
 
+import type { FileTypeType } from '@pika/types'
+
 export interface FileStorageLogDTO {
   id: string
-  fileId: string
+  userId: string
+  fileKey: string
   fileName: string
-  contentType: string
-  size: number
-  folder?: string
-  isPublic: boolean
-  url: string
-  storageKey?: string
+  fileSize: number
+  mimeType: string
+  fileType: FileTypeType
   status: string
-  userId?: string
-  metadata?: any
-  provider?: string
+  provider: string
+  bucketName?: string
+  region?: string
   uploadedAt?: string
   deletedAt?: string
-  errorMessage?: string
-  processingTimeMs?: number
+  metadata?: Record<string, any>
+  error?: string
   createdAt: string
   updatedAt: string
 }

@@ -112,7 +112,7 @@ export type SortOrder = z.infer<typeof SortOrder>
 /**
  * Common timestamp sort fields - used by entities that only sort by timestamps
  */
-export const TimestampSortBy = z.enum(['CREATED_AT', 'UPDATED_AT'])
+export const TimestampSortBy = z.enum(['createdAt', 'updatedAt'])
 export type TimestampSortBy = z.infer<typeof TimestampSortBy>
 
 // ============= Category Enums =============

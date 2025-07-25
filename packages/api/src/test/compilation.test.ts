@@ -2,18 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 // Import our schemas to test compilation
-import {
-  DateTime,
-  Email,
-  ErrorResponse,
-  Money,
-  paginatedResponse,
-  Password,
-  UserId,
-  UUID,
-  validate,
-  ZodRegistry,
-} from '../index.js'
+import { ZodRegistry } from '../common/registry/base.js'
+import { validate } from '../common/utils/validators.js'
+import { shared } from '../index.js'
+import { paginatedResponse } from '../schemas/shared/responses.js'
+
+const { DateTime, Email, ErrorResponse, Money, Password, UserId, UUID } = shared
+
 import { TokenRequest, TokenResponse } from '../schemas/auth/public/oauth.js'
 
 describe('Zod Schema Compilation', () => {

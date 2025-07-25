@@ -57,7 +57,7 @@ export class NotificationMapper {
       isGlobal: domain.global,
       isRead: domain.read,
       readAt: domain.readAt?.toISOString(),
-      metadata: domain.metadata,
+      metadata: domain.metadata || undefined,
       category: domain.metadata?.category || undefined,
       actionUrl: domain.metadata?.actionUrl || undefined,
       imageUrl: domain.metadata?.imageUrl || undefined,

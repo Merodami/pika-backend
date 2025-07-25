@@ -93,6 +93,18 @@ export class NotificationService implements INotificationService {
       throw ErrorFactory.forbidden('Access denied to this notification')
     }
 
+    // Automatically mark as read when retrieved (if not already read)
+    if (!notification.read) {
+      const updated = await this.notificationRepository.markAsRead(id)
+
+      // Clear cache for the user
+      if (notification.userId) {
+        await this.clearUserNotificationCache(notification.userId)
+      }
+
+      return updated
+    }
+
     return notification
   }
 
@@ -115,10 +127,25 @@ export class NotificationService implements INotificationService {
     // Get notification to check permissions
     const notification = await this.getNotificationById(id, userId)
 
-    const updated = await this.notificationRepository.update(id, {
-      isRead: data.isRead,
-      metadata: data.metadata,
-    })
+    let updated: NotificationDomain
+
+    // If marking as read, use markAsRead to set readAt timestamp
+    if (data.isRead === true && !notification.read) {
+      updated = await this.notificationRepository.markAsRead(id)
+
+      // If there's metadata to update as well, do a separate update
+      if (data.metadata !== undefined) {
+        updated = await this.notificationRepository.update(id, {
+          metadata: data.metadata,
+        })
+      }
+    } else {
+      // Regular update
+      updated = await this.notificationRepository.update(id, {
+        isRead: data.isRead,
+        metadata: data.metadata,
+      })
+    }
 
     // Clear cache
     if (notification.userId) {
