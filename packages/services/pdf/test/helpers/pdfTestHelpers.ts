@@ -39,6 +39,7 @@ export interface SeedVoucherBooksOptions {
   count?: number
   addPages?: boolean
   addAds?: boolean
+  createdBy?: string // UUID of the user who created the voucher books
 }
 
 /**
@@ -54,7 +55,20 @@ export async function seedTestVoucherBooks(
     count = 3,
     addPages = false,
     addAds = false,
+    createdBy,
   } = options
+  
+  // Get a test user if createdBy not provided
+  let userId = createdBy
+  if (!userId) {
+    const testUser = await prisma.user.findFirst({
+      where: { email: { contains: '@test.com' } },
+    })
+    if (!testUser) {
+      throw new Error('No test users found and no createdBy provided.')
+    }
+    userId = testUser.id
+  }
 
   const voucherBooks: any[] = []
 
@@ -74,11 +88,11 @@ export async function seedTestVoucherBooks(
         title: `Test Voucher Book ${i + 1}`,
         year: new Date().getFullYear(),
         month: (new Date().getMonth() + i) % 12 + 1,
-        bookType: i % 2 === 0 ? 'MONTHLY' : 'SPECIAL',
+        bookType: i % 2 === 0 ? 'monthly' : 'special_edition',
         totalPages: 24 + (i * 8), // 24, 32, 40, etc.
         status,
-        createdBy: 'test-admin',
-        updatedBy: 'test-admin',
+        createdBy: userId,
+        updatedBy: userId,
       },
     })
 
@@ -92,7 +106,7 @@ export async function seedTestVoucherBooks(
             pageNumber: pageNum,
             pageType: pageNum % 4 === 0 ? 'ADVERTISEMENT' : 'VOUCHER',
             content: `Page ${pageNum} content`,
-            createdBy: 'test-admin',
+            createdBy: userId,
           },
         })
       }
@@ -110,7 +124,7 @@ export async function seedTestVoucherBooks(
           position: 'CENTER',
           status: 'ACTIVE',
           price: 100.0,
-          createdBy: 'test-admin',
+          createdBy: userId,
         },
       })
     }
@@ -130,12 +144,21 @@ export async function seedTestVoucherBooks(
 export async function createSharedPDFTestData(
   prisma: PrismaClient,
 ): Promise<SharedPDFTestData> {
+  // Get a test user for foreign key references
+  const testUser = await prisma.user.findFirst({
+    where: { email: { contains: '@test.com' } },
+  })
+  
+  if (!testUser) {
+    throw new Error('No test users found. Make sure authHelper.createAllTestUsers() was called first.')
+  }
   // Create published books
   const publishedBooksData = await seedTestVoucherBooks(prisma, {
     generatePublished: true,
     generateDrafts: false,
     count: 3,
     addPages: true,
+    createdBy: testUser.id,
   })
 
   // Create draft books
@@ -143,6 +166,7 @@ export async function createSharedPDFTestData(
     generatePublished: false,
     generateDrafts: true,
     count: 2,
+    createdBy: testUser.id,
   })
 
   const allBooks = [...publishedBooksData.voucherBooks, ...draftBooksData.voucherBooks]
@@ -163,18 +187,31 @@ export async function createTestVoucherBook(
   prisma: PrismaClient,
   status: 'draft' | 'published' = 'published',
   title?: string,
+  createdBy?: string,
 ): Promise<any> {
+  // Get a test user if createdBy not provided
+  let userId = createdBy
+  if (!userId) {
+    const testUser = await prisma.user.findFirst({
+      where: { email: { contains: '@test.com' } },
+    })
+    if (!testUser) {
+      throw new Error('No test users found and no createdBy provided.')
+    }
+    userId = testUser.id
+  }
+
   return await prisma.voucherBook.create({
     data: {
       id: uuid(),
       title: title || `Test Voucher Book`,
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
-      bookType: 'MONTHLY',
+      bookType: 'monthly',
       totalPages: 24,
       status,
-      createdBy: 'test-admin',
-      updatedBy: 'test-admin',
+      createdBy: userId,
+      updatedBy: userId,
     },
   })
 }

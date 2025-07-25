@@ -1,16 +1,16 @@
 enum UserRole {
-  ADMIN
-  CUSTOMER
-  BUSINESS
+  admin
+  customer
+  business
 
   @@schema("identity")
 }
 
 enum UserStatus {
-  ACTIVE
-  SUSPENDED
-  BANNED
-  UNCONFIRMED
+  active
+  suspended
+  banned
+  unconfirmed
 
   @@schema("identity")
 }

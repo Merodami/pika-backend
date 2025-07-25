@@ -39,6 +39,7 @@ import {
 describe('PDF Service - Admin API Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
+  let request: supertest.SuperTest<supertest.Test>
   let authHelper: E2EAuthHelper
   let cacheService: MemoryCacheService
 
@@ -181,7 +182,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
             title: `Book ${i}`,
             year: new Date().getFullYear(),
             month: new Date().getMonth() + 1,
-            bookType: 'MONTHLY',
+            bookType: 'monthly',
             totalPages: 24,
             status: 'draft',
             createdBy: 'test-admin',
@@ -277,7 +278,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
         title: 'New Admin Voucher Book',
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1,
-        bookType: 'MONTHLY',
+        bookType: 'monthly',
         totalPages: 32,
       }
 
@@ -318,7 +319,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
         title: 'Duplicate Title Book',
         year: new Date().getFullYear(),
         month: new Date().getMonth() + 1,
-        bookType: 'MONTHLY',
+        bookType: 'monthly',
         totalPages: 24,
       }
 

@@ -128,5 +128,5 @@ export async function createPDFServer(config: ServerConfig) {
 
   logger.info('PDF service server configured successfully')
 
-  return { app }
+  return app
 }

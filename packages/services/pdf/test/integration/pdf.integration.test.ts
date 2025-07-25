@@ -30,10 +30,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { createPDFServer } from '../../src/server.js'
 import {
-  createSharedPDFTestData,
   createTestVoucherBook,
   seedTestVoucherBooks,
-  type SharedPDFTestData,
 } from '../helpers/pdfTestHelpers.js'
 
 describe('PDF Service - Public API Integration Tests', () => {
@@ -47,10 +45,7 @@ describe('PDF Service - Public API Integration Tests', () => {
   let customerClient: AuthenticatedRequestClient
   let businessClient: AuthenticatedRequestClient
 
-  // Shared test data created once
-  let sharedTestData: SharedPDFTestData
-
-  // Note: Using shared helper from pdfTestHelpers.js
+  // Note: Using helper from pdfTestHelpers.js
 
   beforeAll(async () => {
     logger.debug('Setting up PDF Service integration tests...')
@@ -90,14 +85,6 @@ describe('PDF Service - Public API Integration Tests', () => {
     businessClient = await authHelper.getBusinessClient(testDb.prisma)
 
     logger.debug('E2E authentication setup complete')
-
-    // Create shared test data once for all tests
-    logger.debug('Creating shared test data...')
-    sharedTestData = await createSharedPDFTestData(testDb.prisma)
-
-    logger.debug(
-      `Created ${sharedTestData.allBooks.length} test voucher books`,
-    )
   }, 120000)
 
   beforeEach(async () => {
@@ -182,7 +169,7 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Current Month Book',
           year: currentYear,
           month: currentMonth,
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           totalPages: 24,
           status: 'published',
           createdBy: 'test-admin',
@@ -196,7 +183,7 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Different Month Book',
           year: currentYear,
           month: currentMonth === 12 ? 1 : currentMonth + 1,
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           totalPages: 24,
           status: 'published',
           createdBy: 'test-admin',
@@ -221,7 +208,7 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Monthly Book',
           year: new Date().getFullYear(),
           month: new Date().getMonth() + 1,
-          bookType: 'MONTHLY',
+          bookType: 'monthly',
           totalPages: 24,
           status: 'published',
           createdBy: 'test-admin',
@@ -245,12 +232,12 @@ describe('PDF Service - Public API Integration Tests', () => {
 
       const response = await customerClient
         .get('/voucher-books')
-        .query({ bookType: 'MONTHLY' })
+        .query({ bookType: 'monthly' })
         .set('Accept', 'application/json')
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].bookType).toBe('MONTHLY')
+      expect(response.body.data[0].bookType).toBe('monthly')
     })
   })
 

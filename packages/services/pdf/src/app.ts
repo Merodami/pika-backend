@@ -29,7 +29,7 @@ export async function startPDFService(): Promise<void> {
     prisma = await initializeDatabase()
     cacheService = await initializeCache()
 
-    const { app } = await createPDFServer({
+    const app = await createPDFServer({
       prisma,
       cacheService,
     })

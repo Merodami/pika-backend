@@ -66,8 +66,8 @@ export async function createTestDatabase(
 
   logger.debug('Starting PostgreSQL test container...')
 
-  // Create container with standard PostgreSQL
-  let container = new PostgreSqlContainer('postgres:17.2')
+  // Create container with PostGIS (matches docker-compose.local.yml and testcontainers.ts)
+  let container = new PostgreSqlContainer('postgis/postgis:17-3.5')
     .withDatabase(databaseName)
     .withUsername(username)
     .withPassword(password)
