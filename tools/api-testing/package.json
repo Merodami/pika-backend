@@ -13,7 +13,7 @@
     "@pika/environment": "workspace:^",
     "@pika/types": "workspace:^",
     "@prisma/client": "^6.12.0",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "bcrypt": "^6.0.0"
   },
   "devDependencies": {
