@@ -78,7 +78,7 @@ export const AdminTicketQueryParams = z.object({
   type: TicketType.optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
-  sortBy: AdminTicketSortBy.default('CREATED_AT'),
+  sortBy: AdminTicketSortBy.default('createdAt'),
   sortOrder: SortOrder.default(SortOrder.enum.desc),
   ...createIncludeParam(ADMIN_PROBLEM_RELATIONS).shape,
 })
@@ -356,7 +356,7 @@ export const AdminGetAllCommentsQuery = openapi(
   z.object({
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(20),
-    sortBy: TimestampSortBy.default('CREATED_AT'),
+    sortBy: TimestampSortBy.default('createdAt'),
     sortOrder: SortOrder.default(SortOrder.enum.desc),
     search: z.string().optional(),
     problemId: z.string().optional(),

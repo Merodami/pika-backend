@@ -136,20 +136,123 @@ export function createUserServiceClientMock() {
 }
 
 /**
- * Setup mocks for all service clients used by Subscription Service
+ * Mock for VoucherServiceClient - handles voucher operations
+ */
+export function createVoucherServiceClientMock() {
+  return {
+    getVouchersByIds: vi.fn().mockResolvedValue(new Map([
+      ['voucher-1', {
+        id: 'voucher-1',
+        businessId: 'business-1',
+        title: { en: 'Mock Voucher 1' },
+        description: { en: 'Mock Description 1' },
+        terms: { en: 'Mock Terms 1' },
+        discountType: 'percentage',
+        discountValue: 10,
+        businessName: 'Mock Business 1',
+        category: 'restaurants',
+        qrPayload: 'mock-qr-payload-1',
+        shortCode: 'MOCK01',
+      }],
+      ['voucher-2', {
+        id: 'voucher-2',
+        businessId: 'business-2',
+        title: { en: 'Mock Voucher 2' },
+        description: { en: 'Mock Description 2' },
+        terms: { en: 'Mock Terms 2' },
+        discountType: 'fixed',
+        discountValue: 5,
+        businessName: 'Mock Business 2',
+        category: 'retail',
+        qrPayload: 'mock-qr-payload-2',
+        shortCode: 'MOCK02',
+      }],
+    ])),
+    getVoucherById: vi.fn().mockResolvedValue({
+      id: 'voucher-1',
+      businessId: 'business-1',
+      title: { en: 'Mock Voucher' },
+      description: { en: 'Mock Description' },
+      terms: { en: 'Mock Terms' },
+      discountType: 'percentage',
+      discountValue: 10,
+      businessName: 'Mock Business',
+      category: 'restaurants',
+      qrPayload: 'mock-qr-payload',
+      shortCode: 'MOCK01',
+    }),
+    getVouchersByProviderId: vi.fn().mockResolvedValue([
+      {
+        id: 'voucher-1',
+        businessId: 'business-1',
+        title: { en: 'Mock Voucher' },
+        description: { en: 'Mock Description' },
+        terms: { en: 'Mock Terms' },
+        discountType: 'percentage',
+        discountValue: 10,
+        businessName: 'Mock Business',
+        category: 'restaurants',
+        qrPayload: 'mock-qr-payload',
+        shortCode: 'MOCK01',
+      },
+    ]),
+    getVouchersForBook: vi.fn().mockResolvedValue({
+      vouchers: [
+        {
+          id: 'voucher-1',
+          businessId: 'business-1',
+          title: { en: 'Mock Voucher 1' },
+          description: { en: 'Mock Description 1' },
+          terms: { en: 'Mock Terms 1' },
+          discountType: 'percentage',
+          discountValue: 10,
+          businessName: 'Mock Business 1',
+          category: 'restaurants',
+          qrPayload: 'mock-qr-payload-1',
+          shortCode: 'MOCK01',
+        },
+        {
+          id: 'voucher-2',
+          businessId: 'business-2',
+          title: { en: 'Mock Voucher 2' },
+          description: { en: 'Mock Description 2' },
+          terms: { en: 'Mock Terms 2' },
+          discountType: 'fixed',
+          discountValue: 5,
+          businessName: 'Mock Business 2',
+          category: 'retail',
+          qrPayload: 'mock-qr-payload-2',
+          shortCode: 'MOCK02',
+        },
+      ],
+      count: 2,
+    }),
+    validateBookStateTransition: vi.fn().mockResolvedValue({
+      allowed: true,
+      reason: undefined,
+      requiredFields: undefined,
+    }),
+  }
+}
+
+/**
+ * Setup mocks for all service clients
  */
 export function setupServiceClientMocks() {
   const paymentClientMock = createPaymentServiceClientMock()
   const communicationClientMock = createCommunicationServiceClientMock()
   const userClientMock = createUserServiceClientMock()
+  const voucherClientMock = createVoucherServiceClientMock()
 
   return {
     PaymentServiceClient: vi.fn(() => paymentClientMock),
     CommunicationServiceClient: vi.fn(() => communicationClientMock),
     UserServiceClient: vi.fn(() => userClientMock),
+    VoucherServiceClient: vi.fn(() => voucherClientMock),
     // Return instances for direct usage
     paymentClientMock,
     communicationClientMock,
     userClientMock,
+    voucherClientMock,
   }
 }

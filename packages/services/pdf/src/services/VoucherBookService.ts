@@ -108,15 +108,16 @@ export class VoucherBookService implements IVoucherBookService {
   private readonly voucherServiceClient: VoucherServiceClient
 
   constructor(
-    private readonly voucherBookRepository: IVoucherBookRepository,
+    protected readonly voucherBookRepository: IVoucherBookRepository,
     private readonly pageRepository: IVoucherBookPageRepository,
     private readonly placementRepository: IAdPlacementRepository,
     private readonly distributionRepository: IBookDistributionRepository,
     private readonly cache: ICacheService,
+    voucherServiceClient?: VoucherServiceClient,
   ) {
     this.pdfGenerationService = new PDFGenerationService()
     this.pageLayoutEngine = new PageLayoutEngine()
-    this.voucherServiceClient = new VoucherServiceClient()
+    this.voucherServiceClient = voucherServiceClient || new VoucherServiceClient()
   }
 
   async createVoucherBook(
@@ -128,6 +129,20 @@ export class VoucherBookService implements IVoucherBookService {
         createdById: data.createdById,
       })
 
+      // Check for duplicate titles in the same year/month
+      const existingBooks = await this.voucherBookRepository.findByTitleAndPeriod(
+        data.title,
+        data.year,
+        data.month,
+      )
+      
+      if (existingBooks.length > 0) {
+        throw ErrorFactory.resourceConflict(
+          'VoucherBook',
+          `A voucher book with title "${data.title}" already exists for ${data.year}${data.month ? `/${data.month}` : ''}`,
+        )
+      }
+
       // Validate and set defaults
       const bookData = {
         title: data.title,
@@ -136,8 +151,11 @@ export class VoucherBookService implements IVoucherBookService {
         month: data.month,
         year: data.year,
         totalPages: data.totalPages || VoucherBookService.DEFAULT_PAGES,
+        coverImageUrl: data.coverImageUrl,
+        backImageUrl: data.backImageUrl,
         metadata: data.metadata,
         createdBy: data.createdById,
+        updatedBy: data.createdById,
       }
 
       // Create the voucher book

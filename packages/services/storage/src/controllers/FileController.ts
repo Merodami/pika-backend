@@ -73,7 +73,7 @@ export class FileController implements IFileController {
    */
   async uploadFile(
     request: Request<{}, {}, storagePublic.FileUploadRequest>,
-    response: Response<storagePublic.FileStorageLog>,
+    response: Response<storagePublic.FileUploadResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -113,10 +113,10 @@ export class FileController implements IFileController {
         userId,
       })
 
-      // Transform FileStorageLogDomain to DTO and return full storage log
-      const responseData = FileStorageLogMapper.toDTO(result)
+      // Transform FileStorageLogDomain to FileUploadResponse format
+      const responseData = FileStorageLogMapper.toFileUploadResponseDTO(result)
       const validatedResponse = validateResponse(
-        storagePublic.FileStorageLog,
+        storagePublic.FileUploadResponse,
         responseData,
         'FileController.uploadFile',
       )
@@ -172,9 +172,33 @@ export class FileController implements IFileController {
         userId,
       })
 
+      // Transform BatchUploadResult to BatchUploadResponse format
+      const successful: any[] = []
+      const failed: any[] = []
+
+      result.logs.forEach((log) => {
+        if (log.status === 'uploaded') {
+          // Convert successful uploads to FileUploadResponse format
+          successful.push(FileStorageLogMapper.toFileUploadResponseDTO(log))
+        } else {
+          // Convert failed uploads to error format
+          failed.push({
+            fileName: log.fileName,
+            error: log.errorMessage || 'Upload failed',
+          })
+        }
+      })
+
+      const responseData = {
+        successful,
+        failed,
+        totalUploaded: successful.length,
+        totalFailed: failed.length,
+      }
+
       const validatedResponse = validateResponse(
         storagePublic.BatchUploadResponse,
-        result,
+        responseData,
         'FileController.uploadBatch',
       )
 
@@ -306,7 +330,7 @@ export class FileController implements IFileController {
    */
   async getFileById(
     request: Request<storageCommon.FileHistoryIdParam>,
-    res: Response<storagePublic.FileHistoryResponse>,
+    res: Response<storagePublic.FileStorageLog>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -320,7 +344,7 @@ export class FileController implements IFileController {
 
       const response = FileStorageLogMapper.toDTO(file)
       const validatedResponse = validateResponse(
-        storagePublic.FileHistoryResponse,
+        storagePublic.FileStorageLog,
         response,
         'FileController.getFileById',
       )

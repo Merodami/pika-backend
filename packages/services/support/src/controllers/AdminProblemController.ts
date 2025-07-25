@@ -48,13 +48,17 @@ export class AdminProblemController {
         status: query.status,
         priority: query.priority,
         userId: query.userId,
+        assignedTo: query.assignedTo,
+        ticketNumber: query.ticketNumber,
+        type: query.type,
+        include: query.include,
       }
 
       const result = await this.problemService.getAllProblems(problemParams)
 
-      // Transform to DTOs
+      // Transform to Admin DTOs
       const dtoResult = {
-        data: result.data.map(ProblemMapper.toDTO),
+        data: result.data.map(ProblemMapper.toAdminDTO),
         pagination: result.pagination,
       }
 
@@ -86,15 +90,16 @@ export class AdminProblemController {
   ): Promise<void> {
     try {
       const { id } = request.params
+      const query = getValidatedQuery<supportAdmin.AdminTicketByIdQuery>(request)
 
-      const problem = await this.problemService.getProblemById(id)
+      const problem = await this.problemService.getProblemById(id, query.include)
 
       if (!problem) {
         throw ErrorFactory.resourceNotFound('Problem', id)
       }
 
       // Transform to DTO
-      const dto = ProblemMapper.toDTO(problem)
+      const dto = ProblemMapper.toAdminDTO(problem)
 
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,
@@ -134,7 +139,7 @@ export class AdminProblemController {
       const problem = await this.problemService.updateProblem(id, data)
 
       // Transform to DTO
-      const dto = ProblemMapper.toDTO(problem)
+      const dto = ProblemMapper.toAdminDTO(problem)
 
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,

@@ -297,3 +297,51 @@ export enum CustomerVoucherStatus {
  * Type definition for customer voucher status - use this for type annotations
  */
 export type CustomerVoucherStatusType = `${CustomerVoucherStatus}`
+
+/**
+ * File types supported by the storage system
+ * Must match Prisma schema definitions
+ */
+export enum FileType {
+  IMAGE = 'image',
+  VIDEO = 'video',
+  DOCUMENT = 'document',
+  AUDIO = 'audio',
+  OTHER = 'other',
+}
+
+/**
+ * Type definition for file type - use this for type annotations
+ */
+export type FileTypeType = `${FileType}`
+
+/**
+ * File status in the storage system
+ * Must match Prisma schema definitions and storage operations
+ */
+export enum FileStatus {
+  PENDING = 'pending',
+  UPLOADED = 'uploaded',
+  FAILED = 'failed',
+  DELETED = 'deleted',
+}
+
+/**
+ * Type definition for file status - use this for type annotations
+ */
+export type FileStatusType = `${FileStatus}`
+
+/**
+ * Storage providers supported by the system
+ * Must match Prisma schema definitions
+ */
+export enum StorageProvider {
+  AWS_S3 = 'aws_s3',
+  LOCAL = 'local',
+  MINIO = 'minio',
+}
+
+/**
+ * Type definition for storage provider - use this for type annotations
+ */
+export type StorageProviderType = `${StorageProvider}`

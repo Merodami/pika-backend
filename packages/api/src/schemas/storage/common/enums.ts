@@ -4,17 +4,16 @@ import { z } from 'zod'
  * Storage service enums
  */
 
-export const FileType = z.enum(['IMAGE', 'VIDEO', 'DOCUMENT', 'AUDIO', 'OTHER'])
+export const FileType = z.enum(['image', 'video', 'document', 'audio', 'other'])
 export type FileType = z.infer<typeof FileType>
 
-export const FileStatus = z.enum(['PENDING', 'UPLOADED', 'FAILED', 'DELETED'])
+export const FileStatus = z.enum(['pending', 'uploaded', 'failed', 'deleted'])
 export type FileStatus = z.infer<typeof FileStatus>
 
 export const StorageProvider = z.enum([
-  'AWS_S3',
-  'GOOGLE_CLOUD',
-  'AZURE',
-  'LOCAL',
+  'aws_s3',
+  'local',
+  'minio',
 ])
 export type StorageProvider = z.infer<typeof StorageProvider>
 

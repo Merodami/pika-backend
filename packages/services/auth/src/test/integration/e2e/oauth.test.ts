@@ -129,11 +129,11 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
           expiresIn: 900,
           refreshToken: expect.any(String),
           user: {
-            id: '11111111-1111-1111-1111-111111111111',
+            id: '123e4567-e89b-12d3-a456-426614174001',
             email: 'test@example.com',
             firstName: 'Test',
             lastName: 'User',
-            role: 'USER',
+            role: UserRole.CUSTOMER,
           },
         })
       })
@@ -272,7 +272,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         active: true,
-        sub: '11111111-1111-1111-1111-111111111111',
+        sub: '123e4567-e89b-12d3-a456-426614174001',
         tokenType: 'Bearer',
         scope: expect.any(String),
         iat: expect.any(Number),
@@ -297,7 +297,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
     it('should return inactive for expired token', async () => {
       // Create an expired token using authHelper
       const expiredToken = authHelper.generateTestToken({
-        userId: '11111111-1111-1111-1111-111111111111',
+        userId: '123e4567-e89b-12d3-a456-426614174001',
         email: 'test@example.com',
         role: 'USER',
         expiresIn: '-1h', // Expired 1 hour ago
@@ -454,7 +454,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toMatchObject({
-        id: '11111111-1111-1111-1111-111111111111',
+        id: '123e4567-e89b-12d3-a456-426614174001',
         email: 'test@example.com',
         emailVerified: true,
         firstName: 'Test',

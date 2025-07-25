@@ -6,6 +6,7 @@ import type {
 } from '@pika/sdk'
 import { SupportCommentMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
+import type { PaginatedResult } from '@pika/types'
 
 import type {
   CreateSupportCommentInput,
@@ -13,8 +14,16 @@ import type {
   UpdateSupportCommentInput,
 } from '../repositories/SupportCommentRepository.js'
 
+export interface CommentSearchParams {
+  problemId: string
+  page?: number
+  limit?: number
+  sortBy?: string
+  sortOrder?: 'ASC' | 'DESC'
+}
+
 export interface ISupportCommentService {
-  getCommentsByProblemId(problemId: string): Promise<SupportCommentDomain[]>
+  getCommentsByProblemId(params: CommentSearchParams): Promise<PaginatedResult<SupportCommentDomain>>
   getCommentById(id: string): Promise<SupportCommentDomain>
   createComment(
     userId: string,
@@ -35,11 +44,11 @@ export class SupportCommentService implements ISupportCommentService {
   ) {}
 
   async getCommentsByProblemId(
-    problemId: string,
-  ): Promise<SupportCommentDomain[]> {
-    logger.info('Fetching comments for problem', { problemId })
+    params: CommentSearchParams,
+  ): Promise<PaginatedResult<SupportCommentDomain>> {
+    logger.info('Fetching comments for problem', { params })
 
-    return this.repository.findByProblemId(problemId)
+    return this.repository.findByProblemId(params)
   }
 
   async getCommentById(id: string): Promise<SupportCommentDomain> {

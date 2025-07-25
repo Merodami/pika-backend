@@ -16,7 +16,7 @@ import type {
  */
 export class ConsoleStorageProvider implements StorageProvider {
   getProviderName(): string {
-    return 'console'
+    return 'local'
   }
 
   async isAvailable(): Promise<boolean> {

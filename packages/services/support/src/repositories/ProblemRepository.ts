@@ -81,12 +81,12 @@ export class ProblemRepository implements IProblemRepository {
    */
   private mapSortField(sortBy: string): string {
     const sortFieldMap: Record<string, string> = {
-      TITLE: 'title',
-      STATUS: 'status',
-      PRIORITY: 'priority',
-      CREATED_AT: 'createdAt',
-      UPDATED_AT: 'updatedAt',
-      RESOLVED_AT: 'resolvedAt',
+      title: 'title',
+      status: 'status',
+      priority: 'priority',
+      createdAt: 'createdAt',
+      updatedAt: 'updatedAt',
+      resolvedAt: 'resolvedAt',
     }
 
     return get(sortFieldMap, sortBy, 'createdAt')

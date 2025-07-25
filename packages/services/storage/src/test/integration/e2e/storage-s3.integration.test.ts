@@ -11,13 +11,14 @@ import {
   createS3TestHelper,
   E2EAuthHelper,
   S3TestHelper,
-} from '@pika'
+} from '@pika/tests'
 import {
   AWS_S3_ACCESS_KEY_ID,
   AWS_S3_ENDPOINT,
   AWS_S3_REGION,
   AWS_S3_SECRET_ACCESS_KEY,
 } from '@pika/environment'
+import { StorageProvider, FileStatus } from '@pika/types'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -53,8 +54,8 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
 
   beforeAll(async () => {
     // Set environment variables for S3 provider
-    process.env.STORAGE_PROVIDER_PRIMARY = 'aws-s3'
-    process.env.STORAGE_PROVIDER_FALLBACK = 'console'
+    process.env.STORAGE_PROVIDER_PRIMARY = 'aws_s3'
+    process.env.STORAGE_PROVIDER_FALLBACK = 'local'
     process.env.NODE_ENV = 'test'
 
     // Initialize S3 test helper
@@ -194,9 +195,9 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
       expect(response.body).toHaveProperty('id')
       expect(response.body).toHaveProperty('fileId')
       expect(response.body).toHaveProperty('fileName', fileName)
-      expect(response.body).toHaveProperty('status', 'uploaded')
-      expect(response.body).toHaveProperty('provider', 'aws-s3')
-      expect(response.body).toHaveProperty('size', fileContent.length)
+      expect(response.body).toHaveProperty('status', FileStatus.UPLOADED)
+      expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
+      expect(response.body).toHaveProperty('fileSize', fileContent.length)
       expect(response.body.url).toContain(TEST_BUCKET)
 
       // Verify file exists in S3/MinIO
@@ -222,7 +223,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .field('isPublic', 'false')
         .expect(201)
 
-      expect(uploadResponse.body.provider).toBe('aws-s3')
+      expect(uploadResponse.body.provider).toBe(StorageProvider.AWS_S3)
 
       const fileId = uploadResponse.body.fileId
 
@@ -233,7 +234,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .expect(200)
 
       expect(urlResponse.body).toHaveProperty('url')
-      expect(urlResponse.body).toHaveProperty('expiresIn', 3600)
+      expect(urlResponse.body).toHaveProperty('expiresAt')
       expect(urlResponse.body.url).toContain(TEST_BUCKET)
       expect(urlResponse.body.url).toContain('X-Amz-Signature') // S3 presigned URL signature
       expect(urlResponse.body.url).toContain('X-Amz-Expires') // S3 presigned URL expiration
@@ -259,14 +260,16 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
 
       const response = await request.expect(201)
 
-      expect(response.body).toHaveProperty('uploaded', 3)
-      expect(response.body).toHaveProperty('failed', 0)
-      expect(response.body).toHaveProperty('total', 3)
-      expect(response.body.logs).toHaveLength(3)
+      expect(response.body).toHaveProperty('totalUploaded', 3)
+      expect(response.body).toHaveProperty('totalFailed', 0)
+      expect(response.body).toHaveProperty('successful')
+      expect(response.body).toHaveProperty('failed')
+      expect(response.body.successful).toHaveLength(3)
+      expect(response.body.failed).toHaveLength(0)
 
       // Verify all uploads used S3 provider
-      response.body.logs.forEach((log: any) => {
-        expect(log.provider).toBe('aws-s3')
+      response.body.successful.forEach((upload: any) => {
+        expect(upload.provider).toBe(StorageProvider.AWS_S3)
       })
 
       // Verify files exist in S3
@@ -287,7 +290,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .attach('file', fileContent, fileName)
         .expect(201)
 
-      expect(uploadResponse.body.provider).toBe('aws-s3')
+      expect(uploadResponse.body.provider).toBe(StorageProvider.AWS_S3)
 
       const fileId = uploadResponse.body.fileId
 
@@ -329,9 +332,9 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
           .attach('file', testFile.content, testFile.name)
           .expect(201)
 
-        expect(response.body).toHaveProperty('provider', 'aws-s3')
+        expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
         expect(response.body).toHaveProperty(
-          'contentType',
+          'mimeType',
           testFile.expectedType,
         )
       }
@@ -357,7 +360,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .field('metadata', JSON.stringify(metadata))
         .expect(201)
 
-      expect(response.body).toHaveProperty('provider', 'aws-s3')
+      expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
       expect(response.body).toHaveProperty('metadata')
 
       // Get file details and verify metadata
@@ -367,8 +370,8 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
 
       expect(detailResponse.body).toHaveProperty('metadata')
 
-      // Metadata is stored as JSON string in the database
-      const parsedMetadata = JSON.parse(detailResponse.body.metadata)
+      // Metadata should already be parsed as an object
+      const parsedMetadata = detailResponse.body.metadata
 
       expect(parsedMetadata).toMatchObject(metadata)
 
@@ -386,7 +389,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .attach('file', fileContent, fileName)
         .expect(201)
 
-      expect(response.body.provider).toBe('aws-s3')
+      expect(response.body.provider).toBe(StorageProvider.AWS_S3)
 
       // Check that response doesn't contain sensitive information
       const responseString = JSON.stringify(response.body)
@@ -412,9 +415,9 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .attach('file', almostLimitFile, `large-ok-${uuid()}.bin`)
         .expect(201)
 
-      expect(successResponse.body).toHaveProperty('provider', 'aws-s3')
+      expect(successResponse.body).toHaveProperty('provider', StorageProvider.AWS_S3)
       expect(successResponse.body).toHaveProperty(
-        'size',
+        'fileSize',
         almostLimitFile.length,
       )
 
@@ -426,8 +429,9 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .attach('file', overLimitFile, `too-large-${uuid()}.bin`)
         .expect(413)
 
-      expect(errorResponse.body).toHaveProperty('message')
-      expect(errorResponse.body.message).toContain('size')
+      expect(errorResponse.body).toHaveProperty('error')
+      expect(errorResponse.body.error).toHaveProperty('message')
+      expect(errorResponse.body.error.message).toContain('size')
 
       logger.info('✅ S3 file size limits test passed')
     })
@@ -450,7 +454,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
 
       results.forEach((response) => {
         expect(response.status).toBe(201)
-        expect(response.body).toHaveProperty('provider', 'aws-s3')
+        expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
       })
 
       // Verify all files were uploaded to S3
@@ -487,7 +491,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
           .attach('file', Buffer.from(`Content for ${fileName}`), fileName)
           .expect(201)
 
-        expect(response.body.provider).toBe('aws-s3')
+        expect(response.body.provider).toBe(StorageProvider.AWS_S3)
       }
 
       // Check file history
@@ -498,7 +502,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
 
       // Verify all tracked files use S3 provider
       const s3Files = historyResponse.body.data.filter(
-        (file: any) => file.provider === 'aws-s3',
+        (file: any) => file.provider === StorageProvider.AWS_S3,
       )
 
       expect(s3Files.length).toBeGreaterThanOrEqual(3)

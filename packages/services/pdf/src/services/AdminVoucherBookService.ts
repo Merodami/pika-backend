@@ -8,6 +8,7 @@ import type {
   BatchVoucherBookResult,
   VoucherBookStatistics,
 } from '../types/index.js'
+import type { IVoucherBookRepository } from '../repositories/index.js'
 import { VoucherBookService } from './VoucherBookService.js'
 
 export interface IAdminVoucherBookService {
@@ -66,32 +67,24 @@ export class AdminVoucherBookService
         status,
       )
 
-      // 3. Apply status-specific business logic
-      let updateData: any = {
-        status,
-        updatedById: userId,
-      }
+      // 3. Apply status-specific business logic - use base service methods
+      let updatedBook: VoucherBookDomain
 
       switch (status) {
         case 'published':
-          updateData = {
-            ...updateData,
-            publishedAt: new Date(),
-          }
+          updatedBook = await this.publishVoucherBook(id, userId)
           break
         case 'archived':
-          updateData = {
-            ...updateData,
-            archivedAt: new Date(),
-          }
+          updatedBook = await this.archiveVoucherBook(id, userId)
           break
         case 'ready_for_print':
-          // Mark as ready for print - could trigger PDF generation
+        case 'draft':
+          // For other status changes, use repository's updateStatus method
+          updatedBook = await this.voucherBookRepository.updateStatus(id, status)
           break
+        default:
+          throw ErrorFactory.badRequest(`Unsupported status: ${status}`)
       }
-
-      // 4. Update using the base service
-      const updatedBook = await this.updateVoucherBook(id, updateData)
 
       logger.info('Voucher book status updated successfully', {
         id,

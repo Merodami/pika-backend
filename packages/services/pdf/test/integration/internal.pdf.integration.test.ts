@@ -9,4 +9,10 @@
  * this file should be updated to include appropriate integration tests.
  */
 
-// Placeholder - no internal routes currently exist in PDF service
+import { describe, it } from 'vitest'
+
+describe('PDF Service - Internal API Integration Tests', () => {
+  it('should be implemented when internal routes are added', () => {
+    // Placeholder test - no internal routes currently exist in PDF service
+  })
+})

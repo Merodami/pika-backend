@@ -12,6 +12,7 @@
  */
 
 import type { PrismaClient } from '@prisma/client'
+import { UserRole, UserStatus } from '@pika/types'
 import bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 
@@ -85,8 +86,8 @@ export async function seedTestAuthUsers(
         password: hashedPassword,
         firstName: 'Test',
         lastName: `User ${i + 1}`,
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
         emailVerified: true,
       },
     })
@@ -103,8 +104,8 @@ export async function seedTestAuthUsers(
         password: hashedPassword,
         firstName: 'Inactive',
         lastName: 'User',
-        role: 'CUSTOMER',
-        status: 'SUSPENDED',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.SUSPENDED,
         emailVerified: true,
       },
     })
@@ -120,8 +121,8 @@ export async function seedTestAuthUsers(
         email: 'oauth@test.com',
         firstName: 'OAuth',
         lastName: 'User',
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
         emailVerified: true,
         // No password field
       },
@@ -139,8 +140,8 @@ export async function seedTestAuthUsers(
         password: hashedPassword,
         firstName: 'Admin',
         lastName: 'User',
-        role: 'ADMIN',
-        status: 'ACTIVE',
+        role: UserRole.ADMIN,
+        status: UserStatus.ACTIVE,
         emailVerified: true,
       },
     })
@@ -172,8 +173,8 @@ export async function createSharedAuthTestData(
       password: hashedPassword,
       firstName: 'Test',
       lastName: 'User',
-      role: 'CUSTOMER',
-      status: 'ACTIVE',
+      role: UserRole.CUSTOMER,
+      status: UserStatus.ACTIVE,
       emailVerified: true,
     },
   })
@@ -185,8 +186,8 @@ export async function createSharedAuthTestData(
       password: hashedPassword,
       firstName: 'Admin',
       lastName: 'User',
-      role: 'ADMIN',
-      status: 'ACTIVE',
+      role: UserRole.ADMIN,
+      status: UserStatus.ACTIVE,
       emailVerified: true,
     },
   })
@@ -198,8 +199,8 @@ export async function createSharedAuthTestData(
       password: hashedPassword,
       firstName: 'Inactive',
       lastName: 'User',
-      role: 'CUSTOMER',
-      status: 'SUSPENDED',
+      role: UserRole.CUSTOMER,
+      status: UserStatus.SUSPENDED,
       emailVerified: true,
     },
   })
@@ -210,8 +211,8 @@ export async function createSharedAuthTestData(
       email: 'oauth@example.com',
       firstName: 'OAuth',
       lastName: 'User',
-      role: 'CUSTOMER',
-      status: 'ACTIVE',
+      role: UserRole.CUSTOMER,
+      status: UserStatus.ACTIVE,
       emailVerified: true,
       // No password
     },
@@ -228,8 +229,8 @@ export async function createSharedAuthTestData(
         password: hashedPassword,
         firstName: 'Active',
         lastName: `User ${i + 1}`,
-        role: 'CUSTOMER',
-        status: 'ACTIVE',
+        role: UserRole.CUSTOMER,
+        status: UserStatus.ACTIVE,
         emailVerified: true,
       },
     })
@@ -292,8 +293,8 @@ export async function createTestUser(
   const {
     email = `test-${uuid()}@example.com`,
     password = 'Password123!',
-    role = 'CUSTOMER',
-    status = 'ACTIVE',
+    role = UserRole.CUSTOMER,
+    status = UserStatus.ACTIVE,
     emailVerified = true,
   } = options
 

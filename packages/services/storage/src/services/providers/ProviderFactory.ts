@@ -47,6 +47,7 @@ export class ProviderFactory {
           new AwsS3Provider({
             ...this.config.storage.aws,
             endpoint: this.config.storage.aws.endpoint,
+            providerName: 'aws_s3',
           }),
         )
         logger.debug('Initialized AWS S3 provider for test/dev', {
@@ -91,7 +92,17 @@ export class ProviderFactory {
 
     // Try primary provider (handle minio as alias for aws-s3)
     const primaryProviderName = primaryName === 'minio' ? 'aws-s3' : primaryName
-    const primary = this.storageProviders.get(primaryProviderName)
+    let primary = this.storageProviders.get(primaryProviderName)
+
+    // If using minio and we have AWS config, create a minio-specific provider
+    if (primaryName === 'minio' && this.config.storage?.aws && !primary) {
+      primary = new AwsS3Provider({
+        ...this.config.storage.aws,
+        endpoint: this.config.storage.aws.endpoint,
+        providerName: 'minio',
+      })
+      this.storageProviders.set('minio-instance', primary)
+    }
 
     if (primary && (await primary.isAvailable())) {
       logger.info('Using primary storage provider', { provider: primaryName })

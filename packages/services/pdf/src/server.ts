@@ -14,14 +14,16 @@ import { createAdminVoucherBookRoutes } from './routes/AdminVoucherBookRoutes.js
 import { createVoucherBookRoutes } from './routes/VoucherBookRoutes.js'
 import { AdminVoucherBookService } from './services/AdminVoucherBookService.js'
 import { VoucherBookService } from './services/VoucherBookService.js'
+import { VoucherServiceClient } from './services/VoucherServiceClient.js'
 
 export interface ServerConfig {
   prisma: PrismaClient
   cacheService: ICacheService
+  voucherServiceClient?: VoucherServiceClient
 }
 
 export async function createPDFServer(config: ServerConfig) {
-  const { prisma, cacheService } = config
+  const { prisma, cacheService, voucherServiceClient } = config
 
   // Create Express app with standard configuration
   const app = await createExpressServer({
@@ -101,6 +103,7 @@ export async function createPDFServer(config: ServerConfig) {
     adPlacementRepository,
     bookDistributionRepository,
     cacheService,
+    voucherServiceClient,
   )
   const adminVoucherBookService = new AdminVoucherBookService(
     voucherBookRepository,
@@ -108,6 +111,7 @@ export async function createPDFServer(config: ServerConfig) {
     adPlacementRepository,
     bookDistributionRepository,
     cacheService,
+    voucherServiceClient,
   )
 
   // Initialize controllers

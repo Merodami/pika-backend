@@ -14,10 +14,12 @@ vi.unmock('@pika/redis')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { UserRole } from '@pika/types'
 import {
   cleanupTestDatabase,
   createE2EAuthHelper,
   createTestDatabase,
+  E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
 import type { Express } from 'express'
@@ -37,6 +39,7 @@ describe('Auth Login Integration Tests', () => {
   let app: Express
   let request: supertest.SuperTest<supertest.Test>
   let cacheService: MemoryCacheService
+  let authHelper: E2EAuthHelper
 
   // Shared test data created once
   let sharedTestData: SharedAuthTestData
@@ -125,11 +128,11 @@ describe('Auth Login Integration Tests', () => {
         expiresIn: 900,
         refreshToken: expect.any(String),
         user: {
-          id: '11111111-1111-1111-1111-111111111111',
+          id: '123e4567-e89b-12d3-a456-426614174001',
           email: 'test@example.com',
           firstName: 'Test',
           lastName: 'User',
-          role: 'USER',
+          role: UserRole.CUSTOMER,
         },
       })
     })
@@ -249,7 +252,7 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         user: {
-          role: 'ADMIN',
+          role: UserRole.ADMIN,
         },
       })
     })

@@ -1,3 +1,4 @@
+import { FileType, FileStatus, StorageProvider } from '@pika/types'
 import type {
   FileStorageLogDomain,
   FileUploadDomain,
@@ -71,7 +72,7 @@ export class FileStorageLogMapper {
       fileName: log.fileName,
       fileSize: log.size,
       mimeType: log.contentType,
-      fileType: this.determineFileType(log.contentType),
+      fileType: FileStorageLogMapper.determineFileType(log.contentType),
       url: log.url,
       uploadedAt: log.uploadedAt || log.createdAt,
     }
@@ -94,14 +95,46 @@ export class FileStorageLogMapper {
   }
 
   /**
-   * Helper to determine file type from MIME type
+   * Convert FileStorageLogDomain directly to FileUploadResponse DTO
    */
-  private static determineFileType(
-    mimeType: string,
-  ): 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | 'OTHER' {
-    if (mimeType.startsWith('image/')) return 'IMAGE'
-    if (mimeType.startsWith('video/')) return 'VIDEO'
-    if (mimeType.startsWith('audio/')) return 'AUDIO'
+  static toFileUploadResponseDTO(domain: FileStorageLogDomain) {
+    // Parse metadata if it's a string (from database)
+    let parsedMetadata: Record<string, any> | undefined
+    if (domain.metadata) {
+      try {
+        if (typeof domain.metadata === 'string') {
+          parsedMetadata = JSON.parse(domain.metadata)
+        } else {
+          parsedMetadata = domain.metadata
+        }
+      } catch {
+        parsedMetadata = undefined
+      }
+    }
+
+    return {
+      id: domain.id,
+      fileId: domain.fileId,
+      fileKey: domain.storageKey || domain.fileId,
+      fileName: domain.fileName,
+      fileSize: domain.size,
+      mimeType: domain.contentType,
+      fileType: FileStorageLogMapper.determineFileType(domain.contentType),
+      status: domain.status, // Already correct enum value from database
+      provider: domain.provider || StorageProvider.LOCAL, // Already correct enum value from database
+      url: domain.url,
+      uploadedAt: (domain.uploadedAt || domain.createdAt).toISOString(),
+      metadata: parsedMetadata,
+    }
+  }
+
+  /**
+   * Helper to determine file type from MIME type using proper enums
+   */
+  private static determineFileType(mimeType: string): FileType {
+    if (mimeType.startsWith('image/')) return FileType.IMAGE
+    if (mimeType.startsWith('video/')) return FileType.VIDEO
+    if (mimeType.startsWith('audio/')) return FileType.AUDIO
     if (
       mimeType === 'application/pdf' ||
       mimeType.includes('document') ||
@@ -109,35 +142,47 @@ export class FileStorageLogMapper {
       mimeType.includes('word') ||
       mimeType.includes('excel')
     )
-      return 'DOCUMENT'
+      return FileType.DOCUMENT
 
-    return 'OTHER'
+    return FileType.OTHER
   }
 
   /**
    * Convert domain entity to API DTO
    */
   static toDTO(domain: FileStorageLogDomain): FileStorageLogDTO {
+    // Parse metadata if it's a string (from database)
+    let parsedMetadata: Record<string, any> | undefined
+    if (domain.metadata) {
+      try {
+        if (typeof domain.metadata === 'string') {
+          parsedMetadata = JSON.parse(domain.metadata)
+        } else {
+          parsedMetadata = domain.metadata
+        }
+      } catch {
+        parsedMetadata = undefined
+      }
+    }
+
     return {
       id: domain.id,
-      fileId: domain.fileId,
+      userId: domain.userId || '',
+      fileKey: domain.storageKey || domain.fileId, // Map storageKey to fileKey
       fileName: domain.fileName,
-      contentType: domain.contentType,
-      size: domain.size,
-      folder: domain.folder,
-      isPublic: domain.isPublic,
-      url: domain.url,
-      storageKey: domain.storageKey,
-      status: domain.status,
-      userId: domain.userId,
-      metadata: domain.metadata,
-      provider: domain.provider,
+      fileSize: domain.size, // Map size to fileSize
+      mimeType: domain.contentType, // Map contentType to mimeType
+      fileType: FileStorageLogMapper.determineFileType(domain.contentType), // Determine from MIME type
+      status: domain.status, // Status is already lowercase from Prisma
+      provider: domain.provider || StorageProvider.LOCAL, // Provider is already lowercase from Prisma
+      bucketName: undefined, // Not stored in current domain
+      region: undefined, // Not stored in current domain
       uploadedAt: domain.uploadedAt?.toISOString(),
       deletedAt: domain.deletedAt?.toISOString(),
-      errorMessage: domain.errorMessage,
-      processingTimeMs: domain.processingTimeMs,
+      metadata: parsedMetadata, // Parsed metadata
+      error: domain.errorMessage, // Map errorMessage to error
       createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt.toISOString(),
+      updatedAt: domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
     }
   }
 

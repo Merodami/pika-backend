@@ -55,6 +55,7 @@ export interface CreateVoucherBookInput {
   backImageUrl?: string
   metadata?: Record<string, any>
   createdBy: string
+  updatedBy?: string
 }
 
 export interface UpdateVoucherBookInput {
@@ -135,7 +136,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
           backImageUrl: data.backImageUrl,
           metadata: data.metadata || {},
           createdBy: data.createdBy,
-          updatedBy: data.createdBy,
+          updatedBy: data.updatedBy || data.createdBy,
         },
       })
 
@@ -398,6 +399,40 @@ export class VoucherBookRepository implements IVoucherBookRepository {
     } catch (error) {
       throw ErrorFactory.databaseError(
         'findByYearAndMonth',
+        'VoucherBook',
+        error,
+      )
+    }
+  }
+
+  /**
+   * Find voucher books by title and period (for duplicate validation)
+   */
+  async findByTitleAndPeriod(
+    title: string,
+    year: number,
+    month?: number | null,
+  ): Promise<VoucherBookDomain[]> {
+    try {
+      const where: Prisma.VoucherBookWhereInput = {
+        title,
+        year,
+        deletedAt: null, // Only check non-deleted books
+      }
+
+      if (month !== null && month !== undefined) {
+        where.month = month
+      }
+
+      const voucherBooks = await this.prisma.voucherBook.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+      })
+
+      return voucherBooks.map(VoucherBookMapper.fromDocument)
+    } catch (error) {
+      throw ErrorFactory.databaseError(
+        'findByTitleAndPeriod',
         'VoucherBook',
         error,
       )
