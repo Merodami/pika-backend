@@ -1,5 +1,5 @@
 import { subscriptionAdmin, subscriptionCommon } from '@pika/api'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
 import { SubscriptionMapper, SubscriptionPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { BillingInterval, SubscriptionStatus } from '@pika/types'
@@ -75,8 +75,11 @@ export class AdminSubscriptionController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, SubscriptionMapper.toDTO)
-      const validatedResponse =
-        subscriptionAdmin.AdminGetSubscriptionsResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminGetSubscriptionsResponse,
+        responseData,
+        'AdminSubscriptionController.getAllSubscriptions'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -106,8 +109,11 @@ export class AdminSubscriptionController {
       }
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionAdmin.AdminSubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminSubscriptionResponse,
+        dto,
+        'AdminSubscriptionController.getSubscriptionById'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -143,8 +149,11 @@ export class AdminSubscriptionController {
       )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionAdmin.AdminSubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminSubscriptionResponse,
+        dto,
+        'AdminSubscriptionController.createSubscription'
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -177,8 +186,11 @@ export class AdminSubscriptionController {
       )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionAdmin.AdminSubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminSubscriptionResponse,
+        dto,
+        'AdminSubscriptionController.updateSubscription'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -237,8 +249,11 @@ export class AdminSubscriptionController {
       )
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionAdmin.AdminSubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminSubscriptionResponse,
+        dto,
+        'AdminSubscriptionController.cancelSubscription'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -264,8 +279,11 @@ export class AdminSubscriptionController {
         await this.subscriptionService.reactivateSubscription(id)
 
       const dto = SubscriptionMapper.toDTO(subscription)
-      const validatedResponse =
-        subscriptionAdmin.AdminSubscriptionResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminSubscriptionResponse,
+        dto,
+        'AdminSubscriptionController.reactivateSubscription'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -314,8 +332,11 @@ export class AdminSubscriptionController {
         result,
         SubscriptionPlanMapper.toDTO,
       )
-      const validatedResponse =
-        subscriptionAdmin.AdminGetPlansResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminGetPlansResponse,
+        responseData,
+        'AdminSubscriptionController.getAllPlans'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -344,7 +365,11 @@ export class AdminSubscriptionController {
       }
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
-      const validatedResponse = subscriptionAdmin.AdminPlanResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminPlanResponse,
+        dto,
+        'AdminSubscriptionController.getPlanById'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -369,7 +394,11 @@ export class AdminSubscriptionController {
       const plan = await this.planService.createPlan(data)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
-      const validatedResponse = subscriptionAdmin.AdminPlanResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminPlanResponse,
+        dto,
+        'AdminSubscriptionController.createPlan'
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -399,7 +428,11 @@ export class AdminSubscriptionController {
       const plan = await this.planService.updatePlan(id, data)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
-      const validatedResponse = subscriptionAdmin.AdminPlanResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        subscriptionAdmin.AdminPlanResponse,
+        dto,
+        'AdminSubscriptionController.updatePlan'
+      )
 
       response.json(validatedResponse)
     } catch (error) {

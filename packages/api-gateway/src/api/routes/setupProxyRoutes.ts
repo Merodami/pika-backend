@@ -1,24 +1,9 @@
-import {
-  AUTH_API_URL,
-  COMMUNICATION_API_URL,
-  FILE_STORAGE_API_URL,
-  PAYMENT_API_URL,
-  SUBSCRIPTION_API_URL,
-  SUPPORT_API_URL,
-  USER_API_URL,
-} from '@pika/environment'
 import { logger } from '@pika/shared'
 import type { Express } from 'express'
 import { createProxyMiddleware } from 'http-proxy-middleware'
 
-/**
- * Simple service route configuration
- */
-interface ServiceConfig {
-  name: string
-  prefix: string
-  upstream: string
-}
+import { allRoutes } from './services/index.js'
+import type { ServiceConfig } from './types.js'
 
 /**
  * Context headers that should be propagated to downstream services
@@ -61,98 +46,8 @@ function extractContextHeaders(req: any): Record<string, string> {
   return Object.fromEntries(contextHeaders)
 }
 
-const services: ServiceConfig[] = [
-  {
-    name: 'auth',
-    prefix: '/api/v1/auth',
-    upstream: AUTH_API_URL,
-  },
-  {
-    name: 'users',
-    prefix: '/api/v1/users',
-    upstream: USER_API_URL,
-  },
-  {
-    name: 'admin/users',
-    prefix: '/api/v1/admin/users',
-    upstream: USER_API_URL,
-  },
-  {
-    name: 'admin/payments',
-    prefix: '/api/v1/admin/payments',
-    upstream: PAYMENT_API_URL,
-  },
-  {
-    name: 'admin/subscriptions',
-    prefix: '/api/v1/admin/subscriptions',
-    upstream: SUBSCRIPTION_API_URL,
-  },
-  {
-    name: 'admin/communications',
-    prefix: '/api/v1/admin/communications',
-    upstream: COMMUNICATION_API_URL,
-  },
-  {
-    name: 'admin/support',
-    prefix: '/api/v1/admin/support',
-    upstream: SUPPORT_API_URL,
-  },
-  {
-    name: 'admin/files',
-    prefix: '/api/v1/admin/files',
-    upstream: FILE_STORAGE_API_URL,
-  },
-  {
-    name: 'payments',
-    prefix: '/api/v1/payments',
-    upstream: PAYMENT_API_URL,
-  },
-  {
-    name: 'credits',
-    prefix: '/api/v1/credits',
-    upstream: PAYMENT_API_URL,
-  },
-  {
-    name: 'subscriptions',
-    prefix: '/api/v1/subscriptions',
-    upstream: SUBSCRIPTION_API_URL,
-  },
-  {
-    name: 'memberships',
-    prefix: '/api/v1/memberships',
-    upstream: SUBSCRIPTION_API_URL,
-  },
-  {
-    name: 'communications',
-    prefix: '/api/v1/communications',
-    upstream: COMMUNICATION_API_URL,
-  },
-  {
-    name: 'notifications',
-    prefix: '/api/v1/notifications',
-    upstream: COMMUNICATION_API_URL,
-  },
-  {
-    name: 'problems',
-    prefix: '/api/v1/problems',
-    upstream: SUPPORT_API_URL,
-  },
-  {
-    name: 'support',
-    prefix: '/api/v1/support',
-    upstream: SUPPORT_API_URL,
-  },
-  {
-    name: 'files',
-    prefix: '/api/v1/files',
-    upstream: FILE_STORAGE_API_URL,
-  },
-  {
-    name: 'uploads',
-    prefix: '/api/v1/uploads',
-    upstream: FILE_STORAGE_API_URL,
-  },
-]
+// Use the organized routes from separate files
+const services: ServiceConfig[] = allRoutes
 
 /**
  * Set up proxy routes to backend services

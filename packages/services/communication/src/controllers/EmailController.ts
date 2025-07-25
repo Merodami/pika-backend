@@ -4,6 +4,7 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { CommunicationLogMapper } from '@pika/sdk'
@@ -96,8 +97,11 @@ export class EmailController implements IEmailController {
         queuedAt: result.createdAt,
         scheduledAt: result.sentAt || undefined,
       }
-      const validatedResponse =
-        communicationPublic.SendEmailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.SendEmailResponse,
+        responseData,
+        'EmailController.sendEmail'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -142,8 +146,11 @@ export class EmailController implements IEmailController {
         total: result.total,
         logs: result.logs.map(CommunicationLogMapper.toDTO),
       }
-      const validatedResponse =
-        communicationPublic.SendBulkEmailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.SendBulkEmailResponse,
+        responseData,
+        'EmailController.sendBulkEmail'
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -194,8 +201,11 @@ export class EmailController implements IEmailController {
         result,
         CommunicationLogMapper.toDTO,
       )
-      const validatedResponse =
-        communicationPublic.CommunicationLogListResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.CommunicationLogListResponse,
+        responseData,
+        'EmailController.getEmailHistory'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -222,8 +232,11 @@ export class EmailController implements IEmailController {
       const email = await this.emailService.getEmailById(id, userId)
 
       const responseData = CommunicationLogMapper.toDTO(email)
-      const validatedResponse =
-        communicationPublic.CommunicationLogResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.CommunicationLogResponse,
+        responseData,
+        'EmailController.getEmailById'
+      )
 
       response.json(validatedResponse)
     } catch (error) {

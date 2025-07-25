@@ -1,6 +1,6 @@
 import { categoryCommon, categoryInternal } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -44,8 +44,11 @@ export class InternalCategoryController {
       const response = CategoryMapper.toInternalDTO(category)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        categoryInternal.InternalCategoryData.parse(response)
+      const validatedResponse = validateResponse(
+        categoryInternal.InternalCategoryData,
+        response,
+        'InternalCategoryController.getCategoryById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -74,8 +77,11 @@ export class InternalCategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
-      const validatedResponse =
-        categoryInternal.BulkCategoryResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryInternal.BulkCategoryResponse,
+        response,
+        'InternalCategoryController.getCategoriesByIds'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -132,8 +138,11 @@ export class InternalCategoryController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse =
-        categoryInternal.ValidateCategoryResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryInternal.ValidateCategoryResponse,
+        response,
+        'InternalCategoryController.validateCategories'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -168,8 +177,11 @@ export class InternalCategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
-      const validatedResponse =
-        categoryInternal.InternalCategoryListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryInternal.InternalCategoryListResponse,
+        response,
+        'InternalCategoryController.getActiveCategoriesOnly'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -207,8 +219,11 @@ export class InternalCategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
-      const validatedResponse =
-        categoryInternal.InternalCategoryListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryInternal.InternalCategoryListResponse,
+        response,
+        'InternalCategoryController.getAllCategories'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -241,8 +256,11 @@ export class InternalCategoryController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse =
-        categoryInternal.InternalCategoryHierarchyResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryInternal.InternalCategoryHierarchyResponse,
+        response,
+        'InternalCategoryController.getCategoryHierarchy'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

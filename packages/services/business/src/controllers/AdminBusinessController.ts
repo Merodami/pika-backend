@@ -1,6 +1,6 @@
 import { businessAdmin, businessPublic, mapSortOrder } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
@@ -65,8 +65,11 @@ export class AdminBusinessController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
-      const validatedResponse =
-        businessAdmin.AdminBusinessListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessListResponse,
+        response,
+        'AdminBusinessController.getAllBusinesses'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -104,8 +107,11 @@ export class AdminBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessResponse,
+        response,
+        'AdminBusinessController.getBusinessById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -138,8 +144,11 @@ export class AdminBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessResponse,
+        response,
+        'AdminBusinessController.createBusiness'
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -173,8 +182,11 @@ export class AdminBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessResponse,
+        response,
+        'AdminBusinessController.updateBusiness'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -228,8 +240,11 @@ export class AdminBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessResponse,
+        response,
+        'AdminBusinessController.verifyBusiness'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -255,8 +270,11 @@ export class AdminBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessResponse,
+        response,
+        'AdminBusinessController.deactivateBusiness'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -284,8 +302,11 @@ export class AdminBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessResponse,
+        response,
+        'AdminBusinessController.activateBusiness'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -319,8 +340,11 @@ export class AdminBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessAdmin.AdminBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessResponse,
+        response,
+        'AdminBusinessController.updateBusinessRating'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

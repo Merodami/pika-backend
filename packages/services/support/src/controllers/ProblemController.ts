@@ -1,6 +1,6 @@
 import { supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { RequestContext } from '@pika/http'
+import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
 import type { NextFunction, Request, Response } from 'express'
@@ -40,8 +40,15 @@ export class ProblemController {
 
       // Transform to DTOs
       const dtos = problems.map(ProblemMapper.toDTO)
+      const responseData = { data: dtos }
+      
+      const validatedResponse = validateResponse(
+        supportPublic.SupportProblemListResponse,
+        responseData,
+        'ProblemController.getUserProblems'
+      )
 
-      response.json({ data: dtos })
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -68,8 +75,14 @@ export class ProblemController {
 
       // Transform to DTO
       const dto = ProblemMapper.toDTO(problem)
+      
+      const validatedResponse = validateResponse(
+        supportPublic.SupportProblemResponse,
+        dto,
+        'ProblemController.createProblem'
+      )
 
-      response.status(201).json(dto)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }

@@ -1,6 +1,6 @@
 import { supportAdmin, supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import { getValidatedQuery, RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
@@ -53,8 +53,15 @@ export class AdminCommentController {
 
       // Transform to DTOs
       const dtos = comments.map(SupportCommentMapper.toDTO)
+      const responseData = { data: dtos }
+      
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminCommentListResponse,
+        responseData,
+        'AdminCommentController.getAllComments'
+      )
 
-      response.json({ data: dtos })
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -99,8 +106,15 @@ export class AdminCommentController {
 
       // Transform to DTOs
       const dtos = comments.map(SupportCommentMapper.toDTO)
+      const responseData = { data: dtos }
+      
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminCommentListResponse,
+        responseData,
+        'AdminCommentController.getCommentsByProblemId'
+      )
 
-      response.json({ data: dtos })
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -136,8 +150,14 @@ export class AdminCommentController {
 
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
+      
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminCommentResponse,
+        dto,
+        'AdminCommentController.createInternalComment'
+      )
 
-      response.status(201).json(dto)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -167,8 +187,14 @@ export class AdminCommentController {
 
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
+      
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminCommentResponse,
+        dto,
+        'AdminCommentController.updateAnyComment'
+      )
 
-      response.json(dto)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

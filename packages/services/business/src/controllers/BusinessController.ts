@@ -4,6 +4,7 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
@@ -62,8 +63,11 @@ export class BusinessController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
-      const validatedResponse =
-        businessPublic.BusinessListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessListResponse,
+        response,
+        'BusinessController.getAllBusinesses'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -106,7 +110,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.getBusinessById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -149,7 +157,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.getBusinessByUserId'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -183,7 +195,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.getMyBusiness'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -215,7 +231,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.createMyBusiness'
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -249,7 +269,11 @@ export class BusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse = businessPublic.BusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessPublic.BusinessResponse,
+        response,
+        'BusinessController.updateMyBusiness'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

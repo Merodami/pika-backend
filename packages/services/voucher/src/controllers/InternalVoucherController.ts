@@ -1,6 +1,6 @@
 import { voucherCommon, voucherInternal } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import { paginatedResponse } from '@pika/http'
+import { paginatedResponse, validateResponse } from '@pika/http'
 import { VoucherMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import { VoucherState } from '@pika/types'
@@ -67,8 +67,11 @@ export class InternalVoucherController {
         notFound, // Additional bulk-specific field
       }
 
-      const validatedResponse =
-        voucherInternal.GetVouchersByIdsResponse.parse(response)
+      const validatedResponse = validateResponse(
+        voucherInternal.GetVouchersByIdsResponse,
+        response,
+        'InternalVoucherController.getVouchersByIds'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -112,8 +115,11 @@ export class InternalVoucherController {
           ? VoucherMapper.toAdminDTO(validation.voucher)
           : undefined,
       }
-      const validatedResponse =
-        voucherInternal.ValidateVoucherResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.ValidateVoucherResponse,
+        responseData,
+        'InternalVoucherController.validateVoucher'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -156,8 +162,11 @@ export class InternalVoucherController {
         previousState,
         newState: updatedVoucher.state,
       }
-      const validatedResponse =
-        voucherInternal.InternalUpdateVoucherStateResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.InternalUpdateVoucherStateResponse,
+        responseData,
+        'InternalVoucherController.updateVoucherState'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -187,8 +196,11 @@ export class InternalVoucherController {
         exists: exists.exists,
         voucherId: exists.voucherId,
       }
-      const validatedResponse =
-        voucherInternal.CheckVoucherExistsResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.CheckVoucherExistsResponse,
+        responseData,
+        'InternalVoucherController.checkVoucherExists'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -226,8 +238,11 @@ export class InternalVoucherController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, VoucherMapper.toAdminDTO)
-      const validatedResponse =
-        voucherInternal.GetVouchersByBusinessResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.GetVouchersByBusinessResponse,
+        responseData,
+        'InternalVoucherController.getVouchersByBusiness'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -263,8 +278,11 @@ export class InternalVoucherController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, VoucherMapper.toAdminDTO)
-      const validatedResponse =
-        voucherInternal.GetVouchersByCategoryResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.GetVouchersByCategoryResponse,
+        responseData,
+        'InternalVoucherController.getVouchersByCategory'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -298,8 +316,11 @@ export class InternalVoucherController {
         result,
         VoucherMapper.toUserVoucherDTO,
       )
-      const validatedResponse =
-        voucherInternal.GetUserVouchersResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.GetUserVouchersResponse,
+        responseData,
+        'InternalVoucherController.getUserVouchers'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -333,8 +354,11 @@ export class InternalVoucherController {
         currentRedemptions: result.currentRedemptions,
         maxRedemptions: result.maxRedemptions ?? null,
       }
-      const validatedResponse =
-        voucherInternal.TrackRedemptionResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.TrackRedemptionResponse,
+        responseData,
+        'InternalVoucherController.trackRedemption'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -375,8 +399,11 @@ export class InternalVoucherController {
         })),
         processingTime: 0, // The internal service doesn't track this, but we need it for API compatibility
       }
-      const validatedResponse =
-        voucherInternal.BatchVoucherProcessResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.BatchVoucherProcessResponse,
+        responseData,
+        'InternalVoucherController.batchProcessVouchers'
+      )
 
       res.status(200).json(validatedResponse)
     } catch (error) {
@@ -440,8 +467,11 @@ export class InternalVoucherController {
         total: updates.length,
         updates: updateResults,
       }
-      const validatedResponse =
-        voucherInternal.BatchUpdateVoucherStateResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherInternal.BatchUpdateVoucherStateResponse,
+        responseData,
+        'InternalVoucherController.batchUpdateVoucherState'
+      )
 
       res.status(200).json(validatedResponse)
     } catch (error) {
@@ -499,8 +529,11 @@ export class InternalVoucherController {
         count: vouchersWithTokens.length,
       }
 
-      const validatedResponse =
-        voucherInternal.GetVouchersForBookResponse.parse(response)
+      const validatedResponse = validateResponse(
+        voucherInternal.GetVouchersForBookResponse,
+        response,
+        'InternalVoucherController.getVouchersForBook'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -541,8 +574,11 @@ export class InternalVoucherController {
         count: tokenArray.length,
       }
 
-      const validatedResponse =
-        voucherInternal.GenerateVoucherTokensResponse.parse(response)
+      const validatedResponse = validateResponse(
+        voucherInternal.GenerateVoucherTokensResponse,
+        response,
+        'InternalVoucherController.generateVoucherTokens'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -567,8 +603,11 @@ export class InternalVoucherController {
         newStatus,
       )
 
-      const validatedResponse =
-        voucherInternal.ValidateBookStateTransitionResponse.parse(result)
+      const validatedResponse = validateResponse(
+        voucherInternal.ValidateBookStateTransitionResponse,
+        result,
+        'InternalVoucherController.validateBookStateTransition'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

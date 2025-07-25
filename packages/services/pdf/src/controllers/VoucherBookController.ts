@@ -1,6 +1,6 @@
 import { pdfCommon, pdfPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -56,8 +56,11 @@ export class VoucherBookController {
         result,
         VoucherBookMapper.toPublicDTOFromDomain,
       )
-      const validatedResponse =
-        pdfPublic.VoucherBookListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        pdfPublic.VoucherBookListResponse,
+        response,
+        'VoucherBookController.getAllVoucherBooks'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -90,7 +93,11 @@ export class VoucherBookController {
       }
 
       const response = VoucherBookMapper.toPublicDTOFromDomain(voucherBook)
-      const validatedResponse = pdfPublic.VoucherBookResponse.parse(response)
+      const validatedResponse = validateResponse(
+        pdfPublic.VoucherBookResponse,
+        response,
+        'VoucherBookController.getVoucherBookById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -129,7 +136,11 @@ export class VoucherBookController {
         generatedAt: voucherBook.pdfGeneratedAt || voucherBook.updatedAt,
       })
 
-      const validatedResponse = pdfPublic.PdfDownloadResponse.parse(response)
+      const validatedResponse = validateResponse(
+        pdfPublic.PdfDownloadResponse,
+        response,
+        'VoucherBookController.downloadPDF'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

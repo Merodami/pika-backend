@@ -3,6 +3,7 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { ProblemMapper } from '@pika/sdk'
 import { ErrorFactory, logger, parseIncludeParam } from '@pika/shared'
@@ -63,8 +64,11 @@ export class AdminSupportController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, ProblemMapper.toAdminDTO)
-      const validatedResponse =
-        supportAdmin.AdminTicketListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminTicketListResponse,
+        response,
+        'AdminSupportController.getAllTickets'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -102,8 +106,11 @@ export class AdminSupportController {
 
       // Transform and validate single entity response
       const responseData = ProblemMapper.toAdminDTO(problem)
-      const validatedResponse =
-        supportAdmin.AdminTicketDetailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminTicketDetailResponse,
+        responseData,
+        'AdminSupportController.getTicketById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -144,8 +151,11 @@ export class AdminSupportController {
 
       // Transform and validate update response
       const responseData = ProblemMapper.toAdminDTO(updated)
-      const validatedResponse =
-        supportAdmin.AdminTicketDetailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminTicketDetailResponse,
+        responseData,
+        'AdminSupportController.updateTicketStatus'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -191,8 +201,11 @@ export class AdminSupportController {
 
       // Transform and validate assign response
       const responseData = ProblemMapper.toAdminDTO(updated)
-      const validatedResponse =
-        supportAdmin.AdminTicketDetailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminTicketDetailResponse,
+        responseData,
+        'AdminSupportController.assignTicket'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

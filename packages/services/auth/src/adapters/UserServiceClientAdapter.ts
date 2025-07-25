@@ -17,7 +17,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.password,
+      password: user.password ?? undefined,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -46,7 +46,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.password,
+      password: user.password ?? undefined,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -80,7 +80,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.password,
+      password: user.password ?? undefined,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,

@@ -1,5 +1,5 @@
 import { communicationInternal } from '@pika/api'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
 import {
   CommunicationLogMapper,
   InternalCommunicationMapper,
@@ -89,8 +89,11 @@ export class InternalCommunicationController {
         createdAt: dto.createdAt,
         sentAt: dto.sentAt,
       }
-      const validatedResponse =
-        communicationInternal.SendEmailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationInternal.SendEmailResponse,
+        responseData,
+        'InternalCommunicationController.sendEmail'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -160,8 +163,11 @@ export class InternalCommunicationController {
         sent,
         failed,
       }
-      const validatedResponse =
-        communicationInternal.BulkEmailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationInternal.BulkEmailResponse,
+        responseData,
+        'InternalCommunicationController.sendBulkEmail'
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -216,8 +222,11 @@ export class InternalCommunicationController {
         result,
         InternalCommunicationMapper.toInternalEmailDTO,
       )
-      const validatedResponse =
-        communicationInternal.InternalEmailHistoryResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationInternal.InternalEmailHistoryResponse,
+        responseData,
+        'InternalCommunicationController.getEmailHistory'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -265,8 +274,11 @@ export class InternalCommunicationController {
           status: result.status === 'sent' ? 'queued' : 'failed',
           scheduledAt: result.sentAt,
         }
-      const validatedResponse =
-        communicationInternal.SendTransactionalEmailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationInternal.SendTransactionalEmailResponse,
+        responseData,
+        'InternalCommunicationController.sendTransactionalEmail'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -340,8 +352,11 @@ export class InternalCommunicationController {
           channels: createChannelResults(channels, recipientCount),
           timestamp: new Date(),
         }
-      const validatedResponse =
-        communicationInternal.SendSystemNotificationResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationInternal.SendSystemNotificationResponse,
+        responseData,
+        'InternalCommunicationController.sendSystemNotification'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -408,8 +423,11 @@ export class InternalCommunicationController {
         }
       }
 
-      const validatedResponse =
-        communicationInternal.CreateNotificationResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        communicationInternal.CreateNotificationResponse,
+        dto,
+        'InternalCommunicationController.createNotification'
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -471,10 +489,11 @@ export class InternalCommunicationController {
         created: created.length,
         notifications: created,
       }
-      const validatedResponse =
-        communicationInternal.BatchCreateNotificationsResponse.parse(
-          responseData,
-        )
+      const validatedResponse = validateResponse(
+        communicationInternal.BatchCreateNotificationsResponse,
+        responseData,
+        'InternalCommunicationController.createBatchNotifications'
+      )
 
       response.status(201).json(validatedResponse)
     } catch (error) {
@@ -526,8 +545,11 @@ export class InternalCommunicationController {
         result,
         InternalCommunicationMapper.toInternalNotificationDTO,
       )
-      const validatedResponse =
-        communicationInternal.InternalNotificationsResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationInternal.InternalNotificationsResponse,
+        responseData,
+        'InternalCommunicationController.getNotifications'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -570,8 +592,11 @@ export class InternalCommunicationController {
         userId: userId as string,
         unreadCount: result.pagination.total,
       }
-      const validatedResponse =
-        communicationInternal.GetUnreadCountResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationInternal.GetUnreadCountResponse,
+        responseData,
+        'InternalCommunicationController.getUnreadCount'
+      )
 
       response.json(validatedResponse)
     } catch (error) {

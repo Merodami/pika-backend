@@ -8,6 +8,7 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { NotificationMapper } from '@pika/sdk'
@@ -114,8 +115,11 @@ export class NotificationController implements INotificationController {
       })
 
       const responseData = NotificationMapper.toDTO(notification)
-      const validatedResponse =
-        communicationPublic.NotificationResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.NotificationResponse,
+        responseData,
+        'NotificationController.createNotification'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -161,8 +165,11 @@ export class NotificationController implements INotificationController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, NotificationMapper.toDTO)
-      const validatedResponse =
-        communicationPublic.NotificationListResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.NotificationListResponse,
+        responseData,
+        'NotificationController.getNotifications'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -193,8 +200,11 @@ export class NotificationController implements INotificationController {
       )
 
       const responseData = NotificationMapper.toDTO(notification)
-      const validatedResponse =
-        communicationPublic.NotificationResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.NotificationResponse,
+        responseData,
+        'NotificationController.getNotificationById'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -230,8 +240,11 @@ export class NotificationController implements INotificationController {
       )
 
       const responseData = NotificationMapper.toDTO(notification)
-      const validatedResponse =
-        communicationPublic.NotificationResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.NotificationResponse,
+        responseData,
+        'NotificationController.updateNotification'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -258,8 +271,11 @@ export class NotificationController implements INotificationController {
       const notification = await this.notificationService.markAsRead(id, userId)
 
       const responseData = NotificationMapper.toDTO(notification)
-      const validatedResponse =
-        communicationPublic.NotificationResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.NotificationResponse,
+        responseData,
+        'NotificationController.markAsRead'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -285,8 +301,11 @@ export class NotificationController implements INotificationController {
       const updatedCount = await this.notificationService.markAllAsRead(userId)
 
       const responseData = { updated: updatedCount }
-      const validatedResponse =
-        communicationPublic.MarkAllAsReadResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        communicationPublic.MarkAllAsReadResponse,
+        responseData,
+        'NotificationController.markAllAsRead'
+      )
 
       response.json(validatedResponse)
     } catch (error) {

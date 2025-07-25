@@ -4,6 +4,7 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -85,7 +86,11 @@ export class UserController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, UserMapper.toDTO)
-      const validatedResponse = userAdmin.AdminUserListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserListResponse,
+        response,
+        'UserController.getAllUsers'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -117,7 +122,11 @@ export class UserController {
       })
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getUserById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -145,7 +154,11 @@ export class UserController {
       const user = await this.userService.getUserByEmail(email)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getUserByEmail'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -168,7 +181,11 @@ export class UserController {
       const user = await this.userService.createUser(data)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.createUser'
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -191,7 +208,11 @@ export class UserController {
       const user = await this.userService.createAdminUser(data)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.createAdminUser'
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -215,7 +236,11 @@ export class UserController {
       const user = await this.userService.updateUser(userId, data)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.updateUser'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -275,7 +300,11 @@ export class UserController {
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
       const response = { avatarUrl: url }
-      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userPublic.UploadAvatarResponse,
+        response,
+        'UserController.uploadAvatar'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -302,7 +331,11 @@ export class UserController {
       const user = await this.userService.getUserBySubToken(subToken)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getUserBySubToken'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -325,7 +358,11 @@ export class UserController {
       const user = await this.userService.updateUserStatus(userId, status)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.updateUserStatus'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -348,7 +385,11 @@ export class UserController {
       const user = await this.userService.banUser(userId)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.banUser'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -371,7 +412,11 @@ export class UserController {
       const user = await this.userService.unbanUser(userId)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.unbanUser'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -393,7 +438,11 @@ export class UserController {
       const friends = await this.userService.getUserFriends(userId)
 
       const response = { guests: friends }
-      const validatedResponse = userPublic.UserFriendsResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userPublic.UserFriendsResponse,
+        response,
+        'UserController.getUserFriends'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -413,7 +462,11 @@ export class UserController {
       const user = await this.userService.getUserById(userId)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.getMe'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -437,7 +490,11 @@ export class UserController {
       const user = await this.userService.updateUser(userId, req.body)
 
       const dto = UserMapper.toDTO(user)
-      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+      const validatedResponse = validateResponse(
+        userPublic.UserProfileResponse,
+        dto,
+        'UserController.updateMe'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -471,7 +528,11 @@ export class UserController {
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
       const response = { avatarUrl: url }
-      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userPublic.UploadAvatarResponse,
+        response,
+        'UserController.uploadMyAvatar'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

@@ -226,7 +226,11 @@ export class InternalUserController {
       await this.internalUserService.verifyEmail(id)
 
       const response = { success: true }
-      const validatedResponse = userInternal.SuccessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.SuccessResponse,
+        response,
+        'InternalUserController.verifyEmail'
+      )
 
       res.status(200).json(validatedResponse)
     } catch (error) {
@@ -256,7 +260,11 @@ export class InternalUserController {
         token: tokenData.token,
         expiresAt: tokenData.expiresAt.toISOString(),
       }
-      const validatedResponse = userInternal.TokenResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.TokenResponse,
+        response,
+        'InternalUserController.createPasswordResetToken'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -279,8 +287,11 @@ export class InternalUserController {
         await this.internalUserService.validatePasswordResetToken(token)
 
       const response = { valid: true, userId }
-      const validatedResponse =
-        userInternal.ValidateTokenResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.ValidateTokenResponse,
+        response,
+        'InternalUserController.validatePasswordResetToken'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -303,7 +314,11 @@ export class InternalUserController {
       await this.internalUserService.invalidatePasswordResetToken(token)
 
       const response = { success: true }
-      const validatedResponse = userInternal.SuccessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.SuccessResponse,
+        response,
+        'InternalUserController.invalidatePasswordResetToken'
+      )
 
       res.status(200).json(validatedResponse)
     } catch (error) {
@@ -333,7 +348,11 @@ export class InternalUserController {
         token: tokenData.token,
         expiresAt: tokenData.expiresAt.toISOString(),
       }
-      const validatedResponse = userInternal.TokenResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.TokenResponse,
+        response,
+        'InternalUserController.createEmailVerificationToken'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -356,8 +375,11 @@ export class InternalUserController {
         await this.internalUserService.validateEmailVerificationToken(token)
 
       const response = { valid: true, userId }
-      const validatedResponse =
-        userInternal.ValidateTokenResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.ValidateTokenResponse,
+        response,
+        'InternalUserController.validateEmailVerificationToken'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

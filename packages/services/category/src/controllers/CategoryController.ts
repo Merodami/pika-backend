@@ -1,6 +1,6 @@
 import { categoryPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -52,8 +52,11 @@ export class CategoryController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)
-      const validatedResponse =
-        categoryPublic.CategoryListResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryPublic.CategoryListResponse,
+        response,
+        'CategoryController.getAllCategories'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -84,7 +87,11 @@ export class CategoryController {
       const response = CategoryMapper.toDTO(category)
 
       // Validate response against Zod schema
-      const validatedResponse = categoryPublic.CategoryResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryPublic.CategoryResponse,
+        response,
+        'CategoryController.getCategoryById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -120,8 +127,11 @@ export class CategoryController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse =
-        categoryPublic.CategoryHierarchyResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryPublic.CategoryHierarchyResponse,
+        response,
+        'CategoryController.getCategoryHierarchy'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -154,8 +164,11 @@ export class CategoryController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse =
-        categoryPublic.CategoryPathResponse.parse(response)
+      const validatedResponse = validateResponse(
+        categoryPublic.CategoryPathResponse,
+        response,
+        'CategoryController.getCategoryPath'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

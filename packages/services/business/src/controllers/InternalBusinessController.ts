@@ -1,6 +1,6 @@
 import { businessCommon, businessInternal, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
 import { BusinessMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -43,8 +43,11 @@ export class InternalBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessInternal.InternalBusinessData.parse(response)
+      const validatedResponse = validateResponse(
+        businessInternal.InternalBusinessData,
+        response,
+        'InternalBusinessController.getBusinessById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -76,8 +79,11 @@ export class InternalBusinessController {
       const response = BusinessMapper.toDTO(business)
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessInternal.InternalBusinessData.parse(response)
+      const validatedResponse = validateResponse(
+        businessInternal.InternalBusinessData,
+        response,
+        'InternalBusinessController.getBusinessByUserId'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -115,8 +121,11 @@ export class InternalBusinessController {
       }
 
       // Validate response against Zod schema
-      const validatedResponse =
-        businessInternal.BulkBusinessResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessInternal.BulkBusinessResponse,
+        response,
+        'InternalBusinessController.getBusinessesByIds'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -159,8 +168,11 @@ export class InternalBusinessController {
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
-      const validatedResponse =
-        businessInternal.GetBusinessesByCategoryResponse.parse(response)
+      const validatedResponse = validateResponse(
+        businessInternal.GetBusinessesByCategoryResponse,
+        response,
+        'InternalBusinessController.getBusinessesByCategory'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

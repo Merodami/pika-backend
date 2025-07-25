@@ -79,8 +79,11 @@ export class AuthController {
             'Registration successful. Please check your email to verify your account.',
           user: UserMapper.toDTO(result.user),
         }
-        const validatedResponse =
-          authPublic.RegisterResponse.parse(responseData)
+        const validatedResponse = validateResponse(
+          authPublic.RegisterResponse,
+          responseData,
+          'AuthController.register'
+        )
 
         response.status(201).json(validatedResponse)
       } else {
@@ -89,7 +92,11 @@ export class AuthController {
           result.accessToken,
           result.refreshToken,
         )
-        const validatedResponse = authPublic.AuthUserResponse.parse(dto)
+        const validatedResponse = validateResponse(
+          authPublic.AuthUserResponse,
+          dto,
+          'AuthController.register'
+        )
 
         response.status(201).json(validatedResponse)
       }
@@ -117,7 +124,11 @@ export class AuthController {
           result.message ||
           'If an account exists with this email, a password reset link has been sent.',
       }
-      const validatedResponse = shared.MessageResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        shared.MessageResponse,
+        responseData,
+        'AuthController.forgotPassword'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -148,7 +159,11 @@ export class AuthController {
       const responseData = {
         message: result.message || 'Password reset successfully',
       }
-      const validatedResponse = shared.MessageResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        shared.MessageResponse,
+        responseData,
+        'AuthController.resetPassword'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -178,8 +193,11 @@ export class AuthController {
         message: 'Email verified successfully',
         userId: result.userId,
       }
-      const validatedResponse =
-        authPublic.VerifyEmailResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        authPublic.VerifyEmailResponse,
+        responseData,
+        'AuthController.verifyEmail'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -206,7 +224,11 @@ export class AuthController {
           result.message ||
           'If an account exists with this email, a verification link has been sent.',
       }
-      const validatedResponse = shared.MessageResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        shared.MessageResponse,
+        responseData,
+        'AuthController.resendVerificationEmail'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -243,7 +265,11 @@ export class AuthController {
       const responseData = {
         message: 'Password changed successfully',
       }
-      const validatedResponse = shared.MessageResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        shared.MessageResponse,
+        responseData,
+        'AuthController.changePassword'
+      )
 
       response.json(validatedResponse)
     } catch (error) {
@@ -328,8 +354,11 @@ export class AuthController {
 
       if (!result.valid) {
         const responseData = { active: false }
-        const validatedResponse =
-          authPublic.IntrospectResponse.parse(responseData)
+        const validatedResponse = validateResponse(
+          authPublic.IntrospectResponse,
+          responseData,
+          'AuthController.introspect'
+        )
 
         response.json(validatedResponse)
 
@@ -348,15 +377,21 @@ export class AuthController {
         userEmail: result.payload?.email,
         userRole: result.payload?.role,
       }
-      const validatedResponse =
-        authPublic.IntrospectResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        authPublic.IntrospectResponse,
+        responseData,
+        'AuthController.introspect'
+      )
 
       response.json(validatedResponse)
     } catch {
       // For introspection, always return active: false for invalid tokens
       const responseData = { active: false }
-      const validatedResponse =
-        authPublic.IntrospectResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        authPublic.IntrospectResponse,
+        responseData,
+        'AuthController.introspect'
+      )
 
       response.json(validatedResponse)
     }
@@ -385,8 +420,11 @@ export class AuthController {
             success: true,
             message: 'All tokens revoked successfully',
           }
-          const validatedResponse =
-            authPublic.RevokeTokenResponse.parse(responseData)
+          const validatedResponse = validateResponse(
+            authPublic.RevokeTokenResponse,
+            responseData,
+            'AuthController.revoke'
+          )
 
           response.json(validatedResponse)
         } else {
@@ -396,8 +434,11 @@ export class AuthController {
             success: true,
             message: 'All tokens revoked successfully',
           }
-          const validatedResponse =
-            authPublic.RevokeTokenResponse.parse(responseData)
+          const validatedResponse = validateResponse(
+            authPublic.RevokeTokenResponse,
+            responseData,
+            'AuthController.revoke'
+          )
 
           response.json(validatedResponse)
         }
@@ -409,8 +450,11 @@ export class AuthController {
           success: true,
           message: 'Token revoked successfully',
         }
-        const validatedResponse =
-          authPublic.RevokeTokenResponse.parse(responseData)
+        const validatedResponse = validateResponse(
+          authPublic.RevokeTokenResponse,
+          responseData,
+          'AuthController.revoke'
+        )
 
         response.json(validatedResponse)
       }
@@ -477,7 +521,11 @@ export class AuthController {
         updatedAt: user.updatedAt,
       }
 
-      const validatedResponse = authPublic.UserInfoResponse.parse(userInfo)
+      const validatedResponse = validateResponse(
+        authPublic.UserInfoResponse,
+        userInfo,
+        'AuthController.userinfo'
+      )
 
       response.json(validatedResponse)
     } catch (error) {

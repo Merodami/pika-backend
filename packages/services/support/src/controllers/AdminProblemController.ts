@@ -1,6 +1,6 @@
 import { supportAdmin, supportCommon } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery } from '@pika/http'
+import { getValidatedQuery, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
@@ -57,8 +57,14 @@ export class AdminProblemController {
         data: result.data.map(ProblemMapper.toDTO),
         pagination: result.pagination,
       }
+      
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminTicketListResponse,
+        dtoResult,
+        'AdminProblemController.getAllProblems'
+      )
 
-      response.json(dtoResult)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -89,8 +95,14 @@ export class AdminProblemController {
 
       // Transform to DTO
       const dto = ProblemMapper.toDTO(problem)
+      
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminTicketDetailResponse,
+        dto,
+        'AdminProblemController.getProblemById'
+      )
 
-      response.json(dto)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -123,8 +135,14 @@ export class AdminProblemController {
 
       // Transform to DTO
       const dto = ProblemMapper.toDTO(problem)
+      
+      const validatedResponse = validateResponse(
+        supportAdmin.AdminTicketDetailResponse,
+        dto,
+        'AdminProblemController.updateProblem'
+      )
 
-      response.json(dto)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

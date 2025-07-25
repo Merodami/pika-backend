@@ -6,6 +6,7 @@ import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateResponse,
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { VoucherDomain, VoucherMapper } from '@pika/sdk'
@@ -90,8 +91,11 @@ export class VoucherController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, VoucherMapper.toDTO)
-      const validatedResponse =
-        voucherPublic.VoucherListResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.VoucherListResponse,
+        responseData,
+        'VoucherController.getAllVouchers'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -141,8 +145,11 @@ export class VoucherController {
 
       // Transform and validate single entity response
       const responseData = VoucherMapper.toDTO(voucher)
-      const validatedResponse =
-        voucherPublic.VoucherResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.VoucherResponse,
+        responseData,
+        'VoucherController.getVoucherById'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -192,8 +199,11 @@ export class VoucherController {
 
       // Transform and validate scan response
       const responseData = VoucherMapper.toScanResponseDTO(scanResult)
-      const validatedResponse =
-        voucherPublic.VoucherScanResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.VoucherScanResponse,
+        responseData,
+        'VoucherController.scanVoucher'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -236,8 +246,11 @@ export class VoucherController {
 
       // Transform and validate claim response
       const responseData = VoucherMapper.toClaimResponseDTO(claimResult)
-      const validatedResponse =
-        voucherPublic.VoucherClaimResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.VoucherClaimResponse,
+        responseData,
+        'VoucherController.claimVoucher'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -276,8 +289,11 @@ export class VoucherController {
 
       // Transform and validate redeem response
       const responseData = VoucherMapper.toRedeemResponseDTO(redeemResult)
-      const validatedResponse =
-        voucherPublic.VoucherRedeemResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.VoucherRedeemResponse,
+        responseData,
+        'VoucherController.redeemVoucher'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -330,8 +346,11 @@ export class VoucherController {
         result,
         VoucherMapper.toUserVoucherDTO,
       )
-      const validatedResponse =
-        voucherPublic.UserVouchersListResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.UserVouchersListResponse,
+        responseData,
+        'VoucherController.getUserVouchers'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -389,8 +408,11 @@ export class VoucherController {
 
       // Use paginatedResponse utility + validation
       const responseData = paginatedResponse(result, VoucherMapper.toDTO)
-      const validatedResponse =
-        voucherPublic.VoucherListResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.VoucherListResponse,
+        responseData,
+        'VoucherController.getBusinessVouchers'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -438,8 +460,11 @@ export class VoucherController {
 
       // Transform and validate single entity response
       const responseData = VoucherMapper.toDTO(voucherWithIncludes)
-      const validatedResponse =
-        voucherPublic.VoucherResponse.parse(responseData)
+      const validatedResponse = validateResponse(
+        voucherPublic.VoucherResponse,
+        responseData,
+        'VoucherController.getVoucherByCode'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

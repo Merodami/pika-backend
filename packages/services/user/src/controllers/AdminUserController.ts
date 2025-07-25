@@ -63,7 +63,11 @@ export class AdminUserController {
         message: `User ${user.email} verified successfully`,
         user: adminResponse,
       }
-      const validatedResponse = userAdmin.VerifyUserResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userAdmin.VerifyUserResponse,
+        response,
+        'AdminUserController.verifyUser'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -96,8 +100,11 @@ export class AdminUserController {
         success: true,
         message: `Verification resent successfully`,
       }
-      const validatedResponse =
-        userAdmin.ResendVerificationResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userAdmin.ResendVerificationResponse,
+        response,
+        'AdminUserController.resendVerification'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -130,7 +137,11 @@ export class AdminUserController {
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
       const response = { avatarUrl: url }
-      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userPublic.UploadAvatarResponse,
+        response,
+        'AdminUserController.uploadUserAvatar'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -279,8 +290,11 @@ export class AdminUserController {
           user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
       }
 
-      const validatedResponse =
-        userAdmin.UserVerificationStatusResponse.parse(verificationStatus)
+      const validatedResponse = validateResponse(
+        userAdmin.UserVerificationStatusResponse,
+        verificationStatus,
+        'AdminUserController.getUserVerificationStatus'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

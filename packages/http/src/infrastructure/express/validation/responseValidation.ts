@@ -51,14 +51,18 @@ export function validateResponse<T extends z.ZodTypeAny>(
 
     // In non-production environments, throw validation error
     if (NODE_ENV !== 'production') {
-      const validationErrors = result.error.issues.map(issue => ({
-        path: issue.path.join('.'),
-        message: issue.message
-      }))
+      const validationErrors: Record<string, string[]> = {}
+      result.error.issues.forEach(issue => {
+        const path = issue.path.join('.')
+        if (!validationErrors[path]) {
+          validationErrors[path] = []
+        }
+        validationErrors[path].push(issue.message)
+      })
       
       throw ErrorFactory.validationError(
-        `Response validation failed${context ? ` in ${context}` : ''}`,
-        validationErrors
+        validationErrors,
+        { source: context || 'response validation' }
       )
     }
   }
