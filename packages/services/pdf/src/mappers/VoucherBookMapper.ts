@@ -1,7 +1,7 @@
 import type { VoucherBookDomain } from '@pika/sdk'
 
-import type { VoucherBookStatistics } from '../types/domain.js'
 import type { GeneratePDFResult } from '../services/VoucherBookService.js'
+import type { VoucherBookStatistics } from '../types/domain.js'
 
 /**
  * Interface for VoucherBook document from database
@@ -611,9 +611,7 @@ export class VoucherBookMapper {
   /**
    * Map PDF generation result to response DTO
    */
-  static toGeneratePDFResponse(
-    result: GeneratePDFResult,
-  ): {
+  static toGeneratePDFResponse(result: GeneratePDFResult): {
     jobId: string
     status: 'queued' | 'processing' | 'completed' | 'failed'
     message: string
@@ -625,7 +623,9 @@ export class VoucherBookMapper {
         jobId: `pdf-job-${Date.now()}`,
         status: 'completed',
         message: 'PDF generated successfully',
-        pdfUrl: result.filename ? `https://example.com/pdfs/${result.filename}` : undefined,
+        pdfUrl: result.filename
+          ? `https://example.com/pdfs/${result.filename}`
+          : undefined,
       }
     } else {
       return {

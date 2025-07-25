@@ -80,7 +80,9 @@ export class ProblemMapper {
       type: domain.type,
       createdAt: domain.createdAt.toISOString(),
       updatedAt: domain.updatedAt ? domain.updatedAt.toISOString() : null,
-      resolvedAt: domain.resolvedAt ? domain.resolvedAt.toISOString() : undefined,
+      resolvedAt: domain.resolvedAt
+        ? domain.resolvedAt.toISOString()
+        : undefined,
       ticketNumber: domain.ticketNumber || undefined,
       assignedTo: domain.assignedTo || undefined,
       files: domain.files,

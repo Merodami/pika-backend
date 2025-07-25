@@ -10,11 +10,7 @@ export type FileType = z.infer<typeof FileType>
 export const FileStatus = z.enum(['pending', 'uploaded', 'failed', 'deleted'])
 export type FileStatus = z.infer<typeof FileStatus>
 
-export const StorageProvider = z.enum([
-  'aws_s3',
-  'local',
-  'minio',
-])
+export const StorageProvider = z.enum(['aws_s3', 'local', 'minio'])
 export type StorageProvider = z.infer<typeof StorageProvider>
 
 export const AllowedMimeTypes = z.enum([

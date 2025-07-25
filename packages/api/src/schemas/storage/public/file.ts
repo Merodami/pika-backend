@@ -66,7 +66,10 @@ export const FileUploadResponse = openapi(
     provider: StorageProvider,
     url: z.string().url().optional().describe('Presigned URL if applicable'),
     uploadedAt: DateTime,
-    metadata: z.record(z.string(), z.any()).optional().describe('File metadata'),
+    metadata: z
+      .record(z.string(), z.any())
+      .optional()
+      .describe('File metadata'),
   }),
   {
     description: 'Response after successful file upload',

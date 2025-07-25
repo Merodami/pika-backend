@@ -69,6 +69,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
 
     // Create server with mocked VoucherServiceClient
     cacheService = new MemoryCacheService()
+
     const mockedVoucherClient = createMockedVoucherServiceClient()
 
     app = await createPDFServer({
@@ -440,11 +441,11 @@ describe('PDF Service - Admin API Integration Tests', () => {
   describe('POST /admin/voucher-books/:id/status', () => {
     it('should update voucher book status', async () => {
       const testBook = await createTestVoucherBook(
-        testDb.prisma, 
+        testDb.prisma,
         'ready_for_print',
         undefined,
         undefined,
-        true // withPlacements = true
+        true, // withPlacements = true
       )
 
       const response = await adminClient
@@ -481,7 +482,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .send({ force: false })
         .set('Accept', 'application/json')
         .expect(200)
-        
+
       expect(response.body).toMatchObject({
         jobId: expect.any(String),
         status: expect.any(String),

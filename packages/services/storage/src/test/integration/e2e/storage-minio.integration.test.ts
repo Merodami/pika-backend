@@ -21,7 +21,6 @@ import {
 } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { StorageProvider, FileStatus } from '@pika/types'
 import {
   AuthenticatedRequestClient,
   createE2EAuthHelper,
@@ -33,6 +32,7 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
+import { FileStatus, StorageProvider } from '@pika/types'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import {
@@ -326,7 +326,10 @@ describe('Storage Service with MinIO Integration Tests', () => {
       // Verify the upload was successful by checking the response
       expect(uploadResponse.body).toHaveProperty('fileId')
       expect(uploadResponse.body).toHaveProperty('status', 'uploaded')
-      expect(uploadResponse.body).toHaveProperty('provider', StorageProvider.AWS_S3)
+      expect(uploadResponse.body).toHaveProperty(
+        'provider',
+        StorageProvider.AWS_S3,
+      )
 
       // Delete the file via API
       await userClient.delete(`/files/${fileId}`).expect(204)
@@ -398,10 +401,7 @@ describe('Storage Service with MinIO Integration Tests', () => {
           .attach('file', testFile.content, testFile.name)
           .expect(201)
 
-        expect(response.body).toHaveProperty(
-          'mimeType',
-          testFile.expectedType,
-        )
+        expect(response.body).toHaveProperty('mimeType', testFile.expectedType)
         expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
       }
     })

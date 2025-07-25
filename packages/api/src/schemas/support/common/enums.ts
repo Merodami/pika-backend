@@ -51,8 +51,5 @@ export const ProblemSortBy = z.enum([
 ])
 export type ProblemSortBy = z.infer<typeof ProblemSortBy>
 
-export const CommentSortBy = z.enum([
-  'createdAt',
-  'updatedAt',
-])
+export const CommentSortBy = z.enum(['createdAt', 'updatedAt'])
 export type CommentSortBy = z.infer<typeof CommentSortBy>

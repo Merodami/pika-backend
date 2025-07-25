@@ -11,8 +11,8 @@
  * - Handles OAuth-only users (no password)
  */
 
-import type { PrismaClient } from '@prisma/client'
 import { UserRole, UserStatus } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 

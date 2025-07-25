@@ -1,4 +1,5 @@
-import { FileType, FileStatus, StorageProvider } from '@pika/types'
+import { FileType, StorageProvider } from '@pika/types'
+
 import type {
   FileStorageLogDomain,
   FileUploadDomain,
@@ -100,6 +101,7 @@ export class FileStorageLogMapper {
   static toFileUploadResponseDTO(domain: FileStorageLogDomain) {
     // Parse metadata if it's a string (from database)
     let parsedMetadata: Record<string, any> | undefined
+
     if (domain.metadata) {
       try {
         if (typeof domain.metadata === 'string') {
@@ -153,6 +155,7 @@ export class FileStorageLogMapper {
   static toDTO(domain: FileStorageLogDomain): FileStorageLogDTO {
     // Parse metadata if it's a string (from database)
     let parsedMetadata: Record<string, any> | undefined
+
     if (domain.metadata) {
       try {
         if (typeof domain.metadata === 'string') {
@@ -182,7 +185,8 @@ export class FileStorageLogMapper {
       metadata: parsedMetadata, // Parsed metadata
       error: domain.errorMessage, // Map errorMessage to error
       createdAt: domain.createdAt.toISOString(),
-      updatedAt: domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
+      updatedAt:
+        domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
     }
   }
 

@@ -8,7 +8,6 @@ import type {
   BatchVoucherBookResult,
   VoucherBookStatistics,
 } from '../types/index.js'
-import type { IVoucherBookRepository } from '../repositories/index.js'
 import { VoucherBookService } from './VoucherBookService.js'
 
 export interface IAdminVoucherBookService {
@@ -80,7 +79,10 @@ export class AdminVoucherBookService
         case 'ready_for_print':
         case 'draft':
           // For other status changes, use repository's updateStatus method
-          updatedBook = await this.voucherBookRepository.updateStatus(id, status)
+          updatedBook = await this.voucherBookRepository.updateStatus(
+            id,
+            status,
+          )
           break
         default:
           throw ErrorFactory.badRequest(`Unsupported status: ${status}`)

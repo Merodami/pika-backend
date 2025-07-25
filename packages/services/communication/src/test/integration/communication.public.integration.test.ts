@@ -362,7 +362,7 @@ describe('Communication Service - Public API Integration Tests', () => {
       it('should mark all unread notifications as read', async () => {
         // Clean up existing notifications for this user to ensure test isolation
         await testDb.prisma.notification.deleteMany({
-          where: { userId: regularUserId }
+          where: { userId: regularUserId },
         })
 
         await testDb.prisma.notification.createMany({

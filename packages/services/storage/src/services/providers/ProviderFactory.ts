@@ -92,6 +92,7 @@ export class ProviderFactory {
 
     // Try primary provider (handle minio as alias for aws-s3)
     const primaryProviderName = primaryName === 'minio' ? 'aws-s3' : primaryName
+
     let primary = this.storageProviders.get(primaryProviderName)
 
     // If using minio and we have AWS config, create a minio-specific provider

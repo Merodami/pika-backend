@@ -6,21 +6,21 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 
 import {
+  AWS_S3_ACCESS_KEY_ID,
+  AWS_S3_ENDPOINT,
+  AWS_S3_REGION,
+  AWS_S3_SECRET_ACCESS_KEY,
+} from '@pika/environment'
+import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
+import {
   AuthenticatedRequestClient,
   createE2EAuthHelper,
   createS3TestHelper,
   E2EAuthHelper,
   S3TestHelper,
 } from '@pika/tests'
-import {
-  AWS_S3_ACCESS_KEY_ID,
-  AWS_S3_ENDPOINT,
-  AWS_S3_REGION,
-  AWS_S3_SECRET_ACCESS_KEY,
-} from '@pika/environment'
-import { StorageProvider, FileStatus } from '@pika/types'
-import { MemoryCacheService } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { FileStatus, StorageProvider } from '@pika/types'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
@@ -333,10 +333,7 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
           .expect(201)
 
         expect(response.body).toHaveProperty('provider', StorageProvider.AWS_S3)
-        expect(response.body).toHaveProperty(
-          'mimeType',
-          testFile.expectedType,
-        )
+        expect(response.body).toHaveProperty('mimeType', testFile.expectedType)
       }
 
       logger.info('✅ S3 file types test passed')
@@ -415,7 +412,10 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
         .attach('file', almostLimitFile, `large-ok-${uuid()}.bin`)
         .expect(201)
 
-      expect(successResponse.body).toHaveProperty('provider', StorageProvider.AWS_S3)
+      expect(successResponse.body).toHaveProperty(
+        'provider',
+        StorageProvider.AWS_S3,
+      )
       expect(successResponse.body).toHaveProperty(
         'fileSize',
         almostLimitFile.length,

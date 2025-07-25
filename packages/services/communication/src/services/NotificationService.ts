@@ -96,12 +96,12 @@ export class NotificationService implements INotificationService {
     // Automatically mark as read when retrieved (if not already read)
     if (!notification.read) {
       const updated = await this.notificationRepository.markAsRead(id)
-      
+
       // Clear cache for the user
       if (notification.userId) {
         await this.clearUserNotificationCache(notification.userId)
       }
-      
+
       return updated
     }
 
@@ -132,7 +132,7 @@ export class NotificationService implements INotificationService {
     // If marking as read, use markAsRead to set readAt timestamp
     if (data.isRead === true && !notification.read) {
       updated = await this.notificationRepository.markAsRead(id)
-      
+
       // If there's metadata to update as well, do a separate update
       if (data.metadata !== undefined) {
         updated = await this.notificationRepository.update(id, {

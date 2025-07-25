@@ -1,5 +1,10 @@
 import { supportCommon, supportPublic } from '@pika/api'
-import { requireAuth, validateBody, validateParams, validateQuery } from '@pika/http'
+import {
+  requireAuth,
+  validateBody,
+  validateParams,
+  validateQuery,
+} from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'

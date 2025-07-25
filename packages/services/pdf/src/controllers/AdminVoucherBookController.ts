@@ -7,8 +7,8 @@ import {
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { ErrorFactory } from '@pika/shared'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import { VoucherBookMapper } from '../mappers/VoucherBookMapper.js'
@@ -70,8 +70,7 @@ export class AdminVoucherBookController {
 
       // Use mapper for proper response transformation
       const response = paginatedResponse(result, VoucherBookMapper.toAdminDTO)
-      
-      
+
       const validatedResponse = validateResponse(
         pdfAdmin.AdminVoucherBookListResponse,
         response,
@@ -128,7 +127,6 @@ export class AdminVoucherBookController {
     try {
       const context = RequestContext.getContext(req)
       const data = getValidatedBody<pdfAdmin.CreateVoucherBookRequest>(req)
-
 
       if (!context.userId) {
         throw ErrorFactory.unauthorized('User context not found')

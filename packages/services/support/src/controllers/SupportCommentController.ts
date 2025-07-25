@@ -1,6 +1,11 @@
 import { supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, RequestContext, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+  validateResponse,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import type { NextFunction, Request, Response } from 'express'
@@ -36,7 +41,8 @@ export class SupportCommentController {
   ): Promise<void> {
     try {
       const { problemId } = request.params
-      const query = getValidatedQuery<supportPublic.SupportCommentSearchParams>(request)
+      const query =
+        getValidatedQuery<supportPublic.SupportCommentSearchParams>(request)
 
       const params = {
         problemId,

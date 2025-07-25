@@ -117,7 +117,8 @@ export class VoucherBookService implements IVoucherBookService {
   ) {
     this.pdfGenerationService = new PDFGenerationService()
     this.pageLayoutEngine = new PageLayoutEngine()
-    this.voucherServiceClient = voucherServiceClient || new VoucherServiceClient()
+    this.voucherServiceClient =
+      voucherServiceClient || new VoucherServiceClient()
   }
 
   async createVoucherBook(
@@ -130,12 +131,13 @@ export class VoucherBookService implements IVoucherBookService {
       })
 
       // Check for duplicate titles in the same year/month
-      const existingBooks = await this.voucherBookRepository.findByTitleAndPeriod(
-        data.title,
-        data.year,
-        data.month,
-      )
-      
+      const existingBooks =
+        await this.voucherBookRepository.findByTitleAndPeriod(
+          data.title,
+          data.year,
+          data.month,
+        )
+
       if (existingBooks.length > 0) {
         throw ErrorFactory.resourceConflict(
           'VoucherBook',

@@ -14,7 +14,6 @@ vi.unmock('@pika/redis')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { UserRole } from '@pika/types'
 import {
   cleanupTestDatabase,
   createE2EAuthHelper,
@@ -22,6 +21,7 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
+import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

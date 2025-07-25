@@ -11,8 +11,8 @@
  * - Handles proper test data cleanup and relationships
  */
 
-import type { PrismaClient } from '@prisma/client'
 import { createVoucherServiceClientMock } from '@pika/tests'
+import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 
 export interface VoucherBookTestData {
@@ -255,7 +255,7 @@ export async function createTestVoucherBook(
       data: {
         id: uuid(),
         book: {
-          connect: { id: voucherBook.id }
+          connect: { id: voucherBook.id },
         },
         pageNumber: 1,
         layoutType: 'standard',
@@ -266,10 +266,10 @@ export async function createTestVoucherBook(
       data: {
         id: uuid(),
         page: {
-          connect: { id: page.id }
+          connect: { id: page.id },
         },
         createdByUser: {
-          connect: { id: userId }
+          connect: { id: userId },
         },
         contentType: 'ad',
         position: 1,

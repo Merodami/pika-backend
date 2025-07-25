@@ -90,9 +90,13 @@ export class AdminProblemController {
   ): Promise<void> {
     try {
       const { id } = request.params
-      const query = getValidatedQuery<supportAdmin.AdminTicketByIdQuery>(request)
+      const query =
+        getValidatedQuery<supportAdmin.AdminTicketByIdQuery>(request)
 
-      const problem = await this.problemService.getProblemById(id, query.include)
+      const problem = await this.problemService.getProblemById(
+        id,
+        query.include,
+      )
 
       if (!problem) {
         throw ErrorFactory.resourceNotFound('Problem', id)

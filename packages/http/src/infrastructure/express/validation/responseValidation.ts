@@ -1,12 +1,14 @@
 import { NODE_ENV, VALIDATE_RESPONSES } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
-import { get, has, set } from 'lodash-es'
 import { z } from 'zod'
 
 /**
  * Helper to properly display validation errors in tests (fixes [Array] display)
  */
-function logValidationErrorsForTest(validationErrors: Record<string, string[]>, context?: string): void {
+function logValidationErrorsForTest(
+  validationErrors: Record<string, string[]>,
+  context?: string,
+): void {
   if (NODE_ENV.includes('test')) {
     console.log(`\n🔍 VALIDATION ERRORS (${context || 'Unknown'}):`)
     console.log(JSON.stringify(validationErrors, null, 2))
@@ -67,11 +69,13 @@ export function validateResponse<T extends z.ZodTypeAny>(
 
       // Create a simple, flat structure that avoids prototype pollution
       const errors: string[] = []
+
       result.error.issues.forEach((issue) => {
         const pathStr = issue.path.length > 0 ? issue.path.join('.') : 'root'
+
         errors.push(`${pathStr}: ${issue.message}`)
       })
-      
+
       // Use a single 'errors' key to avoid any path injection issues
       validationErrors['validation_errors'] = errors
 

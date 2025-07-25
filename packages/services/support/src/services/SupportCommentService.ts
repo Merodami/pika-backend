@@ -23,7 +23,9 @@ export interface CommentSearchParams {
 }
 
 export interface ISupportCommentService {
-  getCommentsByProblemId(params: CommentSearchParams): Promise<PaginatedResult<SupportCommentDomain>>
+  getCommentsByProblemId(
+    params: CommentSearchParams,
+  ): Promise<PaginatedResult<SupportCommentDomain>>
   getCommentById(id: string): Promise<SupportCommentDomain>
   createComment(
     userId: string,
