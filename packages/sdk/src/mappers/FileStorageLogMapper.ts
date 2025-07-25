@@ -1,4 +1,4 @@
-import { FileType, StorageProvider } from '@pika/types'
+import { FileType, FileTypeType, StorageProvider } from '@pika/types'
 
 import type {
   FileStorageLogDomain,
@@ -73,7 +73,7 @@ export class FileStorageLogMapper {
       fileName: log.fileName,
       fileSize: log.size,
       mimeType: log.contentType,
-      fileType: FileStorageLogMapper.determineFileType(log.contentType),
+      fileType: FileStorageLogMapper.determineFileType(log.contentType) as any,
       url: log.url,
       uploadedAt: log.uploadedAt || log.createdAt,
     }
@@ -96,9 +96,10 @@ export class FileStorageLogMapper {
   }
 
   /**
-   * Convert FileStorageLogDomain directly to FileUploadResponse DTO
+   * Convert FileStorageLogDomain to FileUploadResponse format
+   * Used for upload endpoints that return a different schema
    */
-  static toFileUploadResponseDTO(domain: FileStorageLogDomain) {
+  static toFileUploadResponse(domain: FileStorageLogDomain) {
     // Parse metadata if it's a string (from database)
     let parsedMetadata: Record<string, any> | undefined
 
@@ -122,18 +123,19 @@ export class FileStorageLogMapper {
       fileSize: domain.size,
       mimeType: domain.contentType,
       fileType: FileStorageLogMapper.determineFileType(domain.contentType),
-      status: domain.status, // Already correct enum value from database
-      provider: domain.provider || StorageProvider.LOCAL, // Already correct enum value from database
+      status: domain.status,
+      provider: domain.provider || 'local',
       url: domain.url,
       uploadedAt: (domain.uploadedAt || domain.createdAt).toISOString(),
       metadata: parsedMetadata,
     }
   }
 
+
   /**
-   * Helper to determine file type from MIME type using proper enums
+   * Helper to determine file type from MIME type using FileType enum
    */
-  private static determineFileType(mimeType: string): FileType {
+  private static determineFileType(mimeType: string): FileTypeType {
     if (mimeType.startsWith('image/')) return FileType.IMAGE
     if (mimeType.startsWith('video/')) return FileType.VIDEO
     if (mimeType.startsWith('audio/')) return FileType.AUDIO
@@ -171,22 +173,21 @@ export class FileStorageLogMapper {
     return {
       id: domain.id,
       userId: domain.userId || '',
-      fileKey: domain.storageKey || domain.fileId, // Map storageKey to fileKey
+      fileKey: domain.storageKey || domain.fileId,
       fileName: domain.fileName,
-      fileSize: domain.size, // Map size to fileSize
-      mimeType: domain.contentType, // Map contentType to mimeType
-      fileType: FileStorageLogMapper.determineFileType(domain.contentType), // Determine from MIME type
-      status: domain.status, // Status is already lowercase from Prisma
-      provider: domain.provider || StorageProvider.LOCAL, // Provider is already lowercase from Prisma
-      bucketName: undefined, // Not stored in current domain
-      region: undefined, // Not stored in current domain
+      fileSize: domain.size,
+      mimeType: domain.contentType,
+      fileType: FileStorageLogMapper.determineFileType(domain.contentType),
+      status: domain.status,
+      provider: domain.provider || 'local',
+      bucketName: undefined,
+      region: undefined,
       uploadedAt: domain.uploadedAt?.toISOString(),
       deletedAt: domain.deletedAt?.toISOString(),
-      metadata: parsedMetadata, // Parsed metadata
-      error: domain.errorMessage, // Map errorMessage to error
+      metadata: parsedMetadata,
+      error: domain.errorMessage,
       createdAt: domain.createdAt.toISOString(),
-      updatedAt:
-        domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
+      updatedAt: domain.updatedAt?.toISOString() || domain.createdAt.toISOString(),
     }
   }
 
@@ -196,22 +197,22 @@ export class FileStorageLogMapper {
   static fromDTO(dto: FileStorageLogDTO): FileStorageLogDomain {
     return {
       id: dto.id,
-      fileId: dto.fileId,
+      fileId: dto.fileKey, // API uses fileKey, domain uses fileId
       fileName: dto.fileName,
-      contentType: dto.contentType,
-      size: dto.size,
-      folder: dto.folder,
-      isPublic: dto.isPublic,
-      url: dto.url,
-      storageKey: dto.storageKey,
+      contentType: dto.mimeType, // API uses mimeType, domain uses contentType
+      size: dto.fileSize, // API uses fileSize, domain uses size
+      folder: undefined, // Not in API DTO
+      isPublic: true, // Default value, not in API DTO
+      url: '', // Not in API DTO, should come from different source
+      storageKey: dto.fileKey, // API uses fileKey
       status: dto.status,
-      userId: dto.userId,
+      userId: dto.userId || undefined,
       metadata: dto.metadata,
       provider: dto.provider,
       uploadedAt: dto.uploadedAt ? new Date(dto.uploadedAt) : undefined,
       deletedAt: dto.deletedAt ? new Date(dto.deletedAt) : undefined,
-      errorMessage: dto.errorMessage,
-      processingTimeMs: dto.processingTimeMs,
+      errorMessage: dto.error, // API uses error, domain uses errorMessage
+      processingTimeMs: undefined, // Not in API DTO
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),
     }

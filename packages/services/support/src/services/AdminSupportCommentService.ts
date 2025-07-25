@@ -6,22 +6,23 @@ import type {
 } from '@pika/sdk'
 import { SupportCommentMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
-import type { ParsedIncludes } from '@pika/types'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 
 import type {
   CreateSupportCommentInput,
   ISupportCommentRepository,
   UpdateSupportCommentInput,
 } from '../repositories/SupportCommentRepository.js'
+import type { CommentSearchParams } from './SupportCommentService.js'
 
 export interface IAdminSupportCommentService {
   getAllComments(
     parsedIncludes?: ParsedIncludes,
   ): Promise<SupportCommentDomain[]>
   getCommentsByProblemId(
-    problemId: string,
+    params: CommentSearchParams,
     parsedIncludes?: ParsedIncludes,
-  ): Promise<SupportCommentDomain[]>
+  ): Promise<PaginatedResult<SupportCommentDomain>>
   createInternalComment(
     adminUserId: string,
     data: CreateSupportCommentDTO & { isInternal?: boolean },
@@ -55,13 +56,13 @@ export class AdminSupportCommentService implements IAdminSupportCommentService {
    * Get all comments for a problem including internal notes
    */
   async getCommentsByProblemId(
-    problemId: string,
+    params: CommentSearchParams,
     parsedIncludes?: ParsedIncludes,
-  ): Promise<SupportCommentDomain[]> {
-    logger.info('Admin fetching comments for problem', { problemId })
+  ): Promise<PaginatedResult<SupportCommentDomain>> {
+    logger.info('Admin fetching comments for problem', { problemId: params.problemId })
 
     // Admin sees all comments including internal ones
-    return this.repository.findByProblemId(problemId, parsedIncludes)
+    return this.repository.findByProblemId(params, parsedIncludes)
   }
 
   /**

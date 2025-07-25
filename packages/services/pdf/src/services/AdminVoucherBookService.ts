@@ -82,6 +82,7 @@ export class AdminVoucherBookService
           updatedBook = await this.voucherBookRepository.updateStatus(
             id,
             status,
+            userId,
           )
           break
         default:

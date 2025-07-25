@@ -1,6 +1,6 @@
 import { supportAdmin, supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext, validateResponse } from '@pika/http'
+import { getValidatedQuery, paginatedResponse, RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
@@ -77,12 +77,7 @@ export class AdminCommentController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getCommentsByProblemId(
-    request: Request<
-      supportCommon.ProblemIdForCommentsParam,
-      {},
-      {},
-      supportAdmin.AdminCommentsByProblemQuery
-    >,
+    request: Request<supportCommon.ProblemIdForCommentsParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -99,14 +94,22 @@ export class AdminCommentController {
         supportAdmin.ADMIN_COMMENT_RELATIONS as unknown as string[],
       )
 
-      const comments = await this.adminCommentService.getCommentsByProblemId(
+      // Build search params from query
+      const params = {
         problemId,
+        page: query.page || 1,
+        limit: query.limit || 20,
+        sortBy: query.sortBy || 'createdAt',
+        sortOrder: (query.sortOrder || 'DESC') as 'ASC' | 'DESC',
+      }
+
+      const result = await this.adminCommentService.getCommentsByProblemId(
+        params,
         parsedIncludes,
       )
 
-      // Transform to DTOs
-      const dtos = comments.map(SupportCommentMapper.toDTO)
-      const responseData = { data: dtos }
+      // Use paginatedResponse utility + validation (following documented pattern)
+      const responseData = paginatedResponse(result, SupportCommentMapper.toDTO)
 
       const validatedResponse = validateResponse(
         supportAdmin.AdminCommentListResponse,

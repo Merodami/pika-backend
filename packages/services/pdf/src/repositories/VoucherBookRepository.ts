@@ -39,6 +39,11 @@ export interface IVoucherBookRepository {
     updatedBy: string,
   ): Promise<VoucherBookDomain>
   findBooksForGeneration(): Promise<VoucherBookDomain[]>
+  findByTitleAndPeriod(
+    title: string,
+    year: number,
+    month?: number | null,
+  ): Promise<VoucherBookDomain[]>
 }
 
 /**
@@ -540,10 +545,12 @@ export class VoucherBookRepository implements IVoucherBookRepository {
   async updateStatus(
     id: string,
     status: VoucherBookStatus,
+    updatedBy: string,
   ): Promise<VoucherBookDomain> {
     try {
-      const updateData: Prisma.VoucherBookUpdateInput = {
+      const updateData: any = {
         status,
+        updatedBy,
       }
 
       if (status === 'published') {

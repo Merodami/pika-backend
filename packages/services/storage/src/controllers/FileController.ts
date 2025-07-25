@@ -114,7 +114,7 @@ export class FileController implements IFileController {
       })
 
       // Transform FileStorageLogDomain to FileUploadResponse format
-      const responseData = FileStorageLogMapper.toFileUploadResponseDTO(result)
+      const responseData = FileStorageLogMapper.toFileUploadResponse(result)
       const validatedResponse = validateResponse(
         storagePublic.FileUploadResponse,
         responseData,
@@ -179,7 +179,7 @@ export class FileController implements IFileController {
       result.logs.forEach((log) => {
         if (log.status === 'uploaded') {
           // Convert successful uploads to FileUploadResponse format
-          successful.push(FileStorageLogMapper.toFileUploadResponseDTO(log))
+          successful.push(FileStorageLogMapper.toFileUploadResponse(log))
         } else {
           // Convert failed uploads to error format
           failed.push({

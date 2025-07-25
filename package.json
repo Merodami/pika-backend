@@ -45,6 +45,7 @@
     "reset:codebase": "yarn nx reset && yarn clear && yarn cache clear",
     "kill": "yarn kill:backend; yarn kill:frontend; yarn kill:processes",
     "kill:backend": "fkill --force --silent :5501 :5502 :5503 :5504 :5505 :5506 :5507 :5508 :5509 :5510",
+    "kill:frontend": "fkill --force --silent :3000",
     "kill:processes": "pkill -9 -f 'node.*vitest'; echo '✅ All vitest and node processes killed'",
     "db:generate": "nx run @pika/database:prisma:generate",
     "db:migrate:reset": "npx prisma migrate reset --schema packages/database/prisma/schema.prisma --force",

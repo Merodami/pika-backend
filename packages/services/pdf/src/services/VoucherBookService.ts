@@ -32,6 +32,8 @@ export interface CreateVoucherBookData {
   month?: number
   totalPages?: number
   edition?: string
+  coverImageUrl?: string
+  backImageUrl?: string
   metadata?: Record<string, any>
   createdById: string
 }

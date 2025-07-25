@@ -129,9 +129,9 @@ export class VoucherBookMapper {
    * Ensure metadata is a proper object or null
    * Business rule from old system
    */
-  private static ensureMetadata(value: any): Record<string, any> | undefined {
+  private static ensureMetadata(value: any): Record<string, any> | null {
     if (!value || typeof value !== 'object') {
-      return undefined
+      return null
     }
 
     return value
@@ -277,12 +277,16 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl || undefined,
       pdfUrl: voucherBook.pdfUrl || undefined,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || undefined,
-      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata),
+      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy || undefined,
       createdAt: voucherBook.createdAt.toISOString(),
       updatedAt: voucherBook.updatedAt.toISOString(),
       deletedAt: voucherBook.deletedAt?.toISOString() || undefined,
+      // Required admin fields
+      pageCount: voucherBook.totalPages,
+      totalPlacements: voucherBook.pages?.length || 0,
+      distributionCount: voucherBook.distributions?.length || 0,
     }
 
     // Add statistics if relations are loaded
@@ -355,7 +359,7 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl || undefined,
       pdfUrl: voucherBook.pdfUrl || undefined,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || undefined,
-      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata),
+      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy || undefined,
       createdAt: voucherBook.createdAt.toISOString(),
@@ -390,12 +394,16 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl,
       pdfUrl: voucherBook.pdfUrl,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || null,
-      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata),
+      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata) || undefined,
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy || undefined,
       createdAt: voucherBook.createdAt.toISOString(),
       updatedAt: voucherBook.updatedAt.toISOString(),
       deletedAt: voucherBook.deletedAt?.toISOString() || null,
+      // Admin-specific fields (required by admin schema)
+      pageCount: 0,
+      totalPlacements: 0,
+      distributionCount: 0,
     }
   }
 
@@ -499,7 +507,6 @@ export class VoucherBookMapper {
   static fromUpdateDTO(dto: UpdateVoucherBookDTO, updatedById: string): any {
     const updates: any = {
       updatedBy: updatedById,
-      updatedAt: new Date(),
     }
 
     // Validate year if changed

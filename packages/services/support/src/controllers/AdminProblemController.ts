@@ -3,7 +3,7 @@ import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
+import { ErrorFactory, parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IProblemService } from '../services/ProblemService.js'
@@ -93,9 +93,13 @@ export class AdminProblemController {
       const query =
         getValidatedQuery<supportAdmin.AdminTicketByIdQuery>(request)
 
+      const parsedIncludes = query.include
+        ? parseIncludeParam(query.include)
+        : undefined
+
       const problem = await this.problemService.getProblemById(
         id,
-        query.include,
+        parsedIncludes,
       )
 
       if (!problem) {

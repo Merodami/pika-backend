@@ -1,9 +1,10 @@
-import { supportCommon, supportPublic } from '@pika/api'
+import { supportAdmin, supportCommon, supportPublic } from '@pika/api'
 import {
   requireAuth,
   requirePermissions,
   validateBody,
   validateParams,
+  validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
@@ -37,6 +38,7 @@ export function createAdminCommentRouter(
     requireAuth(),
     requirePermissions('admin:support'),
     validateParams(supportCommon.ProblemIdForCommentsParam),
+    validateQuery(supportAdmin.AdminCommentsByProblemQuery),
     controller.getCommentsByProblemId,
   )
 
