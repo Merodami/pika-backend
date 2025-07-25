@@ -8,9 +8,9 @@ import type {
 } from '../domain/user.js'
 import type { AddressDTO, PaymentMethodDTO, UserDTO } from '../dto/user.dto.js'
 import {
+  formatDateOnlyOrUndefined,
   formatDateToISO,
   formatDateToISOOrUndefined,
-  formatDateOnlyOrUndefined,
 } from '../utils/dateUtils.js'
 
 /**

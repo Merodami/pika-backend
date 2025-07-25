@@ -14,12 +14,12 @@ import {
 } from '@pika/shared'
 import {
   EmailTemplateId,
+  mapUserRole,
+  mapUserStatus,
   type PaginatedResult,
   UserRole,
   UserStatus,
   VerificationType,
-  mapUserRole,
-  mapUserStatus,
 } from '@pika/types'
 import bcrypt from 'bcrypt'
 import { randomInt } from 'crypto'
@@ -169,7 +169,9 @@ export class UserService implements IUserService {
         ...data,
         password,
         role: data.role ? mapUserRole(data.role) : UserRole.CUSTOMER,
-        status: data.status ? mapUserStatus(data.status) : UserStatus.UNCONFIRMED,
+        status: data.status
+          ? mapUserStatus(data.status)
+          : UserStatus.UNCONFIRMED,
       })
 
       // Invalidate cache
@@ -202,7 +204,9 @@ export class UserService implements IUserService {
         phoneNumber: data.phoneNumber,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
         role: data.role ? mapUserRole(data.role) : UserRole.CUSTOMER,
-        status: data.status ? mapUserStatus(data.status) : UserStatus.UNCONFIRMED,
+        status: data.status
+          ? mapUserStatus(data.status)
+          : UserStatus.UNCONFIRMED,
       }
 
       const user = await this.repository.create(userData)

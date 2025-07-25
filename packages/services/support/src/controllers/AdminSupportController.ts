@@ -136,7 +136,11 @@ export class AdminSupportController {
         adminUserId,
       })
 
-      const updated = await this.problemService.updateProblem(id, { status }, { user: true })
+      const updated = await this.problemService.updateProblem(
+        id,
+        { status },
+        { user: true },
+      )
 
       // Transform and validate update response
       const responseData = ProblemMapper.toAdminDTO(updated)
@@ -181,7 +185,9 @@ export class AdminSupportController {
         updates.priority = priority
       }
 
-      const updated = await this.problemService.updateProblem(id, updates, { user: true })
+      const updated = await this.problemService.updateProblem(id, updates, {
+        user: true,
+      })
 
       // Transform and validate assign response
       const responseData = ProblemMapper.toAdminDTO(updated)

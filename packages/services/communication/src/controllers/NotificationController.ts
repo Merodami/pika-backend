@@ -166,6 +166,7 @@ export class NotificationController implements INotificationController {
 
       response.json(validatedResponse)
     } catch (error) {
+      logger.error('NotificationController.getNotifications error:', error)
       next(error)
     }
   }

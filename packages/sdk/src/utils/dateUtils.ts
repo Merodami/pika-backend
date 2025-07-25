@@ -41,8 +41,9 @@ export function formatDateOnlyOrUndefined(
   date: Date | string | undefined | null,
 ): string | undefined {
   if (!date) return undefined
-  
+
   let dateObj: Date
+
   if (typeof date === 'string') {
     // If already in YYYY-MM-DD format, return as is
     if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -59,6 +60,6 @@ export function formatDateOnlyOrUndefined(
   const year = dateObj.getFullYear()
   const month = String(dateObj.getMonth() + 1).padStart(2, '0')
   const day = String(dateObj.getDate()).padStart(2, '0')
-  
+
   return `${year}-${month}-${day}`
 }

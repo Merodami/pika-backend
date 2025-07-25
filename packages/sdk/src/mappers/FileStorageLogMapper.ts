@@ -1,4 +1,7 @@
-import type { FileStorageLogDomain, FileUploadDomain } from '../domain/file-storage.js'
+import type {
+  FileStorageLogDomain,
+  FileUploadDomain,
+} from '../domain/file-storage.js'
 import type { FileStorageLogDTO } from '../dto/file-storage.dto.js'
 import type { UserDocument } from './UserMapper.js'
 
@@ -93,18 +96,23 @@ export class FileStorageLogMapper {
   /**
    * Helper to determine file type from MIME type
    */
-  private static determineFileType(mimeType: string): 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | 'OTHER' {
+  private static determineFileType(
+    mimeType: string,
+  ): 'IMAGE' | 'VIDEO' | 'DOCUMENT' | 'AUDIO' | 'OTHER' {
     if (mimeType.startsWith('image/')) return 'IMAGE'
     if (mimeType.startsWith('video/')) return 'VIDEO'
     if (mimeType.startsWith('audio/')) return 'AUDIO'
-    if (mimeType === 'application/pdf' || 
-        mimeType.includes('document') || 
-        mimeType.includes('spreadsheet') ||
-        mimeType.includes('word') ||
-        mimeType.includes('excel')) return 'DOCUMENT'
+    if (
+      mimeType === 'application/pdf' ||
+      mimeType.includes('document') ||
+      mimeType.includes('spreadsheet') ||
+      mimeType.includes('word') ||
+      mimeType.includes('excel')
+    )
+      return 'DOCUMENT'
+
     return 'OTHER'
   }
-
 
   /**
    * Convert domain entity to API DTO

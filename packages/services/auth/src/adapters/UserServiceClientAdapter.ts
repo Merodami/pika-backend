@@ -17,7 +17,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.passwordHash,
+      password: user.password,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -36,13 +36,17 @@ export class UserServiceClientAdapter implements UserService {
       firstName: data.firstName,
       lastName: data.lastName,
       phoneNumber: data.phoneNumber,
+      dateOfBirth: data.dateOfBirth,
+      acceptTerms: data.acceptTerms!,
+      marketingConsent: data.marketingConsent,
       role: data.role,
+      avatarUrl: data.avatarUrl,
     })
 
     return {
       id: user.id,
       email: user.email,
-      password: user.passwordHash,
+      password: user.password,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,
@@ -76,7 +80,7 @@ export class UserServiceClientAdapter implements UserService {
     return {
       id: user.id,
       email: user.email,
-      password: user.passwordHash,
+      password: user.password,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as UserRole,

@@ -45,7 +45,12 @@ export const VoucherBookResponse = openapi(
       .min(1)
       .max(100)
       .describe('Total number of pages'),
-    publishedAt: z.string().datetime().nullable().optional().describe('When the book was published'),
+    publishedAt: z
+      .string()
+      .datetime()
+      .nullable()
+      .optional()
+      .describe('When the book was published'),
     coverImageUrl: z
       .string()
       .url()
@@ -58,7 +63,12 @@ export const VoucherBookResponse = openapi(
       .nullable()
       .optional()
       .describe('URL of the back cover image'),
-    pdfUrl: z.string().url().nullable().optional().describe('URL of the generated PDF'),
+    pdfUrl: z
+      .string()
+      .url()
+      .nullable()
+      .optional()
+      .describe('URL of the generated PDF'),
     // Note: No internal fields like createdBy, metadata, pdfGeneratedAt exposed to public
   }),
   {
@@ -75,15 +85,20 @@ export type VoucherBookResponse = z.infer<typeof VoucherBookResponse>
  */
 export const VoucherBookQueryParams = SearchParams.extend({
   bookType: VoucherBookType.optional().describe('Filter by book type'),
-  year: z
-    .coerce
+  year: z.coerce
     .number()
     .int()
     .min(2020)
     .max(2100)
     .optional()
     .describe('Filter by year'),
-  month: z.coerce.number().int().min(1).max(12).optional().describe('Filter by month'),
+  month: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(12)
+    .optional()
+    .describe('Filter by month'),
   search: z.string().optional().describe('Search in title and edition'),
   sortBy: VoucherBookSortBy.default('publishedAt'),
   // Note: status is always PUBLISHED for public API - no status filtering needed

@@ -3,19 +3,19 @@ import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
-import * as businessSchemas from '@api/schemas/business/public/business.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
-import * as categorySchemas from '@api/schemas/category/public/category.js'
+import * as businessSchemas from '@api/schemas/business/public/business.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
+import * as categorySchemas from '@api/schemas/category/public/category.js'
 import * as communicationNotificationSchemas from '@api/schemas/communication/public/notification.js'
 import * as paymentHeaderSchemas from '@api/schemas/payment/public/headers.js'
 import * as webhookSchemas from '@api/schemas/payment/public/webhooks.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import * as storageSchemas from '@api/schemas/storage/public/file.js'
-import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import { MessageResponse } from '@api/schemas/shared/responses.js'
+import * as storageParameters from '@api/schemas/storage/common/parameters.js'
+import * as storageSchemas from '@api/schemas/storage/public/file.js'
 import * as subscriptionSchemas from '@api/schemas/subscription/public/index.js'
 import * as subscriptionPlanSchemas from '@api/schemas/subscription/public/index.js'
 import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
@@ -24,8 +24,8 @@ import * as supportProblemSchemas from '@api/schemas/support/public/problem.js'
 import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
-import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
+import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
 
 /**
  * Register all public API schemas and routes
@@ -40,13 +40,34 @@ export function registerPublicAPI(registry: ZodRegistry): void {
 
   // ============= Business Schemas =============
   registry.registerSchema('BusinessResponse', businessSchemas.BusinessResponse)
-  registry.registerSchema('BusinessQueryParams', businessSchemas.BusinessQueryParams)
-  registry.registerSchema('BusinessPathParams', businessSchemas.BusinessPathParams)
-  registry.registerSchema('BusinessDetailQueryParams', businessSchemas.BusinessDetailQueryParams)
-  registry.registerSchema('BusinessListResponse', businessSchemas.BusinessListResponse)
-  registry.registerSchema('BusinessesByCategoryResponse', businessSchemas.BusinessesByCategoryResponse)
-  registry.registerSchema('CreateMyBusinessRequest', businessSchemas.CreateMyBusinessRequest)
-  registry.registerSchema('UpdateMyBusinessRequest', businessSchemas.UpdateMyBusinessRequest)
+  registry.registerSchema(
+    'BusinessQueryParams',
+    businessSchemas.BusinessQueryParams,
+  )
+  registry.registerSchema(
+    'BusinessPathParams',
+    businessSchemas.BusinessPathParams,
+  )
+  registry.registerSchema(
+    'BusinessDetailQueryParams',
+    businessSchemas.BusinessDetailQueryParams,
+  )
+  registry.registerSchema(
+    'BusinessListResponse',
+    businessSchemas.BusinessListResponse,
+  )
+  registry.registerSchema(
+    'BusinessesByCategoryResponse',
+    businessSchemas.BusinessesByCategoryResponse,
+  )
+  registry.registerSchema(
+    'CreateMyBusinessRequest',
+    businessSchemas.CreateMyBusinessRequest,
+  )
+  registry.registerSchema(
+    'UpdateMyBusinessRequest',
+    businessSchemas.UpdateMyBusinessRequest,
+  )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
 
   // ============= Category Schemas =============
@@ -118,12 +139,18 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     'VoucherCodeResponse',
     voucherSchemas.VoucherCodeResponse,
   )
-  registry.registerSchema('VoucherQueryParams', voucherSchemas.VoucherQueryParams)
+  registry.registerSchema(
+    'VoucherQueryParams',
+    voucherSchemas.VoucherQueryParams,
+  )
   registry.registerSchema(
     'VoucherListResponse',
     voucherSchemas.VoucherListResponse,
   )
-  registry.registerSchema('VoucherScanRequest', voucherSchemas.VoucherScanRequest)
+  registry.registerSchema(
+    'VoucherScanRequest',
+    voucherSchemas.VoucherScanRequest,
+  )
   registry.registerSchema(
     'VoucherScanResponse',
     voucherSchemas.VoucherScanResponse,
@@ -154,7 +181,10 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
 
   // Voucher parameter schemas
-  registry.registerSchema('VoucherPathParams', voucherParameters.VoucherPathParams)
+  registry.registerSchema(
+    'VoucherPathParams',
+    voucherParameters.VoucherPathParams,
+  )
 
   registry.registerSchema('AuthUserResponse', authLoginSchemas.AuthUserResponse)
 

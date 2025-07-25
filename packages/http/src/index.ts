@@ -49,6 +49,7 @@ export {
   getValidatedData,
   getValidatedParams,
   getValidatedQuery,
+  safeValidateResponse,
 } from './infrastructure/express/types/validated-request.js'
 export {
   createZodValidatorMiddleware,
@@ -59,4 +60,5 @@ export {
   validateQuery,
   validateRequest,
 } from './infrastructure/express/validation/zodValidation.js'
+export { validateResponse } from './infrastructure/express/validation/responseValidation.js'
 export * from './utils/index.js'

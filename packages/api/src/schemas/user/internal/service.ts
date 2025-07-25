@@ -290,8 +290,6 @@ export const CreateUserRequest = openapi(
     lastName: z.string(),
     phoneNumber: z.string().optional(),
     dateOfBirth: DateOnly.optional(),
-    description: z.string().optional(),
-    specialties: z.array(z.string()).optional(),
     acceptTerms: z.boolean(),
     marketingConsent: z.boolean().optional(),
     role: UserRole,

@@ -1,15 +1,15 @@
 import type { ZodRegistry } from '@api/common/registry/base.js'
 import * as internalAuthSchemas from '@api/schemas/auth/internal/service.js'
-import * as internalBusinessSchemas from '@api/schemas/business/internal/service.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
-import * as internalCategorySchemas from '@api/schemas/category/internal/service.js'
+import * as internalBusinessSchemas from '@api/schemas/business/internal/service.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
+import * as internalCategorySchemas from '@api/schemas/category/internal/service.js'
 import * as internalCommunicationSchemas from '@api/schemas/communication/internal/service.js'
 import * as internalDiscoverySchemas from '@api/schemas/discovery/internal/service.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
 import { MessageResponse } from '@api/schemas/shared/responses.js'
-import * as internalStorageSchemas from '@api/schemas/storage/internal/service.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
+import * as internalStorageSchemas from '@api/schemas/storage/internal/service.js'
 import * as internalSubscriptionSchemas from '@api/schemas/subscription/internal/service.js'
 import * as healthSchemas from '@api/schemas/system/public/health.js'
 import * as internalUserSchemas from '@api/schemas/user/internal/service.js'
@@ -25,19 +25,58 @@ export function registerInternalAPI(registry: ZodRegistry): void {
   registry.registerSchema('ServiceHealth', healthSchemas.ServiceHealth)
 
   // ============= Business Service Schemas =============
-  registry.registerSchema('InternalBusinessData', internalBusinessSchemas.InternalBusinessData)
-  registry.registerSchema('InternalBusinessQueryParams', internalBusinessSchemas.InternalBusinessQueryParams)
-  registry.registerSchema('BulkBusinessRequest', internalBusinessSchemas.BulkBusinessRequest)
-  registry.registerSchema('BulkBusinessResponse', internalBusinessSchemas.BulkBusinessResponse)
-  registry.registerSchema('ValidateBusinessRequest', internalBusinessSchemas.ValidateBusinessRequest)
-  registry.registerSchema('ValidateBusinessResponse', internalBusinessSchemas.ValidateBusinessResponse)
-  registry.registerSchema('GetBusinessesByUserRequest', internalBusinessSchemas.GetBusinessesByUserRequest)
-  registry.registerSchema('GetBusinessesByUserResponse', internalBusinessSchemas.GetBusinessesByUserResponse)
-  registry.registerSchema('GetBusinessRequest', internalBusinessSchemas.GetBusinessRequest)
-  registry.registerSchema('GetBusinessesByCategoryRequest', internalBusinessSchemas.GetBusinessesByCategoryRequest)
-  registry.registerSchema('GetBusinessesByCategoryResponse', internalBusinessSchemas.GetBusinessesByCategoryResponse)
-  registry.registerSchema('CheckBusinessExistsRequest', internalBusinessSchemas.CheckBusinessExistsRequest)
-  registry.registerSchema('CheckBusinessExistsResponse', internalBusinessSchemas.CheckBusinessExistsResponse)
+  registry.registerSchema(
+    'InternalBusinessData',
+    internalBusinessSchemas.InternalBusinessData,
+  )
+  registry.registerSchema(
+    'InternalBusinessQueryParams',
+    internalBusinessSchemas.InternalBusinessQueryParams,
+  )
+  registry.registerSchema(
+    'BulkBusinessRequest',
+    internalBusinessSchemas.BulkBusinessRequest,
+  )
+  registry.registerSchema(
+    'BulkBusinessResponse',
+    internalBusinessSchemas.BulkBusinessResponse,
+  )
+  registry.registerSchema(
+    'ValidateBusinessRequest',
+    internalBusinessSchemas.ValidateBusinessRequest,
+  )
+  registry.registerSchema(
+    'ValidateBusinessResponse',
+    internalBusinessSchemas.ValidateBusinessResponse,
+  )
+  registry.registerSchema(
+    'GetBusinessesByUserRequest',
+    internalBusinessSchemas.GetBusinessesByUserRequest,
+  )
+  registry.registerSchema(
+    'GetBusinessesByUserResponse',
+    internalBusinessSchemas.GetBusinessesByUserResponse,
+  )
+  registry.registerSchema(
+    'GetBusinessRequest',
+    internalBusinessSchemas.GetBusinessRequest,
+  )
+  registry.registerSchema(
+    'GetBusinessesByCategoryRequest',
+    internalBusinessSchemas.GetBusinessesByCategoryRequest,
+  )
+  registry.registerSchema(
+    'GetBusinessesByCategoryResponse',
+    internalBusinessSchemas.GetBusinessesByCategoryResponse,
+  )
+  registry.registerSchema(
+    'CheckBusinessExistsRequest',
+    internalBusinessSchemas.CheckBusinessExistsRequest,
+  )
+  registry.registerSchema(
+    'CheckBusinessExistsResponse',
+    internalBusinessSchemas.CheckBusinessExistsResponse,
+  )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
 
   // ============= Category Service Schemas =============
@@ -165,7 +204,10 @@ export function registerInternalAPI(registry: ZodRegistry): void {
   )
 
   // Voucher parameter schema
-  registry.registerSchema('VoucherPathParams', voucherParameters.VoucherPathParams)
+  registry.registerSchema(
+    'VoucherPathParams',
+    voucherParameters.VoucherPathParams,
+  )
 
   registry.registerSchema(
     'ServiceRegistryQuery',

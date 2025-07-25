@@ -18,7 +18,13 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
-import { PrismaClient, UserRole, UserStatus, ProblemStatus, ProblemPriority, ProblemType } from '@prisma/client'
+import {
+  PrismaClient,
+  ProblemPriority,
+  ProblemStatus,
+  UserRole,
+  UserStatus,
+} from '@prisma/client'
 import {
   cleanupTestDatabase,
   clearTestDatabase,

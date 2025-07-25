@@ -21,8 +21,14 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
-import { PrismaClient, UserRole, UserStatus, ProblemStatus, ProblemPriority, ProblemType } from '@prisma/client'
-import { SortOrder, supportAdmin, supportCommon } from '@pika/api'
+import {
+  PrismaClient,
+  ProblemPriority,
+  ProblemStatus,
+  ProblemType,
+  UserRole,
+  UserStatus,
+} from '@prisma/client'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
@@ -45,8 +51,8 @@ import {
   createE2EAuthHelper,
   E2EAuthHelper,
 } from '@pika/tests'
-// ProblemPriority, ProblemStatus, ProblemType are imported from @prisma/client above
 
+// ProblemPriority, ProblemStatus, ProblemType are imported from @prisma/client above
 import { createSupportServer } from '../../../server.js'
 
 // Test data seeding function for support tickets
@@ -210,13 +216,12 @@ describe('Admin Support API Integration Tests', () => {
 
   describe('GET /admin/support/tickets', () => {
     it('should return all tickets for admin users', async () => {
-      const response = await adminClient
-        .get('/admin/support/tickets')
-      
+      const response = await adminClient.get('/admin/support/tickets')
+
       if (response.status !== 200) {
         console.error('Error response:', response.status, response.body)
       }
-      
+
       expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('data')
       expect(response.body).toHaveProperty('pagination')

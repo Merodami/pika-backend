@@ -1,5 +1,5 @@
 import { userAdmin, userPublic } from '@pika/api'
-import { adaptMulterFile, RequestContext } from '@pika/http'
+import { adaptMulterFile, RequestContext, validateResponse } from '@pika/http'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -47,9 +47,7 @@ export class AdminUserController {
         firstName: user.firstName,
         lastName: user.lastName,
         phoneNumber: user.phoneNumber || undefined,
-        dateOfBirth: user.dateOfBirth
-          ? user.dateOfBirth.toISOString()
-          : undefined,
+        dateOfBirth: user.dateOfBirth || undefined,
         avatarUrl: user.avatarUrl || undefined,
         status: user.status as any,
         role: user.role as any,
@@ -170,9 +168,7 @@ export class AdminUserController {
         firstName: user.firstName,
         lastName: user.lastName,
         phoneNumber: user.phoneNumber || undefined,
-        dateOfBirth: user.dateOfBirth
-          ? user.dateOfBirth.toISOString()
-          : undefined,
+        dateOfBirth: user.dateOfBirth || undefined,
         avatarUrl: user.avatarUrl || undefined,
         status: user.status as any, // Status enum mapping
         role: user.role as any, // Role enum mapping
@@ -183,8 +179,11 @@ export class AdminUserController {
         updatedAt: user.updatedAt,
       }
 
-      const validatedResponse =
-        userAdmin.AdminUserDetailResponse.parse(adminResponse)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserDetailResponse,
+        adminResponse,
+        'AdminUserController.getMyProfile'
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -229,9 +228,7 @@ export class AdminUserController {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         phoneNumber: updatedUser.phoneNumber || undefined,
-        dateOfBirth: updatedUser.dateOfBirth
-          ? updatedUser.dateOfBirth.toISOString()
-          : undefined,
+        dateOfBirth: updatedUser.dateOfBirth || undefined,
         avatarUrl: updatedUser.avatarUrl || undefined,
         status: updatedUser.status as any,
         role: updatedUser.role as any,
@@ -244,8 +241,11 @@ export class AdminUserController {
         updatedAt: updatedUser.updatedAt,
       }
 
-      const validatedResponse =
-        userAdmin.AdminUserDetailResponse.parse(adminResponse)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserDetailResponse,
+        adminResponse,
+        'AdminUserController.getMyProfile'
+      )
 
       res.json(validatedResponse)
     } catch (error) {

@@ -12,7 +12,11 @@ export interface CreateUserRequest {
   firstName: string
   lastName: string
   phoneNumber?: string
+  dateOfBirth?: string
+  acceptTerms: boolean
+  marketingConsent?: boolean
   role?: string
+  avatarUrl?: string
 }
 
 export interface UpdateLastLoginRequest {

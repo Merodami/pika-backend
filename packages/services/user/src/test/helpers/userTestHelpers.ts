@@ -245,6 +245,7 @@ export async function cleanupUserTestData(
   if (!options.preserveE2EUsers && !options.preserveSharedUsers) {
     // Delete all test users
     await prismaClient.user.deleteMany({})
+
     return
   }
 
@@ -297,6 +298,7 @@ export function generateUserTestData(
 
   for (let i = 0; i < count; i++) {
     const timestamp = Date.now()
+
     users.push({
       id: uuid(),
       email: `test${timestamp}-${i}@example.com`,

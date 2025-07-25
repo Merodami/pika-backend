@@ -8,7 +8,6 @@ import {
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
-import { UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IBusinessService } from '../services/BusinessService.js'
@@ -173,7 +172,6 @@ export class BusinessController {
       const query =
         getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
 
-
       // Parse include parameter
       const includeRelations = query.include?.split(',') || []
       const business = await this.businessService.getBusinessByUserId(userId, {
@@ -206,7 +204,6 @@ export class BusinessController {
       const context = RequestContext.getContext(req)
       const authenticatedUserId = context.userId
 
-
       const data = {
         ...req.body,
         userId: authenticatedUserId,
@@ -238,7 +235,6 @@ export class BusinessController {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
-
 
       // Get user's business first
       const existingBusiness =

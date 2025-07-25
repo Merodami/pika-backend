@@ -52,7 +52,7 @@ describe('Admin Category Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let request: supertest.SuperTest<supertest.Test>
-  let authHelper: E2EAuthHelper  
+  let authHelper: E2EAuthHelper
   let adminClient: AuthenticatedRequestClient
   let customerClient: AuthenticatedRequestClient
   let server: any
@@ -343,7 +343,7 @@ describe('Admin Category Integration Tests', () => {
   describe('Authentication Boundary Tests', () => {
     it('should require authentication for all admin endpoints', async () => {
       const testCategory = sharedTestData.activeParentCategories[0]
-      
+
       // Test all admin endpoints without authentication
       const adminEndpoints = [
         { method: 'get', url: '/admin/categories' },
@@ -362,7 +362,7 @@ describe('Admin Category Integration Tests', () => {
 
     it('should require admin role for admin endpoints', async () => {
       const testCategory = sharedTestData.activeParentCategories[0]
-      
+
       // Test admin endpoints with customer token (should get 403)
       const adminEndpoints = [
         { method: 'get', url: '/admin/categories' },

@@ -144,6 +144,7 @@ async function startGateway(): Promise<Express> {
         '/api/v1/uploads/*', // Static file uploads (avatars, etc.)
         // Public auth endpoints only
         '/api/v1/auth/token',
+        '/api/v1/auth/login',
         '/api/v1/auth/register',
         '/api/v1/auth/forgot-password',
         '/api/v1/auth/reset-password',

@@ -16,7 +16,6 @@ vi.unmock('@pika/translation')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { UserRole, UserStatus } from '@prisma/client'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -27,6 +26,7 @@ import {
   MockTranslationClient,
   TestDatabaseResult,
 } from '@pika/tests'
+import { UserRole, UserStatus } from '@prisma/client'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'

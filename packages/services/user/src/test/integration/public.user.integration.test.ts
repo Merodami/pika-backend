@@ -16,12 +16,14 @@ vi.unmock('@pika/redis')
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
   const actualApi = await vi.importActual('@pika/api')
+
   return actualApi // Return all actual exports
 })
 
 // Force Vitest to use the actual implementation of '@pika/shared' for this test file.
 vi.mock('@pika/shared', async () => {
   const actualShared = await vi.importActual('@pika/shared')
+
   return actualShared // Return all actual exports
 })
 
@@ -35,7 +37,6 @@ import {
 } from '@pika/tests'
 import {
   cleanupTestDatabase,
-  clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
@@ -142,9 +143,7 @@ describe('User Service - Public API Integration Tests', () => {
     logger.debug('Creating shared test data...')
     sharedTestData = await createSharedUserTestData(testDb.prisma)
 
-    logger.debug(
-      `Created ${sharedTestData.allUsers.length} shared test users`,
-    )
+    logger.debug(`Created ${sharedTestData.allUsers.length} shared test users`)
   }, 120000)
 
   beforeEach(async () => {
@@ -166,7 +165,7 @@ describe('User Service - Public API Integration Tests', () => {
                 'user@e2etest.com',
                 'business@e2etest.com',
                 // Preserve shared test users
-                ...sharedTestData.allUsers.map(u => u.email),
+                ...sharedTestData.allUsers.map((u) => u.email),
               ],
             },
           },
@@ -329,6 +328,7 @@ describe('User Service - Public API Integration Tests', () => {
       const updatedUser = await testDb.prisma.user.findFirst({
         where: { email: 'user@e2etest.com' },
       })
+
       expect(updatedUser?.firstName).toBe('Updated')
       expect(updatedUser?.lastName).toBe('Name')
     })
@@ -355,6 +355,7 @@ describe('User Service - Public API Integration Tests', () => {
       const user = await testDb.prisma.user.findFirst({
         where: { email: 'user@e2etest.com' },
       })
+
       expect(user?.role).toBe(UserRole.CUSTOMER)
     })
 
@@ -378,6 +379,7 @@ describe('User Service - Public API Integration Tests', () => {
       const user = await testDb.prisma.user.findFirst({
         where: { email: 'user@e2etest.com' },
       })
+
       expect(user?.email).toBe('user@e2etest.com')
     })
 
@@ -456,7 +458,7 @@ describe('User Service - Public API Integration Tests', () => {
     it('should handle user search if publicly available', async () => {
       // This test checks if users can browse/search other users
       // Implementation may vary based on business requirements
-      
+
       const response = await customerClient
         .get('/users')
         .set('Accept', 'application/json')
@@ -510,12 +512,12 @@ describe('User Service - Public API Integration Tests', () => {
     it('should handle network timeouts gracefully', async () => {
       // This test ensures error handling works properly
       // In a real scenario, you might simulate network issues
-      
+
       const response = await customerClient
         .get('/users/me')
         .timeout(1) // Very short timeout
         .set('Accept', 'application/json')
-        .catch(err => err)
+        .catch((err) => err)
 
       // Should handle timeout error
       expect(typeof response).toBe('object')
@@ -527,17 +529,15 @@ describe('User Service - Public API Integration Tests', () => {
     it('should handle multiple concurrent requests', async () => {
       // Test concurrent access to user profile
       const promises = Array.from({ length: 5 }, () =>
-        customerClient
-          .get('/users/me')
-          .set('Accept', 'application/json')
+        customerClient.get('/users/me').set('Accept', 'application/json'),
       )
 
       const responses = await Promise.all(promises)
 
       // All requests should succeed (or consistently fail if endpoint doesn't exist)
-      const statuses = responses.map(r => r.status)
+      const statuses = responses.map((r) => r.status)
       const uniqueStatuses = [...new Set(statuses)]
-      
+
       // Should all have the same status (either all 200 or all 404)
       expect(uniqueStatuses).toHaveLength(1)
     })

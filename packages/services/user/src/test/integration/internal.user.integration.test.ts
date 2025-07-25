@@ -27,12 +27,10 @@ vi.mock('@pika/shared', async () => {
 })
 
 import type {
-  CreateEmailVerificationTokenRequest,
   CreatePasswordResetTokenRequest,
   ValidatePasswordResetTokenRequest,
   VerifyEmailRequest,
 } from '@pika/api'
-import { UserRole, UserStatus } from '@pika/types'
 import { MemoryCacheService } from '@pika/redis'
 import type { FileStoragePort } from '@pika/shared'
 import type { InternalAPIClient, TestDatabase } from '@pika/tests'
@@ -41,6 +39,7 @@ import {
   createTestDatabase,
   InternalAPITestHelper,
 } from '@pika/tests'
+import { UserRole, UserStatus } from '@pika/types'
 import bcrypt from 'bcrypt'
 import type { Express } from 'express'
 import supertest from 'supertest'
@@ -50,7 +49,6 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { createUserServer } from '../../server.js'
 import {
   createSharedUserTestData,
-  seedTestUsers,
   type SharedUserTestData,
 } from '../helpers/userTestHelpers.js'
 
@@ -92,7 +90,7 @@ describe('User Service - Internal API Integration Tests', () => {
 
     // Create server
     cacheService = new MemoryCacheService()
-    
+
     app = await createUserServer({
       prisma: testDb.prisma,
       cacheService,
@@ -140,7 +138,7 @@ describe('User Service - Internal API Integration Tests', () => {
               in: [
                 'existing@test.com',
                 // Preserve shared test users
-                ...sharedTestData.allUsers.map(u => u.email),
+                ...sharedTestData.allUsers.map((u) => u.email),
               ],
             },
           },
@@ -183,7 +181,7 @@ describe('User Service - Internal API Integration Tests', () => {
       const response = await internalClient
         .get('/internal/users/auth/by-email/EXISTING@TEST.COM')
         .expect(200)
-      
+
       expect(response.body).toMatchObject({
         id: testUserIds.existing,
         email: 'existing@test.com', // Stored in lowercase
@@ -218,8 +216,9 @@ describe('User Service - Internal API Integration Tests', () => {
     })
 
     it('should handle invalid UUID format', async () => {
-      const response = await internalClient
-        .get('/internal/users/auth/invalid-uuid')
+      const response = await internalClient.get(
+        '/internal/users/auth/invalid-uuid',
+      )
 
       expect([400, 404]).toContain(response.status)
     })
@@ -681,8 +680,8 @@ describe('User Service - Internal API Integration Tests', () => {
         'nonexistent2@test.com',
       ]
 
-      const promises = emails.map(email =>
-        internalClient.get(`/internal/users/check-email/${email}`)
+      const promises = emails.map((email) =>
+        internalClient.get(`/internal/users/check-email/${email}`),
       )
 
       const responses = await Promise.all(promises)
@@ -692,7 +691,7 @@ describe('User Service - Internal API Integration Tests', () => {
       expect(responses[2].body.exists).toBe(false)
 
       // All requests should complete successfully
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
       })
     })
@@ -722,19 +721,17 @@ describe('User Service - Internal API Integration Tests', () => {
         }),
       ])
 
-      const promises = users.map(user =>
-        internalClient
-          .post(`/internal/users/${user.id}/password`)
-          .send({
-            userId: user.id,
-            passwordHash: `new-password-${user.id}`,
-          })
+      const promises = users.map((user) =>
+        internalClient.post(`/internal/users/${user.id}/password`).send({
+          userId: user.id,
+          passwordHash: `new-password-${user.id}`,
+        }),
       )
 
       const responses = await Promise.all(promises)
 
       // All updates should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(204)
       })
     })
@@ -829,20 +826,21 @@ describe('User Service - Internal API Integration Tests', () => {
       const promises = Array.from({ length: 10 }, () =>
         internalClient
           .post(`/internal/users/${testUserIds.existing}/password-reset-token`)
-          .send({})
+          .send({}),
       )
 
       const responses = await Promise.all(promises)
 
       // All token creations should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
         expect(response.body.token).toBeDefined()
       })
 
       // All tokens should be unique
-      const tokens = responses.map(r => r.body.token)
+      const tokens = responses.map((r) => r.body.token)
       const uniqueTokens = new Set(tokens)
+
       expect(uniqueTokens.size).toBe(tokens.length)
     })
 
@@ -851,8 +849,9 @@ describe('User Service - Internal API Integration Tests', () => {
       await cacheService.disconnect()
 
       // Operations should still work (though may be slower)
-      const response = await internalClient
-        .get('/internal/users/check-email/existing@test.com')
+      const response = await internalClient.get(
+        '/internal/users/check-email/existing@test.com',
+      )
 
       expect([200, 500]).toContain(response.status) // May fail gracefully or continue
 
@@ -878,18 +877,16 @@ describe('User Service - Internal API Integration Tests', () => {
         internalClient
           .post(`/internal/users/${user.id}/verify-email`)
           .send({ userId: user.id }),
-        internalClient
-          .post(`/internal/users/${user.id}/password`)
-          .send({
-            userId: user.id,
-            passwordHash: 'new-password-hash',
-          }),
+        internalClient.post(`/internal/users/${user.id}/password`).send({
+          userId: user.id,
+          passwordHash: 'new-password-hash',
+        }),
       ]
 
       const responses = await Promise.all(promises)
 
       // Both operations should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect([200, 204]).toContain(response.status)
       })
 

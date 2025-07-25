@@ -16,12 +16,14 @@ vi.unmock('@pika/redis')
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
   const actualApi = await vi.importActual('@pika/api')
+
   return actualApi // Return all actual exports
 })
 
 // Force Vitest to use the actual implementation of '@pika/shared' for this test file.
 vi.mock('@pika/shared', async () => {
   const actualShared = await vi.importActual('@pika/shared')
+
   return actualShared // Return all actual exports
 })
 
@@ -35,7 +37,6 @@ import {
 } from '@pika/tests'
 import {
   cleanupTestDatabase,
-  clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
@@ -137,9 +138,7 @@ describe('User Service - Admin API Integration Tests', () => {
     logger.debug('Creating shared test data...')
     sharedTestData = await createSharedUserTestData(testDb.prisma)
 
-    logger.debug(
-      `Created ${sharedTestData.allUsers.length} shared test users`,
-    )
+    logger.debug(`Created ${sharedTestData.allUsers.length} shared test users`)
   }, 120000)
 
   beforeEach(async () => {
@@ -161,7 +160,7 @@ describe('User Service - Admin API Integration Tests', () => {
                 'user@e2etest.com',
                 'business@e2etest.com',
                 // Preserve shared test users
-                ...sharedTestData.allUsers.map(u => u.email),
+                ...sharedTestData.allUsers.map((u) => u.email),
               ],
             },
           },
@@ -238,10 +237,10 @@ describe('User Service - Admin API Integration Tests', () => {
     })
 
     it('should filter users by status', async () => {
-      await seedTestUsers(testDb.prisma, { 
-        count: 5, 
+      await seedTestUsers(testDb.prisma, {
+        count: 5,
         generateInactive: true,
-        generateUnconfirmed: true
+        generateUnconfirmed: true,
       })
 
       const response = await adminClient
@@ -252,7 +251,9 @@ describe('User Service - Admin API Integration Tests', () => {
 
       expect(response.body.data.length).toBeGreaterThan(0)
       expect(
-        response.body.data.every((user: any) => user.status === UserStatus.ACTIVE)
+        response.body.data.every(
+          (user: any) => user.status === UserStatus.ACTIVE,
+        ),
       ).toBe(true)
     })
 
@@ -268,6 +269,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const emails = response.body.data
         .map((user: any) => user.email)
         .filter((email: string) => !email.endsWith('@e2etest.com'))
+
       expect(emails).toEqual([...emails].sort())
     })
 
@@ -392,7 +394,7 @@ describe('User Service - Admin API Integration Tests', () => {
       if (response.status !== 201) {
         console.error('User creation failed:', response.body)
       }
-      
+
       expect(response.status).toBe(201)
 
       expect(response.body.id).toBeDefined()
@@ -587,9 +589,9 @@ describe('User Service - Admin API Integration Tests', () => {
     })
 
     it('should allow admin to update user role', async () => {
-      const testUsers = await seedTestUsers(testDb.prisma, { 
-        count: 1, 
-        role: UserRole.CUSTOMER 
+      const testUsers = await seedTestUsers(testDb.prisma, {
+        count: 1,
+        role: UserRole.CUSTOMER,
       })
       const targetUser = testUsers.users[0]
 
@@ -822,11 +824,7 @@ describe('User Service - Admin API Integration Tests', () => {
         })
 
         // Store verification code
-        await cacheService.set(
-          `phone-verification:${user.id}`,
-          '123456',
-          300,
-        )
+        await cacheService.set(`phone-verification:${user.id}`, '123456', 300)
 
         const response = await adminClient
           .post('/admin/users/verify')
@@ -843,6 +841,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const updatedUser = await testDb.prisma.user.findUnique({
           where: { id: user.id },
         })
+
         expect(updatedUser?.phoneVerified).toBe(true)
 
         // Verify code is deleted
@@ -864,11 +863,7 @@ describe('User Service - Admin API Integration Tests', () => {
           },
         })
 
-        await cacheService.set(
-          `phone-verification:${user.id}`,
-          '123456',
-          300,
-        )
+        await cacheService.set(`phone-verification:${user.id}`, '123456', 300)
 
         await adminClient
           .post('/admin/users/verify')
@@ -932,11 +927,12 @@ describe('User Service - Admin API Integration Tests', () => {
           .expect(200)
 
         expect(response.body.success).toBe(true)
-        
+
         // Verify the user status was updated
         const updatedUser = await testDb.prisma.user.findUnique({
-          where: { id: user.id }
+          where: { id: user.id },
         })
+
         expect(updatedUser?.status).toBe(UserStatus.ACTIVE)
       })
 
@@ -1056,16 +1052,14 @@ describe('User Service - Admin API Integration Tests', () => {
       const testUsers = await seedTestUsers(testDb.prisma, { count: 5 })
 
       // Perform concurrent read operations
-      const promises = testUsers.users.map(user =>
-        adminClient
-          .get(`/users/${user.id}`)
-          .set('Accept', 'application/json')
+      const promises = testUsers.users.map((user) =>
+        adminClient.get(`/users/${user.id}`).set('Accept', 'application/json'),
       )
 
       const responses = await Promise.all(promises)
 
       // All requests should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
       })
     })

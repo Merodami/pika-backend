@@ -1,4 +1,5 @@
 import { userInternal } from '@pika/api'
+import { validateResponse } from '@pika/http'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -45,7 +46,11 @@ export class InternalUserController {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
 
-      const validatedResponse = userInternal.UserAuthData.parse(user)
+      const validatedResponse = validateResponse(
+        userInternal.UserAuthData,
+        user,
+        'InternalUserController.getUserAuthDataByEmail',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -70,7 +75,11 @@ export class InternalUserController {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
 
-      const validatedResponse = userInternal.UserAuthData.parse(user)
+      const validatedResponse = validateResponse(
+        userInternal.UserAuthData,
+        user,
+        'InternalUserController.getUserAuthData',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -91,7 +100,11 @@ export class InternalUserController {
       const data = req.body
       const user = await this.internalUserService.createUser(data)
 
-      const validatedResponse = userInternal.UserAuthData.parse(user)
+      const validatedResponse = validateResponse(
+        userInternal.UserAuthData,
+        user,
+        'InternalUserController.getUserAuthData',
+      )
 
       res.status(201).json(validatedResponse)
     } catch (error) {
@@ -136,7 +149,11 @@ export class InternalUserController {
       const exists = await this.internalUserService.checkEmailExists(email)
 
       const response = { exists }
-      const validatedResponse = userInternal.ExistsResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.ExistsResponse,
+        response,
+        'InternalUserController.checkEmail',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -158,7 +175,11 @@ export class InternalUserController {
       const exists = await this.internalUserService.checkPhoneExists(phone)
 
       const response = { exists }
-      const validatedResponse = userInternal.ExistsResponse.parse(response)
+      const validatedResponse = validateResponse(
+        userInternal.ExistsResponse,
+        response,
+        'InternalUserController.checkPhone',
+      )
 
       res.json(validatedResponse)
     } catch (error) {
@@ -228,11 +249,12 @@ export class InternalUserController {
   ): Promise<void> {
     try {
       const { id } = req.params
-      const tokenData = await this.internalUserService.createPasswordResetToken(id)
+      const tokenData =
+        await this.internalUserService.createPasswordResetToken(id)
 
-      const response = { 
+      const response = {
         token: tokenData.token,
-        expiresAt: tokenData.expiresAt.toISOString()
+        expiresAt: tokenData.expiresAt.toISOString(),
       }
       const validatedResponse = userInternal.TokenResponse.parse(response)
 
@@ -307,9 +329,9 @@ export class InternalUserController {
       const tokenData =
         await this.internalUserService.createEmailVerificationToken(id)
 
-      const response = { 
+      const response = {
         token: tokenData.token,
-        expiresAt: tokenData.expiresAt.toISOString()
+        expiresAt: tokenData.expiresAt.toISOString(),
       }
       const validatedResponse = userInternal.TokenResponse.parse(response)
 

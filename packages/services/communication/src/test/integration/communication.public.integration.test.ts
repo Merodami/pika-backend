@@ -13,7 +13,6 @@ vi.unmock('@pika/redis')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { UserRole, UserStatus } from '@pika/types'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -22,6 +21,7 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
+import { UserRole, UserStatus } from '@pika/types'
 import type { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

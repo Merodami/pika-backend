@@ -27,7 +27,7 @@ export interface SharedPDFTestData {
   // Voucher Books by type
   publishedBooks: any[]
   draftBooks: any[]
-  
+
   // Quick access
   allBooks: any[]
   bookById: Map<string, any>
@@ -57,13 +57,15 @@ export async function seedTestVoucherBooks(
     addAds = false,
     createdBy,
   } = options
-  
+
   // Get a test user if createdBy not provided
   let userId = createdBy
+
   if (!userId) {
     const testUser = await prisma.user.findFirst({
       where: { email: { contains: '@e2etest.com' } },
     })
+
     if (!testUser) {
       throw new Error('No test users found and no createdBy provided.')
     }
@@ -75,7 +77,7 @@ export async function seedTestVoucherBooks(
   for (let i = 0; i < count; i++) {
     // Create published book by default
     let status: 'draft' | 'published' = 'published'
-    
+
     if (generateDrafts && generatePublished) {
       status = i % 2 === 0 ? 'published' : 'draft'
     } else if (generateDrafts) {
@@ -87,14 +89,17 @@ export async function seedTestVoucherBooks(
         id: uuid(),
         title: `Test Voucher Book ${i + 1}`,
         year: new Date().getFullYear(),
-        month: (new Date().getMonth() + i) % 12 + 1,
+        month: ((new Date().getMonth() + i) % 12) + 1,
         bookType: i % 2 === 0 ? 'monthly' : 'special_edition',
-        totalPages: 24 + (i * 8), // 24, 32, 40, etc.
+        totalPages: 24 + i * 8, // 24, 32, 40, etc.
         status,
         createdBy: userId,
         updatedBy: userId,
         // Add PDF URL for published books
-        pdfUrl: status === 'published' ? `https://example.com/test-voucher-book-${i + 1}.pdf` : null,
+        pdfUrl:
+          status === 'published'
+            ? `https://example.com/test-voucher-book-${i + 1}.pdf`
+            : null,
         pdfGeneratedAt: status === 'published' ? new Date() : null,
         publishedAt: status === 'published' ? new Date() : null,
       },
@@ -106,28 +111,28 @@ export async function seedTestVoucherBooks(
         await prisma.voucherBookPage.create({
           data: {
             id: uuid(),
-            voucherBookId: voucherBook.id,
+            bookId: voucherBook.id,
             pageNumber: pageNum,
-            pageType: pageNum % 4 === 0 ? 'ADVERTISEMENT' : 'VOUCHER',
-            content: `Page ${pageNum} content`,
-            createdBy: userId,
+            layoutType: pageNum % 4 === 0 ? 'mixed' : 'standard',
+            metadata: { content: `Page ${pageNum} content` },
           },
         })
       }
     }
 
     // Add ads if requested
-    if (addAds) {
+    if (addAds && voucherBook.pages && voucherBook.pages.length > 0) {
+      // Create an ad placement on the first page
       await prisma.adPlacement.create({
         data: {
           id: uuid(),
-          voucherBookId: voucherBook.id,
-          businessId: uuid(), // Mock business ID
-          pageNumber: Math.floor(Math.random() * voucherBook.totalPages) + 1,
-          adType: 'FULL_PAGE',
-          position: 'CENTER',
-          status: 'ACTIVE',
-          price: 100.0,
+          pageId: voucherBook.pages[0].id,
+          contentType: 'ad',
+          position: 1,
+          size: 'full',
+          spacesUsed: 8,
+          title: 'Sample Ad',
+          description: 'Sample ad placement',
           createdBy: userId,
         },
       })
@@ -150,12 +155,15 @@ export async function createSharedPDFTestData(
 ): Promise<SharedPDFTestData> {
   // Get a test user for foreign key references
   const testUser = await prisma.user.findFirst({
-    where: { email: { contains: '@test.com' } },
+    where: { email: { contains: '@e2etest.com' } },
   })
-  
+
   if (!testUser) {
-    throw new Error('No test users found. Make sure authHelper.createAllTestUsers() was called first.')
+    throw new Error(
+      'No test users found. Make sure authHelper.createAllTestUsers() was called first.',
+    )
   }
+
   // Create published books
   const publishedBooksData = await seedTestVoucherBooks(prisma, {
     generatePublished: true,
@@ -173,7 +181,10 @@ export async function createSharedPDFTestData(
     createdBy: testUser.id,
   })
 
-  const allBooks = [...publishedBooksData.voucherBooks, ...draftBooksData.voucherBooks]
+  const allBooks = [
+    ...publishedBooksData.voucherBooks,
+    ...draftBooksData.voucherBooks,
+  ]
   const bookById = new Map(allBooks.map((book) => [book.id, book]))
 
   return {
@@ -195,10 +206,12 @@ export async function createTestVoucherBook(
 ): Promise<any> {
   // Get a test user if createdBy not provided
   let userId = createdBy
+
   if (!userId) {
     const testUser = await prisma.user.findFirst({
       where: { email: { contains: '@e2etest.com' } },
     })
+
     if (!testUser) {
       throw new Error('No test users found and no createdBy provided.')
     }
@@ -217,7 +230,10 @@ export async function createTestVoucherBook(
       createdBy: userId,
       updatedBy: userId,
       // Add PDF URL for published books
-      pdfUrl: status === 'published' ? 'https://example.com/test-voucher-book.pdf' : null,
+      pdfUrl:
+        status === 'published'
+          ? 'https://example.com/test-voucher-book.pdf'
+          : null,
       pdfGeneratedAt: status === 'published' ? new Date() : null,
       publishedAt: status === 'published' ? new Date() : null,
     },

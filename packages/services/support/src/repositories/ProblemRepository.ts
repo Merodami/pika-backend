@@ -51,7 +51,11 @@ export interface IProblemRepository {
     parsedIncludes?: ParsedIncludes,
   ): Promise<ProblemDomain[]>
   create(data: CreateProblemInput): Promise<ProblemDomain>
-  update(id: string, data: UpdateProblemInput, parsedIncludes?: ParsedIncludes): Promise<ProblemDomain>
+  update(
+    id: string,
+    data: UpdateProblemInput,
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<ProblemDomain>
   delete(id: string): Promise<void>
 }
 
@@ -258,7 +262,11 @@ export class ProblemRepository implements IProblemRepository {
     }
   }
 
-  async update(id: string, data: UpdateProblemInput, parsedIncludes?: ParsedIncludes): Promise<ProblemDomain> {
+  async update(
+    id: string,
+    data: UpdateProblemInput,
+    parsedIncludes?: ParsedIncludes,
+  ): Promise<ProblemDomain> {
     try {
       // Set resolvedAt automatically when status changes to RESOLVED
       const updateData: any = { ...data }

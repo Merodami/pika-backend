@@ -123,12 +123,12 @@ describe('PDF Service - Public API Integration Tests', () => {
       const response = await customerClient
         .get('/voucher-books')
         .set('Accept', 'application/json')
-      
+
       if (response.status !== 200) {
         console.log('Response status:', response.status)
         console.log('Response body:', JSON.stringify(response.body, null, 2))
       }
-      
+
       expect(response.status).toBe(200)
 
       expect(response.body).toMatchObject({
@@ -143,7 +143,9 @@ describe('PDF Service - Public API Integration Tests', () => {
 
       // Should only show published books (2 published, 1 draft created)
       expect(response.body.data).toHaveLength(2)
-      expect(response.body.data.every((book: any) => book.status === 'published')).toBe(true)
+      expect(
+        response.body.data.every((book: any) => book.status === 'published'),
+      ).toBe(true)
     })
 
     it('should support pagination parameters', async () => {
@@ -167,11 +169,12 @@ describe('PDF Service - Public API Integration Tests', () => {
     it('should support filtering by year and month', async () => {
       const currentYear = new Date().getFullYear()
       const currentMonth = new Date().getMonth() + 1
-      
+
       // Get a test user for foreign key references
       const testUser = await testDb.prisma.user.findFirst({
         where: { email: { contains: '@e2etest.com' } },
       })
+
       if (!testUser) {
         throw new Error('No test users found')
       }
@@ -220,6 +223,7 @@ describe('PDF Service - Public API Integration Tests', () => {
       const testUser = await testDb.prisma.user.findFirst({
         where: { email: { contains: '@e2etest.com' } },
       })
+
       if (!testUser) {
         throw new Error('No test users found')
       }
@@ -354,7 +358,7 @@ describe('PDF Service - Public API Integration Tests', () => {
   describe('Authentication Boundary Tests', () => {
     it('should require authentication for all voucher book endpoints', async () => {
       const testBook = await createTestVoucherBook(testDb.prisma, 'published')
-      
+
       // Test all protected endpoints without authentication
       const protectedEndpoints = [
         { method: 'get', url: '/voucher-books' },

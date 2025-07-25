@@ -29,10 +29,14 @@ export interface IInternalUserService {
   checkPhoneExists(phone: string): Promise<boolean>
   updatePassword(id: string, hashedPassword: string): Promise<void>
   verifyEmail(id: string): Promise<void>
-  createPasswordResetToken(id: string): Promise<{ token: string; expiresAt: Date }>
+  createPasswordResetToken(
+    id: string,
+  ): Promise<{ token: string; expiresAt: Date }>
   validatePasswordResetToken(token: string): Promise<string>
   invalidatePasswordResetToken(token: string): Promise<void>
-  createEmailVerificationToken(id: string): Promise<{ token: string; expiresAt: Date }>
+  createEmailVerificationToken(
+    id: string,
+  ): Promise<{ token: string; expiresAt: Date }>
   validateEmailVerificationToken(token: string): Promise<string>
 }
 
@@ -224,10 +228,13 @@ export class InternalUserService implements IInternalUserService {
     }
   }
 
-  async createPasswordResetToken(id: string): Promise<{ token: string; expiresAt: Date }> {
+  async createPasswordResetToken(
+    id: string,
+  ): Promise<{ token: string; expiresAt: Date }> {
     try {
       // Check if user exists first
       const user = await this.repository.getRawUserById(id)
+
       if (!user) {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
@@ -277,17 +284,22 @@ export class InternalUserService implements IInternalUserService {
     }
   }
 
-  async createEmailVerificationToken(id: string): Promise<{ token: string; expiresAt: Date }> {
+  async createEmailVerificationToken(
+    id: string,
+  ): Promise<{ token: string; expiresAt: Date }> {
     try {
       // Check if user exists first
       const user = await this.repository.getRawUserById(id)
+
       if (!user) {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
 
       const token = randomBytes(32).toString('hex')
       const key = `email-verification:${token}`
-      const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TOKEN_TTL * 1000)
+      const expiresAt = new Date(
+        Date.now() + EMAIL_VERIFICATION_TOKEN_TTL * 1000,
+      )
 
       await this.cache.set(key, id, EMAIL_VERIFICATION_TOKEN_TTL)
 

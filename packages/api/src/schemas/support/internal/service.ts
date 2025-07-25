@@ -3,11 +3,7 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import { UUID } from '../../shared/primitives.js'
-import {
-  TicketPriority,
-  TicketStatus,
-  TicketType,
-} from '../common/index.js'
+import { TicketPriority, TicketStatus, TicketType } from '../common/index.js'
 
 /**
  * Internal support service schemas for service-to-service communication

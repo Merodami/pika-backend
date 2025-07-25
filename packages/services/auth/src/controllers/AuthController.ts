@@ -9,7 +9,7 @@ type ResetPasswordRequest = z.infer<typeof authPublic.ResetPasswordRequest>
 type RevokeTokenRequest = z.infer<typeof authPublic.RevokeTokenRequest>
 type TokenRequest = z.infer<typeof authPublic.TokenRequest>
 type VerifyEmailRequest = z.infer<typeof authPublic.VerifyEmailRequest>
-import { RequestContext } from '@pika/http'
+import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
@@ -279,7 +279,11 @@ export class AuthController {
           user: AuthMapper.toUserResponse(result.user),
         }
 
-        const validatedResponse = authPublic.TokenResponse.parse(oauthResponse)
+        const validatedResponse = validateResponse(
+          authPublic.TokenResponse,
+          oauthResponse,
+          'AuthController.token',
+        )
 
         response.json(validatedResponse)
       } else if (grantType === 'refreshToken') {
@@ -294,7 +298,11 @@ export class AuthController {
           scope: 'read write',
         }
 
-        const validatedResponse = authPublic.TokenResponse.parse(oauthResponse)
+        const validatedResponse = validateResponse(
+          authPublic.TokenResponse,
+          oauthResponse,
+          'AuthController.token',
+        )
 
         response.json(validatedResponse)
       } else {

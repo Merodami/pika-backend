@@ -72,7 +72,7 @@ export class FileController implements IFileController {
    */
   async uploadFile(
     request: Request<{}, {}, storagePublic.FileUploadRequest>,
-    response: Response<storagePublic.FileUploadResponse>,
+    response: Response<storagePublic.FileStorageLog>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -112,10 +112,9 @@ export class FileController implements IFileController {
         userId,
       })
 
-      // Transform FileStorageLogDomain to FileUploadResponse using mapper
-      const fileUploadDomain = FileStorageLogMapper.toFileUploadDomain(result)
-      const responseData = FileStorageLogMapper.fileUploadToDTO(fileUploadDomain)
-      const validatedResponse = storagePublic.FileUploadResponse.parse(responseData)
+      // Transform FileStorageLogDomain to DTO and return full storage log
+      const responseData = FileStorageLogMapper.toDTO(result)
+      const validatedResponse = storagePublic.FileStorageLog.parse(responseData)
 
       response.status(201).json(validatedResponse)
     } catch (error) {

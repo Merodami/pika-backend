@@ -42,7 +42,9 @@ export class PlanController {
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
 
-      const validatedResponse = subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
+
       response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)

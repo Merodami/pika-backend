@@ -4,7 +4,7 @@
  * Usage: yarn user:create
  */
 
-import { PrismaClient, UserRole, UserStatus } from '@prisma/client'
+import { PrismaClient, UserRole } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
