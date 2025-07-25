@@ -57,11 +57,11 @@ export class AdminProblemController {
         data: result.data.map(ProblemMapper.toDTO),
         pagination: result.pagination,
       }
-      
+
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketListResponse,
         dtoResult,
-        'AdminProblemController.getAllProblems'
+        'AdminProblemController.getAllProblems',
       )
 
       response.json(validatedResponse)
@@ -95,11 +95,11 @@ export class AdminProblemController {
 
       // Transform to DTO
       const dto = ProblemMapper.toDTO(problem)
-      
+
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,
         dto,
-        'AdminProblemController.getProblemById'
+        'AdminProblemController.getProblemById',
       )
 
       response.json(validatedResponse)
@@ -135,11 +135,11 @@ export class AdminProblemController {
 
       // Transform to DTO
       const dto = ProblemMapper.toDTO(problem)
-      
+
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,
         dto,
-        'AdminProblemController.updateProblem'
+        'AdminProblemController.updateProblem',
       )
 
       response.json(validatedResponse)

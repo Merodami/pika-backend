@@ -1,6 +1,5 @@
-import {
-  // Import service URLs as needed
-} from '@pika/environment'
+import {} from // Import service URLs as needed
+'@pika/environment'
 
 import type { ServiceConfig } from '../types.js'
 

@@ -1,5 +1,9 @@
 import { subscriptionAdmin, subscriptionCommon } from '@pika/api'
-import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  validateResponse,
+} from '@pika/http'
 import { SubscriptionMapper, SubscriptionPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { BillingInterval, SubscriptionStatus } from '@pika/types'
@@ -78,7 +82,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminGetSubscriptionsResponse,
         responseData,
-        'AdminSubscriptionController.getAllSubscriptions'
+        'AdminSubscriptionController.getAllSubscriptions',
       )
 
       response.json(validatedResponse)
@@ -112,7 +116,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminSubscriptionResponse,
         dto,
-        'AdminSubscriptionController.getSubscriptionById'
+        'AdminSubscriptionController.getSubscriptionById',
       )
 
       response.json(validatedResponse)
@@ -152,7 +156,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminSubscriptionResponse,
         dto,
-        'AdminSubscriptionController.createSubscription'
+        'AdminSubscriptionController.createSubscription',
       )
 
       response.status(201).json(validatedResponse)
@@ -189,7 +193,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminSubscriptionResponse,
         dto,
-        'AdminSubscriptionController.updateSubscription'
+        'AdminSubscriptionController.updateSubscription',
       )
 
       response.json(validatedResponse)
@@ -235,7 +239,7 @@ export class AdminSubscriptionController {
   ): Promise<void> {
     try {
       const { id } = request.params
-      const { cancelAtPeriodEnd = true, reason, feedback } = request.body
+      const { cancelAtPeriodEnd = true, reason } = request.body
 
       logger.info('Admin cancelling subscription', {
         id,
@@ -252,7 +256,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminSubscriptionResponse,
         dto,
-        'AdminSubscriptionController.cancelSubscription'
+        'AdminSubscriptionController.cancelSubscription',
       )
 
       response.json(validatedResponse)
@@ -282,7 +286,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminSubscriptionResponse,
         dto,
-        'AdminSubscriptionController.reactivateSubscription'
+        'AdminSubscriptionController.reactivateSubscription',
       )
 
       response.json(validatedResponse)
@@ -335,7 +339,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminGetPlansResponse,
         responseData,
-        'AdminSubscriptionController.getAllPlans'
+        'AdminSubscriptionController.getAllPlans',
       )
 
       response.json(validatedResponse)
@@ -368,7 +372,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminPlanResponse,
         dto,
-        'AdminSubscriptionController.getPlanById'
+        'AdminSubscriptionController.getPlanById',
       )
 
       response.json(validatedResponse)
@@ -397,7 +401,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminPlanResponse,
         dto,
-        'AdminSubscriptionController.createPlan'
+        'AdminSubscriptionController.createPlan',
       )
 
       response.status(201).json(validatedResponse)
@@ -431,7 +435,7 @@ export class AdminSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionAdmin.AdminPlanResponse,
         dto,
-        'AdminSubscriptionController.updatePlan'
+        'AdminSubscriptionController.updatePlan',
       )
 
       response.json(validatedResponse)

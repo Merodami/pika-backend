@@ -1,6 +1,10 @@
 import { subscriptionCommon, subscriptionPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  validateResponse,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
@@ -45,7 +49,7 @@ export class PlanController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionPlanDetailResponse,
         dto,
-        'PlanController.createPlan'
+        'PlanController.createPlan',
       )
 
       response.status(201).json(validatedResponse)
@@ -96,7 +100,7 @@ export class PlanController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionPlanListResponse,
         responseData,
-        'PlanController.getPlans'
+        'PlanController.getPlans',
       )
 
       response.json(validatedResponse)
@@ -125,7 +129,7 @@ export class PlanController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionPlanDetailResponse,
         dto,
-        'PlanController.getPlanById'
+        'PlanController.getPlanById',
       )
 
       response.json(validatedResponse)
@@ -159,7 +163,7 @@ export class PlanController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionPlanDetailResponse,
         dto,
-        'PlanController.updatePlan'
+        'PlanController.updatePlan',
       )
 
       response.json(validatedResponse)
@@ -208,7 +212,7 @@ export class PlanController {
       const validatedResponse = validateResponse(
         subscriptionPublic.PlanSyncResponse,
         responseData,
-        'PlanController.syncPlans'
+        'PlanController.syncPlans',
       )
 
       response.json(validatedResponse)

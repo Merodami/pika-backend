@@ -1,6 +1,10 @@
 import { categoryPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  validateResponse,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -55,7 +59,7 @@ export class CategoryController {
       const validatedResponse = validateResponse(
         categoryPublic.CategoryListResponse,
         response,
-        'CategoryController.getAllCategories'
+        'CategoryController.getAllCategories',
       )
 
       res.json(validatedResponse)
@@ -90,7 +94,7 @@ export class CategoryController {
       const validatedResponse = validateResponse(
         categoryPublic.CategoryResponse,
         response,
-        'CategoryController.getCategoryById'
+        'CategoryController.getCategoryById',
       )
 
       res.json(validatedResponse)
@@ -130,7 +134,7 @@ export class CategoryController {
       const validatedResponse = validateResponse(
         categoryPublic.CategoryHierarchyResponse,
         response,
-        'CategoryController.getCategoryHierarchy'
+        'CategoryController.getCategoryHierarchy',
       )
 
       res.json(validatedResponse)
@@ -167,7 +171,7 @@ export class CategoryController {
       const validatedResponse = validateResponse(
         categoryPublic.CategoryPathResponse,
         response,
-        'CategoryController.getCategoryPath'
+        'CategoryController.getCategoryPath',
       )
 
       res.json(validatedResponse)

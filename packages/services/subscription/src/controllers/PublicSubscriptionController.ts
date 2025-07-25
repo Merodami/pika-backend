@@ -44,7 +44,7 @@ export class PublicSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionResponse,
         dto,
-        'PublicSubscriptionController.createSubscription'
+        'PublicSubscriptionController.createSubscription',
       )
 
       response.json(validatedResponse)
@@ -86,7 +86,7 @@ export class PublicSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionResponse,
         dto,
-        'PublicSubscriptionController.getUserSubscription'
+        'PublicSubscriptionController.getUserSubscription',
       )
 
       response.json(validatedResponse)
@@ -128,7 +128,7 @@ export class PublicSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionResponse,
         dto,
-        'PublicSubscriptionController.cancelSubscription'
+        'PublicSubscriptionController.cancelSubscription',
       )
 
       response.json(validatedResponse)
@@ -173,7 +173,7 @@ export class PublicSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionPublic.SubscriptionResponse,
         dto,
-        'PublicSubscriptionController.reactivateSubscription'
+        'PublicSubscriptionController.reactivateSubscription',
       )
 
       response.json(validatedResponse)

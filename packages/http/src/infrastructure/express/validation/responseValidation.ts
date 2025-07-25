@@ -1,19 +1,20 @@
 import { NODE_ENV, VALIDATE_RESPONSES } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
+import { get, has, set } from 'lodash-es'
 import { z } from 'zod'
 
 /**
  * Validates response data against a Zod schema in non-production environments.
  * In production, returns data without validation for performance.
- * 
+ *
  * This function helps catch response schema mismatches during development
  * and testing while avoiding performance overhead in production.
- * 
+ *
  * @example
  * ```typescript
  * // Instead of:
  * const validatedResponse = schema.parse(response)
- * 
+ *
  * // Use:
  * const validatedResponse = validateResponse(
  *   schema,
@@ -21,7 +22,7 @@ import { z } from 'zod'
  *   'UserController.getProfile'
  * )
  * ```
- * 
+ *
  * @param schema - The Zod schema to validate against
  * @param data - The data to validate
  * @param context - Optional context string for better error logging (e.g., 'ControllerName.methodName')
@@ -52,18 +53,19 @@ export function validateResponse<T extends z.ZodTypeAny>(
     // In non-production environments, throw validation error
     if (NODE_ENV !== 'production') {
       const validationErrors: Record<string, string[]> = {}
-      result.error.issues.forEach(issue => {
+
+      result.error.issues.forEach((issue) => {
         const path = issue.path.join('.')
-        if (!validationErrors[path]) {
-          validationErrors[path] = []
+
+        if (!has(validationErrors, path)) {
+          set(validationErrors, path, [])
         }
-        validationErrors[path].push(issue.message)
+        get(validationErrors, path)?.push(issue.message)
       })
-      
-      throw ErrorFactory.validationError(
-        validationErrors,
-        { source: context || 'response validation' }
-      )
+
+      throw ErrorFactory.validationError(validationErrors, {
+        source: context || 'response validation',
+      })
     }
   }
 

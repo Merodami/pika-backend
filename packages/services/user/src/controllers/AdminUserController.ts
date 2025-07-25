@@ -66,7 +66,7 @@ export class AdminUserController {
       const validatedResponse = validateResponse(
         userAdmin.VerifyUserResponse,
         response,
-        'AdminUserController.verifyUser'
+        'AdminUserController.verifyUser',
       )
 
       res.json(validatedResponse)
@@ -103,7 +103,7 @@ export class AdminUserController {
       const validatedResponse = validateResponse(
         userAdmin.ResendVerificationResponse,
         response,
-        'AdminUserController.resendVerification'
+        'AdminUserController.resendVerification',
       )
 
       res.json(validatedResponse)
@@ -140,7 +140,7 @@ export class AdminUserController {
       const validatedResponse = validateResponse(
         userPublic.UploadAvatarResponse,
         response,
-        'AdminUserController.uploadUserAvatar'
+        'AdminUserController.uploadUserAvatar',
       )
 
       res.json(validatedResponse)
@@ -193,7 +193,7 @@ export class AdminUserController {
       const validatedResponse = validateResponse(
         userAdmin.AdminUserDetailResponse,
         adminResponse,
-        'AdminUserController.getMyProfile'
+        'AdminUserController.getMyProfile',
       )
 
       res.json(validatedResponse)
@@ -255,7 +255,7 @@ export class AdminUserController {
       const validatedResponse = validateResponse(
         userAdmin.AdminUserDetailResponse,
         adminResponse,
-        'AdminUserController.getMyProfile'
+        'AdminUserController.getMyProfile',
       )
 
       res.json(validatedResponse)
@@ -293,7 +293,7 @@ export class AdminUserController {
       const validatedResponse = validateResponse(
         userAdmin.UserVerificationStatusResponse,
         verificationStatus,
-        'AdminUserController.getUserVerificationStatus'
+        'AdminUserController.getUserVerificationStatus',
       )
 
       res.json(validatedResponse)

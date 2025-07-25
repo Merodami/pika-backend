@@ -89,7 +89,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userAdmin.AdminUserListResponse,
         response,
-        'UserController.getAllUsers'
+        'UserController.getAllUsers',
       )
 
       res.json(validatedResponse)
@@ -125,7 +125,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.getUserById'
+        'UserController.getUserById',
       )
 
       res.json(validatedResponse)
@@ -157,7 +157,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.getUserByEmail'
+        'UserController.getUserByEmail',
       )
 
       res.json(validatedResponse)
@@ -184,7 +184,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.createUser'
+        'UserController.createUser',
       )
 
       res.status(201).json(validatedResponse)
@@ -211,7 +211,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.createAdminUser'
+        'UserController.createAdminUser',
       )
 
       res.status(201).json(validatedResponse)
@@ -239,7 +239,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.updateUser'
+        'UserController.updateUser',
       )
 
       res.json(validatedResponse)
@@ -303,7 +303,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UploadAvatarResponse,
         response,
-        'UserController.uploadAvatar'
+        'UserController.uploadAvatar',
       )
 
       res.json(validatedResponse)
@@ -334,7 +334,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.getUserBySubToken'
+        'UserController.getUserBySubToken',
       )
 
       res.json(validatedResponse)
@@ -361,7 +361,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.updateUserStatus'
+        'UserController.updateUserStatus',
       )
 
       res.json(validatedResponse)
@@ -388,7 +388,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.banUser'
+        'UserController.banUser',
       )
 
       res.json(validatedResponse)
@@ -415,7 +415,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.unbanUser'
+        'UserController.unbanUser',
       )
 
       res.json(validatedResponse)
@@ -441,7 +441,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserFriendsResponse,
         response,
-        'UserController.getUserFriends'
+        'UserController.getUserFriends',
       )
 
       res.json(validatedResponse)
@@ -465,7 +465,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.getMe'
+        'UserController.getMe',
       )
 
       res.json(validatedResponse)
@@ -493,7 +493,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UserProfileResponse,
         dto,
-        'UserController.updateMe'
+        'UserController.updateMe',
       )
 
       res.json(validatedResponse)
@@ -531,7 +531,7 @@ export class UserController {
       const validatedResponse = validateResponse(
         userPublic.UploadAvatarResponse,
         response,
-        'UserController.uploadMyAvatar'
+        'UserController.uploadMyAvatar',
       )
 
       res.json(validatedResponse)

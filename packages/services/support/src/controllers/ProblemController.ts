@@ -41,11 +41,11 @@ export class ProblemController {
       // Transform to DTOs
       const dtos = problems.map(ProblemMapper.toDTO)
       const responseData = { data: dtos }
-      
+
       const validatedResponse = validateResponse(
         supportPublic.SupportProblemListResponse,
         responseData,
-        'ProblemController.getUserProblems'
+        'ProblemController.getUserProblems',
       )
 
       response.json(validatedResponse)
@@ -75,11 +75,11 @@ export class ProblemController {
 
       // Transform to DTO
       const dto = ProblemMapper.toDTO(problem)
-      
+
       const validatedResponse = validateResponse(
         supportPublic.SupportProblemResponse,
         dto,
-        'ProblemController.createProblem'
+        'ProblemController.createProblem',
       )
 
       response.status(201).json(validatedResponse)

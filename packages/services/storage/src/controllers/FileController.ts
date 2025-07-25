@@ -118,7 +118,7 @@ export class FileController implements IFileController {
       const validatedResponse = validateResponse(
         storagePublic.FileStorageLog,
         responseData,
-        'FileController.uploadFile'
+        'FileController.uploadFile',
       )
 
       response.status(201).json(validatedResponse)
@@ -175,7 +175,7 @@ export class FileController implements IFileController {
       const validatedResponse = validateResponse(
         storagePublic.BatchUploadResponse,
         result,
-        'FileController.uploadBatch'
+        'FileController.uploadBatch',
       )
 
       response.status(201).json(validatedResponse)
@@ -242,7 +242,7 @@ export class FileController implements IFileController {
       const validatedResponse = validateResponse(
         storagePublic.FileUrlResponse,
         responseData,
-        'FileController.getFileUrl'
+        'FileController.getFileUrl',
       )
 
       response.json(validatedResponse)
@@ -291,7 +291,7 @@ export class FileController implements IFileController {
       const validatedResponse = validateResponse(
         storagePublic.FileHistoryResponse,
         response,
-        'FileController.getFileHistory'
+        'FileController.getFileHistory',
       )
 
       res.json(validatedResponse)
@@ -322,7 +322,7 @@ export class FileController implements IFileController {
       const validatedResponse = validateResponse(
         storagePublic.FileHistoryResponse,
         response,
-        'FileController.getFileById'
+        'FileController.getFileById',
       )
 
       res.json(validatedResponse)

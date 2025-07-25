@@ -1,6 +1,10 @@
 import { businessCommon, businessInternal, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  validateResponse,
+} from '@pika/http'
 import { BusinessMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -46,7 +50,7 @@ export class InternalBusinessController {
       const validatedResponse = validateResponse(
         businessInternal.InternalBusinessData,
         response,
-        'InternalBusinessController.getBusinessById'
+        'InternalBusinessController.getBusinessById',
       )
 
       res.json(validatedResponse)
@@ -82,7 +86,7 @@ export class InternalBusinessController {
       const validatedResponse = validateResponse(
         businessInternal.InternalBusinessData,
         response,
-        'InternalBusinessController.getBusinessByUserId'
+        'InternalBusinessController.getBusinessByUserId',
       )
 
       res.json(validatedResponse)
@@ -124,7 +128,7 @@ export class InternalBusinessController {
       const validatedResponse = validateResponse(
         businessInternal.BulkBusinessResponse,
         response,
-        'InternalBusinessController.getBusinessesByIds'
+        'InternalBusinessController.getBusinessesByIds',
       )
 
       res.json(validatedResponse)
@@ -171,7 +175,7 @@ export class InternalBusinessController {
       const validatedResponse = validateResponse(
         businessInternal.GetBusinessesByCategoryResponse,
         response,
-        'InternalBusinessController.getBusinessesByCategory'
+        'InternalBusinessController.getBusinessesByCategory',
       )
 
       res.json(validatedResponse)

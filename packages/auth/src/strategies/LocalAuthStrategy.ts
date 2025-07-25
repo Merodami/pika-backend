@@ -105,7 +105,6 @@ export class LocalAuthStrategy implements AuthStrategy {
         credentials.email.toLowerCase().trim(),
       )
 
-
       logger.info('User lookup result', {
         email: credentials.email,
         normalizedEmail: credentials.email.toLowerCase().trim(),

@@ -405,9 +405,6 @@ export function requirePermissions(...permissions: string[]): RequestHandler {
       // For ':own' permissions, only check for exact match or resource wildcard
       // Ownership validation must be done in the controller
       if (permission.endsWith(':own')) {
-        const permissionParts = permission.split(':')
-        const resource = permissionParts[0]
-
         return (
           userPermissions.includes(permission) ||
           userPermissions.includes(`${resource}:*`)

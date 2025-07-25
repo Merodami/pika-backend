@@ -1,6 +1,10 @@
 import { categoryCommon, categoryInternal } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  validateResponse,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -47,7 +51,7 @@ export class InternalCategoryController {
       const validatedResponse = validateResponse(
         categoryInternal.InternalCategoryData,
         response,
-        'InternalCategoryController.getCategoryById'
+        'InternalCategoryController.getCategoryById',
       )
 
       res.json(validatedResponse)
@@ -80,7 +84,7 @@ export class InternalCategoryController {
       const validatedResponse = validateResponse(
         categoryInternal.BulkCategoryResponse,
         response,
-        'InternalCategoryController.getCategoriesByIds'
+        'InternalCategoryController.getCategoriesByIds',
       )
 
       res.json(validatedResponse)
@@ -141,7 +145,7 @@ export class InternalCategoryController {
       const validatedResponse = validateResponse(
         categoryInternal.ValidateCategoryResponse,
         response,
-        'InternalCategoryController.validateCategories'
+        'InternalCategoryController.validateCategories',
       )
 
       res.json(validatedResponse)
@@ -180,7 +184,7 @@ export class InternalCategoryController {
       const validatedResponse = validateResponse(
         categoryInternal.InternalCategoryListResponse,
         response,
-        'InternalCategoryController.getActiveCategoriesOnly'
+        'InternalCategoryController.getActiveCategoriesOnly',
       )
 
       res.json(validatedResponse)
@@ -222,7 +226,7 @@ export class InternalCategoryController {
       const validatedResponse = validateResponse(
         categoryInternal.InternalCategoryListResponse,
         response,
-        'InternalCategoryController.getAllCategories'
+        'InternalCategoryController.getAllCategories',
       )
 
       res.json(validatedResponse)
@@ -259,7 +263,7 @@ export class InternalCategoryController {
       const validatedResponse = validateResponse(
         categoryInternal.InternalCategoryHierarchyResponse,
         response,
-        'InternalCategoryController.getCategoryHierarchy'
+        'InternalCategoryController.getCategoryHierarchy',
       )
 
       res.json(validatedResponse)

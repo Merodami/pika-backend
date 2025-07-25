@@ -68,7 +68,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryListResponse,
         response,
-        'AdminCategoryController.getAllCategories'
+        'AdminCategoryController.getAllCategories',
       )
 
       res.json(validatedResponse)
@@ -103,7 +103,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryResponse,
         response,
-        'AdminCategoryController.getCategoryById'
+        'AdminCategoryController.getCategoryById',
       )
 
       res.json(validatedResponse)
@@ -139,7 +139,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryResponse,
         response,
-        'AdminCategoryController.createCategory'
+        'AdminCategoryController.createCategory',
       )
 
       res.status(201).json(validatedResponse)
@@ -180,7 +180,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryResponse,
         response,
-        'AdminCategoryController.updateCategory'
+        'AdminCategoryController.updateCategory',
       )
 
       res.json(validatedResponse)
@@ -231,7 +231,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryResponse,
         response,
-        'AdminCategoryController.toggleCategoryStatus'
+        'AdminCategoryController.toggleCategoryStatus',
       )
 
       res.json(validatedResponse)
@@ -269,7 +269,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryResponse,
         response,
-        'AdminCategoryController.moveCategory'
+        'AdminCategoryController.moveCategory',
       )
 
       res.json(validatedResponse)
@@ -307,7 +307,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryResponse,
         response,
-        'AdminCategoryController.updateCategorySortOrder'
+        'AdminCategoryController.updateCategorySortOrder',
       )
 
       res.json(validatedResponse)
@@ -343,7 +343,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.BulkCategoryOperationResponse,
         response,
-        'AdminCategoryController.bulkDeleteCategories'
+        'AdminCategoryController.bulkDeleteCategories',
       )
 
       res.json(validatedResponse)
@@ -382,7 +382,7 @@ export class AdminCategoryController {
       const validatedResponse = validateResponse(
         categoryAdmin.AdminCategoryTreeResponse,
         response,
-        'AdminCategoryController.getCategoryHierarchy'
+        'AdminCategoryController.getCategoryHierarchy',
       )
 
       res.json(validatedResponse)

@@ -67,7 +67,7 @@ export class AdminSupportController {
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketListResponse,
         response,
-        'AdminSupportController.getAllTickets'
+        'AdminSupportController.getAllTickets',
       )
 
       res.json(validatedResponse)
@@ -109,7 +109,7 @@ export class AdminSupportController {
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,
         responseData,
-        'AdminSupportController.getTicketById'
+        'AdminSupportController.getTicketById',
       )
 
       res.json(validatedResponse)
@@ -154,7 +154,7 @@ export class AdminSupportController {
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,
         responseData,
-        'AdminSupportController.updateTicketStatus'
+        'AdminSupportController.updateTicketStatus',
       )
 
       res.json(validatedResponse)
@@ -204,7 +204,7 @@ export class AdminSupportController {
       const validatedResponse = validateResponse(
         supportAdmin.AdminTicketDetailResponse,
         responseData,
-        'AdminSupportController.assignTicket'
+        'AdminSupportController.assignTicket',
       )
 
       res.json(validatedResponse)

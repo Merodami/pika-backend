@@ -229,7 +229,7 @@ export class InternalUserController {
       const validatedResponse = validateResponse(
         userInternal.SuccessResponse,
         response,
-        'InternalUserController.verifyEmail'
+        'InternalUserController.verifyEmail',
       )
 
       res.status(200).json(validatedResponse)
@@ -263,7 +263,7 @@ export class InternalUserController {
       const validatedResponse = validateResponse(
         userInternal.TokenResponse,
         response,
-        'InternalUserController.createPasswordResetToken'
+        'InternalUserController.createPasswordResetToken',
       )
 
       res.json(validatedResponse)
@@ -290,7 +290,7 @@ export class InternalUserController {
       const validatedResponse = validateResponse(
         userInternal.ValidateTokenResponse,
         response,
-        'InternalUserController.validatePasswordResetToken'
+        'InternalUserController.validatePasswordResetToken',
       )
 
       res.json(validatedResponse)
@@ -317,7 +317,7 @@ export class InternalUserController {
       const validatedResponse = validateResponse(
         userInternal.SuccessResponse,
         response,
-        'InternalUserController.invalidatePasswordResetToken'
+        'InternalUserController.invalidatePasswordResetToken',
       )
 
       res.status(200).json(validatedResponse)
@@ -351,7 +351,7 @@ export class InternalUserController {
       const validatedResponse = validateResponse(
         userInternal.TokenResponse,
         response,
-        'InternalUserController.createEmailVerificationToken'
+        'InternalUserController.createEmailVerificationToken',
       )
 
       res.json(validatedResponse)
@@ -378,7 +378,7 @@ export class InternalUserController {
       const validatedResponse = validateResponse(
         userInternal.ValidateTokenResponse,
         response,
-        'InternalUserController.validateEmailVerificationToken'
+        'InternalUserController.validateEmailVerificationToken',
       )
 
       res.json(validatedResponse)

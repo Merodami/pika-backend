@@ -54,11 +54,11 @@ export class AdminCommentController {
       // Transform to DTOs
       const dtos = comments.map(SupportCommentMapper.toDTO)
       const responseData = { data: dtos }
-      
+
       const validatedResponse = validateResponse(
         supportAdmin.AdminCommentListResponse,
         responseData,
-        'AdminCommentController.getAllComments'
+        'AdminCommentController.getAllComments',
       )
 
       response.json(validatedResponse)
@@ -107,11 +107,11 @@ export class AdminCommentController {
       // Transform to DTOs
       const dtos = comments.map(SupportCommentMapper.toDTO)
       const responseData = { data: dtos }
-      
+
       const validatedResponse = validateResponse(
         supportAdmin.AdminCommentListResponse,
         responseData,
-        'AdminCommentController.getCommentsByProblemId'
+        'AdminCommentController.getCommentsByProblemId',
       )
 
       response.json(validatedResponse)
@@ -150,11 +150,11 @@ export class AdminCommentController {
 
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
-      
+
       const validatedResponse = validateResponse(
         supportAdmin.AdminCommentResponse,
         dto,
-        'AdminCommentController.createInternalComment'
+        'AdminCommentController.createInternalComment',
       )
 
       response.status(201).json(validatedResponse)
@@ -187,11 +187,11 @@ export class AdminCommentController {
 
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
-      
+
       const validatedResponse = validateResponse(
         supportAdmin.AdminCommentResponse,
         dto,
-        'AdminCommentController.updateAnyComment'
+        'AdminCommentController.updateAnyComment',
       )
 
       response.json(validatedResponse)

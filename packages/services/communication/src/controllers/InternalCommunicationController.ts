@@ -1,5 +1,9 @@
 import { communicationInternal } from '@pika/api'
-import { getValidatedQuery, paginatedResponse, validateResponse } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  validateResponse,
+} from '@pika/http'
 import {
   CommunicationLogMapper,
   InternalCommunicationMapper,
@@ -92,7 +96,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.SendEmailResponse,
         responseData,
-        'InternalCommunicationController.sendEmail'
+        'InternalCommunicationController.sendEmail',
       )
 
       response.json(validatedResponse)
@@ -166,7 +170,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.BulkEmailResponse,
         responseData,
-        'InternalCommunicationController.sendBulkEmail'
+        'InternalCommunicationController.sendBulkEmail',
       )
 
       response.status(201).json(validatedResponse)
@@ -225,7 +229,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.InternalEmailHistoryResponse,
         responseData,
-        'InternalCommunicationController.getEmailHistory'
+        'InternalCommunicationController.getEmailHistory',
       )
 
       response.json(validatedResponse)
@@ -277,7 +281,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.SendTransactionalEmailResponse,
         responseData,
-        'InternalCommunicationController.sendTransactionalEmail'
+        'InternalCommunicationController.sendTransactionalEmail',
       )
 
       response.json(validatedResponse)
@@ -355,7 +359,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.SendSystemNotificationResponse,
         responseData,
-        'InternalCommunicationController.sendSystemNotification'
+        'InternalCommunicationController.sendSystemNotification',
       )
 
       response.json(validatedResponse)
@@ -426,7 +430,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.CreateNotificationResponse,
         dto,
-        'InternalCommunicationController.createNotification'
+        'InternalCommunicationController.createNotification',
       )
 
       response.status(201).json(validatedResponse)
@@ -492,7 +496,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.BatchCreateNotificationsResponse,
         responseData,
-        'InternalCommunicationController.createBatchNotifications'
+        'InternalCommunicationController.createBatchNotifications',
       )
 
       response.status(201).json(validatedResponse)
@@ -548,7 +552,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.InternalNotificationsResponse,
         responseData,
-        'InternalCommunicationController.getNotifications'
+        'InternalCommunicationController.getNotifications',
       )
 
       response.json(validatedResponse)
@@ -595,7 +599,7 @@ export class InternalCommunicationController {
       const validatedResponse = validateResponse(
         communicationInternal.GetUnreadCountResponse,
         responseData,
-        'InternalCommunicationController.getUnreadCount'
+        'InternalCommunicationController.getUnreadCount',
       )
 
       response.json(validatedResponse)

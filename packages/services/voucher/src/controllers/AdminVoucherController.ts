@@ -103,7 +103,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherListResponse,
         responseData,
-        'AdminVoucherController.getAllVouchers'
+        'AdminVoucherController.getAllVouchers',
       )
 
       res.json(validatedResponse)
@@ -147,7 +147,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherDetailResponse,
         responseData,
-        'AdminVoucherController.getVoucherById'
+        'AdminVoucherController.getVoucherById',
       )
 
       res.json(validatedResponse)
@@ -183,7 +183,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherDetailResponse,
         responseData,
-        'AdminVoucherController.createVoucher'
+        'AdminVoucherController.createVoucher',
       )
 
       res.status(201).json(validatedResponse)
@@ -228,7 +228,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherDetailResponse,
         responseData,
-        'AdminVoucherController.updateVoucher'
+        'AdminVoucherController.updateVoucher',
       )
 
       res.json(validatedResponse)
@@ -301,7 +301,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherDetailResponse,
         responseData,
-        'AdminVoucherController.updateVoucherState'
+        'AdminVoucherController.updateVoucherState',
       )
 
       res.json(validatedResponse)
@@ -341,7 +341,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherDetailResponse,
         responseData,
-        'AdminVoucherController.generateVoucherCodes'
+        'AdminVoucherController.generateVoucherCodes',
       )
 
       res.json(validatedResponse)
@@ -379,7 +379,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.UploadVoucherImageResponse,
         responseData,
-        'AdminVoucherController.uploadVoucherImage'
+        'AdminVoucherController.uploadVoucherImage',
       )
 
       res.json(validatedResponse)
@@ -425,7 +425,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.VoucherTranslationsResponse,
         responseData,
-        'AdminVoucherController.updateVoucherTranslations'
+        'AdminVoucherController.updateVoucherTranslations',
       )
 
       res.json(validatedResponse)
@@ -460,7 +460,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.VoucherTranslationsResponse,
         responseData,
-        'AdminVoucherController.getVoucherTranslations'
+        'AdminVoucherController.getVoucherTranslations',
       )
 
       res.json(validatedResponse)
@@ -511,7 +511,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.BulkVoucherOperationResponse,
         responseData,
-        'AdminVoucherController.bulkUpdateVouchers'
+        'AdminVoucherController.bulkUpdateVouchers',
       )
 
       res.json(validatedResponse)
@@ -551,7 +551,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.VoucherAnalyticsResponse,
         responseData,
-        'AdminVoucherController.getVoucherAnalytics'
+        'AdminVoucherController.getVoucherAnalytics',
       )
 
       res.json(validatedResponse)
@@ -582,7 +582,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.BusinessVoucherStatsResponse,
         responseData,
-        'AdminVoucherController.getBusinessVoucherStats'
+        'AdminVoucherController.getBusinessVoucherStats',
       )
 
       res.json(validatedResponse)
@@ -611,7 +611,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherResponse,
         dto,
-        'AdminVoucherController.publishVoucher'
+        'AdminVoucherController.publishVoucher',
       )
 
       res.status(200).json(validatedResponse)
@@ -640,7 +640,7 @@ export class AdminVoucherController {
       const validatedResponse = validateResponse(
         voucherAdmin.AdminVoucherResponse,
         dto,
-        'AdminVoucherController.expireVoucher'
+        'AdminVoucherController.expireVoucher',
       )
 
       res.status(200).json(validatedResponse)

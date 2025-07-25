@@ -111,15 +111,15 @@ export function getRequestLanguage(request: Request): LanguageCode {
 
 /**
  * Safely validate response data against a Zod schema
- * 
+ *
  * This helper properly transforms ZodErrors into the expected validation error format
  * that the error middleware can handle, preventing 500 errors.
- * 
+ *
  * @example
  * ```typescript
  * // Instead of:
  * const validatedResponse = schema.parse(response) // Throws ZodError -> 500
- * 
+ *
  * // Use:
  * const validatedResponse = safeValidateResponse(schema, response)
  * ```
@@ -134,7 +134,7 @@ export function safeValidateResponse<T extends z.ZodTypeAny>(
     if (error instanceof z.ZodError) {
       // Create a validation error in the expected format
       const validationError = new Error('Response validation failed') as any
-      
+
       validationError.code = 'VALIDATION_ERROR'
       validationError.httpPart = 'response'
       validationError.validation = error.issues.map((issue) => ({
@@ -145,10 +145,10 @@ export function safeValidateResponse<T extends z.ZodTypeAny>(
         message: issue.message,
         data: undefined,
       }))
-      
+
       throw validationError
     }
-    
+
     throw error
   }
 }

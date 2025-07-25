@@ -1,4 +1,5 @@
 import type { VoucherBookDomain } from '@pika/sdk'
+
 import type { VoucherBookStatistics } from '../types/domain.js'
 
 /**
@@ -179,7 +180,7 @@ export class VoucherBookMapper {
    * Business rule from old system
    */
   static isRecent(createdAt: string): boolean {
-    return this.getAgeInDays(createdAt) <= 7
+    return VoucherBookMapper.getAgeInDays(createdAt) <= 7
   }
 
   /**
@@ -203,7 +204,10 @@ export class VoucherBookMapper {
    * Business rule: Must be READY_FOR_PRINT and have PDF
    */
   static canBePublished(voucherBook: VoucherBookDTO): boolean {
-    return voucherBook.status === 'ready_for_print' && this.hasPDF(voucherBook)
+    return (
+      voucherBook.status === 'ready_for_print' &&
+      VoucherBookMapper.hasPDF(voucherBook)
+    )
   }
 
   /**
@@ -242,7 +246,7 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl,
       pdfUrl: voucherBook.pdfUrl,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || null,
-      metadata: this.ensureMetadata(voucherBook.metadata),
+      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata),
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy,
       createdAt: voucherBook.createdAt.toISOString(),
@@ -281,18 +285,18 @@ export class VoucherBookMapper {
 
     // Add computed properties
     dto.computed = {
-      displayName: this.getDisplayName(dto),
-      displayPeriod: this.getDisplayPeriod(dto),
-      ageInDays: this.getAgeInDays(dto.createdAt),
-      isRecent: this.isRecent(dto.createdAt),
-      canBeEdited: this.canBeEdited(dto),
-      canBePublished: this.canBePublished(dto),
-      hasPDF: this.hasPDF(dto),
+      displayName: VoucherBookMapper.getDisplayName(dto),
+      displayPeriod: VoucherBookMapper.getDisplayPeriod(dto),
+      ageInDays: VoucherBookMapper.getAgeInDays(dto.createdAt),
+      isRecent: VoucherBookMapper.isRecent(dto.createdAt),
+      canBeEdited: VoucherBookMapper.canBeEdited(dto),
+      canBePublished: VoucherBookMapper.canBePublished(dto),
+      hasPDF: VoucherBookMapper.hasPDF(dto),
     }
 
     // Add admin-specific fields (for compatibility with schema)
     dto.pageCount = voucherBook.pages?.length || 0
-    dto.totalPlacements = 
+    dto.totalPlacements =
       voucherBook.pages?.reduce(
         (total, page) => total + (page.adPlacements?.length || 0),
         0,
@@ -320,7 +324,7 @@ export class VoucherBookMapper {
       backImageUrl: voucherBook.backImageUrl,
       pdfUrl: voucherBook.pdfUrl,
       pdfGeneratedAt: voucherBook.pdfGeneratedAt?.toISOString() || null,
-      metadata: this.ensureMetadata(voucherBook.metadata),
+      metadata: VoucherBookMapper.ensureMetadata(voucherBook.metadata),
       createdBy: voucherBook.createdBy,
       updatedBy: voucherBook.updatedBy,
       createdAt: voucherBook.createdAt.toISOString(),
@@ -373,7 +377,7 @@ export class VoucherBookMapper {
    * Convert array to DTOs
    */
   static toDTOList(voucherBooks: VoucherBookDocument[]): VoucherBookDTO[] {
-    return voucherBooks.map((vb) => this.toSimpleDTO(vb))
+    return voucherBooks.map((vb) => VoucherBookMapper.toSimpleDTO(vb))
   }
 
   /**
@@ -382,7 +386,7 @@ export class VoucherBookMapper {
   static toPublicDTOList(
     voucherBooks: VoucherBookDocument[],
   ): PublicVoucherBookDTO[] {
-    return voucherBooks.map((vb) => this.toPublicDTO(vb))
+    return voucherBooks.map((vb) => VoucherBookMapper.toPublicDTO(vb))
   }
 
   /**
@@ -390,11 +394,11 @@ export class VoucherBookMapper {
    */
   static fromCreateDTO(dto: CreateVoucherBookDTO, createdById: string): any {
     // Validate business rules
-    if (!this.validateYear(dto.year)) {
+    if (!VoucherBookMapper.validateYear(dto.year)) {
       throw new Error('VoucherBook year must be between 2020 and 2100')
     }
 
-    if (!this.validateMonth(dto.month)) {
+    if (!VoucherBookMapper.validateMonth(dto.month)) {
       throw new Error('VoucherBook month must be between 1 and 12')
     }
 
@@ -431,7 +435,7 @@ export class VoucherBookMapper {
 
     // Validate year if changed
     if (dto.year !== undefined) {
-      if (!this.validateYear(dto.year)) {
+      if (!VoucherBookMapper.validateYear(dto.year)) {
         throw new Error('VoucherBook year must be between 2020 and 2100')
       }
       updates.year = dto.year
@@ -439,7 +443,7 @@ export class VoucherBookMapper {
 
     // Validate month if changed
     if (dto.month !== undefined) {
-      if (!this.validateMonth(dto.month)) {
+      if (!VoucherBookMapper.validateMonth(dto.month)) {
         throw new Error('VoucherBook month must be between 1 and 12')
       }
       updates.month = dto.month
@@ -490,7 +494,7 @@ export class VoucherBookMapper {
     for (const book of voucherBooks) {
       const statusList = statusMap.get(book.status) || []
 
-      statusList.push(this.toSimpleDTO(book))
+      statusList.push(VoucherBookMapper.toSimpleDTO(book))
       statusMap.set(book.status, statusList)
     }
 
@@ -622,7 +626,7 @@ export class VoucherBookMapper {
     pagination: any
   } {
     return {
-      data: result.data.map((book) => this.toPublicDTO(book)),
+      data: result.data.map((book) => VoucherBookMapper.toPublicDTO(book)),
       pagination: result.pagination,
     }
   }
@@ -635,7 +639,7 @@ export class VoucherBookMapper {
     pagination: any
   } {
     return {
-      data: result.data.map((book) => this.toDTO(book)),
+      data: result.data.map((book) => VoucherBookMapper.toDTO(book)),
       pagination: result.pagination,
     }
   }

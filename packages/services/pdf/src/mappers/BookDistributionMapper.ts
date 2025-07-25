@@ -129,14 +129,18 @@ export class BookDistributionMapper {
    * Validate distribution type
    */
   static isValidDistributionType(type: string): boolean {
-    return Object.values(this.DISTRIBUTION_TYPES).includes(type as any)
+    return Object.values(BookDistributionMapper.DISTRIBUTION_TYPES).includes(
+      type as any,
+    )
   }
 
   /**
    * Validate status
    */
   static isValidStatus(status: string): boolean {
-    return Object.values(this.STATUSES).includes(status as any)
+    return Object.values(BookDistributionMapper.STATUSES).includes(
+      status as any,
+    )
   }
 
   /**
@@ -144,7 +148,7 @@ export class BookDistributionMapper {
    * Business rule: Only pending distributions can be shipped
    */
   static canBeShipped(distribution: { status: string }): boolean {
-    return distribution.status === this.STATUSES.PENDING
+    return distribution.status === BookDistributionMapper.STATUSES.PENDING
   }
 
   /**
@@ -152,7 +156,7 @@ export class BookDistributionMapper {
    * Business rule: Only shipped distributions can be delivered
    */
   static canBeDelivered(distribution: { status: string }): boolean {
-    return distribution.status === this.STATUSES.SHIPPED
+    return distribution.status === BookDistributionMapper.STATUSES.SHIPPED
   }
 
   /**
@@ -160,7 +164,7 @@ export class BookDistributionMapper {
    * Business rule: Only pending distributions can be cancelled
    */
   static canBeCancelled(distribution: { status: string }): boolean {
-    return distribution.status === this.STATUSES.PENDING
+    return distribution.status === BookDistributionMapper.STATUSES.PENDING
   }
 
   /**
@@ -207,7 +211,7 @@ export class BookDistributionMapper {
       trackingNumber: distribution.trackingNumber,
       shippingCarrier: distribution.shippingCarrier,
       notes: distribution.notes,
-      metadata: this.ensureMetadata(distribution.metadata),
+      metadata: BookDistributionMapper.ensureMetadata(distribution.metadata),
       createdAt: distribution.createdAt.toISOString(),
       updatedAt: distribution.updatedAt.toISOString(),
       createdById: distribution.createdBy,
@@ -268,7 +272,7 @@ export class BookDistributionMapper {
       trackingNumber: distribution.trackingNumber,
       shippingCarrier: distribution.shippingCarrier,
       notes: distribution.notes,
-      metadata: this.ensureMetadata(distribution.metadata),
+      metadata: BookDistributionMapper.ensureMetadata(distribution.metadata),
       createdAt: distribution.createdAt.toISOString(),
       updatedAt: distribution.updatedAt.toISOString(),
       createdById: distribution.createdBy,
@@ -280,7 +284,7 @@ export class BookDistributionMapper {
    * Convert array to DTOs
    */
   static toDTOList(distributions: BookDistribution[]): BookDistributionDTO[] {
-    return distributions.map((d) => this.toSimpleDTO(d))
+    return distributions.map((d) => BookDistributionMapper.toSimpleDTO(d))
   }
 
   /**
@@ -291,7 +295,7 @@ export class BookDistributionMapper {
     createdById: string,
   ): any {
     // Validate business rules
-    if (!this.isValidDistributionType(dto.distributionType)) {
+    if (!BookDistributionMapper.isValidDistributionType(dto.distributionType)) {
       throw new Error(`Invalid distribution type: ${dto.distributionType}`)
     }
 
@@ -311,7 +315,7 @@ export class BookDistributionMapper {
       contactEmail: dto.contactEmail,
       contactPhone: dto.contactPhone,
       deliveryAddress: dto.deliveryAddress,
-      status: this.STATUSES.PENDING,
+      status: BookDistributionMapper.STATUSES.PENDING,
       notes: dto.notes,
       metadata: dto.metadata || {},
       createdBy: createdById,
@@ -333,7 +337,7 @@ export class BookDistributionMapper {
 
     // Validate status if changed
     if (dto.status !== undefined) {
-      if (!this.isValidStatus(dto.status)) {
+      if (!BookDistributionMapper.isValidStatus(dto.status)) {
         throw new Error(`Invalid status: ${dto.status}`)
       }
       updates.status = dto.status
@@ -371,7 +375,7 @@ export class BookDistributionMapper {
    */
   static fromShipDTO(dto: ShipDistributionDTO, updatedById: string): any {
     return {
-      status: this.STATUSES.SHIPPED,
+      status: BookDistributionMapper.STATUSES.SHIPPED,
       trackingNumber: dto.trackingNumber,
       shippingCarrier: dto.shippingCarrier,
       shippedAt: dto.shippedAt || new Date(),
@@ -386,7 +390,7 @@ export class BookDistributionMapper {
    */
   static fromDeliverDTO(dto: DeliverDistributionDTO, updatedById: string): any {
     const updates: any = {
-      status: this.STATUSES.DELIVERED,
+      status: BookDistributionMapper.STATUSES.DELIVERED,
       deliveredAt: dto.deliveredAt || new Date(),
       updatedBy: updatedById,
       updatedAt: new Date(),
@@ -408,7 +412,7 @@ export class BookDistributionMapper {
     const statusMap = new Map<string, BookDistributionDTO[]>()
 
     // Initialize with all statuses
-    Object.values(this.STATUSES).forEach((status) => {
+    Object.values(BookDistributionMapper.STATUSES).forEach((status) => {
       statusMap.set(status, [])
     })
 
@@ -416,7 +420,7 @@ export class BookDistributionMapper {
     for (const distribution of distributions) {
       const statusList = statusMap.get(distribution.status) || []
 
-      statusList.push(this.toSimpleDTO(distribution))
+      statusList.push(BookDistributionMapper.toSimpleDTO(distribution))
       statusMap.set(distribution.status, statusList)
     }
 
@@ -447,16 +451,16 @@ export class BookDistributionMapper {
       stats.totalQuantity += distribution.quantity
 
       switch (distribution.status) {
-        case this.STATUSES.PENDING:
+        case BookDistributionMapper.STATUSES.PENDING:
           stats.pending++
           break
-        case this.STATUSES.SHIPPED:
+        case BookDistributionMapper.STATUSES.SHIPPED:
           stats.shipped++
           break
-        case this.STATUSES.DELIVERED:
+        case BookDistributionMapper.STATUSES.DELIVERED:
           stats.delivered++
           break
-        case this.STATUSES.CANCELLED:
+        case BookDistributionMapper.STATUSES.CANCELLED:
           stats.cancelled++
           break
       }
@@ -484,12 +488,12 @@ export class BookDistributionMapper {
     let statusDate: Date
 
     switch (distribution.status) {
-      case this.STATUSES.SHIPPED:
+      case BookDistributionMapper.STATUSES.SHIPPED:
         statusDate = distribution.shippedAt
           ? new Date(distribution.shippedAt)
           : new Date(distribution.createdAt)
         break
-      case this.STATUSES.DELIVERED:
+      case BookDistributionMapper.STATUSES.DELIVERED:
         statusDate = distribution.deliveredAt
           ? new Date(distribution.deliveredAt)
           : new Date(distribution.createdAt)

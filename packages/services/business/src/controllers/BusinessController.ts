@@ -66,7 +66,7 @@ export class BusinessController {
       const validatedResponse = validateResponse(
         businessPublic.BusinessListResponse,
         response,
-        'BusinessController.getAllBusinesses'
+        'BusinessController.getAllBusinesses',
       )
 
       res.json(validatedResponse)
@@ -113,7 +113,7 @@ export class BusinessController {
       const validatedResponse = validateResponse(
         businessPublic.BusinessResponse,
         response,
-        'BusinessController.getBusinessById'
+        'BusinessController.getBusinessById',
       )
 
       res.json(validatedResponse)
@@ -160,7 +160,7 @@ export class BusinessController {
       const validatedResponse = validateResponse(
         businessPublic.BusinessResponse,
         response,
-        'BusinessController.getBusinessByUserId'
+        'BusinessController.getBusinessByUserId',
       )
 
       res.json(validatedResponse)
@@ -198,7 +198,7 @@ export class BusinessController {
       const validatedResponse = validateResponse(
         businessPublic.BusinessResponse,
         response,
-        'BusinessController.getMyBusiness'
+        'BusinessController.getMyBusiness',
       )
 
       res.json(validatedResponse)
@@ -234,7 +234,7 @@ export class BusinessController {
       const validatedResponse = validateResponse(
         businessPublic.BusinessResponse,
         response,
-        'BusinessController.createMyBusiness'
+        'BusinessController.createMyBusiness',
       )
 
       res.status(201).json(validatedResponse)
@@ -272,7 +272,7 @@ export class BusinessController {
       const validatedResponse = validateResponse(
         businessPublic.BusinessResponse,
         response,
-        'BusinessController.updateMyBusiness'
+        'BusinessController.updateMyBusiness',
       )
 
       res.json(validatedResponse)

@@ -82,7 +82,7 @@ export class AuthController {
         const validatedResponse = validateResponse(
           authPublic.RegisterResponse,
           responseData,
-          'AuthController.register'
+          'AuthController.register',
         )
 
         response.status(201).json(validatedResponse)
@@ -95,7 +95,7 @@ export class AuthController {
         const validatedResponse = validateResponse(
           authPublic.AuthUserResponse,
           dto,
-          'AuthController.register'
+          'AuthController.register',
         )
 
         response.status(201).json(validatedResponse)
@@ -127,7 +127,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         shared.MessageResponse,
         responseData,
-        'AuthController.forgotPassword'
+        'AuthController.forgotPassword',
       )
 
       response.json(validatedResponse)
@@ -162,7 +162,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         shared.MessageResponse,
         responseData,
-        'AuthController.resetPassword'
+        'AuthController.resetPassword',
       )
 
       response.json(validatedResponse)
@@ -196,7 +196,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         authPublic.VerifyEmailResponse,
         responseData,
-        'AuthController.verifyEmail'
+        'AuthController.verifyEmail',
       )
 
       response.json(validatedResponse)
@@ -227,7 +227,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         shared.MessageResponse,
         responseData,
-        'AuthController.resendVerificationEmail'
+        'AuthController.resendVerificationEmail',
       )
 
       response.json(validatedResponse)
@@ -268,7 +268,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         shared.MessageResponse,
         responseData,
-        'AuthController.changePassword'
+        'AuthController.changePassword',
       )
 
       response.json(validatedResponse)
@@ -357,7 +357,7 @@ export class AuthController {
         const validatedResponse = validateResponse(
           authPublic.IntrospectResponse,
           responseData,
-          'AuthController.introspect'
+          'AuthController.introspect',
         )
 
         response.json(validatedResponse)
@@ -380,7 +380,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         authPublic.IntrospectResponse,
         responseData,
-        'AuthController.introspect'
+        'AuthController.introspect',
       )
 
       response.json(validatedResponse)
@@ -390,7 +390,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         authPublic.IntrospectResponse,
         responseData,
-        'AuthController.introspect'
+        'AuthController.introspect',
       )
 
       response.json(validatedResponse)
@@ -423,7 +423,7 @@ export class AuthController {
           const validatedResponse = validateResponse(
             authPublic.RevokeTokenResponse,
             responseData,
-            'AuthController.revoke'
+            'AuthController.revoke',
           )
 
           response.json(validatedResponse)
@@ -437,7 +437,7 @@ export class AuthController {
           const validatedResponse = validateResponse(
             authPublic.RevokeTokenResponse,
             responseData,
-            'AuthController.revoke'
+            'AuthController.revoke',
           )
 
           response.json(validatedResponse)
@@ -453,7 +453,7 @@ export class AuthController {
         const validatedResponse = validateResponse(
           authPublic.RevokeTokenResponse,
           responseData,
-          'AuthController.revoke'
+          'AuthController.revoke',
         )
 
         response.json(validatedResponse)
@@ -524,7 +524,7 @@ export class AuthController {
       const validatedResponse = validateResponse(
         authPublic.UserInfoResponse,
         userInfo,
-        'AuthController.userinfo'
+        'AuthController.userinfo',
       )
 
       response.json(validatedResponse)

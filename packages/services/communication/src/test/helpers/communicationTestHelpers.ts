@@ -229,7 +229,7 @@ export class MockEmailProvider {
     return true
   }
 
-  async sendEmail(data: any) {
+  async sendEmail() {
     return {
       success: true,
       messageId: uuid(),
@@ -262,7 +262,7 @@ export class MockEmailProvider {
  * Mock SMS Provider for testing
  */
 export class MockSmsProvider {
-  async sendSms(data: any) {
+  async sendSms() {
     return {
       id: uuid(),
       status: 'sent',

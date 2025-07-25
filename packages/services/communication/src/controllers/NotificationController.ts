@@ -118,7 +118,7 @@ export class NotificationController implements INotificationController {
       const validatedResponse = validateResponse(
         communicationPublic.NotificationResponse,
         responseData,
-        'NotificationController.createNotification'
+        'NotificationController.createNotification',
       )
 
       response.json(validatedResponse)
@@ -168,7 +168,7 @@ export class NotificationController implements INotificationController {
       const validatedResponse = validateResponse(
         communicationPublic.NotificationListResponse,
         responseData,
-        'NotificationController.getNotifications'
+        'NotificationController.getNotifications',
       )
 
       response.json(validatedResponse)
@@ -203,7 +203,7 @@ export class NotificationController implements INotificationController {
       const validatedResponse = validateResponse(
         communicationPublic.NotificationResponse,
         responseData,
-        'NotificationController.getNotificationById'
+        'NotificationController.getNotificationById',
       )
 
       response.json(validatedResponse)
@@ -243,7 +243,7 @@ export class NotificationController implements INotificationController {
       const validatedResponse = validateResponse(
         communicationPublic.NotificationResponse,
         responseData,
-        'NotificationController.updateNotification'
+        'NotificationController.updateNotification',
       )
 
       response.json(validatedResponse)
@@ -274,7 +274,7 @@ export class NotificationController implements INotificationController {
       const validatedResponse = validateResponse(
         communicationPublic.NotificationResponse,
         responseData,
-        'NotificationController.markAsRead'
+        'NotificationController.markAsRead',
       )
 
       response.json(validatedResponse)
@@ -304,7 +304,7 @@ export class NotificationController implements INotificationController {
       const validatedResponse = validateResponse(
         communicationPublic.MarkAllAsReadResponse,
         responseData,
-        'NotificationController.markAllAsRead'
+        'NotificationController.markAllAsRead',
       )
 
       response.json(validatedResponse)

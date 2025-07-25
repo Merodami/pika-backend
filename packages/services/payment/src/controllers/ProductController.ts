@@ -42,7 +42,7 @@ export class ProductController {
       const validatedResponse = validateResponse(
         paymentPublic.Product,
         product,
-        'ProductController.createProduct'
+        'ProductController.createProduct',
       )
 
       response.status(201).json(validatedResponse)
@@ -80,7 +80,7 @@ export class ProductController {
       const validatedResponse = validateResponse(
         paymentPublic.Product,
         product,
-        'ProductController.updateProduct'
+        'ProductController.updateProduct',
       )
 
       response.json(validatedResponse)
@@ -115,7 +115,7 @@ export class ProductController {
       const validatedResponse = validateResponse(
         paymentPublic.Price,
         price,
-        'ProductController.createPrice'
+        'ProductController.createPrice',
       )
 
       response.status(201).json(validatedResponse)
@@ -143,7 +143,7 @@ export class ProductController {
       const validatedResponse = validateResponse(
         paymentPublic.Price,
         price,
-        'ProductController.deactivatePrice'
+        'ProductController.deactivatePrice',
       )
 
       response.json(validatedResponse)
@@ -173,7 +173,7 @@ export class ProductController {
       const validatedResponse = validateResponse(
         paymentPublic.ProductListResponse,
         responseData,
-        'ProductController.listProducts'
+        'ProductController.listProducts',
       )
 
       response.json(validatedResponse)
@@ -203,7 +203,7 @@ export class ProductController {
       const validatedResponse = validateResponse(
         paymentPublic.PriceListResponse,
         responseData,
-        'ProductController.listPrices'
+        'ProductController.listPrices',
       )
 
       response.json(validatedResponse)

@@ -94,7 +94,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.VoucherListResponse,
         responseData,
-        'VoucherController.getAllVouchers'
+        'VoucherController.getAllVouchers',
       )
 
       res.json(validatedResponse)
@@ -148,7 +148,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.VoucherResponse,
         responseData,
-        'VoucherController.getVoucherById'
+        'VoucherController.getVoucherById',
       )
 
       res.json(validatedResponse)
@@ -202,7 +202,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.VoucherScanResponse,
         responseData,
-        'VoucherController.scanVoucher'
+        'VoucherController.scanVoucher',
       )
 
       res.json(validatedResponse)
@@ -249,7 +249,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.VoucherClaimResponse,
         responseData,
-        'VoucherController.claimVoucher'
+        'VoucherController.claimVoucher',
       )
 
       res.json(validatedResponse)
@@ -292,7 +292,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.VoucherRedeemResponse,
         responseData,
-        'VoucherController.redeemVoucher'
+        'VoucherController.redeemVoucher',
       )
 
       res.json(validatedResponse)
@@ -349,7 +349,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.UserVouchersListResponse,
         responseData,
-        'VoucherController.getUserVouchers'
+        'VoucherController.getUserVouchers',
       )
 
       res.json(validatedResponse)
@@ -411,7 +411,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.VoucherListResponse,
         responseData,
-        'VoucherController.getBusinessVouchers'
+        'VoucherController.getBusinessVouchers',
       )
 
       res.json(validatedResponse)
@@ -463,7 +463,7 @@ export class VoucherController {
       const validatedResponse = validateResponse(
         voucherPublic.VoucherResponse,
         responseData,
-        'VoucherController.getVoucherByCode'
+        'VoucherController.getVoucherByCode',
       )
 
       res.json(validatedResponse)

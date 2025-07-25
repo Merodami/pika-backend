@@ -35,6 +35,7 @@ export default [
       'api-microservices-sdk/**',
       'ai/**',
       'pika-old/**',
+      'docs/**',
       'scripts/vercel-test.ts',
     ],
   },

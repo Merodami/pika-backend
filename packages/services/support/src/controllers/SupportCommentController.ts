@@ -43,11 +43,11 @@ export class SupportCommentController {
       // Transform to DTOs
       const dtos = comments.map(SupportCommentMapper.toDTO)
       const responseData = { data: dtos }
-      
+
       const validatedResponse = validateResponse(
         supportPublic.SupportCommentListResponse,
         responseData,
-        'SupportCommentController.getCommentsByProblemId'
+        'SupportCommentController.getCommentsByProblemId',
       )
 
       response.json(validatedResponse)
@@ -72,11 +72,11 @@ export class SupportCommentController {
 
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
-      
+
       const validatedResponse = validateResponse(
         supportPublic.SupportCommentResponse,
         dto,
-        'SupportCommentController.getCommentById'
+        'SupportCommentController.getCommentById',
       )
 
       response.json(validatedResponse)
@@ -106,11 +106,11 @@ export class SupportCommentController {
 
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
-      
+
       const validatedResponse = validateResponse(
         supportPublic.SupportCommentResponse,
         dto,
-        'SupportCommentController.createComment'
+        'SupportCommentController.createComment',
       )
 
       response.status(201).json(validatedResponse)
@@ -147,11 +147,11 @@ export class SupportCommentController {
 
       // Transform to DTO
       const dto = SupportCommentMapper.toDTO(comment)
-      
+
       const validatedResponse = validateResponse(
         supportPublic.SupportCommentResponse,
         dto,
-        'SupportCommentController.updateComment'
+        'SupportCommentController.updateComment',
       )
 
       response.json(validatedResponse)

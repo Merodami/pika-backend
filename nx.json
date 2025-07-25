@@ -9,7 +9,7 @@
       "runner": "nx/tasks-runners/default",
       "options": {
         "cacheableOperations": ["build", "typecheck", "lint", "test"],
-        "parallel": 100,
+        "parallel": 8,
         "globalEnv": {
           "DOTENV_PATH": ".env"
         }

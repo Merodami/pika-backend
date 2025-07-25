@@ -91,7 +91,7 @@ export class InternalSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionInternal.ProcessSubscriptionWebhookResponse,
         responseData,
-        'InternalSubscriptionController.processWebhook'
+        'InternalSubscriptionController.processWebhook',
       )
 
       response.json(validatedResponse)
@@ -146,7 +146,7 @@ export class InternalSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionInternal.UpdateSubscriptionFromPaymentResponse,
         responseData,
-        'InternalSubscriptionController.updateFromPayment'
+        'InternalSubscriptionController.updateFromPayment',
       )
 
       response.json(validatedResponse)
@@ -182,7 +182,7 @@ export class InternalSubscriptionController {
         const validatedResponse = validateResponse(
           subscriptionInternal.SubscriptionAccessResponse,
           responseData,
-          'InternalSubscriptionController.checkAccess'
+          'InternalSubscriptionController.checkAccess',
         )
 
         response.json(validatedResponse)
@@ -206,7 +206,7 @@ export class InternalSubscriptionController {
         const validatedResponse = validateResponse(
           subscriptionInternal.SubscriptionAccessResponse,
           responseData,
-          'InternalSubscriptionController.checkAccess'
+          'InternalSubscriptionController.checkAccess',
         )
 
         response.json(validatedResponse)
@@ -230,7 +230,7 @@ export class InternalSubscriptionController {
         const validatedResponse = validateResponse(
           subscriptionInternal.SubscriptionAccessResponse,
           responseData,
-          'InternalSubscriptionController.checkAccess'
+          'InternalSubscriptionController.checkAccess',
         )
 
         response.json(validatedResponse)
@@ -251,7 +251,7 @@ export class InternalSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionInternal.SubscriptionAccessResponse,
         responseData,
-        'InternalSubscriptionController.checkAccess'
+        'InternalSubscriptionController.checkAccess',
       )
 
       response.json(validatedResponse)
@@ -288,7 +288,7 @@ export class InternalSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionInternal.InternalSubscriptionData,
         responseData,
-        'InternalSubscriptionController.getByStripeId'
+        'InternalSubscriptionController.getByStripeId',
       )
 
       response.json(validatedResponse)
@@ -323,7 +323,7 @@ export class InternalSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionInternal.SubscriptionListResponse,
         responseData,
-        'InternalSubscriptionController.getUserSubscriptions'
+        'InternalSubscriptionController.getUserSubscriptions',
       )
 
       response.json(validatedResponse)
@@ -388,7 +388,7 @@ export class InternalSubscriptionController {
       const validatedResponse = validateResponse(
         subscriptionInternal.SendSubscriptionNotificationResponse,
         responseData,
-        'InternalSubscriptionController.sendNotification'
+        'InternalSubscriptionController.sendNotification',
       )
 
       response.json(validatedResponse)

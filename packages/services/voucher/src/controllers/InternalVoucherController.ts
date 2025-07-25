@@ -70,7 +70,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.GetVouchersByIdsResponse,
         response,
-        'InternalVoucherController.getVouchersByIds'
+        'InternalVoucherController.getVouchersByIds',
       )
 
       res.json(validatedResponse)
@@ -118,7 +118,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.ValidateVoucherResponse,
         responseData,
-        'InternalVoucherController.validateVoucher'
+        'InternalVoucherController.validateVoucher',
       )
 
       res.json(validatedResponse)
@@ -165,7 +165,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.InternalUpdateVoucherStateResponse,
         responseData,
-        'InternalVoucherController.updateVoucherState'
+        'InternalVoucherController.updateVoucherState',
       )
 
       res.json(validatedResponse)
@@ -199,7 +199,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.CheckVoucherExistsResponse,
         responseData,
-        'InternalVoucherController.checkVoucherExists'
+        'InternalVoucherController.checkVoucherExists',
       )
 
       res.json(validatedResponse)
@@ -241,7 +241,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.GetVouchersByBusinessResponse,
         responseData,
-        'InternalVoucherController.getVouchersByBusiness'
+        'InternalVoucherController.getVouchersByBusiness',
       )
 
       res.json(validatedResponse)
@@ -281,7 +281,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.GetVouchersByCategoryResponse,
         responseData,
-        'InternalVoucherController.getVouchersByCategory'
+        'InternalVoucherController.getVouchersByCategory',
       )
 
       res.json(validatedResponse)
@@ -319,7 +319,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.GetUserVouchersResponse,
         responseData,
-        'InternalVoucherController.getUserVouchers'
+        'InternalVoucherController.getUserVouchers',
       )
 
       res.json(validatedResponse)
@@ -357,7 +357,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.TrackRedemptionResponse,
         responseData,
-        'InternalVoucherController.trackRedemption'
+        'InternalVoucherController.trackRedemption',
       )
 
       res.json(validatedResponse)
@@ -402,7 +402,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.BatchVoucherProcessResponse,
         responseData,
-        'InternalVoucherController.batchProcessVouchers'
+        'InternalVoucherController.batchProcessVouchers',
       )
 
       res.status(200).json(validatedResponse)
@@ -470,7 +470,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.BatchUpdateVoucherStateResponse,
         responseData,
-        'InternalVoucherController.batchUpdateVoucherState'
+        'InternalVoucherController.batchUpdateVoucherState',
       )
 
       res.status(200).json(validatedResponse)
@@ -532,7 +532,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.GetVouchersForBookResponse,
         response,
-        'InternalVoucherController.getVouchersForBook'
+        'InternalVoucherController.getVouchersForBook',
       )
 
       res.json(validatedResponse)
@@ -577,7 +577,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.GenerateVoucherTokensResponse,
         response,
-        'InternalVoucherController.generateVoucherTokens'
+        'InternalVoucherController.generateVoucherTokens',
       )
 
       res.json(validatedResponse)
@@ -606,7 +606,7 @@ export class InternalVoucherController {
       const validatedResponse = validateResponse(
         voucherInternal.ValidateBookStateTransitionResponse,
         result,
-        'InternalVoucherController.validateBookStateTransition'
+        'InternalVoucherController.validateBookStateTransition',
       )
 
       res.json(validatedResponse)

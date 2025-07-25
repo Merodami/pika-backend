@@ -100,7 +100,7 @@ export class EmailController implements IEmailController {
       const validatedResponse = validateResponse(
         communicationPublic.SendEmailResponse,
         responseData,
-        'EmailController.sendEmail'
+        'EmailController.sendEmail',
       )
 
       response.json(validatedResponse)
@@ -149,7 +149,7 @@ export class EmailController implements IEmailController {
       const validatedResponse = validateResponse(
         communicationPublic.SendBulkEmailResponse,
         responseData,
-        'EmailController.sendBulkEmail'
+        'EmailController.sendBulkEmail',
       )
 
       response.status(201).json(validatedResponse)
@@ -204,7 +204,7 @@ export class EmailController implements IEmailController {
       const validatedResponse = validateResponse(
         communicationPublic.CommunicationLogListResponse,
         responseData,
-        'EmailController.getEmailHistory'
+        'EmailController.getEmailHistory',
       )
 
       response.json(validatedResponse)
@@ -235,7 +235,7 @@ export class EmailController implements IEmailController {
       const validatedResponse = validateResponse(
         communicationPublic.CommunicationLogResponse,
         responseData,
-        'EmailController.getEmailById'
+        'EmailController.getEmailById',
       )
 
       response.json(validatedResponse)

@@ -156,7 +156,12 @@ describe('PDF Service - Admin API Integration Tests', () => {
       const response = await adminClient
         .get('/admin/voucher-books')
         .set('Accept', 'application/json')
-        .expect(200)
+
+      if (response.status !== 200) {
+        console.log('Error response:', response.status, response.body)
+      }
+
+      expect(response.status).toBe(200)
 
       expect(response.body).toMatchObject({
         data: expect.any(Array),
@@ -243,9 +248,25 @@ describe('PDF Service - Admin API Integration Tests', () => {
         .expect(200)
 
       expect(response.body).toMatchObject({
-        totalBooks: expect.any(Number),
-        draftBooks: expect.any(Number),
-        publishedBooks: expect.any(Number),
+        total: expect.any(Number),
+        byStatus: {
+          draft: expect.any(Number),
+          readyForPrint: expect.any(Number),
+          published: expect.any(Number),
+          archived: expect.any(Number),
+        },
+        byType: {
+          monthly: expect.any(Number),
+          specialEdition: expect.any(Number),
+          regional: expect.any(Number),
+        },
+        distributions: {
+          total: expect.any(Number),
+          pending: expect.any(Number),
+          shipped: expect.any(Number),
+          delivered: expect.any(Number),
+        },
+        recentActivity: expect.any(Array),
       })
     })
 
