@@ -11,14 +11,14 @@ import { UserRole, UserStatus } from './enum.js'
 export function mapUserRole(role: any): UserRole {
   if (!role) return UserRole.CUSTOMER
 
-  const roleStr = String(role).toUpperCase()
+  const roleStr = String(role).toLowerCase()
 
   switch (roleStr) {
-    case 'ADMIN':
+    case 'admin':
       return UserRole.ADMIN
-    case 'CUSTOMER':
+    case 'customer':
       return UserRole.CUSTOMER
-    case 'BUSINESS':
+    case 'business':
       return UserRole.BUSINESS
     default:
       return UserRole.CUSTOMER
@@ -32,16 +32,16 @@ export function mapUserRole(role: any): UserRole {
 export function mapUserStatus(status: any): UserStatus {
   if (!status) return UserStatus.ACTIVE
 
-  const statusStr = String(status).toUpperCase()
+  const statusStr = String(status).toLowerCase()
 
   switch (statusStr) {
-    case 'ACTIVE':
+    case 'active':
       return UserStatus.ACTIVE
-    case 'SUSPENDED':
+    case 'suspended':
       return UserStatus.SUSPENDED
-    case 'BANNED':
+    case 'banned':
       return UserStatus.BANNED
-    case 'UNCONFIRMED':
+    case 'unconfirmed':
       return UserStatus.UNCONFIRMED
     default:
       return UserStatus.ACTIVE

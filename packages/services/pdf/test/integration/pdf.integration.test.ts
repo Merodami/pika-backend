@@ -123,7 +123,13 @@ describe('PDF Service - Public API Integration Tests', () => {
       const response = await customerClient
         .get('/voucher-books')
         .set('Accept', 'application/json')
-        .expect(200)
+      
+      if (response.status !== 200) {
+        console.log('Response status:', response.status)
+        console.log('Response body:', JSON.stringify(response.body, null, 2))
+      }
+      
+      expect(response.status).toBe(200)
 
       expect(response.body).toMatchObject({
         data: expect.any(Array),
@@ -162,6 +168,14 @@ describe('PDF Service - Public API Integration Tests', () => {
       const currentYear = new Date().getFullYear()
       const currentMonth = new Date().getMonth() + 1
       
+      // Get a test user for foreign key references
+      const testUser = await testDb.prisma.user.findFirst({
+        where: { email: { contains: '@e2etest.com' } },
+      })
+      if (!testUser) {
+        throw new Error('No test users found')
+      }
+
       // Create books with different dates
       await testDb.prisma.voucherBook.create({
         data: {
@@ -172,8 +186,8 @@ describe('PDF Service - Public API Integration Tests', () => {
           bookType: 'monthly',
           totalPages: 24,
           status: 'published',
-          createdBy: 'test-admin',
-          updatedBy: 'test-admin',
+          createdBy: testUser.id,
+          updatedBy: testUser.id,
         },
       })
 
@@ -186,8 +200,8 @@ describe('PDF Service - Public API Integration Tests', () => {
           bookType: 'monthly',
           totalPages: 24,
           status: 'published',
-          createdBy: 'test-admin',
-          updatedBy: 'test-admin',
+          createdBy: testUser.id,
+          updatedBy: testUser.id,
         },
       })
 
@@ -202,6 +216,14 @@ describe('PDF Service - Public API Integration Tests', () => {
     })
 
     it('should support filtering by book type', async () => {
+      // Get a test user for foreign key references
+      const testUser = await testDb.prisma.user.findFirst({
+        where: { email: { contains: '@e2etest.com' } },
+      })
+      if (!testUser) {
+        throw new Error('No test users found')
+      }
+
       await testDb.prisma.voucherBook.create({
         data: {
           id: uuid(),
@@ -211,8 +233,8 @@ describe('PDF Service - Public API Integration Tests', () => {
           bookType: 'monthly',
           totalPages: 24,
           status: 'published',
-          createdBy: 'test-admin',
-          updatedBy: 'test-admin',
+          createdBy: testUser.id,
+          updatedBy: testUser.id,
         },
       })
 
@@ -222,11 +244,11 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Special Book',
           year: new Date().getFullYear(),
           month: new Date().getMonth() + 1,
-          bookType: 'SPECIAL',
+          bookType: 'special_edition',
           totalPages: 32,
           status: 'published',
-          createdBy: 'test-admin',
-          updatedBy: 'test-admin',
+          createdBy: testUser.id,
+          updatedBy: testUser.id,
         },
       })
 

@@ -39,7 +39,7 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { UserRole } from '@prisma/client'
+import { UserRole } from '@pika/types'
 import { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -238,8 +238,8 @@ describe('User Service - Public API Integration Tests', () => {
 
       expect(customerResponse.status).toBe(200)
       expect(businessResponse.status).toBe(200)
-      expect(customerResponse.body.role).toBe('CUSTOMER')
-      expect(businessResponse.body.role).toBe('BUSINESS')
+      expect(customerResponse.body.role).toBe('customer')
+      expect(businessResponse.body.role).toBe('business')
     })
   })
 
@@ -335,7 +335,7 @@ describe('User Service - Public API Integration Tests', () => {
 
     it('should not allow updating role', async () => {
       const updateData = {
-        role: 'ADMIN', // Trying to elevate privileges
+        role: 'admin', // Trying to elevate privileges
       }
 
       const response = await customerClient

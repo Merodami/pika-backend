@@ -84,7 +84,22 @@ describe('PDF Service - Admin API Integration Tests', () => {
 
     // Create test users and authenticate them
     logger.debug('Setting up E2E authentication...')
-    await authHelper.createAllTestUsers(testDb.prisma)
+    try {
+      await authHelper.createAllTestUsers(testDb.prisma)
+    } catch (error) {
+      console.error('Error creating test users:', error)
+      throw error
+    }
+
+    // Check if users were created successfully
+    const userCount = await testDb.prisma.user.count()
+    logger.debug(`Total users in database after createAllTestUsers: ${userCount}`)
+    
+    const testUsers = await testDb.prisma.user.findMany({
+      where: { email: { contains: '@e2etest.com' } },
+      select: { id: true, email: true, role: true }
+    })
+    logger.debug(`Test users found: ${JSON.stringify(testUsers)}`)
 
     // Get authenticated clients for different user types
     adminClient = await authHelper.getAdminClient(testDb.prisma)
@@ -174,6 +189,14 @@ describe('PDF Service - Admin API Integration Tests', () => {
     })
 
     it('should support pagination with sorting', async () => {
+      // Get a test user for foreign key references
+      const testUser = await testDb.prisma.user.findFirst({
+        where: { email: { contains: '@e2etest.com' } },
+      })
+      if (!testUser) {
+        throw new Error('No test users found')
+      }
+
       // Create multiple books
       for (let i = 1; i <= 5; i++) {
         await testDb.prisma.voucherBook.create({
@@ -185,8 +208,8 @@ describe('PDF Service - Admin API Integration Tests', () => {
             bookType: 'monthly',
             totalPages: 24,
             status: 'draft',
-            createdBy: 'test-admin',
-            updatedBy: 'test-admin',
+            createdBy: testUser.id,
+            updatedBy: testUser.id,
           },
         })
       }

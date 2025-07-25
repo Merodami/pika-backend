@@ -11,6 +11,7 @@
  * - Handles password hashing and proper user data structure
  */
 
+import { UserRole, UserStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
@@ -54,7 +55,7 @@ export interface SeedUserOptions {
   generateUnverified?: boolean
   generateUnconfirmed?: boolean
   count?: number
-  role?: 'admin' | 'business' | 'customer'
+  role?: UserRole
   includePassword?: boolean
 }
 
@@ -74,7 +75,7 @@ export async function seedTestUsers(
     generateUnverified = false,
     generateUnconfirmed = false,
     count = 5,
-    role = 'customer',
+    role = UserRole.CUSTOMER,
     includePassword = true,
   } = options
 
@@ -85,9 +86,10 @@ export async function seedTestUsers(
 
   // Generate test users
   for (let i = 0; i < count; i++) {
-    const userRole = role === 'customer' && i === 0 ? 'admin' : role
+    const userRole =
+      role === UserRole.CUSTOMER && i === 0 ? UserRole.ADMIN : role
     const timestamp = Date.now()
-    
+
     const userData = {
       id: uuid(),
       email: `testuser${timestamp}-${i}@example.com`,
@@ -95,7 +97,12 @@ export async function seedTestUsers(
       lastName: `User${i}`,
       phoneNumber: `+123456789${i}${timestamp.toString().slice(-3)}`,
       role: userRole,
-      status: generateUnconfirmed && i % 3 === 0 ? 'unconfirmed' : generateInactive && i % 2 === 0 ? 'suspended' : 'active',
+      status:
+        generateUnconfirmed && i % 3 === 0
+          ? UserStatus.UNCONFIRMED
+          : generateInactive && i % 2 === 0
+            ? UserStatus.SUSPENDED
+            : UserStatus.ACTIVE,
       emailVerified: generateUnverified ? i % 2 === 0 : true,
       phoneVerified: generateUnverified ? i % 3 === 0 : false,
       ...(includePassword && {
@@ -103,24 +110,25 @@ export async function seedTestUsers(
       }),
       createdAt: new Date(),
       updatedAt: new Date(),
-      lastLoginAt: i % 2 === 0 ? new Date(Date.now() - 24 * 60 * 60 * 1000) : null,
+      lastLoginAt:
+        i % 2 === 0 ? new Date(Date.now() - 24 * 60 * 60 * 1000) : null,
     }
 
     const user = await prismaClient.user.create({
-      data: userData,
+      data: userData as any,
     })
 
     users.push(user)
 
     // Organize by role
     switch (userRole) {
-      case 'admin':
+      case UserRole.ADMIN:
         adminUsers.push(user)
         break
-      case 'business':
+      case UserRole.BUSINESS:
         businessUsers.push(user)
         break
-      case 'customer':
+      case UserRole.CUSTOMER:
         customerUsers.push(user)
         break
     }
@@ -139,8 +147,8 @@ export async function createTestUser(
     firstName?: string
     lastName?: string
     phoneNumber?: string
-    role?: 'admin' | 'business' | 'customer'
-    status?: 'active' | 'suspended' | 'banned' | 'unconfirmed'
+    role?: UserRole
+    status?: UserStatus
     emailVerified?: boolean
     phoneVerified?: boolean
     includePassword?: boolean
@@ -153,8 +161,8 @@ export async function createTestUser(
     firstName = 'Test',
     lastName = 'User',
     phoneNumber = `+1234567${timestamp.toString().slice(-3)}`,
-    role = 'customer',
-    status = 'active',
+    role = UserRole.CUSTOMER,
+    status = UserStatus.ACTIVE,
     emailVerified = true,
     phoneVerified = false,
     includePassword = true,
@@ -179,7 +187,7 @@ export async function createTestUser(
   }
 
   return await prismaClient.user.create({
-    data: userData,
+    data: userData as any,
   })
 }
 
@@ -191,7 +199,7 @@ export async function createTestAdminUser(
   options: Partial<Parameters<typeof createTestUser>[1]> = {},
 ) {
   return createTestUser(prismaClient, {
-    role: 'admin',
+    role: UserRole.ADMIN,
     emailVerified: true,
     ...options,
   })
@@ -205,7 +213,7 @@ export async function createTestBusinessUser(
   options: Partial<Parameters<typeof createTestUser>[1]> = {},
 ) {
   return createTestUser(prismaClient, {
-    role: 'business',
+    role: UserRole.BUSINESS,
     emailVerified: true,
     ...options,
   })
@@ -219,7 +227,7 @@ export async function createTestCustomerUser(
   options: Partial<Parameters<typeof createTestUser>[1]> = {},
 ) {
   return createTestUser(prismaClient, {
-    role: 'customer',
+    role: UserRole.CUSTOMER,
     ...options,
   })
 }
@@ -242,7 +250,7 @@ export async function cleanupUserTestData(
 
   // Preserve specific users
   const emailsToPreserve = []
-  
+
   if (options.preserveE2EUsers) {
     emailsToPreserve.push(
       'admin@e2etest.com',
@@ -253,7 +261,7 @@ export async function cleanupUserTestData(
 
   if (options.preserveSharedUsers) {
     emailsToPreserve.push(
-      ...Array.from({ length: 10 }, (_, i) => `shared-user-${i}@test.com`)
+      ...Array.from({ length: 10 }, (_, i) => `shared-user-${i}@test.com`),
     )
   }
 
@@ -276,14 +284,14 @@ export function generateUserTestData(
     count?: number
     includeInactive?: boolean
     includeUnverified?: boolean
-    role?: 'admin' | 'business' | 'customer'
+    role?: UserRole
   } = {},
 ) {
   const {
     count = 5,
     includeInactive = false,
     includeUnverified = false,
-    role = 'customer',
+    role = UserRole.CUSTOMER,
   } = options
   const users = []
 
@@ -295,14 +303,18 @@ export function generateUserTestData(
       firstName: `Test${i}`,
       lastName: `User${i}`,
       phoneNumber: `+123456789${i}`,
-      role: i === 0 && role === 'customer' ? 'admin' : role,
-      status: includeInactive && i % 2 === 0 ? 'suspended' : 'active',
+      role: i === 0 && role === UserRole.CUSTOMER ? UserRole.ADMIN : role,
+      status:
+        includeInactive && i % 2 === 0
+          ? UserStatus.SUSPENDED
+          : UserStatus.ACTIVE,
       emailVerified: includeUnverified ? i % 2 === 0 : true,
       phoneVerified: includeUnverified ? i % 3 === 0 : false,
       password: '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe',
       createdAt: new Date(),
       updatedAt: new Date(),
-      lastLoginAt: i % 2 === 0 ? new Date(Date.now() - 24 * 60 * 60 * 1000) : null,
+      lastLoginAt:
+        i % 2 === 0 ? new Date(Date.now() - 24 * 60 * 60 * 1000) : null,
       deletedAt: null,
     })
   }
@@ -337,7 +349,7 @@ export async function createSharedUserTestData(
       email: `admin-shared-${i}@test.com`,
       firstName: `Admin${i}`,
       lastName: 'Shared',
-      status: 'active',
+      status: UserStatus.ACTIVE,
       emailVerified: true,
       phoneVerified: i === 0,
     })
@@ -358,7 +370,7 @@ export async function createSharedUserTestData(
       email: `business-shared-${i}@test.com`,
       firstName: `Business${i}`,
       lastName: 'Shared',
-      status: i === 2 ? 'suspended' : 'active',
+      status: i === 2 ? UserStatus.SUSPENDED : UserStatus.ACTIVE,
       emailVerified: i !== 1,
       phoneVerified: i === 0,
     })
@@ -381,7 +393,12 @@ export async function createSharedUserTestData(
       email: `customer-shared-${i}@test.com`,
       firstName: `Customer${i}`,
       lastName: 'Shared',
-      status: i === 0 ? 'unconfirmed' : i === 4 ? 'suspended' : 'active',
+      status:
+        i === 0
+          ? UserStatus.UNCONFIRMED
+          : i === 4
+            ? UserStatus.SUSPENDED
+            : UserStatus.ACTIVE,
       emailVerified: i !== 2,
       phoneVerified: i === 1 || i === 3,
     })
@@ -442,7 +459,7 @@ export async function createAuthTestUsers(prismaClient: PrismaClient) {
     email: 'auth-inactive@test.com',
     firstName: 'Auth',
     lastName: 'Inactive',
-    status: 'suspended',
+    status: UserStatus.SUSPENDED,
   })
 
   return {
@@ -462,7 +479,7 @@ export async function createVerificationTestUsers(prismaClient: PrismaClient) {
     firstName: 'Unverified',
     lastName: 'Email',
     emailVerified: false,
-    status: 'UNCONFIRMED',
+    status: UserStatus.UNCONFIRMED,
   })
 
   const unverifiedPhoneUser = await createTestCustomerUser(prismaClient, {
@@ -479,7 +496,7 @@ export async function createVerificationTestUsers(prismaClient: PrismaClient) {
     lastName: 'Verified',
     emailVerified: true,
     phoneVerified: true,
-    status: 'ACTIVE',
+    status: UserStatus.ACTIVE,
   })
 
   return {

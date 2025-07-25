@@ -1,4 +1,4 @@
-import { pdfPublic, voucherCommon, voucherPublic } from '@pika/api'
+import { pdfCommon, pdfPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -31,7 +31,7 @@ export class VoucherBookController {
   })
   async getAllVoucherBooks(
     req: Request,
-    res: Response<voucherPublic.VoucherListResponse>,
+    res: Response<pdfPublic.VoucherBookListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -57,7 +57,7 @@ export class VoucherBookController {
         VoucherBookMapper.toPublicDTOFromDomain,
       )
       const validatedResponse =
-        voucherPublic.VoucherListResponse.parse(response)
+        pdfPublic.VoucherBookListResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {
@@ -75,8 +75,8 @@ export class VoucherBookController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getVoucherBookById(
-    req: Request<voucherCommon.VoucherIdParam>,
-    res: Response<voucherPublic.VoucherResponse>,
+    req: Request<pdfCommon.VoucherBookIdParam>,
+    res: Response<pdfPublic.VoucherBookResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -84,8 +84,13 @@ export class VoucherBookController {
 
       const voucherBook = await this.voucherBookService.getVoucherBookById(id)
 
+      // Public API should only return published books
+      if (voucherBook.status !== 'published') {
+        throw ErrorFactory.resourceNotFound('VoucherBook', id)
+      }
+
       const response = VoucherBookMapper.toPublicDTOFromDomain(voucherBook)
-      const validatedResponse = voucherPublic.VoucherResponse.parse(response)
+      const validatedResponse = pdfPublic.VoucherBookResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {
@@ -98,14 +103,19 @@ export class VoucherBookController {
    * Download PDF for published voucher book
    */
   async downloadPDF(
-    req: Request<voucherCommon.VoucherIdParam>,
-    res: Response<voucherPublic.VoucherResponse>,
+    req: Request<pdfCommon.VoucherBookIdParam>,
+    res: Response<pdfPublic.PdfDownloadResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id } = req.params
 
       const voucherBook = await this.voucherBookService.getVoucherBookById(id)
+
+      // Public API should only return published books
+      if (voucherBook.status !== 'published') {
+        throw ErrorFactory.resourceNotFound('VoucherBook', id)
+      }
 
       if (!voucherBook.pdfUrl) {
         return next(ErrorFactory.resourceNotFound('PDF', id))
@@ -119,7 +129,7 @@ export class VoucherBookController {
         generatedAt: voucherBook.pdfGeneratedAt || voucherBook.updatedAt,
       })
 
-      const validatedResponse = voucherPublic.VoucherResponse.parse(response)
+      const validatedResponse = pdfPublic.PdfDownloadResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

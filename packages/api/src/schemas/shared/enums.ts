@@ -11,14 +11,14 @@ import { openapi } from '../../common/utils/openapi.js'
 /**
  * User roles - matches database UserRole enum exactly
  */
-export const UserRole = z.enum(['ADMIN', 'CUSTOMER', 'BUSINESS'])
+export const UserRole = z.enum(['admin', 'customer', 'business'])
 
 export type UserRole = z.infer<typeof UserRole>
 
 /**
  * User status - matches database UserStatus enum exactly
  */
-export const UserStatus = z.enum(['ACTIVE', 'SUSPENDED', 'UNCONFIRMED'])
+export const UserStatus = z.enum(['active', 'suspended', 'unconfirmed'])
 
 export type UserStatus = z.infer<typeof UserStatus>
 
@@ -240,7 +240,7 @@ export type ContentType = z.infer<typeof ContentType>
  */
 export const UserRoleSchema = openapi(UserRole, {
   description: 'User role in the system',
-  example: UserRole.enum.CUSTOMER,
+  example: UserRole.enum.customer,
 })
 
 /**
@@ -248,5 +248,5 @@ export const UserRoleSchema = openapi(UserRole, {
  */
 export const UserStatusSchema = openapi(UserStatus, {
   description: 'User account status',
-  example: 'ACTIVE',
+  example: 'active',
 })

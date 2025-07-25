@@ -328,11 +328,14 @@ export class VoucherBookMapper {
       bookType: voucherBook.bookType as VoucherBookType,
       month: voucherBook.month,
       year: voucherBook.year,
+      status: 'published', // Public API only shows published books
       totalPages: voucherBook.totalPages,
       publishedAt: voucherBook.publishedAt?.toISOString() || null,
       coverImageUrl: voucherBook.coverImageUrl,
+      backImageUrl: voucherBook.backImageUrl,
       pdfUrl: voucherBook.status === 'published' ? voucherBook.pdfUrl : null, // Only show PDF if published
       createdAt: voucherBook.createdAt.toISOString(),
+      updatedAt: voucherBook.updatedAt.toISOString(),
     }
   }
 

@@ -7,7 +7,7 @@ import {
   JWT_SECRET,
 } from '@pika/environment'
 import { logger } from '@pika/shared'
-import { UserRole } from '@pika/types'
+import { UserRole, UserStatus } from '@pika/types'
 import type { Express } from 'express'
 import type jwt from 'jsonwebtoken'
 import { get } from 'lodash-es'
@@ -132,7 +132,7 @@ export class E2EAuthHelper {
           lastName: userData.lastName,
           phoneNumber: userData.phoneNumber,
           role: userData.role,
-          status: 'ACTIVE',
+          status: UserStatus.ACTIVE,
           emailVerified: true,
           phoneVerified: !!userData.phoneNumber,
           password: null, // No password needed for test users
@@ -215,7 +215,7 @@ export class E2EAuthHelper {
         userId: userId,
         email: userData.email,
         role: userData.role,
-        status: 'ACTIVE',
+        status: UserStatus.ACTIVE,
         type: 'access' as const,
         iat: Math.floor(Date.now() / 1000),
       }
@@ -225,7 +225,7 @@ export class E2EAuthHelper {
         userId: userTypeOrData.userId,
         email: userTypeOrData.email,
         role: userTypeOrData.role,
-        status: 'ACTIVE',
+        status: UserStatus.ACTIVE,
         type: 'access' as const,
         iat: Math.floor(Date.now() / 1000),
       }

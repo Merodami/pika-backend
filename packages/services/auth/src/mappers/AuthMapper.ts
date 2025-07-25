@@ -1,4 +1,4 @@
-import type { UserRole } from '@pika/types'
+import { UserRole, UserStatus } from '@pika/types'
 import type { User } from '@prisma/client'
 
 export interface UserDTO {
@@ -44,7 +44,7 @@ export class AuthMapper {
       phoneNumber: user.phoneNumber,
       role: user.role as UserRole,
       avatarUrl: user.avatarUrl,
-      isActive: user.status === 'ACTIVE',
+      isActive: user.status === UserStatus.ACTIVE,
       emailVerified: user.emailVerified,
       createdAt: user.createdAt?.toISOString() ?? new Date().toISOString(),
       updatedAt: user.updatedAt?.toISOString() ?? new Date().toISOString(),
@@ -112,7 +112,7 @@ export class AuthMapper {
       firstName: user.firstName,
       lastName: user.lastName,
       profilePicture: user.avatarUrl,
-      role: user.role === 'ADMIN' ? 'ADMIN' : 'USER',
+      role: user.role === 'admin' ? 'admin' : 'customer',
     }
   }
 }

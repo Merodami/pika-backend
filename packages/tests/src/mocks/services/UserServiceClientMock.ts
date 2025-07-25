@@ -1,5 +1,5 @@
 import { UserServiceClient } from '@pika/shared'
-import { UserRole } from '@pika/types'
+import { UserStatus } from '@pika/types'
 import type { User } from '@prisma/client'
 import { vi } from 'vitest'
 
@@ -15,8 +15,8 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
     password: '$2b$10$9Erjm5.hmByB.mD99PAvb.0fJF38j2JZSVNHHjE4vY.cRdHdOovzW', // Password123!
     firstName: 'Test',
     lastName: 'User',
-    role: UserRole.CUSTOMER,
-    status: 'ACTIVE',
+    role: 'customer',
+    status: UserStatus.ACTIVE,
     emailVerified: true,
     phoneNumber: '+1234567890',
     avatarUrl: null,
@@ -29,7 +29,7 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
     ...UserServiceClientMock.TEST_USER,
     id: 'admin-123',
     email: 'admin@example.com',
-    role: UserRole.ADMIN,
+    role: 'admin',
   }
 
   // Mock methods
@@ -57,7 +57,7 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
     // Auth data includes isActive as a function
     const authData = {
       ...user,
-      isActive: () => user.status === 'ACTIVE',
+      isActive: () => user.status === UserStatus.ACTIVE,
     }
 
     this.getUserAuthDataByEmail.mockResolvedValue(authData)
@@ -87,12 +87,15 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
   setupInactiveUser(user: Partial<User> = UserServiceClientMock.TEST_USER) {
     const inactiveUser = {
       ...user,
-      status: 'SUSPENDED',
+      status: UserStatus.SUSPENDED,
       isActive: () => false,
     }
 
     this.getUserAuthDataByEmail.mockResolvedValue(inactiveUser)
-    this.getUserByEmail.mockResolvedValue({ ...user, status: 'SUSPENDED' })
+    this.getUserByEmail.mockResolvedValue({
+      ...user,
+      status: UserStatus.SUSPENDED,
+    })
 
     return this
   }

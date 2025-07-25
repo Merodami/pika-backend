@@ -9,6 +9,7 @@ import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
+import { UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 import type { IUserService } from '../services/UserService.js'
@@ -34,6 +35,7 @@ export class UserController {
     this.getUserFriends = this.getUserFriends.bind(this)
     this.getMe = this.getMe.bind(this)
     this.updateMe = this.updateMe.bind(this)
+    this.uploadMyAvatar = this.uploadMyAvatar.bind(this)
   }
 
   /**
@@ -262,7 +264,7 @@ export class UserController {
       const authenticatedUserId = context.userId
 
       // Authorization check: Users can only upload their own avatars (unless admin)
-      if (authenticatedUserId !== userId && context.role !== 'ADMIN') {
+      if (authenticatedUserId !== userId && context.role !== UserRole.ADMIN) {
         throw ErrorFactory.forbidden('You can only upload your own avatar')
       }
 
@@ -442,6 +444,40 @@ export class UserController {
 
       const dto = UserMapper.toDTO(user)
       const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /users/me/avatar
+   * Upload avatar for current authenticated user
+   */
+  async uploadMyAvatar(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      // Get the uploaded file from Multer
+      const file = req.file
+
+      if (!file) {
+        throw ErrorFactory.badRequest('No file uploaded')
+      }
+
+      // Adapt the multer file to our FileUpload format
+      const adaptedFile = adaptMulterFile(file)
+
+      const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
+
+      const response = { avatarUrl: url }
+      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
 
       res.json(validatedResponse)
     } catch (error) {

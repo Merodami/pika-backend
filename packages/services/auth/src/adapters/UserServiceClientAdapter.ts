@@ -25,7 +25,7 @@ export class UserServiceClientAdapter implements UserService {
       emailVerified: user.emailVerified,
       createdAt: new Date(user.createdAt),
       lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
-      isActive: () => user.status === 'ACTIVE',
+      isActive: () => user.status === UserStatus.ACTIVE,
     }
   }
 
@@ -50,7 +50,7 @@ export class UserServiceClientAdapter implements UserService {
       emailVerified: user.emailVerified,
       createdAt: new Date(user.createdAt),
       lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
-      isActive: () => user.status === 'ACTIVE',
+      isActive: () => user.status === UserStatus.ACTIVE,
     }
   }
 
@@ -84,7 +84,7 @@ export class UserServiceClientAdapter implements UserService {
       emailVerified: user.emailVerified,
       createdAt: new Date(user.createdAt),
       lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
-      isActive: () => user.status === 'ACTIVE',
+      isActive: () => user.status === UserStatus.ACTIVE,
     }
   }
 

@@ -62,7 +62,7 @@ export async function seedTestVoucherBooks(
   let userId = createdBy
   if (!userId) {
     const testUser = await prisma.user.findFirst({
-      where: { email: { contains: '@test.com' } },
+      where: { email: { contains: '@e2etest.com' } },
     })
     if (!testUser) {
       throw new Error('No test users found and no createdBy provided.')
@@ -93,6 +93,10 @@ export async function seedTestVoucherBooks(
         status,
         createdBy: userId,
         updatedBy: userId,
+        // Add PDF URL for published books
+        pdfUrl: status === 'published' ? `https://example.com/test-voucher-book-${i + 1}.pdf` : null,
+        pdfGeneratedAt: status === 'published' ? new Date() : null,
+        publishedAt: status === 'published' ? new Date() : null,
       },
     })
 
@@ -193,7 +197,7 @@ export async function createTestVoucherBook(
   let userId = createdBy
   if (!userId) {
     const testUser = await prisma.user.findFirst({
-      where: { email: { contains: '@test.com' } },
+      where: { email: { contains: '@e2etest.com' } },
     })
     if (!testUser) {
       throw new Error('No test users found and no createdBy provided.')
@@ -212,6 +216,10 @@ export async function createTestVoucherBook(
       status,
       createdBy: userId,
       updatedBy: userId,
+      // Add PDF URL for published books
+      pdfUrl: status === 'published' ? 'https://example.com/test-voucher-book.pdf' : null,
+      pdfGeneratedAt: status === 'published' ? new Date() : null,
+      publishedAt: status === 'published' ? new Date() : null,
     },
   })
 }

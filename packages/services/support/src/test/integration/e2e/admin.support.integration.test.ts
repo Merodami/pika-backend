@@ -21,7 +21,7 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
-import { PrismaClient, UserRole, UserStatus } from '@prisma/client'
+import { PrismaClient, UserRole, UserStatus, ProblemStatus, ProblemPriority, ProblemType } from '@prisma/client'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
@@ -44,7 +44,7 @@ import {
   createE2EAuthHelper,
   E2EAuthHelper,
 } from '@pika/tests'
-import { ProblemPriority, ProblemStatus, ProblemType } from '@pika/types'
+// ProblemPriority, ProblemStatus, ProblemType are imported from @prisma/client above
 
 import { createSupportServer } from '../../../server.js'
 
@@ -74,9 +74,9 @@ async function seedTestData(
         userId: testUser.id,
         title: 'Technical Issue - Login Problem',
         description: 'Cannot login to the application',
-        status: ProblemStatus.OPEN,
-        priority: ProblemPriority.HIGH,
-        type: ProblemType.TECHNICAL,
+        status: ProblemStatus.open,
+        priority: ProblemPriority.high,
+        type: ProblemType.technical,
         ticketNumber: 'TKT-001',
         files: ['screenshot1.png', 'error-log.txt'],
       },
@@ -90,9 +90,9 @@ async function seedTestData(
         userId: testUser.id,
         title: 'Billing Question',
         description: 'Charged twice for the same session',
-        status: ProblemStatus.IN_PROGRESS,
-        priority: ProblemPriority.MEDIUM,
-        type: ProblemType.BILLING,
+        status: ProblemStatus.in_progress,
+        priority: ProblemPriority.medium,
+        type: ProblemType.billing,
         ticketNumber: 'TKT-002',
         assignedTo: adminUser.id,
       },
@@ -106,9 +106,9 @@ async function seedTestData(
         userId: testUser.id,
         title: 'Feature Request',
         description: 'Add dark mode to the app',
-        status: ProblemStatus.CLOSED,
-        priority: ProblemPriority.LOW,
-        type: ProblemType.FEATURE_REQUEST,
+        status: ProblemStatus.closed,
+        priority: ProblemPriority.low,
+        type: ProblemType.feature_request,
         ticketNumber: 'TKT-003',
         resolvedAt: new Date(),
       },
@@ -239,31 +239,31 @@ describe('Admin Support API Integration Tests', () => {
     it('should filter tickets by status', async () => {
       const response = await adminClient
         .get('/admin/support/tickets')
-        .query({ status: ProblemStatus.OPEN })
+        .query({ status: ProblemStatus.open })
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].status).toBe(ProblemStatus.OPEN)
+      expect(response.body.data[0].status).toBe(ProblemStatus.open)
     })
 
     it('should filter tickets by priority', async () => {
       const response = await adminClient
         .get('/admin/support/tickets')
-        .query({ priority: ProblemPriority.HIGH })
+        .query({ priority: ProblemPriority.high })
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].priority).toBe(ProblemPriority.HIGH)
+      expect(response.body.data[0].priority).toBe(ProblemPriority.high)
     })
 
     it('should filter tickets by type', async () => {
       const response = await adminClient
         .get('/admin/support/tickets')
-        .query({ type: ProblemType.BILLING })
+        .query({ type: ProblemType.billing })
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].type).toBe(ProblemType.BILLING)
+      expect(response.body.data[0].type).toBe(ProblemType.billing)
     })
 
     it('should filter tickets by assignedTo', async () => {
@@ -306,8 +306,8 @@ describe('Admin Support API Integration Tests', () => {
         .query({ sortBy: 'PRIORITY', sortOrder: 'DESC' })
         .expect(200)
 
-      expect(response.body.data[0].priority).toBe(ProblemPriority.HIGH)
-      expect(response.body.data[2].priority).toBe(ProblemPriority.LOW)
+      expect(response.body.data[0].priority).toBe(ProblemPriority.high)
+      expect(response.body.data[2].priority).toBe(ProblemPriority.low)
     })
 
     it('should require admin authentication', async () => {
@@ -361,19 +361,19 @@ describe('Admin Support API Integration Tests', () => {
       const response = await adminClient
         .put(`/admin/support/tickets/${ticket.id}/status`)
         .send({
-          status: ProblemStatus.IN_PROGRESS,
+          status: ProblemStatus.in_progress,
           note: 'Starting work on this issue',
         })
         .expect(200)
 
-      expect(response.body.status).toBe(ProblemStatus.IN_PROGRESS)
+      expect(response.body.status).toBe(ProblemStatus.in_progress)
 
       // Verify in database
       const updated = await testDb.prisma.problem.findUnique({
         where: { id: ticket.id },
       })
 
-      expect(updated?.status).toBe(ProblemStatus.IN_PROGRESS)
+      expect(updated?.status).toBe(ProblemStatus.in_progress)
     })
 
     it('should set resolvedAt when status is RESOLVED', async () => {

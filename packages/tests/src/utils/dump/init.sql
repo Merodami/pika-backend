@@ -732,9 +732,9 @@ CREATE TYPE identity."MfaMethod" AS ENUM (
 --
 
 CREATE TYPE identity."UserRole" AS ENUM (
-    'ADMIN',
-    'CUSTOMER',
-    'BUSINESS'
+    'admin',
+    'customer',
+    'business'
 );
 
 
@@ -743,10 +743,10 @@ CREATE TYPE identity."UserRole" AS ENUM (
 --
 
 CREATE TYPE identity."UserStatus" AS ENUM (
-    'ACTIVE',
-    'SUSPENDED',
-    'BANNED',
-    'UNCONFIRMED'
+    'active',
+    'suspended',
+    'banned',
+    'unconfirmed'
 );
 
 
@@ -1501,8 +1501,8 @@ CREATE TABLE users.users (
     phone_number character varying(50),
     phone_verified boolean DEFAULT false NOT NULL,
     avatar_url character varying(1000),
-    role identity."UserRole" DEFAULT 'CUSTOMER'::identity."UserRole" NOT NULL,
-    status identity."UserStatus" DEFAULT 'ACTIVE'::identity."UserStatus" NOT NULL,
+    role identity."UserRole" DEFAULT 'customer'::identity."UserRole" NOT NULL,
+    status identity."UserStatus" DEFAULT 'active'::identity."UserStatus" NOT NULL,
     last_login_at timestamp(6) with time zone,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,

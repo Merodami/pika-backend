@@ -50,10 +50,10 @@ CREATE EXTENSION IF NOT EXISTS "postgis_tiger_geocoder";
 CREATE EXTENSION IF NOT EXISTS "postgis_topology";
 
 -- CreateEnum
-CREATE TYPE "identity"."UserRole" AS ENUM ('ADMIN', 'CUSTOMER', 'BUSINESS');
+CREATE TYPE "identity"."UserRole" AS ENUM ('admin', 'customer', 'business');
 
 -- CreateEnum
-CREATE TYPE "identity"."UserStatus" AS ENUM ('ACTIVE', 'SUSPENDED', 'BANNED', 'UNCONFIRMED');
+CREATE TYPE "identity"."UserStatus" AS ENUM ('active', 'suspended', 'banned', 'unconfirmed');
 
 -- CreateEnum
 CREATE TYPE "audit"."AuditAction" AS ENUM ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'STATUS_CHANGE');
@@ -470,8 +470,8 @@ CREATE TABLE "users"."users" (
     "phone_number" VARCHAR(50),
     "phone_verified" BOOLEAN NOT NULL DEFAULT false,
     "avatar_url" VARCHAR(1000),
-    "role" "identity"."UserRole" NOT NULL DEFAULT 'CUSTOMER',
-    "status" "identity"."UserStatus" NOT NULL DEFAULT 'ACTIVE',
+    "role" "identity"."UserRole" NOT NULL DEFAULT 'customer',
+    "status" "identity"."UserStatus" NOT NULL DEFAULT 'active',
     "last_login_at" TIMESTAMPTZ(6),
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,

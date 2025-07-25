@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
-import { UserRole } from '../../shared/enums.js'
+import { UserRole, UserStatus } from '../../shared/enums.js'
 import {
   DateOnly,
   DateTime,
@@ -55,10 +55,12 @@ export const CurrentUserProfile = openapi(
     dateOfBirth: DateOnly.optional(),
     preferredLanguage: LanguageCode.optional(),
     role: UserRole,
+    status: UserStatus,
     emailVerified: z.boolean(),
     phoneVerified: z.boolean().optional(),
     createdAt: DateTime,
     updatedAt: DateTime,
+    lastLoginAt: DateTime.optional(),
   }),
   {
     description: "Authenticated user's complete profile",

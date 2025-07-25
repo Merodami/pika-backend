@@ -21,7 +21,7 @@ export function createVoucherBookRoutes(
   router.get(
     '/',
     requireAuth(),
-    requirePermissions('voucher:read'),
+    requirePermissions('vouchers:read'),
     validateQuery(pdfPublic.VoucherBookQueryParams),
     voucherBookController.getAllVoucherBooks,
   )
@@ -30,7 +30,7 @@ export function createVoucherBookRoutes(
   router.get(
     '/:id',
     requireAuth(),
-    requirePermissions('voucher:read'),
+    requirePermissions('vouchers:read'),
     validateParams(pdfCommon.VoucherBookIdParam),
     voucherBookController.getVoucherBookById,
   )
@@ -39,7 +39,7 @@ export function createVoucherBookRoutes(
   router.get(
     '/:id/download',
     requireAuth(),
-    requirePermissions('voucher:read'),
+    requirePermissions('vouchers:read'),
     validateParams(pdfCommon.VoucherBookIdParam),
     voucherBookController.downloadPDF,
   )
