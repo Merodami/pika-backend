@@ -1,13 +1,10 @@
-import type {
-  BatchFileUploadRequest,
-  FileHistoryIdParam,
-  FileIdParam,
-  FileUploadRequest,
-  GetFileHistoryQuery,
-  GetFileUrlQuery,
-} from '@pika/api/public'
+import { storageCommon, storagePublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { FileStorageLogMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
@@ -74,8 +71,8 @@ export class FileController implements IFileController {
    * Upload a single file
    */
   async uploadFile(
-    request: Request<{}, {}, FileUploadRequest>,
-    response: Response,
+    request: Request<{}, {}, storagePublic.FileUploadRequest>,
+    response: Response<storagePublic.FileUploadResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -115,7 +112,9 @@ export class FileController implements IFileController {
         userId,
       })
 
-      response.status(201).json(FileStorageLogMapper.toDTO(result))
+      const validatedResponse = storagePublic.FileUploadResponse.parse(result)
+
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -126,8 +125,8 @@ export class FileController implements IFileController {
    * Upload multiple files
    */
   async uploadBatch(
-    request: Request<{}, {}, BatchFileUploadRequest>,
-    response: Response,
+    request: Request<{}, {}, storagePublic.BatchFileUploadRequest>,
+    response: Response<storagePublic.BatchUploadResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -166,12 +165,9 @@ export class FileController implements IFileController {
         userId,
       })
 
-      response.status(201).json({
-        uploaded: result.uploaded,
-        failed: result.failed,
-        total: result.total,
-        logs: result.logs.map(FileStorageLogMapper.toDTO),
-      })
+      const validatedResponse = storagePublic.BatchUploadResponse.parse(result)
+
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -182,8 +178,8 @@ export class FileController implements IFileController {
    * Delete a file
    */
   async deleteFile(
-    request: Request<FileIdParam>,
-    response: Response,
+    request: Request<storageCommon.FileIdParam>,
+    response: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -206,13 +202,13 @@ export class FileController implements IFileController {
    * Get signed URL for file access
    */
   async getFileUrl(
-    request: Request<FileIdParam>,
-    response: Response,
+    request: Request<storageCommon.FileIdParam>,
+    response: Response<storagePublic.FileUrlResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { fileId } = request.params
-      const query = getValidatedQuery<GetFileUrlQuery>(request)
+      const query = getValidatedQuery<storagePublic.GetFileUrlQuery>(request)
       const { expiresIn } = query
       const context = RequestContext.getContext(request)
       const userId = context.userId
@@ -225,11 +221,15 @@ export class FileController implements IFileController {
         userId,
       )
 
-      response.json({
+      const validatedResponse = storagePublic.FileUrlResponse.parse({
         url,
-        expiresIn,
-        expiresAt: new Date(Date.now() + expiresIn * 1000),
+        fileId,
+        fileName: '',
+        mimeType: '',
+        expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString(),
       })
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -246,13 +246,14 @@ export class FileController implements IFileController {
   })
   async getFileHistory(
     request: Request,
-    response: Response,
+    res: Response<storagePublic.FileHistoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const context = RequestContext.getContext(request)
       const userId = context.userId
-      const query = getValidatedQuery<GetFileHistoryQuery>(request)
+      const query =
+        getValidatedQuery<storagePublic.GetFileHistoryQuery>(request)
 
       // Transform API query to service params
       const params: FileStorageLogSearchParams = {
@@ -270,10 +271,11 @@ export class FileController implements IFileController {
 
       const result = await this.storageService.getFileHistory(userId, params)
 
-      response.json({
-        data: result.data.map(FileStorageLogMapper.toDTO),
-        pagination: result.pagination,
-      })
+      const response = paginatedResponse(result, FileStorageLogMapper.toDTO)
+      const validatedResponse =
+        storagePublic.FileHistoryResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -284,8 +286,8 @@ export class FileController implements IFileController {
    * Get file details by ID
    */
   async getFileById(
-    request: Request<FileHistoryIdParam>,
-    response: Response,
+    request: Request<storageCommon.FileHistoryIdParam>,
+    res: Response<storagePublic.FileHistoryResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -297,7 +299,11 @@ export class FileController implements IFileController {
 
       const file = await this.storageService.getFileById(id, userId)
 
-      response.json(FileStorageLogMapper.toDTO(file))
+      const response = FileStorageLogMapper.toDTO(file)
+      const validatedResponse =
+        storagePublic.FileHistoryResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

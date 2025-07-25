@@ -1,8 +1,8 @@
 import {
-    CACHE_DISABLED,
-    REDIS_DEFAULT_TTL,
-    REDIS_HOST,
-    REDIS_PORT,
+  CACHE_DISABLED,
+  REDIS_DEFAULT_TTL,
+  REDIS_HOST,
+  REDIS_PORT,
 } from '@pika/environment'
 
 import { setCacheService } from '../../application/decorators/cache.js'

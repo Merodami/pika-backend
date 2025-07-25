@@ -1,13 +1,13 @@
 import { logger } from '@pika/shared'
 
 import type {
-    FileDeleteParams,
-    FileDeleteResult,
-    FileUploadParams,
-    FileUploadResult,
-    FileUrlParams,
-    FileUrlResult,
-    StorageProvider,
+  FileDeleteParams,
+  FileDeleteResult,
+  FileUploadParams,
+  FileUploadResult,
+  FileUrlParams,
+  FileUrlResult,
+  StorageProvider,
 } from './StorageProvider.js'
 
 /**

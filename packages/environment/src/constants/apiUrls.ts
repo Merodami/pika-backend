@@ -43,6 +43,30 @@ export const FILE_STORAGE_API_URL = getEnvVariable(
   'http://localhost:5510',
 )
 
+export const BUSINESS_API_URL = getEnvVariable(
+  'BUSINESS_API_URL',
+  String,
+  'http://localhost:5511',
+)
+
+export const CATEGORY_API_URL = getEnvVariable(
+  'CATEGORY_API_URL',
+  String,
+  'http://localhost:5512',
+)
+
+export const PDF_API_URL = getEnvVariable(
+  'PDF_API_URL',
+  String,
+  'http://localhost:5513',
+)
+
+export const VOUCHER_API_URL = getEnvVariable(
+  'VOUCHER_API_URL',
+  String,
+  'http://localhost:5514',
+)
+
 export const LOCAL_AUTH_URL = getEnvVariable(
   'LOCAL_AUTH_URL',
   String,

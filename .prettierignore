@@ -34,3 +34,6 @@ previous-architecture/**
 api-microservices-sdk/**
 ai/**
 pika/**
+pika-old/**
+frontend/flutter-app/**
+scripts/vercel-test.ts

@@ -1,29 +1,29 @@
 import { NODE_ENV, REDIS_DEFAULT_TTL } from '@pika/environment'
-import type {
-    BulkEmailDTO,
-    CommunicationLogDomain,
-    SendEmailDTO,
-} from '@pika/sdk'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
+import type {
+  BulkEmailDTO,
+  CommunicationLogDomain,
+  SendEmailDTO,
+} from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { EmailTemplateId, PaginatedResult } from '@pika/types'
 import Handlebars from 'handlebars'
 import { nth } from 'lodash-es'
 
 import type {
-    CommunicationLogSearchParams,
-    ICommunicationLogRepository,
+  CommunicationLogSearchParams,
+  ICommunicationLogRepository,
 } from '../repositories/CommunicationLogRepository.js'
 import { TemplateService } from '../templates/TemplateRegistry.js'
 import type {
-    BulkEmailParams,
-    EmailParams,
-    EmailProvider,
+  BulkEmailParams,
+  EmailParams,
+  EmailProvider,
 } from './providers/EmailProvider.js'
 import {
-    type ProviderConfig,
-    ProviderFactory,
+  type ProviderConfig,
+  ProviderFactory,
 } from './providers/ProviderFactory.js'
 
 export interface EmailConfig {
@@ -160,7 +160,13 @@ export class EmailService implements IEmailService {
           : undefined,
         provider: emailProvider.getProviderName(),
         externalId: result.messageId,
-        metadata: result.metadata ? JSON.stringify(result.metadata) : undefined,
+        metadata: {
+          ...(result.metadata || {}),
+          templateId: templateId,
+          templateParams: input.templateParams,
+          cc: input.cc,
+          bcc: input.bcc,
+        },
         sentAt: result.success ? new Date() : undefined,
         errorMessage: result.error,
         processingTimeMs: Date.now() - startTime,
@@ -200,6 +206,12 @@ export class EmailService implements IEmailService {
             ? JSON.stringify(input.templateParams)
             : undefined,
           provider: emailProvider?.getProviderName() || 'unknown',
+          metadata: {
+            templateId: input.templateId,
+            templateParams: input.templateParams,
+            cc: input.cc,
+            bcc: input.bcc,
+          },
           errorMessage:
             error instanceof Error ? error.message : 'Unknown error',
           processingTimeMs: Date.now() - startTime,
@@ -311,9 +323,7 @@ export class EmailService implements IEmailService {
           variables: variables ? JSON.stringify(variables) : undefined,
           provider: emailProvider.getProviderName(),
           externalId: recipientResult.messageId,
-          metadata: recipientResult.metadata
-            ? JSON.stringify(recipientResult.metadata)
-            : undefined,
+          metadata: recipientResult.metadata,
           sentAt: recipientResult.success ? new Date() : undefined,
           errorMessage: recipientResult.error,
           processingTimeMs: Date.now() - startTime,

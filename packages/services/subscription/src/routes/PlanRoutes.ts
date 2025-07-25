@@ -1,22 +1,19 @@
-import type { PrismaClient } from '@prisma/client'
+import { subscriptionPublic } from '@pika/api'
 import {
-  CreateSubscriptionPlanRequest,
-  PlanIdParam,
-  SubscriptionPlanQueryParams,
-  UpdateSubscriptionPlanRequest,
-} from '@pika/api/public'
-import {
-  requireAdmin,
+  requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { PaymentServiceClient } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
+import { Router } from 'express'
+
 import { PlanController } from '../controllers/PlanController.js'
 import { PlanRepository } from '../repositories/PlanRepository.js'
 import { PlanService } from '../services/PlanService.js'
-import { Router } from 'express'
 
 export function createPlanRouter(
   prisma: PrismaClient,
@@ -37,36 +34,48 @@ export function createPlanRouter(
   // Plan routes - public access for viewing
   router.get(
     '/',
-    validateQuery(SubscriptionPlanQueryParams),
+    validateQuery(subscriptionPublic.SubscriptionPlanQueryParams),
     controller.getPlans,
   )
 
-  router.get('/:id', validateParams(PlanIdParam), controller.getPlanById)
+  router.get(
+    '/:id',
+    validateParams(subscriptionPublic.PlanIdParam),
+    controller.getPlanById,
+  )
 
   // Admin routes
   router.post(
     '/',
-    requireAdmin(),
-    validateBody(CreateSubscriptionPlanRequest),
+    requireAuth(),
+    requirePermissions('admin:subscriptions'),
+    validateBody(subscriptionPublic.CreateSubscriptionPlanRequest),
     controller.createPlan,
   )
 
   router.put(
     '/:id',
-    requireAdmin(),
-    validateParams(PlanIdParam),
-    validateBody(UpdateSubscriptionPlanRequest),
+    requireAuth(),
+    requirePermissions('admin:subscriptions'),
+    validateParams(subscriptionPublic.PlanIdParam),
+    validateBody(subscriptionPublic.UpdateSubscriptionPlanRequest),
     controller.updatePlan,
   )
 
   router.delete(
     '/:id',
-    requireAdmin(),
-    validateParams(PlanIdParam),
+    requireAuth(),
+    requirePermissions('admin:subscriptions'),
+    validateParams(subscriptionPublic.PlanIdParam),
     controller.deletePlan,
   )
 
-  router.post('/sync', requireAdmin(), controller.syncPlans)
+  router.post(
+    '/sync',
+    requireAuth(),
+    requirePermissions('admin:subscriptions'),
+    controller.syncPlans,
+  )
 
   return router
 }

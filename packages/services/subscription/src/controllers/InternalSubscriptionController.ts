@@ -1,14 +1,13 @@
-import type {
-    CheckSubscriptionAccessRequest,
-    ProcessSubscriptionWebhookRequest,
-    SendSubscriptionNotificationRequest,
-    UpdateSubscriptionFromPaymentRequest,
-} from '@pika/api/internal'
+import { subscriptionInternal } from '@pika/api'
+import { paginatedResponse } from '@pika/http'
+import { SubscriptionMapper } from '@pika/sdk'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
+import type { NextFunction, Request, Response } from 'express'
+
 import type { ISubscriptionRepository } from '../repositories/SubscriptionRepository.js'
 import type { ISubscriptionService } from '../services/SubscriptionService.js'
-import type { NextFunction, Request, Response } from 'express'
+import { TEMPLATE_KEYS } from '../types/constants.js'
 
 /**
  * Handles internal subscription operations for service-to-service communication
@@ -33,7 +32,11 @@ export class InternalSubscriptionController {
    * Process subscription webhook events
    */
   async processWebhook(
-    request: Request<unknown, unknown, ProcessSubscriptionWebhookRequest>,
+    request: Request<
+      {},
+      {},
+      subscriptionInternal.ProcessSubscriptionWebhookRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -79,11 +82,18 @@ export class InternalSubscriptionController {
           break
       }
 
-      response.json({
+      const responseData = {
         processed,
         subscriptionId,
         action,
-      })
+      }
+
+      const validatedResponse =
+        subscriptionInternal.ProcessSubscriptionWebhookResponse.parse(
+          responseData,
+        )
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -94,7 +104,11 @@ export class InternalSubscriptionController {
    * Update subscription from payment service
    */
   async updateFromPayment(
-    request: Request<unknown, unknown, UpdateSubscriptionFromPaymentRequest>,
+    request: Request<
+      {},
+      {},
+      subscriptionInternal.UpdateSubscriptionFromPaymentRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -127,7 +141,13 @@ export class InternalSubscriptionController {
         metadata: data.metadata,
       })
 
-      response.json({ success: true })
+      const responseData = { success: true }
+      const validatedResponse =
+        subscriptionInternal.UpdateSubscriptionFromPaymentResponse.parse(
+          responseData,
+        )
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -138,7 +158,11 @@ export class InternalSubscriptionController {
    * Check subscription access for features
    */
   async checkAccess(
-    request: Request<unknown, unknown, CheckSubscriptionAccessRequest>,
+    request: Request<
+      {},
+      {},
+      subscriptionInternal.CheckSubscriptionAccessRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -149,17 +173,21 @@ export class InternalSubscriptionController {
         await this.subscriptionService.getUserActiveSubscription(userId)
 
       if (!subscription || !subscription.plan) {
-        response.json({
+        const responseData = {
           hasAccess: false,
           reason: 'No active subscription',
-        })
+        }
+        const validatedResponse =
+          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
+        response.json(validatedResponse)
 
         return
       }
 
       // Check if plan matches if required
       if (requiredPlan && subscription.plan.name !== requiredPlan) {
-        response.json({
+        const responseData = {
           hasAccess: false,
           subscription: {
             id: subscription.id,
@@ -169,14 +197,18 @@ export class InternalSubscriptionController {
             features: subscription.plan.features,
           },
           reason: `Required plan: ${requiredPlan}`,
-        })
+        }
+        const validatedResponse =
+          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
+        response.json(validatedResponse)
 
         return
       }
 
       // Check if feature is included
       if (feature && !subscription.plan.features.includes(feature)) {
-        response.json({
+        const responseData = {
           hasAccess: false,
           subscription: {
             id: subscription.id,
@@ -186,12 +218,16 @@ export class InternalSubscriptionController {
             features: subscription.plan.features,
           },
           reason: `Feature not included: ${feature}`,
-        })
+        }
+        const validatedResponse =
+          subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
+        response.json(validatedResponse)
 
         return
       }
 
-      response.json({
+      const responseData = {
         hasAccess: true,
         subscription: {
           id: subscription.id,
@@ -200,7 +236,11 @@ export class InternalSubscriptionController {
           status: subscription.status,
           features: subscription.plan.features,
         },
-      })
+      }
+      const validatedResponse =
+        subscriptionInternal.SubscriptionAccessResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -211,7 +251,7 @@ export class InternalSubscriptionController {
    * Get subscription by Stripe ID
    */
   async getByStripeId(
-    request: Request<{ stripeSubscriptionId: string }>,
+    request: Request<subscriptionInternal.StripeSubscriptionIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -230,7 +270,11 @@ export class InternalSubscriptionController {
         )
       }
 
-      response.json(subscription)
+      const responseData = SubscriptionMapper.toDTO(subscription)
+      const validatedResponse =
+        subscriptionInternal.InternalSubscriptionData.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -241,7 +285,7 @@ export class InternalSubscriptionController {
    * Get user's subscriptions
    */
   async getUserSubscriptions(
-    request: Request<{ userId: string }>,
+    request: Request<subscriptionInternal.SubscriptionByUserIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -251,23 +295,18 @@ export class InternalSubscriptionController {
 
       const subscriptions = await this.subscriptionRepository.findAll({
         userId,
-        status: includeInactive ? undefined : 'ACTIVE',
+        status: includeInactive ? undefined : 'active',
       })
 
-      response.json({
-        subscriptions: subscriptions.data.map((sub) => ({
-          id: sub.id,
-          userId: sub.userId,
-          planId: sub.planId,
-          planName: 'Unknown Plan', // planType field removed
-          status: sub.status,
-          currentPeriodStart: sub.currentPeriodStart,
-          currentPeriodEnd: sub.currentPeriodEnd,
-          cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
-          createdAt: sub.createdAt,
-        })),
-        total: subscriptions.pagination.total,
-      })
+      // Use standard pagination pattern like Business service
+      const responseData = paginatedResponse(
+        subscriptions,
+        SubscriptionMapper.toDTO,
+      )
+      const validatedResponse =
+        subscriptionInternal.SubscriptionListResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -278,7 +317,11 @@ export class InternalSubscriptionController {
    * Send subscription notification
    */
   async sendNotification(
-    request: Request<unknown, unknown, SendSubscriptionNotificationRequest>,
+    request: Request<
+      {},
+      {},
+      subscriptionInternal.SendSubscriptionNotificationRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -288,40 +331,46 @@ export class InternalSubscriptionController {
       logger.info('Sending subscription notification', { userId, type })
 
       // Map notification type to template key
-      let templateKey: string
+      let templateKey: (typeof TEMPLATE_KEYS)[keyof typeof TEMPLATE_KEYS]
 
       switch (type) {
-        case 'CREATED':
-          templateKey = 'SUBSCRIPTION_ACTIVATED'
+        case 'created':
+          templateKey = TEMPLATE_KEYS.SUBSCRIPTION_ACTIVATED
           break
-        case 'CANCELLED':
-          templateKey = 'subscription-cancelled'
+        case 'cancelled':
+          templateKey = TEMPLATE_KEYS.SUBSCRIPTION_CANCELLED
           break
-        case 'PAYMENT_FAILED':
-          templateKey = 'PAYMENT_FAILED'
+        case 'paymentFailed':
+          templateKey = TEMPLATE_KEYS.PAYMENT_FAILED
           break
-        case 'CREDITS_ALLOCATED':
-          templateKey = 'subscription-credits-allocated'
+        case 'creditsAllocated':
+          templateKey = TEMPLATE_KEYS.CREDITS_ALLOCATED
           break
-        case 'RENEWAL_REMINDER':
-          templateKey = 'SUBSCRIPTION_EXPIRING'
+        case 'renewalReminder':
+          templateKey = TEMPLATE_KEYS.RENEWAL_REMINDER
           break
-        case 'TRIAL_ENDING':
-          templateKey = 'subscription-trial-ending'
+        case 'trialEnding':
+          templateKey = TEMPLATE_KEYS.TRIAL_ENDING
           break
         default:
           throw ErrorFactory.badRequest(`Unknown notification type: ${type}`)
       }
 
       await this.communicationClient.sendTransactionalEmail({
-        userId: userId as any,
-        templateKey: templateKey as any,
-        variables: subscriptionData as any,
+        userId,
+        templateKey,
+        variables: subscriptionData,
         trackOpens: true,
         trackClicks: true,
       })
 
-      response.json({ success: true })
+      const responseData = { success: true }
+      const validatedResponse =
+        subscriptionInternal.SendSubscriptionNotificationResponse.parse(
+          responseData,
+        )
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

@@ -1,5 +1,5 @@
-import type { ICacheService } from '@pika/redis'
 import { createExpressServer, errorMiddleware } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
@@ -18,6 +18,9 @@ export async function createStorageServer(config: ServerConfig) {
     serviceName: 'storage-service',
     port: config.port,
     cacheService: config.cacheService,
+    authOptions: {
+      excludePaths: ['/health', '/metrics', '/internal/*'],
+    },
     healthChecks: [
       {
         name: 'postgres',

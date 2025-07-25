@@ -4,14 +4,13 @@ export * from './interfaces.js'
 
 // Re-export domain types from SDK
 export type {
-    BulkEmailDTO,
-    CommunicationLogDomain,
-    CreateNotificationDTO,
-    CreateTemplateDTO,
-    NotificationDomain,
-    SendEmailDTO,
-    TemplateDomain,
-    UpdateNotificationDTO,
-    UpdateTemplateDTO
+  BulkEmailDTO,
+  CommunicationLogDomain,
+  CreateNotificationDTO,
+  CreateTemplateDTO,
+  NotificationDomain,
+  SendEmailDTO,
+  TemplateDomain,
+  UpdateNotificationDTO,
+  UpdateTemplateDTO,
 } from '@pika/sdk'
-

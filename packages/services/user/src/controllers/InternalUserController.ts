@@ -1,16 +1,4 @@
-import type {
-    CreateEmailVerificationTokenRequest,
-    CreatePasswordResetTokenRequest,
-    CreateUserRequest,
-    EmailParam,
-    PhoneParam,
-    UpdateLastLoginRequest,
-    UpdatePasswordRequest,
-    UserIdParam,
-    ValidateEmailVerificationTokenRequest,
-    ValidatePasswordResetTokenRequest,
-    VerifyEmailRequest,
-} from '@pika/api/internal'
+import { userInternal } from '@pika/api'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -45,7 +33,7 @@ export class InternalUserController {
    * Get user authentication data by email
    */
   async getUserAuthDataByEmail(
-    req: Request<EmailParam>,
+    req: Request<userInternal.EmailParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -57,7 +45,9 @@ export class InternalUserController {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
 
-      res.json(user)
+      const validatedResponse = userInternal.UserAuthData.parse(user)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -68,7 +58,7 @@ export class InternalUserController {
    * Get user authentication data by ID
    */
   async getUserAuthData(
-    req: Request<UserIdParam>,
+    req: Request<userInternal.UserIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -80,7 +70,9 @@ export class InternalUserController {
         throw ErrorFactory.resourceNotFound('User', 'User not found')
       }
 
-      res.json(user)
+      const validatedResponse = userInternal.UserAuthData.parse(user)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -91,7 +83,7 @@ export class InternalUserController {
    * Create new user for registration
    */
   async createUser(
-    req: Request<{}, {}, CreateUserRequest>,
+    req: Request<{}, {}, userInternal.CreateUserRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -99,7 +91,9 @@ export class InternalUserController {
       const data = req.body
       const user = await this.internalUserService.createUser(data)
 
-      res.status(201).json(user)
+      const validatedResponse = userInternal.UserAuthData.parse(user)
+
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -110,7 +104,11 @@ export class InternalUserController {
    * Update user's last login timestamp
    */
   async updateLastLogin(
-    req: Request<UserIdParam, {}, UpdateLastLoginRequest>,
+    req: Request<
+      userInternal.UserIdParam,
+      {},
+      userInternal.UpdateLastLoginRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -129,7 +127,7 @@ export class InternalUserController {
    * Check if email already exists
    */
   async checkEmailExists(
-    req: Request<EmailParam>,
+    req: Request<userInternal.EmailParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -137,7 +135,10 @@ export class InternalUserController {
       const { email } = req.params
       const exists = await this.internalUserService.checkEmailExists(email)
 
-      res.json({ exists })
+      const response = { exists }
+      const validatedResponse = userInternal.ExistsResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -148,7 +149,7 @@ export class InternalUserController {
    * Check if phone number already exists
    */
   async checkPhoneExists(
-    req: Request<PhoneParam>,
+    req: Request<userInternal.PhoneParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -156,7 +157,10 @@ export class InternalUserController {
       const { phone } = req.params
       const exists = await this.internalUserService.checkPhoneExists(phone)
 
-      res.json({ exists })
+      const response = { exists }
+      const validatedResponse = userInternal.ExistsResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -167,7 +171,11 @@ export class InternalUserController {
    * Update user's hashed password
    */
   async updatePassword(
-    req: Request<UserIdParam, {}, UpdatePasswordRequest>,
+    req: Request<
+      userInternal.UserIdParam,
+      {},
+      userInternal.UpdatePasswordRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -187,7 +195,7 @@ export class InternalUserController {
    * Mark user's email as verified
    */
   async verifyEmail(
-    req: Request<UserIdParam, {}, VerifyEmailRequest>,
+    req: Request<userInternal.UserIdParam, {}, userInternal.VerifyEmailRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -195,7 +203,11 @@ export class InternalUserController {
       const { id } = req.params
 
       await this.internalUserService.verifyEmail(id)
-      res.status(200).json({ success: true })
+
+      const response = { success: true }
+      const validatedResponse = userInternal.SuccessResponse.parse(response)
+
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -206,7 +218,11 @@ export class InternalUserController {
    * Create password reset token for user
    */
   async createPasswordResetToken(
-    req: Request<UserIdParam, {}, CreatePasswordResetTokenRequest>,
+    req: Request<
+      userInternal.UserIdParam,
+      {},
+      userInternal.CreatePasswordResetTokenRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -214,7 +230,10 @@ export class InternalUserController {
       const { id } = req.params
       const token = await this.internalUserService.createPasswordResetToken(id)
 
-      res.json({ token })
+      const response = { token }
+      const validatedResponse = userInternal.TokenResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -225,7 +244,7 @@ export class InternalUserController {
    * Validate password reset token and return user ID
    */
   async validatePasswordResetToken(
-    req: Request<{}, {}, ValidatePasswordResetTokenRequest>,
+    req: Request<{}, {}, userInternal.ValidatePasswordResetTokenRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -234,7 +253,11 @@ export class InternalUserController {
       const userId =
         await this.internalUserService.validatePasswordResetToken(token)
 
-      res.json({ userId })
+      const response = { userId }
+      const validatedResponse =
+        userInternal.ValidateTokenResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -245,7 +268,7 @@ export class InternalUserController {
    * Invalidate password reset token after use
    */
   async invalidatePasswordResetToken(
-    req: Request<{}, {}, ValidatePasswordResetTokenRequest>,
+    req: Request<{}, {}, userInternal.ValidatePasswordResetTokenRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -253,7 +276,11 @@ export class InternalUserController {
       const { token } = req.body
 
       await this.internalUserService.invalidatePasswordResetToken(token)
-      res.status(200).json({ success: true })
+
+      const response = { success: true }
+      const validatedResponse = userInternal.SuccessResponse.parse(response)
+
+      res.status(200).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -264,7 +291,11 @@ export class InternalUserController {
    * Create email verification token for user
    */
   async createEmailVerificationToken(
-    req: Request<UserIdParam, {}, CreateEmailVerificationTokenRequest>,
+    req: Request<
+      userInternal.UserIdParam,
+      {},
+      userInternal.CreateEmailVerificationTokenRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -273,7 +304,10 @@ export class InternalUserController {
       const token =
         await this.internalUserService.createEmailVerificationToken(id)
 
-      res.json({ token })
+      const response = { token }
+      const validatedResponse = userInternal.TokenResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -284,7 +318,7 @@ export class InternalUserController {
    * Validate email verification token and return user ID
    */
   async validateEmailVerificationToken(
-    req: Request<{}, {}, ValidateEmailVerificationTokenRequest>,
+    req: Request<{}, {}, userInternal.ValidateEmailVerificationTokenRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -293,7 +327,11 @@ export class InternalUserController {
       const userId =
         await this.internalUserService.validateEmailVerificationToken(token)
 
-      res.json({ userId })
+      const response = { userId }
+      const validatedResponse =
+        userInternal.ValidateTokenResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

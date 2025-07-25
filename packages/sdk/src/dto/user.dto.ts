@@ -3,7 +3,6 @@
  * These represent the API contract for user-related endpoints
  */
 
-
 // ============= Address DTO =============
 
 export interface AddressDTO {
@@ -38,7 +37,6 @@ export interface PaymentMethodDTO {
   createdAt: string
   updatedAt: string
 }
-
 
 // ============= User DTO =============
 

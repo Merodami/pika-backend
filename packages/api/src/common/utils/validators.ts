@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
-import { fromZodError } from 'zod-validation-error'
 
 /**
  * Validation utilities for Express middleware
@@ -27,23 +26,34 @@ export function validate<T extends z.ZodTypeAny>(
       next()
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const validationError = fromZodError(error, {
-          prefix: 'Validation failed',
-          prefixSeparator: ': ',
-          includePath: true,
-          maxIssuesInMessage: 3,
-        })
+        // Create error message from issues
+        const baseErrorMessage = `Validation failed: ${error.issues
+          .slice(0, 3)
+          .map((issue) => {
+            const path =
+              issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
+            return `${path}${issue.message}`
+          })
+          .join('; ')}`
+
+        const additionalErrors =
+          error.issues.length > 3
+            ? `; and ${error.issues.length - 3} more errors`
+            : ''
+
+        const errorMessage = baseErrorMessage + additionalErrors
 
         res.status(400).json({
           error: {
             code: 'VALIDATION_ERROR',
-            message: validationError.message,
-            details: error.errors.map((err: any) => ({
+            message: errorMessage,
+            details: error.issues.map((err) => ({
               path: err.path,
               message: err.message,
               code: err.code,
-              ...(err.expected && { expected: err.expected }),
-              ...(err.received && { received: err.received }),
+              ...('expected' in err && { expected: err.expected }),
+              ...('received' in err && { received: err.received }),
             })),
             correlationId: (req as any).id || `req_${Date.now()}`,
             timestamp: new Date().toISOString(),
@@ -79,23 +89,27 @@ export function validateAll(validators: {
       ])
 
       if (validators.body) req.body = results[0]
-      if (validators.query) req.query = results[1]
-      if (validators.params) req.params = results[2]
+      if (validators.query) req.query = results[1] as Request['query']
+      if (validators.params) req.params = results[2] as Request['params']
 
       next()
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const validationError = fromZodError(error, {
-          prefix: 'Validation failed',
-          prefixSeparator: ': ',
-          includePath: true,
-        })
+        // Create error message from issues
+        const errorMessage = `Validation failed: ${error.issues
+          .map((issue) => {
+            const path =
+              issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
+            return `${path}${issue.message}`
+          })
+          .join('; ')}`
 
         res.status(400).json({
           error: {
             code: 'VALIDATION_ERROR',
-            message: validationError.message,
-            details: error.errors,
+            message: errorMessage,
+            details: error.issues,
             correlationId: (req as any).id || `req_${Date.now()}`,
             timestamp: new Date().toISOString(),
           },
@@ -142,13 +156,21 @@ export function validateAsync<T extends z.ZodTypeAny>(
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const validationError = fromZodError(error)
+        // Create error message from issues
+        const errorMessage = error.issues
+          .map((issue) => {
+            const path =
+              issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
+            return `${path}${issue.message}`
+          })
+          .join('; ')
 
         res.status(400).json({
           error: {
             code: 'VALIDATION_ERROR',
-            message: validationError.message,
-            details: error.errors,
+            message: errorMessage,
+            details: error.issues,
             correlationId: (req as any).id || `req_${Date.now()}`,
             timestamp: new Date().toISOString(),
           },
@@ -172,7 +194,7 @@ export function safeParse<T extends z.ZodTypeAny>(
   success: boolean
   data?: z.infer<T>
   error?: string
-  details?: z.ZodError['errors']
+  details?: z.ZodError['issues']
 } {
   const result = schema.safeParse(data)
 
@@ -182,15 +204,19 @@ export function safeParse<T extends z.ZodTypeAny>(
       data: result.data,
     }
   } else {
-    const validationError = fromZodError(result.error, {
-      prefix: null,
-      includePath: true,
-    })
+    // Create error message from issues
+    const errorMessage = result.error.issues
+      .map((issue) => {
+        const path = issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+
+        return `${path}${issue.message}`
+      })
+      .join('; ')
 
     return {
       success: false,
-      error: validationError.message,
-      details: result.error.errors,
+      error: errorMessage,
+      details: result.error.issues,
     }
   }
 }
@@ -280,22 +306,38 @@ export function formatZodError(error: z.ZodError): {
     code: string
   }>
 } {
-  const formatted = fromZodError(error, {
-    prefix: 'Validation failed',
-    prefixSeparator: ': ',
-    includePath: false,
-  })
+  // Create error message from issues
+  const message = `Validation failed: ${error.issues
+    .map((issue) => issue.message)
+    .join(', ')}`
 
   return {
     code: 'VALIDATION_ERROR',
-    message: formatted.message,
-    details: error.errors.map((err) => ({
-      path: err.path,
+    message,
+    details: error.issues.map((err) => ({
+      path: err.path as (string | number)[],
       message: err.message,
-      code: err.code,
+      code: err.code as string,
     })),
   }
 }
+
+// ============= Custom Transformations =============
+
+/**
+ * Creates an optional boolean schema that properly handles string query parameters
+ * - "true" -> true
+ * - "false" -> false
+ * - undefined -> undefined
+ * - boolean values pass through unchanged
+ */
+export const optionalBoolean = () =>
+  z.preprocess((val) => {
+    if (val === 'true') return true
+    if (val === 'false') return false
+
+    return val
+  }, z.boolean().optional())
 
 // ============= Schema Helpers =============
 

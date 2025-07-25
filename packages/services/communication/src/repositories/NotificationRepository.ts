@@ -6,11 +6,12 @@ import type { PaginatedResult } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface CreateNotificationInput {
-  userId: string
+  userId?: string // Optional for global notifications
   type?: string
   title: string
   description: string
   metadata?: any
+  isGlobal?: boolean
 }
 
 export interface UpdateNotificationInput {
@@ -39,7 +40,7 @@ export interface INotificationRepository {
   ): Promise<PaginatedResult<NotificationDomain>>
   update(id: string, data: UpdateNotificationInput): Promise<NotificationDomain>
   markAsRead(id: string): Promise<NotificationDomain>
-  markAllAsRead(userId: string): Promise<void>
+  markAllAsRead(userId: string): Promise<number>
   delete(id: string): Promise<void>
   findUserByEmail(email: string): Promise<{ id: string } | null>
 }
@@ -57,6 +58,10 @@ export class NotificationRepository implements INotificationRepository {
     })
 
     try {
+      if (!data.userId) {
+        throw ErrorFactory.badRequest('userId is required for notifications')
+      }
+
       const notification = await this.prisma.notification.create({
         data: {
           userId: data.userId,
@@ -187,9 +192,9 @@ export class NotificationRepository implements INotificationRepository {
     return this.update(id, { isRead: true })
   }
 
-  async markAllAsRead(userId: string): Promise<void> {
+  async markAllAsRead(userId: string): Promise<number> {
     try {
-      await this.prisma.notification.updateMany({
+      const result = await this.prisma.notification.updateMany({
         where: {
           userId: userId,
           isRead: false,
@@ -199,6 +204,8 @@ export class NotificationRepository implements INotificationRepository {
           updatedAt: new Date(),
         },
       })
+
+      return result.count
     } catch (error) {
       throw ErrorFactory.databaseError('markAllAsRead', 'Notification', error)
     }

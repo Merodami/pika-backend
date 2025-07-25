@@ -21,16 +21,18 @@ export {
   authMiddleware,
   requireAdmin,
   requireAuth,
-  requireUser,
+  requireBusinessRole,
   requireOwnership,
   requirePermissions,
   requireRoles,
+  requireUser,
 } from './infrastructure/express/middleware/auth.js'
 export { errorMiddleware } from './infrastructure/express/middleware/errorHandler.js'
 export {
   idempotencyMiddleware,
   idempotencyPlugin,
 } from './infrastructure/express/middleware/idempotency.js'
+export { createLanguageMiddleware } from './infrastructure/express/middleware/language.js'
 export {
   paginationHook,
   paginationMiddleware,
@@ -42,6 +44,7 @@ export {
   type ServiceAuthContext,
 } from './infrastructure/express/middleware/serviceAuth.js'
 export {
+  getRequestLanguage,
   getValidatedBody,
   getValidatedData,
   getValidatedParams,

@@ -89,10 +89,7 @@ export class CommunicationLogRepository implements ICommunicationLogRepository {
         },
       })
 
-      return CommunicationLogMapper.fromDocument({
-        ...communicationLog,
-        metadata: communicationLog.metadata as Record<string, unknown> | null,
-      })
+      return CommunicationLogMapper.fromDocument(communicationLog)
     } catch (error) {
       throw ErrorFactory.databaseError('create', 'CommunicationLog', error)
     }
@@ -225,10 +222,7 @@ export class CommunicationLogRepository implements ICommunicationLogRepository {
         },
       })
 
-      return CommunicationLogMapper.fromDocument({
-        ...communicationLog,
-        metadata: communicationLog.metadata as Record<string, unknown> | null,
-      })
+      return CommunicationLogMapper.fromDocument(communicationLog)
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {

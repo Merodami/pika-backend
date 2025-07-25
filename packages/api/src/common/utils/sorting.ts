@@ -19,7 +19,7 @@ export type SortFieldMapping<
  * This keeps the mapping logic close to the API schemas where it belongs
  */
 export function createSortFieldMapper<
-  TApiSchema extends z.ZodEnum<[string, ...string[]]>,
+  TApiSchema extends z.ZodEnum<any>,
   TDbFields extends string,
 >(
   apiSchema: TApiSchema,

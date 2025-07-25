@@ -2,11 +2,11 @@ import { SendEmailCommand, SESClient } from '@aws-sdk/client-ses'
 import { logger } from '@pika/shared'
 
 import type {
-    BulkEmailParams,
-    BulkEmailResult,
-    EmailParams,
-    EmailProvider,
-    EmailResult,
+  BulkEmailParams,
+  BulkEmailResult,
+  EmailParams,
+  EmailProvider,
+  EmailResult,
 } from './EmailProvider.js'
 
 export class AwsSesProvider implements EmailProvider {

@@ -12,37 +12,39 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./public": {
-      "types": "./dist/public/index.d.ts",
-      "import": "./dist/public/index.js"
-    },
-    "./admin": {
-      "types": "./dist/admin/index.d.ts",
-      "import": "./dist/admin/index.js"
-    },
-    "./internal": {
-      "types": "./dist/internal/index.d.ts",
-      "import": "./dist/internal/index.js"
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "import": "./dist/schemas/index.js"
     },
     "./common": {
       "types": "./dist/common/index.d.ts",
       "import": "./dist/common/index.js"
+    },
+    "./public": {
+      "types": "./dist/public.d.ts",
+      "import": "./dist/public.js"
+    },
+    "./admin": {
+      "types": "./dist/admin.d.ts",
+      "import": "./dist/admin.js"
+    },
+    "./internal": {
+      "types": "./dist/internal.d.ts",
+      "import": "./dist/internal.js"
     }
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@asteasolutions/zod-to-openapi": "^8.0.0",
     "@pika/environment": "workspace:^",
     "@pika/types": "workspace:^",
-    "@sinclair/typebox": "^0.34.37",
     "fs-extra": "^11.3.0",
     "lodash-es": "^4.17.21",
     "tsc-alias": "^1.8.16",
-    "zod": "^3.25.76",
-    "zod-validation-error": "^3.5.3"
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^12.0.0",
-    "@scalar/api-reference": "^1.32.7",
+    "@scalar/api-reference": "^1.32.10",
     "@types/fs-extra": "^11.0.4",
     "@types/lodash-es": "^4.17.12",
     "dotenv": "^17.2.0",

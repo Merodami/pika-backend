@@ -1,13 +1,4 @@
-import type {
-  AdminUserDetailResponse,
-  UpdateAdminProfileRequest,
-  UserIdParam,
-  UserVerificationStatusResponse,
-} from '@pika/api/admin'
-import type {
-  UnifiedResendVerificationRequest,
-  UnifiedVerificationRequest,
-} from '@pika/api/public'
+import { userAdmin, userPublic } from '@pika/api'
 import { adaptMulterFile, RequestContext } from '@pika/http'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -33,7 +24,7 @@ export class AdminUserController {
    * Admin verifies any user account (email, phone, or account confirmation)
    */
   async verifyUser(
-    req: Request<{}, {}, UnifiedVerificationRequest>,
+    req: Request<{}, {}, userPublic.UnifiedVerificationRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -50,7 +41,7 @@ export class AdminUserController {
       const user = await this.userService.verify(verificationRequest)
 
       // Map to admin detail response format
-      const adminResponse: AdminUserDetailResponse = {
+      const adminResponse: userAdmin.AdminUserDetailResponse = {
         id: user.id as any,
         email: user.email as any,
         firstName: user.firstName,
@@ -62,40 +53,21 @@ export class AdminUserController {
         avatarUrl: user.avatarUrl || undefined,
         status: user.status as any,
         role: user.role as any,
-        flags: [],
         emailVerified: user.emailVerified,
         phoneVerified: user.phoneVerified,
-        identityVerified: false,
-        verificationDate:
-          user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
         lastLoginAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        lastActivityAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        loginCount: 0,
-        ipAddress: undefined,
-        userAgent: undefined,
-        stats: {
-          totalBookings: 0,
-          totalSpent: 0,
-          creditsBalance: 0,
-          friendsCount: 0,
-          followersCount: 0,
-          reportsCount: 0,
-        },
-        adminNotes: undefined,
-        suspensionReason: undefined,
-        suspendedAt: undefined,
-        suspendedBy: undefined,
-        description: undefined,
-        specialties: undefined,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
 
-      res.json({
+      const response = {
         success: true,
         message: `User ${user.email} verified successfully`,
         user: adminResponse,
-      })
+      }
+      const validatedResponse = userAdmin.VerifyUserResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -106,7 +78,7 @@ export class AdminUserController {
    * Admin resends verification (email or phone) for any user
    */
   async resendVerification(
-    req: Request<{}, {}, UnifiedResendVerificationRequest>,
+    req: Request<{}, {}, userPublic.UnifiedResendVerificationRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -122,10 +94,14 @@ export class AdminUserController {
 
       await this.userService.resendVerification(resendRequest)
 
-      res.json({
+      const response = {
         success: true,
         message: `Verification resent successfully`,
-      })
+      }
+      const validatedResponse =
+        userAdmin.ResendVerificationResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -136,7 +112,7 @@ export class AdminUserController {
    * Admin uploads avatar for any user
    */
   async uploadUserAvatar(
-    req: Request<UserIdParam>,
+    req: Request<userAdmin.UserIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -155,7 +131,10 @@ export class AdminUserController {
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
-      res.json({ avatarUrl: url })
+      const response = { avatarUrl: url }
+      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -167,7 +146,7 @@ export class AdminUserController {
    */
   async getMyProfile(
     req: Request,
-    res: Response<AdminUserDetailResponse>,
+    res: Response<userAdmin.AdminUserDetailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -185,7 +164,7 @@ export class AdminUserController {
       }
 
       // Map user to admin detail response format
-      const adminResponse: AdminUserDetailResponse = {
+      const adminResponse: userAdmin.AdminUserDetailResponse = {
         id: user.id as any,
         email: user.email as any,
         firstName: user.firstName,
@@ -197,36 +176,17 @@ export class AdminUserController {
         avatarUrl: user.avatarUrl || undefined,
         status: user.status as any, // Status enum mapping
         role: user.role as any, // Role enum mapping
-        flags: [], // TODO: Implement flags if needed
         emailVerified: user.emailVerified,
         phoneVerified: user.phoneVerified,
-        identityVerified: false, // TODO: Implement identity verification
-        verificationDate:
-          user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
         lastLoginAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        lastActivityAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        loginCount: 0, // TODO: Implement login count tracking
-        ipAddress: undefined, // TODO: Track IP addresses if needed
-        userAgent: undefined, // TODO: Track user agents if needed
-        stats: {
-          totalBookings: 0, // TODO: Implement booking stats
-          totalSpent: 0, // TODO: Implement spending stats
-          creditsBalance: 0, // TODO: Implement credits
-          friendsCount: 0,
-          followersCount: 0, // TODO: Implement followers
-          reportsCount: 0, // TODO: Implement reports
-        },
-        adminNotes: undefined, // TODO: Implement admin notes
-        suspensionReason: undefined,
-        suspendedAt: undefined,
-        suspendedBy: undefined,
-        description: undefined,
-        specialties: undefined,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }
 
-      res.json(adminResponse)
+      const validatedResponse =
+        userAdmin.AdminUserDetailResponse.parse(adminResponse)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -237,8 +197,8 @@ export class AdminUserController {
    * Update current admin user profile
    */
   async updateMyProfile(
-    req: Request<{}, {}, UpdateAdminProfileRequest>,
-    res: Response<AdminUserDetailResponse>,
+    req: Request<{}, {}, userAdmin.UpdateAdminProfileRequest>,
+    res: Response<userAdmin.AdminUserDetailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -263,7 +223,7 @@ export class AdminUserController {
       // TODO: Handle adminNotes update separately if needed
 
       // Return updated profile in same format as getMyProfile
-      const adminResponse: AdminUserDetailResponse = {
+      const adminResponse: userAdmin.AdminUserDetailResponse = {
         id: updatedUser.id as any,
         email: updatedUser.email as any,
         firstName: updatedUser.firstName,
@@ -275,42 +235,19 @@ export class AdminUserController {
         avatarUrl: updatedUser.avatarUrl || undefined,
         status: updatedUser.status as any,
         role: updatedUser.role as any,
-        flags: [],
         emailVerified: updatedUser.emailVerified,
         phoneVerified: updatedUser.phoneVerified,
-        identityVerified: false,
-        verificationDate:
-          updatedUser.emailVerified && updatedUser.updatedAt
-            ? updatedUser.updatedAt
-            : undefined,
         lastLoginAt: updatedUser.lastLoginAt
           ? updatedUser.lastLoginAt
           : undefined,
-        lastActivityAt: updatedUser.lastLoginAt
-          ? updatedUser.lastLoginAt
-          : undefined,
-        loginCount: 0,
-        ipAddress: undefined,
-        userAgent: undefined,
-        stats: {
-          totalBookings: 0,
-          totalSpent: 0,
-          creditsBalance: 0,
-          friendsCount: 0, // friends feature removed
-          followersCount: 0,
-          reportsCount: 0,
-        },
-        adminNotes: updateData.adminNotes,
-        suspensionReason: undefined,
-        suspendedAt: undefined,
-        suspendedBy: undefined,
-        description: undefined, // professional feature removed
-        specialties: undefined, // professional feature removed
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt,
       }
 
-      res.json(adminResponse)
+      const validatedResponse =
+        userAdmin.AdminUserDetailResponse.parse(adminResponse)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -321,8 +258,8 @@ export class AdminUserController {
    * Get user verification status
    */
   async getUserVerificationStatus(
-    req: Request<UserIdParam>,
-    res: Response<UserVerificationStatusResponse>,
+    req: Request<userAdmin.UserIdParam>,
+    res: Response<userAdmin.UserVerificationStatusResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -334,16 +271,18 @@ export class AdminUserController {
         throw ErrorFactory.resourceNotFound('User', id)
       }
 
-      const verificationStatus: UserVerificationStatusResponse = {
+      const verificationStatus: userAdmin.UserVerificationStatusResponse = {
         userId: user.id as any,
         emailVerified: user.emailVerified,
         phoneVerified: user.phoneVerified,
-        identityVerified: false, // TODO: Implement identity verification
         verificationDate:
           user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
       }
 
-      res.json(verificationStatus)
+      const validatedResponse =
+        userAdmin.UserVerificationStatusResponse.parse(verificationStatus)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }

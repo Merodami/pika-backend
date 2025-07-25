@@ -1,7 +1,10 @@
 import {
   JWT_ACCESS_TOKEN_EXPIRY,
+  JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
+  JWT_PRIVATE_KEY,
+  JWT_PUBLIC_KEY,
   JWT_REFRESH_TOKEN_EXPIRY,
   JWT_SECRET,
 } from '@pika/environment'
@@ -51,6 +54,9 @@ export interface TokenValidationResult {
  */
 export class JwtTokenService {
   private readonly jwtSecret: string
+  private readonly jwtPrivateKey: string
+  private readonly jwtPublicKey: string
+  private readonly algorithm: jwt.Algorithm
   private readonly accessTokenExpiry: string
   private readonly refreshTokenExpiry: string
   private readonly issuer: string
@@ -72,16 +78,35 @@ export class JwtTokenService {
     issuer: string = 'pika-api',
     audience: string = 'pikapp',
     cacheService?: ICacheService,
+    algorithm: jwt.Algorithm = 'HS256',
+    jwtPrivateKey?: string,
+    jwtPublicKey?: string,
   ) {
     this.jwtSecret = jwtSecret
+    this.algorithm = algorithm
+    this.jwtPrivateKey = jwtPrivateKey || ''
+    this.jwtPublicKey = jwtPublicKey || ''
     this.accessTokenExpiry = accessTokenExpiry
     this.refreshTokenExpiry = refreshTokenExpiry
     this.issuer = issuer
     this.audience = audience
     this.cacheService = cacheService
 
-    if (!jwtSecret || jwtSecret.length < 32) {
-      throw new Error('JWT secret must be at least 32 characters long')
+    // Validate based on algorithm type
+    if (algorithm.startsWith('HS')) {
+      if (!jwtSecret || jwtSecret.length < 32) {
+        throw new Error(
+          'JWT secret must be at least 32 characters long for HMAC algorithms',
+        )
+      }
+    } else if (algorithm.startsWith('RS') || algorithm.startsWith('ES')) {
+      if (!jwtPrivateKey || !jwtPublicKey) {
+        throw new Error(
+          `Private and public keys are required for ${algorithm} algorithm`,
+        )
+      }
+    } else {
+      throw new Error(`Unsupported JWT algorithm: ${algorithm}`)
     }
   }
 
@@ -106,7 +131,11 @@ export class JwtTokenService {
         type: 'access',
       }
 
-      const accessToken = jwt.sign(accessPayload, this.jwtSecret, {
+      // Use appropriate key based on algorithm
+      const signingKey = this.getSigningKey()
+
+      const accessToken = jwt.sign(accessPayload, signingKey, {
+        algorithm: this.algorithm,
         expiresIn: this.accessTokenExpiry,
         issuer: this.issuer,
         audience: this.audience,
@@ -123,7 +152,8 @@ export class JwtTokenService {
         type: 'refresh',
       }
 
-      const refreshToken = jwt.sign(refreshPayload, this.jwtSecret, {
+      const refreshToken = jwt.sign(refreshPayload, signingKey, {
+        algorithm: this.algorithm,
         expiresIn: this.refreshTokenExpiry,
         issuer: this.issuer,
         audience: this.audience,
@@ -182,7 +212,10 @@ export class JwtTokenService {
       }
 
       // Verify token signature and claims
-      const decoded = jwt.verify(token, this.jwtSecret, {
+      const verifyKey = this.getVerifyKey()
+
+      const decoded = jwt.verify(token, verifyKey, {
+        algorithms: [this.algorithm],
         issuer: this.issuer,
         audience: this.audience,
       }) as TokenPayload
@@ -252,7 +285,10 @@ export class JwtTokenService {
         type: 'access',
       }
 
-      const accessToken = jwt.sign(accessPayload, this.jwtSecret, {
+      const signingKey = this.getSigningKey()
+
+      const accessToken = jwt.sign(accessPayload, signingKey, {
+        algorithm: this.algorithm,
         expiresIn: this.accessTokenExpiry,
         issuer: this.issuer,
         audience: this.audience,
@@ -289,7 +325,8 @@ export class JwtTokenService {
           const ttl = decoded.exp - Math.floor(Date.now() / 1000)
 
           if (ttl > 0) {
-            const blacklistKey = `${this.TOKEN_BLACKLIST_PREFIX}${this.hashToken(token)}`
+            const tokenId = this.getTokenId(token)
+            const blacklistKey = `${this.TOKEN_BLACKLIST_PREFIX}${tokenId}`
 
             await this.cacheService.set(blacklistKey, true, ttl)
           }
@@ -432,21 +469,25 @@ export class JwtTokenService {
     // Check Redis first if available
     if (this.cacheService) {
       try {
-        const blacklistKey = `${this.TOKEN_BLACKLIST_PREFIX}${this.hashToken(token)}`
+        const decoded = this.decodeTokenUnsafe(token)
 
-        // Check if the cache service has the exists method
-        if (typeof this.cacheService.exists === 'function') {
-          const isBlacklisted = await this.cacheService.exists(blacklistKey)
+        if (decoded?.jti) {
+          const blacklistKey = `${this.TOKEN_BLACKLIST_PREFIX}${decoded.jti}`
 
-          if (isBlacklisted) {
-            return true
-          }
-        } else {
-          // Fallback: try to get the value if exists method is not available
-          const value = await this.cacheService.get(blacklistKey)
+          // Check if the cache service has the exists method
+          if (typeof this.cacheService.exists === 'function') {
+            const isBlacklisted = await this.cacheService.exists(blacklistKey)
 
-          if (value !== null) {
-            return true
+            if (isBlacklisted) {
+              return true
+            }
+          } else {
+            // Fallback: try to get the value if exists method is not available
+            const value = await this.cacheService.get(blacklistKey)
+
+            if (value !== null) {
+              return true
+            }
           }
         }
       } catch (error) {
@@ -474,24 +515,38 @@ export class JwtTokenService {
   }
 
   /**
-   * Create a hash of the token for Redis storage (to avoid storing the actual token)
+   * Get the JWT ID from token for Redis storage
    */
-  private hashToken(token: string): string {
-    // Use the jti (JWT ID) from the token if available
+  private getTokenId(token: string): string {
     const decoded = this.decodeTokenUnsafe(token)
 
-    if (decoded?.jti) {
-      return decoded.jti
+    if (!decoded?.jti) {
+      throw new Error('Token missing JWT ID')
     }
 
-    // Use crypto hash for tokens without jti (more secure than simple hash)
-    const crypto = require('crypto')
+    return decoded.jti
+  }
 
-    return crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex')
-      .substring(0, 16)
+  /**
+   * Get the appropriate signing key based on algorithm
+   */
+  private getSigningKey(): string | Buffer {
+    if (this.algorithm.startsWith('HS')) {
+      return this.jwtSecret
+    }
+
+    return this.jwtPrivateKey
+  }
+
+  /**
+   * Get the appropriate verification key based on algorithm
+   */
+  private getVerifyKey(): string | Buffer {
+    if (this.algorithm.startsWith('HS')) {
+      return this.jwtSecret
+    }
+
+    return this.jwtPublicKey
   }
 
   /**
@@ -535,10 +590,6 @@ export class JwtTokenService {
 export function createJwtTokenService(
   cacheService?: ICacheService,
 ): JwtTokenService {
-  if (!JWT_SECRET) {
-    throw new Error('JWT_SECRET environment variable is required')
-  }
-
   return new JwtTokenService(
     JWT_SECRET,
     JWT_ACCESS_TOKEN_EXPIRY,
@@ -546,5 +597,8 @@ export function createJwtTokenService(
     JWT_ISSUER,
     JWT_AUDIENCE,
     cacheService,
+    JWT_ALGORITHM as jwt.Algorithm,
+    JWT_PRIVATE_KEY,
+    JWT_PUBLIC_KEY,
   )
 }

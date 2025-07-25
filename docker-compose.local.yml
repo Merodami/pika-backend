@@ -2,7 +2,7 @@ services:
   postgres:
     container_name: pika_postgres
     hostname: postgres
-    image: postgres:17.2
+    image: postgis/postgis:17-3.5
     platform: linux/amd64
     restart: unless-stopped
     env_file:
@@ -15,7 +15,7 @@ services:
       - '${PG_PORT}:5432'
     volumes:
       - ./.local/data/postgres:/var/lib/postgresql/data
-      - ./packages/database/src/infrastructure/persistence/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./packages/tests/src/utils/dump/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${PG_USER} -d ${PG_DATABASE}']
       interval: 10s

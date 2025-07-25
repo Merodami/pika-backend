@@ -6,7 +6,6 @@ import type { PrismaClient } from '@prisma/client'
 import { createEmailRouter } from './routes/EmailRoutes.js'
 import { createInternalCommunicationRouter } from './routes/InternalCommunicationRoutes.js'
 import { createNotificationRouter } from './routes/NotificationRoutes.js'
-import { createTemplateRouter } from './routes/TemplateRoutes.js'
 import type { EmailConfig } from './services/EmailService.js'
 
 export interface ServerConfig {
@@ -23,6 +22,8 @@ export async function createCommunicationServer(config: ServerConfig) {
     cacheService: config.cacheService,
     authOptions: {
       excludePaths: [
+        '/health',
+        '/metrics',
         '/internal/*', // Internal routes use service authentication
       ],
     },
@@ -86,10 +87,6 @@ export async function createCommunicationServer(config: ServerConfig) {
       config.emailConfig,
     ),
   )
-  app.use(
-    '/templates',
-    createTemplateRouter(config.prisma, config.cacheService),
-  )
 
   // Mount internal routes for service-to-service communication
   app.use(
@@ -100,6 +97,9 @@ export async function createCommunicationServer(config: ServerConfig) {
       config.emailConfig,
     ),
   )
+
+  // TODO: Add admin routes when needed (currently excluded per directive)
+  // app.use('/admin', createAdminRouter(config.prisma, config.cacheService, config.emailConfig))
 
   // TODO: Add more routes when implemented
   // app.use('/sms', createSmsRouter(config.prisma, config.cacheService))

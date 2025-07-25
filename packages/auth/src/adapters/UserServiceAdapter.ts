@@ -1,9 +1,9 @@
 import { UserRole, UserStatus } from '@pika/types'
 
 import {
-    CreateUserData,
-    UserService,
-    UserServiceUser,
+  CreateUserData,
+  UserService,
+  UserServiceUser,
 } from '../strategies/LocalAuthStrategy.js'
 
 /**

@@ -1,18 +1,16 @@
-import type { Prisma, PrismaClient, SubscriptionStatus } from '@prisma/client'
-import { Prisma as PrismaErrors } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
-import type {
-  SubscriptionDomain,
-  SubscriptionWithPlanDomain,
-} from '@pika/sdk'
+import type { SubscriptionDomain, SubscriptionWithPlanDomain } from '@pika/sdk'
 import { SubscriptionMapper, SubscriptionWithPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import type { Prisma, PrismaClient } from '@prisma/client'
+import type { SubscriptionStatus } from '@prisma/client'
+import { Prisma as PrismaErrors } from '@prisma/client'
 
 export interface CreateSubscriptionInput {
   userId: string
   planId: string
-  status: SubscriptionStatus
+  status: SubscriptionStatus | string // Allow both Prisma enum and string
   currentPeriodStart?: Date
   currentPeriodEnd?: Date
   trialEnd?: Date
@@ -23,7 +21,7 @@ export interface CreateSubscriptionInput {
 }
 
 export interface UpdateSubscriptionInput {
-  status?: SubscriptionStatus
+  status?: SubscriptionStatus | string // Allow both Prisma enum and string
   currentPeriodStart?: Date
   currentPeriodEnd?: Date
   trialEnd?: Date
@@ -36,7 +34,7 @@ export interface UpdateSubscriptionInput {
 export interface SubscriptionSearchParams {
   page?: number
   limit?: number
-  status?: SubscriptionStatus
+  status?: SubscriptionStatus | string // Allow both Prisma enum and string
   userId?: string
   planId?: string
   cancelAtPeriodEnd?: boolean
@@ -80,7 +78,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         data: {
           userId: data.userId,
           planId: data.planId,
-          status: data.status,
+          status: data.status as SubscriptionStatus,
           currentPeriodStart: data.currentPeriodStart,
           currentPeriodEnd: data.currentPeriodEnd,
           trialEnd: data.trialEnd,
@@ -150,7 +148,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['ACTIVE', 'TRIALING', 'PAST_DUE'],
+            in: ['active', 'trialing', 'pastDue'],
           },
         },
       })
@@ -169,7 +167,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['ACTIVE', 'TRIALING', 'PAST_DUE'],
+            in: ['active', 'trialing', 'pastDue'],
           },
         },
         include: {
@@ -226,7 +224,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     const where: Prisma.SubscriptionWhereInput = {
       ...(userId && { userId }),
       ...(planId && { planId }),
-      ...(status && { status }),
+      ...(status && { status: status as SubscriptionStatus }),
       ...(cancelAtPeriodEnd !== undefined && { cancelAtPeriodEnd }),
       ...(fromDate || toDate
         ? {
@@ -276,7 +274,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
     try {
       const subscriptions = await this.prisma.subscription.findMany({
         where: {
-          status: 'ACTIVE',
+          status: 'active',
           cancelAtPeriodEnd: false,
         },
       })
@@ -295,7 +293,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       const subscription = await this.prisma.subscription.update({
         where: { id },
         data: {
-          status: data.status,
+          status: data.status as SubscriptionStatus,
           currentPeriodStart: data.currentPeriodStart,
           currentPeriodEnd: data.currentPeriodEnd,
           trialEnd: data.trialEnd,

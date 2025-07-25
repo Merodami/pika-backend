@@ -1,30 +1,15 @@
-import type {
-  AdminCreateUserRequest,
-  AdminUpdateUserRequest,
-  AdminUserQueryParams,
-  BanUserRequest,
-  EmailParam,
-  SubTokenParam,
-  UnbanUserRequest,
-  UpdateUserStatusRequest,
-  UserIdParam,
-} from '@pika/api/admin'
-import type {
-  GetUserByIdQuery,
-  RegisterRequest,
-  UpdateProfileRequest,
-} from '@pika/api/public'
+import { authPublic, userAdmin, userCommon, userPublic } from '@pika/api'
+import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
-  PAGINATION_DEFAULT_LIMIT,
-  REDIS_DEFAULT_TTL,
-} from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
 import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
-import { get } from 'lodash-es'
 
 import type { IUserService } from '../services/UserService.js'
 
@@ -67,7 +52,7 @@ export class UserController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<AdminUserQueryParams>(req)
+      const query = getValidatedQuery<userAdmin.AdminUserQueryParams>(req)
 
       // Map API query to service params
       const params = {
@@ -77,12 +62,14 @@ export class UserController {
         search: query.search,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: this.mapSortField(query.sortBy),
+        sortBy: userCommon.adminUserSortFieldMapper.mapSortField(
+          query.sortBy,
+          'createdAt',
+        ),
         sortOrder: query.sortOrder?.toLowerCase() as 'asc' | 'desc' | undefined,
         // Additional admin search params
         emailVerified: query.emailVerified,
         phoneVerified: query.phoneVerified,
-        identityVerified: query.identityVerified,
         registeredFrom: query.registeredFrom,
         registeredTo: query.registeredTo,
         lastLoginFrom: query.lastLoginFrom,
@@ -90,16 +77,15 @@ export class UserController {
         minSpent: query.minSpent,
         maxSpent: query.maxSpent,
         hasReports: query.hasReports,
-        flags: query.flags,
       }
 
       const result = await this.userService.getAllUsers(params)
 
-      // Convert to DTOs
-      res.json({
-        data: result.data.map((user: any) => UserMapper.toDTO(user)),
-        pagination: result.pagination,
-      })
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, UserMapper.toDTO)
+      const validatedResponse = userAdmin.AdminUserListResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       console.log('[USER_CONTROLLER] Caught error in getAllUsers:', {
         name: (error as any).name,
@@ -121,22 +107,23 @@ export class UserController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getUserById(
-    req: Request<UserIdParam>,
+    req: Request<userAdmin.UserIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: userId } = req.params
-      const query = getValidatedQuery<GetUserByIdQuery>(req)
-      const { includeProfessional, includeParq, includeFriends } = query
+      const query = getValidatedQuery<userPublic.GetUserByIdQuery>(req)
+      const { includeFriends } = query
 
       const user = await this.userService.getUserById(userId, {
-        includeProfessional: includeProfessional,
-        includeParq: includeParq,
         includeFriends: includeFriends,
       })
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -152,7 +139,7 @@ export class UserController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getUserByEmail(
-    req: Request<EmailParam>,
+    req: Request<userAdmin.EmailParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -161,7 +148,10 @@ export class UserController {
 
       const user = await this.userService.getUserByEmail(email)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -172,7 +162,7 @@ export class UserController {
    * Create new user
    */
   async createUser(
-    req: Request<{}, {}, RegisterRequest>,
+    req: Request<{}, {}, authPublic.RegisterRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -182,8 +172,9 @@ export class UserController {
       const user = await this.userService.createUser(data)
 
       const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
 
-      res.status(201).json(dto)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -194,7 +185,7 @@ export class UserController {
    * Create new user via admin interface
    */
   async createAdminUser(
-    req: Request<{}, {}, AdminCreateUserRequest>,
+    req: Request<{}, {}, userAdmin.AdminCreateUserRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -204,8 +195,9 @@ export class UserController {
       const user = await this.userService.createAdminUser(data)
 
       const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
 
-      res.status(201).json(dto)
+      res.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -216,7 +208,7 @@ export class UserController {
    * Update user information
    */
   async updateUser(
-    req: Request<UserIdParam, {}, AdminUpdateUserRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminUpdateUserRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -226,7 +218,10 @@ export class UserController {
 
       const user = await this.userService.updateUser(userId, data)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -237,7 +232,7 @@ export class UserController {
    * Delete user account
    */
   async deleteUser(
-    req: Request<UserIdParam>,
+    req: Request<userAdmin.UserIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -257,7 +252,7 @@ export class UserController {
    * Upload user avatar image
    */
   async uploadAvatar(
-    req: Request<UserIdParam>,
+    req: Request<userAdmin.UserIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -283,7 +278,10 @@ export class UserController {
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
-      res.json({ avatarUrl: url })
+      const response = { avatarUrl: url }
+      const validatedResponse = userPublic.UploadAvatarResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -299,7 +297,7 @@ export class UserController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getUserBySubToken(
-    req: Request<SubTokenParam>,
+    req: Request<userAdmin.SubTokenParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -307,7 +305,10 @@ export class UserController {
       const { subToken } = req.params
       const user = await this.userService.getUserBySubToken(subToken)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -318,7 +319,7 @@ export class UserController {
    * Update user account status
    */
   async updateUserStatus(
-    req: Request<UserIdParam, {}, UpdateUserStatusRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.UpdateUserStatusRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -327,7 +328,10 @@ export class UserController {
       const { status } = req.body
       const user = await this.userService.updateUserStatus(userId, status)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -338,7 +342,7 @@ export class UserController {
    * Ban user account
    */
   async banUser(
-    req: Request<UserIdParam, {}, BanUserRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.BanUserRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -347,7 +351,10 @@ export class UserController {
       // TODO: Update service method to accept reason, duration, and notifyUser from req.body
       const user = await this.userService.banUser(userId)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -358,7 +365,7 @@ export class UserController {
    * Unban user account
    */
   async unbanUser(
-    req: Request<UserIdParam, {}, UnbanUserRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.UnbanUserRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -367,7 +374,10 @@ export class UserController {
       // TODO: Update service method to accept reason and notifyUser from req.body
       const user = await this.userService.unbanUser(userId)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -378,7 +388,7 @@ export class UserController {
    * Get user's friends list
    */
   async getUserFriends(
-    req: Request<UserIdParam>,
+    req: Request<userAdmin.UserIdParam>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -386,7 +396,10 @@ export class UserController {
       const { id: userId } = req.params
       const friends = await this.userService.getUserFriends(userId)
 
-      res.json({ guests: friends })
+      const response = { guests: friends }
+      const validatedResponse = userPublic.UserFriendsResponse.parse(response)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -403,7 +416,10 @@ export class UserController {
 
       const user = await this.userService.getUserById(userId)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -414,7 +430,7 @@ export class UserController {
    * Update current authenticated user profile
    */
   async updateMe(
-    req: Request<{}, {}, UpdateProfileRequest>,
+    req: Request<{}, {}, userPublic.UpdateProfileRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -424,25 +440,12 @@ export class UserController {
 
       const user = await this.userService.updateUser(userId, req.body)
 
-      res.json(UserMapper.toDTO(user))
+      const dto = UserMapper.toDTO(user)
+      const validatedResponse = userPublic.UserProfileResponse.parse(dto)
+
+      res.json(validatedResponse)
     } catch (error) {
       next(error)
     }
-  }
-
-  /**
-   * Map API field names to database field names
-   */
-  private mapSortField(apiField?: string): string | undefined {
-    if (!apiField) return undefined
-
-    const fieldMap: Record<string, string> = {
-      EMAIL: 'email',
-      CREATED_AT: 'createdAt',
-      LAST_LOGIN_AT: 'lastLoginAt',
-      TOTAL_SPENT: 'totalSpent',
-    }
-
-    return get(fieldMap, apiField, apiField.toLowerCase())
   }
 }

@@ -1,4 +1,3 @@
-import type { PrismaClient } from '@prisma/client'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
@@ -17,12 +16,14 @@ import {
   logger,
 } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+
 import type { IPlanRepository } from '../repositories/PlanRepository.js'
 import type {
   ISubscriptionRepository,
   SubscriptionSearchParams,
 } from '../repositories/SubscriptionRepository.js'
-import { CACHE_TTL_MULTIPLIERS } from '../types/constants.js'
+import { CACHE_TTL_MULTIPLIERS, TEMPLATE_KEYS } from '../types/constants.js'
 
 export interface ISubscriptionService {
   createSubscription(
@@ -45,6 +46,7 @@ export interface ISubscriptionService {
     cancelAtPeriodEnd: boolean,
   ): Promise<SubscriptionDomain>
   reactivateSubscription(id: string): Promise<SubscriptionDomain>
+  deleteSubscription(id: string): Promise<void>
   // Webhook-driven subscription creation
   createSubscriptionFromWebhook(
     data: CreateSubscriptionFromWebhookDTO,
@@ -98,7 +100,7 @@ export class SubscriptionService implements ISubscriptionService {
       const subscription = await this.subscriptionRepository.create({
         userId,
         planId: plan.id,
-        status: 'UNPAID' as any, // Will be updated by webhook
+        status: 'unpaid', // Will be updated by webhook
         stripeCustomerId: data.stripeCustomerId,
         trialEnd: data.trialEnd,
         metadata: data.metadata,
@@ -110,7 +112,7 @@ export class SubscriptionService implements ISubscriptionService {
       await this.clearUserSubscriptionCache(userId)
 
       // Send welcome email notification
-      if (this.communicationClient && subscription.status === 'ACTIVE') {
+      if (this.communicationClient && subscription.status === 'active') {
         await this.sendSubscriptionCreatedEmail(userId, subscription, plan)
       }
 
@@ -186,7 +188,7 @@ export class SubscriptionService implements ISubscriptionService {
 
     const updatedSubscription = await this.subscriptionRepository.update(
       id,
-      data as any,
+      data,
     )
 
     // Clear subscription cache
@@ -203,7 +205,7 @@ export class SubscriptionService implements ISubscriptionService {
 
     const subscription = await this.getSubscriptionById(id)
 
-    if (subscription.status === 'CANCELED') {
+    if (subscription.status === 'canceled') {
       throw ErrorFactory.businessRuleViolation(
         'Subscription already cancelled',
         'This subscription is already cancelled',
@@ -214,7 +216,7 @@ export class SubscriptionService implements ISubscriptionService {
     const updatedSubscription = await this.subscriptionRepository.update(id, {
       cancelAtPeriodEnd,
       cancelledAt: cancelAtPeriodEnd ? undefined : new Date(),
-      status: cancelAtPeriodEnd ? subscription.status : 'CANCELLED' as any,
+      status: cancelAtPeriodEnd ? subscription.status : 'canceled',
     })
 
     // Clear subscription cache
@@ -256,6 +258,20 @@ export class SubscriptionService implements ISubscriptionService {
     return updatedSubscription
   }
 
+  async deleteSubscription(id: string): Promise<void> {
+    logger.info('Deleting subscription', { id })
+
+    const subscription = await this.getSubscriptionById(id)
+
+    // Soft delete the subscription
+    await this.subscriptionRepository.delete(id)
+
+    // Clear subscription cache
+    await this.clearSubscriptionCache(id, subscription.userId)
+
+    logger.info('Successfully deleted subscription', { id })
+  }
+
   async createSubscriptionFromWebhook(
     data: CreateSubscriptionFromWebhookDTO,
   ): Promise<SubscriptionDomain> {
@@ -277,7 +293,7 @@ export class SubscriptionService implements ISubscriptionService {
       const subscription = await this.subscriptionRepository.create({
         userId: data.userId,
         planId: data.planId,
-        status: data.status as any,
+        status: data.status,
         currentPeriodStart: data.currentPeriodStart,
         currentPeriodEnd: data.currentPeriodEnd,
         trialEnd: data.trialEnd,
@@ -297,7 +313,7 @@ export class SubscriptionService implements ISubscriptionService {
       })
 
       // Send welcome email notification
-      if (this.communicationClient && subscription.status === 'ACTIVE') {
+      if (this.communicationClient && subscription.status === 'active') {
         await this.sendSubscriptionCreatedEmail(data.userId, subscription, plan)
       }
 
@@ -312,9 +328,7 @@ export class SubscriptionService implements ISubscriptionService {
   }
 
   // Credit processing method removed - no credit tables in database
-  async processSubscriptionCredits(
-    subscriptionId: string,
-  ): Promise<never> {
+  async processSubscriptionCredits(subscriptionId: string): Promise<never> {
     logger.info('Processing subscription credits', { subscriptionId })
 
     const subscription =
@@ -344,7 +358,7 @@ export class SubscriptionService implements ISubscriptionService {
     const activeSubscriptions =
       await this.subscriptionRepository.findAllActive()
 
-    let processedCount = 0
+    const processedCount = 0
 
     for (const subscription of activeSubscriptions) {
       try {
@@ -394,13 +408,12 @@ export class SubscriptionService implements ISubscriptionService {
 
     try {
       await this.communicationClient.sendTransactionalEmail({
-        userId: userId as any,
-        templateKey: 'SUBSCRIPTION_ACTIVATED',
+        userId: userId as any, // Communication client expects branded UserId
+        templateKey: TEMPLATE_KEYS.SUBSCRIPTION_ACTIVATED,
         variables: {
           planName: plan.name,
           price: `$${(plan.price / 100).toFixed(2)}`,
           interval: plan.interval,
-          creditsAmount: plan.creditsAmount.toString(),
           features: plan.features.join(', '),
           nextBillingDate: subscription.currentPeriodEnd
             ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
@@ -433,8 +446,8 @@ export class SubscriptionService implements ISubscriptionService {
 
     try {
       await this.communicationClient.sendTransactionalEmail({
-        userId: userId as any,
-        templateKey: 'SUBSCRIPTION_EXPIRED',
+        userId: userId as any, // Communication client expects branded UserId
+        templateKey: TEMPLATE_KEYS.SUBSCRIPTION_CANCELLED,
         variables: {
           planType: 'Standard', // planType field removed
           cancelAtPeriodEnd: cancelAtPeriodEnd.toString(),

@@ -1,10 +1,12 @@
-import type { PrismaClient } from '@prisma/client'
-import { Prisma } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
 import type { SubscriptionPlanDomain } from '@pika/sdk'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { BillingIntervalType, PaginatedResult } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
+
+import type { PlanSearchParams } from '../types/search.js'
 
 export interface CreatePlanInput {
   name: string
@@ -13,7 +15,6 @@ export interface CreatePlanInput {
   currency?: string
   interval: BillingIntervalType
   intervalCount?: number
-  creditsAmount: number
   trialPeriodDays?: number
   features: string[]
   isActive?: boolean
@@ -26,18 +27,9 @@ export interface UpdatePlanInput {
   name?: string
   description?: string
   price?: number
-  creditsAmount?: number
   features?: string[]
   isActive?: boolean
   metadata?: any
-}
-
-export interface PlanSearchParams {
-  page?: number
-  limit?: number
-  isActive?: boolean
-  interval?: string
-  search?: string
 }
 
 export interface IPlanRepository {
@@ -73,7 +65,6 @@ export class PlanRepository implements IPlanRepository {
           price: data.price,
           interval: data.interval,
           intervalCount: data.intervalCount ?? 1,
-          creditsAmount: data.creditsAmount,
           trialPeriodDays: data.trialPeriodDays,
           features: data.features,
           isActive: data.isActive ?? true,
@@ -132,13 +123,7 @@ export class PlanRepository implements IPlanRepository {
   async findAll(
     params: PlanSearchParams,
   ): Promise<PaginatedResult<SubscriptionPlanDomain>> {
-    const {
-      page = 1,
-      limit = 20,
-      isActive,
-      interval,
-      search,
-    } = params
+    const { page = 1, limit = 20, isActive, interval, search } = params
 
     const skip = (page - 1) * limit
 
@@ -195,7 +180,6 @@ export class PlanRepository implements IPlanRepository {
           name: data.name,
           description: data.description,
           price: data.price,
-          creditsAmount: data.creditsAmount,
           features: data.features,
           isActive: data.isActive,
           metadata: data.metadata,

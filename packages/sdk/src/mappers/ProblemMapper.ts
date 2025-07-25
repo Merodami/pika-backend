@@ -94,6 +94,37 @@ export class ProblemMapper {
     }
   }
 
+  /**
+   * Convert domain entity to admin DTO format
+   * Matches AdminTicketDetailResponse schema
+   */
+  static toAdminDTO(domain: ProblemDomain) {
+    return {
+      id: domain.id,
+      ticketNumber: domain.ticketNumber || undefined,
+      userId: domain.userId,
+      userName: domain.user
+        ? `${domain.user.firstName} ${domain.user.lastName}`
+        : '',
+      userEmail: domain.user?.email || '',
+      title: domain.title,
+      description: domain.description,
+      type: domain.type,
+      status: domain.status,
+      priority: domain.priority,
+      resolvedAt: domain.resolvedAt
+        ? domain.resolvedAt.toISOString()
+        : undefined,
+      assignedTo: domain.assignedTo || undefined,
+      assignedToName: domain.assignedUser
+        ? `${domain.assignedUser.firstName} ${domain.assignedUser.lastName}`
+        : undefined,
+      files: domain.files || [],
+      createdAt: domain.createdAt.toISOString(),
+      updatedAt: (domain.updatedAt || new Date()).toISOString(),
+    }
+  }
+
   static fromCreateDTO(dto: CreateProblemDTO): Partial<ProblemDomain> {
     return {
       userId: dto.userId,

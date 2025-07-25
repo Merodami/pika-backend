@@ -24,22 +24,22 @@ const API_URL = 'http://127.0.0.1:5500/api/v1'
 const TEST_USERS = [
   { email: 'test.admin@pika.com', role: UserRole.ADMIN, name: 'Test Admin' },
   {
-    email: 'test.member@pika
+    email: 'test.member@pika.com',
     role: UserRole.MEMBER,
     name: 'Test Member',
   },
   {
-    email: 'test.professional@pika
+    email: 'test.professional@pika.com',
     role: UserRole.PROFESSIONAL,
     name: 'Test Professional',
   },
   {
-    email: 'test.therapist@pika
+    email: 'test.therapist@pika.com',
     role: UserRole.THERAPIST,
     name: 'Test Therapist',
   },
   {
-    email: 'test.creator@pika
+    email: 'test.creator@pika.com',
     role: UserRole.CONTENT_CREATOR,
     name: 'Test Creator',
   },

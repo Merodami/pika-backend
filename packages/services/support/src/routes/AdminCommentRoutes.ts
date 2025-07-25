@@ -1,16 +1,11 @@
+import { supportCommon, supportPublic } from '@pika/api'
 import {
-    CreateSupportCommentRequest,
-    ProblemIdForCommentsParam,
-    SupportCommentIdParam,
-    UpdateSupportCommentRequest,
-} from '@pika/api/public'
-import type { ICacheService } from '@pika/redis'
-import {
-    requireAdmin,
-    requireAuth,
-    validateBody,
-    validateParams,
+  requireAuth,
+  requirePermissions,
+  validateBody,
+  validateParams,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -30,38 +25,43 @@ export function createAdminCommentRouter(
   const controller = new AdminCommentController(service)
 
   // Admin comment management routes
-  router.get('/', requireAuth(), requireAdmin(), controller.getAllComments)
+  router.get(
+    '/',
+    requireAuth(),
+    requirePermissions('admin:support'),
+    controller.getAllComments,
+  )
 
   router.get(
     '/problem/:problemId',
     requireAuth(),
-    requireAdmin(),
-    validateParams(ProblemIdForCommentsParam),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.ProblemIdForCommentsParam),
     controller.getCommentsByProblemId,
   )
 
   router.post(
     '/',
     requireAuth(),
-    requireAdmin(),
-    validateBody(CreateSupportCommentRequest),
+    requirePermissions('admin:support'),
+    validateBody(supportPublic.CreateSupportCommentRequest),
     controller.createInternalComment,
   )
 
   router.put(
     '/:id',
     requireAuth(),
-    requireAdmin(),
-    validateParams(SupportCommentIdParam),
-    validateBody(UpdateSupportCommentRequest),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.SupportCommentIdParam),
+    validateBody(supportPublic.UpdateSupportCommentRequest),
     controller.updateAnyComment,
   )
 
   router.delete(
     '/:id',
     requireAuth(),
-    requireAdmin(),
-    validateParams(SupportCommentIdParam),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.SupportCommentIdParam),
     controller.deleteAnyComment,
   )
 

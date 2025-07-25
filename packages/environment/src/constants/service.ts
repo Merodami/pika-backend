@@ -150,3 +150,117 @@ export const FILE_STORAGE_SERVICE_HOST = getEnvVariable(
   String,
   '0.0.0.0',
 )
+
+// Business service name
+export const BUSINESS_SERVICE_NAME = getEnvVariable(
+  'BUSINESS_SERVICE_NAME',
+  String,
+  'business_service',
+)
+
+// Business service port
+export const BUSINESS_SERVICE_PORT = getEnvVariable(
+  'BUSINESS_SERVICE_PORT',
+  parseNumber,
+  5511,
+)
+
+// Business service host
+export const BUSINESS_SERVICE_HOST = getEnvVariable(
+  'BUSINESS_SERVICE_HOST',
+  String,
+  '0.0.0.0',
+)
+
+// Category service name
+export const CATEGORY_SERVICE_NAME = getEnvVariable(
+  'CATEGORY_SERVICE_NAME',
+  String,
+  'category_service',
+)
+
+// Category service port
+export const CATEGORY_SERVICE_PORT = getEnvVariable(
+  'CATEGORY_SERVICE_PORT',
+  parseNumber,
+  5512,
+)
+
+// Category service host
+export const CATEGORY_SERVICE_HOST = getEnvVariable(
+  'CATEGORY_SERVICE_HOST',
+  String,
+  '0.0.0.0',
+)
+
+// PDF service name
+export const PDF_SERVICE_NAME = getEnvVariable(
+  'PDF_SERVICE_NAME',
+  String,
+  'pdf_service',
+)
+
+// PDF service port
+export const PDF_SERVICE_PORT = getEnvVariable(
+  'PDF_SERVICE_PORT',
+  parseNumber,
+  5513,
+)
+
+// PDF service host
+export const PDF_SERVICE_HOST = getEnvVariable(
+  'PDF_SERVICE_HOST',
+  String,
+  '0.0.0.0',
+)
+
+// Voucher service name
+export const VOUCHER_SERVICE_NAME = getEnvVariable(
+  'VOUCHER_SERVICE_NAME',
+  String,
+  'voucher_service',
+)
+
+// Voucher service port
+export const VOUCHER_SERVICE_PORT = getEnvVariable(
+  'VOUCHER_SERVICE_PORT',
+  parseNumber,
+  5514,
+)
+
+// Voucher service host
+export const VOUCHER_SERVICE_HOST = getEnvVariable(
+  'VOUCHER_SERVICE_HOST',
+  String,
+  '0.0.0.0',
+)
+
+// Translation service configuration
+export const DEFAULT_LANGUAGE = getEnvVariable('DEFAULT_LANGUAGE', String, 'es')
+
+export const SUPPORTED_LANGUAGES = ['es', 'en', 'gn'] as const
+
+// Voucher service configuration
+export const VOUCHER_CODE_ALPHABET = getEnvVariable(
+  'VOUCHER_CODE_ALPHABET',
+  String,
+  'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', // No ambiguous chars
+)
+
+export const VOUCHER_SHORT_CODE_LENGTH = getEnvVariable(
+  'VOUCHER_SHORT_CODE_LENGTH',
+  parseNumber,
+  8,
+)
+
+export const VOUCHER_JWT_ALGORITHM = getEnvVariable(
+  'VOUCHER_JWT_ALGORITHM',
+  String,
+  'RS256',
+)
+
+export const VOUCHER_JWT_PRIVATE_KEY = getEnvVariable(
+  'VOUCHER_JWT_PRIVATE_KEY',
+  String,
+  '',
+)

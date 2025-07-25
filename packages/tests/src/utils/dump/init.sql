@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.2 (Debian 17.2-1.pgdg120+1)
+-- Dumped from database version 17.5 (Debian 17.5-1.pgdg110+1)
 -- Dumped by pg_dump version 17.2 (Debian 17.2-1.pgdg120+1)
 
 SET statement_timeout = 0;
@@ -17,10 +17,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY users.professionals DROP CONSTRAINT IF EXISTS professionals_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY users.parq DROP CONSTRAINT IF EXISTS parq_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY users.friends DROP CONSTRAINT IF EXISTS friends_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY users.friends DROP CONSTRAINT IF EXISTS friends_referred_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY users.addresses DROP CONSTRAINT IF EXISTS addresses_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_problem_id_fkey;
@@ -28,76 +24,51 @@ ALTER TABLE IF EXISTS ONLY support.problems DROP CONSTRAINT IF EXISTS problems_u
 ALTER TABLE IF EXISTS ONLY support.problems DROP CONSTRAINT IF EXISTS problems_assigned_to_fkey;
 ALTER TABLE IF EXISTS ONLY support.notifications DROP CONSTRAINT IF EXISTS notifications_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.communication_logs DROP CONSTRAINT IF EXISTS communication_logs_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY storage.file_storage_logs DROP CONSTRAINT IF EXISTS file_storage_logs_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY social.social_interactions DROP CONSTRAINT IF EXISTS social_interactions_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY social.follows DROP CONSTRAINT IF EXISTS follows_following_id_fkey;
-ALTER TABLE IF EXISTS ONLY social.follows DROP CONSTRAINT IF EXISTS follows_follower_id_fkey;
-ALTER TABLE IF EXISTS ONLY social.activities DROP CONSTRAINT IF EXISTS activities_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.waiting_list DROP CONSTRAINT IF EXISTS waiting_list_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.waiting_list DROP CONSTRAINT IF EXISTS waiting_list_session_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.sessions DROP CONSTRAINT IF EXISTS sessions_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.sessions DROP CONSTRAINT IF EXISTS sessions_trainer_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.sessions DROP CONSTRAINT IF EXISTS sessions_gym_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_reviews DROP CONSTRAINT IF EXISTS session_reviews_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_reviews DROP CONSTRAINT IF EXISTS session_reviews_session_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_records DROP CONSTRAINT IF EXISTS session_records_session_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_invitees DROP CONSTRAINT IF EXISTS session_invitees_session_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_invitees DROP CONSTRAINT IF EXISTS session_invitees_friend_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.invitations DROP CONSTRAINT IF EXISTS invitations_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.invitations DROP CONSTRAINT IF EXISTS invitations_session_id_fkey;
-ALTER TABLE IF EXISTS ONLY sessions.invitations DROP CONSTRAINT IF EXISTS invitations_friend_id_fkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_cases DROP CONSTRAINT IF EXISTS fraud_cases_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_cases DROP CONSTRAINT IF EXISTS fraud_cases_reviewed_by_fkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_cases DROP CONSTRAINT IF EXISTS fraud_cases_redemption_id_fkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_cases DROP CONSTRAINT IF EXISTS fraud_cases_customer_id_fkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_cases DROP CONSTRAINT IF EXISTS fraud_cases_business_id_fkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_case_history DROP CONSTRAINT IF EXISTS fraud_case_history_performed_by_fkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_case_history DROP CONSTRAINT IF EXISTS fraud_case_history_case_id_fkey;
 ALTER TABLE IF EXISTS ONLY payments.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY payments.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_plan_id_fkey;
-ALTER TABLE IF EXISTS ONLY payments.promo_code_usages DROP CONSTRAINT IF EXISTS promo_code_usages_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY payments.promo_code_usages DROP CONSTRAINT IF EXISTS promo_code_usages_promo_code_id_fkey;
-ALTER TABLE IF EXISTS ONLY payments.memberships DROP CONSTRAINT IF EXISTS memberships_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY payments.credits DROP CONSTRAINT IF EXISTS credits_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY payments.credits_history DROP CONSTRAINT IF EXISTS credits_history_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY payments.credits_history DROP CONSTRAINT IF EXISTS credits_history_credits_id_fkey;
+ALTER TABLE IF EXISTS ONLY marketplace.businesses DROP CONSTRAINT IF EXISTS businesses_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY marketplace.businesses DROP CONSTRAINT IF EXISTS businesses_category_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_mfa_settings DROP CONSTRAINT IF EXISTS user_mfa_settings_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_identities DROP CONSTRAINT IF EXISTS user_identities_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_devices DROP CONSTRAINT IF EXISTS user_devices_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_device_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.stuff DROP CONSTRAINT IF EXISTS stuff_gym_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.inductions DROP CONSTRAINT IF EXISTS inductions_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.inductions DROP CONSTRAINT IF EXISTS inductions_gym_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gyms DROP CONSTRAINT IF EXISTS gyms_verified_by_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gyms DROP CONSTRAINT IF EXISTS gyms_owner_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_trainers DROP CONSTRAINT IF EXISTS gym_trainers_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_trainers DROP CONSTRAINT IF EXISTS gym_trainers_gym_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_special_prices DROP CONSTRAINT IF EXISTS gym_special_prices_gym_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_reviews DROP CONSTRAINT IF EXISTS gym_reviews_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_reviews DROP CONSTRAINT IF EXISTS gym_reviews_gym_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_members DROP CONSTRAINT IF EXISTS gym_members_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_members DROP CONSTRAINT IF EXISTS gym_members_gym_id_fkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_hourly_prices DROP CONSTRAINT IF EXISTS gym_hourly_prices_gym_id_fkey;
+ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS "user_language_preferences_languageCode_fkey";
+ALTER TABLE IF EXISTS ONLY i18n.translations DROP CONSTRAINT IF EXISTS "translations_languageCode_fkey";
+ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_updated_by_fkey;
+ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_created_by_fkey;
+ALTER TABLE IF EXISTS ONLY files.voucher_book_pages DROP CONSTRAINT IF EXISTS voucher_book_pages_book_id_fkey;
 ALTER TABLE IF EXISTS ONLY files.file_storage_logs DROP CONSTRAINT IF EXISTS file_storage_logs_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY auth.user_mfa_settings DROP CONSTRAINT IF EXISTS user_mfa_settings_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY auth.user_identities DROP CONSTRAINT IF EXISTS user_identities_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY auth.user_devices DROP CONSTRAINT IF EXISTS user_devices_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY auth.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY auth.security_events DROP CONSTRAINT IF EXISTS security_events_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY auth.security_events DROP CONSTRAINT IF EXISTS security_events_device_id_fkey;
+ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS book_distributions_updated_by_fkey;
+ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS book_distributions_created_by_fkey;
+ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS book_distributions_book_id_fkey;
+ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_updated_by_fkey;
+ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_page_id_fkey;
+ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_created_by_fkey;
+ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_parent_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.vouchers DROP CONSTRAINT IF EXISTS vouchers_category_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.vouchers DROP CONSTRAINT IF EXISTS vouchers_business_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_customer_id_fkey;
+ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_business_id_fkey;
 DROP INDEX IF EXISTS users.users_phone_number_idx;
 DROP INDEX IF EXISTS users.users_email_key;
 DROP INDEX IF EXISTS users.users_email_idx;
 DROP INDEX IF EXISTS users.users_deleted_at_idx;
-DROP INDEX IF EXISTS users.users_alias_key;
-DROP INDEX IF EXISTS users.professionals_user_id_key;
-DROP INDEX IF EXISTS users.professionals_user_id_idx;
-DROP INDEX IF EXISTS users.parq_user_id_key;
-DROP INDEX IF EXISTS users.parq_user_id_idx;
-DROP INDEX IF EXISTS users.friends_user_id_idx;
-DROP INDEX IF EXISTS users.friends_user_id_email_key;
-DROP INDEX IF EXISTS users.friends_referred_user_id_idx;
 DROP INDEX IF EXISTS users.addresses_user_id_idx;
-DROP INDEX IF EXISTS support.templates_type_is_active_idx;
-DROP INDEX IF EXISTS support.templates_name_key;
-DROP INDEX IF EXISTS support.templates_name_idx;
-DROP INDEX IF EXISTS support.templates_external_id_key;
-DROP INDEX IF EXISTS support.templates_category_idx;
 DROP INDEX IF EXISTS support.support_comments_user_id_idx;
 DROP INDEX IF EXISTS support.support_comments_problem_id_idx;
 DROP INDEX IF EXISTS support.support_comments_created_at_idx;
@@ -117,76 +88,40 @@ DROP INDEX IF EXISTS support.communication_logs_type_status_idx;
 DROP INDEX IF EXISTS support.communication_logs_template_id_idx;
 DROP INDEX IF EXISTS support.communication_logs_recipient_idx;
 DROP INDEX IF EXISTS support.communication_logs_created_at_idx;
-DROP INDEX IF EXISTS storage.file_storage_logs_user_id_idx;
-DROP INDEX IF EXISTS storage.file_storage_logs_status_idx;
-DROP INDEX IF EXISTS storage.file_storage_logs_is_public_idx;
-DROP INDEX IF EXISTS storage.file_storage_logs_folder_idx;
-DROP INDEX IF EXISTS storage.file_storage_logs_file_id_idx;
-DROP INDEX IF EXISTS storage.file_storage_logs_created_at_idx;
-DROP INDEX IF EXISTS storage.file_storage_logs_content_type_idx;
-DROP INDEX IF EXISTS social.social_interactions_user_id_idx;
-DROP INDEX IF EXISTS social.social_interactions_user_id_entity_type_entity_id_type_key;
-DROP INDEX IF EXISTS social.social_interactions_type_idx;
-DROP INDEX IF EXISTS social.social_interactions_entity_type_entity_id_idx;
-DROP INDEX IF EXISTS social.follows_following_id_idx;
-DROP INDEX IF EXISTS social.follows_following_id_created_at_idx;
-DROP INDEX IF EXISTS social.follows_follower_id_idx;
-DROP INDEX IF EXISTS social.follows_follower_id_following_id_key;
-DROP INDEX IF EXISTS social.follows_follower_id_created_at_idx;
-DROP INDEX IF EXISTS social.activities_user_id_idx;
-DROP INDEX IF EXISTS social.activities_user_id_created_at_idx;
-DROP INDEX IF EXISTS social.activities_type_idx;
-DROP INDEX IF EXISTS social.activities_privacy_created_at_idx;
-DROP INDEX IF EXISTS social.activities_entity_type_entity_id_idx;
-DROP INDEX IF EXISTS social.activities_created_at_idx;
-DROP INDEX IF EXISTS sessions.waiting_list_user_id_idx;
-DROP INDEX IF EXISTS sessions.waiting_list_session_id_joined_at_idx;
-DROP INDEX IF EXISTS sessions.sessions_user_id_idx;
-DROP INDEX IF EXISTS sessions.sessions_trainer_id_idx;
-DROP INDEX IF EXISTS sessions.sessions_status_idx;
-DROP INDEX IF EXISTS sessions.sessions_payment_deadline_idx;
-DROP INDEX IF EXISTS sessions.sessions_gym_id_idx;
-DROP INDEX IF EXISTS sessions.sessions_date_idx;
-DROP INDEX IF EXISTS sessions.session_reviews_user_id_idx;
-DROP INDEX IF EXISTS sessions.session_reviews_session_id_user_id_key;
-DROP INDEX IF EXISTS sessions.session_reviews_session_id_idx;
-DROP INDEX IF EXISTS sessions.session_records_session_id_idx;
-DROP INDEX IF EXISTS sessions.session_records_created_at_idx;
-DROP INDEX IF EXISTS sessions.session_invitees_session_id_idx;
-DROP INDEX IF EXISTS sessions.session_invitees_session_id_friend_id_key;
-DROP INDEX IF EXISTS sessions.session_invitees_friend_id_idx;
-DROP INDEX IF EXISTS sessions.invitations_user_id_idx;
-DROP INDEX IF EXISTS sessions.invitations_session_id_idx;
-DROP INDEX IF EXISTS sessions.invitations_guest_email_idx;
+DROP INDEX IF EXISTS security.fraud_cases_voucher_id_idx;
+DROP INDEX IF EXISTS security.fraud_cases_status_idx;
+DROP INDEX IF EXISTS security.fraud_cases_status_detected_at_idx;
+DROP INDEX IF EXISTS security.fraud_cases_risk_score_status_idx;
+DROP INDEX IF EXISTS security.fraud_cases_risk_score_idx;
+DROP INDEX IF EXISTS security.fraud_cases_reviewed_by_idx;
+DROP INDEX IF EXISTS security.fraud_cases_redemption_id_key;
+DROP INDEX IF EXISTS security.fraud_cases_detected_at_idx;
+DROP INDEX IF EXISTS security.fraud_cases_customer_id_status_idx;
+DROP INDEX IF EXISTS security.fraud_cases_customer_id_idx;
+DROP INDEX IF EXISTS security.fraud_cases_case_number_key;
+DROP INDEX IF EXISTS security.fraud_cases_case_number_idx;
+DROP INDEX IF EXISTS security.fraud_cases_business_id_status_idx;
+DROP INDEX IF EXISTS security.fraud_cases_business_id_idx;
+DROP INDEX IF EXISTS security.fraud_case_history_performed_by_idx;
+DROP INDEX IF EXISTS security.fraud_case_history_performed_at_idx;
+DROP INDEX IF EXISTS security.fraud_case_history_case_id_performed_at_idx;
+DROP INDEX IF EXISTS security.fraud_case_history_case_id_idx;
+DROP INDEX IF EXISTS security.fraud_case_history_action_idx;
 DROP INDEX IF EXISTS payments.subscriptions_user_id_idx;
 DROP INDEX IF EXISTS payments.subscriptions_stripe_subscription_id_key;
 DROP INDEX IF EXISTS payments.subscriptions_stripe_subscription_id_idx;
 DROP INDEX IF EXISTS payments.subscriptions_status_idx;
-DROP INDEX IF EXISTS payments.subscriptions_plan_type_idx;
 DROP INDEX IF EXISTS payments.subscriptions_plan_id_idx;
 DROP INDEX IF EXISTS payments.subscription_plans_stripe_product_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_stripe_price_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_name_key;
-DROP INDEX IF EXISTS payments.subscription_plans_membership_type_idx;
-DROP INDEX IF EXISTS payments.subscription_plans_membership_package_idx;
 DROP INDEX IF EXISTS payments.subscription_plans_is_active_idx;
 DROP INDEX IF EXISTS payments.subscription_plans_interval_idx;
-DROP INDEX IF EXISTS payments.promo_codes_expiration_date_idx;
-DROP INDEX IF EXISTS payments.promo_codes_code_key;
-DROP INDEX IF EXISTS payments.promo_codes_code_idx;
-DROP INDEX IF EXISTS payments.promo_codes_active_idx;
-DROP INDEX IF EXISTS payments.promo_code_usages_user_id_idx;
-DROP INDEX IF EXISTS payments.promo_code_usages_promo_code_id_idx;
-DROP INDEX IF EXISTS payments.memberships_user_id_key;
-DROP INDEX IF EXISTS payments.memberships_subscription_status_idx;
-DROP INDEX IF EXISTS payments.memberships_stripe_subscription_id_idx;
-DROP INDEX IF EXISTS payments.memberships_stripe_customer_id_key;
-DROP INDEX IF EXISTS payments.memberships_stripe_customer_id_idx;
-DROP INDEX IF EXISTS payments.credits_user_id_key;
-DROP INDEX IF EXISTS payments.credits_packs_active_idx;
-DROP INDEX IF EXISTS payments.credits_history_user_id_idx;
-DROP INDEX IF EXISTS payments.credits_history_date_idx;
-DROP INDEX IF EXISTS payments.credits_history_credits_id_idx;
+DROP INDEX IF EXISTS marketplace.businesses_verified_active_idx;
+DROP INDEX IF EXISTS marketplace.businesses_user_id_key;
+DROP INDEX IF EXISTS marketplace.businesses_deleted_at_idx;
+DROP INDEX IF EXISTS marketplace.businesses_category_id_idx;
+DROP INDEX IF EXISTS marketplace.businesses_avg_rating_idx;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_key;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_is_enabled_idx;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_idx;
@@ -209,10 +144,25 @@ DROP INDEX IF EXISTS identity.security_events_user_id_idx;
 DROP INDEX IF EXISTS identity.security_events_risk_score_created_at_idx;
 DROP INDEX IF EXISTS identity.security_events_event_type_idx;
 DROP INDEX IF EXISTS identity.security_events_created_at_idx;
-DROP INDEX IF EXISTS gyms.gym_trainers_gym_id_user_id_key;
-DROP INDEX IF EXISTS gyms.gym_special_prices_gym_id_date_hour_key;
-DROP INDEX IF EXISTS gyms.gym_members_gym_id_user_id_key;
-DROP INDEX IF EXISTS gyms.gym_hourly_prices_gym_id_day_of_week_hour_key;
+DROP INDEX IF EXISTS i18n."user_language_preferences_userId_key";
+DROP INDEX IF EXISTS i18n."user_language_preferences_userId_idx";
+DROP INDEX IF EXISTS i18n.translations_service_key_idx;
+DROP INDEX IF EXISTS i18n."translations_key_languageCode_key";
+DROP INDEX IF EXISTS i18n."translations_key_languageCode_idx";
+DROP INDEX IF EXISTS files.voucher_books_year_month_idx;
+DROP INDEX IF EXISTS files.voucher_books_updated_by_idx;
+DROP INDEX IF EXISTS files.voucher_books_status_year_month_idx;
+DROP INDEX IF EXISTS files.voucher_books_status_idx;
+DROP INDEX IF EXISTS files.voucher_books_published_at_idx;
+DROP INDEX IF EXISTS files.voucher_books_pdf_generated_at_idx;
+DROP INDEX IF EXISTS files.voucher_books_edition_idx;
+DROP INDEX IF EXISTS files.voucher_books_deleted_at_idx;
+DROP INDEX IF EXISTS files.voucher_books_created_by_idx;
+DROP INDEX IF EXISTS files.voucher_books_created_at_idx;
+DROP INDEX IF EXISTS files.voucher_books_book_type_status_idx;
+DROP INDEX IF EXISTS files.voucher_books_book_type_idx;
+DROP INDEX IF EXISTS files.voucher_book_pages_book_id_page_number_key;
+DROP INDEX IF EXISTS files.voucher_book_pages_book_id_idx;
 DROP INDEX IF EXISTS files.file_storage_logs_user_id_idx;
 DROP INDEX IF EXISTS files.file_storage_logs_status_idx;
 DROP INDEX IF EXISTS files.file_storage_logs_is_public_idx;
@@ -220,171 +170,197 @@ DROP INDEX IF EXISTS files.file_storage_logs_folder_idx;
 DROP INDEX IF EXISTS files.file_storage_logs_file_id_idx;
 DROP INDEX IF EXISTS files.file_storage_logs_created_at_idx;
 DROP INDEX IF EXISTS files.file_storage_logs_content_type_idx;
-DROP INDEX IF EXISTS auth.user_mfa_settings_user_id_key;
-DROP INDEX IF EXISTS auth.user_mfa_settings_user_id_is_enabled_idx;
-DROP INDEX IF EXISTS auth.user_mfa_settings_user_id_idx;
-DROP INDEX IF EXISTS auth.user_identities_user_id_key;
-DROP INDEX IF EXISTS auth.user_identities_user_id_idx;
-DROP INDEX IF EXISTS auth.user_identities_provider_provider_id_key;
-DROP INDEX IF EXISTS auth.user_identities_provider_provider_id_idx;
-DROP INDEX IF EXISTS auth.user_identities_firebase_uid_key;
-DROP INDEX IF EXISTS auth.user_identities_firebase_uid_idx;
-DROP INDEX IF EXISTS auth.user_devices_user_id_last_active_at_idx;
-DROP INDEX IF EXISTS auth.user_devices_user_id_is_trusted_trust_expires_at_idx;
-DROP INDEX IF EXISTS auth.user_devices_user_id_idx;
-DROP INDEX IF EXISTS auth.user_devices_user_id_device_id_key;
-DROP INDEX IF EXISTS auth.user_devices_fcm_token_idx;
-DROP INDEX IF EXISTS auth.user_auth_methods_user_id_is_enabled_last_used_at_idx;
-DROP INDEX IF EXISTS auth.user_auth_methods_user_id_idx;
-DROP INDEX IF EXISTS auth.user_auth_methods_user_id_auth_method_key;
-DROP INDEX IF EXISTS auth.user_auth_methods_auth_method_idx;
-DROP INDEX IF EXISTS auth.security_events_user_id_idx;
-DROP INDEX IF EXISTS auth.security_events_risk_score_created_at_idx;
-DROP INDEX IF EXISTS auth.security_events_event_type_idx;
-DROP INDEX IF EXISTS auth.security_events_created_at_idx;
+DROP INDEX IF EXISTS files.book_distributions_status_idx;
+DROP INDEX IF EXISTS files.book_distributions_shipped_at_idx;
+DROP INDEX IF EXISTS files.book_distributions_location_id_idx;
+DROP INDEX IF EXISTS files.book_distributions_delivered_at_idx;
+DROP INDEX IF EXISTS files.book_distributions_created_at_idx;
+DROP INDEX IF EXISTS files.book_distributions_business_id_idx;
+DROP INDEX IF EXISTS files.book_distributions_book_id_idx;
+DROP INDEX IF EXISTS files.ad_placements_updated_by_idx;
+DROP INDEX IF EXISTS files.ad_placements_page_id_position_key;
+DROP INDEX IF EXISTS files.ad_placements_page_id_idx;
+DROP INDEX IF EXISTS files.ad_placements_created_by_idx;
+DROP INDEX IF EXISTS files.ad_placements_content_type_idx;
+DROP INDEX IF EXISTS catalog.categories_sort_order_idx;
+DROP INDEX IF EXISTS catalog.categories_slug_key;
+DROP INDEX IF EXISTS catalog.categories_slug_idx;
+DROP INDEX IF EXISTS catalog.categories_path_idx;
+DROP INDEX IF EXISTS catalog.categories_parent_id_is_active_deleted_at_idx;
+DROP INDEX IF EXISTS catalog.categories_parent_id_idx;
+DROP INDEX IF EXISTS catalog.categories_name_key_idx;
+DROP INDEX IF EXISTS catalog.categories_level_sort_order_idx;
+DROP INDEX IF EXISTS catalog.categories_level_idx;
+DROP INDEX IF EXISTS catalog.categories_is_active_deleted_at_idx;
+DROP INDEX IF EXISTS business.vouchers_valid_until_idx;
+DROP INDEX IF EXISTS business.vouchers_valid_from_idx;
+DROP INDEX IF EXISTS business.vouchers_updated_at_idx;
+DROP INDEX IF EXISTS business.vouchers_type_idx;
+DROP INDEX IF EXISTS business.vouchers_state_valid_until_idx;
+DROP INDEX IF EXISTS business.vouchers_state_idx;
+DROP INDEX IF EXISTS business.vouchers_state_business_id_idx;
+DROP INDEX IF EXISTS business.vouchers_qr_code_key;
+DROP INDEX IF EXISTS business.vouchers_qr_code_idx;
+DROP INDEX IF EXISTS business.vouchers_deleted_at_idx;
+DROP INDEX IF EXISTS business.vouchers_created_at_idx;
+DROP INDEX IF EXISTS business.vouchers_category_id_state_idx;
+DROP INDEX IF EXISTS business.vouchers_category_id_idx;
+DROP INDEX IF EXISTS business.vouchers_business_id_idx;
+DROP INDEX IF EXISTS business.vouchers_business_id_created_at_idx;
+DROP INDEX IF EXISTS business.voucher_redemptions_voucher_id_user_id_key;
+DROP INDEX IF EXISTS business.voucher_redemptions_voucher_id_redeemed_at_idx;
+DROP INDEX IF EXISTS business.voucher_redemptions_voucher_id_idx;
+DROP INDEX IF EXISTS business.voucher_redemptions_user_id_redeemed_at_idx;
+DROP INDEX IF EXISTS business.voucher_redemptions_user_id_idx;
+DROP INDEX IF EXISTS business.voucher_redemptions_redeemed_at_idx;
+DROP INDEX IF EXISTS business.voucher_redemptions_code_used_idx;
+DROP INDEX IF EXISTS business.voucher_codes_voucher_id_type_idx;
+DROP INDEX IF EXISTS business.voucher_codes_voucher_id_is_active_idx;
+DROP INDEX IF EXISTS business.voucher_codes_voucher_id_idx;
+DROP INDEX IF EXISTS business.voucher_codes_type_idx;
+DROP INDEX IF EXISTS business.voucher_codes_is_active_idx;
+DROP INDEX IF EXISTS business.voucher_codes_code_key;
+DROP INDEX IF EXISTS business.voucher_codes_code_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_voucher_id_status_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_voucher_id_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_status_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_redeemed_at_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_customer_id_voucher_id_key;
+DROP INDEX IF EXISTS business.customer_vouchers_customer_id_status_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_customer_id_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_customer_id_claimed_at_idx;
+DROP INDEX IF EXISTS business.customer_vouchers_claimed_at_idx;
 DROP INDEX IF EXISTS audit.audit_logs_user_id_idx;
 DROP INDEX IF EXISTS audit.audit_logs_entity_type_entity_id_idx;
 DROP INDEX IF EXISTS audit.audit_logs_created_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scanned_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scan_type_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_user_id_scanned_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_user_id_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_scanned_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_scan_type_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_scanned_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_business_id_scanned_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_business_id_idx;
 ALTER TABLE IF EXISTS ONLY users.users DROP CONSTRAINT IF EXISTS users_pkey;
-ALTER TABLE IF EXISTS ONLY users.professionals DROP CONSTRAINT IF EXISTS professionals_pkey;
-ALTER TABLE IF EXISTS ONLY users.parq DROP CONSTRAINT IF EXISTS parq_pkey;
-ALTER TABLE IF EXISTS ONLY users.friends DROP CONSTRAINT IF EXISTS friends_pkey;
 ALTER TABLE IF EXISTS ONLY users.addresses DROP CONSTRAINT IF EXISTS addresses_pkey;
-ALTER TABLE IF EXISTS ONLY support.templates DROP CONSTRAINT IF EXISTS templates_pkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_pkey;
 ALTER TABLE IF EXISTS ONLY support.problems DROP CONSTRAINT IF EXISTS problems_pkey;
 ALTER TABLE IF EXISTS ONLY support.notifications DROP CONSTRAINT IF EXISTS notifications_pkey;
 ALTER TABLE IF EXISTS ONLY support.communication_logs DROP CONSTRAINT IF EXISTS communication_logs_pkey;
-ALTER TABLE IF EXISTS ONLY storage.file_storage_logs DROP CONSTRAINT IF EXISTS file_storage_logs_pkey;
-ALTER TABLE IF EXISTS ONLY social.social_interactions DROP CONSTRAINT IF EXISTS social_interactions_pkey;
-ALTER TABLE IF EXISTS ONLY social.follows DROP CONSTRAINT IF EXISTS follows_pkey;
-ALTER TABLE IF EXISTS ONLY social.activities DROP CONSTRAINT IF EXISTS activities_pkey;
-ALTER TABLE IF EXISTS ONLY sessions.waiting_list DROP CONSTRAINT IF EXISTS waiting_list_pkey;
-ALTER TABLE IF EXISTS ONLY sessions.sessions DROP CONSTRAINT IF EXISTS sessions_pkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_reviews DROP CONSTRAINT IF EXISTS session_reviews_pkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_records DROP CONSTRAINT IF EXISTS session_records_pkey;
-ALTER TABLE IF EXISTS ONLY sessions.session_invitees DROP CONSTRAINT IF EXISTS session_invitees_pkey;
-ALTER TABLE IF EXISTS ONLY sessions.invitations DROP CONSTRAINT IF EXISTS invitations_pkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_cases DROP CONSTRAINT IF EXISTS fraud_cases_pkey;
+ALTER TABLE IF EXISTS ONLY security.fraud_case_history DROP CONSTRAINT IF EXISTS fraud_case_history_pkey;
 ALTER TABLE IF EXISTS ONLY public._prisma_migrations DROP CONSTRAINT IF EXISTS _prisma_migrations_pkey;
 ALTER TABLE IF EXISTS ONLY payments.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_pkey;
 ALTER TABLE IF EXISTS ONLY payments.subscription_plans DROP CONSTRAINT IF EXISTS subscription_plans_pkey;
-ALTER TABLE IF EXISTS ONLY payments.promo_codes DROP CONSTRAINT IF EXISTS promo_codes_pkey;
-ALTER TABLE IF EXISTS ONLY payments.promo_code_usages DROP CONSTRAINT IF EXISTS promo_code_usages_pkey;
-ALTER TABLE IF EXISTS ONLY payments.memberships DROP CONSTRAINT IF EXISTS memberships_pkey;
-ALTER TABLE IF EXISTS ONLY payments.credits DROP CONSTRAINT IF EXISTS credits_pkey;
-ALTER TABLE IF EXISTS ONLY payments.credits_packs DROP CONSTRAINT IF EXISTS credits_packs_pkey;
-ALTER TABLE IF EXISTS ONLY payments.credits_history DROP CONSTRAINT IF EXISTS credits_history_pkey;
+ALTER TABLE IF EXISTS ONLY marketplace.businesses DROP CONSTRAINT IF EXISTS businesses_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_mfa_settings DROP CONSTRAINT IF EXISTS user_mfa_settings_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_identities DROP CONSTRAINT IF EXISTS user_identities_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_devices DROP CONSTRAINT IF EXISTS user_devices_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_pkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.stuff DROP CONSTRAINT IF EXISTS stuff_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.inductions DROP CONSTRAINT IF EXISTS inductions_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.gyms DROP CONSTRAINT IF EXISTS gyms_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_trainers DROP CONSTRAINT IF EXISTS gym_trainers_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_special_prices DROP CONSTRAINT IF EXISTS gym_special_prices_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_reviews DROP CONSTRAINT IF EXISTS gym_reviews_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_members DROP CONSTRAINT IF EXISTS gym_members_pkey;
-ALTER TABLE IF EXISTS ONLY gyms.gym_hourly_prices DROP CONSTRAINT IF EXISTS gym_hourly_prices_pkey;
+ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS user_language_preferences_pkey;
+ALTER TABLE IF EXISTS ONLY i18n.translations DROP CONSTRAINT IF EXISTS translations_pkey;
+ALTER TABLE IF EXISTS ONLY i18n.languages DROP CONSTRAINT IF EXISTS languages_pkey;
+ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_pkey;
+ALTER TABLE IF EXISTS ONLY files.voucher_book_pages DROP CONSTRAINT IF EXISTS voucher_book_pages_pkey;
 ALTER TABLE IF EXISTS ONLY files.file_storage_logs DROP CONSTRAINT IF EXISTS file_storage_logs_pkey;
-ALTER TABLE IF EXISTS ONLY auth.user_mfa_settings DROP CONSTRAINT IF EXISTS user_mfa_settings_pkey;
-ALTER TABLE IF EXISTS ONLY auth.user_identities DROP CONSTRAINT IF EXISTS user_identities_pkey;
-ALTER TABLE IF EXISTS ONLY auth.user_devices DROP CONSTRAINT IF EXISTS user_devices_pkey;
-ALTER TABLE IF EXISTS ONLY auth.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_pkey;
-ALTER TABLE IF EXISTS ONLY auth.security_events DROP CONSTRAINT IF EXISTS security_events_pkey;
+ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS book_distributions_pkey;
+ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_pkey;
+ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_pkey;
+ALTER TABLE IF EXISTS ONLY business.vouchers DROP CONSTRAINT IF EXISTS vouchers_pkey;
+ALTER TABLE IF EXISTS ONLY business.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_pkey;
+ALTER TABLE IF EXISTS ONLY business.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_pkey;
+ALTER TABLE IF EXISTS ONLY business.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_pkey;
 ALTER TABLE IF EXISTS ONLY audit.audit_logs DROP CONSTRAINT IF EXISTS audit_logs_pkey;
+ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_pkey;
 DROP TABLE IF EXISTS users.users;
-DROP TABLE IF EXISTS users.professionals;
-DROP TABLE IF EXISTS users.parq;
-DROP TABLE IF EXISTS users.friends;
 DROP TABLE IF EXISTS users.addresses;
-DROP TABLE IF EXISTS support.templates;
 DROP TABLE IF EXISTS support.support_comments;
 DROP TABLE IF EXISTS support.problems;
 DROP TABLE IF EXISTS support.notifications;
 DROP TABLE IF EXISTS support.communication_logs;
-DROP TABLE IF EXISTS storage.file_storage_logs;
-DROP TABLE IF EXISTS social.social_interactions;
-DROP TABLE IF EXISTS social.follows;
-DROP TABLE IF EXISTS social.activities;
-DROP TABLE IF EXISTS sessions.waiting_list;
-DROP TABLE IF EXISTS sessions.sessions;
-DROP TABLE IF EXISTS sessions.session_reviews;
-DROP TABLE IF EXISTS sessions.session_records;
-DROP TABLE IF EXISTS sessions.session_invitees;
-DROP TABLE IF EXISTS sessions.invitations;
+DROP TABLE IF EXISTS security.fraud_cases;
+DROP TABLE IF EXISTS security.fraud_case_history;
 DROP TABLE IF EXISTS public._prisma_migrations;
 DROP TABLE IF EXISTS payments.subscriptions;
 DROP TABLE IF EXISTS payments.subscription_plans;
-DROP TABLE IF EXISTS payments.promo_codes;
-DROP TABLE IF EXISTS payments.promo_code_usages;
-DROP TABLE IF EXISTS payments.memberships;
-DROP TABLE IF EXISTS payments.credits_packs;
-DROP TABLE IF EXISTS payments.credits_history;
-DROP TABLE IF EXISTS payments.credits;
+DROP TABLE IF EXISTS marketplace.businesses;
 DROP TABLE IF EXISTS identity.user_mfa_settings;
 DROP TABLE IF EXISTS identity.user_identities;
 DROP TABLE IF EXISTS identity.user_devices;
 DROP TABLE IF EXISTS identity.user_auth_methods;
 DROP TABLE IF EXISTS identity.security_events;
-DROP TABLE IF EXISTS gyms.stuff;
-DROP TABLE IF EXISTS gyms.inductions;
-DROP TABLE IF EXISTS gyms.gyms;
-DROP TABLE IF EXISTS gyms.gym_trainers;
-DROP TABLE IF EXISTS gyms.gym_special_prices;
-DROP TABLE IF EXISTS gyms.gym_reviews;
-DROP TABLE IF EXISTS gyms.gym_members;
-DROP TABLE IF EXISTS gyms.gym_hourly_prices;
+DROP TABLE IF EXISTS i18n.user_language_preferences;
+DROP TABLE IF EXISTS i18n.translations;
+DROP TABLE IF EXISTS i18n.languages;
+DROP TABLE IF EXISTS files.voucher_books;
+DROP TABLE IF EXISTS files.voucher_book_pages;
 DROP TABLE IF EXISTS files.file_storage_logs;
-DROP TABLE IF EXISTS auth.user_mfa_settings;
-DROP TABLE IF EXISTS auth.user_identities;
-DROP TABLE IF EXISTS auth.user_devices;
-DROP TABLE IF EXISTS auth.user_auth_methods;
-DROP TABLE IF EXISTS auth.security_events;
+DROP TABLE IF EXISTS files.book_distributions;
+DROP TABLE IF EXISTS files.ad_placements;
+DROP TABLE IF EXISTS catalog.categories;
+DROP TABLE IF EXISTS business.vouchers;
+DROP TABLE IF EXISTS business.voucher_redemptions;
+DROP TABLE IF EXISTS business.voucher_codes;
+DROP TABLE IF EXISTS business.customer_vouchers;
 DROP TABLE IF EXISTS audit.audit_logs;
-DROP TYPE IF EXISTS users."FriendStatus";
-DROP TYPE IF EXISTS users."FriendOrClientType";
+DROP TABLE IF EXISTS analytics.voucher_scans;
 DROP TYPE IF EXISTS support."ProblemType";
 DROP TYPE IF EXISTS support."ProblemStatus";
 DROP TYPE IF EXISTS support."ProblemPriority";
-DROP TYPE IF EXISTS social."PrivacyLevel";
-DROP TYPE IF EXISTS social."InteractionType";
-DROP TYPE IF EXISTS social."ActivityType";
-DROP TYPE IF EXISTS sessions."WaitingListStatus";
-DROP TYPE IF EXISTS sessions."TeamSize";
-DROP TYPE IF EXISTS sessions."SessionStatus";
-DROP TYPE IF EXISTS sessions."SessionRating";
-DROP TYPE IF EXISTS sessions."SessionPurpose";
-DROP TYPE IF EXISTS sessions."InviteeStatus";
-DROP TYPE IF EXISTS sessions."InvitationStatus";
+DROP TYPE IF EXISTS support."NotificationType";
+DROP TYPE IF EXISTS support."NotificationStatus";
+DROP TYPE IF EXISTS support."CommunicationMethod";
+DROP TYPE IF EXISTS security."FraudCaseStatus";
+DROP TYPE IF EXISTS payments."SubscriptionStatus";
 DROP TYPE IF EXISTS identity."UserStatus";
 DROP TYPE IF EXISTS identity."UserRole";
 DROP TYPE IF EXISTS identity."MfaMethod";
 DROP TYPE IF EXISTS identity."DeviceType";
-DROP TYPE IF EXISTS gyms."WeekDay";
-DROP TYPE IF EXISTS gyms."StuffType";
-DROP TYPE IF EXISTS gyms."GymVerificationStatus";
-DROP TYPE IF EXISTS gyms."GymTier";
-DROP TYPE IF EXISTS gyms."GymSubscriptionStatus";
-DROP TYPE IF EXISTS gyms."GymStatus";
-DROP TYPE IF EXISTS auth."UserStatus";
-DROP TYPE IF EXISTS auth."UserRole";
-DROP TYPE IF EXISTS auth."MfaMethod";
-DROP TYPE IF EXISTS auth."DeviceType";
+DROP TYPE IF EXISTS files."VoucherBookType";
+DROP TYPE IF EXISTS files."VoucherBookStatus";
+DROP TYPE IF EXISTS files."StorageProvider";
+DROP TYPE IF EXISTS files."PageLayoutType";
+DROP TYPE IF EXISTS files."FileType";
+DROP TYPE IF EXISTS files."ContentType";
+DROP TYPE IF EXISTS files."AdSize";
+DROP TYPE IF EXISTS business."VoucherType";
+DROP TYPE IF EXISTS business."VoucherState";
+DROP TYPE IF EXISTS business."VoucherCodeType";
+DROP TYPE IF EXISTS business."CustomerVoucherStatus";
 DROP TYPE IF EXISTS audit."AuditAction";
+DROP TYPE IF EXISTS analytics."VoucherScanType";
+DROP TYPE IF EXISTS analytics."VoucherScanSource";
+DROP EXTENSION IF EXISTS postgis_topology;
+DROP EXTENSION IF EXISTS postgis_tiger_geocoder;
+DROP EXTENSION IF EXISTS postgis;
 DROP EXTENSION IF EXISTS pgcrypto;
+DROP EXTENSION IF EXISTS fuzzystrmatch;
 DROP SCHEMA IF EXISTS users;
+DROP SCHEMA IF EXISTS topology;
+DROP SCHEMA IF EXISTS tiger_data;
+DROP SCHEMA IF EXISTS tiger;
 DROP SCHEMA IF EXISTS support;
-DROP SCHEMA IF EXISTS storage;
-DROP SCHEMA IF EXISTS social;
-DROP SCHEMA IF EXISTS sessions;
+DROP SCHEMA IF EXISTS security;
 DROP SCHEMA IF EXISTS payments;
+DROP SCHEMA IF EXISTS marketplace;
 DROP SCHEMA IF EXISTS identity;
-DROP SCHEMA IF EXISTS gyms;
+DROP SCHEMA IF EXISTS i18n;
 DROP SCHEMA IF EXISTS files;
-DROP SCHEMA IF EXISTS auth;
+DROP SCHEMA IF EXISTS catalog;
+DROP SCHEMA IF EXISTS business;
 DROP SCHEMA IF EXISTS audit;
+DROP SCHEMA IF EXISTS analytics;
+--
+-- Name: analytics; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA analytics;
+
+
 --
 -- Name: audit; Type: SCHEMA; Schema: -; Owner: -
 --
@@ -393,10 +369,17 @@ CREATE SCHEMA audit;
 
 
 --
--- Name: auth; Type: SCHEMA; Schema: -; Owner: -
+-- Name: business; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA auth;
+CREATE SCHEMA business;
+
+
+--
+-- Name: catalog; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA catalog;
 
 
 --
@@ -407,10 +390,10 @@ CREATE SCHEMA files;
 
 
 --
--- Name: gyms; Type: SCHEMA; Schema: -; Owner: -
+-- Name: i18n; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA gyms;
+CREATE SCHEMA i18n;
 
 
 --
@@ -421,6 +404,13 @@ CREATE SCHEMA identity;
 
 
 --
+-- Name: marketplace; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA marketplace;
+
+
+--
 -- Name: payments; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -428,24 +418,10 @@ CREATE SCHEMA payments;
 
 
 --
--- Name: sessions; Type: SCHEMA; Schema: -; Owner: -
+-- Name: security; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA sessions;
-
-
---
--- Name: social; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA social;
-
-
---
--- Name: storage; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA storage;
+CREATE SCHEMA security;
 
 
 --
@@ -456,10 +432,52 @@ CREATE SCHEMA support;
 
 
 --
+-- Name: tiger; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA tiger;
+
+
+--
+-- Name: tiger_data; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA tiger_data;
+
+
+--
+-- Name: topology; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA topology;
+
+
+--
+-- Name: SCHEMA topology; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA topology IS 'PostGIS Topology schema';
+
+
+--
 -- Name: users; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA users;
+
+
+--
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
 
 
 --
@@ -477,6 +495,70 @@ COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 --
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types and functions';
+
+
+--
+-- Name: postgis_tiger_geocoder; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
+
+
+--
+-- Name: EXTENSION postgis_tiger_geocoder; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION postgis_tiger_geocoder IS 'PostGIS tiger geocoder and reverse geocoder';
+
+
+--
+-- Name: postgis_topology; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
+
+
+--
+-- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and functions';
+
+
+--
+-- Name: VoucherScanSource; Type: TYPE; Schema: analytics; Owner: -
+--
+
+CREATE TYPE analytics."VoucherScanSource" AS ENUM (
+    'camera',
+    'gallery',
+    'link',
+    'share'
+);
+
+
+--
+-- Name: VoucherScanType; Type: TYPE; Schema: analytics; Owner: -
+--
+
+CREATE TYPE analytics."VoucherScanType" AS ENUM (
+    'customer',
+    'business'
+);
+
+
+--
 -- Name: AuditAction; Type: TYPE; Schema: audit; Owner: -
 --
 
@@ -491,125 +573,133 @@ CREATE TYPE audit."AuditAction" AS ENUM (
 
 
 --
--- Name: DeviceType; Type: TYPE; Schema: auth; Owner: -
+-- Name: CustomerVoucherStatus; Type: TYPE; Schema: business; Owner: -
 --
 
-CREATE TYPE auth."DeviceType" AS ENUM (
-    'ios',
-    'android',
-    'web',
-    'desktop'
+CREATE TYPE business."CustomerVoucherStatus" AS ENUM (
+    'claimed',
+    'redeemed',
+    'expired'
 );
 
 
 --
--- Name: MfaMethod; Type: TYPE; Schema: auth; Owner: -
+-- Name: VoucherCodeType; Type: TYPE; Schema: business; Owner: -
 --
 
-CREATE TYPE auth."MfaMethod" AS ENUM (
-    'sms',
-    'totp',
-    'email',
-    'backup_codes'
+CREATE TYPE business."VoucherCodeType" AS ENUM (
+    'qr',
+    'short',
+    'static'
 );
 
 
 --
--- Name: UserRole; Type: TYPE; Schema: auth; Owner: -
+-- Name: VoucherState; Type: TYPE; Schema: business; Owner: -
 --
 
-CREATE TYPE auth."UserRole" AS ENUM (
-    'ADMIN',
-    'MEMBER',
-    'PROFESSIONAL',
-    'THERAPIST',
-    'CONTENT_CREATOR'
+CREATE TYPE business."VoucherState" AS ENUM (
+    'draft',
+    'published',
+    'claimed',
+    'redeemed',
+    'expired',
+    'suspended'
 );
 
 
 --
--- Name: UserStatus; Type: TYPE; Schema: auth; Owner: -
+-- Name: VoucherType; Type: TYPE; Schema: business; Owner: -
 --
 
-CREATE TYPE auth."UserStatus" AS ENUM (
-    'ACTIVE',
-    'SUSPENDED',
-    'BANNED',
-    'UNCONFIRMED'
+CREATE TYPE business."VoucherType" AS ENUM (
+    'percentage',
+    'fixed'
 );
 
 
 --
--- Name: GymStatus; Type: TYPE; Schema: gyms; Owner: -
+-- Name: AdSize; Type: TYPE; Schema: files; Owner: -
 --
 
-CREATE TYPE gyms."GymStatus" AS ENUM (
-    'ACTIVE',
-    'INACTIVE',
-    'MAINTENANCE',
-    'COMING_SOON'
+CREATE TYPE files."AdSize" AS ENUM (
+    'single',
+    'quarter',
+    'half',
+    'full'
 );
 
 
 --
--- Name: GymSubscriptionStatus; Type: TYPE; Schema: gyms; Owner: -
+-- Name: ContentType; Type: TYPE; Schema: files; Owner: -
 --
 
-CREATE TYPE gyms."GymSubscriptionStatus" AS ENUM (
-    'ACTIVE',
-    'EXPIRED',
-    'CANCELLED'
+CREATE TYPE files."ContentType" AS ENUM (
+    'voucher',
+    'image',
+    'ad',
+    'sponsored'
 );
 
 
 --
--- Name: GymTier; Type: TYPE; Schema: gyms; Owner: -
+-- Name: FileType; Type: TYPE; Schema: files; Owner: -
 --
 
-CREATE TYPE gyms."GymTier" AS ENUM (
-    'BASIC',
-    'STANDARD',
-    'PREMIUM',
-    'ENTERPRISE'
+CREATE TYPE files."FileType" AS ENUM (
+    'IMAGE',
+    'VIDEO',
+    'DOCUMENT',
+    'AUDIO',
+    'OTHER'
 );
 
 
 --
--- Name: GymVerificationStatus; Type: TYPE; Schema: gyms; Owner: -
+-- Name: PageLayoutType; Type: TYPE; Schema: files; Owner: -
 --
 
-CREATE TYPE gyms."GymVerificationStatus" AS ENUM (
-    'PENDING',
-    'UNDER_REVIEW',
-    'APPROVED',
-    'REJECTED',
-    'SUSPENDED'
+CREATE TYPE files."PageLayoutType" AS ENUM (
+    'standard',
+    'mixed',
+    'full_page',
+    'custom'
 );
 
 
 --
--- Name: StuffType; Type: TYPE; Schema: gyms; Owner: -
+-- Name: StorageProvider; Type: TYPE; Schema: files; Owner: -
 --
 
-CREATE TYPE gyms."StuffType" AS ENUM (
-    'EQUIPMENT',
-    'AMENITY',
-    'FEATURE'
+CREATE TYPE files."StorageProvider" AS ENUM (
+    'AWS_S3',
+    'LOCAL',
+    'MINIO'
 );
 
 
 --
--- Name: WeekDay; Type: TYPE; Schema: gyms; Owner: -
+-- Name: VoucherBookStatus; Type: TYPE; Schema: files; Owner: -
 --
 
-CREATE TYPE gyms."WeekDay" AS ENUM (
-    'SUNDAY',
-    'MONDAY',
-    'TUESDAY',
-    'WEDNESDAY',
-    'THURSDAY',
-    'FRIDAY',
-    'SATURDAY'
+CREATE TYPE files."VoucherBookStatus" AS ENUM (
+    'draft',
+    'ready_for_print',
+    'published',
+    'archived'
+);
+
+
+--
+-- Name: VoucherBookType; Type: TYPE; Schema: files; Owner: -
+--
+
+CREATE TYPE files."VoucherBookType" AS ENUM (
+    'monthly',
+    'special_edition',
+    'regional',
+    'seasonal',
+    'promotional'
 );
 
 
@@ -643,10 +733,8 @@ CREATE TYPE identity."MfaMethod" AS ENUM (
 
 CREATE TYPE identity."UserRole" AS ENUM (
     'ADMIN',
-    'MEMBER',
-    'PROFESSIONAL',
-    'THERAPIST',
-    'CONTENT_CREATOR'
+    'CUSTOMER',
+    'BUSINESS'
 );
 
 
@@ -663,127 +751,66 @@ CREATE TYPE identity."UserStatus" AS ENUM (
 
 
 --
--- Name: InvitationStatus; Type: TYPE; Schema: sessions; Owner: -
+-- Name: SubscriptionStatus; Type: TYPE; Schema: payments; Owner: -
 --
 
-CREATE TYPE sessions."InvitationStatus" AS ENUM (
+CREATE TYPE payments."SubscriptionStatus" AS ENUM (
+    'active',
+    'canceled',
+    'incomplete',
+    'incompleteExpired',
+    'pastDue',
+    'trialing',
+    'unpaid'
+);
+
+
+--
+-- Name: FraudCaseStatus; Type: TYPE; Schema: security; Owner: -
+--
+
+CREATE TYPE security."FraudCaseStatus" AS ENUM (
+    'pending',
+    'reviewing',
+    'approved',
+    'rejected',
+    'false_positive'
+);
+
+
+--
+-- Name: CommunicationMethod; Type: TYPE; Schema: support; Owner: -
+--
+
+CREATE TYPE support."CommunicationMethod" AS ENUM (
+    'EMAIL',
+    'SMS',
+    'PUSH',
+    'IN_APP'
+);
+
+
+--
+-- Name: NotificationStatus; Type: TYPE; Schema: support; Owner: -
+--
+
+CREATE TYPE support."NotificationStatus" AS ENUM (
     'PENDING',
-    'ACCEPTED',
-    'DECLINED'
+    'SENT',
+    'FAILED',
+    'READ'
 );
 
 
 --
--- Name: InviteeStatus; Type: TYPE; Schema: sessions; Owner: -
+-- Name: NotificationType; Type: TYPE; Schema: support; Owner: -
 --
 
-CREATE TYPE sessions."InviteeStatus" AS ENUM (
-    'PENDING',
-    'CONFIRMED',
-    'DECLINED'
-);
-
-
---
--- Name: SessionPurpose; Type: TYPE; Schema: sessions; Owner: -
---
-
-CREATE TYPE sessions."SessionPurpose" AS ENUM (
-    'WORKING',
-    'WORKOUT',
-    'CONTENT'
-);
-
-
---
--- Name: SessionRating; Type: TYPE; Schema: sessions; Owner: -
---
-
-CREATE TYPE sessions."SessionRating" AS ENUM (
-    'SAD',
-    'NEUTRAL',
-    'HAPPY'
-);
-
-
---
--- Name: SessionStatus; Type: TYPE; Schema: sessions; Owner: -
---
-
-CREATE TYPE sessions."SessionStatus" AS ENUM (
-    'UPCOMING',
-    'PENDING_APPROVAL',
-    'PAYMENT_PENDING',
-    'COMPLETED',
-    'CANCELLED',
-    'DECLINED'
-);
-
-
---
--- Name: TeamSize; Type: TYPE; Schema: sessions; Owner: -
---
-
-CREATE TYPE sessions."TeamSize" AS ENUM (
-    'CREATOR',
-    'BRAND',
-    'ENTERPRISE'
-);
-
-
---
--- Name: WaitingListStatus; Type: TYPE; Schema: sessions; Owner: -
---
-
-CREATE TYPE sessions."WaitingListStatus" AS ENUM (
-    'WAITING',
-    'ACCEPTED',
-    'DECLINED',
-    'LEFT'
-);
-
-
---
--- Name: ActivityType; Type: TYPE; Schema: social; Owner: -
---
-
-CREATE TYPE social."ActivityType" AS ENUM (
-    'SESSION_BOOKED',
-    'SESSION_COMPLETED',
-    'SESSION_REVIEWED',
-    'FRIEND_ADDED',
-    'USER_FOLLOWED',
-    'GYM_VISITED',
-    'ACHIEVEMENT_EARNED',
-    'PROFILE_UPDATED',
-    'ENTITY_LIKED',
-    'ENTITY_SHARED',
-    'ENTITY_COMMENTED',
-    'ENTITY_BOOKMARKED'
-);
-
-
---
--- Name: InteractionType; Type: TYPE; Schema: social; Owner: -
---
-
-CREATE TYPE social."InteractionType" AS ENUM (
-    'LIKE',
-    'COMMENT',
-    'SHARE',
-    'BOOKMARK'
-);
-
-
---
--- Name: PrivacyLevel; Type: TYPE; Schema: social; Owner: -
---
-
-CREATE TYPE social."PrivacyLevel" AS ENUM (
-    'PUBLIC',
-    'FRIENDS',
-    'FOLLOWERS',
-    'PRIVATE'
+CREATE TYPE support."NotificationType" AS ENUM (
+    'EMAIL',
+    'SMS',
+    'PUSH',
+    'IN_APP'
 );
 
 
@@ -806,12 +833,12 @@ CREATE TYPE support."ProblemPriority" AS ENUM (
 
 CREATE TYPE support."ProblemStatus" AS ENUM (
     'OPEN',
-    'IN_PROGRESS',
-    'RESOLVED',
-    'CLOSED',
     'ASSIGNED',
+    'IN_PROGRESS',
     'WAITING_CUSTOMER',
-    'WAITING_INTERNAL'
+    'WAITING_INTERNAL',
+    'RESOLVED',
+    'CLOSED'
 );
 
 
@@ -823,40 +850,34 @@ CREATE TYPE support."ProblemType" AS ENUM (
     'BILLING',
     'TECHNICAL',
     'ACCOUNT',
-    'BOOKING',
-    'GYM_ISSUE',
-    'TRAINER_ISSUE',
     'GENERAL',
     'BUG_REPORT',
     'FEATURE_REQUEST'
 );
 
 
---
--- Name: FriendOrClientType; Type: TYPE; Schema: users; Owner: -
---
-
-CREATE TYPE users."FriendOrClientType" AS ENUM (
-    'FRIEND',
-    'CLIENT'
-);
-
-
---
--- Name: FriendStatus; Type: TYPE; Schema: users; Owner: -
---
-
-CREATE TYPE users."FriendStatus" AS ENUM (
-    'PENDING',
-    'ACCEPTED',
-    'DECLINED',
-    'BLOCKED'
-);
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: voucher_scans; Type: TABLE; Schema: analytics; Owner: -
+--
+
+CREATE TABLE analytics.voucher_scans (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    voucher_id uuid NOT NULL,
+    user_id uuid,
+    scan_type analytics."VoucherScanType" NOT NULL,
+    scan_source analytics."VoucherScanSource" NOT NULL,
+    location public.geography(Point,4326),
+    device_info jsonb DEFAULT '{}'::jsonb NOT NULL,
+    business_id uuid,
+    scanned_at timestamp(6) with time zone NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    metadata jsonb
+);
+
 
 --
 -- Name: audit_logs; Type: TABLE; Schema: audit; Owner: -
@@ -874,99 +895,162 @@ CREATE TABLE audit.audit_logs (
 
 
 --
--- Name: security_events; Type: TABLE; Schema: auth; Owner: -
+-- Name: customer_vouchers; Type: TABLE; Schema: business; Owner: -
 --
 
-CREATE TABLE auth.security_events (
+CREATE TABLE business.customer_vouchers (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid,
-    device_id uuid,
-    event_type character varying(100) NOT NULL,
-    event_data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    ip_address inet,
-    user_agent text,
-    location jsonb,
-    risk_score integer DEFAULT 0 NOT NULL,
+    customer_id uuid NOT NULL,
+    voucher_id uuid NOT NULL,
+    claimed_at timestamp(6) with time zone NOT NULL,
+    status business."CustomerVoucherStatus" DEFAULT 'claimed'::business."CustomerVoucherStatus" NOT NULL,
+    notification_preferences jsonb,
+    redeemed_at timestamp(6) with time zone,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: voucher_codes; Type: TABLE; Schema: business; Owner: -
+--
+
+CREATE TABLE business.voucher_codes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    voucher_id uuid NOT NULL,
+    code character varying(500) NOT NULL,
+    type business."VoucherCodeType" NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    metadata jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: voucher_redemptions; Type: TABLE; Schema: business; Owner: -
+--
+
+CREATE TABLE business.voucher_redemptions (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    voucher_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    code_used character varying(500) NOT NULL,
+    redeemed_at timestamp(6) with time zone NOT NULL,
+    location public.geography(Point,4326),
+    metadata jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
 --
--- Name: user_auth_methods; Type: TABLE; Schema: auth; Owner: -
+-- Name: vouchers; Type: TABLE; Schema: business; Owner: -
 --
 
-CREATE TABLE auth.user_auth_methods (
+CREATE TABLE business.vouchers (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    auth_method character varying(50) NOT NULL,
-    provider_data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    is_verified boolean DEFAULT false NOT NULL,
-    is_enabled boolean DEFAULT true NOT NULL,
-    last_used_at timestamp(6) with time zone,
+    business_id uuid NOT NULL,
+    category_id uuid,
+    state business."VoucherState" DEFAULT 'draft'::business."VoucherState" NOT NULL,
+    title_key character varying(255) NOT NULL,
+    description_key character varying(255) NOT NULL,
+    terms_and_conditions_key character varying(255) NOT NULL,
+    type business."VoucherType" NOT NULL,
+    value numeric(10,2),
+    discount numeric(5,2),
+    currency character varying(3) DEFAULT 'PYG'::character varying NOT NULL,
+    location public.geography(Point,4326),
+    image_url character varying(500),
+    valid_from timestamp(6) with time zone,
+    valid_until timestamp(6) with time zone,
+    max_redemptions integer,
+    max_redemptions_per_user integer DEFAULT 1 NOT NULL,
+    redemptions_count integer DEFAULT 0 NOT NULL,
+    scan_count integer DEFAULT 0 NOT NULL,
+    claim_count integer DEFAULT 0 NOT NULL,
+    metadata jsonb,
+    qr_code character varying(500),
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp(6) with time zone
+);
+
+
+--
+-- Name: categories; Type: TABLE; Schema: catalog; Owner: -
+--
+
+CREATE TABLE catalog.categories (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name_key character varying(255) NOT NULL,
+    description_key character varying(255),
+    icon character varying(255),
+    parent_id uuid,
+    is_active boolean DEFAULT true NOT NULL,
+    sort_order integer DEFAULT 0 NOT NULL,
+    slug character varying(255) NOT NULL,
+    level integer DEFAULT 1 NOT NULL,
+    path character varying(1000) DEFAULT ''::character varying NOT NULL,
+    created_by uuid NOT NULL,
+    updated_by uuid,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
+    deleted_at timestamp(6) with time zone
+);
+
+
+--
+-- Name: ad_placements; Type: TABLE; Schema: files; Owner: -
+--
+
+CREATE TABLE files.ad_placements (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    page_id uuid NOT NULL,
+    content_type files."ContentType" DEFAULT 'voucher'::files."ContentType" NOT NULL,
+    "position" integer NOT NULL,
+    size files."AdSize" DEFAULT 'single'::files."AdSize" NOT NULL,
+    spaces_used integer DEFAULT 1 NOT NULL,
+    image_url character varying(500),
+    qr_code_payload text,
+    short_code character varying(20),
+    title character varying(255),
+    description text,
+    metadata jsonb,
+    created_by uuid NOT NULL,
+    updated_by uuid,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
 --
--- Name: user_devices; Type: TABLE; Schema: auth; Owner: -
+-- Name: book_distributions; Type: TABLE; Schema: files; Owner: -
 --
 
-CREATE TABLE auth.user_devices (
+CREATE TABLE files.book_distributions (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    device_id character varying(255) NOT NULL,
-    device_name character varying(255),
-    device_type auth."DeviceType" NOT NULL,
-    browser_info jsonb DEFAULT '{}'::jsonb NOT NULL,
-    last_ip_address inet,
-    last_location jsonb,
-    is_trusted boolean DEFAULT false NOT NULL,
-    trust_expires_at timestamp(6) with time zone,
-    fcm_token character varying(500),
-    last_active_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    book_id uuid NOT NULL,
+    business_id uuid NOT NULL,
+    business_name character varying(255) NOT NULL,
+    location_id uuid,
+    location_name character varying(255),
+    quantity integer NOT NULL,
+    distribution_type character varying(50) NOT NULL,
+    contact_name character varying(255) NOT NULL,
+    contact_email character varying(255),
+    contact_phone character varying(50),
+    delivery_address text,
+    status character varying(50) DEFAULT 'pending'::character varying NOT NULL,
+    shipped_at timestamp(6) with time zone,
+    delivered_at timestamp(6) with time zone,
+    tracking_number character varying(255),
+    shipping_carrier character varying(100),
+    notes text,
+    metadata jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: user_identities; Type: TABLE; Schema: auth; Owner: -
---
-
-CREATE TABLE auth.user_identities (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    provider character varying(50) NOT NULL,
-    provider_id character varying(255) NOT NULL,
-    firebase_uid character varying(128),
-    provider_data jsonb DEFAULT '{}'::jsonb NOT NULL,
-    last_sign_in_method character varying(50),
-    is_email_verified boolean DEFAULT false NOT NULL,
-    is_phone_verified boolean DEFAULT false NOT NULL,
-    last_login timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: user_mfa_settings; Type: TABLE; Schema: auth; Owner: -
---
-
-CREATE TABLE auth.user_mfa_settings (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    is_enabled boolean DEFAULT false NOT NULL,
-    preferred_method auth."MfaMethod",
-    backup_codes_hash text[],
-    backup_codes_generated_at timestamp(6) with time zone,
-    backup_codes_used integer DEFAULT 0 NOT NULL,
-    totp_secret_encrypted text,
-    recovery_email character varying(255),
-    phone_number_verified character varying(50),
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_by uuid NOT NULL,
+    updated_by uuid
 );
 
 
@@ -998,155 +1082,88 @@ CREATE TABLE files.file_storage_logs (
 
 
 --
--- Name: gym_hourly_prices; Type: TABLE; Schema: gyms; Owner: -
+-- Name: voucher_book_pages; Type: TABLE; Schema: files; Owner: -
 --
 
-CREATE TABLE gyms.gym_hourly_prices (
+CREATE TABLE files.voucher_book_pages (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    gym_id uuid NOT NULL,
-    hour integer NOT NULL,
-    price integer NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    day_of_week gyms."WeekDay" NOT NULL
-);
-
-
---
--- Name: gym_members; Type: TABLE; Schema: gyms; Owner: -
---
-
-CREATE TABLE gyms.gym_members (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    gym_id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    joined_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    status text DEFAULT 'ACTIVE'::text NOT NULL
-);
-
-
---
--- Name: gym_reviews; Type: TABLE; Schema: gyms; Owner: -
---
-
-CREATE TABLE gyms.gym_reviews (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    gym_id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    rating integer NOT NULL,
-    comment text,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: gym_special_prices; Type: TABLE; Schema: gyms; Owner: -
---
-
-CREATE TABLE gyms.gym_special_prices (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    gym_id uuid NOT NULL,
-    date date NOT NULL,
-    hour integer NOT NULL,
-    price integer NOT NULL,
-    reason text,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: gym_trainers; Type: TABLE; Schema: gyms; Owner: -
---
-
-CREATE TABLE gyms.gym_trainers (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    gym_id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    start_date date DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    end_date date,
-    status text DEFAULT 'ACTIVE'::text NOT NULL
-);
-
-
---
--- Name: gyms; Type: TABLE; Schema: gyms; Owner: -
---
-
-CREATE TABLE gyms.gyms (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name text NOT NULL,
-    description text NOT NULL,
-    address text NOT NULL,
-    opening_hours text NOT NULL,
-    area integer NOT NULL,
-    capacity integer NOT NULL,
-    price_range text NOT NULL,
-    pictures text[] DEFAULT ARRAY[]::text[],
-    house_rules text,
-    public_transport text,
-    parking text,
-    is_partner boolean DEFAULT false NOT NULL,
-    partner text,
-    latitude double precision,
-    longitude double precision,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    status gyms."GymStatus" DEFAULT 'COMING_SOON'::gyms."GymStatus" NOT NULL,
-    is_active boolean DEFAULT true NOT NULL,
-    admin_notes text,
-    amenities text[] DEFAULT ARRAY[]::text[],
-    bank_account_verified boolean DEFAULT false NOT NULL,
-    business_registration_number text,
-    city text NOT NULL,
-    country text DEFAULT 'UK'::text NOT NULL,
-    email text NOT NULL,
-    features text[] DEFAULT ARRAY[]::text[],
-    last_inspection_date date,
-    owner_id uuid,
-    phone_number text NOT NULL,
-    postal_code text NOT NULL,
-    rejection_reason text,
-    risk_score integer,
-    state text NOT NULL,
-    subscription_expires_at timestamp(6) with time zone,
-    subscription_status gyms."GymSubscriptionStatus",
-    tax_id text,
-    tier gyms."GymTier" DEFAULT 'BASIC'::gyms."GymTier" NOT NULL,
-    verification_status gyms."GymVerificationStatus" DEFAULT 'PENDING'::gyms."GymVerificationStatus" NOT NULL,
-    verified_at timestamp(6) with time zone,
-    verified_by uuid,
-    website text
-);
-
-
---
--- Name: inductions; Type: TABLE; Schema: gyms; Owner: -
---
-
-CREATE TABLE gyms.inductions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    gym_id uuid NOT NULL,
-    date date NOT NULL,
-    start_time time without time zone NOT NULL,
-    status text DEFAULT 'pending'::text NOT NULL,
+    book_id uuid NOT NULL,
+    page_number integer NOT NULL,
+    layout_type files."PageLayoutType" DEFAULT 'standard'::files."PageLayoutType" NOT NULL,
+    metadata jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
 --
--- Name: stuff; Type: TABLE; Schema: gyms; Owner: -
+-- Name: voucher_books; Type: TABLE; Schema: files; Owner: -
 --
 
-CREATE TABLE gyms.stuff (
+CREATE TABLE files.voucher_books (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name text NOT NULL,
-    icon text NOT NULL,
-    type gyms."StuffType" DEFAULT 'EQUIPMENT'::gyms."StuffType" NOT NULL,
-    gym_id uuid,
+    title character varying(255) NOT NULL,
+    edition character varying(100),
+    book_type files."VoucherBookType" DEFAULT 'monthly'::files."VoucherBookType" NOT NULL,
+    month integer,
+    year integer NOT NULL,
+    status files."VoucherBookStatus" DEFAULT 'draft'::files."VoucherBookStatus" NOT NULL,
+    total_pages integer DEFAULT 24 NOT NULL,
+    published_at timestamp(6) with time zone,
+    cover_image_url character varying(500),
+    back_image_url character varying(500),
+    pdf_url character varying(500),
+    pdf_generated_at timestamp(6) with time zone,
+    metadata jsonb,
+    created_by uuid NOT NULL,
+    updated_by uuid,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    is_active boolean DEFAULT true NOT NULL
+    deleted_at timestamp(6) with time zone
+);
+
+
+--
+-- Name: languages; Type: TABLE; Schema: i18n; Owner: -
+--
+
+CREATE TABLE i18n.languages (
+    code text NOT NULL,
+    name text NOT NULL,
+    direction text DEFAULT 'ltr'::text NOT NULL,
+    "isDefault" boolean DEFAULT false NOT NULL,
+    "isActive" boolean DEFAULT true NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+--
+-- Name: translations; Type: TABLE; Schema: i18n; Owner: -
+--
+
+CREATE TABLE i18n.translations (
+    id text NOT NULL,
+    key text NOT NULL,
+    value text NOT NULL,
+    "languageCode" text NOT NULL,
+    context text,
+    service text,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_language_preferences; Type: TABLE; Schema: i18n; Owner: -
+--
+
+CREATE TABLE i18n.user_language_preferences (
+    id text NOT NULL,
+    "userId" text NOT NULL,
+    "languageCode" text NOT NULL,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
 );
 
 
@@ -1248,102 +1265,21 @@ CREATE TABLE identity.user_mfa_settings (
 
 
 --
--- Name: credits; Type: TABLE; Schema: payments; Owner: -
+-- Name: businesses; Type: TABLE; Schema: marketplace; Owner: -
 --
 
-CREATE TABLE payments.credits (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    amount_demand integer DEFAULT 0 NOT NULL,
-    amount_sub integer DEFAULT 0 NOT NULL,
-    user_id uuid NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: credits_history; Type: TABLE; Schema: payments; Owner: -
---
-
-CREATE TABLE payments.credits_history (
+CREATE TABLE marketplace.businesses (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
-    credits_id uuid NOT NULL,
-    amount integer NOT NULL,
-    description text NOT NULL,
-    operation text NOT NULL,
-    type text DEFAULT 'demand'::text NOT NULL,
-    transaction_id text,
-    date timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: credits_packs; Type: TABLE; Schema: payments; Owner: -
---
-
-CREATE TABLE payments.credits_packs (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    type text NOT NULL,
-    amount integer NOT NULL,
-    frequency integer NOT NULL,
-    price double precision NOT NULL,
+    business_name_key character varying(255) NOT NULL,
+    business_description_key character varying(255),
+    category_id uuid NOT NULL,
+    verified boolean DEFAULT false NOT NULL,
     active boolean DEFAULT true NOT NULL,
-    created_by uuid NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone
-);
-
-
---
--- Name: memberships; Type: TABLE; Schema: payments; Owner: -
---
-
-CREATE TABLE payments.memberships (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    stripe_customer_id text,
-    stripe_subscription_id text,
-    active boolean DEFAULT true NOT NULL,
-    subscription_status text DEFAULT 'inactive'::text NOT NULL,
-    plan_type text DEFAULT 'basic'::text NOT NULL,
-    subscription_start_date timestamp(6) with time zone,
-    subscription_end_date timestamp(6) with time zone,
-    last_payment_date timestamp(6) with time zone,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: promo_code_usages; Type: TABLE; Schema: payments; Owner: -
---
-
-CREATE TABLE payments.promo_code_usages (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    promo_code_id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    transaction_id text,
-    used_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: promo_codes; Type: TABLE; Schema: payments; Owner: -
---
-
-CREATE TABLE payments.promo_codes (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    code text NOT NULL,
-    discount integer NOT NULL,
-    active boolean DEFAULT true NOT NULL,
-    allowed_times integer NOT NULL,
-    amount_available integer NOT NULL,
-    expiration_date timestamp(6) with time zone NOT NULL,
-    created_by uuid NOT NULL,
+    avg_rating numeric(3,2) DEFAULT 0 NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    cancelled_at timestamp(6) with time zone
+    deleted_at timestamp(6) with time zone
 );
 
 
@@ -1359,16 +1295,12 @@ CREATE TABLE payments.subscription_plans (
     currency text DEFAULT 'usd'::text NOT NULL,
     "interval" text NOT NULL,
     interval_count integer DEFAULT 1 NOT NULL,
-    credits_amount integer NOT NULL,
     trial_period_days integer,
     features text[],
     is_active boolean DEFAULT true NOT NULL,
     metadata jsonb,
     stripe_product_id text,
     stripe_price_id text,
-    membership_type text,
-    membership_package text,
-    gym_access_times jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -1382,9 +1314,7 @@ CREATE TABLE payments.subscriptions (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_id uuid NOT NULL,
     plan_id uuid,
-    plan_type text DEFAULT 'basic'::text NOT NULL,
-    status text DEFAULT 'active'::text NOT NULL,
-    billing_interval text DEFAULT 'monthly'::text NOT NULL,
+    status payments."SubscriptionStatus" DEFAULT 'active'::payments."SubscriptionStatus" NOT NULL,
     current_period_start timestamp(6) with time zone,
     current_period_end timestamp(6) with time zone,
     trial_end timestamp(6) with time zone,
@@ -1395,7 +1325,6 @@ CREATE TABLE payments.subscriptions (
     start_date timestamp(6) with time zone,
     end_date timestamp(6) with time zone,
     cancelled_at timestamp(6) with time zone,
-    last_processed_at timestamp(6) with time zone,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -1418,174 +1347,45 @@ CREATE TABLE public._prisma_migrations (
 
 
 --
--- Name: invitations; Type: TABLE; Schema: sessions; Owner: -
+-- Name: fraud_case_history; Type: TABLE; Schema: security; Owner: -
 --
 
-CREATE TABLE sessions.invitations (
+CREATE TABLE security.fraud_case_history (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    session_id uuid NOT NULL,
-    guest_email character varying(255) NOT NULL,
-    friend_id uuid,
-    status sessions."InvitationStatus" DEFAULT 'PENDING'::sessions."InvitationStatus" NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: session_invitees; Type: TABLE; Schema: sessions; Owner: -
---
-
-CREATE TABLE sessions.session_invitees (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    session_id uuid NOT NULL,
-    friend_id uuid NOT NULL,
-    status sessions."InviteeStatus" DEFAULT 'PENDING'::sessions."InviteeStatus" NOT NULL,
-    invited_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: session_records; Type: TABLE; Schema: sessions; Owner: -
---
-
-CREATE TABLE sessions.session_records (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    session_id uuid NOT NULL,
-    type character varying(50) NOT NULL,
-    description text NOT NULL,
-    modified_by uuid NOT NULL,
+    case_id uuid NOT NULL,
+    action character varying(100) NOT NULL,
+    old_value text,
+    new_value text,
+    notes text,
+    performed_by uuid NOT NULL,
+    performed_at timestamp(6) with time zone NOT NULL,
+    metadata jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
 --
--- Name: session_reviews; Type: TABLE; Schema: sessions; Owner: -
+-- Name: fraud_cases; Type: TABLE; Schema: security; Owner: -
 --
 
-CREATE TABLE sessions.session_reviews (
+CREATE TABLE security.fraud_cases (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    session_id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    rating sessions."SessionRating" NOT NULL,
-    reason text,
-    image character varying(500),
+    case_number character varying(20) NOT NULL,
+    redemption_id uuid NOT NULL,
+    detected_at timestamp(6) with time zone NOT NULL,
+    risk_score integer NOT NULL,
+    flags jsonb NOT NULL,
+    detection_metadata jsonb,
+    customer_id uuid NOT NULL,
+    business_id uuid NOT NULL,
+    voucher_id uuid NOT NULL,
+    status security."FraudCaseStatus" DEFAULT 'pending'::security."FraudCaseStatus" NOT NULL,
+    reviewed_at timestamp(6) with time zone,
+    reviewed_by uuid,
+    review_notes text,
+    actions_taken jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: sessions; Type: TABLE; Schema: sessions; Owner: -
---
-
-CREATE TABLE sessions.sessions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    gym_id uuid NOT NULL,
-    date date NOT NULL,
-    start_time time without time zone NOT NULL,
-    end_time time without time zone NOT NULL,
-    duration integer NOT NULL,
-    status sessions."SessionStatus" DEFAULT 'UPCOMING'::sessions."SessionStatus" NOT NULL,
-    payment_deadline timestamp(6) with time zone,
-    price integer NOT NULL,
-    guests text[] DEFAULT ARRAY[]::text[],
-    purpose sessions."SessionPurpose" NOT NULL,
-    team_size sessions."TeamSize",
-    feedback text,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
-    cancelled_at timestamp(6) with time zone,
-    trainer_id uuid,
-    gym_name character varying(255),
-    trainer_name character varying(255)
-);
-
-
---
--- Name: waiting_list; Type: TABLE; Schema: sessions; Owner: -
---
-
-CREATE TABLE sessions.waiting_list (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    session_id uuid NOT NULL,
-    status sessions."WaitingListStatus" DEFAULT 'WAITING'::sessions."WaitingListStatus" NOT NULL,
-    joined_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: activities; Type: TABLE; Schema: social; Owner: -
---
-
-CREATE TABLE social.activities (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    type social."ActivityType" NOT NULL,
-    entity_type character varying(50) NOT NULL,
-    entity_id uuid NOT NULL,
-    metadata jsonb,
-    privacy social."PrivacyLevel" DEFAULT 'PUBLIC'::social."PrivacyLevel" NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: follows; Type: TABLE; Schema: social; Owner: -
---
-
-CREATE TABLE social.follows (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    follower_id uuid NOT NULL,
-    following_id uuid NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: social_interactions; Type: TABLE; Schema: social; Owner: -
---
-
-CREATE TABLE social.social_interactions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    entity_type character varying(50) NOT NULL,
-    entity_id uuid NOT NULL,
-    type social."InteractionType" NOT NULL,
-    content text,
-    metadata jsonb,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone NOT NULL
-);
-
-
---
--- Name: file_storage_logs; Type: TABLE; Schema: storage; Owner: -
---
-
-CREATE TABLE storage.file_storage_logs (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    file_id uuid NOT NULL,
-    file_name character varying(255) NOT NULL,
-    content_type character varying(100) NOT NULL,
-    size integer NOT NULL,
-    folder character varying(255),
-    is_public boolean DEFAULT false NOT NULL,
-    url text NOT NULL,
-    storage_key text,
-    status character varying(20) NOT NULL,
-    user_id uuid,
-    metadata jsonb,
-    provider character varying(50),
-    uploaded_at timestamp(6) with time zone,
-    deleted_at timestamp(6) with time zone,
-    error_message text,
-    processing_time_ms integer,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -1642,13 +1442,13 @@ CREATE TABLE support.problems (
     description text NOT NULL,
     status support."ProblemStatus" DEFAULT 'OPEN'::support."ProblemStatus" NOT NULL,
     priority support."ProblemPriority" DEFAULT 'MEDIUM'::support."ProblemPriority" NOT NULL,
+    type support."ProblemType" DEFAULT 'GENERAL'::support."ProblemType" NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     resolved_at timestamp(6) with time zone,
-    assigned_to uuid,
-    files text[] DEFAULT ARRAY[]::text[],
     ticket_number character varying(20),
-    type support."ProblemType" DEFAULT 'GENERAL'::support."ProblemType" NOT NULL
+    assigned_to uuid,
+    files text[] DEFAULT ARRAY[]::text[]
 );
 
 
@@ -1664,27 +1464,6 @@ CREATE TABLE support.support_comments (
     is_internal boolean DEFAULT false NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: templates; Type: TABLE; Schema: support; Owner: -
---
-
-CREATE TABLE support.templates (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name character varying(100) NOT NULL,
-    type character varying(20) NOT NULL,
-    category character varying(50),
-    external_id character varying(255) NOT NULL,
-    subject character varying(255),
-    body text NOT NULL,
-    description text,
-    variables jsonb,
-    metadata jsonb,
-    is_active boolean DEFAULT true NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -1709,60 +1488,6 @@ CREATE TABLE users.addresses (
 
 
 --
--- Name: friends; Type: TABLE; Schema: users; Owner: -
---
-
-CREATE TABLE users.friends (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    email character varying(255) NOT NULL,
-    name character varying(255),
-    avatar_url character varying(1000),
-    type users."FriendOrClientType" DEFAULT 'FRIEND'::users."FriendOrClientType" NOT NULL,
-    status users."FriendStatus" DEFAULT 'PENDING'::users."FriendStatus" NOT NULL,
-    invited_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    referred_user_id uuid,
-    message text,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: parq; Type: TABLE; Schema: users; Owner: -
---
-
-CREATE TABLE users.parq (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    medical_clearance boolean NOT NULL,
-    existing_injuries boolean NOT NULL,
-    symptoms_check boolean NOT NULL,
-    doctor_consultation boolean NOT NULL,
-    experience_level boolean NOT NULL,
-    proper_technique boolean NOT NULL,
-    gym_etiquette boolean NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: professionals; Type: TABLE; Schema: users; Owner: -
---
-
-CREATE TABLE users.professionals (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    description text NOT NULL,
-    specialties text[] DEFAULT ARRAY[]::text[],
-    favorite_gyms text[] DEFAULT ARRAY[]::text[],
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
 -- Name: users; Type: TABLE; Schema: users; Owner: -
 --
 
@@ -1776,19 +1501,23 @@ CREATE TABLE users.users (
     phone_number character varying(50),
     phone_verified boolean DEFAULT false NOT NULL,
     avatar_url character varying(1000),
+    role identity."UserRole" DEFAULT 'CUSTOMER'::identity."UserRole" NOT NULL,
+    status identity."UserStatus" DEFAULT 'ACTIVE'::identity."UserStatus" NOT NULL,
     last_login_at timestamp(6) with time zone,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     deleted_at timestamp(6) with time zone,
     date_of_birth date,
-    alias character varying(50),
-    app_version character varying(20),
-    active_membership boolean DEFAULT false NOT NULL,
-    guests text[] DEFAULT ARRAY[]::text[],
-    stripe_user_id character varying(255),
-    role identity."UserRole" DEFAULT 'ADMIN'::identity."UserRole" NOT NULL,
-    status identity."UserStatus" DEFAULT 'ACTIVE'::identity."UserStatus" NOT NULL
+    stripe_user_id character varying(255)
 );
+
+
+--
+-- Name: voucher_scans voucher_scans_pkey; Type: CONSTRAINT; Schema: analytics; Owner: -
+--
+
+ALTER TABLE ONLY analytics.voucher_scans
+    ADD CONSTRAINT voucher_scans_pkey PRIMARY KEY (id);
 
 
 --
@@ -1800,43 +1529,59 @@ ALTER TABLE ONLY audit.audit_logs
 
 
 --
--- Name: security_events security_events_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
+-- Name: customer_vouchers customer_vouchers_pkey; Type: CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY auth.security_events
-    ADD CONSTRAINT security_events_pkey PRIMARY KEY (id);
-
-
---
--- Name: user_auth_methods user_auth_methods_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
---
-
-ALTER TABLE ONLY auth.user_auth_methods
-    ADD CONSTRAINT user_auth_methods_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY business.customer_vouchers
+    ADD CONSTRAINT customer_vouchers_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_devices user_devices_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
+-- Name: voucher_codes voucher_codes_pkey; Type: CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY auth.user_devices
-    ADD CONSTRAINT user_devices_pkey PRIMARY KEY (id);
-
-
---
--- Name: user_identities user_identities_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
---
-
-ALTER TABLE ONLY auth.user_identities
-    ADD CONSTRAINT user_identities_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY business.voucher_codes
+    ADD CONSTRAINT voucher_codes_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_mfa_settings user_mfa_settings_pkey; Type: CONSTRAINT; Schema: auth; Owner: -
+-- Name: voucher_redemptions voucher_redemptions_pkey; Type: CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY auth.user_mfa_settings
-    ADD CONSTRAINT user_mfa_settings_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY business.voucher_redemptions
+    ADD CONSTRAINT voucher_redemptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: vouchers vouchers_pkey; Type: CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.vouchers
+    ADD CONSTRAINT vouchers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: categories categories_pkey; Type: CONSTRAINT; Schema: catalog; Owner: -
+--
+
+ALTER TABLE ONLY catalog.categories
+    ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ad_placements ad_placements_pkey; Type: CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.ad_placements
+    ADD CONSTRAINT ad_placements_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: book_distributions book_distributions_pkey; Type: CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.book_distributions
+    ADD CONSTRAINT book_distributions_pkey PRIMARY KEY (id);
 
 
 --
@@ -1848,67 +1593,43 @@ ALTER TABLE ONLY files.file_storage_logs
 
 
 --
--- Name: gym_hourly_prices gym_hourly_prices_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
+-- Name: voucher_book_pages voucher_book_pages_pkey; Type: CONSTRAINT; Schema: files; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gym_hourly_prices
-    ADD CONSTRAINT gym_hourly_prices_pkey PRIMARY KEY (id);
-
-
---
--- Name: gym_members gym_members_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gym_members
-    ADD CONSTRAINT gym_members_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY files.voucher_book_pages
+    ADD CONSTRAINT voucher_book_pages_pkey PRIMARY KEY (id);
 
 
 --
--- Name: gym_reviews gym_reviews_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
+-- Name: voucher_books voucher_books_pkey; Type: CONSTRAINT; Schema: files; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gym_reviews
-    ADD CONSTRAINT gym_reviews_pkey PRIMARY KEY (id);
-
-
---
--- Name: gym_special_prices gym_special_prices_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gym_special_prices
-    ADD CONSTRAINT gym_special_prices_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY files.voucher_books
+    ADD CONSTRAINT voucher_books_pkey PRIMARY KEY (id);
 
 
 --
--- Name: gym_trainers gym_trainers_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
+-- Name: languages languages_pkey; Type: CONSTRAINT; Schema: i18n; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gym_trainers
-    ADD CONSTRAINT gym_trainers_pkey PRIMARY KEY (id);
-
-
---
--- Name: gyms gyms_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gyms
-    ADD CONSTRAINT gyms_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY i18n.languages
+    ADD CONSTRAINT languages_pkey PRIMARY KEY (code);
 
 
 --
--- Name: inductions inductions_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
+-- Name: translations translations_pkey; Type: CONSTRAINT; Schema: i18n; Owner: -
 --
 
-ALTER TABLE ONLY gyms.inductions
-    ADD CONSTRAINT inductions_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY i18n.translations
+    ADD CONSTRAINT translations_pkey PRIMARY KEY (id);
 
 
 --
--- Name: stuff stuff_pkey; Type: CONSTRAINT; Schema: gyms; Owner: -
+-- Name: user_language_preferences user_language_preferences_pkey; Type: CONSTRAINT; Schema: i18n; Owner: -
 --
 
-ALTER TABLE ONLY gyms.stuff
-    ADD CONSTRAINT stuff_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY i18n.user_language_preferences
+    ADD CONSTRAINT user_language_preferences_pkey PRIMARY KEY (id);
 
 
 --
@@ -1952,51 +1673,11 @@ ALTER TABLE ONLY identity.user_mfa_settings
 
 
 --
--- Name: credits_history credits_history_pkey; Type: CONSTRAINT; Schema: payments; Owner: -
+-- Name: businesses businesses_pkey; Type: CONSTRAINT; Schema: marketplace; Owner: -
 --
 
-ALTER TABLE ONLY payments.credits_history
-    ADD CONSTRAINT credits_history_pkey PRIMARY KEY (id);
-
-
---
--- Name: credits_packs credits_packs_pkey; Type: CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.credits_packs
-    ADD CONSTRAINT credits_packs_pkey PRIMARY KEY (id);
-
-
---
--- Name: credits credits_pkey; Type: CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.credits
-    ADD CONSTRAINT credits_pkey PRIMARY KEY (id);
-
-
---
--- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.memberships
-    ADD CONSTRAINT memberships_pkey PRIMARY KEY (id);
-
-
---
--- Name: promo_code_usages promo_code_usages_pkey; Type: CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.promo_code_usages
-    ADD CONSTRAINT promo_code_usages_pkey PRIMARY KEY (id);
-
-
---
--- Name: promo_codes promo_codes_pkey; Type: CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.promo_codes
-    ADD CONSTRAINT promo_codes_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY marketplace.businesses
+    ADD CONSTRAINT businesses_pkey PRIMARY KEY (id);
 
 
 --
@@ -2024,83 +1705,19 @@ ALTER TABLE ONLY public._prisma_migrations
 
 
 --
--- Name: invitations invitations_pkey; Type: CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_case_history fraud_case_history_pkey; Type: CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.invitations
-    ADD CONSTRAINT invitations_pkey PRIMARY KEY (id);
-
-
---
--- Name: session_invitees session_invitees_pkey; Type: CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.session_invitees
-    ADD CONSTRAINT session_invitees_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY security.fraud_case_history
+    ADD CONSTRAINT fraud_case_history_pkey PRIMARY KEY (id);
 
 
 --
--- Name: session_records session_records_pkey; Type: CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_cases fraud_cases_pkey; Type: CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.session_records
-    ADD CONSTRAINT session_records_pkey PRIMARY KEY (id);
-
-
---
--- Name: session_reviews session_reviews_pkey; Type: CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.session_reviews
-    ADD CONSTRAINT session_reviews_pkey PRIMARY KEY (id);
-
-
---
--- Name: sessions sessions_pkey; Type: CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.sessions
-    ADD CONSTRAINT sessions_pkey PRIMARY KEY (id);
-
-
---
--- Name: waiting_list waiting_list_pkey; Type: CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.waiting_list
-    ADD CONSTRAINT waiting_list_pkey PRIMARY KEY (id);
-
-
---
--- Name: activities activities_pkey; Type: CONSTRAINT; Schema: social; Owner: -
---
-
-ALTER TABLE ONLY social.activities
-    ADD CONSTRAINT activities_pkey PRIMARY KEY (id);
-
-
---
--- Name: follows follows_pkey; Type: CONSTRAINT; Schema: social; Owner: -
---
-
-ALTER TABLE ONLY social.follows
-    ADD CONSTRAINT follows_pkey PRIMARY KEY (id);
-
-
---
--- Name: social_interactions social_interactions_pkey; Type: CONSTRAINT; Schema: social; Owner: -
---
-
-ALTER TABLE ONLY social.social_interactions
-    ADD CONSTRAINT social_interactions_pkey PRIMARY KEY (id);
-
-
---
--- Name: file_storage_logs file_storage_logs_pkey; Type: CONSTRAINT; Schema: storage; Owner: -
---
-
-ALTER TABLE ONLY storage.file_storage_logs
-    ADD CONSTRAINT file_storage_logs_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY security.fraud_cases
+    ADD CONSTRAINT fraud_cases_pkey PRIMARY KEY (id);
 
 
 --
@@ -2136,14 +1753,6 @@ ALTER TABLE ONLY support.support_comments
 
 
 --
--- Name: templates templates_pkey; Type: CONSTRAINT; Schema: support; Owner: -
---
-
-ALTER TABLE ONLY support.templates
-    ADD CONSTRAINT templates_pkey PRIMARY KEY (id);
-
-
---
 -- Name: addresses addresses_pkey; Type: CONSTRAINT; Schema: users; Owner: -
 --
 
@@ -2152,35 +1761,88 @@ ALTER TABLE ONLY users.addresses
 
 
 --
--- Name: friends friends_pkey; Type: CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.friends
-    ADD CONSTRAINT friends_pkey PRIMARY KEY (id);
-
-
---
--- Name: parq parq_pkey; Type: CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.parq
-    ADD CONSTRAINT parq_pkey PRIMARY KEY (id);
-
-
---
--- Name: professionals professionals_pkey; Type: CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.professionals
-    ADD CONSTRAINT professionals_pkey PRIMARY KEY (id);
-
-
---
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: users; Owner: -
 --
 
 ALTER TABLE ONLY users.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: voucher_scans_business_id_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_business_id_idx ON analytics.voucher_scans USING btree (business_id);
+
+
+--
+-- Name: voucher_scans_business_id_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_business_id_scanned_at_idx ON analytics.voucher_scans USING btree (business_id, scanned_at);
+
+
+--
+-- Name: voucher_scans_scan_source_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_scan_source_idx ON analytics.voucher_scans USING btree (scan_source);
+
+
+--
+-- Name: voucher_scans_scan_source_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_scan_source_scanned_at_idx ON analytics.voucher_scans USING btree (scan_source, scanned_at);
+
+
+--
+-- Name: voucher_scans_scan_type_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_scan_type_idx ON analytics.voucher_scans USING btree (scan_type);
+
+
+--
+-- Name: voucher_scans_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_scanned_at_idx ON analytics.voucher_scans USING btree (scanned_at);
+
+
+--
+-- Name: voucher_scans_user_id_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_user_id_idx ON analytics.voucher_scans USING btree (user_id);
+
+
+--
+-- Name: voucher_scans_user_id_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_user_id_scanned_at_idx ON analytics.voucher_scans USING btree (user_id, scanned_at);
+
+
+--
+-- Name: voucher_scans_voucher_id_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_voucher_id_idx ON analytics.voucher_scans USING btree (voucher_id);
+
+
+--
+-- Name: voucher_scans_voucher_id_scan_type_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_voucher_id_scan_type_idx ON analytics.voucher_scans USING btree (voucher_id, scan_type);
+
+
+--
+-- Name: voucher_scans_voucher_id_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_voucher_id_scanned_at_idx ON analytics.voucher_scans USING btree (voucher_id, scanned_at);
 
 
 --
@@ -2205,157 +1867,423 @@ CREATE INDEX audit_logs_user_id_idx ON audit.audit_logs USING btree (user_id);
 
 
 --
--- Name: security_events_created_at_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_claimed_at_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX security_events_created_at_idx ON auth.security_events USING btree (created_at);
-
-
---
--- Name: security_events_event_type_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX security_events_event_type_idx ON auth.security_events USING btree (event_type);
+CREATE INDEX customer_vouchers_claimed_at_idx ON business.customer_vouchers USING btree (claimed_at);
 
 
 --
--- Name: security_events_risk_score_created_at_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_customer_id_claimed_at_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX security_events_risk_score_created_at_idx ON auth.security_events USING btree (risk_score, created_at);
-
-
---
--- Name: security_events_user_id_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX security_events_user_id_idx ON auth.security_events USING btree (user_id);
+CREATE INDEX customer_vouchers_customer_id_claimed_at_idx ON business.customer_vouchers USING btree (customer_id, claimed_at);
 
 
 --
--- Name: user_auth_methods_auth_method_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_customer_id_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX user_auth_methods_auth_method_idx ON auth.user_auth_methods USING btree (auth_method);
-
-
---
--- Name: user_auth_methods_user_id_auth_method_key; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE UNIQUE INDEX user_auth_methods_user_id_auth_method_key ON auth.user_auth_methods USING btree (user_id, auth_method);
+CREATE INDEX customer_vouchers_customer_id_idx ON business.customer_vouchers USING btree (customer_id);
 
 
 --
--- Name: user_auth_methods_user_id_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_customer_id_status_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX user_auth_methods_user_id_idx ON auth.user_auth_methods USING btree (user_id);
-
-
---
--- Name: user_auth_methods_user_id_is_enabled_last_used_at_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX user_auth_methods_user_id_is_enabled_last_used_at_idx ON auth.user_auth_methods USING btree (user_id, is_enabled, last_used_at);
+CREATE INDEX customer_vouchers_customer_id_status_idx ON business.customer_vouchers USING btree (customer_id, status);
 
 
 --
--- Name: user_devices_fcm_token_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_customer_id_voucher_id_key; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX user_devices_fcm_token_idx ON auth.user_devices USING btree (fcm_token);
-
-
---
--- Name: user_devices_user_id_device_id_key; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE UNIQUE INDEX user_devices_user_id_device_id_key ON auth.user_devices USING btree (user_id, device_id);
+CREATE UNIQUE INDEX customer_vouchers_customer_id_voucher_id_key ON business.customer_vouchers USING btree (customer_id, voucher_id);
 
 
 --
--- Name: user_devices_user_id_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX user_devices_user_id_idx ON auth.user_devices USING btree (user_id);
-
-
---
--- Name: user_devices_user_id_is_trusted_trust_expires_at_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX user_devices_user_id_is_trusted_trust_expires_at_idx ON auth.user_devices USING btree (user_id, is_trusted, trust_expires_at);
+CREATE INDEX customer_vouchers_redeemed_at_idx ON business.customer_vouchers USING btree (redeemed_at);
 
 
 --
--- Name: user_devices_user_id_last_active_at_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_status_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX user_devices_user_id_last_active_at_idx ON auth.user_devices USING btree (user_id, last_active_at);
-
-
---
--- Name: user_identities_firebase_uid_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX user_identities_firebase_uid_idx ON auth.user_identities USING btree (firebase_uid);
+CREATE INDEX customer_vouchers_status_idx ON business.customer_vouchers USING btree (status);
 
 
 --
--- Name: user_identities_firebase_uid_key; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_voucher_id_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE UNIQUE INDEX user_identities_firebase_uid_key ON auth.user_identities USING btree (firebase_uid);
-
-
---
--- Name: user_identities_provider_provider_id_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX user_identities_provider_provider_id_idx ON auth.user_identities USING btree (provider, provider_id);
+CREATE INDEX customer_vouchers_voucher_id_idx ON business.customer_vouchers USING btree (voucher_id);
 
 
 --
--- Name: user_identities_provider_provider_id_key; Type: INDEX; Schema: auth; Owner: -
+-- Name: customer_vouchers_voucher_id_status_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE UNIQUE INDEX user_identities_provider_provider_id_key ON auth.user_identities USING btree (provider, provider_id);
-
-
---
--- Name: user_identities_user_id_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX user_identities_user_id_idx ON auth.user_identities USING btree (user_id);
+CREATE INDEX customer_vouchers_voucher_id_status_idx ON business.customer_vouchers USING btree (voucher_id, status);
 
 
 --
--- Name: user_identities_user_id_key; Type: INDEX; Schema: auth; Owner: -
+-- Name: voucher_codes_code_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE UNIQUE INDEX user_identities_user_id_key ON auth.user_identities USING btree (user_id);
-
-
---
--- Name: user_mfa_settings_user_id_idx; Type: INDEX; Schema: auth; Owner: -
---
-
-CREATE INDEX user_mfa_settings_user_id_idx ON auth.user_mfa_settings USING btree (user_id);
+CREATE INDEX voucher_codes_code_idx ON business.voucher_codes USING btree (code);
 
 
 --
--- Name: user_mfa_settings_user_id_is_enabled_idx; Type: INDEX; Schema: auth; Owner: -
+-- Name: voucher_codes_code_key; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX user_mfa_settings_user_id_is_enabled_idx ON auth.user_mfa_settings USING btree (user_id, is_enabled);
+CREATE UNIQUE INDEX voucher_codes_code_key ON business.voucher_codes USING btree (code);
 
 
 --
--- Name: user_mfa_settings_user_id_key; Type: INDEX; Schema: auth; Owner: -
+-- Name: voucher_codes_is_active_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE UNIQUE INDEX user_mfa_settings_user_id_key ON auth.user_mfa_settings USING btree (user_id);
+CREATE INDEX voucher_codes_is_active_idx ON business.voucher_codes USING btree (is_active);
+
+
+--
+-- Name: voucher_codes_type_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_codes_type_idx ON business.voucher_codes USING btree (type);
+
+
+--
+-- Name: voucher_codes_voucher_id_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_codes_voucher_id_idx ON business.voucher_codes USING btree (voucher_id);
+
+
+--
+-- Name: voucher_codes_voucher_id_is_active_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_codes_voucher_id_is_active_idx ON business.voucher_codes USING btree (voucher_id, is_active);
+
+
+--
+-- Name: voucher_codes_voucher_id_type_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_codes_voucher_id_type_idx ON business.voucher_codes USING btree (voucher_id, type);
+
+
+--
+-- Name: voucher_redemptions_code_used_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_code_used_idx ON business.voucher_redemptions USING btree (code_used);
+
+
+--
+-- Name: voucher_redemptions_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_redeemed_at_idx ON business.voucher_redemptions USING btree (redeemed_at);
+
+
+--
+-- Name: voucher_redemptions_user_id_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_user_id_idx ON business.voucher_redemptions USING btree (user_id);
+
+
+--
+-- Name: voucher_redemptions_user_id_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_user_id_redeemed_at_idx ON business.voucher_redemptions USING btree (user_id, redeemed_at);
+
+
+--
+-- Name: voucher_redemptions_voucher_id_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_voucher_id_idx ON business.voucher_redemptions USING btree (voucher_id);
+
+
+--
+-- Name: voucher_redemptions_voucher_id_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_voucher_id_redeemed_at_idx ON business.voucher_redemptions USING btree (voucher_id, redeemed_at);
+
+
+--
+-- Name: voucher_redemptions_voucher_id_user_id_key; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_redemptions_voucher_id_user_id_key ON business.voucher_redemptions USING btree (voucher_id, user_id);
+
+
+--
+-- Name: vouchers_business_id_created_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_business_id_created_at_idx ON business.vouchers USING btree (business_id, created_at);
+
+
+--
+-- Name: vouchers_business_id_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_business_id_idx ON business.vouchers USING btree (business_id);
+
+
+--
+-- Name: vouchers_category_id_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_category_id_idx ON business.vouchers USING btree (category_id);
+
+
+--
+-- Name: vouchers_category_id_state_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_category_id_state_idx ON business.vouchers USING btree (category_id, state);
+
+
+--
+-- Name: vouchers_created_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_created_at_idx ON business.vouchers USING btree (created_at);
+
+
+--
+-- Name: vouchers_deleted_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_deleted_at_idx ON business.vouchers USING btree (deleted_at);
+
+
+--
+-- Name: vouchers_qr_code_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_qr_code_idx ON business.vouchers USING btree (qr_code);
+
+
+--
+-- Name: vouchers_qr_code_key; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE UNIQUE INDEX vouchers_qr_code_key ON business.vouchers USING btree (qr_code);
+
+
+--
+-- Name: vouchers_state_business_id_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_state_business_id_idx ON business.vouchers USING btree (state, business_id);
+
+
+--
+-- Name: vouchers_state_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_state_idx ON business.vouchers USING btree (state);
+
+
+--
+-- Name: vouchers_state_valid_until_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_state_valid_until_idx ON business.vouchers USING btree (state, valid_until);
+
+
+--
+-- Name: vouchers_type_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_type_idx ON business.vouchers USING btree (type);
+
+
+--
+-- Name: vouchers_updated_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_updated_at_idx ON business.vouchers USING btree (updated_at);
+
+
+--
+-- Name: vouchers_valid_from_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_valid_from_idx ON business.vouchers USING btree (valid_from);
+
+
+--
+-- Name: vouchers_valid_until_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX vouchers_valid_until_idx ON business.vouchers USING btree (valid_until);
+
+
+--
+-- Name: categories_is_active_deleted_at_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_is_active_deleted_at_idx ON catalog.categories USING btree (is_active, deleted_at);
+
+
+--
+-- Name: categories_level_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_level_idx ON catalog.categories USING btree (level);
+
+
+--
+-- Name: categories_level_sort_order_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_level_sort_order_idx ON catalog.categories USING btree (level, sort_order);
+
+
+--
+-- Name: categories_name_key_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_name_key_idx ON catalog.categories USING btree (name_key);
+
+
+--
+-- Name: categories_parent_id_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_parent_id_idx ON catalog.categories USING btree (parent_id);
+
+
+--
+-- Name: categories_parent_id_is_active_deleted_at_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_parent_id_is_active_deleted_at_idx ON catalog.categories USING btree (parent_id, is_active, deleted_at);
+
+
+--
+-- Name: categories_path_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_path_idx ON catalog.categories USING btree (path);
+
+
+--
+-- Name: categories_slug_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_slug_idx ON catalog.categories USING btree (slug);
+
+
+--
+-- Name: categories_slug_key; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE UNIQUE INDEX categories_slug_key ON catalog.categories USING btree (slug);
+
+
+--
+-- Name: categories_sort_order_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_sort_order_idx ON catalog.categories USING btree (sort_order);
+
+
+--
+-- Name: ad_placements_content_type_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX ad_placements_content_type_idx ON files.ad_placements USING btree (content_type);
+
+
+--
+-- Name: ad_placements_created_by_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX ad_placements_created_by_idx ON files.ad_placements USING btree (created_by);
+
+
+--
+-- Name: ad_placements_page_id_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX ad_placements_page_id_idx ON files.ad_placements USING btree (page_id);
+
+
+--
+-- Name: ad_placements_page_id_position_key; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE UNIQUE INDEX ad_placements_page_id_position_key ON files.ad_placements USING btree (page_id, "position");
+
+
+--
+-- Name: ad_placements_updated_by_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX ad_placements_updated_by_idx ON files.ad_placements USING btree (updated_by);
+
+
+--
+-- Name: book_distributions_book_id_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX book_distributions_book_id_idx ON files.book_distributions USING btree (book_id);
+
+
+--
+-- Name: book_distributions_business_id_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX book_distributions_business_id_idx ON files.book_distributions USING btree (business_id);
+
+
+--
+-- Name: book_distributions_created_at_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX book_distributions_created_at_idx ON files.book_distributions USING btree (created_at);
+
+
+--
+-- Name: book_distributions_delivered_at_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX book_distributions_delivered_at_idx ON files.book_distributions USING btree (delivered_at);
+
+
+--
+-- Name: book_distributions_location_id_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX book_distributions_location_id_idx ON files.book_distributions USING btree (location_id);
+
+
+--
+-- Name: book_distributions_shipped_at_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX book_distributions_shipped_at_idx ON files.book_distributions USING btree (shipped_at);
+
+
+--
+-- Name: book_distributions_status_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX book_distributions_status_idx ON files.book_distributions USING btree (status);
 
 
 --
@@ -2408,31 +2336,136 @@ CREATE INDEX file_storage_logs_user_id_idx ON files.file_storage_logs USING btre
 
 
 --
--- Name: gym_hourly_prices_gym_id_day_of_week_hour_key; Type: INDEX; Schema: gyms; Owner: -
+-- Name: voucher_book_pages_book_id_idx; Type: INDEX; Schema: files; Owner: -
 --
 
-CREATE UNIQUE INDEX gym_hourly_prices_gym_id_day_of_week_hour_key ON gyms.gym_hourly_prices USING btree (gym_id, day_of_week, hour);
-
-
---
--- Name: gym_members_gym_id_user_id_key; Type: INDEX; Schema: gyms; Owner: -
---
-
-CREATE UNIQUE INDEX gym_members_gym_id_user_id_key ON gyms.gym_members USING btree (gym_id, user_id);
+CREATE INDEX voucher_book_pages_book_id_idx ON files.voucher_book_pages USING btree (book_id);
 
 
 --
--- Name: gym_special_prices_gym_id_date_hour_key; Type: INDEX; Schema: gyms; Owner: -
+-- Name: voucher_book_pages_book_id_page_number_key; Type: INDEX; Schema: files; Owner: -
 --
 
-CREATE UNIQUE INDEX gym_special_prices_gym_id_date_hour_key ON gyms.gym_special_prices USING btree (gym_id, date, hour);
+CREATE UNIQUE INDEX voucher_book_pages_book_id_page_number_key ON files.voucher_book_pages USING btree (book_id, page_number);
 
 
 --
--- Name: gym_trainers_gym_id_user_id_key; Type: INDEX; Schema: gyms; Owner: -
+-- Name: voucher_books_book_type_idx; Type: INDEX; Schema: files; Owner: -
 --
 
-CREATE UNIQUE INDEX gym_trainers_gym_id_user_id_key ON gyms.gym_trainers USING btree (gym_id, user_id);
+CREATE INDEX voucher_books_book_type_idx ON files.voucher_books USING btree (book_type);
+
+
+--
+-- Name: voucher_books_book_type_status_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_book_type_status_idx ON files.voucher_books USING btree (book_type, status);
+
+
+--
+-- Name: voucher_books_created_at_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_created_at_idx ON files.voucher_books USING btree (created_at);
+
+
+--
+-- Name: voucher_books_created_by_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_created_by_idx ON files.voucher_books USING btree (created_by);
+
+
+--
+-- Name: voucher_books_deleted_at_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_deleted_at_idx ON files.voucher_books USING btree (deleted_at);
+
+
+--
+-- Name: voucher_books_edition_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_edition_idx ON files.voucher_books USING btree (edition);
+
+
+--
+-- Name: voucher_books_pdf_generated_at_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_pdf_generated_at_idx ON files.voucher_books USING btree (pdf_generated_at);
+
+
+--
+-- Name: voucher_books_published_at_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_published_at_idx ON files.voucher_books USING btree (published_at);
+
+
+--
+-- Name: voucher_books_status_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_status_idx ON files.voucher_books USING btree (status);
+
+
+--
+-- Name: voucher_books_status_year_month_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_status_year_month_idx ON files.voucher_books USING btree (status, year, month);
+
+
+--
+-- Name: voucher_books_updated_by_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_updated_by_idx ON files.voucher_books USING btree (updated_by);
+
+
+--
+-- Name: voucher_books_year_month_idx; Type: INDEX; Schema: files; Owner: -
+--
+
+CREATE INDEX voucher_books_year_month_idx ON files.voucher_books USING btree (year, month);
+
+
+--
+-- Name: translations_key_languageCode_idx; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE INDEX "translations_key_languageCode_idx" ON i18n.translations USING btree (key, "languageCode");
+
+
+--
+-- Name: translations_key_languageCode_key; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE UNIQUE INDEX "translations_key_languageCode_key" ON i18n.translations USING btree (key, "languageCode");
+
+
+--
+-- Name: translations_service_key_idx; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE INDEX translations_service_key_idx ON i18n.translations USING btree (service, key);
+
+
+--
+-- Name: user_language_preferences_userId_idx; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE INDEX "user_language_preferences_userId_idx" ON i18n.user_language_preferences USING btree ("userId");
+
+
+--
+-- Name: user_language_preferences_userId_key; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE UNIQUE INDEX "user_language_preferences_userId_key" ON i18n.user_language_preferences USING btree ("userId");
 
 
 --
@@ -2590,115 +2623,38 @@ CREATE UNIQUE INDEX user_mfa_settings_user_id_key ON identity.user_mfa_settings 
 
 
 --
--- Name: credits_history_credits_id_idx; Type: INDEX; Schema: payments; Owner: -
+-- Name: businesses_avg_rating_idx; Type: INDEX; Schema: marketplace; Owner: -
 --
 
-CREATE INDEX credits_history_credits_id_idx ON payments.credits_history USING btree (credits_id);
-
-
---
--- Name: credits_history_date_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX credits_history_date_idx ON payments.credits_history USING btree (date);
+CREATE INDEX businesses_avg_rating_idx ON marketplace.businesses USING btree (avg_rating);
 
 
 --
--- Name: credits_history_user_id_idx; Type: INDEX; Schema: payments; Owner: -
+-- Name: businesses_category_id_idx; Type: INDEX; Schema: marketplace; Owner: -
 --
 
-CREATE INDEX credits_history_user_id_idx ON payments.credits_history USING btree (user_id);
-
-
---
--- Name: credits_packs_active_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX credits_packs_active_idx ON payments.credits_packs USING btree (active);
+CREATE INDEX businesses_category_id_idx ON marketplace.businesses USING btree (category_id);
 
 
 --
--- Name: credits_user_id_key; Type: INDEX; Schema: payments; Owner: -
+-- Name: businesses_deleted_at_idx; Type: INDEX; Schema: marketplace; Owner: -
 --
 
-CREATE UNIQUE INDEX credits_user_id_key ON payments.credits USING btree (user_id);
-
-
---
--- Name: memberships_stripe_customer_id_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX memberships_stripe_customer_id_idx ON payments.memberships USING btree (stripe_customer_id);
+CREATE INDEX businesses_deleted_at_idx ON marketplace.businesses USING btree (deleted_at);
 
 
 --
--- Name: memberships_stripe_customer_id_key; Type: INDEX; Schema: payments; Owner: -
+-- Name: businesses_user_id_key; Type: INDEX; Schema: marketplace; Owner: -
 --
 
-CREATE UNIQUE INDEX memberships_stripe_customer_id_key ON payments.memberships USING btree (stripe_customer_id);
-
-
---
--- Name: memberships_stripe_subscription_id_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX memberships_stripe_subscription_id_idx ON payments.memberships USING btree (stripe_subscription_id);
+CREATE UNIQUE INDEX businesses_user_id_key ON marketplace.businesses USING btree (user_id);
 
 
 --
--- Name: memberships_subscription_status_idx; Type: INDEX; Schema: payments; Owner: -
+-- Name: businesses_verified_active_idx; Type: INDEX; Schema: marketplace; Owner: -
 --
 
-CREATE INDEX memberships_subscription_status_idx ON payments.memberships USING btree (subscription_status);
-
-
---
--- Name: memberships_user_id_key; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE UNIQUE INDEX memberships_user_id_key ON payments.memberships USING btree (user_id);
-
-
---
--- Name: promo_code_usages_promo_code_id_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX promo_code_usages_promo_code_id_idx ON payments.promo_code_usages USING btree (promo_code_id);
-
-
---
--- Name: promo_code_usages_user_id_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX promo_code_usages_user_id_idx ON payments.promo_code_usages USING btree (user_id);
-
-
---
--- Name: promo_codes_active_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX promo_codes_active_idx ON payments.promo_codes USING btree (active);
-
-
---
--- Name: promo_codes_code_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX promo_codes_code_idx ON payments.promo_codes USING btree (code);
-
-
---
--- Name: promo_codes_code_key; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE UNIQUE INDEX promo_codes_code_key ON payments.promo_codes USING btree (code);
-
-
---
--- Name: promo_codes_expiration_date_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX promo_codes_expiration_date_idx ON payments.promo_codes USING btree (expiration_date);
+CREATE INDEX businesses_verified_active_idx ON marketplace.businesses USING btree (verified, active);
 
 
 --
@@ -2713,20 +2669,6 @@ CREATE INDEX subscription_plans_interval_idx ON payments.subscription_plans USIN
 --
 
 CREATE INDEX subscription_plans_is_active_idx ON payments.subscription_plans USING btree (is_active);
-
-
---
--- Name: subscription_plans_membership_package_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX subscription_plans_membership_package_idx ON payments.subscription_plans USING btree (membership_package);
-
-
---
--- Name: subscription_plans_membership_type_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX subscription_plans_membership_type_idx ON payments.subscription_plans USING btree (membership_type);
 
 
 --
@@ -2758,13 +2700,6 @@ CREATE INDEX subscriptions_plan_id_idx ON payments.subscriptions USING btree (pl
 
 
 --
--- Name: subscriptions_plan_type_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX subscriptions_plan_type_idx ON payments.subscriptions USING btree (plan_type);
-
-
---
 -- Name: subscriptions_status_idx; Type: INDEX; Schema: payments; Owner: -
 --
 
@@ -2793,290 +2728,136 @@ CREATE INDEX subscriptions_user_id_idx ON payments.subscriptions USING btree (us
 
 
 --
--- Name: invitations_guest_email_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_case_history_action_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX invitations_guest_email_idx ON sessions.invitations USING btree (guest_email);
+CREATE INDEX fraud_case_history_action_idx ON security.fraud_case_history USING btree (action);
 
 
 --
--- Name: invitations_session_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_case_history_case_id_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX invitations_session_id_idx ON sessions.invitations USING btree (session_id);
+CREATE INDEX fraud_case_history_case_id_idx ON security.fraud_case_history USING btree (case_id);
 
 
 --
--- Name: invitations_user_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_case_history_case_id_performed_at_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX invitations_user_id_idx ON sessions.invitations USING btree (user_id);
+CREATE INDEX fraud_case_history_case_id_performed_at_idx ON security.fraud_case_history USING btree (case_id, performed_at);
 
 
 --
--- Name: session_invitees_friend_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_case_history_performed_at_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX session_invitees_friend_id_idx ON sessions.session_invitees USING btree (friend_id);
+CREATE INDEX fraud_case_history_performed_at_idx ON security.fraud_case_history USING btree (performed_at);
 
 
 --
--- Name: session_invitees_session_id_friend_id_key; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_case_history_performed_by_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE UNIQUE INDEX session_invitees_session_id_friend_id_key ON sessions.session_invitees USING btree (session_id, friend_id);
+CREATE INDEX fraud_case_history_performed_by_idx ON security.fraud_case_history USING btree (performed_by);
 
 
 --
--- Name: session_invitees_session_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_business_id_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX session_invitees_session_id_idx ON sessions.session_invitees USING btree (session_id);
+CREATE INDEX fraud_cases_business_id_idx ON security.fraud_cases USING btree (business_id);
 
 
 --
--- Name: session_records_created_at_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_business_id_status_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX session_records_created_at_idx ON sessions.session_records USING btree (created_at);
+CREATE INDEX fraud_cases_business_id_status_idx ON security.fraud_cases USING btree (business_id, status);
 
 
 --
--- Name: session_records_session_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_case_number_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX session_records_session_id_idx ON sessions.session_records USING btree (session_id);
+CREATE INDEX fraud_cases_case_number_idx ON security.fraud_cases USING btree (case_number);
 
 
 --
--- Name: session_reviews_session_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_case_number_key; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX session_reviews_session_id_idx ON sessions.session_reviews USING btree (session_id);
+CREATE UNIQUE INDEX fraud_cases_case_number_key ON security.fraud_cases USING btree (case_number);
 
 
 --
--- Name: session_reviews_session_id_user_id_key; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_customer_id_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE UNIQUE INDEX session_reviews_session_id_user_id_key ON sessions.session_reviews USING btree (session_id, user_id);
+CREATE INDEX fraud_cases_customer_id_idx ON security.fraud_cases USING btree (customer_id);
 
 
 --
--- Name: session_reviews_user_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_customer_id_status_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX session_reviews_user_id_idx ON sessions.session_reviews USING btree (user_id);
+CREATE INDEX fraud_cases_customer_id_status_idx ON security.fraud_cases USING btree (customer_id, status);
 
 
 --
--- Name: sessions_date_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_detected_at_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX sessions_date_idx ON sessions.sessions USING btree (date);
+CREATE INDEX fraud_cases_detected_at_idx ON security.fraud_cases USING btree (detected_at);
 
 
 --
--- Name: sessions_gym_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_redemption_id_key; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX sessions_gym_id_idx ON sessions.sessions USING btree (gym_id);
+CREATE UNIQUE INDEX fraud_cases_redemption_id_key ON security.fraud_cases USING btree (redemption_id);
 
 
 --
--- Name: sessions_payment_deadline_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_reviewed_by_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX sessions_payment_deadline_idx ON sessions.sessions USING btree (payment_deadline);
+CREATE INDEX fraud_cases_reviewed_by_idx ON security.fraud_cases USING btree (reviewed_by);
 
 
 --
--- Name: sessions_status_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_risk_score_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX sessions_status_idx ON sessions.sessions USING btree (status);
+CREATE INDEX fraud_cases_risk_score_idx ON security.fraud_cases USING btree (risk_score);
 
 
 --
--- Name: sessions_trainer_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_risk_score_status_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX sessions_trainer_id_idx ON sessions.sessions USING btree (trainer_id);
+CREATE INDEX fraud_cases_risk_score_status_idx ON security.fraud_cases USING btree (risk_score, status);
 
 
 --
--- Name: sessions_user_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_status_detected_at_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX sessions_user_id_idx ON sessions.sessions USING btree (user_id);
+CREATE INDEX fraud_cases_status_detected_at_idx ON security.fraud_cases USING btree (status, detected_at);
 
 
 --
--- Name: waiting_list_session_id_joined_at_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_status_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX waiting_list_session_id_joined_at_idx ON sessions.waiting_list USING btree (session_id, joined_at);
+CREATE INDEX fraud_cases_status_idx ON security.fraud_cases USING btree (status);
 
 
 --
--- Name: waiting_list_user_id_idx; Type: INDEX; Schema: sessions; Owner: -
+-- Name: fraud_cases_voucher_id_idx; Type: INDEX; Schema: security; Owner: -
 --
 
-CREATE INDEX waiting_list_user_id_idx ON sessions.waiting_list USING btree (user_id);
-
-
---
--- Name: activities_created_at_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX activities_created_at_idx ON social.activities USING btree (created_at);
-
-
---
--- Name: activities_entity_type_entity_id_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX activities_entity_type_entity_id_idx ON social.activities USING btree (entity_type, entity_id);
-
-
---
--- Name: activities_privacy_created_at_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX activities_privacy_created_at_idx ON social.activities USING btree (privacy, created_at DESC);
-
-
---
--- Name: activities_type_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX activities_type_idx ON social.activities USING btree (type);
-
-
---
--- Name: activities_user_id_created_at_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX activities_user_id_created_at_idx ON social.activities USING btree (user_id, created_at DESC);
-
-
---
--- Name: activities_user_id_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX activities_user_id_idx ON social.activities USING btree (user_id);
-
-
---
--- Name: follows_follower_id_created_at_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX follows_follower_id_created_at_idx ON social.follows USING btree (follower_id, created_at DESC);
-
-
---
--- Name: follows_follower_id_following_id_key; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE UNIQUE INDEX follows_follower_id_following_id_key ON social.follows USING btree (follower_id, following_id);
-
-
---
--- Name: follows_follower_id_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX follows_follower_id_idx ON social.follows USING btree (follower_id);
-
-
---
--- Name: follows_following_id_created_at_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX follows_following_id_created_at_idx ON social.follows USING btree (following_id, created_at DESC);
-
-
---
--- Name: follows_following_id_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX follows_following_id_idx ON social.follows USING btree (following_id);
-
-
---
--- Name: social_interactions_entity_type_entity_id_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX social_interactions_entity_type_entity_id_idx ON social.social_interactions USING btree (entity_type, entity_id);
-
-
---
--- Name: social_interactions_type_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX social_interactions_type_idx ON social.social_interactions USING btree (type);
-
-
---
--- Name: social_interactions_user_id_entity_type_entity_id_type_key; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE UNIQUE INDEX social_interactions_user_id_entity_type_entity_id_type_key ON social.social_interactions USING btree (user_id, entity_type, entity_id, type);
-
-
---
--- Name: social_interactions_user_id_idx; Type: INDEX; Schema: social; Owner: -
---
-
-CREATE INDEX social_interactions_user_id_idx ON social.social_interactions USING btree (user_id);
-
-
---
--- Name: file_storage_logs_content_type_idx; Type: INDEX; Schema: storage; Owner: -
---
-
-CREATE INDEX file_storage_logs_content_type_idx ON storage.file_storage_logs USING btree (content_type);
-
-
---
--- Name: file_storage_logs_created_at_idx; Type: INDEX; Schema: storage; Owner: -
---
-
-CREATE INDEX file_storage_logs_created_at_idx ON storage.file_storage_logs USING btree (created_at);
-
-
---
--- Name: file_storage_logs_file_id_idx; Type: INDEX; Schema: storage; Owner: -
---
-
-CREATE INDEX file_storage_logs_file_id_idx ON storage.file_storage_logs USING btree (file_id);
-
-
---
--- Name: file_storage_logs_folder_idx; Type: INDEX; Schema: storage; Owner: -
---
-
-CREATE INDEX file_storage_logs_folder_idx ON storage.file_storage_logs USING btree (folder);
-
-
---
--- Name: file_storage_logs_is_public_idx; Type: INDEX; Schema: storage; Owner: -
---
-
-CREATE INDEX file_storage_logs_is_public_idx ON storage.file_storage_logs USING btree (is_public);
-
-
---
--- Name: file_storage_logs_status_idx; Type: INDEX; Schema: storage; Owner: -
---
-
-CREATE INDEX file_storage_logs_status_idx ON storage.file_storage_logs USING btree (status);
-
-
---
--- Name: file_storage_logs_user_id_idx; Type: INDEX; Schema: storage; Owner: -
---
-
-CREATE INDEX file_storage_logs_user_id_idx ON storage.file_storage_logs USING btree (user_id);
+CREATE INDEX fraud_cases_voucher_id_idx ON security.fraud_cases USING btree (voucher_id);
 
 
 --
@@ -3213,101 +2994,10 @@ CREATE INDEX support_comments_user_id_idx ON support.support_comments USING btre
 
 
 --
--- Name: templates_category_idx; Type: INDEX; Schema: support; Owner: -
---
-
-CREATE INDEX templates_category_idx ON support.templates USING btree (category);
-
-
---
--- Name: templates_external_id_key; Type: INDEX; Schema: support; Owner: -
---
-
-CREATE UNIQUE INDEX templates_external_id_key ON support.templates USING btree (external_id);
-
-
---
--- Name: templates_name_idx; Type: INDEX; Schema: support; Owner: -
---
-
-CREATE INDEX templates_name_idx ON support.templates USING btree (name);
-
-
---
--- Name: templates_name_key; Type: INDEX; Schema: support; Owner: -
---
-
-CREATE UNIQUE INDEX templates_name_key ON support.templates USING btree (name);
-
-
---
--- Name: templates_type_is_active_idx; Type: INDEX; Schema: support; Owner: -
---
-
-CREATE INDEX templates_type_is_active_idx ON support.templates USING btree (type, is_active);
-
-
---
 -- Name: addresses_user_id_idx; Type: INDEX; Schema: users; Owner: -
 --
 
 CREATE INDEX addresses_user_id_idx ON users.addresses USING btree (user_id);
-
-
---
--- Name: friends_referred_user_id_idx; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE INDEX friends_referred_user_id_idx ON users.friends USING btree (referred_user_id);
-
-
---
--- Name: friends_user_id_email_key; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE UNIQUE INDEX friends_user_id_email_key ON users.friends USING btree (user_id, email);
-
-
---
--- Name: friends_user_id_idx; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE INDEX friends_user_id_idx ON users.friends USING btree (user_id);
-
-
---
--- Name: parq_user_id_idx; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE INDEX parq_user_id_idx ON users.parq USING btree (user_id);
-
-
---
--- Name: parq_user_id_key; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE UNIQUE INDEX parq_user_id_key ON users.parq USING btree (user_id);
-
-
---
--- Name: professionals_user_id_idx; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE INDEX professionals_user_id_idx ON users.professionals USING btree (user_id);
-
-
---
--- Name: professionals_user_id_key; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE UNIQUE INDEX professionals_user_id_key ON users.professionals USING btree (user_id);
-
-
---
--- Name: users_alias_key; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE UNIQUE INDEX users_alias_key ON users.users USING btree (alias);
 
 
 --
@@ -3339,51 +3029,139 @@ CREATE INDEX users_phone_number_idx ON users.users USING btree (phone_number);
 
 
 --
--- Name: security_events security_events_device_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
+-- Name: voucher_scans voucher_scans_business_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: -
 --
 
-ALTER TABLE ONLY auth.security_events
-    ADD CONSTRAINT security_events_device_id_fkey FOREIGN KEY (device_id) REFERENCES auth.user_devices(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: security_events security_events_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
---
-
-ALTER TABLE ONLY auth.security_events
-    ADD CONSTRAINT security_events_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY analytics.voucher_scans
+    ADD CONSTRAINT voucher_scans_business_id_fkey FOREIGN KEY (business_id) REFERENCES marketplace.businesses(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
--- Name: user_auth_methods user_auth_methods_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
+-- Name: voucher_scans voucher_scans_user_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: -
 --
 
-ALTER TABLE ONLY auth.user_auth_methods
-    ADD CONSTRAINT user_auth_methods_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: user_devices user_devices_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
---
-
-ALTER TABLE ONLY auth.user_devices
-    ADD CONSTRAINT user_devices_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY analytics.voucher_scans
+    ADD CONSTRAINT voucher_scans_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
--- Name: user_identities user_identities_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
+-- Name: voucher_scans voucher_scans_voucher_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: -
 --
 
-ALTER TABLE ONLY auth.user_identities
-    ADD CONSTRAINT user_identities_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY analytics.voucher_scans
+    ADD CONSTRAINT voucher_scans_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: user_mfa_settings user_mfa_settings_user_id_fkey; Type: FK CONSTRAINT; Schema: auth; Owner: -
+-- Name: customer_vouchers customer_vouchers_customer_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY auth.user_mfa_settings
-    ADD CONSTRAINT user_mfa_settings_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY business.customer_vouchers
+    ADD CONSTRAINT customer_vouchers_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: customer_vouchers customer_vouchers_voucher_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.customer_vouchers
+    ADD CONSTRAINT customer_vouchers_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: voucher_codes voucher_codes_voucher_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.voucher_codes
+    ADD CONSTRAINT voucher_codes_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: voucher_redemptions voucher_redemptions_user_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.voucher_redemptions
+    ADD CONSTRAINT voucher_redemptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: voucher_redemptions voucher_redemptions_voucher_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.voucher_redemptions
+    ADD CONSTRAINT voucher_redemptions_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: vouchers vouchers_business_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.vouchers
+    ADD CONSTRAINT vouchers_business_id_fkey FOREIGN KEY (business_id) REFERENCES marketplace.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: vouchers vouchers_category_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.vouchers
+    ADD CONSTRAINT vouchers_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: categories categories_parent_id_fkey; Type: FK CONSTRAINT; Schema: catalog; Owner: -
+--
+
+ALTER TABLE ONLY catalog.categories
+    ADD CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: ad_placements ad_placements_created_by_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.ad_placements
+    ADD CONSTRAINT ad_placements_created_by_fkey FOREIGN KEY (created_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: ad_placements ad_placements_page_id_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.ad_placements
+    ADD CONSTRAINT ad_placements_page_id_fkey FOREIGN KEY (page_id) REFERENCES files.voucher_book_pages(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: ad_placements ad_placements_updated_by_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.ad_placements
+    ADD CONSTRAINT ad_placements_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: book_distributions book_distributions_book_id_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.book_distributions
+    ADD CONSTRAINT book_distributions_book_id_fkey FOREIGN KEY (book_id) REFERENCES files.voucher_books(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: book_distributions book_distributions_created_by_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.book_distributions
+    ADD CONSTRAINT book_distributions_created_by_fkey FOREIGN KEY (created_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: book_distributions book_distributions_updated_by_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
+--
+
+ALTER TABLE ONLY files.book_distributions
+    ADD CONSTRAINT book_distributions_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -3395,107 +3173,43 @@ ALTER TABLE ONLY files.file_storage_logs
 
 
 --
--- Name: gym_hourly_prices gym_hourly_prices_gym_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
+-- Name: voucher_book_pages voucher_book_pages_book_id_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gym_hourly_prices
-    ADD CONSTRAINT gym_hourly_prices_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: gym_members gym_members_gym_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gym_members
-    ADD CONSTRAINT gym_members_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY files.voucher_book_pages
+    ADD CONSTRAINT voucher_book_pages_book_id_fkey FOREIGN KEY (book_id) REFERENCES files.voucher_books(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: gym_members gym_members_user_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
+-- Name: voucher_books voucher_books_created_by_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gym_members
-    ADD CONSTRAINT gym_members_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: gym_reviews gym_reviews_gym_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gym_reviews
-    ADD CONSTRAINT gym_reviews_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY files.voucher_books
+    ADD CONSTRAINT voucher_books_created_by_fkey FOREIGN KEY (created_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: gym_reviews gym_reviews_user_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
+-- Name: voucher_books voucher_books_updated_by_fkey; Type: FK CONSTRAINT; Schema: files; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gym_reviews
-    ADD CONSTRAINT gym_reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: gym_special_prices gym_special_prices_gym_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gym_special_prices
-    ADD CONSTRAINT gym_special_prices_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY files.voucher_books
+    ADD CONSTRAINT voucher_books_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
--- Name: gym_trainers gym_trainers_gym_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
+-- Name: translations translations_languageCode_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gym_trainers
-    ADD CONSTRAINT gym_trainers_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: gym_trainers gym_trainers_user_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gym_trainers
-    ADD CONSTRAINT gym_trainers_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY i18n.translations
+    ADD CONSTRAINT "translations_languageCode_fkey" FOREIGN KEY ("languageCode") REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: gyms gyms_owner_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
+-- Name: user_language_preferences user_language_preferences_languageCode_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
 --
 
-ALTER TABLE ONLY gyms.gyms
-    ADD CONSTRAINT gyms_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: gyms gyms_verified_by_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.gyms
-    ADD CONSTRAINT gyms_verified_by_fkey FOREIGN KEY (verified_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: inductions inductions_gym_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.inductions
-    ADD CONSTRAINT inductions_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: inductions inductions_user_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.inductions
-    ADD CONSTRAINT inductions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: stuff stuff_gym_id_fkey; Type: FK CONSTRAINT; Schema: gyms; Owner: -
---
-
-ALTER TABLE ONLY gyms.stuff
-    ADD CONSTRAINT stuff_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY i18n.user_language_preferences
+    ADD CONSTRAINT "user_language_preferences_languageCode_fkey" FOREIGN KEY ("languageCode") REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3547,51 +3261,19 @@ ALTER TABLE ONLY identity.user_mfa_settings
 
 
 --
--- Name: credits_history credits_history_credits_id_fkey; Type: FK CONSTRAINT; Schema: payments; Owner: -
+-- Name: businesses businesses_category_id_fkey; Type: FK CONSTRAINT; Schema: marketplace; Owner: -
 --
 
-ALTER TABLE ONLY payments.credits_history
-    ADD CONSTRAINT credits_history_credits_id_fkey FOREIGN KEY (credits_id) REFERENCES payments.credits(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: credits_history credits_history_user_id_fkey; Type: FK CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.credits_history
-    ADD CONSTRAINT credits_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY marketplace.businesses
+    ADD CONSTRAINT businesses_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: credits credits_user_id_fkey; Type: FK CONSTRAINT; Schema: payments; Owner: -
+-- Name: businesses businesses_user_id_fkey; Type: FK CONSTRAINT; Schema: marketplace; Owner: -
 --
 
-ALTER TABLE ONLY payments.credits
-    ADD CONSTRAINT credits_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: memberships memberships_user_id_fkey; Type: FK CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.memberships
-    ADD CONSTRAINT memberships_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: promo_code_usages promo_code_usages_promo_code_id_fkey; Type: FK CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.promo_code_usages
-    ADD CONSTRAINT promo_code_usages_promo_code_id_fkey FOREIGN KEY (promo_code_id) REFERENCES payments.promo_codes(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: promo_code_usages promo_code_usages_user_id_fkey; Type: FK CONSTRAINT; Schema: payments; Owner: -
---
-
-ALTER TABLE ONLY payments.promo_code_usages
-    ADD CONSTRAINT promo_code_usages_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY marketplace.businesses
+    ADD CONSTRAINT businesses_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3611,147 +3293,59 @@ ALTER TABLE ONLY payments.subscriptions
 
 
 --
--- Name: invitations invitations_friend_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_case_history fraud_case_history_case_id_fkey; Type: FK CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.invitations
-    ADD CONSTRAINT invitations_friend_id_fkey FOREIGN KEY (friend_id) REFERENCES users.friends(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: invitations invitations_session_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.invitations
-    ADD CONSTRAINT invitations_session_id_fkey FOREIGN KEY (session_id) REFERENCES sessions.sessions(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY security.fraud_case_history
+    ADD CONSTRAINT fraud_case_history_case_id_fkey FOREIGN KEY (case_id) REFERENCES security.fraud_cases(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: invitations invitations_user_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_case_history fraud_case_history_performed_by_fkey; Type: FK CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.invitations
-    ADD CONSTRAINT invitations_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: session_invitees session_invitees_friend_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.session_invitees
-    ADD CONSTRAINT session_invitees_friend_id_fkey FOREIGN KEY (friend_id) REFERENCES users.friends(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY security.fraud_case_history
+    ADD CONSTRAINT fraud_case_history_performed_by_fkey FOREIGN KEY (performed_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: session_invitees session_invitees_session_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_cases fraud_cases_business_id_fkey; Type: FK CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.session_invitees
-    ADD CONSTRAINT session_invitees_session_id_fkey FOREIGN KEY (session_id) REFERENCES sessions.sessions(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: session_records session_records_session_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.session_records
-    ADD CONSTRAINT session_records_session_id_fkey FOREIGN KEY (session_id) REFERENCES sessions.sessions(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY security.fraud_cases
+    ADD CONSTRAINT fraud_cases_business_id_fkey FOREIGN KEY (business_id) REFERENCES marketplace.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: session_reviews session_reviews_session_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_cases fraud_cases_customer_id_fkey; Type: FK CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.session_reviews
-    ADD CONSTRAINT session_reviews_session_id_fkey FOREIGN KEY (session_id) REFERENCES sessions.sessions(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: session_reviews session_reviews_user_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.session_reviews
-    ADD CONSTRAINT session_reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY security.fraud_cases
+    ADD CONSTRAINT fraud_cases_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: sessions sessions_gym_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_cases fraud_cases_redemption_id_fkey; Type: FK CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.sessions
-    ADD CONSTRAINT sessions_gym_id_fkey FOREIGN KEY (gym_id) REFERENCES gyms.gyms(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: sessions sessions_trainer_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.sessions
-    ADD CONSTRAINT sessions_trainer_id_fkey FOREIGN KEY (trainer_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY security.fraud_cases
+    ADD CONSTRAINT fraud_cases_redemption_id_fkey FOREIGN KEY (redemption_id) REFERENCES business.voucher_redemptions(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: sessions sessions_user_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_cases fraud_cases_reviewed_by_fkey; Type: FK CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.sessions
-    ADD CONSTRAINT sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: waiting_list waiting_list_session_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
---
-
-ALTER TABLE ONLY sessions.waiting_list
-    ADD CONSTRAINT waiting_list_session_id_fkey FOREIGN KEY (session_id) REFERENCES sessions.sessions(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY security.fraud_cases
+    ADD CONSTRAINT fraud_cases_reviewed_by_fkey FOREIGN KEY (reviewed_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
--- Name: waiting_list waiting_list_user_id_fkey; Type: FK CONSTRAINT; Schema: sessions; Owner: -
+-- Name: fraud_cases fraud_cases_voucher_id_fkey; Type: FK CONSTRAINT; Schema: security; Owner: -
 --
 
-ALTER TABLE ONLY sessions.waiting_list
-    ADD CONSTRAINT waiting_list_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: activities activities_user_id_fkey; Type: FK CONSTRAINT; Schema: social; Owner: -
---
-
-ALTER TABLE ONLY social.activities
-    ADD CONSTRAINT activities_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: follows follows_follower_id_fkey; Type: FK CONSTRAINT; Schema: social; Owner: -
---
-
-ALTER TABLE ONLY social.follows
-    ADD CONSTRAINT follows_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: follows follows_following_id_fkey; Type: FK CONSTRAINT; Schema: social; Owner: -
---
-
-ALTER TABLE ONLY social.follows
-    ADD CONSTRAINT follows_following_id_fkey FOREIGN KEY (following_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: social_interactions social_interactions_user_id_fkey; Type: FK CONSTRAINT; Schema: social; Owner: -
---
-
-ALTER TABLE ONLY social.social_interactions
-    ADD CONSTRAINT social_interactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: file_storage_logs file_storage_logs_user_id_fkey; Type: FK CONSTRAINT; Schema: storage; Owner: -
---
-
-ALTER TABLE ONLY storage.file_storage_logs
-    ADD CONSTRAINT file_storage_logs_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY security.fraud_cases
+    ADD CONSTRAINT fraud_cases_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3808,38 +3402,6 @@ ALTER TABLE ONLY support.support_comments
 
 ALTER TABLE ONLY users.addresses
     ADD CONSTRAINT addresses_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
---
--- Name: friends friends_referred_user_id_fkey; Type: FK CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.friends
-    ADD CONSTRAINT friends_referred_user_id_fkey FOREIGN KEY (referred_user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: friends friends_user_id_fkey; Type: FK CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.friends
-    ADD CONSTRAINT friends_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: parq parq_user_id_fkey; Type: FK CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.parq
-    ADD CONSTRAINT parq_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: professionals professionals_user_id_fkey; Type: FK CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.professionals
-    ADD CONSTRAINT professionals_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

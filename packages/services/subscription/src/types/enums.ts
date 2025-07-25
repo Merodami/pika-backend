@@ -1,11 +1,7 @@
 // Subscription-specific enums
 // Note: SubscriptionStatus and BillingInterval are now in @pika/types
 
-// Re-export shared enums for convenience
-export {
-    BillingInterval as SubscriptionInterval,
-    SubscriptionStatus
-} from '@pika/types';
+// Service-specific enums only - common enums imported from @pika/types directly
 
 export enum MembershipType {
   FULL_ACCESS = 'FULL_ACCESS',
@@ -26,9 +22,12 @@ export enum StripeWebhookEvent {
   INVOICE_PAYMENT_FAILED = 'invoice.payment_failed',
 }
 
-export enum CreditProcessingStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-}
+// Available template keys from communication service
+export type AvailableTemplateKey =
+  | 'welcome'
+  | 'passwordReset'
+  | 'emailVerification'
+  | 'paymentSuccess'
+  | 'paymentFailed'
+  | 'subscriptionActivated'
+  | 'subscriptionCancelled'

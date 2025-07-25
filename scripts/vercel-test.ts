@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import { execSync } from 'child_process'
 import { existsSync, readFileSync } from 'fs'
 import ora from 'ora'
-import { join } from 'path'
+import { basename,join, resolve } from 'path'
 
 interface TestResult {
   name: string
@@ -63,7 +63,9 @@ class VercelDeploymentTester {
         'JWT_REFRESH_SECRET',
       ]
 
-      const missingVars = requiredEnvVars.filter((v) => !process.env[v])
+      const missingVars = requiredEnvVars.filter(
+        (v) => !process.env[v as keyof typeof process.env],
+      )
 
       if (missingVars.length > 0) {
         console.warn(
@@ -151,10 +153,20 @@ class VercelDeploymentTester {
         throw new Error(`Missing deployment files: ${missingFiles.join(', ')}`)
       }
 
-      // Validate vercel.json
-      const vercelConfig = JSON.parse(
-        readFileSync(join(this.rootDir, 'vercel.json'), 'utf-8'),
-      )
+      // Validate vercel.json with secure path handling
+      const safeConfigPath = resolve(this.rootDir, 'vercel.json')
+
+      // Security check: ensure the resolved path is still within our project directory
+      if (!safeConfigPath.startsWith(resolve(this.rootDir)) || basename(safeConfigPath) !== 'vercel.json') {
+        throw new Error('Invalid vercel.json path')
+      }
+
+      if (!existsSync(safeConfigPath)) {
+        throw new Error('vercel.json file not found')
+      }
+
+      const vercelConfigContent = readFileSync(safeConfigPath, { encoding: 'utf-8' })
+      const vercelConfig = JSON.parse(vercelConfigContent)
 
       if (!vercelConfig.functions?.['api/index.js']) {
         throw new Error('vercel.json missing function configuration')
@@ -267,7 +279,7 @@ class VercelDeploymentTester {
       )
 
       // Wait for server to start
-      await new Promise((resolve) => setTimeout(resolve, 5000))
+      await new Promise((resolvePromise) => setTimeout(resolvePromise, 5000))
 
       // Test health endpoint
       const response = await fetch('http://localhost:3333/health')

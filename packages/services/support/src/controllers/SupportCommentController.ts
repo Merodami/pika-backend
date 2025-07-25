@@ -1,9 +1,4 @@
-import type {
-  CreateSupportCommentRequest,
-  ProblemIdForCommentsParam,
-  SupportCommentIdParam,
-  UpdateSupportCommentRequest,
-} from '@pika/api/public'
+import { supportCommon, supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -35,7 +30,7 @@ export class SupportCommentController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getCommentsByProblemId(
-    request: Request<ProblemIdForCommentsParam>,
+    request: Request<supportCommon.ProblemIdForCommentsParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -59,7 +54,7 @@ export class SupportCommentController {
    * Get comment by ID
    */
   async getCommentById(
-    request: Request<SupportCommentIdParam>,
+    request: Request<supportCommon.SupportCommentIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -82,7 +77,7 @@ export class SupportCommentController {
    * Create new comment on support ticket
    */
   async createComment(
-    request: Request<{}, {}, CreateSupportCommentRequest>,
+    request: Request<{}, {}, supportPublic.CreateSupportCommentRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -110,7 +105,11 @@ export class SupportCommentController {
    * Update comment
    */
   async updateComment(
-    request: Request<SupportCommentIdParam, {}, UpdateSupportCommentRequest>,
+    request: Request<
+      supportCommon.SupportCommentIdParam,
+      {},
+      supportPublic.UpdateSupportCommentRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -141,7 +140,7 @@ export class SupportCommentController {
    * Delete comment
    */
   async deleteComment(
-    request: Request<SupportCommentIdParam>,
+    request: Request<supportCommon.SupportCommentIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

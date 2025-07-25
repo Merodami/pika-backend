@@ -1,4 +1,6 @@
 export * from './bookingStats.dto.js'
+export * from './business.dto.js'
+export * from './category.dto.js'
 export * from './communication.dto.js'
 export * from './file-storage.dto.js'
 export * from './payment.dto.js'

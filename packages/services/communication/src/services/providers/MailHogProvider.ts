@@ -1,18 +1,18 @@
 import {
-    MAILHOG_SMTP_HOST,
-    MAILHOG_SMTP_PORT,
-    MAILHOG_UI_PORT,
+  MAILHOG_SMTP_HOST,
+  MAILHOG_SMTP_PORT,
+  MAILHOG_UI_PORT,
 } from '@pika/environment'
 import { logger } from '@pika/shared'
 import { get, isEmpty } from 'lodash-es'
 import nodemailer, { type SentMessageInfo, type Transporter } from 'nodemailer'
 
 import type {
-    BulkEmailParams,
-    BulkEmailResult,
-    EmailParams,
-    EmailProvider,
-    EmailResult,
+  BulkEmailParams,
+  BulkEmailResult,
+  EmailParams,
+  EmailProvider,
+  EmailResult,
 } from './EmailProvider.js'
 
 /**

@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient } from '@prisma/client'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { type UserDomain, UserMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface UserSearchParams {
   email?: string
@@ -158,20 +158,16 @@ export class UserRepository implements IUserRepository {
     try {
       const include: any = {}
 
-      if (includeOptions?.includeProfessional) {
-        include.professional = true
-      }
-      if (includeOptions?.includeParq) {
-        include.parq = true
-      }
+      // Professional and PARQ includes removed - no longer exist
       if (includeOptions?.includeFriends) {
         include.friends = true
       }
 
       // If no specific includes requested, include common relations
       if (Object.keys(include).length === 0) {
-        include.professional = true
-        include.parq = true
+        // These relations were removed during schema cleanup
+        // include.professional = true
+        // include.parq = true
       }
 
       const user = await this.prisma.user.findFirst({
@@ -281,29 +277,18 @@ export class UserRepository implements IUserRepository {
   async create(data: any): Promise<UserDomain> {
     try {
       const {
-        description,
-        specialties,
         password,
         acceptTerms: _acceptTerms,
         marketingConsent: _marketingConsent,
         ...userData
       } = data
 
-      // Create user with professional profile if role is PROFESSIONAL
+      // Create user (professional profile removed)
       const user = await this.prisma.user.create({
         data: {
           ...userData,
           email: userData.email.toLowerCase(),
           password: password || undefined,
-          professional:
-            userData.role === 'PROFESSIONAL' && description && specialties
-              ? {
-                  create: {
-                    description,
-                    specialties,
-                  },
-                }
-              : undefined,
         },
         // Removed includes for non-existent relations
       })

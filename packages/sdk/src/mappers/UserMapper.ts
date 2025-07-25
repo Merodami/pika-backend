@@ -1,5 +1,5 @@
-import type { UserRoleType, UserStatusType } from '@pika/types'
-import { UserRole, UserStatus } from '@pika/types'
+import type { UserStatusType } from '@pika/types'
+import { mapUserRole, mapUserStatus, UserRole, UserStatus } from '@pika/types'
 
 import type {
   AddressDomain,
@@ -7,6 +7,10 @@ import type {
   UserDomain,
 } from '../domain/user.js'
 import type { AddressDTO, PaymentMethodDTO, UserDTO } from '../dto/user.dto.js'
+import {
+  formatDateToISO,
+  formatDateToISOOrUndefined,
+} from '../utils/dateUtils.js'
 
 /**
  * Interface representing a database User document
@@ -24,7 +28,7 @@ export interface UserDocument {
   avatarUrl: string | null
   role: string
   status: string
-  lastLoginAt: Date | null
+  lastLoginAt?: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt?: Date | null
@@ -32,7 +36,6 @@ export interface UserDocument {
   dateOfBirth?: Date | null
   stripeUserId?: string | null
 }
-
 
 /**
  * Interface for address document
@@ -94,9 +97,9 @@ export class UserMapper {
       phoneNumber: doc.phoneNumber,
       phoneVerified: doc.phoneVerified,
       avatarUrl: doc.avatarUrl,
-      role: this.mapRole(doc.role),
-      status: this.mapStatus(doc.status),
-      lastLoginAt: doc.lastLoginAt,
+      role: mapUserRole(doc.role),
+      status: mapUserStatus(doc.status),
+      lastLoginAt: doc.lastLoginAt ?? null,
       createdAt:
         doc.createdAt instanceof Date
           ? doc.createdAt
@@ -129,16 +132,6 @@ export class UserMapper {
    * Transforms camelCase to snake_case and handles date formatting
    */
   static toDTO(domain: UserDomain): UserDTO {
-    const formatDate = (
-      date: Date | string | undefined | null,
-    ): string | undefined => {
-      if (!date) return undefined
-      if (typeof date === 'string') return date
-      if (date instanceof Date) return date.toISOString()
-
-      return undefined
-    }
-
     return {
       id: domain.id,
       email: domain.email,
@@ -150,11 +143,12 @@ export class UserMapper {
       avatarUrl: domain.avatarUrl || undefined,
       role: this.mapRoleToDTO(domain.role),
       status: this.mapStatusToDTO(domain.status),
-      lastLoginAt: formatDate(domain.lastLoginAt),
-      createdAt: formatDate(domain.createdAt) || new Date().toISOString(),
-      updatedAt: formatDate(domain.updatedAt) || new Date().toISOString(),
+      lastLoginAt: formatDateToISOOrUndefined(domain.lastLoginAt),
+      createdAt: formatDateToISO(domain.createdAt),
+      updatedAt: formatDateToISO(domain.updatedAt),
       // Additional fields
-      dateOfBirth: formatDate(domain.dateOfBirth),
+      dateOfBirth: formatDateToISOOrUndefined(domain.dateOfBirth),
+      // Admin fields - default values when not available
       stripeUserId: domain.stripeUserId || undefined,
     }
   }
@@ -173,8 +167,8 @@ export class UserMapper {
       phoneNumber: dto.phoneNumber || null,
       phoneVerified: dto.phoneVerified,
       avatarUrl: dto.avatarUrl || null,
-      role: this.mapRole(dto.role),
-      status: this.mapStatus(dto.status),
+      role: mapUserRole(dto.role),
+      status: mapUserStatus(dto.status),
       lastLoginAt: dto.lastLoginAt ? new Date(dto.lastLoginAt) : null,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),
@@ -271,38 +265,7 @@ export class UserMapper {
     }
   }
 
-
-  /**
-   * Maps role string to enum
-   */
-  private static mapRole(role: string): UserRoleType {
-    switch (role) {
-      case UserRole.ADMIN:
-        return UserRole.ADMIN
-      case UserRole.USER:
-        return UserRole.USER
-      default:
-        return UserRole.USER
-    }
-  }
-
-  /**
-   * Maps status string to enum
-   */
-  private static mapStatus(status: string): UserStatusType {
-    switch (status) {
-      case UserStatus.ACTIVE:
-        return UserStatus.ACTIVE
-      case UserStatus.INACTIVE:
-        return UserStatus.INACTIVE
-      case UserStatus.BANNED:
-        return UserStatus.BANNED
-      case UserStatus.UNCONFIRMED:
-        return UserStatus.UNCONFIRMED
-      default:
-        return UserStatus.ACTIVE
-    }
-  }
+  // Role and status mapping functions are now imported from @pika/types
 
   /**
    * Maps payment type string to enum
@@ -331,10 +294,12 @@ export class UserMapper {
     switch (role) {
       case UserRole.ADMIN:
         return UserRole.ADMIN
-      case UserRole.USER:
-        return UserRole.USER
+      case UserRole.CUSTOMER:
+        return UserRole.CUSTOMER
+      case UserRole.BUSINESS:
+        return UserRole.BUSINESS
       default:
-        return UserRole.USER
+        return UserRole.CUSTOMER
     }
   }
 
@@ -346,8 +311,8 @@ export class UserMapper {
     switch (status) {
       case UserStatus.ACTIVE:
         return UserStatus.ACTIVE
-      case UserStatus.INACTIVE:
-        return UserStatus.INACTIVE
+      case UserStatus.SUSPENDED:
+        return UserStatus.SUSPENDED
       case UserStatus.UNCONFIRMED:
         return UserStatus.UNCONFIRMED
       case UserStatus.BANNED:

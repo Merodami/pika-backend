@@ -1,13 +1,4 @@
-import {
-  ChangePasswordRequest,
-  ForgotPasswordRequest,
-  IntrospectRequest,
-  RegisterRequest,
-  ResetPasswordRequest,
-  RevokeTokenRequest,
-  TokenRequest,
-  VerifyEmailRequest,
-} from '@pika/api/public'
+import { authPublic } from '@pika/api'
 import { requireAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, UserServiceClient } from '@pika/shared'
@@ -32,31 +23,35 @@ export function createAuthRouter(
   const controller = new AuthController(authService)
 
   // Public routes (no authentication required)
-  router.post('/register', validateBody(RegisterRequest), controller.register)
+  router.post(
+    '/register',
+    validateBody(authPublic.RegisterRequest),
+    controller.register,
+  )
 
   // Password reset routes (public)
   router.post(
     '/forgot-password',
-    validateBody(ForgotPasswordRequest),
+    validateBody(authPublic.ForgotPasswordRequest),
     controller.forgotPassword,
   )
 
   router.post(
     '/reset-password',
-    validateBody(ResetPasswordRequest),
+    validateBody(authPublic.ResetPasswordRequest),
     controller.resetPassword,
   )
 
   // Email verification routes (public)
   router.get(
     '/verify-email/:token',
-    validateParams(VerifyEmailRequest),
+    validateParams(authPublic.VerifyEmailRequest),
     controller.verifyEmail,
   )
 
   router.post(
     '/resend-verification',
-    validateBody(ForgotPasswordRequest), // Reuse same schema (only email field)
+    validateBody(authPublic.ForgotPasswordRequest), // Reuse same schema (only email field)
     controller.resendVerificationEmail,
   )
 
@@ -64,20 +59,24 @@ export function createAuthRouter(
   router.post(
     '/change-password',
     requireAuth(),
-    validateBody(ChangePasswordRequest),
+    validateBody(authPublic.ChangePasswordRequest),
     controller.changePassword,
   )
 
   // OAuth 2.0 standard endpoints
-  router.post('/token', validateBody(TokenRequest), controller.token)
+  router.post('/token', validateBody(authPublic.TokenRequest), controller.token)
 
   router.post(
     '/introspect',
-    validateBody(IntrospectRequest),
+    validateBody(authPublic.IntrospectRequest),
     controller.introspect,
   )
 
-  router.post('/revoke', validateBody(RevokeTokenRequest), controller.revoke)
+  router.post(
+    '/revoke',
+    validateBody(authPublic.RevokeTokenRequest),
+    controller.revoke,
+  )
 
   // Protected route - auth is handled manually in the controller
   router.get('/userinfo', controller.userinfo)

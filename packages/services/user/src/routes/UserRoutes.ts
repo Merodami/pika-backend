@@ -1,26 +1,15 @@
-import { PrismaClient } from '@prisma/client'
-import {
-  AdminCreateUserRequest,
-  AdminUpdateUserRequest,
-  AdminUserQueryParams,
-  BanUserRequest,
-  EmailParam,
-  SubTokenParam,
-  UnbanUserRequest,
-  UpdateUserStatusRequest,
-  UserIdParam,
-} from '@pika/api/admin'
-import { GetUserByIdQuery, UpdateProfileRequest } from '@pika/api/public'
+import { userAdmin, userPublic } from '@pika/api'
 import {
   createMulterMiddleware,
-  requireAdmin,
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,
 } from '@pika/http'
 import { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { UserController } from '../controllers/UserController.js'
@@ -55,8 +44,8 @@ export async function createUserRouter(
   // GET /users - Get all users with filters (admin only)
   router.get(
     '/',
-    requireAdmin(),
-    validateQuery(AdminUserQueryParams),
+    requirePermissions('admin:users'),
+    validateQuery(userAdmin.AdminUserQueryParams),
     controller.getAllUsers,
   )
 
@@ -67,15 +56,15 @@ export async function createUserRouter(
   router.put(
     '/me',
     requireAuth(),
-    validateBody(UpdateProfileRequest),
+    validateBody(userPublic.UpdateProfileRequest),
     controller.updateMe,
   )
 
   // GET /users/email/:email - Get user by email (admin only)
   router.get(
     '/email/:email',
-    requireAdmin(),
-    validateParams(EmailParam),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.EmailParam),
     controller.getUserByEmail,
   )
 
@@ -83,33 +72,33 @@ export async function createUserRouter(
   router.get(
     '/:id',
     requireAuth(),
-    validateParams(UserIdParam),
-    validateQuery(GetUserByIdQuery),
+    validateParams(userAdmin.UserIdParam),
+    validateQuery(userPublic.GetUserByIdQuery),
     controller.getUserById,
   )
 
   // POST /users - Create new user (admin only)
   router.post(
     '/',
-    requireAdmin(),
-    validateBody(AdminCreateUserRequest),
+    requirePermissions('admin:users'),
+    validateBody(userAdmin.AdminCreateUserRequest),
     controller.createAdminUser,
   )
 
   // PATCH /users/:id - Update user (admin only)
   router.patch(
     '/:id',
-    requireAdmin(),
-    validateParams(UserIdParam),
-    validateBody(AdminUpdateUserRequest),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.AdminUpdateUserRequest),
     controller.updateUser,
   )
 
   // DELETE /users/:id - Delete user (admin only)
   router.delete(
     '/:id',
-    requireAdmin(),
-    validateParams(UserIdParam),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
     controller.deleteUser,
   )
 
@@ -117,34 +106,34 @@ export async function createUserRouter(
   router.get(
     '/sub/:subToken',
     requireAuth(),
-    validateParams(SubTokenParam),
+    validateParams(userAdmin.SubTokenParam),
     controller.getUserBySubToken,
   )
 
   // PUT /users/:id/status - Update user status (admin only)
   router.put(
     '/:id/status',
-    requireAdmin(),
-    validateParams(UserIdParam),
-    validateBody(UpdateUserStatusRequest),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.UpdateUserStatusRequest),
     controller.updateUserStatus,
   )
 
   // PUT /users/:id/ban - Ban user (admin only)
   router.put(
     '/:id/ban',
-    requireAdmin(),
-    validateParams(UserIdParam),
-    validateBody(BanUserRequest),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.BanUserRequest),
     controller.banUser,
   )
 
   // PUT /users/:id/unban - Unban user (admin only)
   router.put(
     '/:id/unban',
-    requireAdmin(),
-    validateParams(UserIdParam),
-    validateBody(UnbanUserRequest),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.UnbanUserRequest),
     controller.unbanUser,
   )
 
@@ -152,7 +141,7 @@ export async function createUserRouter(
   router.get(
     '/:id/friends',
     requireAuth(),
-    validateParams(UserIdParam),
+    validateParams(userAdmin.UserIdParam),
     controller.getUserFriends,
   )
 
@@ -166,7 +155,7 @@ export async function createUserRouter(
   router.post(
     '/:id/avatar',
     requireAuth(),
-    validateParams(UserIdParam),
+    validateParams(userAdmin.UserIdParam),
     upload.single('avatar'),
     controller.uploadAvatar,
   )

@@ -13,10 +13,9 @@ import {
 } from '@pika/shared'
 import type { BillingIntervalType, PaginatedResult } from '@pika/types'
 import { BillingInterval } from '@pika/types'
-import type {
-  IPlanRepository,
-  PlanSearchParams,
-} from '../repositories/PlanRepository.js'
+
+import type { IPlanRepository } from '../repositories/PlanRepository.js'
+import type { PlanSearchParams } from '../types/search.js'
 
 export interface IPlanService {
   createPlan(data: CreateSubscriptionPlanDTO): Promise<SubscriptionPlanDomain>
@@ -211,9 +210,6 @@ export class PlanService implements IPlanService {
                 currency: price.currency,
                 interval: price.recurring.interval as BillingIntervalType,
                 intervalCount: price.recurring.intervalCount,
-                creditsAmount: product.metadata.creditsAmount
-                  ? parseInt(product.metadata.creditsAmount)
-                  : 0,
                 features: product.metadata.features
                   ? JSON.parse(product.metadata.features)
                   : [],

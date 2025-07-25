@@ -1,12 +1,4 @@
-import {
-  CreatePriceRequest,
-  CreateProductRequest,
-  ListPricesQuery,
-  ListProductsQuery,
-  PriceIdParam,
-  ProductIdParam,
-  UpdateProductRequest,
-} from '@pika/api/public'
+import { paymentPublic } from '@pika/api'
 import { getValidatedQuery } from '@pika/http'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -32,7 +24,7 @@ export class ProductController {
    * Create a new Stripe product
    */
   async createProduct(
-    request: Request<{}, {}, CreateProductRequest>,
+    request: Request<{}, {}, paymentPublic.CreateProductRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -47,7 +39,8 @@ export class ProductController {
         metadata,
       })
 
-      response.status(201).json(product)
+      const validatedResponse = paymentPublic.Product.parse(product)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -58,7 +51,11 @@ export class ProductController {
    * Update Stripe product
    */
   async updateProduct(
-    request: Request<ProductIdParam, {}, UpdateProductRequest>,
+    request: Request<
+      paymentPublic.ProductIdParam,
+      {},
+      paymentPublic.UpdateProductRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -75,7 +72,8 @@ export class ProductController {
         metadata,
       })
 
-      response.json(product)
+      const validatedResponse = paymentPublic.Product.parse(product)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -86,7 +84,7 @@ export class ProductController {
    * Create a new price for a product
    */
   async createPrice(
-    request: Request<{}, {}, CreatePriceRequest>,
+    request: Request<{}, {}, paymentPublic.CreatePriceRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -104,7 +102,8 @@ export class ProductController {
         intervalCount,
       })
 
-      response.status(201).json(price)
+      const validatedResponse = paymentPublic.Price.parse(price)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -115,7 +114,7 @@ export class ProductController {
    * Deactivate a price
    */
   async deactivatePrice(
-    request: Request<PriceIdParam>,
+    request: Request<paymentPublic.PriceIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -126,7 +125,8 @@ export class ProductController {
 
       const price = await this.productService.deactivatePrice(id)
 
-      response.json(price)
+      const validatedResponse = paymentPublic.Price.parse(price)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -142,14 +142,15 @@ export class ProductController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<ListProductsQuery>(request)
+      const query = getValidatedQuery<paymentPublic.ListProductsQuery>(request)
       const { limit } = query
 
       logger.info('Listing products via API', { limit })
 
       const products = await this.productService.listProducts(limit)
 
-      response.json({ data: products })
+      const validatedResponse = paymentPublic.ProductListResponse.parse({ data: products })
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -165,14 +166,15 @@ export class ProductController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<ListPricesQuery>(request)
+      const query = getValidatedQuery<paymentPublic.ListPricesQuery>(request)
       const { productId, limit } = query
 
       logger.info('Listing prices via API', { productId, limit })
 
       const prices = await this.productService.listPrices(productId, limit)
 
-      response.json({ data: prices })
+      const validatedResponse = paymentPublic.PriceListResponse.parse({ data: prices })
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

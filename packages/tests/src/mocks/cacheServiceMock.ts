@@ -1,4 +1,4 @@
-import type { ICacheService } from '@pika/redis';
+import type { ICacheService } from '@pika/redis'
 
 /**
  * In-memory cache service mock for tests, based on the real MemoryCacheService implementation.

@@ -1,4 +1,5 @@
 import { UserServiceClient } from '@pika/shared'
+import { UserRole } from '@pika/types'
 import type { User } from '@prisma/client'
 import { vi } from 'vitest'
 
@@ -14,7 +15,7 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
     password: '$2b$10$9Erjm5.hmByB.mD99PAvb.0fJF38j2JZSVNHHjE4vY.cRdHdOovzW', // Password123!
     firstName: 'Test',
     lastName: 'User',
-    role: 'USER',
+    role: UserRole.CUSTOMER,
     status: 'ACTIVE',
     emailVerified: true,
     phoneNumber: '+1234567890',
@@ -28,7 +29,7 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
     ...UserServiceClientMock.TEST_USER,
     id: 'admin-123',
     email: 'admin@example.com',
-    role: 'ADMIN',
+    role: UserRole.ADMIN,
   }
 
   // Mock methods

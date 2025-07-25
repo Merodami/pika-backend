@@ -1,11 +1,11 @@
 import { logger } from '@pika/shared'
 
 import type {
-    BulkEmailParams,
-    BulkEmailResult,
-    EmailParams,
-    EmailProvider,
-    EmailResult,
+  BulkEmailParams,
+  BulkEmailResult,
+  EmailParams,
+  EmailProvider,
+  EmailResult,
 } from './EmailProvider.js'
 
 /**

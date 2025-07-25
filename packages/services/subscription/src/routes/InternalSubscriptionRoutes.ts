@@ -1,20 +1,14 @@
-import type { PrismaClient } from '@prisma/client'
-import {
-  CheckSubscriptionAccessRequest,
-  ProcessSubscriptionWebhookRequest,
-  SendSubscriptionNotificationRequest,
-  StripeSubscriptionIdParam,
-  SubscriptionByUserIdParam,
-  UpdateSubscriptionFromPaymentRequest,
-} from '@pika/api/internal'
+import { subscriptionInternal } from '@pika/api'
 import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
+import { Router } from 'express'
+
 import { InternalSubscriptionController } from '../controllers/InternalSubscriptionController.js'
 import { PlanRepository } from '../repositories/PlanRepository.js'
 import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
 import { SubscriptionService } from '../services/SubscriptionService.js'
-import { Router } from 'express'
 
 export function createInternalSubscriptionRouter(
   prisma: PrismaClient,
@@ -49,42 +43,42 @@ export function createInternalSubscriptionRouter(
   // Webhook processing
   router.post(
     '/webhook',
-    validateBody(ProcessSubscriptionWebhookRequest),
+    validateBody(subscriptionInternal.ProcessSubscriptionWebhookRequest),
     controller.processWebhook,
   )
 
   // Subscription updates from payment service
   router.put(
     '/update-from-payment',
-    validateBody(UpdateSubscriptionFromPaymentRequest),
+    validateBody(subscriptionInternal.UpdateSubscriptionFromPaymentRequest),
     controller.updateFromPayment,
   )
 
   // Access checks
   router.post(
     '/check-access',
-    validateBody(CheckSubscriptionAccessRequest),
+    validateBody(subscriptionInternal.CheckSubscriptionAccessRequest),
     controller.checkAccess,
   )
 
   // Get by Stripe ID
   router.get(
     '/stripe/:stripeSubscriptionId',
-    validateParams(StripeSubscriptionIdParam),
+    validateParams(subscriptionInternal.StripeSubscriptionIdParam),
     controller.getByStripeId,
   )
 
   // Get user subscriptions
   router.get(
     '/users/:userId/subscriptions',
-    validateParams(SubscriptionByUserIdParam),
+    validateParams(subscriptionInternal.SubscriptionByUserIdParam),
     controller.getUserSubscriptions,
   )
 
   // Send notification
   router.post(
     '/notify',
-    validateBody(SendSubscriptionNotificationRequest),
+    validateBody(subscriptionInternal.SendSubscriptionNotificationRequest),
     controller.sendNotification,
   )
 

@@ -5,12 +5,8 @@ import { IdempotencyConfig } from './idempotency.js'
 
 export interface ApiTokenOptions {
   /**
-   * The secret key used to verify the API token.
-   */
-  secret: string
-
-  /**
    * The name of the header that contains the API token.
+   * @default 'Authorization'
    */
   headerName?: string
 

@@ -25,7 +25,7 @@ export interface ValidationOptions {
   /**
    * Custom error handler
    */
-  errorHandler?: (error: z.ZodError, req: Request, res: Response) => void
+  errorHandler?: (error: z.ZodError<any>, req: Request, res: Response) => void
 
   /**
    * Whether to log validation errors
@@ -48,7 +48,7 @@ export function createValidationMiddleware(
     try {
       // Validate each part of the request
       const validatedData: Record<string, any> = {}
-      const errors: z.ZodError[] = []
+      const errors: z.ZodError<any>[] = []
 
       // Validate body
       if (schema.body) {
@@ -117,7 +117,7 @@ export function createValidationMiddleware(
           logger.warn('Validation failed', {
             path: req.path,
             method: req.method,
-            errors: combinedError.errors,
+            errors: combinedError.issues,
           })
         }
 
@@ -207,8 +207,8 @@ function extractRelevantHeaders(
 /**
  * Combine multiple ZodErrors into a single error
  */
-function combineZodErrors(errors: z.ZodError[]): z.ZodError {
-  const allIssues = errors.flatMap((error) => error.errors)
+function combineZodErrors(errors: z.ZodError<any>[]): z.ZodError<any> {
+  const allIssues = errors.flatMap((error) => error.issues)
 
   return new z.ZodError(allIssues)
 }
@@ -226,15 +226,15 @@ function getCorrelationId(req: Request): string {
  * Default validation error handler
  */
 function handleValidationError(
-  error: z.ZodError,
+  error: z.ZodError<any>,
   req: Request,
   res: Response,
 ): void {
   // Use zod-validation-error for better error messages
-  const validationError = fromZodError(error)
+  const validationError = fromZodError(error as any)
 
   // Format errors to match our API error format
-  const formattedErrors = error.errors.map((err) => ({
+  const formattedErrors = error.issues.map((err: any) => ({
     field: err.path.join('.'),
     message: err.message,
     code: err.code,

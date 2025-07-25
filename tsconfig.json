@@ -34,25 +34,31 @@
       "@tests/*": ["packages/tests/src/*"],
       "@environment/*": ["packages/environment/src/*"],
       "@pika/shared": ["packages/shared/src"],
-      "@pikapi": ["packages/api/src"],
-      "@pikaypes": ["packages/types/src"],
-      "@pikadk": ["packages/sdk/src"],
-      "@pikattp": ["packages/http/src"],
-      "@pikaedis": ["packages/redis/src"],
-      "@pikauth": ["packages/auth/src"],
-      "@pikaatabase": ["packages/database/src"],
-      "@pikanvironment": ["packages/environment/src"],
-      "@pikaests": ["packages/tests/src"],
-      "@pikaser": ["packages/services/user/src"],
-      "@pikauth-service": ["packages/services/auth/src"],
-      "@pikaubscription": ["packages/services/subscription/src"],
-      "@pikaayment": ["packages/services/payment/src"],
-      "@pikaommunication": ["packages/services/communication/src"],
-      "@pikaupport": ["packages/services/support/src"],
-      "@pikatorage": ["packages/services/storage/src"]
+      "@pika/api": ["packages/api/src"],
+      "@pika/types": ["packages/types/src"],
+      "@pika/sdk": ["packages/sdk/src"],
+      "@pika/http": ["packages/http/src"],
+      "@pika/redis": ["packages/redis/src"],
+      "@pika/auth": ["packages/auth/src"],
+      "@pika/database": ["packages/database/src"],
+      "@pika/environment": ["packages/environment/src"],
+      "@pika/tests": ["packages/tests/src"],
+      "@pika/user": ["packages/services/user/src"],
+      "@pika/auth-service": ["packages/services/auth/src"],
+      "@pika/subscription": ["packages/services/subscription/src"],
+      "@pika/payment": ["packages/services/payment/src"],
+      "@pika/communication": ["packages/services/communication/src"],
+      "@pika/support": ["packages/services/support/src"],
+      "@pika/storage": ["packages/services/storage/src"]
     }
   },
-  "exclude": ["**/dist", "node_modules", "previous-architecture", "ai"],
+  "exclude": [
+    "**/dist",
+    "node_modules",
+    "previous-architecture",
+    "ai",
+    "pika-old"
+  ],
   "references": [
     // Core packages
     { "path": "packages/types" },
@@ -76,6 +82,6 @@
     { "path": "packages/services/payment" },
     { "path": "packages/services/communication" },
     { "path": "packages/services/support" },
-    { "path": "packages/services/storage" },
+    { "path": "packages/services/storage" }
   ]
 }

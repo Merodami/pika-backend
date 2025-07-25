@@ -17,11 +17,15 @@ export const JWT_ALGORITHM = getEnvVariable(
 // JWT Key Pair for RS256
 export const JWT_PRIVATE_KEY = getEnvVariable(
   'JWT_PRIVATE_KEY',
-  parseString,
+  (value: string) => value.replace(/\\n/g, '\n'), // Unescape newlines
   '',
 )
 
-export const JWT_PUBLIC_KEY = getEnvVariable('JWT_PUBLIC_KEY', parseString, '')
+export const JWT_PUBLIC_KEY = getEnvVariable(
+  'JWT_PUBLIC_KEY',
+  (value: string) => value.replace(/\\n/g, '\n'), // Unescape newlines
+  '',
+)
 export const INTERNAL_API_TOKEN = getEnvVariable(
   'INTERNAL_API_TOKEN',
   String,
@@ -37,11 +41,7 @@ export const JWT_REFRESH_TOKEN_EXPIRY = getEnvVariable(
   parseString,
   '7d',
 )
-export const JWT_ISSUER = getEnvVariable(
-  'JWT_ISSUER',
-  parseString,
-  'pika-api',
-)
+export const JWT_ISSUER = getEnvVariable('JWT_ISSUER', parseString, 'pika-api')
 export const JWT_AUDIENCE = getEnvVariable(
   'JWT_AUDIENCE',
   parseString,

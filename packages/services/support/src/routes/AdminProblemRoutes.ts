@@ -1,16 +1,12 @@
+import { supportAdmin, supportCommon } from '@pika/api'
 import {
-    AdminTicketQueryParams,
-    AdminUpdateProblemRequest,
-} from '@pika/api/admin'
-import type { ICacheService } from '@pika/redis'
-import { ProblemIdParam } from '@pika/api/public'
-import {
-    requireAdmin,
-    requireAuth,
-    validateBody,
-    validateParams,
-    validateQuery,
+  requireAuth,
+  requirePermissions,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -33,33 +29,33 @@ export function createAdminProblemRouter(
   router.get(
     '/',
     requireAuth(),
-    requireAdmin(),
-    validateQuery(AdminTicketQueryParams),
+    requirePermissions('admin:support'),
+    validateQuery(supportAdmin.AdminTicketQueryParams),
     controller.getAllProblems,
   )
 
   router.get(
     '/:id',
     requireAuth(),
-    requireAdmin(),
-    validateParams(ProblemIdParam),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.ProblemIdParam),
     controller.getProblemById,
   )
 
   router.put(
     '/:id',
     requireAuth(),
-    requireAdmin(),
-    validateParams(ProblemIdParam),
-    validateBody(AdminUpdateProblemRequest),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.ProblemIdParam),
+    validateBody(supportAdmin.AdminUpdateProblemRequest),
     controller.updateProblem,
   )
 
   router.delete(
     '/:id',
     requireAuth(),
-    requireAdmin(),
-    validateParams(ProblemIdParam),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.ProblemIdParam),
     controller.deleteProblem,
   )
 

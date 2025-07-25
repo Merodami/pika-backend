@@ -7,8 +7,8 @@
 import { logger } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 import {
-    PostgreSqlContainer,
-    StartedPostgreSqlContainer,
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql'
 import fs from 'fs'
 import path from 'path'
@@ -66,8 +66,8 @@ export async function createTestDatabase(
 
   logger.debug('Starting PostgreSQL test container...')
 
-  // Create container with standard PostgreSQL
-  let container = new PostgreSqlContainer('postgres:17.2')
+  // Create container with PostGIS (matches docker-compose.local.yml and testcontainers.ts)
+  let container = new PostgreSqlContainer('postgis/postgis:17-3.5')
     .withDatabase(databaseName)
     .withUsername(username)
     .withPassword(password)
@@ -75,7 +75,9 @@ export async function createTestDatabase(
 
   // Add init.sql if requested and file exists
   if (useInitSql) {
-    const initSqlPath = path.resolve(__dirname, './dump/init.sql')
+    // Look for init.sql in the source directory instead of dist
+    const sourceDir = path.resolve(__dirname, '../../src/utils')
+    const initSqlPath = path.resolve(sourceDir, './dump/init.sql')
 
     logger.debug(`Looking for init.sql at: ${initSqlPath}`)
 

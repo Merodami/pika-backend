@@ -1,21 +1,19 @@
-import type {
-    CommunicationLogSearchParams as ApiCommunicationLogSearchParams,
-    CommunicationLogIdParam,
-    SendBulkEmailRequest,
-    SendEmailRequest,
-} from '@pika/api/public'
-import { CommunicationLogMapper } from '@pika/sdk'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { communicationCommon, communicationPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { CommunicationLogMapper } from '@pika/sdk'
+import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { CommunicationLogSearchParams } from '../repositories/CommunicationLogRepository.js'
 import type {
-    BulkEmailInput,
-    IEmailService,
-    SendEmailInput,
+  BulkEmailInput,
+  IEmailService,
+  SendEmailInput,
 } from '../services/EmailService.js'
 
 export interface IEmailController {
@@ -61,8 +59,8 @@ export class EmailController implements IEmailController {
    * Send an email to a single recipient
    */
   async sendEmail(
-    request: Request<{}, {}, SendEmailRequest>,
-    response: Response,
+    request: Request<{}, {}, communicationPublic.SendEmailRequest>,
+    response: Response<communicationPublic.SendEmailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -92,7 +90,16 @@ export class EmailController implements IEmailController {
 
       const result = await this.emailService.sendEmail(emailInput)
 
-      response.json(CommunicationLogMapper.toDTO(result))
+      const responseData = {
+        messageId: result.id, // Use the communication log ID as messageId
+        status: result.status as any, // Cast to match EmailStatus
+        queuedAt: result.createdAt,
+        scheduledAt: result.sentAt || undefined,
+      }
+      const validatedResponse =
+        communicationPublic.SendEmailResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -103,8 +110,8 @@ export class EmailController implements IEmailController {
    * Send emails to multiple recipients
    */
   async sendBulkEmail(
-    request: Request<{}, {}, SendBulkEmailRequest>,
-    response: Response,
+    request: Request<{}, {}, communicationPublic.SendBulkEmailRequest>,
+    response: Response<communicationPublic.SendBulkEmailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -129,12 +136,16 @@ export class EmailController implements IEmailController {
 
       const result = await this.emailService.sendBulkEmail(bulkEmailInput)
 
-      response.status(201).json({
+      const responseData = {
         sent: result.sent,
         failed: result.failed,
         total: result.total,
         logs: result.logs.map(CommunicationLogMapper.toDTO),
-      })
+      }
+      const validatedResponse =
+        communicationPublic.SendBulkEmailResponse.parse(responseData)
+
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -150,34 +161,43 @@ export class EmailController implements IEmailController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getEmailHistory(
-    request: Request,
-    response: Response,
+    request: Request, // Standard pattern - don't use Query params on Request
+    response: Response<communicationPublic.CommunicationLogListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const context = RequestContext.getContext(request)
       const userId = context.userId
 
-      const query = getValidatedQuery<ApiCommunicationLogSearchParams>(request)
+      const query =
+        getValidatedQuery<communicationPublic.CommunicationLogSearchParams>(
+          request,
+        )
 
-      // Transform API params to service params
-      const params: CommunicationLogSearchParams = {
-        page: query.page,
-        limit: query.limit,
+      // Map API query parameters inline - standard pattern
+      const params = {
+        page: query.page || 1,
+        limit: query.limit || 20,
         status: query.status,
         recipient: query.recipient,
         fromDate: query.fromDate ? new Date(query.fromDate) : undefined,
         toDate: query.toDate ? new Date(query.toDate) : undefined,
+        sortBy: query.sortBy || 'createdAt',
+        sortOrder: query.sortOrder || 'desc',
       }
 
       logger.info('Getting email history', { userId, params })
 
       const result = await this.emailService.getEmailHistory(userId, params)
 
-      response.json({
-        data: result.data.map(CommunicationLogMapper.toDTO),
-        pagination: result.pagination,
-      })
+      const responseData = paginatedResponse(
+        result,
+        CommunicationLogMapper.toDTO,
+      )
+      const validatedResponse =
+        communicationPublic.CommunicationLogListResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -188,8 +208,8 @@ export class EmailController implements IEmailController {
    * Get specific email details by ID
    */
   async getEmailById(
-    request: Request<CommunicationLogIdParam>,
-    response: Response,
+    request: Request<communicationCommon.CommunicationLogIdParam>,
+    response: Response<communicationPublic.CommunicationLogResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -201,7 +221,11 @@ export class EmailController implements IEmailController {
 
       const email = await this.emailService.getEmailById(id, userId)
 
-      response.json(CommunicationLogMapper.toDTO(email))
+      const responseData = CommunicationLogMapper.toDTO(email)
+      const validatedResponse =
+        communicationPublic.CommunicationLogResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

@@ -1,17 +1,17 @@
 import type { ICacheService } from '@pika/redis'
 import type {
-    CreateSupportCommentDTO,
-    SupportCommentDomain,
-    UpdateSupportCommentDTO,
+  CreateSupportCommentDTO,
+  SupportCommentDomain,
+  UpdateSupportCommentDTO,
 } from '@pika/sdk'
 import { SupportCommentMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { ParsedIncludes } from '@pika/types'
 
 import type {
-    CreateSupportCommentInput,
-    ISupportCommentRepository,
-    UpdateSupportCommentInput,
+  CreateSupportCommentInput,
+  ISupportCommentRepository,
+  UpdateSupportCommentInput,
 } from '../repositories/SupportCommentRepository.js'
 
 export interface IAdminSupportCommentService {

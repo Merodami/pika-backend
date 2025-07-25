@@ -1,26 +1,89 @@
-import type {
-  AccountVerificationResponse,
-  AuthUserResponse,
-  CheckUserRoleRequest,
-  ConfirmPasswordResetRequest,
-  CreateServiceSessionRequest,
-  GetUserByEmailRequest,
-  InitiatePasswordResetRequest,
-  PasswordResetResponse,
-  RoleCheckResponse,
-  ServiceKeyValidationResponse,
-  ServiceSessionResponse,
-  TokenValidationResponse,
-  ValidateServiceKeyRequest,
-  ValidateTokenRequest,
-  VerifyAccountRequest,
-} from '@pika/api/internal'
+// Service client types - these should NOT import from @pika/api
+// Each service client defines its own interfaces for communication
 import type { ServiceContext } from '@pika/types'
 
 import {
   BaseServiceClient,
   type ServiceClientConfig,
 } from '../BaseServiceClient.js'
+
+// Auth service client types
+export interface ValidateTokenRequest {
+  token: string
+}
+
+export interface TokenValidationResponse {
+  valid: boolean
+  userId?: string
+  email?: string
+  role?: string
+}
+
+export interface GetUserByEmailRequest {
+  email: string
+}
+
+export interface AuthUserResponse {
+  id: string
+  email: string
+  role: string
+  status: string
+}
+
+export interface InitiatePasswordResetRequest {
+  email: string
+}
+
+export interface PasswordResetResponse {
+  success: boolean
+  message?: string
+}
+
+export interface ConfirmPasswordResetRequest {
+  token: string
+  newPassword: string
+}
+
+export interface VerifyAccountRequest {
+  token: string
+}
+
+export interface AccountVerificationResponse {
+  success: boolean
+  userId?: string
+}
+
+export interface CreateServiceSessionRequest {
+  serviceName: string
+  serviceId: string
+}
+
+export interface ServiceSessionResponse {
+  sessionId: string
+  expiresAt: string
+}
+
+export interface CheckUserRoleRequest {
+  userId: string
+  roles: string[]
+  requireAll: boolean
+}
+
+export interface RoleCheckResponse {
+  hasRole: boolean
+  matchedRoles: string[]
+}
+
+export interface ValidateServiceKeyRequest {
+  serviceKey: string
+  serviceName: string
+}
+
+export interface ServiceKeyValidationResponse {
+  valid: boolean
+  serviceName?: string
+  serviceId?: string
+}
 
 /**
  * Client for interacting with the Auth service

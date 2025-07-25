@@ -7,21 +7,21 @@ import { vi } from 'vitest'
 
 // --- START MOCKING CONFIGURATION ---
 vi.unmock('@pika/http')
-vi.mock('@pikanc () => {
+vi.mock('@pika/api', async () => {
   const actualApi =
-    await vi.importActual<typeof import('@pikap@p@p@p@p@pika
+    await vi.importActual<typeof import('@pika/api')>('@pika/api')
 
   return actualApi
 })
-vi.mock('@pikaasync () => {
+vi.mock('@pika/shared', async () => {
   const actualShared =
-    await vi.importActual<typeof import('@pika('@p@p@p@p@p@pika
+    await vi.importActual<typeof import('@pika/shared')>('@pika/shared')
 
   return actualShared
 })
 // --- END MOCKING CONFIGURATION ---
 
-import { logger } from '@pika
+import { logger } from '@pika/shared'
 import { MockCacheService } from '@tests/mocks/cacheServiceMock.js'
 import {
   clearTestDatabase,

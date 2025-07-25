@@ -1,14 +1,14 @@
 import {
-    AWS_ACCESS_KEY_ID,
-    AWS_REGION,
-    AWS_SECRET_ACCESS_KEY,
-    COMMUNICATION_SERVICE_PORT,
-    EMAIL_FROM,
-    EMAIL_FROM_NAME,
+  AWS_ACCESS_KEY_ID,
+  AWS_REGION,
+  AWS_SECRET_ACCESS_KEY,
+  COMMUNICATION_SERVICE_PORT,
+  EMAIL_FROM,
+  EMAIL_FROM_NAME,
 } from '@pika/environment'
+import { startServer } from '@pika/http'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { startServer } from '@pika/http'
 import { PrismaClient } from '@prisma/client'
 
 import { createCommunicationServer } from './server.js'

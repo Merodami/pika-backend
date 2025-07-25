@@ -1,4 +1,4 @@
-import { DaysOfWeek } from './const.js'
+import { DaysOfWeek, SupportedLanguage } from './const.js'
 import { UserRole, UserStatus } from './enum.js'
 
 /**
@@ -46,6 +46,13 @@ export interface RetryOptions {
 }
 
 export type DayOfWeek = (typeof DaysOfWeek)[keyof typeof DaysOfWeek]
+
+/**
+ * Supported language code for internationalization
+ * Based on ISO 639-1 language codes
+ */
+export type LanguageCode =
+  (typeof SupportedLanguage)[keyof typeof SupportedLanguage]
 
 /**
  * Basic user interface

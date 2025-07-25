@@ -2,17 +2,9 @@ import { vi } from 'vitest'
 
 // Unmock modules for real service integration testing
 vi.unmock('@pika/http')
-vi.unmock('@pika
-vi.unmock('@pika')
+vi.unmock('@pika/api')
+vi.unmock('@pika/redis')
 
-import {
-  AWS_S3_ACCESS_KEY_ID,
-  AWS_S3_ENDPOINT,
-  AWS_S3_REGION,
-  AWS_S3_SECRET_ACCESS_KEY,
-} from '@pikaonment'
-import { MemoryCacheService } from '@pika'
-import { logger } from '@pikad'
 import {
   AuthenticatedRequestClient,
   createE2EAuthHelper,
@@ -20,6 +12,14 @@ import {
   E2EAuthHelper,
   S3TestHelper,
 } from '@pika'
+import {
+  AWS_S3_ACCESS_KEY_ID,
+  AWS_S3_ENDPOINT,
+  AWS_S3_REGION,
+  AWS_S3_SECRET_ACCESS_KEY,
+} from '@pika/environment'
+import { MemoryCacheService } from '@pika/redis'
+import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
   clearTestDatabase,

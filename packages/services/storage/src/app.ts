@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client'
 import {
   AWS_S3_ACCESS_KEY_ID,
   AWS_S3_BUCKET,
@@ -10,6 +9,7 @@ import {
 import { startServer } from '@pika/http'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { PrismaClient } from '@prisma/client'
 
 import { createStorageServer } from './server.js'
 

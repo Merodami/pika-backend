@@ -1,4 +1,4 @@
-import type { CreateSupportProblemRequest } from '@pika/api/public'
+import { supportPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { RequestContext } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
@@ -52,7 +52,7 @@ export class ProblemController {
    * Create new support ticket
    */
   async createProblem(
-    request: Request<{}, {}, CreateSupportProblemRequest>,
+    request: Request<{}, {}, supportPublic.CreateSupportProblemRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {

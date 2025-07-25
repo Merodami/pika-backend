@@ -14,25 +14,22 @@ config({ path: pathJoin(__currentDirname, '../../../../.env.local') })
 
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import {
-    API_GATEWAY_BASE_URL,
-    AUTH_SERVICE_PORT,
-    COMMUNICATION_SERVICE_PORT,
-    FILE_STORAGE_SERVICE_PORT,
-    GYM_SERVICE_PORT,
-    PAYMENT_SERVICE_PORT,
-    SERVICE_HOST,
-    SESSION_SERVICE_PORT,
-    SOCIAL_SERVICE_PORT,
-    SUBSCRIPTION_SERVICE_PORT,
-    SUPPORT_SERVICE_PORT,
-    USER_SERVICE_PORT,
+  API_GATEWAY_BASE_URL,
+  AUTH_SERVICE_PORT,
+  COMMUNICATION_SERVICE_PORT,
+  FILE_STORAGE_SERVICE_PORT,
+  PAYMENT_SERVICE_PORT,
+  SERVICE_HOST,
+  SUBSCRIPTION_SERVICE_PORT,
+  SUPPORT_SERVICE_PORT,
+  USER_SERVICE_PORT,
 } from '@pika/environment'
 import { mkdirSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { z } from 'zod'
 
-import { createSimpleRegistry } from '../common/registry/simple.js'
+import { createRegistry } from '../common/registry/base.js'
 import { registerAdminAPI } from './generators/admin-api.js'
 import { registerInternalAPI } from './generators/internal-api.js'
 import { registerPublicAPI } from './generators/public-api.js'
@@ -51,7 +48,7 @@ const __dirname = dirname(__filename)
 const OUTPUT_DIR = join(__dirname, '../../generated/openapi')
 
 // ============= Public API =============
-const publicRegistry = createSimpleRegistry({
+const publicRegistry = createRegistry({
   title: 'Pika Public API',
   version: '1.0.0',
   description: 'Public API for Pika mobile and web applications',
@@ -69,7 +66,7 @@ const publicRegistry = createSimpleRegistry({
 registerPublicAPI(publicRegistry)
 
 // ============= Admin API =============
-const adminRegistry = createSimpleRegistry({
+const adminRegistry = createRegistry({
   title: 'Pika Admin API',
   version: '1.0.0',
   description: 'Administrative API for Pika platform management',
@@ -87,7 +84,7 @@ const adminRegistry = createSimpleRegistry({
 registerAdminAPI(adminRegistry)
 
 // ============= Internal API =============
-const internalRegistry = createSimpleRegistry({
+const internalRegistry = createRegistry({
   title: 'Pika Internal API',
   version: '1.0.0',
   description: 'Internal service-to-service communication API',
@@ -105,24 +102,12 @@ const internalRegistry = createSimpleRegistry({
       description: 'Subscription Service',
     },
     {
-      url: `http://${SERVICE_HOST}:${SESSION_SERVICE_PORT}`,
-      description: 'Session Service',
-    },
-    {
-      url: `http://${SERVICE_HOST}:${SOCIAL_SERVICE_PORT}`,
-      description: 'Social Service',
-    },
-    {
       url: `http://${SERVICE_HOST}:${COMMUNICATION_SERVICE_PORT}`,
       description: 'Communication Service',
     },
     {
       url: `http://${SERVICE_HOST}:${FILE_STORAGE_SERVICE_PORT}`,
       description: 'Storage Service',
-    },
-    {
-      url: `http://${SERVICE_HOST}:${GYM_SERVICE_PORT}`,
-      description: 'Gym Service',
     },
     {
       url: `http://${SERVICE_HOST}:${PAYMENT_SERVICE_PORT}`,
@@ -139,7 +124,7 @@ const internalRegistry = createSimpleRegistry({
 registerInternalAPI(internalRegistry)
 
 // ============= Combined API (All APIs) =============
-const allApisRegistry = createSimpleRegistry({
+const allApisRegistry = createRegistry({
   title: 'Pika Complete API',
   version: '1.0.0',
   description:
@@ -162,24 +147,12 @@ const allApisRegistry = createSimpleRegistry({
       description: 'Subscription Service (Internal)',
     },
     {
-      url: `http://${SERVICE_HOST}:${SESSION_SERVICE_PORT}`,
-      description: 'Session Service (Internal)',
-    },
-    {
-      url: `http://${SERVICE_HOST}:${SOCIAL_SERVICE_PORT}`,
-      description: 'Social Service (Internal)',
-    },
-    {
       url: `http://${SERVICE_HOST}:${COMMUNICATION_SERVICE_PORT}`,
       description: 'Communication Service (Internal)',
     },
     {
       url: `http://${SERVICE_HOST}:${FILE_STORAGE_SERVICE_PORT}`,
       description: 'Storage Service (Internal)',
-    },
-    {
-      url: `http://${SERVICE_HOST}:${GYM_SERVICE_PORT}`,
-      description: 'Gym Service (Internal)',
     },
     {
       url: `http://${SERVICE_HOST}:${PAYMENT_SERVICE_PORT}`,

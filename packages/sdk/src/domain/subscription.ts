@@ -7,7 +7,6 @@ export interface SubscriptionPlanDomain {
   currency: string
   interval: string
   intervalCount: number
-  creditsAmount: number
   trialPeriodDays?: number
   features: string[]
   isActive: boolean

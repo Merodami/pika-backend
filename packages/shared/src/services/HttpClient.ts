@@ -1,8 +1,8 @@
 import { SERVICE_API_KEY } from '@pika/environment'
 import axios, {
-    type AxiosInstance,
-    type AxiosRequestConfig,
-    type AxiosResponse,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
 } from 'axios'
 
 import { ErrorFactory } from '../errors/index.js'

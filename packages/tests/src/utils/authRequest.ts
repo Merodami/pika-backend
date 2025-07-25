@@ -1,4 +1,3 @@
-import get from 'lodash-es/get.js'
 import supertest from 'supertest'
 
 interface JWTPayload {
@@ -72,7 +71,27 @@ export class AuthenticatedRequestClient {
     url: string,
     overrideToken?: string | null, // null means explicitly no token for this request
   ): supertest.Test {
-    const req = get(this.agent, method)(url).set('Accept', 'application/json')
+    let req: supertest.Test
+
+    switch (method) {
+      case 'get':
+        req = this.agent.get(url)
+        break
+      case 'post':
+        req = this.agent.post(url)
+        break
+      case 'patch':
+        req = this.agent.patch(url)
+        break
+      case 'delete':
+        req = this.agent.delete(url)
+        break
+      case 'put':
+        req = this.agent.put(url)
+        break
+    }
+
+    req.set('Accept', 'application/json')
 
     const tokenToUse =
       overrideToken === null ? undefined : overrideToken || this.token

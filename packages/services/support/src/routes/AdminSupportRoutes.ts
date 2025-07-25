@@ -1,17 +1,12 @@
+import { supportAdmin, supportCommon } from '@pika/api'
 import {
-    AdminTicketQueryParams,
-    AssignTicketRequest,
-    TicketIdParam,
-    UpdateTicketStatusRequest,
-} from '@pika/api/admin'
-import type { ICacheService } from '@pika/redis'
-import {
-    requireAdmin,
-    requireAuth,
-    validateBody,
-    validateParams,
-    validateQuery,
+  requireAuth,
+  requirePermissions,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -34,34 +29,34 @@ export function createAdminSupportRouter(
   router.get(
     '/tickets',
     requireAuth(),
-    requireAdmin(),
-    validateQuery(AdminTicketQueryParams),
+    requirePermissions('admin:support'),
+    validateQuery(supportAdmin.AdminTicketQueryParams),
     controller.getAllTickets,
   )
 
   router.get(
     '/tickets/:id',
     requireAuth(),
-    requireAdmin(),
-    validateParams(TicketIdParam),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.TicketIdParam),
     controller.getTicketById,
   )
 
   router.put(
     '/tickets/:id/status',
     requireAuth(),
-    requireAdmin(),
-    validateParams(TicketIdParam),
-    validateBody(UpdateTicketStatusRequest),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.TicketIdParam),
+    validateBody(supportAdmin.UpdateTicketStatusRequest),
     controller.updateTicketStatus,
   )
 
   router.post(
     '/tickets/:id/assign',
     requireAuth(),
-    requireAdmin(),
-    validateParams(TicketIdParam),
-    validateBody(AssignTicketRequest),
+    requirePermissions('admin:support'),
+    validateParams(supportCommon.TicketIdParam),
+    validateBody(supportAdmin.AssignTicketRequest),
     controller.assignTicket,
   )
 

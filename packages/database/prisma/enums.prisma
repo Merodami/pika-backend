@@ -1,15 +1,16 @@
 enum UserRole {
-  ADMIN
-  USER
+  admin
+  customer
+  business
 
   @@schema("identity")
 }
 
 enum UserStatus {
-  ACTIVE
-  SUSPENDED
-  BANNED
-  UNCONFIRMED
+  active
+  suspended
+  banned
+  unconfirmed
 
   @@schema("identity")
 }
@@ -64,7 +65,7 @@ enum NotificationStatus {
   FAILED
   READ
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum NotificationType {
@@ -73,7 +74,7 @@ enum NotificationType {
   PUSH
   IN_APP
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum CommunicationMethod {
@@ -82,16 +83,17 @@ enum CommunicationMethod {
   PUSH
   IN_APP
 
-  @@schema("public")
+  @@schema("support")
 }
 
 enum SubscriptionStatus {
-  ACTIVE
-  CANCELLED
-  EXPIRED
-  TRIALING
-  PAST_DUE
-  UNPAID
+  active
+  canceled
+  incomplete
+  incompleteExpired
+  pastDue
+  trialing
+  unpaid
 
   @@schema("payments")
 }
@@ -112,4 +114,112 @@ enum StorageProvider {
   MINIO
 
   @@schema("files")
+}
+
+enum VoucherBookStatus {
+  draft
+  ready_for_print
+  published
+  archived
+
+  @@schema("files")
+}
+
+enum VoucherBookType {
+  monthly
+  special_edition
+  regional
+  seasonal
+  promotional
+
+  @@schema("files")
+}
+
+enum PageLayoutType {
+  standard      // 8 spaces (2x4 grid)
+  mixed         // Mixed ad sizes
+  full_page     // Single full-page ad
+  custom        // Custom layout
+
+  @@schema("files")
+}
+
+enum AdSize {
+  single        // 1/8 page (1 space)
+  quarter       // 1/4 page (2 spaces)
+  half          // 1/2 page (4 spaces)
+  full          // Full page (8 spaces)
+
+  @@schema("files")
+}
+
+enum ContentType {
+  voucher       // Business voucher with QR code
+  image         // Static image content
+  ad            // Advertisement content
+  sponsored     // Sponsored content
+
+  @@schema("files")
+}
+
+// ===== VOUCHER SYSTEM ENUMS =====
+
+enum VoucherState {
+  draft
+  published
+  claimed
+  redeemed
+  expired
+  suspended
+
+  @@schema("business")
+}
+
+enum VoucherType {
+  percentage
+  fixed
+
+  @@schema("business")
+}
+
+enum VoucherCodeType {
+  qr            // QR code (JWT-based)
+  short         // Short alphanumeric code
+  static        // Static code (reusable)
+
+  @@schema("business")
+}
+
+enum VoucherScanType {
+  customer      // Customer scanning voucher
+  business      // Business scanning voucher for redemption
+
+  @@schema("analytics")
+}
+
+enum VoucherScanSource {
+  camera        // Scanned with camera
+  gallery       // Uploaded from gallery
+  link          // Opened via link
+  share         // Shared link/code
+
+  @@schema("analytics")
+}
+
+enum CustomerVoucherStatus {
+  claimed       // Voucher claimed to wallet
+  redeemed      // Voucher redeemed
+  expired       // Voucher expired
+
+  @@schema("business")
+}
+
+enum FraudCaseStatus {
+  pending         // Awaiting review
+  reviewing       // Under investigation
+  approved        // Marked as legitimate
+  rejected        // Confirmed fraud
+  false_positive  // Incorrectly flagged
+
+  @@schema("security")
 }

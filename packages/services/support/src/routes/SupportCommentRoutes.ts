@@ -1,11 +1,6 @@
-import {
-    CreateSupportCommentRequest,
-    ProblemIdForCommentsParam,
-    SupportCommentIdParam,
-    UpdateSupportCommentRequest,
-} from '@pika/api/public'
-import type { ICacheService } from '@pika/redis'
+import { supportCommon, supportPublic } from '@pika/api'
 import { requireAuth, validateBody, validateParams } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -32,36 +27,36 @@ export function createSupportCommentRouter(
   router.get(
     '/problem/:problemId',
     requireAuth(),
-    validateParams(ProblemIdForCommentsParam),
+    validateParams(supportCommon.ProblemIdForCommentsParam),
     controller.getCommentsByProblemId,
   )
 
   router.get(
     '/:id',
     requireAuth(),
-    validateParams(SupportCommentIdParam),
+    validateParams(supportCommon.SupportCommentIdParam),
     controller.getCommentById,
   )
 
   router.post(
     '/',
     requireAuth(),
-    validateBody(CreateSupportCommentRequest),
+    validateBody(supportPublic.CreateSupportCommentRequest),
     controller.createComment,
   )
 
   router.put(
     '/:id',
     requireAuth(),
-    validateParams(SupportCommentIdParam),
-    validateBody(UpdateSupportCommentRequest),
+    validateParams(supportCommon.SupportCommentIdParam),
+    validateBody(supportPublic.UpdateSupportCommentRequest),
     controller.updateComment,
   )
 
   router.delete(
     '/:id',
     requireAuth(),
-    validateParams(SupportCommentIdParam),
+    validateParams(supportCommon.SupportCommentIdParam),
     controller.deleteComment,
   )
 

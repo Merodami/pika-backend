@@ -1,13 +1,13 @@
-import { type ICacheService, initializeCache } from '@pika/redis'
 import { createGatewayWithServices } from '@pika/api-gateway'
-import { logger } from '@pika/shared'
 import { CACHE_DISABLED } from '@pika/environment'
+import { type ICacheService, initializeCache } from '@pika/redis'
+import { logger } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 import {
-    type Application,
-    type NextFunction,
-    type Request,
-    type Response,
+  type Application,
+  type NextFunction,
+  type Request,
+  type Response,
 } from 'express'
 
 import { createServiceClients } from '../../services/clients.js'
@@ -86,7 +86,7 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
     }
   }
 
-  protected getDistributedServiceUrl(serviceName: string): string {
+  protected getDistributedServiceUrl(): string {
     // In Vercel, all services go through the API gateway
     const apiGatewayUrl =
       process.env.API_GATEWAY_BASE_URL || 'https://pikaapi.vercel.app'

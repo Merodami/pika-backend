@@ -1,24 +1,172 @@
+import type { ZodRegistry } from '@api/common/registry/base.js'
+import * as internalAuthSchemas from '@api/schemas/auth/internal/service.js'
+import * as internalBusinessSchemas from '@api/schemas/business/internal/service.js'
+import * as businessParameters from '@api/schemas/business/common/parameters.js'
+import * as internalCategorySchemas from '@api/schemas/category/internal/service.js'
+import * as categoryParameters from '@api/schemas/category/common/parameters.js'
+import * as internalCommunicationSchemas from '@api/schemas/communication/internal/service.js'
+import * as internalDiscoverySchemas from '@api/schemas/discovery/internal/service.js'
+import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import { MessageResponse } from '@api/schemas/shared/responses.js'
+import * as internalStorageSchemas from '@api/schemas/storage/internal/service.js'
+import * as storageParameters from '@api/schemas/storage/common/parameters.js'
+import * as internalSubscriptionSchemas from '@api/schemas/subscription/internal/service.js'
+import * as healthSchemas from '@api/schemas/system/public/health.js'
+import * as internalUserSchemas from '@api/schemas/user/internal/service.js'
+import * as internalVoucherSchemas from '@api/schemas/voucher/internal/service.js'
+import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import { z } from 'zod'
-
-import type { SimpleZodRegistry } from '../../common/registry/simple.js'
-import {
-  ErrorResponse,
-  MessageResponse,
-} from '../../common/schemas/responses.js'
-import * as internalAuthSchemas from '../../internal/schemas/auth/service.js'
-import * as internalCommunicationSchemas from '../../internal/schemas/communication/service.js'
-import * as internalDiscoverySchemas from '../../internal/schemas/discovery/service.js'
-import * as healthSchemas from '../../internal/schemas/health.js'
-import * as internalSessionSchemas from '../../internal/schemas/session/service.js'
-import * as internalSubscriptionSchemas from '../../internal/schemas/subscription/service.js'
-import * as internalUserSchemas from '../../internal/schemas/user/service.js'
 
 /**
  * Register all internal API schemas and routes
  */
-export function registerInternalAPI(registry: SimpleZodRegistry): void {
+export function registerInternalAPI(registry: ZodRegistry): void {
   // ============= Health & Discovery Schemas =============
   registry.registerSchema('ServiceHealth', healthSchemas.ServiceHealth)
+
+  // ============= Business Service Schemas =============
+  registry.registerSchema('InternalBusinessData', internalBusinessSchemas.InternalBusinessData)
+  registry.registerSchema('InternalBusinessQueryParams', internalBusinessSchemas.InternalBusinessQueryParams)
+  registry.registerSchema('BulkBusinessRequest', internalBusinessSchemas.BulkBusinessRequest)
+  registry.registerSchema('BulkBusinessResponse', internalBusinessSchemas.BulkBusinessResponse)
+  registry.registerSchema('ValidateBusinessRequest', internalBusinessSchemas.ValidateBusinessRequest)
+  registry.registerSchema('ValidateBusinessResponse', internalBusinessSchemas.ValidateBusinessResponse)
+  registry.registerSchema('GetBusinessesByUserRequest', internalBusinessSchemas.GetBusinessesByUserRequest)
+  registry.registerSchema('GetBusinessesByUserResponse', internalBusinessSchemas.GetBusinessesByUserResponse)
+  registry.registerSchema('GetBusinessRequest', internalBusinessSchemas.GetBusinessRequest)
+  registry.registerSchema('GetBusinessesByCategoryRequest', internalBusinessSchemas.GetBusinessesByCategoryRequest)
+  registry.registerSchema('GetBusinessesByCategoryResponse', internalBusinessSchemas.GetBusinessesByCategoryResponse)
+  registry.registerSchema('CheckBusinessExistsRequest', internalBusinessSchemas.CheckBusinessExistsRequest)
+  registry.registerSchema('CheckBusinessExistsResponse', internalBusinessSchemas.CheckBusinessExistsResponse)
+  registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
+
+  // ============= Category Service Schemas =============
+  registry.registerSchema(
+    'InternalCategoryData',
+    internalCategorySchemas.InternalCategoryData,
+  )
+  registry.registerSchema(
+    'InternalCategoryQueryParams',
+    internalCategorySchemas.InternalCategoryQueryParams,
+  )
+  registry.registerSchema(
+    'BulkCategoryRequest',
+    internalCategorySchemas.BulkCategoryRequest,
+  )
+  registry.registerSchema(
+    'BulkCategoryResponse',
+    internalCategorySchemas.BulkCategoryResponse,
+  )
+  registry.registerSchema(
+    'ValidateCategoryRequest',
+    internalCategorySchemas.ValidateCategoryRequest,
+  )
+  registry.registerSchema(
+    'ValidateCategoryResponse',
+    internalCategorySchemas.ValidateCategoryResponse,
+  )
+  registry.registerSchema(
+    'CategoryValidationResult',
+    internalCategorySchemas.CategoryValidationResult,
+  )
+  registry.registerSchema(
+    'InternalCategoryHierarchyResponse',
+    internalCategorySchemas.InternalCategoryHierarchyResponse,
+  )
+  registry.registerSchema(
+    'CheckCategoryExistsRequest',
+    internalCategorySchemas.CheckCategoryExistsRequest,
+  )
+  registry.registerSchema(
+    'CheckCategoryExistsResponse',
+    internalCategorySchemas.CheckCategoryExistsResponse,
+  )
+  registry.registerSchema(
+    'InternalCategoryListResponse',
+    internalCategorySchemas.InternalCategoryListResponse,
+  )
+
+  // Category parameter schema
+  registry.registerSchema('CategoryIdParam', categoryParameters.CategoryIdParam)
+
+  // ============= Storage Service Schemas =============
+  registry.registerSchema(
+    'StorageServiceHealthCheck',
+    internalStorageSchemas.StorageServiceHealthCheck,
+  )
+  registry.registerSchema(
+    'InternalCreateFileRequest',
+    internalStorageSchemas.InternalCreateFileRequest,
+  )
+  registry.registerSchema(
+    'InternalFileResponse',
+    internalStorageSchemas.InternalFileResponse,
+  )
+  registry.registerSchema(
+    'InternalBulkDeleteRequest',
+    internalStorageSchemas.InternalBulkDeleteRequest,
+  )
+  registry.registerSchema(
+    'InternalBulkDeleteResponse',
+    internalStorageSchemas.InternalBulkDeleteResponse,
+  )
+  registry.registerSchema(
+    'GetUserFilesRequest',
+    internalStorageSchemas.GetUserFilesRequest,
+  )
+  registry.registerSchema(
+    'UserFileSummaryResponse',
+    internalStorageSchemas.UserFileSummaryResponse,
+  )
+  registry.registerSchema(
+    'CheckUserQuotaRequest',
+    internalStorageSchemas.CheckUserQuotaRequest,
+  )
+  registry.registerSchema(
+    'UserQuotaResponse',
+    internalStorageSchemas.UserQuotaResponse,
+  )
+  registry.registerSchema(
+    'MigrateFileRequest',
+    internalStorageSchemas.MigrateFileRequest,
+  )
+  registry.registerSchema(
+    'MigrateFileResponse',
+    internalStorageSchemas.MigrateFileResponse,
+  )
+  registry.registerSchema(
+    'CleanupOrphanedFilesRequest',
+    internalStorageSchemas.CleanupOrphanedFilesRequest,
+  )
+  registry.registerSchema(
+    'CleanupOrphanedFilesResponse',
+    internalStorageSchemas.CleanupOrphanedFilesResponse,
+  )
+
+  // Storage parameter schema
+  registry.registerSchema('FileIdParam', storageParameters.FileIdParam)
+
+  // ============= Voucher Service Schemas =============
+  registry.registerSchema(
+    'GetVouchersByIdsRequest',
+    internalVoucherSchemas.GetVouchersByIdsRequest,
+  )
+  registry.registerSchema(
+    'GetVouchersByIdsResponse',
+    internalVoucherSchemas.GetVouchersByIdsResponse,
+  )
+  registry.registerSchema(
+    'ValidateVoucherRequest',
+    internalVoucherSchemas.ValidateVoucherRequest,
+  )
+  registry.registerSchema(
+    'ValidateVoucherResponse',
+    internalVoucherSchemas.ValidateVoucherResponse,
+  )
+
+  // Voucher parameter schema
+  registry.registerSchema('VoucherPathParams', voucherParameters.VoucherPathParams)
+
   registry.registerSchema(
     'ServiceRegistryQuery',
     internalDiscoverySchemas.ServiceRegistryQuery,
@@ -188,76 +336,6 @@ export function registerInternalAPI(registry: SimpleZodRegistry): void {
     internalCommunicationSchemas.BatchUpdateResponse,
   )
 
-  // ============= Session Service Schemas =============
-  registry.registerSchema(
-    'InternalSessionData',
-    internalSessionSchemas.InternalSessionData,
-  )
-  registry.registerSchema(
-    'ValidateSessionRequest',
-    internalSessionSchemas.ValidateSessionRequest,
-  )
-  registry.registerSchema(
-    'SessionValidationResponse',
-    internalSessionSchemas.SessionValidationResponse,
-  )
-  registry.registerSchema(
-    'CheckBookingEligibilityRequest',
-    internalSessionSchemas.CheckBookingEligibilityRequest,
-  )
-  registry.registerSchema(
-    'BookingEligibilityResponse',
-    internalSessionSchemas.BookingEligibilityResponse,
-  )
-  registry.registerSchema(
-    'ProcessBookingRequest',
-    internalSessionSchemas.ProcessBookingRequest,
-  )
-  registry.registerSchema(
-    'ProcessBookingResponse',
-    internalSessionSchemas.ProcessBookingResponse,
-  )
-  registry.registerSchema(
-    'BatchSessionStatusUpdateRequest',
-    internalSessionSchemas.BatchSessionStatusUpdateRequest,
-  )
-  registry.registerSchema(
-    'BatchUpdateResponse',
-    internalSessionSchemas.SessionBatchUpdateResponse,
-  )
-  registry.registerSchema(
-    'GetUserBookingsRequest',
-    internalSessionSchemas.GetUserBookingsRequest,
-  )
-  registry.registerSchema(
-    'UserBookingsResponse',
-    internalSessionSchemas.UserBookingsResponse,
-  )
-  registry.registerSchema(
-    'GetProfessionalScheduleRequest',
-    internalSessionSchemas.GetProfessionalScheduleRequest,
-  )
-  registry.registerSchema(
-    'ProfessionalScheduleResponse',
-    internalSessionSchemas.ProfessionalScheduleResponse,
-  )
-  registry.registerSchema(
-    'SessionConflictCheckRequest',
-    internalSessionSchemas.SessionConflictCheckRequest,
-  )
-  registry.registerSchema(
-    'SessionConflictResponse',
-    internalSessionSchemas.SessionConflictResponse,
-  )
-  registry.registerSchema(
-    'SessionStatsRequest',
-    internalSessionSchemas.SessionStatsRequest,
-  )
-  registry.registerSchema(
-    'SessionStatsResponse',
-    internalSessionSchemas.SessionStatsResponse,
-  )
-
   // ============= User Service Schemas =============
   registry.registerSchema(
     'InternalUserData',
@@ -278,14 +356,6 @@ export function registerInternalAPI(registry: SimpleZodRegistry): void {
   registry.registerSchema(
     'GetUsersResponse',
     internalUserSchemas.GetUsersResponse,
-  )
-  registry.registerSchema(
-    'UpdateUserCreditsRequest',
-    internalUserSchemas.UpdateUserCreditsRequest,
-  )
-  registry.registerSchema(
-    'UpdateUserCreditsResponse',
-    internalUserSchemas.UpdateUserCreditsResponse,
   )
   registry.registerSchema(
     'CheckUserPermissionRequest',
@@ -425,7 +495,598 @@ export function registerInternalAPI(registry: SimpleZodRegistry): void {
 /**
  * Register all internal API routes
  */
-function registerInternalRoutes(registry: SimpleZodRegistry): void {
+function registerInternalRoutes(registry: ZodRegistry): void {
+  // ============= Business Service Internal Routes =============
+
+  // Get businesses by IDs (bulk)
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/bulk',
+    summary: 'Get multiple businesses by IDs',
+    tags: ['Business Service'],
+    security: [{ apiKey: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.BulkBusinessRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Businesses data',
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.BulkBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Validate businesses
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/validate',
+    summary: 'Validate businesses exist and meet criteria',
+    tags: ['Business Service'],
+    security: [{ apiKey: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.ValidateBusinessRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business validation results',
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.ValidateBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get businesses by user
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/by-user',
+    summary: 'Get all businesses owned by a user',
+    tags: ['Business Service'],
+    security: [{ apiKey: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.GetBusinessesByUserRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'User businesses',
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.GetBusinessesByUserResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get business by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses/{id}',
+    summary: 'Get business details by ID',
+    tags: ['Business Service'],
+    security: [{ apiKey: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      query: internalBusinessSchemas.GetBusinessRequest,
+    },
+    responses: {
+      200: {
+        description: 'Business details',
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.InternalBusinessData,
+          },
+        },
+      },
+    },
+  })
+
+  // Get businesses by category
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/{categoryId}/businesses',
+    summary: 'Get businesses in a specific category',
+    tags: ['Business Service'],
+    security: [{ apiKey: [] }],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+      query: internalBusinessSchemas.GetBusinessesByCategoryRequest,
+    },
+    responses: {
+      200: {
+        description: 'Category businesses',
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.GetBusinessesByCategoryResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Check if business exists
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/exists',
+    summary: 'Check if business exists and is active',
+    tags: ['Business Service'],
+    security: [{ apiKey: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.CheckBusinessExistsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business existence check result',
+        content: {
+          'application/json': {
+            schema: internalBusinessSchemas.CheckBusinessExistsResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Category Service Internal Routes =============
+
+  // Get categories by IDs (bulk)
+  registry.registerRoute({
+    method: 'post',
+    path: '/categories/bulk',
+    summary: 'Get multiple categories by IDs',
+    tags: ['Category Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.BulkCategoryRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Category list',
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.BulkCategoryResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Validate categories
+  registry.registerRoute({
+    method: 'post',
+    path: '/categories/validate',
+    summary: 'Validate categories exist and are active',
+    tags: ['Category Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.ValidateCategoryRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Category validation results',
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.ValidateCategoryResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Check category exists
+  registry.registerRoute({
+    method: 'post',
+    path: '/categories/exists',
+    summary: 'Check if category exists',
+    tags: ['Category Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.CheckCategoryExistsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Category existence check result',
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.CheckCategoryExistsResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get category hierarchy (internal)
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/hierarchy',
+    summary: 'Get category hierarchy for internal use',
+    tags: ['Category Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      query: internalCategorySchemas.InternalCategoryQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Category hierarchy',
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.InternalCategoryHierarchyResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get internal category list
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories',
+    summary: 'Get internal category list',
+    tags: ['Category Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      query: internalCategorySchemas.InternalCategoryQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Internal category list',
+        content: {
+          'application/json': {
+            schema: internalCategorySchemas.InternalCategoryListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Storage Service Internal Routes =============
+
+  // Create file record
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/files',
+    summary: 'Create file record',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.InternalCreateFileRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'File record created',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.InternalFileResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get file by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/files/{fileId}',
+    summary: 'Get file record by ID',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      params: storageParameters.FileIdParam,
+    },
+    responses: {
+      200: {
+        description: 'File record',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.InternalFileResponse,
+          },
+        },
+      },
+      404: {
+        description: 'File not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk delete files
+  registry.registerRoute({
+    method: 'delete',
+    path: '/storage/files/bulk',
+    summary: 'Bulk delete files',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.InternalBulkDeleteRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Bulk delete results',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.InternalBulkDeleteResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get user files
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/users/files',
+    summary: 'Get files for a user',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.GetUserFilesRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'User files',
+        content: {
+          'application/json': {
+            schema: z.array(internalStorageSchemas.InternalFileResponse),
+          },
+        },
+      },
+    },
+  })
+
+  // Get user file summary
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/users/{userId}/summary',
+    summary: 'Get user file summary',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      params: z.object({
+        userId: z.string().uuid(),
+      }),
+    },
+    responses: {
+      200: {
+        description: 'User file summary',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.UserFileSummaryResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Check user quota
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/quota/check',
+    summary: 'Check user storage quota',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.CheckUserQuotaRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'User quota information',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.UserQuotaResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Migrate file
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/files/migrate',
+    summary: 'Migrate file between providers',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.MigrateFileRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'File migration result',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.MigrateFileResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Cleanup orphaned files
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/cleanup/orphaned',
+    summary: 'Cleanup orphaned files',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.CleanupOrphanedFilesRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Cleanup results',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.CleanupOrphanedFilesResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Storage health check
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/health',
+    summary: 'Storage service health check',
+    tags: ['Storage Service'],
+    security: [{ 'x-api-key': [] }],
+    responses: {
+      200: {
+        description: 'Storage service health',
+        content: {
+          'application/json': {
+            schema: internalStorageSchemas.StorageServiceHealthCheck,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Voucher Service Internal Routes =============
+
+  // Get vouchers by IDs (bulk)
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/bulk',
+    summary: 'Get multiple vouchers by IDs',
+    tags: ['Voucher Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalVoucherSchemas.GetVouchersByIdsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher list',
+        content: {
+          'application/json': {
+            schema: internalVoucherSchemas.GetVouchersByIdsResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Validate voucher
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/validate',
+    summary: 'Validate voucher availability',
+    tags: ['Voucher Service'],
+    security: [{ 'x-api-key': [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: internalVoucherSchemas.ValidateVoucherRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher validation result',
+        content: {
+          'application/json': {
+            schema: internalVoucherSchemas.ValidateVoucherResponse,
+          },
+        },
+      },
+    },
+  })
+
   // Health check route
   registry.registerRoute({
     method: 'get',
@@ -729,153 +1390,6 @@ function registerInternalRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
-  // Session Service Internal Routes
-  registry.registerRoute({
-    method: 'get',
-    path: '/sessions/{id}',
-    summary: 'Get session by ID',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'Session details',
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.SessionResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Session not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/sessions/conflicts',
-    summary: 'Check for scheduling conflicts',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.ConflictCheckRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Conflict check result',
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.ConflictCheckResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/sessions/by-user/{userId}',
-    summary: 'Get sessions by user',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        userId: z.string().uuid(),
-      }),
-      query: z.object({
-        status: z.string().optional(),
-        fromDate: z.string().optional(),
-        toDate: z.string().optional(),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'User sessions',
-        content: {
-          'application/json': {
-            schema: z.array(internalSessionSchemas.SessionResponse),
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'put',
-    path: '/sessions/{id}/status',
-    summary: 'Update session status',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.UpdateSessionStatusRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Session updated',
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.SessionResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/sessions/batch/status',
-    summary: 'Batch update session statuses',
-    tags: ['Session Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: internalSessionSchemas.BatchUpdateSessionStatusRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Sessions updated',
-        content: {
-          'application/json': {
-            schema: z.object({
-              updated: z.number(),
-              failed: z.number(),
-            }),
-          },
-        },
-      },
-    },
-  })
-
   // User Service Internal Routes
   registry.registerRoute({
     method: 'get',
@@ -935,64 +1449,10 @@ function registerInternalRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
-  registry.registerRoute({
-    method: 'patch',
-    path: '/users/{id}',
-    summary: 'Update user internally',
-    tags: ['User Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: internalUserSchemas.UpdateUserCreditsRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'User updated',
-        content: {
-          'application/json': {
-            schema: internalUserSchemas.InternalUserData,
-          },
-        },
-      },
-    },
-  })
+  // Note: PATCH /users/{id} route removed - UpdateUserRequest schema doesn't exist in internal user schemas
+  // This route should be re-added once the proper schema is defined
 
   // Subscription Service Internal Routes
-  registry.registerRoute({
-    method: 'post',
-    path: '/subscriptions/process-credits',
-    summary: 'Process subscription credits',
-    tags: ['Subscription Service'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema:
-              internalSubscriptionSchemas.AllocateSubscriptionCreditsRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Credits processed',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-    },
-  })
 
   registry.registerRoute({
     method: 'post',

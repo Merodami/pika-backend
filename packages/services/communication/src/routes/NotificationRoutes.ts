@@ -1,17 +1,11 @@
+import { communicationCommon, communicationPublic } from '@pika/api'
 import {
-    CreateNotificationRequest,
-    NotificationIdParam,
-    NotificationSearchParams,
-    UpdateNotificationStatusRequest,
-} from '@pika/api/public'
-import type { ICacheService } from '@pika/redis'
-import {
-    requireAdmin,
-    requireAuth,
-    validateBody,
-    validateParams,
-    validateQuery,
+  requireAuth,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -54,36 +48,36 @@ export function createNotificationRouter(
   router.post(
     '/',
     requireAuth(),
-    validateBody(CreateNotificationRequest),
+    validateBody(communicationPublic.CreateNotificationRequest),
     controller.createNotification,
   )
 
   router.get(
     '/',
     requireAuth(),
-    validateQuery(NotificationSearchParams),
+    validateQuery(communicationPublic.NotificationSearchParams),
     controller.getNotifications,
   )
 
   router.get(
     '/:id',
     requireAuth(),
-    validateParams(NotificationIdParam),
+    validateParams(communicationCommon.NotificationIdParam),
     controller.getNotificationById,
   )
 
   router.put(
     '/:id',
     requireAuth(),
-    validateParams(NotificationIdParam),
-    validateBody(UpdateNotificationStatusRequest),
+    validateParams(communicationCommon.NotificationIdParam),
+    validateBody(communicationPublic.UpdateNotificationStatusRequest),
     controller.updateNotification,
   )
 
   router.put(
     '/:id/read',
     requireAuth(),
-    validateParams(NotificationIdParam),
+    validateParams(communicationCommon.NotificationIdParam),
     controller.markAsRead,
   )
 
@@ -92,25 +86,17 @@ export function createNotificationRouter(
   router.delete(
     '/:id',
     requireAuth(),
-    validateParams(NotificationIdParam),
+    validateParams(communicationCommon.NotificationIdParam),
     controller.deleteNotification,
   )
 
-  // Admin routes
-  router.post(
-    '/global',
-    requireAdmin(),
-    validateBody(CreateNotificationRequest),
-    controller.createGlobalNotification,
-  )
-
-  // Legacy admin notification endpoint for backward compatibility
-  router.post(
-    '/admin/notification',
-    requireAdmin(),
-    validateBody(CreateNotificationRequest),
-    controller.createGlobalNotification,
-  )
+  // ADMIN ENDPOINTS EXCLUDED - Global notification functionality moved to internal routes
+  // router.post(
+  //   '/global',
+  //   requireAdmin(),
+  //   validateBody(communicationPublic.CreateNotificationRequest),
+  //   controller.createGlobalNotification,
+  // )
 
   return router
 }

@@ -1,166 +1,208 @@
+// Updated imports to use @api paths
+import type { ZodRegistry } from '@api/common/registry/base.js'
+import * as adminBusinessSchemas from '@api/schemas/business/admin/management.js'
+import * as businessParameters from '@api/schemas/business/common/parameters.js'
+import * as adminCategorySchemas from '@api/schemas/category/admin/management.js'
+import * as categoryParameters from '@api/schemas/category/common/parameters.js'
+import * as adminPaymentSchemas from '@api/schemas/payment/admin/transactions.js'
+import * as adminPdfSchemas from '@api/schemas/pdf/admin/voucher-book.js'
+import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
+import { UserId } from '@api/schemas/shared/branded.js'
+import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import { DateTime, UUID } from '@api/schemas/shared/primitives.js'
+import { MessageResponse } from '@api/schemas/shared/responses.js'
+import * as adminStorageSchemas from '@api/schemas/storage/admin/management.js'
+import * as storageParameters from '@api/schemas/storage/common/parameters.js'
+import * as adminSupportSchemas from '@api/schemas/support/admin/tickets.js'
+import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
+import * as adminUserSchemas from '@api/schemas/user/admin/index.js'
+import * as userVerificationSchemas from '@api/schemas/user/public/verification.js'
+import * as adminVoucherSchemas from '@api/schemas/voucher/admin/management.js'
+import * as adminVoucherQueries from '@api/schemas/voucher/admin/queries.js'
+import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import { z } from 'zod'
-
-import * as dashboardSchemas from '../../admin/schemas/dashboard.js'
-import * as adminGymSchemas from '../../admin/schemas/gym/management.js'
-import * as stuffSchemas from '../../admin/schemas/gym/stuff.js'
-import * as adminPaymentSchemas from '../../admin/schemas/payment/transactions.js'
-import * as adminSessionAnalyticsSchemas from '../../admin/schemas/session/analytics.js'
-import * as adminSessionBookingStatsSchemas from '../../admin/schemas/session/bookingStats.js'
-import * as adminSessionSchemas from '../../admin/schemas/session/management.js'
-import * as adminSupportSchemas from '../../admin/schemas/support/tickets.js'
-import * as adminUserSchemas from '../../admin/schemas/user/index.js'
-import type { SimpleZodRegistry } from '../../common/registry/simple.js'
-import { UserId } from '../../common/schemas/branded.js'
-import { DateTime, UUID } from '../../common/schemas/primitives.js'
-import {
-  ErrorResponse,
-  MessageResponse,
-} from '../../common/schemas/responses.js'
-import * as gymSchemas from '../../public/schemas/gym/gym.js'
-import * as inductionSchemas from '../../public/schemas/gym/induction.js'
-import * as userVerificationSchemas from '../../public/schemas/user/verification.js'
 
 /**
  * Register all admin API schemas and routes
  */
-export function registerAdminAPI(registry: SimpleZodRegistry): void {
-  // ============= Dashboard Schemas =============
+export function registerAdminAPI(registry: ZodRegistry): void {
+  // ============= Business Management Schemas =============
   registry.registerSchema(
-    'DashboardStatsResponse',
-    dashboardSchemas.DashboardStatsResponse,
+    'AdminBusinessResponse',
+    adminBusinessSchemas.AdminBusinessResponse,
   )
   registry.registerSchema(
-    'RevenueChartResponse',
-    dashboardSchemas.RevenueChartResponse,
+    'CreateBusinessRequest',
+    adminBusinessSchemas.CreateBusinessRequest,
   )
   registry.registerSchema(
-    'UserGrowthResponse',
-    dashboardSchemas.UserGrowthResponse,
+    'UpdateBusinessRequest',
+    adminBusinessSchemas.UpdateBusinessRequest,
   )
   registry.registerSchema(
-    'DashboardDateRangeParams',
-    dashboardSchemas.DashboardDateRangeParams,
+    'AdminBusinessQueryParams',
+    adminBusinessSchemas.AdminBusinessQueryParams,
+  )
+  registry.registerSchema(
+    'AdminBusinessListResponse',
+    adminBusinessSchemas.AdminBusinessListResponse,
+  )
+  registry.registerSchema(
+    'ToggleBusinessVerificationRequest',
+    adminBusinessSchemas.ToggleBusinessVerificationRequest,
+  )
+  registry.registerSchema(
+    'ToggleBusinessActivationRequest',
+    adminBusinessSchemas.ToggleBusinessActivationRequest,
+  )
+  registry.registerSchema(
+    'BulkBusinessUpdateRequest',
+    adminBusinessSchemas.BulkBusinessUpdateRequest,
+  )
+  registry.registerSchema(
+    'BulkBusinessOperationResponse',
+    adminBusinessSchemas.BulkBusinessOperationResponse,
+  )
+  registry.registerSchema(
+    'BulkDeleteBusinessesRequest',
+    adminBusinessSchemas.BulkDeleteBusinessesRequest,
+  )
+  registry.registerSchema(
+    'UpdateBusinessRatingRequest',
+    adminBusinessSchemas.UpdateBusinessRatingRequest,
+  )
+  registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
+
+  // ============= Category Management Schemas =============
+  registry.registerSchema(
+    'AdminCategoryResponse',
+    adminCategorySchemas.AdminCategoryResponse,
+  )
+  registry.registerSchema(
+    'CreateCategoryRequest',
+    adminCategorySchemas.CreateCategoryRequest,
+  )
+  registry.registerSchema(
+    'UpdateCategoryRequest',
+    adminCategorySchemas.UpdateCategoryRequest,
+  )
+  registry.registerSchema(
+    'AdminCategoryQueryParams',
+    adminCategorySchemas.AdminCategoryQueryParams,
+  )
+  registry.registerSchema(
+    'AdminCategoryListResponse',
+    adminCategorySchemas.AdminCategoryListResponse,
+  )
+  registry.registerSchema(
+    'AdminCategoryTreeResponse',
+    adminCategorySchemas.AdminCategoryTreeResponse,
+  )
+  registry.registerSchema(
+    'MoveCategoryRequest',
+    adminCategorySchemas.MoveCategoryRequest,
+  )
+  registry.registerSchema(
+    'UpdateCategorySortOrderRequest',
+    adminCategorySchemas.UpdateCategorySortOrderRequest,
+  )
+  registry.registerSchema(
+    'ToggleCategoryActivationRequest',
+    adminCategorySchemas.ToggleCategoryActivationRequest,
+  )
+  registry.registerSchema(
+    'BulkCategoryUpdateRequest',
+    adminCategorySchemas.BulkCategoryUpdateRequest,
+  )
+  registry.registerSchema(
+    'BulkCategoryOperationResponse',
+    adminCategorySchemas.BulkCategoryOperationResponse,
+  )
+  registry.registerSchema(
+    'BulkDeleteCategoriesRequest',
+    adminCategorySchemas.BulkDeleteCategoriesRequest,
   )
 
-  // ============= Gym Management Schemas =============
+  // Category parameter schemas
+  registry.registerSchema('CategoryIdParam', categoryParameters.CategoryIdParam)
+
+  // ============= Storage Management Schemas =============
   registry.registerSchema(
-    'AdminGymListResponse',
-    adminGymSchemas.AdminGymListResponse,
-  )
-  registry.registerSchema('AdminGymDetailResponse', adminGymSchemas.AdminGym)
-  registry.registerSchema('NearbyGymsQuery', adminGymSchemas.NearbyGymsQuery)
-  registry.registerSchema('NearestGymQuery', adminGymSchemas.NearestGymQuery)
-  registry.registerSchema(
-    'AdminGymQueryParams',
-    adminGymSchemas.AdminGymSearchParams,
+    'AdminFileDetailResponse',
+    adminStorageSchemas.AdminFileDetailResponse,
   )
   registry.registerSchema(
-    'AdminCreateGymRequest',
-    adminGymSchemas.CreateGymRequest,
+    'AdminFileQueryParams',
+    adminStorageSchemas.AdminFileQueryParams,
   )
   registry.registerSchema(
-    'AdminUpdateGymRequest',
-    adminGymSchemas.UpdateGymRequest,
+    'AdminFileListResponse',
+    adminStorageSchemas.AdminFileListResponse,
   )
   registry.registerSchema(
-    'ApproveGymRequest',
-    adminGymSchemas.ApproveGymRequest,
+    'AdminUpdateFileRequest',
+    adminStorageSchemas.AdminUpdateFileRequest,
   )
   registry.registerSchema(
-    'SuspendGymRequest',
-    adminGymSchemas.SuspendGymRequest,
+    'AdminBulkFileActionRequest',
+    adminStorageSchemas.AdminBulkFileActionRequest,
   )
   registry.registerSchema(
-    'GymOwnerAssignmentRequest',
-    adminGymSchemas.GymOwnerAssignmentRequest,
+    'AdminBulkFileActionResponse',
+    adminStorageSchemas.AdminBulkFileActionResponse,
   )
-  registry.registerSchema('GymStatsResponse', adminGymSchemas.GymStatsResponse)
   registry.registerSchema(
-    'UpdateGymStatusRequest',
-    adminGymSchemas.UpdateGymStatusRequest,
+    'StorageAnalyticsResponse',
+    adminStorageSchemas.StorageAnalyticsResponse,
+  )
+  registry.registerSchema(
+    'StorageConfigurationResponse',
+    adminStorageSchemas.StorageConfigurationResponse,
+  )
+  registry.registerSchema(
+    'UpdateStorageConfigurationRequest',
+    adminStorageSchemas.UpdateStorageConfigurationRequest,
   )
 
-  // Register gym relation schemas
-  registry.registerSchema('GymMember', adminGymSchemas.GymMember)
-  registry.registerSchema('GymTrainer', adminGymSchemas.GymTrainer)
-  registry.registerSchema('GymReview', adminGymSchemas.GymReview)
+  // Storage parameter schemas
+  registry.registerSchema('FileIdParam', storageParameters.FileIdParam)
 
-  // Register gym enums
+  // ============= Voucher Management Schemas =============
   registry.registerSchema(
-    'GymVerificationStatus',
-    adminGymSchemas.GymVerificationStatus,
-  )
-  registry.registerSchema('GymTier', adminGymSchemas.GymTier)
-  registry.registerSchema(
-    'GymSubscriptionStatus',
-    adminGymSchemas.GymSubscriptionStatus,
-  )
-  registry.registerSchema('MemberStatus', adminGymSchemas.MemberStatus)
-  registry.registerSchema('TrainerStatus', adminGymSchemas.TrainerStatus)
-
-  // Additional gym schemas from public API needed for admin
-  registry.registerSchema('CreateGymRequest', gymSchemas.CreateGymRequest)
-  registry.registerSchema('GymHourlyPrice', gymSchemas.GymHourlyPrice)
-  registry.registerSchema('GymSpecialPrice', gymSchemas.GymSpecialPrice)
-  registry.registerSchema('UpdateGymRequest', gymSchemas.UpdateGymRequest)
-  registry.registerSchema('GymDetailsResponse', gymSchemas.GymDetailsResponse)
-  registry.registerSchema(
-    'GymWithDetailsResponse',
-    gymSchemas.GymWithDetailsResponse,
+    'AdminVoucherDetailResponse',
+    adminVoucherSchemas.AdminVoucherDetailResponse,
   )
   registry.registerSchema(
-    'UploadGymPictureResponse',
-    gymSchemas.UploadGymPictureResponse,
-  )
-  registry.registerSchema('GymIdParam', gymSchemas.GymIdParam)
-
-  // Stuff management schemas
-  registry.registerSchema('AdminStuff', stuffSchemas.AdminStuff)
-  registry.registerSchema(
-    'AdminStuffListResponse',
-    stuffSchemas.AdminStuffListResponse,
-  )
-  registry.registerSchema('CreateStuffRequest', stuffSchemas.CreateStuffRequest)
-  registry.registerSchema('UpdateStuffRequest', stuffSchemas.UpdateStuffRequest)
-  registry.registerSchema('StuffIdParam', stuffSchemas.StuffIdParam)
-  registry.registerSchema(
-    'AdminStuffSearchParams',
-    stuffSchemas.AdminStuffSearchParams,
+    'AdminVoucherListResponse',
+    adminVoucherSchemas.AdminVoucherListResponse,
   )
   registry.registerSchema(
-    'BulkUpdateStuffRequest',
-    stuffSchemas.BulkUpdateStuffRequest,
+    'CreateVoucherRequest',
+    adminVoucherSchemas.CreateVoucherRequest,
   )
   registry.registerSchema(
-    'BulkDeleteStuffRequest',
-    stuffSchemas.BulkDeleteStuffRequest,
+    'UpdateVoucherRequest',
+    adminVoucherSchemas.UpdateVoucherRequest,
+  )
+  registry.registerSchema(
+    'AdminVoucherQueryParams',
+    adminVoucherQueries.AdminVoucherQueryParams,
+  )
+  registry.registerSchema(
+    'BulkVoucherUpdateRequest',
+    adminVoucherSchemas.BulkVoucherUpdateRequest,
+  )
+  registry.registerSchema(
+    'BulkVoucherOperationResponse',
+    adminVoucherSchemas.BulkVoucherOperationResponse,
+  )
+  registry.registerSchema(
+    'VoucherAnalyticsResponse',
+    adminVoucherSchemas.VoucherAnalyticsResponse,
   )
 
-  // Induction management schemas
-  registry.registerSchema(
-    'InductionListResponse',
-    inductionSchemas.InductionListResponse,
-  )
-  registry.registerSchema(
-    'InductionSearchParams',
-    inductionSchemas.InductionSearchParams,
-  )
-  registry.registerSchema(
-    'InductionGymIdParam',
-    inductionSchemas.InductionGymIdParam,
-  )
-  registry.registerSchema(
-    'GetGymInductionsQuery',
-    inductionSchemas.GetGymInductionsQuery,
-  )
-  registry.registerSchema(
-    'UpdateInductionStatusRequest',
-    inductionSchemas.UpdateInductionStatusRequest,
-  )
-  registry.registerSchema(
-    'UpdateInductionStatusResponse',
-    inductionSchemas.UpdateInductionStatusResponse,
-  )
+  // Voucher parameter schemas
+  registry.registerSchema('VoucherPathParams', voucherParameters.VoucherPathParams)
 
   // ============= Payment/Transaction Schemas =============
   registry.registerSchema(
@@ -193,106 +235,6 @@ export function registerAdminAPI(registry: SimpleZodRegistry): void {
   )
   registry.registerSchema('PayoutIdParam', adminPaymentSchemas.PayoutIdParam)
 
-  // ============= Session Management Schemas =============
-  registry.registerSchema('AdminSession', adminSessionSchemas.AdminSession)
-  registry.registerSchema(
-    'AdminSessionListResponse',
-    adminSessionSchemas.AdminSessionListResponse,
-  )
-  registry.registerSchema(
-    'AdminSessionDetailResponse',
-    adminSessionSchemas.AdminSessionDetailResponse,
-  )
-  registry.registerSchema('SessionIdParam', adminSessionSchemas.SessionIdParam)
-  registry.registerSchema(
-    'AdminSessionQueryParams',
-    adminSessionSchemas.AdminSessionQueryParams,
-  )
-  registry.registerSchema(
-    'AdminUpdateSessionRequest',
-    adminSessionSchemas.AdminUpdateSessionRequest,
-  )
-  registry.registerSchema(
-    'AdminCancelSessionRequest',
-    adminSessionSchemas.AdminCancelSessionRequest,
-  )
-  registry.registerSchema(
-    'AdminCreateSessionRequest',
-    adminSessionSchemas.AdminCreateSessionRequest,
-  )
-  registry.registerSchema(
-    'AdminBookSessionRequest',
-    adminSessionSchemas.AdminBookSessionRequest,
-  )
-  registry.registerSchema(
-    'BulkSessionActionRequest',
-    adminSessionSchemas.BulkSessionActionRequest,
-  )
-  registry.registerSchema(
-    'SessionConflictResponse',
-    adminSessionSchemas.SessionConflictResponse,
-  )
-  registry.registerSchema(
-    'ReassignSessionRequest',
-    adminSessionSchemas.ReassignSessionRequest,
-  )
-  registry.registerSchema(
-    'AdminAvailableSlotsRequest',
-    adminSessionSchemas.AdminAvailableSlotsRequest,
-  )
-  registry.registerSchema(
-    'AdminAvailableSlotsResponse',
-    adminSessionSchemas.AdminAvailableSlotsResponse,
-  )
-
-  // ============= Session Analytics Schemas =============
-  registry.registerSchema(
-    'SessionAnalyticsResponse',
-    adminSessionAnalyticsSchemas.SessionAnalyticsResponse,
-  )
-  registry.registerSchema(
-    'SessionAnalyticsQuery',
-    adminSessionAnalyticsSchemas.SessionAnalyticsQuery,
-  )
-  registry.registerSchema(
-    'BookingTrendsResponse',
-    adminSessionAnalyticsSchemas.BookingTrendsResponse,
-  )
-  registry.registerSchema(
-    'ProfessionalPerformanceResponse',
-    adminSessionAnalyticsSchemas.ProfessionalPerformanceResponse,
-  )
-  registry.registerSchema(
-    'SessionTypeBreakdownResponse',
-    adminSessionAnalyticsSchemas.SessionTypeBreakdownResponse,
-  )
-  registry.registerSchema(
-    'CancellationAnalyticsResponse',
-    adminSessionAnalyticsSchemas.CancellationAnalyticsResponse,
-  )
-  registry.registerSchema(
-    'RevenueBySessionResponse',
-    adminSessionAnalyticsSchemas.RevenueBySessionResponse,
-  )
-  registry.registerSchema(
-    'UtilizationReportResponse',
-    adminSessionAnalyticsSchemas.UtilizationReportResponse,
-  )
-
-  // ============= Session Booking Stats Schemas =============
-  registry.registerSchema(
-    'GetUserBookingStatsRequest',
-    adminSessionBookingStatsSchemas.GetUserBookingStatsRequest,
-  )
-  registry.registerSchema(
-    'UserBookingStats',
-    adminSessionBookingStatsSchemas.UserBookingStats,
-  )
-  registry.registerSchema(
-    'GetUserBookingStatsResponse',
-    adminSessionBookingStatsSchemas.GetUserBookingStatsResponse,
-  )
-
   // ============= Support/Ticket Schemas =============
   registry.registerSchema(
     'AdminTicketListResponse',
@@ -322,7 +264,10 @@ export function registerAdminAPI(registry: SimpleZodRegistry): void {
     'AgentPerformanceResponse',
     adminSupportSchemas.AgentPerformanceResponse,
   )
-  registry.registerSchema('TicketIdParam', adminSupportSchemas.TicketIdParam)
+  registry.registerSchema(
+    'TicketIdParam',
+    supportParameterSchemas.TicketIdParam,
+  )
   registry.registerSchema(
     'AdminUpdateProblemRequest',
     adminSupportSchemas.AdminUpdateProblemRequest,
@@ -377,6 +322,58 @@ export function registerAdminAPI(registry: SimpleZodRegistry): void {
   )
   registry.registerSchema('UserIdParam', adminUserSchemas.UserIdParam)
 
+  // ============= PDF/Voucher Book Management Schemas =============
+  registry.registerSchema(
+    'AdminVoucherBookResponse',
+    adminPdfSchemas.AdminVoucherBookResponse,
+  )
+  registry.registerSchema(
+    'AdminVoucherBookListResponse',
+    adminPdfSchemas.AdminVoucherBookListResponse,
+  )
+  registry.registerSchema(
+    'CreateVoucherBookRequest',
+    adminPdfSchemas.CreateVoucherBookRequest,
+  )
+  registry.registerSchema(
+    'UpdateVoucherBookRequest',
+    adminPdfSchemas.UpdateVoucherBookRequest,
+  )
+  registry.registerSchema(
+    'PublishVoucherBookRequest',
+    adminPdfSchemas.PublishVoucherBookRequest,
+  )
+  registry.registerSchema(
+    'ArchiveVoucherBookRequest',
+    adminPdfSchemas.ArchiveVoucherBookRequest,
+  )
+  registry.registerSchema(
+    'GeneratePdfRequest',
+    adminPdfSchemas.GeneratePdfRequest,
+  )
+  registry.registerSchema(
+    'GeneratePdfResponse',
+    adminPdfSchemas.GeneratePdfResponse,
+  )
+  registry.registerSchema(
+    'BulkVoucherBookOperationRequest',
+    adminPdfSchemas.BulkVoucherBookOperationRequest,
+  )
+  registry.registerSchema(
+    'BulkVoucherBookOperationResponse',
+    adminPdfSchemas.BulkVoucherBookOperationResponse,
+  )
+  registry.registerSchema(
+    'AdminVoucherBookQueryParams',
+    adminPdfSchemas.AdminVoucherBookQueryParams,
+  )
+
+  // PDF parameter schemas
+  registry.registerSchema(
+    'VoucherBookIdParam',
+    pdfParameters.VoucherBookIdParam,
+  )
+
   // User Verification Schemas (Admin)
   registry.registerSchema(
     'UnifiedVerificationRequest',
@@ -398,20 +395,1017 @@ export function registerAdminAPI(registry: SimpleZodRegistry): void {
 /**
  * Register all admin API routes
  */
-function registerAdminRoutes(registry: SimpleZodRegistry): void {
-  // Dashboard route
+function registerAdminRoutes(registry: ZodRegistry): void {
+  // ============= Category Management Routes =============
+  
+  // Get all categories
   registry.registerRoute({
     method: 'get',
-    path: '/dashboard/stats',
-    summary: 'Get dashboard statistics',
-    tags: ['Dashboard'],
+    path: '/categories',
+    summary: 'List all categories with admin details',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminCategorySchemas.AdminCategoryQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of categories',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.AdminCategoryListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get category tree
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/tree',
+    summary: 'Get category hierarchy tree',
+    tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
     responses: {
       200: {
-        description: 'Dashboard statistics',
+        description: 'Category tree structure',
         content: {
           'application/json': {
-            schema: dashboardSchemas.DashboardStats,
+            schema: adminCategorySchemas.AdminCategoryTreeResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get category by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/categories/{id}',
+    summary: 'Get category details',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+    },
+    responses: {
+      200: {
+        description: 'Category details',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.AdminCategoryResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Category not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Create category
+  registry.registerRoute({
+    method: 'post',
+    path: '/categories',
+    summary: 'Create a new category',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.CreateCategoryRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Category created successfully',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.AdminCategoryResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid category data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update category
+  registry.registerRoute({
+    method: 'put',
+    path: '/categories/{id}',
+    summary: 'Update category information',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.UpdateCategoryRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Category updated successfully',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.AdminCategoryResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Category not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Delete category
+  registry.registerRoute({
+    method: 'delete',
+    path: '/categories/{id}',
+    summary: 'Delete a category',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+    },
+    responses: {
+      204: {
+        description: 'Category deleted successfully',
+      },
+      404: {
+        description: 'Category not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Move category
+  registry.registerRoute({
+    method: 'patch',
+    path: '/categories/{id}/move',
+    summary: 'Move category to different parent',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.MoveCategoryRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Category moved successfully',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.AdminCategoryResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Category not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Toggle category activation
+  registry.registerRoute({
+    method: 'patch',
+    path: '/categories/{id}/activation',
+    summary: 'Toggle category activation status',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: categoryParameters.CategoryIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.ToggleCategoryActivationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Category activation toggled successfully',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.AdminCategoryResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Category not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk update categories
+  registry.registerRoute({
+    method: 'patch',
+    path: '/categories/bulk-update',
+    summary: 'Update multiple categories',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.BulkCategoryUpdateRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Categories updated successfully',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.BulkCategoryOperationResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk delete categories
+  registry.registerRoute({
+    method: 'delete',
+    path: '/categories/bulk-delete',
+    summary: 'Delete multiple categories',
+    tags: ['Category Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.BulkDeleteCategoriesRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Categories deleted successfully',
+        content: {
+          'application/json': {
+            schema: adminCategorySchemas.BulkCategoryOperationResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Business Management Routes =============
+
+  // Get all businesses
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses',
+    summary: 'List all businesses with admin details',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminBusinessSchemas.AdminBusinessQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of businesses',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Create business
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses',
+    summary: 'Create a new business',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.CreateBusinessRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Business created successfully',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get business by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses/{id}',
+    summary: 'Get business details',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+    },
+    responses: {
+      200: {
+        description: 'Business details',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update business
+  registry.registerRoute({
+    method: 'put',
+    path: '/businesses/{id}',
+    summary: 'Update business information',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.UpdateBusinessRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business updated successfully',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Delete business
+  registry.registerRoute({
+    method: 'delete',
+    path: '/businesses/{id}',
+    summary: 'Delete business',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+    },
+    responses: {
+      204: {
+        description: 'Business deleted successfully',
+      },
+    },
+  })
+
+  // Toggle business verification
+  registry.registerRoute({
+    method: 'patch',
+    path: '/businesses/{id}/verification',
+    summary: 'Toggle business verification status',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.ToggleBusinessVerificationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business verification updated',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Toggle business activation
+  registry.registerRoute({
+    method: 'patch',
+    path: '/businesses/{id}/activation',
+    summary: 'Toggle business activation status',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.ToggleBusinessActivationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business activation updated',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update business rating
+  registry.registerRoute({
+    method: 'patch',
+    path: '/businesses/{id}/rating',
+    summary: 'Update business rating',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.UpdateBusinessRatingRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business rating updated',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk update businesses
+  registry.registerRoute({
+    method: 'patch',
+    path: '/businesses/bulk',
+    summary: 'Update multiple businesses at once',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.BulkBusinessUpdateRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Bulk business update results',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.BulkBusinessOperationResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk delete businesses
+  registry.registerRoute({
+    method: 'delete',
+    path: '/businesses/bulk',
+    summary: 'Delete multiple businesses',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.BulkDeleteBusinessesRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Bulk business deletion results',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.BulkBusinessOperationResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Storage Management Routes =============
+
+  // Get all files
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/files',
+    summary: 'List all files with admin details',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminStorageSchemas.AdminFileQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of files',
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.AdminFileListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get file by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/files/{fileId}',
+    summary: 'Get file details',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: storageParameters.FileIdParam,
+    },
+    responses: {
+      200: {
+        description: 'File details',
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.AdminFileDetailResponse,
+          },
+        },
+      },
+      404: {
+        description: 'File not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update file
+  registry.registerRoute({
+    method: 'patch',
+    path: '/storage/files/{fileId}',
+    summary: 'Update file information',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: storageParameters.FileIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.AdminUpdateFileRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'File updated successfully',
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.AdminFileDetailResponse,
+          },
+        },
+      },
+      404: {
+        description: 'File not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Delete file
+  registry.registerRoute({
+    method: 'delete',
+    path: '/storage/files/{fileId}',
+    summary: 'Delete a file',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: storageParameters.FileIdParam,
+    },
+    responses: {
+      204: {
+        description: 'File deleted successfully',
+      },
+      404: {
+        description: 'File not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk file actions
+  registry.registerRoute({
+    method: 'post',
+    path: '/storage/files/bulk-action',
+    summary: 'Perform bulk actions on files',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.AdminBulkFileActionRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Bulk action completed',
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.AdminBulkFileActionResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get storage analytics
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/analytics',
+    summary: 'Get storage usage analytics',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Storage analytics data',
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.StorageAnalyticsResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get storage configuration
+  registry.registerRoute({
+    method: 'get',
+    path: '/storage/configuration',
+    summary: 'Get storage service configuration',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Storage configuration',
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.StorageConfigurationResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update storage configuration
+  registry.registerRoute({
+    method: 'put',
+    path: '/storage/configuration',
+    summary: 'Update storage service configuration',
+    tags: ['Storage Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.UpdateStorageConfigurationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Configuration updated successfully',
+        content: {
+          'application/json': {
+            schema: adminStorageSchemas.StorageConfigurationResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid configuration data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Voucher Management Routes =============
+
+  // Get all vouchers
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers',
+    summary: 'List all vouchers with admin details',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminVoucherQueries.AdminVoucherQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of vouchers',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers/{id}',
+    summary: 'Get voucher details',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher details',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherDetailResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Create voucher
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers',
+    summary: 'Create a new voucher',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.CreateVoucherRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: 'Voucher created successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherDetailResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid voucher data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update voucher
+  registry.registerRoute({
+    method: 'put',
+    path: '/vouchers/{id}',
+    summary: 'Update voucher information',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.UpdateVoucherRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher updated successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherDetailResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Delete voucher
+  registry.registerRoute({
+    method: 'delete',
+    path: '/vouchers/{id}',
+    summary: 'Delete a voucher',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+    },
+    responses: {
+      204: {
+        description: 'Voucher deleted successfully',
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk update vouchers
+  registry.registerRoute({
+    method: 'patch',
+    path: '/vouchers/bulk-update',
+    summary: 'Update multiple vouchers',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.BulkVoucherUpdateRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Vouchers updated successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.BulkVoucherOperationResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher analytics
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers/analytics',
+    summary: 'Get voucher analytics',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminVoucherQueries.VoucherAnalyticsQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher analytics data',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.VoucherAnalyticsResponse,
           },
         },
       },
@@ -964,752 +1958,6 @@ function registerAdminRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
-  // Gym Management routes
-  registry.registerRoute({
-    method: 'get',
-    path: '/gyms',
-    summary: 'List all gyms with admin details',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: adminGymSchemas.AdminGymSearchParams,
-    },
-    responses: {
-      200: {
-        description: 'List of gyms',
-        content: {
-          'application/json': {
-            schema: z.object({
-              data: z.array(adminGymSchemas.AdminGym),
-              pagination: z.object({
-                page: z.number(),
-                limit: z.number(),
-                total: z.number(),
-                totalPages: z.number(),
-              }),
-            }),
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/gyms/nearby',
-    summary: 'Get nearby gyms',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: adminGymSchemas.NearbyGymsQuery,
-    },
-    responses: {
-      200: {
-        description: 'List of nearby gyms',
-        content: {
-          'application/json': {
-            schema: z.object({
-              data: z.array(
-                adminGymSchemas.AdminGym.extend({
-                  distance: z.number().describe('Distance in kilometers'),
-                }),
-              ),
-              total: z.number(),
-            }),
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/gyms/nearest',
-    summary: 'Get nearest gym',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: adminGymSchemas.NearestGymQuery,
-    },
-    responses: {
-      200: {
-        description: 'Nearest gym',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.AdminGym.extend({
-              distance: z.number().describe('Distance in kilometers'),
-            }),
-          },
-        },
-      },
-      404: {
-        description: 'No gyms found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/gyms/{id}',
-    summary: 'Get gym details',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      query: adminGymSchemas.AdminGymByIdQuery,
-    },
-    responses: {
-      200: {
-        description: 'Gym details',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.AdminGym,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/gyms/{id}/verify',
-    summary: 'Verify gym registration',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.VerifyGymRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Gym verification updated',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.AdminGym,
-          },
-        },
-      },
-    },
-  })
-
-  // Create gym route
-  registry.registerRoute({
-    method: 'post',
-    path: '/gyms',
-    summary: 'Create a new gym',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.CreateGymRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Gym created successfully',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.AdminGym,
-          },
-        },
-      },
-      400: {
-        description: 'Invalid gym data',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Update gym route
-  registry.registerRoute({
-    method: 'put',
-    path: '/gyms/{id}',
-    summary: 'Update gym information',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.UpdateGymRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Gym updated successfully',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.AdminGym,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Delete gym route
-  registry.registerRoute({
-    method: 'delete',
-    path: '/gyms/{id}',
-    summary: 'Delete a gym',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    },
-    responses: {
-      204: {
-        description: 'Gym deleted successfully',
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Update gym status route
-  registry.registerRoute({
-    method: 'patch',
-    path: '/gyms/{id}/status',
-    summary: 'Update gym operational status',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.UpdateGymStatusRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Gym status updated successfully',
-        content: {
-          'application/json': {
-            schema: z.object({
-              id: adminGymSchemas.AdminGym.shape.id,
-              name: z.string(),
-              status: adminGymSchemas.AdminGym.shape.status,
-              updatedAt: z.string(),
-              statusChangeReason: z.string().optional(),
-            }),
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Get gym stats route
-  registry.registerRoute({
-    method: 'get',
-    path: '/gyms/{id}/stats',
-    summary: 'Get gym statistics',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'Gym statistics',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.GymStatsResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Add gym equipment route
-  registry.registerRoute({
-    method: 'post',
-    path: '/gyms/{id}/equipment',
-    summary: 'Add equipment to gym',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.AddGymEquipmentRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Equipment added successfully',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.GymEquipment,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Update gym pricing route
-  registry.registerRoute({
-    method: 'patch',
-    path: '/gyms/{id}/pricing',
-    summary: 'Update gym pricing',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.UpdateGymPricingRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Pricing updated successfully',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Set special hours route
-  registry.registerRoute({
-    method: 'post',
-    path: '/gyms/{id}/special-hours',
-    summary: 'Set special operating hours',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.SetSpecialHoursRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Special hours set successfully',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Get gym analytics route
-  registry.registerRoute({
-    method: 'get',
-    path: '/gyms/{id}/analytics',
-    summary: 'Get gym analytics',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-      query: z.object({
-        startDate: z.string().optional(),
-        endDate: z.string().optional(),
-        period: z.enum(['7d', '30d', '90d', '1y']).default('30d'),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'Gym analytics data',
-        content: {
-          'application/json': {
-            schema: adminGymSchemas.GymAnalytics,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Upload gym picture route
-  registry.registerRoute({
-    method: 'post',
-    path: '/gyms/{id}/pictures',
-    summary: 'Upload gym pictures',
-    tags: ['Gym Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: gymSchemas.GymIdParam,
-      body: {
-        content: {
-          'multipart/form-data': {
-            schema: z.object({
-              pictures: z.array(z.instanceof(File)).min(1).max(10),
-            }),
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Pictures uploaded successfully',
-        content: {
-          'application/json': {
-            schema: gymSchemas.UploadGymPictureResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Gym not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Stuff Management routes
-  registry.registerRoute({
-    method: 'get',
-    path: '/stuff',
-    summary: 'List all gym equipment/amenities',
-    tags: ['Stuff Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: stuffSchemas.AdminStuffSearchParams,
-    },
-    responses: {
-      200: {
-        description: 'List of stuff',
-        content: {
-          'application/json': {
-            schema: stuffSchemas.AdminStuffListResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/stuff/{id}',
-    summary: 'Get stuff details',
-    tags: ['Stuff Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: stuffSchemas.StuffIdParam,
-    },
-    responses: {
-      200: {
-        description: 'Stuff details',
-        content: {
-          'application/json': {
-            schema: stuffSchemas.AdminStuff,
-          },
-        },
-      },
-      404: {
-        description: 'Stuff not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/stuff',
-    summary: 'Create new equipment/amenity',
-    tags: ['Stuff Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: stuffSchemas.CreateStuffRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Stuff created successfully',
-        content: {
-          'application/json': {
-            schema: stuffSchemas.AdminStuff,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'put',
-    path: '/stuff/{id}',
-    summary: 'Update equipment/amenity',
-    tags: ['Stuff Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: stuffSchemas.StuffIdParam,
-      body: {
-        content: {
-          'application/json': {
-            schema: stuffSchemas.UpdateStuffRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Stuff updated successfully',
-        content: {
-          'application/json': {
-            schema: stuffSchemas.AdminStuff,
-          },
-        },
-      },
-      404: {
-        description: 'Stuff not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'delete',
-    path: '/stuff/{id}',
-    summary: 'Delete equipment/amenity',
-    tags: ['Stuff Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: stuffSchemas.StuffIdParam,
-    },
-    responses: {
-      200: {
-        description: 'Stuff deleted successfully',
-        content: {
-          'application/json': {
-            schema: stuffSchemas.AdminStuff,
-          },
-        },
-      },
-      404: {
-        description: 'Stuff not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Induction Management routes (admin)
-  registry.registerRoute({
-    method: 'get',
-    path: '/inductions',
-    summary: 'List all induction requests',
-    tags: ['Induction Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: inductionSchemas.InductionSearchParams,
-    },
-    responses: {
-      200: {
-        description: 'List of inductions',
-        content: {
-          'application/json': {
-            schema: inductionSchemas.InductionListResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/inductions/gym/{gymId}',
-    summary: 'Get inductions for a specific gym',
-    tags: ['Induction Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: inductionSchemas.InductionGymIdParam,
-      query: inductionSchemas.GetGymInductionsQuery,
-    },
-    responses: {
-      200: {
-        description: 'Gym inductions',
-        content: {
-          'application/json': {
-            schema: inductionSchemas.InductionListResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'patch',
-    path: '/inductions/{id}/status',
-    summary: 'Update induction status',
-    tags: ['Induction Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: inductionSchemas.InductionIdParam,
-      body: {
-        content: {
-          'application/json': {
-            schema: inductionSchemas.UpdateInductionStatusRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Induction status updated',
-        content: {
-          'application/json': {
-            schema: inductionSchemas.UpdateInductionStatusResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Induction not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
   // Transaction Management routes
   registry.registerRoute({
     method: 'get',
@@ -1764,40 +2012,6 @@ function registerAdminRoutes(registry: SimpleZodRegistry): void {
   })
 
   // Financial Management routes
-  registry.registerRoute({
-    method: 'post',
-    path: '/credits/adjustments',
-    summary: 'Create manual credit adjustment',
-    tags: ['Financial Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: adminPaymentSchemas.ManualAdjustmentRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Adjustment created',
-        content: {
-          'application/json': {
-            schema: adminPaymentSchemas.AdminTransactionDetailResponse,
-          },
-        },
-      },
-      400: {
-        description: 'Invalid adjustment data',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
 
   registry.registerRoute({
     method: 'get',
@@ -2476,33 +2690,87 @@ function registerAdminRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
-  // Session Management routes
+  // ============= PDF/Voucher Book Management Routes =============
+
+  // Get all voucher books
+  registry.registerRoute({
+    method: 'get',
+    path: '/admin/voucher-books',
+    summary: 'List all voucher books with admin details',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      query: adminPdfSchemas.AdminVoucherBookQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'List of voucher books',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.AdminVoucherBookListResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher book by ID
+  registry.registerRoute({
+    method: 'get',
+    path: '/admin/voucher-books/{id}',
+    summary: 'Get voucher book details',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: pdfParameters.VoucherBookIdParam,
+    },
+    responses: {
+      200: {
+        description: 'Voucher book details',
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Create voucher book
   registry.registerRoute({
     method: 'post',
-    path: '/admin/sessions',
-    summary: 'Create a new session',
-    tags: ['Session Management'],
+    path: '/admin/voucher-books',
+    summary: 'Create a new voucher book',
+    tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
     request: {
       body: {
         content: {
           'application/json': {
-            schema: adminSessionSchemas.AdminCreateSessionRequest,
+            schema: adminPdfSchemas.CreateVoucherBookRequest,
           },
         },
       },
     },
     responses: {
       201: {
-        description: 'Session created successfully',
+        description: 'Voucher book created successfully',
         content: {
           'application/json': {
-            schema: adminSessionSchemas.AdminSessionDetailResponse,
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
           },
         },
       },
       400: {
-        description: 'Bad request',
+        description: 'Invalid voucher book data',
         content: {
           'application/json': {
             schema: ErrorResponse,
@@ -2512,44 +2780,34 @@ function registerAdminRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
+  // Update voucher book
   registry.registerRoute({
-    method: 'post',
-    path: '/admin/sessions/book',
-    summary: 'Book a session',
-    tags: ['Session Management'],
+    method: 'put',
+    path: '/admin/voucher-books/{id}',
+    summary: 'Update voucher book information',
+    tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
     request: {
+      params: pdfParameters.VoucherBookIdParam,
       body: {
         content: {
           'application/json': {
-            schema: adminSessionSchemas.AdminBookSessionRequest,
+            schema: adminPdfSchemas.UpdateVoucherBookRequest,
           },
         },
       },
     },
     responses: {
       200: {
-        description: 'Session booked successfully',
+        description: 'Voucher book updated successfully',
         content: {
           'application/json': {
-            schema: z.object({
-              success: z.boolean(),
-              message: z.string(),
-              bookingId: z.string().uuid(),
-            }),
-          },
-        },
-      },
-      400: {
-        description: 'Bad request',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
           },
         },
       },
       404: {
-        description: 'Session not found',
+        description: 'Voucher book not found',
         content: {
           'application/json': {
             schema: ErrorResponse,
@@ -2559,267 +2817,59 @@ function registerAdminRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
-  registry.registerRoute({
-    method: 'post',
-    path: '/admin/sessions/{id}/cancel',
-    summary: 'Cancel a session',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: adminSessionSchemas.SessionIdParam,
-      body: {
-        content: {
-          'application/json': {
-            schema: adminSessionSchemas.AdminCancelSessionRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Session cancelled successfully',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-      400: {
-        description: 'Bad request',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Session not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/admin/sessions/analytics',
-    summary: 'Get session analytics',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: adminSessionAnalyticsSchemas.SessionAnalyticsQuery,
-    },
-    responses: {
-      200: {
-        description: 'Session analytics data',
-        content: {
-          'application/json': {
-            schema: adminSessionAnalyticsSchemas.SessionAnalyticsResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/admin/sessions',
-    summary: 'List all sessions with admin details',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: adminSessionSchemas.AdminGetAllSessionsQuery,
-    },
-    responses: {
-      200: {
-        description: 'List of sessions',
-        content: {
-          'application/json': {
-            schema: adminSessionSchemas.AdminSessionListResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/admin/sessions/{id}',
-    summary: 'Get session details',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: adminSessionSchemas.SessionIdParam,
-    },
-    responses: {
-      200: {
-        description: 'Session details',
-        content: {
-          'application/json': {
-            schema: z.any(), // TODO: Add proper session detail schema
-          },
-        },
-      },
-    },
-  })
-
+  // Delete voucher book
   registry.registerRoute({
     method: 'delete',
-    path: '/admin/sessions/{id}',
-    summary: 'Delete session',
-    tags: ['Session Management'],
+    path: '/admin/voucher-books/{id}',
+    summary: 'Delete a voucher book',
+    tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
     request: {
-      params: adminSessionSchemas.SessionIdParam,
+      params: pdfParameters.VoucherBookIdParam,
     },
     responses: {
-      200: {
-        description: 'Session deleted',
+      204: {
+        description: 'Voucher book deleted successfully',
+      },
+      404: {
+        description: 'Voucher book not found',
         content: {
           'application/json': {
-            schema: MessageResponse,
+            schema: ErrorResponse,
           },
         },
       },
     },
   })
 
+  // Update voucher book status
   registry.registerRoute({
-    method: 'post',
-    path: '/admin/sessions/{id}/approve',
-    summary: 'Approve content session',
-    tags: ['Session Management'],
+    method: 'patch',
+    path: '/admin/voucher-books/{id}/status',
+    summary: 'Update voucher book status',
+    tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
     request: {
-      params: adminSessionSchemas.SessionIdParam,
+      params: pdfParameters.VoucherBookIdParam,
       body: {
         content: {
           'application/json': {
-            schema: adminSessionSchemas.ApproveContentSessionRequest,
+            schema: adminPdfSchemas.PublishVoucherBookRequest,
           },
         },
       },
     },
     responses: {
       200: {
-        description: 'Session approved',
+        description: 'Voucher book status updated successfully',
         content: {
           'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/admin/sessions/{id}/decline',
-    summary: 'Decline content session',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      params: adminSessionSchemas.SessionIdParam,
-      body: {
-        content: {
-          'application/json': {
-            schema: adminSessionSchemas.DeclineContentSessionRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Session declined',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/admin/sessions/force-checkin',
-    summary: 'Force check-in user to session',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: adminSessionSchemas.ForceCheckInRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'User checked in',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'post',
-    path: '/admin/sessions/cleanup-expired-reservations',
-    summary: 'Cleanup expired session reservations',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: adminSessionSchemas.CleanupExpiredReservationsRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Cleanup result',
-        content: {
-          'application/json': {
-            schema: z.object({
-              cleaned: z.number(),
-              message: z.string(),
-            }),
-          },
-        },
-      },
-    },
-  })
-
-  registry.registerRoute({
-    method: 'get',
-    path: '/admin/sessions/available-slots',
-    summary: 'Get available session slots for admin',
-    tags: ['Session Management'],
-    security: [{ bearerAuth: [] }],
-    request: {
-      query: adminSessionSchemas.AdminAvailableSlotsRequest,
-    },
-    responses: {
-      200: {
-        description: 'Available slots with duration options',
-        content: {
-          'application/json': {
-            schema: adminSessionSchemas.AdminAvailableSlotsResponse,
+            schema: adminPdfSchemas.AdminVoucherBookResponse,
           },
         },
       },
       404: {
-        description: 'Gym not found',
+        description: 'Voucher book not found',
         content: {
           'application/json': {
             schema: ErrorResponse,
@@ -2829,43 +2879,101 @@ function registerAdminRoutes(registry: SimpleZodRegistry): void {
     },
   })
 
+  // Generate PDF
   registry.registerRoute({
     method: 'post',
-    path: '/admin/sessions/stats/bookings',
-    summary: 'Get booking statistics for multiple users',
-    tags: ['Session Management'],
+    path: '/admin/voucher-books/{id}/generate-pdf',
+    summary: 'Generate PDF for voucher book',
+    tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
     request: {
+      params: pdfParameters.VoucherBookIdParam,
       body: {
         content: {
           'application/json': {
-            schema: adminSessionBookingStatsSchemas.GetUserBookingStatsRequest,
+            schema: adminPdfSchemas.GeneratePdfRequest,
           },
         },
       },
     },
     responses: {
       200: {
-        description: 'User booking statistics',
+        description: 'PDF generated successfully',
         content: {
           'application/json': {
-            schema: adminSessionBookingStatsSchemas.GetUserBookingStatsResponse,
+            schema: adminPdfSchemas.GeneratePdfResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher book not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Bulk archive voucher books
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/voucher-books/bulk-archive',
+    summary: 'Archive multiple voucher books',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: adminPdfSchemas.BulkVoucherBookOperationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher books archived successfully',
+        content: {
+          'application/json': {
+            schema: z.object({
+              archived: z.number().describe('Number of books archived'),
+              failed: z
+                .number()
+                .describe('Number of books that failed to archive'),
+              errors: z
+                .array(z.string())
+                .describe('Error messages for failed operations'),
+            }),
           },
         },
       },
       400: {
-        description: 'Bad request',
+        description: 'Invalid request data',
         content: {
           'application/json': {
             schema: ErrorResponse,
           },
         },
       },
-      403: {
-        description: 'Forbidden - Admin access required',
+    },
+  })
+
+  // Get voucher book statistics
+  registry.registerRoute({
+    method: 'get',
+    path: '/admin/voucher-books/statistics',
+    summary: 'Get voucher book statistics',
+    tags: ['PDF Management'],
+    security: [{ bearerAuth: [] }],
+    request: {},
+    responses: {
+      200: {
+        description: 'Voucher book statistics',
         content: {
           'application/json': {
-            schema: ErrorResponse,
+            schema: adminPdfSchemas.BulkVoucherBookOperationResponse,
           },
         },
       },

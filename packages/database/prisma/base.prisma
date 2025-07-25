@@ -8,6 +8,6 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [pgcrypto]
-  schemas  = ["public", "users", "audit", "identity", "support", "payments", "files"]
+  extensions = [pgcrypto, postgis, postgis_topology, fuzzystrmatch, postgis_tiger_geocoder]
+  schemas  = ["public", "users", "audit", "identity", "support", "payments", "files", "i18n", "catalog", "marketplace", "business", "analytics", "security"]
 }

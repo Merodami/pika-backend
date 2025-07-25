@@ -12,8 +12,8 @@
     "@pika/environment": "workspace:^",
     "@pika/shared": "workspace:^",
     "@pika/types": "workspace:^",
-    "@prisma/client": "^6.11.1",
-    "@types/bcrypt": "^5.0.2",
+    "@prisma/client": "^6.12.0",
+    "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
     "jsonwebtoken": "^9.0.2"
   },

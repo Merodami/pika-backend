@@ -22,23 +22,8 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason)
 })
 
-// Mock modules that are causing issues
-vi.mock('@pika/api', async (importOriginal) => {
-  const actual = (await importOriginal()) as any
-
-  return {
-    ...actual,
-    schemas: {
-      UserProfileSchema: {},
-      ServiceSchema: {},
-      PaymentMethodSchema: {},
-      LocationSchema: {},
-    },
-  }
-})
-
 // Mock Redis module with Cache decorator
-vi.mock('@pika/redis', async (importOriginal) => {
+vi.mock('@pika/redis', async () => {
   // Create a simple in-memory cache for tests
   const cache = new Map()
 
@@ -54,28 +39,64 @@ vi.mock('@pika/redis', async (importOriginal) => {
       get(key: string) {
         return Promise.resolve(cache.get(key) || null)
       }
-      set(key: string, value: any, ttl?: number) {
+      set(key: string, value: any) {
         cache.set(key, value)
-        // Simple TTL implementation for tests
-        if (ttl && ttl > 0) {
-          setTimeout(() => cache.delete(key), ttl * 1000)
-        }
 
         return Promise.resolve(true)
+      }
+      setNX(key: string, value: any) {
+        if (cache.has(key)) {
+          return Promise.resolve(false)
+        }
+
+        return this.set(key, value)
+      }
+      exists(key: string) {
+        return Promise.resolve(cache.has(key))
+      }
+      getTTL(key: string) {
+        // Simplified TTL for tests - return -1 if exists without TTL
+        return Promise.resolve(cache.has(key) ? -1 : -2)
+      }
+      updateTTL(key: string) {
+        return Promise.resolve(cache.has(key))
       }
       delete(key: string) {
         return Promise.resolve(cache.delete(key))
       }
       del(key: string) {
-        return Promise.resolve(cache.delete(key) ? 1 : 0)
+        return Promise.resolve(cache.delete(key))
       }
-      clear() {
+      delPattern(pattern: string) {
+        let count = 0
+
+        // Convert wildcard pattern to regex safely
+        const escapedPattern = pattern
+          .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape special regex chars
+          .replace(/\\\*/g, '.*') // Replace escaped * with .*
+
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        const regex = new RegExp(`^${escapedPattern}$`)
+
+        for (const key of cache.keys()) {
+          if (regex.test(key)) {
+            cache.delete(key)
+            count++
+          }
+        }
+
+        return Promise.resolve(count)
+      }
+      clearAll() {
         cache.clear()
 
         return Promise.resolve()
       }
       checkHealth() {
-        return Promise.resolve({ status: 'healthy' })
+        return Promise.resolve({
+          status: 'healthy' as const,
+          details: {},
+        })
       }
     },
     RedisService: vi.fn(),
@@ -102,8 +123,86 @@ vi.mock('@pika/redis', async (importOriginal) => {
   }
 })
 
+// Mock HTTP middleware module
+vi.mock('@pika/http', async () => {
+  return {
+    requireAuth: () => (req: any, res: any, next: any) => next(),
+    requireBusinessRole: () => (req: any, res: any, next: any) => next(),
+    requireAdmin: () => (req: any, res: any, next: any) => next(),
+    requireInternalAuth: () => (req: any, res: any, next: any) => next(),
+    requireServiceAuth: () => (req: any, res: any, next: any) => next(),
+    allowServiceOrUserAuth: () => (req: any, res: any, next: any) => next(),
+    requirePermissions: () => (req: any, res: any, next: any) => {
+      // For tests, just pass through - auth is tested separately
+      next()
+    },
+    validateBody: () => (req: any, res: any, next: any) => next(),
+    validateParams: () => (req: any, res: any, next: any) => next(),
+    validateQuery: () => (req: any, res: any, next: any) => next(),
+    getValidatedQuery: (req: any) => req.query || {},
+    getValidatedBody: (req: any) => req.body || {},
+    getValidatedParams: (req: any) => req.params || {},
+    getRequestLanguage: () => 'en',
+    paginatedResponse: (result: any, mapper?: any) => {
+      if (mapper && result.data) {
+        return {
+          ...result,
+          data: result.data.map(mapper),
+        }
+      }
+
+      return result
+    },
+    createMulterMiddleware: () => {
+      // Return a multer-like object with single, array, etc. methods
+      const middleware = (req: any, res: any, next: any) => {
+        req.file = req.body?.file || undefined
+        req.files = req.body?.files || []
+        next()
+      }
+
+      return {
+        single: () => middleware,
+        array: () => middleware,
+        fields: () => middleware,
+        none: () => middleware,
+        any: () => middleware,
+      }
+    },
+    createExpressServer: vi.fn().mockResolvedValue({
+      use: vi.fn(),
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      patch: vi.fn(),
+      delete: vi.fn(),
+      listen: vi.fn(),
+      locals: {},
+    }),
+    errorMiddleware: vi.fn(),
+    RequestContext: class MockRequestContext {
+      constructor(public data: any) {}
+      static getContext: () => any = () => ({
+        userId: 'test-user',
+        role: 'MEMBER',
+      })
+    },
+  }
+})
+
+// Mock translation module
+vi.mock('@pika/translation', () => ({
+  TranslationClient: vi.fn().mockImplementation(() => ({
+    get: vi.fn().mockResolvedValue('mocked-translation'),
+    getBulk: vi.fn().mockResolvedValue({}),
+    set: vi.fn().mockResolvedValue(undefined),
+    getUserLanguage: vi.fn().mockResolvedValue('en'),
+    setUserLanguage: vi.fn().mockResolvedValue(undefined),
+  })),
+}))
+
 // Mock shared module
-vi.mock('@pika/shared', async (importOriginal) => {
+vi.mock('@pika/shared', async () => {
   // Create a BaseError class for the mock
   class BaseError extends Error {
     context: any
@@ -171,10 +270,38 @@ vi.mock('@pika/shared', async (importOriginal) => {
     }
   }
 
+  // Mock BaseServiceClient class
+  class BaseServiceClient {
+    constructor() {
+      // Mock constructor
+    }
+
+    protected async get(): Promise<any> {
+      // Mock GET request
+      return Promise.resolve({ data: 'mock data' })
+    }
+
+    protected async post(): Promise<any> {
+      // Mock POST request
+      return Promise.resolve({ data: 'mock data' })
+    }
+
+    protected async put(): Promise<any> {
+      // Mock PUT request
+      return Promise.resolve({ data: 'mock data' })
+    }
+
+    protected async delete(): Promise<any> {
+      // Mock DELETE request
+      return Promise.resolve({ data: 'mock data' })
+    }
+  }
+
   return {
     BaseError,
     NotAuthenticatedError,
     ValidationError,
+    BaseServiceClient,
     RequestIdSource: {
       GENERATED: 'generated',
       CLIENT: 'client',

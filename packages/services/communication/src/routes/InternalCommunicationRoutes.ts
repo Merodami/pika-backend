@@ -1,16 +1,21 @@
 import {
-    SendEmailRequest,
-    SendSystemNotificationRequest,
-    SendTransactionalEmailRequest,
+  BatchCreateNotificationsRequest,
+  BulkEmailRequest,
+  CreateNotificationRequest,
+  SendEmailRequest,
+  SendSystemNotificationRequest,
+  SendTransactionalEmailRequest,
 } from '@pika/api/internal'
-import type { ICacheService } from '@pika/redis'
 import { requireServiceAuth, validateBody } from '@pika/http'
+import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { InternalCommunicationController } from '../controllers/InternalCommunicationController.js'
 import { CommunicationLogRepository } from '../repositories/CommunicationLogRepository.js'
+import { NotificationRepository } from '../repositories/NotificationRepository.js'
 import { type EmailConfig, EmailService } from '../services/EmailService.js'
+import { NotificationService } from '../services/NotificationService.js'
 
 /**
  * Internal API routes for service-to-service communication
@@ -28,12 +33,21 @@ export function createInternalCommunicationRouter(
     prisma,
     cache,
   )
+  const notificationRepository = new NotificationRepository(prisma, cache)
   const emailService = new EmailService(
     communicationLogRepository,
     cache,
     emailConfig,
   )
-  const controller = new InternalCommunicationController(emailService)
+  const notificationService = new NotificationService(
+    notificationRepository,
+    emailService,
+    cache,
+  )
+  const controller = new InternalCommunicationController(
+    emailService,
+    notificationService,
+  )
 
   // Apply service auth to all internal routes
   router.use(requireServiceAuth())
@@ -43,6 +57,18 @@ export function createInternalCommunicationRouter(
     '/emails/send',
     validateBody(SendEmailRequest),
     controller.sendEmail,
+  )
+
+  router.post(
+    '/emails/send-bulk',
+    validateBody(BulkEmailRequest),
+    controller.sendBulkEmail,
+  )
+
+  router.get(
+    '/emails/history',
+    // Query params don't need validation, they're coerced by Zod
+    controller.getEmailHistory,
   )
 
   router.post(
@@ -57,6 +83,26 @@ export function createInternalCommunicationRouter(
     validateBody(SendSystemNotificationRequest),
     controller.sendSystemNotification,
   )
+
+  router.post(
+    '/notifications',
+    validateBody(CreateNotificationRequest),
+    controller.createNotification,
+  )
+
+  router.post(
+    '/notifications/batch',
+    validateBody(BatchCreateNotificationsRequest),
+    controller.createBatchNotifications,
+  )
+
+  router.get('/notifications', controller.getNotifications)
+
+  router.get('/notifications/unread-count', controller.getUnreadCount)
+
+  // Analytics endpoints (placeholder implementations)
+  router.get('/analytics/user-stats', controller.getUserAnalytics)
+  router.get('/analytics/service-stats', controller.getServiceAnalytics)
 
   return router
 }

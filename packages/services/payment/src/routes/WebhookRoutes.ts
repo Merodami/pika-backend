@@ -17,10 +17,11 @@ export function createWebhookRouter(
   const stripeService = new StripeService(stripeInstance)
 
   // Initialize controller
-  const webhookController = new WebhookController(
-    stripeService,
-  )
+  const webhookController = new WebhookController(stripeService)
 
+  // SECURITY NOTE: No JWT/API key authentication required for webhooks
+  // Authentication is handled via Stripe signature verification in the controller
+  // The raw body is required for signature validation (industry standard)
   // Modern industry standard: Raw body parsing for webhook signature verification
   router.post(
     '/stripe',

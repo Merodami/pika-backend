@@ -5,7 +5,6 @@
 
 import type { UserRoleType, UserStatusType } from '@pika/types'
 
-
 // ============= User Domain =============
 
 export interface UserDomain {
@@ -28,7 +27,6 @@ export interface UserDomain {
   dateOfBirth?: Date | null
   stripeUserId?: string | null
 }
-
 
 // ============= Address Domain =============
 
@@ -64,4 +62,3 @@ export interface PaymentMethodDomain {
   createdAt: Date
   updatedAt: Date
 }
-

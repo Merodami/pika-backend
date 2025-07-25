@@ -115,7 +115,7 @@ export function setupServiceHealthCheck(
 
       // Determine overall status
       const overallStatus = serviceResults.some(
-        (svc) => svc.status === 'unhealthy',
+        (svc: any) => svc.status === 'unhealthy',
       )
         ? 'unhealthy'
         : 'healthy'

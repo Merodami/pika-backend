@@ -1,11 +1,11 @@
 import {
-    ENABLE_COMPRESSION,
-    ENABLE_CORS,
-    ENABLE_HELMET,
-    HEALTH_CHECK_INTERVAL,
-    HEALTH_CHECK_PATH,
-    RATE_LIMIT_MAX,
-    RATE_LIMIT_WINDOW_MS,
+  ENABLE_COMPRESSION,
+  ENABLE_CORS,
+  ENABLE_HELMET,
+  HEALTH_CHECK_INTERVAL,
+  HEALTH_CHECK_PATH,
+  RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW_MS,
 } from '@pika/environment'
 
 import { ApiGatewayConfig } from '../types/gateway.js'

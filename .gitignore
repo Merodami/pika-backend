@@ -54,14 +54,7 @@ tsconfig.tsbuildinfo
 .nx/cache
 .nx/workspace-data
 
-CODEOWNERS
 localstack_data
-ai/
-ORIGINAL.md
-CLAUDE.md
-CHANGELOG.md
-PIKA.md
-
 
 # Security - Never commit private keys
 keys/
@@ -107,6 +100,7 @@ test-tokens.json
 # Generated files
 packages/api/generated/
 packages/database/prisma/schema.prisma
+frontend/dashboard/lib/api/generated/
 
 # Build artifacts
 **/dist/
@@ -159,4 +153,5 @@ tsconfig.tsbuildinfo
 
 # Uploads folder
 uploads/
-pika/
+pika-old/
+docs

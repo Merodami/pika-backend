@@ -1,12 +1,4 @@
-import {
-  CreatePriceRequest,
-  CreateProductRequest,
-  ListPricesQuery,
-  ListProductsQuery,
-  PriceIdParam,
-  ProductIdParam,
-  UpdateProductRequest,
-} from '@pika/api/public'
+import { paymentPublic } from '@pika/api'
 import {
   requireServiceAuth,
   validateBody,
@@ -22,46 +14,42 @@ export function createProductRouter(productService: IProductService): Router {
   const router = Router()
   const controller = new ProductController(productService)
 
-  // All endpoints require service authentication (called by other services)
+  // IMPORTANT: Apply service authentication to ALL routes
+  // As per AUTHENTICATION_ARCHITECTURE.md, internal routes need explicit authentication
+  router.use(requireServiceAuth())
 
   // Product management
   router.post(
     '/products',
-    requireServiceAuth(),
-    validateBody(CreateProductRequest),
+    validateBody(paymentPublic.CreateProductRequest),
     controller.createProduct,
   )
   router.put(
     '/products/:id',
-    requireServiceAuth(),
-    validateParams(ProductIdParam),
-    validateBody(UpdateProductRequest),
+    validateParams(paymentPublic.ProductIdParam),
+    validateBody(paymentPublic.UpdateProductRequest),
     controller.updateProduct,
   )
   router.get(
     '/products',
-    requireServiceAuth(),
-    validateQuery(ListProductsQuery),
+    validateQuery(paymentPublic.ListProductsQuery),
     controller.listProducts,
   )
 
   // Price management
   router.post(
     '/prices',
-    requireServiceAuth(),
-    validateBody(CreatePriceRequest),
+    validateBody(paymentPublic.CreatePriceRequest),
     controller.createPrice,
   )
   router.put(
     '/prices/:id/deactivate',
-    requireServiceAuth(),
-    validateParams(PriceIdParam),
+    validateParams(paymentPublic.PriceIdParam),
     controller.deactivatePrice,
   )
   router.get(
     '/prices',
-    requireServiceAuth(),
-    validateQuery(ListPricesQuery),
+    validateQuery(paymentPublic.ListPricesQuery),
     controller.listPrices,
   )
 

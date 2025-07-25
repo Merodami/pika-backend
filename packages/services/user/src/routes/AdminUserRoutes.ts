@@ -1,20 +1,13 @@
-import type { PrismaClient } from '@prisma/client'
-import { UpdateAdminProfileRequest, UserIdParam } from '@pika/api/admin'
+import { userAdmin, userPublic } from '@pika/api'
 import {
-  UnifiedResendVerificationRequest,
-  UnifiedVerificationRequest,
-} from '@pika/api/public'
-import {
-  requireAdmin,
   requireAuth,
+  requirePermissions,
   validateBody,
   validateParams,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import type {
-  CommunicationServiceClient,
-  FileStoragePort,
-} from '@pika/shared'
+import type { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
+import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 import multer from 'multer'
 
@@ -62,8 +55,8 @@ export function createAdminUserRouter(
   router.post(
     '/verify',
     requireAuth(),
-    requireAdmin(),
-    validateBody(UnifiedVerificationRequest),
+    requirePermissions('admin:users'),
+    validateBody(userPublic.UnifiedVerificationRequest),
     controller.verifyUser,
   )
 
@@ -71,8 +64,8 @@ export function createAdminUserRouter(
   router.post(
     '/resend-verification',
     requireAuth(),
-    requireAdmin(),
-    validateBody(UnifiedResendVerificationRequest),
+    requirePermissions('admin:users'),
+    validateBody(userPublic.UnifiedResendVerificationRequest),
     controller.resendVerification,
   )
 
@@ -80,22 +73,27 @@ export function createAdminUserRouter(
   router.post(
     '/:id/avatar',
     requireAuth(),
-    requireAdmin(),
-    validateParams(UserIdParam),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
     upload.single('file'),
     controller.uploadUserAvatar,
   )
 
   // Admin profile routes
   // GET /admin/users/me - Get current admin user profile
-  router.get('/me', requireAuth(), requireAdmin(), controller.getMyProfile)
+  router.get(
+    '/me',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    controller.getMyProfile,
+  )
 
   // PATCH /admin/users/me - Update current admin user profile
   router.patch(
     '/me',
     requireAuth(),
-    requireAdmin(),
-    validateBody(UpdateAdminProfileRequest),
+    requirePermissions('admin:users'),
+    validateBody(userAdmin.UpdateAdminProfileRequest),
     controller.updateMyProfile,
   )
 
@@ -103,8 +101,8 @@ export function createAdminUserRouter(
   router.get(
     '/:id/verification-status',
     requireAuth(),
-    requireAdmin(),
-    validateParams(UserIdParam),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
     controller.getUserVerificationStatus,
   )
 

@@ -3,66 +3,24 @@ import '../../../types/express.js'
 import { JwtTokenService, TokenValidationResult } from '@pika/auth'
 import {
   JWT_ACCESS_EXPIRY,
+  JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
+  JWT_PRIVATE_KEY,
+  JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
+  JWT_SECRET,
   NODE_ENV,
   SKIP_AUTH,
 } from '@pika/environment'
-import {
-  logger,
-  NotAuthenticatedError,
-  NotAuthorizedError,
-} from '@pika/shared'
-import { UserRole } from '@pika/types'
+import { logger, NotAuthenticatedError, NotAuthorizedError } from '@pika/shared'
+import { mapRoleToPermissions, UserRole } from '@pika/types'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
+import jwt from 'jsonwebtoken'
 
 import { ApiTokenOptions } from '../../../domain/types/server.js'
 
-/**
- * Map user roles to permissions for RBAC
- */
-function mapRoleToPermissions(role: UserRole): string[] {
-  switch (role) {
-    case UserRole.ADMIN:
-      return [
-        // User management
-        'users:read',
-        'users:write',
-        'users:delete',
-        // Service management
-        'services:read',
-        'services:write',
-        'services:delete',
-        // Admin specific
-        'admin:dashboard',
-        'admin:settings',
-        'admin:users',
-        'admin:system',
-        // Credits management
-        'credits:admin',
-        'credits:manage_all',
-        // Payment management
-        'payments:admin',
-        'payments:manage_all',
-      ]
-    case UserRole.USER:
-      return [
-        // Basic user permissions
-        'users:read_own',
-        'users:update_own',
-        // Credits permissions
-        'credits:view_own',
-        'credits:use_own',
-        'credits:transfer_own',
-        // Payment permissions
-        'payments:own',
-        'payments:purchase',
-      ]
-    default:
-      return []
-  }
-}
+// Role to permissions mapping is now imported from @pika/types
 
 /**
  * Enhanced API token authentication middleware for Express.
@@ -70,16 +28,20 @@ function mapRoleToPermissions(role: UserRole): string[] {
  * Provides correlation IDs, security headers, and standardized user context.
  */
 export function authMiddleware(options: ApiTokenOptions): RequestHandler {
-  const { secret, headerName = 'Authorization', excludePaths = [] } = options
+  const { headerName = 'Authorization', excludePaths = [] } = options
 
-  // Initialize JWT service from @pikagle source of truth)
+  // Initialize JWT service from @pika/auth (single source of truth)
+  // Always use environment configuration - no overrides
   const jwtService = new JwtTokenService(
-    secret,
+    JWT_SECRET,
     JWT_ACCESS_EXPIRY,
     JWT_REFRESH_EXPIRY,
     JWT_ISSUER,
     JWT_AUDIENCE,
     options.cacheService, // Optional Redis service for token blacklisting
+    JWT_ALGORITHM as jwt.Algorithm,
+    JWT_PRIVATE_KEY,
+    JWT_PUBLIC_KEY,
   )
 
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -152,6 +114,16 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
         )
       }
 
+      // Debug logging for JWT issues
+      if (NODE_ENV === 'test') {
+        logger.debug('JWT verification attempt', {
+          algorithm: JWT_ALGORITHM,
+          hasPrivateKey: !!JWT_PRIVATE_KEY,
+          hasPublicKey: !!JWT_PUBLIC_KEY,
+          tokenPrefix: token.substring(0, 50),
+        })
+      }
+
       // Delegate token verification to @pikaice (single source of truth)
       const validation: TokenValidationResult = await jwtService.verifyToken(
         token,
@@ -162,6 +134,8 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
         logger.warn('Token validation failed', {
           correlationId: req.correlationId,
           error: validation.error,
+          algorithm: JWT_ALGORITHM,
+          hasKeys: { private: !!JWT_PRIVATE_KEY, public: !!JWT_PUBLIC_KEY },
         })
 
         throw new NotAuthenticatedError(
@@ -333,14 +307,13 @@ export function requireUser(): RequestHandler {
       return next(new NotAuthenticatedError('Authentication required'))
     }
 
-    if (req.user.role !== UserRole.USER) {
+    if (req.user.role !== UserRole.CUSTOMER) {
       return next(new NotAuthorizedError('User access required'))
     }
 
     next()
   }
 }
-
 
 /**
  * Require specific roles (any of the provided roles)
@@ -389,7 +362,14 @@ export function requireOwnership(): RequestHandler {
 }
 
 /**
- * Require specific permissions
+ * Require specific permissions with support for wildcards and ownership
+ *
+ * Permission format: resource:action:scope
+ * - Exact match: 'users:read' matches 'users:read'
+ * - Wildcard: 'admin:*' matches any 'admin:' permission
+ * - Ownership: 'users:read:own' requires ownership check in controller
+ *
+ * @param permissions - Required permissions (ALL must be satisfied)
  */
 export function requirePermissions(...permissions: string[]): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -398,16 +378,89 @@ export function requirePermissions(...permissions: string[]): RequestHandler {
     }
 
     const userPermissions = req.user.permissions || []
-    const hasAllPermissions = permissions.every((permission) =>
-      userPermissions.includes(permission),
-    )
+
+    const hasAllPermissions = permissions.every((permission) => {
+      // Check exact permission match
+      if (userPermissions.includes(permission)) {
+        return true
+      }
+
+      // Check wildcard permissions (e.g., 'admin:*' matches 'admin:dashboard')
+      const permissionParts = permission.split(':')
+      const resource = permissionParts[0]
+
+      // Check for resource-level wildcard
+      if (userPermissions.includes(`${resource}:*`)) {
+        return true
+      }
+
+      // For admin users, check if they have admin:* which grants all permissions
+      if (
+        req.user?.role === UserRole.ADMIN &&
+        userPermissions.includes('admin:*')
+      ) {
+        return true
+      }
+
+      // For ':own' permissions, check if user has the base permission
+      // Ownership validation must be done in the controller
+      if (permission.endsWith(':own')) {
+        const basePermission = permission.replace(':own', '')
+
+        return (
+          userPermissions.includes(permission) ||
+          userPermissions.includes(basePermission) ||
+          userPermissions.includes(`${resource}:*`)
+        )
+      }
+
+      return false
+    })
 
     if (!hasAllPermissions) {
+      logger.warn('Permission denied', {
+        userId: req.user.id,
+        requiredPermissions: permissions,
+        userPermissions: userPermissions,
+        correlationId: req.correlationId,
+      })
+
       return next(
         new NotAuthorizedError(
           `Missing required permissions: ${permissions.join(', ')}`,
+          {
+            userId: req.user.id,
+            correlationId: req.correlationId,
+            metadata: {
+              required: permissions,
+              user: req.user.id,
+            },
+          },
         ),
       )
+    }
+
+    logger.debug('Permission granted', {
+      userId: req.user.id,
+      requiredPermissions: permissions,
+      correlationId: req.correlationId,
+    })
+
+    next()
+  }
+}
+
+/**
+ * Require business role
+ */
+export function requireBusinessRole(): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new NotAuthenticatedError('Authentication required'))
+    }
+
+    if (req.user.role !== UserRole.BUSINESS) {
+      return next(new NotAuthorizedError('Business access required'))
     }
 
     next()

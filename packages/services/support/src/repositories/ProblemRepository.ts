@@ -1,4 +1,3 @@
-import { Prisma, PrismaClient } from '@prisma/client'
 import type { ICacheService } from '@pika/redis'
 import type { ProblemDomain } from '@pika/sdk'
 import { ProblemMapper } from '@pika/sdk'
@@ -11,6 +10,7 @@ import type {
   ProblemTypeType,
 } from '@pika/types'
 import { ProblemPriority, ProblemStatus, ProblemType } from '@pika/types'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { get } from 'lodash-es'
 
 import type { SearchParams } from '../types/search.js'

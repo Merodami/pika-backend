@@ -3,7 +3,6 @@ import { z } from 'zod'
 
 // Import our schemas to test compilation
 import {
-  createSimpleRegistry,
   DateTime,
   Email,
   ErrorResponse,
@@ -13,8 +12,9 @@ import {
   UserId,
   UUID,
   validate,
+  ZodRegistry,
 } from '../index.js'
-import { TokenRequest, TokenResponse } from '../public/schemas/auth/oauth.js'
+import { TokenRequest, TokenResponse } from '../schemas/auth/public/oauth.js'
 
 describe('Zod Schema Compilation', () => {
   it('should compile branded types', () => {
@@ -127,7 +127,7 @@ describe('Zod Schema Compilation', () => {
   })
 
   it('should create and use registry', () => {
-    const registry = createSimpleRegistry({
+    const registry = new ZodRegistry({
       title: 'Test API',
       version: '1.0.0',
     })
@@ -168,7 +168,7 @@ describe('Type Inference', () => {
         email: 'test@example.com' as any,
         firstName: 'Test',
         lastName: 'User',
-        role: 'USER',
+        role: 'CUSTOMER',
         profilePicture: 'https://example.com/pic.jpg',
       },
     }

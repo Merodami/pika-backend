@@ -1,17 +1,14 @@
-import type {
-  CreateSubscriptionPlanRequest,
-  PlanIdParam,
-  SubscriptionPlanQueryParams,
-  UpdateSubscriptionPlanRequest,
-} from '@pika/api/public'
+import { subscriptionCommon, subscriptionPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery } from '@pika/http'
+import { getValidatedQuery, paginatedResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
-import type { PlanSearchParams } from '../repositories/PlanRepository.js'
-import type { IPlanService } from '../services/PlanService.js'
+import type { BillingInterval } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
+
+import type { IPlanService } from '../services/PlanService.js'
+import type { PlanSearchParams } from '../types/search.js'
 
 /**
  * Handles subscription plan management operations
@@ -32,7 +29,7 @@ export class PlanController {
    * Create new subscription plan
    */
   async createPlan(
-    request: Request<{}, {}, CreateSubscriptionPlanRequest>,
+    request: Request<{}, {}, subscriptionPublic.CreateSubscriptionPlanRequest>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -45,7 +42,8 @@ export class PlanController {
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
 
-      response.status(201).json(dto)
+      const validatedResponse = subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -66,14 +64,17 @@ export class PlanController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const query = getValidatedQuery<SubscriptionPlanQueryParams>(request)
+      const query =
+        getValidatedQuery<subscriptionPublic.SubscriptionPlanQueryParams>(
+          request,
+        )
 
       // Transform API query to service params
       const params: PlanSearchParams = {
         page: query.page,
         limit: query.limit,
         isActive: query.isActive,
-        interval: query.interval,
+        interval: query.interval as BillingInterval, // Safe: validated by Zod
         search: undefined, // Not in API schema
         // Removed gym-related properties
       }
@@ -82,12 +83,15 @@ export class PlanController {
 
       const result = await this.planService.getAllPlans(params)
 
-      const dtoResult = {
-        data: result.data.map(SubscriptionPlanMapper.toDTO),
-        pagination: result.pagination,
-      }
+      // Use standard pagination pattern
+      const responseData = paginatedResponse(
+        result,
+        SubscriptionPlanMapper.toDTO,
+      )
+      const validatedResponse =
+        subscriptionPublic.SubscriptionPlanListResponse.parse(responseData)
 
-      response.json(dtoResult)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -98,7 +102,7 @@ export class PlanController {
    * Get subscription plan by ID
    */
   async getPlanById(
-    request: Request<PlanIdParam>,
+    request: Request<subscriptionCommon.PlanIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -110,8 +114,10 @@ export class PlanController {
       const plan = await this.planService.getPlanById(id)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
 
-      response.json(dto)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -122,7 +128,11 @@ export class PlanController {
    * Update subscription plan
    */
   async updatePlan(
-    request: Request<PlanIdParam, {}, UpdateSubscriptionPlanRequest>,
+    request: Request<
+      subscriptionCommon.PlanIdParam,
+      {},
+      subscriptionPublic.UpdateSubscriptionPlanRequest
+    >,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -135,8 +145,10 @@ export class PlanController {
       const plan = await this.planService.updatePlan(id, data)
 
       const dto = SubscriptionPlanMapper.toDTO(plan)
+      const validatedResponse =
+        subscriptionPublic.SubscriptionPlanDetailResponse.parse(dto)
 
-      response.json(dto)
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -147,7 +159,7 @@ export class PlanController {
    * Delete subscription plan
    */
   async deletePlan(
-    request: Request<PlanIdParam>,
+    request: Request<subscriptionCommon.PlanIdParam>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -178,7 +190,11 @@ export class PlanController {
 
       await this.planService.syncWithStripe()
 
-      response.json({ message: 'Plans synced successfully' })
+      const responseData = { message: 'Plans synced successfully' }
+      const validatedResponse =
+        subscriptionPublic.PlanSyncResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }

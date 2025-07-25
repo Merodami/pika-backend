@@ -1,17 +1,19 @@
-import type {
-    NotificationSearchParams as ApiNotificationSearchParams,
-    CreateNotificationRequest,
-    NotificationIdParam,
-    UpdateNotificationStatusRequest,
-} from '@pika/api/public'
-import { NotificationMapper } from '@pika/sdk'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
-import { logger } from '@pika/shared'
+import {
+  // communicationAdmin, // TODO: Uncomment when admin schemas are available
+  communicationCommon,
+  communicationPublic,
+} from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { getValidatedQuery, RequestContext } from '@pika/http'
+import {
+  getValidatedQuery,
+  paginatedResponse,
+  RequestContext,
+} from '@pika/http'
+import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { NotificationMapper } from '@pika/sdk'
+import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { NotificationSearchParams } from '../repositories/NotificationRepository.js'
 import type { INotificationService } from '../services/NotificationService.js'
 
 export interface INotificationController {
@@ -61,11 +63,14 @@ export interface INotificationController {
     next: NextFunction,
   ): Promise<void>
 
+  // TODO: Uncomment when admin schemas are available
+  /*
   createGlobalNotification(
     request: Request,
     response: Response,
     next: NextFunction,
   ): Promise<void>
+  */
 }
 
 /**
@@ -81,7 +86,7 @@ export class NotificationController implements INotificationController {
     this.markAsRead = this.markAsRead.bind(this)
     this.markAllAsRead = this.markAllAsRead.bind(this)
     this.deleteNotification = this.deleteNotification.bind(this)
-    this.createGlobalNotification = this.createGlobalNotification.bind(this)
+    // this.createGlobalNotification = this.createGlobalNotification.bind(this) // TODO: Uncomment when admin functionality is ready
   }
 
   /**
@@ -89,8 +94,8 @@ export class NotificationController implements INotificationController {
    * Create a new notification
    */
   async createNotification(
-    request: Request<{}, {}, CreateNotificationRequest>,
-    response: Response,
+    request: Request<{}, {}, communicationPublic.CreateNotificationRequest>,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -108,7 +113,11 @@ export class NotificationController implements INotificationController {
         userId: data.userId || userId,
       })
 
-      response.json(NotificationMapper.toDTO(notification))
+      const responseData = NotificationMapper.toDTO(notification)
+      const validatedResponse =
+        communicationPublic.NotificationResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -124,20 +133,21 @@ export class NotificationController implements INotificationController {
     keyGenerator: httpRequestKeyGenerator,
   })
   async getNotifications(
-    request: Request,
-    response: Response,
+    request: Request, // Standard pattern - don't use Query params on Request
+    response: Response<communicationPublic.NotificationListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const context = RequestContext.getContext(request)
       const userId = context.userId
 
-      const query = getValidatedQuery<ApiNotificationSearchParams>(request)
+      const query =
+        getValidatedQuery<communicationPublic.NotificationSearchParams>(request)
 
-      // Transform API params to service params
-      const params: NotificationSearchParams = {
-        page: query.page,
-        limit: query.limit,
+      // Map API query parameters inline - standard pattern
+      const params = {
+        page: query.page || 1,
+        limit: query.limit || 20,
         type: query.type,
         isRead: query.isRead,
       }
@@ -149,10 +159,12 @@ export class NotificationController implements INotificationController {
         params,
       )
 
-      response.json({
-        data: result.data.map(NotificationMapper.toDTO),
-        pagination: result.pagination,
-      })
+      // Use paginatedResponse utility + validation
+      const responseData = paginatedResponse(result, NotificationMapper.toDTO)
+      const validatedResponse =
+        communicationPublic.NotificationListResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -163,8 +175,8 @@ export class NotificationController implements INotificationController {
    * Get notification by ID
    */
   async getNotificationById(
-    request: Request<NotificationIdParam>,
-    response: Response,
+    request: Request<communicationCommon.NotificationIdParam>,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -179,7 +191,11 @@ export class NotificationController implements INotificationController {
         userId,
       )
 
-      response.json(NotificationMapper.toDTO(notification))
+      const responseData = NotificationMapper.toDTO(notification)
+      const validatedResponse =
+        communicationPublic.NotificationResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -190,8 +206,12 @@ export class NotificationController implements INotificationController {
    * Update notification status
    */
   async updateNotification(
-    request: Request<NotificationIdParam, {}, UpdateNotificationStatusRequest>,
-    response: Response,
+    request: Request<
+      communicationCommon.NotificationIdParam,
+      {},
+      communicationPublic.UpdateNotificationStatusRequest
+    >,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -208,7 +228,11 @@ export class NotificationController implements INotificationController {
         userId,
       )
 
-      response.json(NotificationMapper.toDTO(notification))
+      const responseData = NotificationMapper.toDTO(notification)
+      const validatedResponse =
+        communicationPublic.NotificationResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -219,8 +243,8 @@ export class NotificationController implements INotificationController {
    * Mark notification as read
    */
   async markAsRead(
-    request: Request<NotificationIdParam>,
-    response: Response,
+    request: Request<communicationCommon.NotificationIdParam>,
+    response: Response<communicationPublic.NotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -232,7 +256,11 @@ export class NotificationController implements INotificationController {
 
       const notification = await this.notificationService.markAsRead(id, userId)
 
-      response.json(NotificationMapper.toDTO(notification))
+      const responseData = NotificationMapper.toDTO(notification)
+      const validatedResponse =
+        communicationPublic.NotificationResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -244,7 +272,7 @@ export class NotificationController implements INotificationController {
    */
   async markAllAsRead(
     request: Request,
-    response: Response,
+    response: Response<communicationPublic.MarkAllAsReadResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -253,9 +281,13 @@ export class NotificationController implements INotificationController {
 
       logger.info('Marking all notifications as read', { userId })
 
-      await this.notificationService.markAllAsRead(userId)
+      const updatedCount = await this.notificationService.markAllAsRead(userId)
 
-      response.json({ message: 'All notifications marked as read' })
+      const responseData = { updated: updatedCount }
+      const validatedResponse =
+        communicationPublic.MarkAllAsReadResponse.parse(responseData)
+
+      response.json(validatedResponse)
     } catch (error) {
       next(error)
     }
@@ -266,8 +298,8 @@ export class NotificationController implements INotificationController {
    * Delete a notification
    */
   async deleteNotification(
-    request: Request<NotificationIdParam>,
-    response: Response,
+    request: Request<communicationCommon.NotificationIdParam>,
+    response: Response<communicationPublic.DeleteNotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -279,7 +311,7 @@ export class NotificationController implements INotificationController {
 
       await this.notificationService.deleteNotification(id, userId)
 
-      response.json({ message: 'Notification deleted successfully' })
+      response.status(204).send()
     } catch (error) {
       next(error)
     }
@@ -288,10 +320,17 @@ export class NotificationController implements INotificationController {
   /**
    * POST /notifications/global
    * Create a global notification for all users
+   *
+   * TODO: Uncomment when admin schemas are available
    */
+  /*
   async createGlobalNotification(
-    request: Request<{}, {}, CreateNotificationRequest>,
-    response: Response,
+    request: Request<
+      {},
+      {},
+      communicationAdmin.CreateGlobalNotificationRequest
+    >,
+    response: Response<communicationAdmin.CreateGlobalNotificationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -299,12 +338,24 @@ export class NotificationController implements INotificationController {
 
       logger.info('Creating global notification', { type: data.type })
 
-      const notification =
-        await this.notificationService.createGlobalNotification(data)
+      // In a real implementation, global notifications would be handled differently:
+      // Option 1: Store a single notification with isGlobal=true and have the UI query it
+      // Option 2: Use a background job to create notifications for all users
+      // Option 3: Integrate with UserService to get all active users
 
-      response.json(NotificationMapper.toDTO(notification))
+      // For now, we'll create a placeholder response
+      // TODO: Implement proper global notification system
+      const responseData = {
+        count: 0,
+        message: 'Global notification system not yet implemented',
+      }
+      const validatedResponse =
+        communicationAdmin.CreateGlobalNotificationResponse.parse(responseData)
+
+      response.status(201).json(validatedResponse)
     } catch (error) {
       next(error)
     }
   }
+  */
 }

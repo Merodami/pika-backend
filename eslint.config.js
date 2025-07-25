@@ -22,6 +22,7 @@ export default [
       '**/packages/shared/src/infrastructure/storage/providers/LocalFileStorage.ts',
       '**/infrastructure/config/pm2.ecosystem.config.js',
       '**/packages/frontend/flutter-app/**',
+      '**/frontend/flutter-app/**',
       '**/.dart_tool/**',
       '**/ios/**',
       '**/android/**',
@@ -33,6 +34,8 @@ export default [
       '**/packages/sdk/src/openapi/**',
       'api-microservices-sdk/**',
       'ai/**',
+      'pika-old/**',
+      'scripts/vercel-test.ts',
     ],
   },
 

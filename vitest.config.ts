@@ -18,46 +18,48 @@ export default defineConfig({
       '@tests': resolve(__dirname, './packages/tests/src'),
       '@environment': resolve(__dirname, './packages/environment/src'),
       // Full @pika/ package aliases
-      '@pikahared': resolve(__dirname, './packages/shared/src'),
-      '@pikapi': resolve(__dirname, './packages/api/src'),
-      '@pikaypes': resolve(__dirname, './packages/types/src'),
-      '@pikadk': resolve(__dirname, './packages/sdk/src'),
-      '@pikattp': resolve(__dirname, './packages/http/src'),
-      '@pikaedis': resolve(__dirname, './packages/redis/src'),
-      '@pikauth': resolve(__dirname, './packages/auth/src'),
-      '@pikaatabase': resolve(__dirname, './packages/database/src'),
-      '@pikanvironment': resolve(__dirname, './packages/environment/src'),
-      '@pikaests': resolve(__dirname, './packages/tests/src'),
+      '@pika/shared': resolve(__dirname, './packages/shared/src'),
+      '@pika/api': resolve(__dirname, './packages/api/src'),
+      '@pika/types': resolve(__dirname, './packages/types/src'),
+      '@pika/sdk': resolve(__dirname, './packages/sdk/src'),
+      '@pika/http': resolve(__dirname, './packages/http/src'),
+      '@pika/redis': resolve(__dirname, './packages/redis/src'),
+      '@pika/auth': resolve(__dirname, './packages/auth/src'),
+      '@pika/database': resolve(__dirname, './packages/database/src'),
+      '@pika/environment': resolve(__dirname, './packages/environment/src'),
+      '@pika/tests': resolve(__dirname, './packages/tests/src'),
       // Service aliases
-      '@pikaser': resolve(__dirname, './packages/services/user/src'),
-      '@pikaym': resolve(__dirname, './packages/services/gym/src'),
-      '@pikauth-service': resolve(__dirname, './packages/services/auth/src'),
-      '@pikaession': resolve(__dirname, './packages/services/session/src'),
-      '@pikaubscription': resolve(
+      '@pika/user': resolve(__dirname, './packages/services/user/src'),
+      '@pika/gym': resolve(__dirname, './packages/services/gym/src'),
+      '@pika/auth-service': resolve(__dirname, './packages/services/auth/src'),
+      '@pika/session': resolve(__dirname, './packages/services/session/src'),
+      '@pika/subscription': resolve(
         __dirname,
-        './packages/services/subscription/src'
+        './packages/services/subscription/src',
       ),
-      '@pikaayment': resolve(__dirname, './packages/services/payment/src'),
-      '@pikaommunication': resolve(
+      '@pika/payment': resolve(__dirname, './packages/services/payment/src'),
+      '@pika/communication': resolve(
         __dirname,
-        './packages/services/communication/src'
+        './packages/services/communication/src',
       ),
       '@communication': resolve(
         __dirname,
-        './packages/services/communication/src'
+        './packages/services/communication/src',
       ),
-      '@pikaupport': resolve(__dirname, './packages/services/support/src'),
-      '@pikaile-storage': resolve(
+      '@pika/support': resolve(__dirname, './packages/services/support/src'),
+      '@pika/file-storage': resolve(
         __dirname,
-        './packages/services/file-storage/src'
+        './packages/services/file-storage/src',
       ),
-      '@pikaocial': resolve(__dirname, './packages/services/social/src'),
+      '@pika/social': resolve(__dirname, './packages/services/social/src'),
+      '@pika/pdf': resolve(__dirname, './packages/services/pdf/src'),
       // Service-specific aliases
       '@subscription': resolve(
         __dirname,
-        './packages/services/subscription/src'
+        './packages/services/subscription/src',
       ),
       '@social': resolve(__dirname, './packages/services/social/src'),
+      '@pdf': resolve(__dirname, './packages/services/pdf/src'),
     },
   },
   test: {

@@ -1,10 +1,6 @@
 import type { ICacheService } from '@pika/redis'
+import type { BillingInterval, SubscriptionStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
-import type {
-    CreditProcessingStatus,
-    SubscriptionInterval,
-    SubscriptionStatus,
-} from '@subscription/types/enums.js'
 
 // Service configuration interfaces
 export interface SubscriptionServiceConfig {
@@ -14,28 +10,10 @@ export interface SubscriptionServiceConfig {
 
 // Plan configuration interfaces
 export interface PlanConfiguration {
-  creditsAmount: number
   features: string[]
 }
 
-// Credit processing interfaces
-export interface CreditProcessingJob {
-  subscriptionId: string
-  userId: string
-  creditsAmount: number
-  status: CreditProcessingStatus
-  attempts: number
-  lastAttemptAt?: Date
-  scheduledFor?: Date
-  error?: string
-}
-
-export interface CreditProcessingResult {
-  success: boolean
-  creditsAdded?: number
-  newBalance?: number
-  error?: string
-}
+// Credit processing interfaces removed - credits system discontinued
 
 // Subscription management interfaces
 export interface SubscriptionCreationData {
@@ -63,9 +41,8 @@ export interface PlanCreationData {
   description?: string
   price: number
   currency: string
-  interval: SubscriptionInterval
+  interval: BillingInterval
   intervalCount: number
-  creditsAmount: number
   trialPeriodDays?: number
   features: string[]
   // Removed gym-related properties
@@ -76,31 +53,12 @@ export interface PlanUpdateData {
   name?: string
   description?: string
   price?: number
-  creditsAmount?: number
   features?: string[]
   isActive?: boolean
   metadata?: Record<string, any>
 }
 
-// Search and filtering interfaces
-export interface SubscriptionSearchParams {
-  page?: number
-  limit?: number
-  status?: SubscriptionStatus
-  userId?: string
-  planId?: string
-  cancelAtPeriodEnd?: boolean
-  fromDate?: Date
-  toDate?: Date
-}
-
-export interface PlanSearchParams {
-  page?: number
-  limit?: number
-  isActive?: boolean
-  // Removed gym-related properties
-  interval?: SubscriptionInterval
-}
+// Search and filtering interfaces moved to search.ts
 
 // User membership status interface
 export interface UserMembershipStatus {
@@ -113,10 +71,5 @@ export interface UserMembershipStatus {
     // Removed gym-related properties
     currentPeriodEnd?: Date
     cancelAtPeriodEnd: boolean
-  }
-  creditBalance?: {
-    total: number
-    demand: number
-    subscription: number
   }
 }

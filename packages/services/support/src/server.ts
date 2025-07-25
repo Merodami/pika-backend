@@ -20,6 +20,9 @@ export async function createSupportServer(config: ServerConfig) {
     serviceName: 'support-service',
     port: config.port,
     cacheService: config.cacheService,
+    authOptions: {
+      excludePaths: ['/health', '/metrics', '/internal/*'],
+    },
     healthChecks: [
       {
         name: 'postgres',

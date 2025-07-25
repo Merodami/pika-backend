@@ -4,9 +4,9 @@ import FormData from 'form-data'
 import { ErrorFactory } from '../../errors/index.js'
 import { logger } from '../../infrastructure/logger/index.js'
 import type {
-    FileStoragePort,
-    FileStorageResult,
-    FileUpload,
+  FileStoragePort,
+  FileStorageResult,
+  FileUpload,
 } from '../../infrastructure/storage/FileStorage.js'
 import { BaseServiceClient } from '../BaseServiceClient.js'
 
