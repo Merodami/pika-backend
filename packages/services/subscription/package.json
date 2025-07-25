@@ -20,7 +20,7 @@
     "express": "^5.1.0",
     "jose": "^6.0.12",
     "pino": "^9.7.0",
-    "zod": "^4.0.5"
+    "zod": "^4.0.9"
   },
   "devDependencies": {
     "@pika/tests": "workspace:^"
