@@ -5,6 +5,7 @@ import {
   UserService,
   UserServiceUser,
 } from '../strategies/LocalAuthStrategy.js'
+import { mapToUserServiceUser } from './UserMapper.js'
 
 /**
  * Adapter to bridge auth package with user service
@@ -19,37 +20,13 @@ export class UserServiceAdapter implements UserService {
 
     if (!user) return null
 
-    return {
-      id: user.id,
-      email: user.email,
-      password: user.password ?? undefined,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      status: user.status,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      lastLoginAt: user.lastLoginAt ?? undefined,
-      isActive: () => user.status === UserStatus.ACTIVE,
-    }
+    return mapToUserServiceUser(user)
   }
 
   async createUser(data: CreateUserData): Promise<UserServiceUser> {
     const user = await this.userRepository.create(data)
 
-    return {
-      id: user.id,
-      email: user.email,
-      password: user.password ?? undefined,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      status: user.status,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      lastLoginAt: user.lastLoginAt ?? undefined,
-      isActive: () => user.status === UserStatus.ACTIVE,
-    }
+    return mapToUserServiceUser(user)
   }
 
   async updateLastLogin(userId: string, loginTime: Date): Promise<void> {
@@ -69,19 +46,7 @@ export class UserServiceAdapter implements UserService {
 
     if (!user) return null
 
-    return {
-      id: user.id,
-      email: user.email,
-      password: user.password ?? undefined,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      status: user.status,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      lastLoginAt: user.lastLoginAt ?? undefined,
-      isActive: () => user.status === UserStatus.ACTIVE,
-    }
+    return mapToUserServiceUser(user)
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {

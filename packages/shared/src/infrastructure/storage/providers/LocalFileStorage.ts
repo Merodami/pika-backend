@@ -2,7 +2,6 @@ import { ErrorFactory } from '@shared/errors/index.js'
 import { logger } from '@shared/infrastructure/logger/index.js'
 import * as crypto from 'crypto'
 import * as fs from 'fs'
-import { get } from 'lodash-es'
 import * as path from 'path'
 import * as stream from 'stream'
 import * as util from 'util'
@@ -14,6 +13,7 @@ import {
   FileStorageResult,
   FileUpload,
 } from '../FileStorage.js'
+import { BaseFileStorage } from './BaseFileStorage.js'
 
 // Convert pipeline to promise-based
 const pipeline = util.promisify(stream.pipeline)
@@ -180,7 +180,10 @@ export interface LocalFileStorageConfig extends FileStorageConfig {
  * Local filesystem implementation of FileStorage
  * This implementation stores files in a local directory and serves them via HTTP
  */
-export class LocalFileStorage implements FileStoragePort {
+export class LocalFileStorage
+  extends BaseFileStorage
+  implements FileStoragePort
+{
   private readonly storageDir: string
   private readonly baseUrl: string
   private readonly allowedTypes: string[]
@@ -192,25 +195,8 @@ export class LocalFileStorage implements FileStoragePort {
   /**
    * Map of valid MIME type to file extension combinations
    */
-  private readonly validCombinations: Record<string, string[]> = {
-    'image/jpeg': ['.jpg', '.jpeg', '.jpe'],
-    'image/png': ['.png'],
-    'image/svg+xml': ['.svg'],
-    'image/webp': ['.webp'],
-    'image/gif': ['.gif'],
-    'application/pdf': ['.pdf'],
-    'text/csv': ['.csv'],
-    'application/vnd.ms-excel': ['.xls'],
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
-      '.xlsx',
-    ],
-    'application/msword': ['.doc'],
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
-      '.docx',
-    ],
-  }
-
   constructor(config: LocalFileStorageConfig) {
+    super()
     this.storageDir = config.storageDir
     this.baseUrl = config.baseUrl
     this.allowedTypes = config.allowedTypes || [
@@ -242,7 +228,7 @@ export class LocalFileStorage implements FileStoragePort {
     options: FileStorageOptions = {},
   ): Promise<FileStorageResult> {
     // Validate file before processing
-    this.validateFile(file)
+    this.validateFile(file, this.allowedTypes, this.maxSize)
 
     // Also run custom validator if provided
     if (this.customValidator) {
@@ -501,109 +487,6 @@ export class LocalFileStorage implements FileStoragePort {
 
     // If no extension is found, default to .bin
     return ext || '.bin'
-  }
-
-  /**
-   * Validate file before saving
-   * @private
-   */
-  private validateFile(file: FileUpload): void {
-    if (!file) {
-      throw ErrorFactory.validationError(
-        { file: ['No file provided'] },
-        { source: 'LocalFileStorage.validateFile' },
-      )
-    }
-
-    if (!file.filename) {
-      throw ErrorFactory.validationError(
-        { file: ['Missing filename'] },
-        { source: 'LocalFileStorage.validateFile' },
-      )
-    }
-
-    // Validate extension matches MIME type
-    const ext = this.getFileExtension(file.filename)
-
-    this.validateFileExtension(ext, file.mimetype)
-
-    // Check file type
-    if (!this.allowedTypes.includes(file.mimetype)) {
-      throw ErrorFactory.validationError(
-        {
-          file: [
-            `Unsupported file type: ${file.mimetype}. Allowed types: ${this.allowedTypes.join(', ')}`,
-          ],
-        },
-        {
-          source: 'LocalFileStorage.validateFile',
-          suggestion: 'Upload a file with a supported format',
-        },
-      )
-    }
-
-    // Check file size (bytesRead is the total file size)
-    if (file.size > this.maxSize) {
-      const maxSizeMB = this.maxSize / (1024 * 1024)
-
-      throw ErrorFactory.validationError(
-        {
-          file: [
-            `File too large: ${(file.size / (1024 * 1024)).toFixed(2)}MB. Maximum size: ${maxSizeMB}MB`,
-          ],
-        },
-        {
-          source: 'LocalFileStorage.validateFile',
-          suggestion: `Reduce file size to under ${maxSizeMB}MB`,
-        },
-      )
-    }
-  }
-
-  /**
-   * Validate file extension matches MIME type
-   * @private
-   */
-  private validateFileExtension(ext: string, mimeType: string): void {
-    // If we have a mapping for this MIME type, check the extension
-    const validExtensions = get(this.validCombinations, mimeType)
-
-    if (validExtensions && !validExtensions.includes(ext)) {
-      throw ErrorFactory.validationError(
-        {
-          file: [
-            `File extension "${ext}" doesn't match declared type "${mimeType}"`,
-          ],
-        },
-        {
-          source: 'LocalFileStorage.validateFileExtension',
-          suggestion: `Use a file with a valid extension for type ${mimeType} (${validExtensions.join(', ')})`,
-        },
-      )
-    }
-  }
-
-  /**
-   * Check if the file is an image based on MIME type
-   * @private
-   */
-  private isImageFile(mimeType: string): boolean {
-    return mimeType.startsWith('image/')
-  }
-
-  /**
-   * Sanitize filename to prevent directory traversal and ensure safe filenames
-   * @private
-   */
-  private sanitizeFilename(filename: string): string {
-    // Remove any path components
-    const basename = path.basename(filename)
-
-    // Remove special characters, keep alphanumeric, dash, underscore and dot
-    const sanitized = basename.replace(/[^a-zA-Z0-9_.-]/g, '_')
-
-    // Ensure filename is not too long
-    return sanitized.substring(0, 255)
   }
 
   /**

@@ -5,8 +5,7 @@ export interface EmailProvider {
   isAvailable(): Promise<boolean>
 }
 
-export interface EmailParams {
-  to: string
+export interface BaseEmailParams {
   from: {
     email: string
     name?: string
@@ -18,6 +17,10 @@ export interface EmailParams {
   html?: string
   isHtml?: boolean
   replyTo?: string
+}
+
+export interface EmailParams extends BaseEmailParams {
+  to: string
   cc?: string[]
   bcc?: string[]
   attachments?: Array<{
@@ -27,20 +30,9 @@ export interface EmailParams {
   }>
 }
 
-export interface BulkEmailParams {
+export interface BulkEmailParams extends BaseEmailParams {
   to: string[]
-  recipients?: string[]
-  from: {
-    email: string
-    name?: string
-  }
-  fromName?: string
-  subject: string
-  body: string
-  text?: string
-  html?: string
-  isHtml?: boolean
-  replyTo?: string
+  recipients?: string[] // alias for 'to' for backward compatibility
   templateVariables?: Record<string, any>[]
 }
 

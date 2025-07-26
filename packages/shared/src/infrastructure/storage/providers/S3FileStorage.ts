@@ -11,6 +11,7 @@ import {
   FileStorageResult,
   FileUpload,
 } from '../FileStorage.js'
+import { BaseFileStorage } from './BaseFileStorage.js'
 
 /**
  * Configuration for S3 storage
@@ -55,27 +56,11 @@ export interface S3FileStorageConfig extends FileStorageConfig {
  * AWS S3 implementation of FileStorage
  * This is a stub implementation - in a real application, you would use the AWS SDK
  */
-export class S3FileStorage implements FileStoragePort {
+export class S3FileStorage extends BaseFileStorage implements FileStoragePort {
   private readonly config: S3FileStorageConfig
-  private readonly validCombinations: Record<string, string[]> = {
-    'image/jpeg': ['.jpg', '.jpeg', '.jpe'],
-    'image/png': ['.png'],
-    'image/svg+xml': ['.svg'],
-    'image/webp': ['.webp'],
-    'image/gif': ['.gif'],
-    'application/pdf': ['.pdf'],
-    'text/csv': ['.csv'],
-    'application/vnd.ms-excel': ['.xls'],
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
-      '.xlsx',
-    ],
-    'application/msword': ['.doc'],
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
-      '.docx',
-    ],
-  }
 
   constructor(config: S3FileStorageConfig) {
+    super()
     this.config = {
       ...config,
       allowedTypes: config.allowedTypes || [
@@ -107,7 +92,7 @@ export class S3FileStorage implements FileStoragePort {
     options: FileStorageOptions = {},
   ): Promise<FileStorageResult> {
     // Validate file before processing
-    this.validateFile(file)
+    this.validateFile(file, this.config.allowedTypes, this.config.maxSize)
 
     // Run custom validator if provided
     if (this.config.customValidator) {
@@ -135,7 +120,7 @@ export class S3FileStorage implements FileStoragePort {
       }
     } else if (options.preserveFilename && file.filename) {
       // Sanitize the original filename
-      filename = this.sanitizeKey(file.filename)
+      filename = this.sanitizeFilename(file.filename)
     } else {
       // Generate random filename
       const randomName = crypto.randomBytes(16).toString('hex')
@@ -235,78 +220,6 @@ export class S3FileStorage implements FileStoragePort {
   }
 
   /**
-   * Validate file before saving
-   * @private
-   */
-  private validateFile(file: FileUpload): void {
-    if (!file) {
-      throw ErrorFactory.validationError(
-        { file: ['No file provided'] },
-        { source: 'S3FileStorage.validateFile' },
-      )
-    }
-
-    if (!file.filename) {
-      throw ErrorFactory.validationError(
-        { file: ['Missing filename'] },
-        { source: 'S3FileStorage.validateFile' },
-      )
-    }
-
-    // Validate extension matches MIME type
-    const ext = path.extname(file.filename).toLowerCase()
-
-    this.validateFileExtension(ext, file.mimetype)
-
-    // Check file type
-    if (!this.config.allowedTypes?.includes(file.mimetype)) {
-      throw ErrorFactory.validationError(
-        {
-          file: [
-            `Unsupported file type: ${file.mimetype}. Allowed types: ${this.config.allowedTypes?.join(', ')}`,
-          ],
-        },
-        { source: 'S3FileStorage.validateFile' },
-      )
-    }
-
-    // Check file size
-    if (this.config.maxSize && file.size > this.config.maxSize) {
-      const maxSizeMB = Math.round(this.config.maxSize / (1024 * 1024))
-
-      throw ErrorFactory.validationError(
-        {
-          file: [`File too large. Maximum size is ${maxSizeMB}MB`],
-        },
-        { source: 'S3FileStorage.validateFile' },
-      )
-    }
-  }
-
-  /**
-   * Validate file extension matches MIME type
-   * @private
-   */
-  private validateFileExtension(ext: string, mimeType: string): void {
-    // If we have a mapping for this MIME type, check the extension
-    const validExtensions = get(this.validCombinations, mimeType)
-
-    if (validExtensions && !validExtensions.includes(ext)) {
-      throw ErrorFactory.validationError(
-        {
-          file: [
-            `File extension "${ext}" doesn't match declared type "${mimeType}"`,
-          ],
-        },
-        {
-          source: 'S3FileStorage.validateFileExtension',
-          suggestion: `Use a file with a valid extension for type ${mimeType} (${validExtensions.join(', ')})`,
-        },
-      )
-    }
-  }
-
-  /**
    * Extract S3 key from URL
    * @private
    */
@@ -348,67 +261,5 @@ export class S3FileStorage implements FileStoragePort {
 
       return null
     }
-  }
-
-  /**
-   * Sanitize S3 key to prevent issues
-   * @private
-   */
-  private sanitizeKey(key: string): string {
-    // Remove any path components
-    const basename = path.basename(key)
-
-    // Remove special characters
-    const sanitized = basename.replace(/[^a-zA-Z0-9_.-]/g, '_')
-
-    // Ensure key is not too long (S3 keys can be up to 1024 bytes)
-    return sanitized.substring(0, 255)
-  }
-
-  /**
-   * Check if the file is an image based on MIME type
-   * @private
-   */
-  private isImageFile(mimeType: string): boolean {
-    return mimeType.startsWith('image/')
-  }
-
-  /**
-   * Get thumbnail filename
-   * @private
-   */
-  private getThumbnailFilename(filename: string): string {
-    const fileNameParts = path.parse(filename)
-
-    return `${fileNameParts.name}_thumb${fileNameParts.ext}`
-  }
-
-  /**
-   * Guess MIME type from path
-   * @private
-   */
-  private getMimeTypeFromPath(filePath: string): string {
-    const ext = path.extname(filePath).toLowerCase()
-
-    // Map extensions back to MIME types
-    const mimeMap: Record<string, string> = {
-      '.jpg': 'image/jpeg',
-      '.jpeg': 'image/jpeg',
-      '.jpe': 'image/jpeg',
-      '.png': 'image/png',
-      '.svg': 'image/svg+xml',
-      '.webp': 'image/webp',
-      '.gif': 'image/gif',
-      '.pdf': 'application/pdf',
-      '.csv': 'text/csv',
-      '.xls': 'application/vnd.ms-excel',
-      '.xlsx':
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      '.doc': 'application/msword',
-      '.docx':
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    }
-
-    return get(mimeMap, ext) || 'application/octet-stream'
   }
 }

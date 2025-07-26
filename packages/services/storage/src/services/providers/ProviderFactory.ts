@@ -39,32 +39,27 @@ export class ProviderFactory {
     if (NODE_ENV === 'development' || NODE_ENV === 'test') {
       // In development/test, use local/console providers by default
       this.storageProviders.set('console', new ConsoleStorageProvider())
+    }
 
-      // S3 provider for development/test with MinIO
-      if (this.config.storage?.aws) {
-        this.storageProviders.set(
-          'aws-s3',
-          new AwsS3Provider({
-            ...this.config.storage.aws,
-            endpoint: this.config.storage.aws.endpoint,
-            providerName: 'aws_s3',
-          }),
-        )
+    // Initialize S3 provider if configured
+    if (this.config.storage?.aws) {
+      const s3Config = {
+        ...this.config.storage.aws,
+        endpoint: this.config.storage.aws.endpoint,
+      }
+
+      // Add providerName for dev/test environments
+      if (this.config.environment !== 'production') {
+        Object.assign(s3Config, { providerName: 'aws_s3' })
+      }
+
+      this.storageProviders.set('aws-s3', new AwsS3Provider(s3Config))
+
+      if (this.config.environment !== 'production') {
         logger.debug('Initialized AWS S3 provider for test/dev', {
           endpoint: this.config.storage.aws.endpoint,
           bucket: this.config.storage.aws.bucketName,
         })
-      }
-    } else {
-      // Production/Staging providers
-      if (this.config.storage?.aws) {
-        this.storageProviders.set(
-          'aws-s3',
-          new AwsS3Provider({
-            ...this.config.storage.aws,
-            endpoint: this.config.storage.aws.endpoint,
-          }),
-        )
       }
 
       // Always have console as ultimate fallback

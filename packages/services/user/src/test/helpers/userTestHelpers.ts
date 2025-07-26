@@ -16,6 +16,36 @@ import type { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { v4 as uuid } from 'uuid'
 
+/**
+ * Helper to generate user status based on index and flags
+ */
+function generateUserStatus(
+  index: number,
+  generateUnconfirmed: boolean,
+  generateInactive: boolean,
+): UserStatus {
+  if (generateUnconfirmed && index % 3 === 0) {
+    return UserStatus.UNCONFIRMED
+  }
+  if (generateInactive && index % 2 === 0) {
+    return UserStatus.SUSPENDED
+  }
+  return UserStatus.ACTIVE
+}
+
+/**
+ * Helper to generate verification status
+ */
+function generateVerificationStatus(
+  index: number,
+  generateUnverified: boolean,
+): { emailVerified: boolean; phoneVerified: boolean } {
+  return {
+    emailVerified: generateUnverified ? index % 2 === 0 : true,
+    phoneVerified: generateUnverified ? index % 3 === 0 : false,
+  }
+}
+
 export interface UserTestData {
   users: any[]
   adminUsers?: any[]
@@ -97,14 +127,8 @@ export async function seedTestUsers(
       lastName: `User${i}`,
       phoneNumber: `+123456789${i}${timestamp.toString().slice(-3)}`,
       role: userRole,
-      status:
-        generateUnconfirmed && i % 3 === 0
-          ? UserStatus.UNCONFIRMED
-          : generateInactive && i % 2 === 0
-            ? UserStatus.SUSPENDED
-            : UserStatus.ACTIVE,
-      emailVerified: generateUnverified ? i % 2 === 0 : true,
-      phoneVerified: generateUnverified ? i % 3 === 0 : false,
+      status: generateUserStatus(i, generateUnconfirmed, generateInactive),
+      ...generateVerificationStatus(i, generateUnverified),
       ...(includePassword && {
         password: await bcrypt.hash('TestPassword123!', 10),
       }),
@@ -192,45 +216,46 @@ export async function createTestUser(
 }
 
 /**
+ * Generic factory function to create user with specific role
+ */
+function createTestUserWithRole(role: UserRole, defaultEmailVerified = true) {
+  return async (
+    prismaClient: PrismaClient,
+    options: Partial<Parameters<typeof createTestUser>[1]> = {},
+  ) => {
+    const defaults: Partial<Parameters<typeof createTestUser>[1]> = {
+      role,
+    }
+    if (defaultEmailVerified && role !== UserRole.CUSTOMER) {
+      defaults.emailVerified = true
+    }
+    return createTestUser(prismaClient, {
+      ...defaults,
+      ...options,
+    })
+  }
+}
+
+/**
  * Factory function to create admin user
  */
-export async function createTestAdminUser(
-  prismaClient: PrismaClient,
-  options: Partial<Parameters<typeof createTestUser>[1]> = {},
-) {
-  return createTestUser(prismaClient, {
-    role: UserRole.ADMIN,
-    emailVerified: true,
-    ...options,
-  })
-}
+export const createTestAdminUser = createTestUserWithRole(UserRole.ADMIN, true)
 
 /**
  * Factory function to create business user
  */
-export async function createTestBusinessUser(
-  prismaClient: PrismaClient,
-  options: Partial<Parameters<typeof createTestUser>[1]> = {},
-) {
-  return createTestUser(prismaClient, {
-    role: UserRole.BUSINESS,
-    emailVerified: true,
-    ...options,
-  })
-}
+export const createTestBusinessUser = createTestUserWithRole(
+  UserRole.BUSINESS,
+  true,
+)
 
 /**
  * Factory function to create customer user
  */
-export async function createTestCustomerUser(
-  prismaClient: PrismaClient,
-  options: Partial<Parameters<typeof createTestUser>[1]> = {},
-) {
-  return createTestUser(prismaClient, {
-    role: UserRole.CUSTOMER,
-    ...options,
-  })
-}
+export const createTestCustomerUser = createTestUserWithRole(
+  UserRole.CUSTOMER,
+  false,
+)
 
 /**
  * Clean up test data - useful for afterEach hooks
@@ -306,12 +331,8 @@ export function generateUserTestData(
       lastName: `User${i}`,
       phoneNumber: `+123456789${i}`,
       role: i === 0 && role === UserRole.CUSTOMER ? UserRole.ADMIN : role,
-      status:
-        includeInactive && i % 2 === 0
-          ? UserStatus.SUSPENDED
-          : UserStatus.ACTIVE,
-      emailVerified: includeUnverified ? i % 2 === 0 : true,
-      phoneVerified: includeUnverified ? i % 3 === 0 : false,
+      status: generateUserStatus(i, false, includeInactive),
+      ...generateVerificationStatus(i, includeUnverified),
       password: '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe',
       createdAt: new Date(),
       updatedAt: new Date(),

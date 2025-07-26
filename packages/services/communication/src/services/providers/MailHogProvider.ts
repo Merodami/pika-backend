@@ -4,22 +4,16 @@ import {
   MAILHOG_UI_PORT,
 } from '@pika/environment'
 import { logger } from '@pika/shared'
-import { get, isEmpty } from 'lodash-es'
 import nodemailer, { type SentMessageInfo, type Transporter } from 'nodemailer'
 
-import type {
-  BulkEmailParams,
-  BulkEmailResult,
-  EmailParams,
-  EmailProvider,
-  EmailResult,
-} from './EmailProvider.js'
+import { BaseEmailProvider } from './BaseEmailProvider.js'
+import type { EmailParams, EmailResult } from './EmailProvider.js'
 
 /**
  * MailHog Email Provider for development
  * Sends real emails to MailHog SMTP server for visual testing
  */
-export class MailHogProvider implements EmailProvider {
+export class MailHogProvider extends BaseEmailProvider {
   private transporter: Transporter | null = null
 
   getProviderName(): string {
@@ -111,78 +105,6 @@ export class MailHogProvider implements EmailProvider {
         status: 'failed',
         error: error instanceof Error ? error.message : 'Unknown error',
       }
-    }
-  }
-
-  async sendBulkEmail(params: BulkEmailParams): Promise<BulkEmailResult> {
-    logger.info('📧 BULK EMAIL (MailHog Provider)', {
-      recipients: params.to.length,
-      subject: params.subject,
-    })
-
-    const results: Array<{
-      success: boolean
-      messageId?: string
-      error?: string
-      metadata?: any
-    }> = []
-
-    for (const [index, recipient] of params.to.entries()) {
-      // Get variables for this recipient if available
-      const variables = get(params.templateVariables, index, {})
-
-      // For bulk emails, we need to render each email individually with variables
-      let personalizedSubject = params.subject
-      let personalizedHtml = params.html
-      let personalizedText = params.text
-
-      // Simple variable substitution for MailHog
-      if (!isEmpty(variables)) {
-        for (const [key, value] of Object.entries(variables)) {
-          const placeholder = `{{${key}}}`
-          // Use string replace instead of RegExp for simple placeholder substitution
-          const replaceValue = String(value)
-
-          personalizedSubject = personalizedSubject
-            ?.split(placeholder)
-            .join(replaceValue)
-          personalizedHtml = personalizedHtml
-            ?.split(placeholder)
-            .join(replaceValue)
-          personalizedText = personalizedText
-            ?.split(placeholder)
-            .join(replaceValue)
-        }
-      }
-
-      const result = await this.sendEmail({
-        to: recipient,
-        from: params.from,
-        fromName: params.fromName,
-        subject: personalizedSubject,
-        body: params.body,
-        html: personalizedHtml,
-        text: personalizedText,
-        isHtml: params.isHtml,
-      })
-
-      results.push({
-        success: result.success,
-        messageId: result.messageId,
-        error: result.error,
-        metadata: result.metadata,
-      })
-    }
-
-    const successful = results.filter((r) => r.success).length
-    const failed = results.filter((r) => !r.success).length
-
-    return {
-      sent: successful,
-      failed: failed,
-      total: params.to.length,
-      results,
-      provider: this.getProviderName(),
     }
   }
 }
