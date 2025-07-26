@@ -13,8 +13,6 @@ import { ErrorFactory, logger } from '@pika/shared'
 import { EmailTemplateId } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { CommunicationLogSearchParams } from '../repositories/CommunicationLogRepository.js'
-import type { NotificationSearchParams } from '../repositories/NotificationRepository.js'
 import type { EmailService, SendEmailInput } from '../services/EmailService.js'
 import type { INotificationService } from '../services/NotificationService.js'
 import { createChannelResults } from '../utils/channelHelpers.js'
@@ -207,7 +205,7 @@ export class InternalCommunicationController {
         endDate,
       } = request.query
 
-      const params: CommunicationLogSearchParams = {
+      const params = {
         page: Number(page),
         limit: Number(limit),
         userId: userId as string,
@@ -534,7 +532,7 @@ export class InternalCommunicationController {
         throw ErrorFactory.badRequest('userId is required')
       }
 
-      const params: NotificationSearchParams = {
+      const params = {
         page: query.page || 1,
         limit: query.limit || 20,
         isRead: query.isRead,

@@ -53,6 +53,13 @@ export interface ISubscriptionService {
   ): Promise<SubscriptionDomain>
   // Removed credit processing methods - no credit tables in database
   processAllActiveSubscriptions(): Promise<number>
+  // Additional methods for internal use
+  getSubscriptionByStripeId(
+    stripeSubscriptionId: string,
+  ): Promise<SubscriptionDomain | null>
+  getUserSubscriptions(
+    userId: string,
+  ): Promise<PaginatedResult<SubscriptionDomain>>
 }
 
 export class SubscriptionService implements ISubscriptionService {
@@ -470,6 +477,40 @@ export class SubscriptionService implements ISubscriptionService {
         error,
       })
       // Don't throw - email failure shouldn't break subscription cancellation
+    }
+  }
+
+  async getSubscriptionByStripeId(
+    stripeSubscriptionId: string,
+  ): Promise<SubscriptionDomain | null> {
+    try {
+      const subscription =
+        await this.subscriptionRepository.findByStripeSubscriptionId(
+          stripeSubscriptionId,
+        )
+
+      return subscription
+    } catch (error) {
+      logger.error('Failed to get subscription by Stripe ID', {
+        stripeSubscriptionId,
+        error,
+      })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  async getUserSubscriptions(
+    userId: string,
+  ): Promise<PaginatedResult<SubscriptionDomain>> {
+    try {
+      const subscriptions = await this.subscriptionRepository.findAll({
+        userId,
+      })
+
+      return subscriptions
+    } catch (error) {
+      logger.error('Failed to get user subscriptions', { userId, error })
+      throw ErrorFactory.fromError(error)
     }
   }
 }

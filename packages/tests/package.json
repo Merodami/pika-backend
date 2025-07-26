@@ -8,8 +8,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@pika/database": "workspace:^",
@@ -20,7 +19,8 @@
     "node-fetch": "^3.3.2",
     "stripe": "^18.3.0",
     "supertest": "^7.1.4",
-    "testcontainers": "^11.4.0"
+    "testcontainers": "^11.4.0",
+    "vitest": "^3.2.4"
   },
   "repository": {
     "type": "git",

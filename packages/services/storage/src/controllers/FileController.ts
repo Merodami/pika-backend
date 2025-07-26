@@ -11,7 +11,6 @@ import { FileStorageLogMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { FileStorageLogSearchParams } from '../repositories/FileStorageLogRepository.js'
 import type { IStorageService } from '../services/StorageService.js'
 
 export interface IFileController {
@@ -296,7 +295,7 @@ export class FileController implements IFileController {
         getValidatedQuery<storagePublic.GetFileHistoryQuery>(request)
 
       // Transform API query to service params
-      const params: FileStorageLogSearchParams = {
+      const params = {
         page: query.page,
         limit: query.limit,
         status: query.status,

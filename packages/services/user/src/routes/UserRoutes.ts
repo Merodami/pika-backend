@@ -151,14 +151,6 @@ export async function createUserRouter(
     controller.unbanUser,
   )
 
-  // GET /users/:id/friends - Get user friends/guests
-  router.get(
-    '/:id/friends',
-    requireAuth(),
-    validateParams(userAdmin.UserIdParam),
-    controller.getUserFriends,
-  )
-
   // POST /users/:id/avatar - Upload user avatar (admin or self)
 
   router.post(

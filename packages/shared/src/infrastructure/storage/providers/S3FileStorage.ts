@@ -1,5 +1,5 @@
 import { ErrorFactory } from '@shared/errors/index.js'
-import { logger } from '@shared/infrastructure/index.js'
+import { logger } from '@shared/infrastructure/logger/index.js'
 import * as crypto from 'crypto'
 import { get } from 'lodash-es'
 import * as path from 'path'

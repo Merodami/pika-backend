@@ -5,7 +5,13 @@ import { ErrorFactory, toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 
-import type { CommentSearchParams } from '../services/SupportCommentService.js'
+export interface CommentSearchParams {
+  problemId: string
+  page?: number
+  limit?: number
+  sortBy?: string
+  sortOrder?: 'ASC' | 'DESC'
+}
 
 export interface CreateSupportCommentInput {
   problemId: string

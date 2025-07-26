@@ -1,11 +1,10 @@
 import { subscriptionInternal } from '@pika/api'
-import { paginatedResponse, validateResponse } from '@pika/http'
+import { validateResponse } from '@pika/http'
 import { SubscriptionMapper } from '@pika/sdk'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { ISubscriptionRepository } from '../repositories/SubscriptionRepository.js'
 import type { ISubscriptionService } from '../services/SubscriptionService.js'
 import { TEMPLATE_KEYS } from '../types/constants.js'
 
@@ -15,7 +14,6 @@ import { TEMPLATE_KEYS } from '../types/constants.js'
 export class InternalSubscriptionController {
   constructor(
     private readonly subscriptionService: ISubscriptionService,
-    private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly communicationClient: CommunicationServiceClient,
   ) {
     // Bind methods to preserve context
@@ -122,7 +120,7 @@ export class InternalSubscriptionController {
       })
 
       const subscription =
-        await this.subscriptionRepository.findByStripeSubscriptionId(
+        await this.subscriptionService.getSubscriptionByStripeId(
           data.stripeSubscriptionId,
         )
 
@@ -273,7 +271,7 @@ export class InternalSubscriptionController {
       const { stripeSubscriptionId } = request.params
 
       const subscription =
-        await this.subscriptionRepository.findByStripeSubscriptionId(
+        await this.subscriptionService.getSubscriptionByStripeId(
           stripeSubscriptionId,
         )
 
@@ -310,16 +308,22 @@ export class InternalSubscriptionController {
       const { userId } = request.params
       const includeInactive = request.query.includeInactive === 'true'
 
-      const subscriptions = await this.subscriptionRepository.findAll({
-        userId,
-        status: includeInactive ? undefined : 'active',
-      })
+      const result = await this.subscriptionService.getUserSubscriptions(userId)
 
-      // Use standard pagination pattern like Business service
-      const responseData = paginatedResponse(
-        subscriptions,
-        SubscriptionMapper.toDTO,
-      )
+      // Filter if needed
+      const filteredData = includeInactive
+        ? result.data
+        : result.data.filter((s) => s.status === 'active')
+
+      // Use paginatedResponse utility
+      const responseData = {
+        data: filteredData.map(SubscriptionMapper.toDTO),
+        pagination: {
+          ...result.pagination,
+          total: filteredData.length,
+          limit: filteredData.length,
+        },
+      }
       const validatedResponse = validateResponse(
         subscriptionInternal.SubscriptionListResponse,
         responseData,

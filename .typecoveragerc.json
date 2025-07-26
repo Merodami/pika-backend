@@ -1,0 +1,22 @@
+{
+  "atLeast": 90,
+  "strict": true,
+  "detail": true,
+  "project": "./tsconfig.json",
+  "ignoreFiles": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.integration-test.ts",
+    "**/tests/**/*",
+    "**/node_modules/**/*",
+    "**/dist/**/*",
+    "**/build/**/*",
+    "**/previous-architecture/**/*",
+    "**/pika-old/**/*",
+    "**/api-microservices-sdk/**/*",
+    "**/packages/api/generated/**/*",
+    "**/packages/database/prisma/migrations/**/*"
+  ],
+  "ignoreCatch": false,
+  "ignoreUnread": false
+}

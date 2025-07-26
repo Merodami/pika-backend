@@ -36,7 +36,6 @@ export function createInternalSubscriptionRouter(
   // Initialize controller
   const controller = new InternalSubscriptionController(
     subscriptionService,
-    subscriptionRepository,
     communicationClient,
   )
 
