@@ -1,8 +1,7 @@
+import type { CategoryController } from '@category/controllers/CategoryController.js'
 import { categoryCommon, categoryPublic } from '@pika/api'
 import { requireAuth, validateParams, validateQuery } from '@pika/http'
 import { Router } from 'express'
-
-import type { CategoryController } from '../controllers/CategoryController.js'
 
 /**
  * Creates public category routes

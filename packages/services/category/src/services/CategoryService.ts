@@ -1,7 +1,3 @@
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { Cache, ICacheService } from '@pika/redis'
-import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
-
 import type {
   Category,
   CategorySearchParams,
@@ -10,7 +6,10 @@ import type {
   ICategoryService,
   PaginatedResult,
   UpdateCategoryData,
-} from '../types/interfaces.js'
+} from '@category/types/interfaces.js'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { Cache, ICacheService } from '@pika/redis'
+import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 
 export class CategoryService implements ICategoryService {
   constructor(

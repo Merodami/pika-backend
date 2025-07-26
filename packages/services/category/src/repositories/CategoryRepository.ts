@@ -1,9 +1,4 @@
-import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import { ICacheService } from '@pika/redis'
-import { ErrorFactory, logger } from '@pika/shared'
-import { Prisma, PrismaClient } from '@prisma/client'
-
-import { CategoryMapper } from '../mappers/CategoryMapper.js'
+import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
 import type {
   Category,
   CategorySearchParams,
@@ -11,7 +6,11 @@ import type {
   ICategoryRepository,
   PaginatedResult,
   UpdateCategoryData,
-} from '../types/interfaces.js'
+} from '@category/types/interfaces.js'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
+import { ICacheService } from '@pika/redis'
+import { ErrorFactory, logger } from '@pika/shared'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 export class CategoryRepository implements ICategoryRepository {
   constructor(

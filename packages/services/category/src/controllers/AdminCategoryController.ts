@@ -1,3 +1,5 @@
+import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
+import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryAdmin, categoryCommon } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
@@ -8,9 +10,6 @@ import {
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
-
-import { CategoryMapper } from '../mappers/CategoryMapper.js'
-import type { ICategoryService } from '../types/interfaces.js'
 
 /**
  * Handles admin category management operations

@@ -1,3 +1,5 @@
+import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
+import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryCommon, categoryInternal } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
@@ -7,9 +9,6 @@ import {
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
-
-import { CategoryMapper } from '../mappers/CategoryMapper.js'
-import type { ICategoryService } from '../types/interfaces.js'
 
 /**
  * Handles internal category operations for service-to-service communication

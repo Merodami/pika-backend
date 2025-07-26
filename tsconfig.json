@@ -49,7 +49,18 @@
       "@pika/payment": ["packages/services/payment/src"],
       "@pika/communication": ["packages/services/communication/src"],
       "@pika/support": ["packages/services/support/src"],
-      "@pika/storage": ["packages/services/storage/src"]
+      "@pika/storage": ["packages/services/storage/src"],
+      "@user/*": ["packages/services/user/src/*"],
+      "@auth-service/*": ["packages/services/auth/src/*"],
+      "@subscription/*": ["packages/services/subscription/src/*"],
+      "@payment/*": ["packages/services/payment/src/*"],
+      "@communication/*": ["packages/services/communication/src/*"],
+      "@support/*": ["packages/services/support/src/*"],
+      "@storage/*": ["packages/services/storage/src/*"],
+      "@business/*": ["packages/services/business/src/*"],
+      "@category/*": ["packages/services/category/src/*"],
+      "@pdf/*": ["packages/services/pdf/src/*"],
+      "@voucher/*": ["packages/services/voucher/src/*"]
     }
   },
   "exclude": [

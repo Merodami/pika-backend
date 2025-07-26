@@ -1,3 +1,4 @@
+import type { InternalCategoryController } from '@category/controllers/InternalCategoryController.js'
 import { categoryCommon, categoryInternal } from '@pika/api'
 import {
   requireServiceAuth,
@@ -6,8 +7,6 @@ import {
   validateQuery,
 } from '@pika/http'
 import { Router } from 'express'
-
-import type { InternalCategoryController } from '../controllers/InternalCategoryController.js'
 
 /**
  * Creates internal category routes for service-to-service communication

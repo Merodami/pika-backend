@@ -7,6 +7,7 @@ This document provides a comprehensive analysis of all relative imports in the c
 **IMPORTANT:** Use ONLY the shorter aliases. The `@pika/` prefix should be removed from tsconfig.json for consistency.
 
 ### Core Packages (Use these aliases)
+
 - `@shared/*` → `packages/shared/src/*`
 - `@api/*` → `packages/api/src/*`
 - `@types/*` → `packages/types/src/*`
@@ -20,7 +21,9 @@ This document provides a comprehensive analysis of all relative imports in the c
 - `@environment/*` → `packages/environment/src/*`
 
 ### Service Packages (Need shorter aliases)
+
 Current (to be updated):
+
 - `@pika/user` → Should be: `@user/*`
 - `@pika/auth-service` → Should be: `@auth-service/*`
 - `@pika/subscription` → Should be: `@subscription/*`
@@ -30,6 +33,7 @@ Current (to be updated):
 - `@pika/storage` → Should be: `@storage/*`
 
 ### Missing Service Mappings (Need to be added to tsconfig.json)
+
 ```json
 "@user/*": ["packages/services/user/src/*"],
 "@auth-service/*": ["packages/services/auth/src/*"],
@@ -45,7 +49,9 @@ Current (to be updated):
 ```
 
 ### Aliases to Remove from tsconfig.json
+
 All `@pika/` prefixed aliases should be removed:
+
 - `@pika/shared`, `@pika/api`, `@pika/types`, `@pika/sdk`, etc.
 - `@pika/user`, `@pika/auth-service`, `@pika/subscription`, etc.
 
@@ -62,6 +68,7 @@ These are imports within a service that reference other files in the same servic
 #### Pattern: `../repositories/`, `../services/`, `../controllers/`, etc.
 
 **Example Files:**
+
 - `packages/services/business/src/services/BusinessService.ts`
   - Current: `import { ... } from '../repositories/BusinessRepository.js'`
   - Should be: `import { ... } from '@business/repositories/BusinessRepository.js'` (after adding alias)
@@ -79,6 +86,7 @@ Test files importing from their service's source files should also use aliases.
 #### Pattern: `../../server.js`, `../helpers/`
 
 **Example Files:**
+
 - `packages/services/business/src/test/integration/business.internal.integration.test.ts`
   - Current: `import { createBusinessServer } from '../../server.js'`
   - Should be: `import { createBusinessServer } from '@business/server.js'` (after adding alias)
@@ -90,6 +98,7 @@ Test files importing from their service's source files should also use aliases.
 These are imports that go across package boundaries using the shorter aliases.
 
 #### Files Already Using Correct Shorter Aliases
+
 - Files using `@shared/*`, `@api/*`, `@http/*`, `@tests/*` - These are correct!
 
 ### 4. API Schema Imports
@@ -99,6 +108,7 @@ API schema files importing from other schema directories should use `@api/` pref
 #### Pattern: `../shared/`, `../common/`, etc.
 
 **Example Files:**
+
 - `packages/api/src/schemas/user/internal/service.ts`
   - Current: `import { ... } from '../common/parameters.js'`
   - Should be: `import { ... } from '@api/schemas/user/common/parameters.js'`
@@ -112,6 +122,7 @@ API schema files importing from other schema directories should use `@api/` pref
 These files are using aliases but need to be updated to use the correct pattern:
 
 #### 1. Shared Package Files (Already using `@shared` - Correct!)
+
 - `packages/shared/src/infrastructure/storage/providers/BaseFileStorage.ts` ✅
 - `packages/shared/src/infrastructure/storage/providers/S3FileStorage.ts` ✅
 - `packages/shared/src/infrastructure/storage/providers/LocalFileStorage.ts` ✅
@@ -119,12 +130,15 @@ These files are using aliases but need to be updated to use the correct pattern:
 - `packages/shared/src/infrastructure/health/HealthCheck.ts` ✅
 
 #### 2. HTTP Package Files (Already using `@http` - Correct!)
+
 - `packages/http/src/application/api/server.ts` ✅
 
 #### 3. API Package Files (Already using `@api` - Correct!)
+
 - `packages/api/src/scripts/generators/internal-api.ts` ✅
 
 #### 4. Test Package Files (Already using `@tests` - Correct!)
+
 - `packages/services/storage/src/test/integration/e2e/storage-s3.integration.test.ts` ✅
 - `packages/services/support/src/test/integration/e2e/support.integration.test.ts` ✅
 - `packages/tests/src/integration/auth-e2e.test.ts` ✅
@@ -147,20 +161,24 @@ These files are using aliases but need to be updated to use the correct pattern:
 ## Conversion Rules
 
 ### Rule 1: Use Shorter Aliases When Available
+
 - For core packages, use `@shared`, `@api`, `@auth`, etc.
 - For services without short aliases yet, use `@pika/service-name`
 
 ### Rule 2: All Imports Should Use Aliases
+
 - No more relative imports (`../`, `./`)
 - Even imports within the same package should use the package alias
 
 ### Rule 3: Consistent Pattern
+
 - Always include the `.js` extension (ESM requirement)
 - Use the full path from the package root
 
 ## Conversion Examples
 
 ### Example 1: Service Internal Import
+
 ```typescript
 // ❌ BEFORE (relative import)
 import { BusinessRepository } from '../repositories/BusinessRepository.js'
@@ -172,6 +190,7 @@ import type { BusinessSearchParams } from '@business/types/search.js'
 ```
 
 ### Example 2: Cross-Package Import
+
 ```typescript
 // ❌ BEFORE (relative or long alias)
 import { ErrorFactory } from '@pika/shared'
@@ -181,6 +200,7 @@ import { ErrorFactory } from '@shared'
 ```
 
 ### Example 3: Auth Package Import
+
 ```typescript
 // ❌ BEFORE (relative)
 import { UserService } from '../strategies/LocalAuthStrategy.js'
@@ -190,6 +210,7 @@ import { UserService } from '@auth/strategies/LocalAuthStrategy.js'
 ```
 
 ### Example 4: API Schema Import
+
 ```typescript
 // ❌ BEFORE (relative)
 import { CategoryIdParam } from '../common/parameters.js'
@@ -217,11 +238,13 @@ import { CategoryIdParam } from '@api/schemas/category/common/parameters.js'
 ## Migration Checklist (Package by Package)
 
 ### Phase 1: Update tsconfig.json
+
 - [ ] Add all missing service aliases (@user, @business, @category, etc.)
 - [ ] Remove all @pika/ prefixed aliases
 - [ ] Verify tsconfig.json compiles without errors
 
 ### Phase 2: Core Packages (Already using correct aliases)
+
 These packages are already using the correct short aliases - just verify:
 
 - [ ] **@shared** - Verify all files use @shared (not @pika/shared)
@@ -238,63 +261,75 @@ These packages are already using the correct short aliases - just verify:
 ### Phase 3: Service Packages (Need full conversion)
 
 #### Business Service
+
 - [ ] Update tsconfig to add @business alias
 - [ ] Convert ~20 files from relative imports to @business
 - [ ] Update imports in other packages from @pika/business to @business
 - [ ] Run `yarn typecheck` to verify
 
 #### Category Service
-- [ ] Update tsconfig to add @category alias
-- [ ] Convert ~15 files from relative imports to @category
-- [ ] Update imports in other packages from @pika/category to @category
-- [ ] Run `yarn typecheck` to verify
+
+- [x] Update tsconfig to add @category alias ✅
+- [x] Convert ~15 files from relative imports to @category ✅
+- [x] Update imports in other packages from @pika/category to @category ✅
+- [x] Run `yarn typecheck` to verify ✅
 
 #### Communication Service
+
 - [ ] Update imports from @pika/communication to @communication
 - [ ] Convert ~25 files from relative imports to @communication
 - [ ] Run `yarn typecheck` to verify
 
 #### User Service
+
 - [ ] Update imports from @pika/user to @user
 - [ ] Convert all files from relative imports to @user
 - [ ] Run `yarn typecheck` to verify
 
 #### Payment Service
+
 - [ ] Update imports from @pika/payment to @payment
 - [ ] Convert all files from relative imports to @payment
 - [ ] Run `yarn typecheck` to verify
 
 #### Storage Service
+
 - [ ] Update imports from @pika/storage to @storage
 - [ ] Convert all files from relative imports to @storage
 - [ ] Run `yarn typecheck` to verify
 
 #### Subscription Service
+
 - [ ] Update imports from @pika/subscription to @subscription
 - [ ] Convert all files from relative imports to @subscription
 - [ ] Run `yarn typecheck` to verify
 
 #### Support Service
+
 - [ ] Update imports from @pika/support to @support
 - [ ] Convert all files from relative imports to @support
 - [ ] Run `yarn typecheck` to verify
 
 #### PDF Service
+
 - [ ] Update tsconfig to add @pdf alias
 - [ ] Convert ~20 files from relative imports to @pdf
 - [ ] Run `yarn typecheck` to verify
 
 #### Voucher Service
+
 - [ ] Update tsconfig to add @voucher alias
 - [ ] Convert ~25 files from relative imports to @voucher
 - [ ] Run `yarn typecheck` to verify
 
 #### Auth Service (different from @auth package)
+
 - [ ] Update imports from @pika/auth-service to @auth-service
 - [ ] Convert all files from relative imports to @auth-service
 - [ ] Run `yarn typecheck` to verify
 
 ### Phase 4: Cross-Package Import Updates
+
 After each service is migrated, update imports in other packages:
 
 - [ ] API Gateway - Update service imports
@@ -302,6 +337,7 @@ After each service is migrated, update imports in other packages:
 - [ ] Test files - Update any cross-service test imports
 
 ### Phase 5: Final Verification
+
 - [ ] Run `yarn typecheck` on entire project
 - [ ] Run `yarn lint` to ensure no issues
 - [ ] Run `yarn test` to ensure nothing broke

@@ -1,5 +1,3 @@
-import type { Category } from '@prisma/client'
-
 import type {
   Category as CategoryDomain,
   CategorySearchParams,
@@ -7,7 +5,8 @@ import type {
   PaginatedResult,
   UpdateCategoryData,
   ValidationResult,
-} from '../types/interfaces.js'
+} from '@category/types/interfaces.js'
+import type { Category } from '@prisma/client'
 
 /**
  * Interface representing a database Category document

@@ -24,6 +24,12 @@ vi.mock('@pika/shared', async () => {
 })
 // --- END MOCKING CONFIGURATION ---
 
+import { createCategoryServer } from '@category/server.js'
+import {
+  cleanupCategoryTestData,
+  createSharedCategoryTestData,
+  type SharedCategoryTestData,
+} from '@category/test/helpers/categoryTestHelpers.js'
 import { SERVICE_API_KEY } from '@pika/environment'
 import { logger } from '@pika/shared'
 import {
@@ -37,13 +43,6 @@ import { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createCategoryServer } from '../../../server.js'
-import {
-  cleanupCategoryTestData,
-  createSharedCategoryTestData,
-  type SharedCategoryTestData,
-} from '../../helpers/categoryTestHelpers.js'
 
 describe('Internal Category Integration Tests', () => {
   let testDb: TestDatabaseResult
