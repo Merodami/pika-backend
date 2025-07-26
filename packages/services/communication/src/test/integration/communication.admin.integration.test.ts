@@ -179,7 +179,7 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
       })
 
       it.skip('should support metadata in global notifications', async () => {
-        const response = await adminClient
+        await adminClient
           .post('/notifications/global')
           .send({
             title: 'New Feature Released',

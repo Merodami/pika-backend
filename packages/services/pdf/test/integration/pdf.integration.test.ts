@@ -43,7 +43,6 @@ describe('PDF Service - Public API Integration Tests', () => {
 
   // Authenticated clients for different user types
   let customerClient: AuthenticatedRequestClient
-  let businessClient: AuthenticatedRequestClient
 
   // Note: Using helper from pdfTestHelpers.js
 
@@ -82,7 +81,6 @@ describe('PDF Service - Public API Integration Tests', () => {
 
     // Get authenticated clients for different user types
     customerClient = await authHelper.getUserClient(testDb.prisma)
-    businessClient = await authHelper.getBusinessClient(testDb.prisma)
 
     logger.debug('E2E authentication setup complete')
   }, 120000)

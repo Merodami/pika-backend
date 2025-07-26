@@ -51,6 +51,7 @@ export abstract class BaseFileStorage {
 
     // Validate extension matches MIME type
     const ext = path.extname(file.filename).toLowerCase()
+
     this.validateFileExtension(ext, file.mimetype)
 
     // Check file type
@@ -68,6 +69,7 @@ export abstract class BaseFileStorage {
     // Check file size
     if (maxSize && file.size > maxSize) {
       const maxSizeMB = Math.round(maxSize / (1024 * 1024))
+
       throw ErrorFactory.validationError(
         {
           file: [`File too large. Maximum size is ${maxSizeMB}MB`],
@@ -111,6 +113,7 @@ export abstract class BaseFileStorage {
    */
   protected getThumbnailFilename(filename: string): string {
     const fileNameParts = path.parse(filename)
+
     return `${fileNameParts.name}_thumb${fileNameParts.ext}`
   }
 
@@ -150,6 +153,7 @@ export abstract class BaseFileStorage {
     const basename = path.basename(filename)
     // Remove special characters
     const sanitized = basename.replace(/[^a-zA-Z0-9_.-]/g, '_')
+
     // Ensure filename is not too long
     return sanitized.substring(0, 255)
   }

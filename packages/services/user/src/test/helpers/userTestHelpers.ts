@@ -30,6 +30,7 @@ function generateUserStatus(
   if (generateInactive && index % 2 === 0) {
     return UserStatus.SUSPENDED
   }
+
   return UserStatus.ACTIVE
 }
 
@@ -226,9 +227,11 @@ function createTestUserWithRole(role: UserRole, defaultEmailVerified = true) {
     const defaults: Partial<Parameters<typeof createTestUser>[1]> = {
       role,
     }
+
     if (defaultEmailVerified && role !== UserRole.CUSTOMER) {
       defaults.emailVerified = true
     }
+
     return createTestUser(prismaClient, {
       ...defaults,
       ...options,

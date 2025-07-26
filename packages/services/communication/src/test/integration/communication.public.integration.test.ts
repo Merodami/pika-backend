@@ -36,7 +36,6 @@ describe('Communication Service - Public API Integration Tests', () => {
   let cacheService: MemoryCacheService
   let customerClient: AuthenticatedRequestClient
   let regularUserId: string
-  let sharedTestData: any
 
   beforeAll(async () => {
     logger.info(
@@ -74,7 +73,7 @@ describe('Communication Service - Public API Integration Tests', () => {
 
     regularUserId = regularUser!.id
 
-    sharedTestData = await createSharedCommunicationTestData(testDb.prisma, {
+    await createSharedCommunicationTestData(testDb.prisma, {
       userCount: 2,
       emailCount: 4,
       notificationCount: 4,

@@ -429,10 +429,8 @@ export class CategoryRepository implements ICategoryRepository {
         orderBy: { level: 'asc' },
       })
 
-      return categories.map((category) =>
-        CategoryMapper.fromDocument(
-          CategoryMapper.fromPrismaCategory(category),
-        ),
+      return categories.map((cat) =>
+        CategoryMapper.fromDocument(CategoryMapper.fromPrismaCategory(cat)),
       )
     } catch (error) {
       logger.error('Error in CategoryRepository.getPath:', error)

@@ -143,7 +143,7 @@ export class VoucherBookService implements IVoucherBookService {
       if (existingBooks.length > 0) {
         throw ErrorFactory.resourceConflict(
           'VoucherBook',
-          `A voucher book with title "${data.title}" already exists for ${data.year}${data.month ? `/${data.month}` : ''}`,
+          `A voucher book with title "${data.title}" already exists for ${data.year}${data.month ? '/' + data.month : ''}`,
         )
       }
 

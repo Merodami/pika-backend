@@ -16,9 +16,7 @@ import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
-  createE2EAuthHelper,
   createTestDatabase,
-  E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
 import { UserRole } from '@pika/types'
@@ -39,7 +37,6 @@ describe('Auth Login Integration Tests', () => {
   let app: Express
   let request: supertest.SuperTest<supertest.Test>
   let cacheService: MemoryCacheService
-  let authHelper: E2EAuthHelper
 
   // Shared test data created once
   let sharedTestData: SharedAuthTestData
@@ -77,7 +74,6 @@ describe('Auth Login Integration Tests', () => {
     request = supertest(app)
 
     // Initialize E2E Authentication Helper
-    authHelper = createE2EAuthHelper(app)
 
     // Create shared test data once for all tests
     logger.debug('Creating shared test data...')

@@ -72,7 +72,6 @@ describe('User Service - Admin API Integration Tests', () => {
   // Authenticated clients for different user types
   let adminClient: AuthenticatedRequestClient
   let customerClient: AuthenticatedRequestClient
-  let businessClient: AuthenticatedRequestClient
 
   // Shared test data created once
   let sharedTestData: SharedUserTestData
@@ -130,7 +129,6 @@ describe('User Service - Admin API Integration Tests', () => {
     // Get authenticated clients for different user types
     adminClient = await authHelper.getAdminClient(testDb.prisma)
     customerClient = await authHelper.getUserClient(testDb.prisma)
-    businessClient = await authHelper.getBusinessClient(testDb.prisma)
 
     logger.debug('E2E authentication setup complete')
 
