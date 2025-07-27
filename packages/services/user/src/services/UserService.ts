@@ -27,8 +27,8 @@ import { randomInt } from 'crypto'
 import type {
   IUserRepository,
   UserSearchParams,
-} from '../repositories/UserRepository.js'
-import type { IInternalUserService } from './InternalUserService.js'
+} from '@user/repositories/UserRepository.js'
+import type { IInternalUserService } from '@user/services/InternalUserService.js'
 
 // Unified verification system using proper enums
 export interface VerificationRequest {

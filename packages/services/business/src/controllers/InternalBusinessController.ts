@@ -9,7 +9,7 @@ import { BusinessMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IBusinessService } from '../services/BusinessService.js'
+import type { IBusinessService } from '@business/services/BusinessService.js'
 
 /**
  * Handles internal business operations for service-to-service communication

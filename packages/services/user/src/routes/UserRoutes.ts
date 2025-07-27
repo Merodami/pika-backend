@@ -12,10 +12,10 @@ import { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
-import { UserController } from '../controllers/UserController.js'
-import { UserRepository } from '../repositories/UserRepository.js'
-import { InternalUserService } from '../services/InternalUserService.js'
-import { UserService } from '../services/UserService.js'
+import { UserController } from '@user/controllers/UserController.js'
+import { UserRepository } from '@user/repositories/UserRepository.js'
+import { InternalUserService } from '@user/services/InternalUserService.js'
+import { UserService } from '@user/services/UserService.js'
 
 // User route definitions for Pika gym platform
 

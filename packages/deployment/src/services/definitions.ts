@@ -4,7 +4,7 @@ import { createPaymentServer } from '@pika/payment'
 import { createStorageServer } from '@pika/storage'
 import { createSubscriptionServer } from '@pika/subscription'
 import { createSupportServer } from '@pika/support'
-import { createUserServer } from '@pika/user'
+import { createUserServer } from '@user/server.js'
 
 import type { ServiceDefinition, ServiceDependencies } from '../types/index.js'
 

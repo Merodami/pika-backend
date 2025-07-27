@@ -10,9 +10,9 @@ import type { TranslationClient } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
-import { InternalBusinessController } from '../controllers/InternalBusinessController.js'
-import { BusinessRepository } from '../repositories/BusinessRepository.js'
-import { BusinessService } from '../services/BusinessService.js'
+import { InternalBusinessController } from '@business/controllers/InternalBusinessController.js'
+import { BusinessRepository } from '@business/repositories/BusinessRepository.js'
+import { BusinessService } from '@business/services/BusinessService.js'
 
 /**
  * Creates internal business routes for service-to-service communication

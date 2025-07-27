@@ -11,10 +11,10 @@ import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 import multer from 'multer'
 
-import { AdminUserController } from '../controllers/AdminUserController.js'
-import { UserRepository } from '../repositories/UserRepository.js'
-import { InternalUserService } from '../services/InternalUserService.js'
-import { UserService } from '../services/UserService.js'
+import { AdminUserController } from '@user/controllers/AdminUserController.js'
+import { UserRepository } from '@user/repositories/UserRepository.js'
+import { InternalUserService } from '@user/services/InternalUserService.js'
+import { UserService } from '@user/services/UserService.js'
 
 export function createAdminUserRouter(
   prisma: PrismaClient,

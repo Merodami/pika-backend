@@ -3,7 +3,7 @@ import { validateResponse } from '@pika/http'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IInternalUserService } from '../services/InternalUserService.js'
+import type { IInternalUserService } from '@user/services/InternalUserService.js'
 
 /**
  * Handles internal user operations for service-to-service communication

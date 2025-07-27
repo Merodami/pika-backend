@@ -11,7 +11,7 @@ import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IBusinessService } from '../services/BusinessService.js'
+import type { IBusinessService } from '@business/services/BusinessService.js'
 
 /**
  * Handles public business operations

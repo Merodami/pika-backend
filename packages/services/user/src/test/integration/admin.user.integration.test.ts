@@ -45,12 +45,12 @@ import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { createUserServer } from '../../server.js'
+import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,
   seedTestUsers,
   type SharedUserTestData,
-} from '../helpers/userTestHelpers.js'
+} from '@user/test/helpers/userTestHelpers.js'
 
 interface FileStoragePort {
   saveFile: (

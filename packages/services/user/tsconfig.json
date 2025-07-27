@@ -7,6 +7,7 @@
     "tsBuildInfoFile": "dist/.tsbuildinfo",
     "baseUrl": ".",
     "paths": {
+      "@user/*": ["src/*"],
       "@user-read/*": ["src/read/*"],
       "@user-write/*": ["src/write/*"]
     }

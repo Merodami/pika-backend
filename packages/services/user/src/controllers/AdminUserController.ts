@@ -3,7 +3,7 @@ import { adaptMulterFile, RequestContext, validateResponse } from '@pika/http'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IUserService } from '../services/UserService.js'
+import type { IUserService } from '@user/services/UserService.js'
 
 /**
  * Handles admin user management operations

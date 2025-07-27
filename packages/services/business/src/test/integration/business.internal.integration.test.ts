@@ -29,12 +29,12 @@ import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { createBusinessServer } from '../../server.js'
+import { createBusinessServer } from '@business/server.js'
 import {
   createSharedBusinessTestData,
   seedTestBusinesses,
   type SharedBusinessTestData,
-} from '../helpers/businessTestHelpers.js'
+} from '@business/test/helpers/businessTestHelpers.js'
 
 // Note: Using shared helper from businessTestHelpers.js
 

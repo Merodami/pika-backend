@@ -13,7 +13,7 @@ import { ErrorFactory } from '@pika/shared'
 import { UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
-import type { IUserService } from '../services/UserService.js'
+import type { IUserService } from '@user/services/UserService.js'
 
 /**
  * Handles user management operations

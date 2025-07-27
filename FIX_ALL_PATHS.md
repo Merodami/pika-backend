@@ -262,10 +262,10 @@ These packages are already using the correct short aliases - just verify:
 
 #### Business Service
 
-- [ ] Update tsconfig to add @business alias
-- [ ] Convert ~20 files from relative imports to @business
-- [ ] Update imports in other packages from @pika/business to @business
-- [ ] Run `yarn typecheck` to verify
+- [x] Update tsconfig to add @business alias ✅
+- [x] Convert ~20 files from relative imports to @business ✅
+- [x] Update imports in other packages from @pika/business to @business ✅
+- [x] Run `yarn typecheck` to verify ✅
 
 #### Category Service
 

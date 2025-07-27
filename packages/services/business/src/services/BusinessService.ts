@@ -10,8 +10,8 @@ import type {
   CreateBusinessData,
   IBusinessRepository,
   UpdateBusinessData,
-} from '../repositories/BusinessRepository.js'
-import type { BusinessSearchParams } from '../types/search.js'
+} from '@business/repositories/BusinessRepository.js'
+import type { BusinessSearchParams } from '@business/types/search.js'
 
 export interface IBusinessService {
   getAllBusinesses(

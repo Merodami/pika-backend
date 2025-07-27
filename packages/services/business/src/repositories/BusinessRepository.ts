@@ -5,7 +5,7 @@ import { ErrorFactory, ErrorSeverity, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import { Prisma, type PrismaClient } from '@prisma/client'
 
-import type { BusinessSearchParams } from '../types/search.js'
+import type { BusinessSearchParams } from '@business/types/search.js'
 
 export interface IBusinessRepository {
   findAll(
