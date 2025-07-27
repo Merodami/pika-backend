@@ -7,14 +7,13 @@ import {
 import { SubscriptionMapper, SubscriptionPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { BillingInterval, SubscriptionStatus } from '@pika/types'
-import type { NextFunction, Request, Response } from 'express'
-
-import type { IPlanService } from '../services/PlanService.js'
-import type { ISubscriptionService } from '../services/SubscriptionService.js'
+import type { IPlanService } from '@subscription/services/PlanService.js'
+import type { ISubscriptionService } from '@subscription/services/SubscriptionService.js'
 import type {
   AdminSubscriptionSearchParams,
   PlanSearchParams,
-} from '../types/search.js'
+} from '@subscription/types/search.js'
+import type { NextFunction, Request, Response } from 'express'
 
 export class AdminSubscriptionController {
   constructor(

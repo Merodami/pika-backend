@@ -40,11 +40,10 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
+import { createStorageServer } from '@storage/server.js'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createStorageServer } from '../../../server.js'
 
 describe('Storage API Integration Tests', () => {
   let testDb: TestDatabaseResult

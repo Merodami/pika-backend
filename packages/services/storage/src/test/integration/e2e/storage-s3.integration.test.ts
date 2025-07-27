@@ -21,6 +21,7 @@ import {
   S3TestHelper,
 } from '@pika/tests'
 import { FileStatus, StorageProvider } from '@pika/types'
+import { createStorageServer } from '@storage/server.js'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
@@ -38,8 +39,6 @@ import {
   expect,
   it,
 } from 'vitest'
-
-import { createStorageServer } from '../../../server.js'
 
 describe('Storage Service with S3/MinIO Integration Tests', () => {
   let testDb: TestDatabaseResult

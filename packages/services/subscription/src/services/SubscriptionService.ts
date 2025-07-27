@@ -17,13 +17,15 @@ import {
 } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
-
-import type { IPlanRepository } from '../repositories/PlanRepository.js'
+import type { IPlanRepository } from '@subscription/repositories/PlanRepository.js'
 import type {
   ISubscriptionRepository,
   SubscriptionSearchParams,
-} from '../repositories/SubscriptionRepository.js'
-import { CACHE_TTL_MULTIPLIERS, TEMPLATE_KEYS } from '../types/constants.js'
+} from '@subscription/repositories/SubscriptionRepository.js'
+import {
+  CACHE_TTL_MULTIPLIERS,
+  TEMPLATE_KEYS,
+} from '@subscription/types/constants.js'
 
 export interface ISubscriptionService {
   createSubscription(

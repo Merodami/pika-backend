@@ -10,15 +10,14 @@ type RevokeTokenRequest = z.infer<typeof authPublic.RevokeTokenRequest>
 type TokenRequest = z.infer<typeof authPublic.TokenRequest>
 type VerifyEmailRequest = z.infer<typeof authPublic.VerifyEmailRequest>
 
+import { AuthMapper } from '@auth-service/mappers/AuthMapper.js'
+import type { IAuthService } from '@auth-service/services/AuthService.js'
 import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import { mapRoleToPermissions, UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
-
-import { AuthMapper } from '../mappers/AuthMapper.js'
-import type { IAuthService } from '../services/AuthService.js'
 
 /**
  * Handles authentication-related operations

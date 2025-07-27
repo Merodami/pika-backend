@@ -1,3 +1,11 @@
+import { InternalCommunicationController } from '@communication/controllers/InternalCommunicationController.js'
+import { CommunicationLogRepository } from '@communication/repositories/CommunicationLogRepository.js'
+import { NotificationRepository } from '@communication/repositories/NotificationRepository.js'
+import {
+  type EmailConfig,
+  EmailService,
+} from '@communication/services/EmailService.js'
+import { NotificationService } from '@communication/services/NotificationService.js'
 import {
   BatchCreateNotificationsRequest,
   BulkEmailRequest,
@@ -10,12 +18,6 @@ import { requireServiceAuth, validateBody } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
-
-import { InternalCommunicationController } from '../controllers/InternalCommunicationController.js'
-import { CommunicationLogRepository } from '../repositories/CommunicationLogRepository.js'
-import { NotificationRepository } from '../repositories/NotificationRepository.js'
-import { type EmailConfig, EmailService } from '../services/EmailService.js'
-import { NotificationService } from '../services/NotificationService.js'
 
 /**
  * Internal API routes for service-to-service communication

@@ -1,3 +1,5 @@
+import { ProductController } from '@payment/controllers/ProductController.js'
+import type { IProductService } from '@payment/services/ProductService.js'
 import { paymentPublic } from '@pika/api'
 import {
   requireServiceAuth,
@@ -6,9 +8,6 @@ import {
   validateQuery,
 } from '@pika/http'
 import { Router } from 'express'
-
-import { ProductController } from '../controllers/ProductController.js'
-import type { IProductService } from '../services/ProductService.js'
 
 export function createProductRouter(productService: IProductService): Router {
   const router = Router()

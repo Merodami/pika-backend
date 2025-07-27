@@ -9,9 +9,8 @@ import {
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { FileStorageLogMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
+import type { IStorageService } from '@storage/services/StorageService.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { IStorageService } from '../services/StorageService.js'
 
 export interface IFileController {
   uploadFile(

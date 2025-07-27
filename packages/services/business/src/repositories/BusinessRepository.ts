@@ -1,11 +1,10 @@
+import type { BusinessSearchParams } from '@business/types/search.js'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { type BusinessDomain, BusinessMapper } from '@pika/sdk'
 import { ErrorFactory, ErrorSeverity, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import { Prisma, type PrismaClient } from '@prisma/client'
-
-import type { BusinessSearchParams } from '@business/types/search.js'
 
 export interface IBusinessRepository {
   findAll(

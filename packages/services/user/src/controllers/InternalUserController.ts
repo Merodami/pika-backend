@@ -1,9 +1,8 @@
 import { userInternal } from '@pika/api'
 import { validateResponse } from '@pika/http'
 import { ErrorFactory } from '@pika/shared'
-import type { NextFunction, Request, Response } from 'express'
-
 import type { IInternalUserService } from '@user/services/InternalUserService.js'
+import type { NextFunction, Request, Response } from 'express'
 
 /**
  * Handles internal user operations for service-to-service communication

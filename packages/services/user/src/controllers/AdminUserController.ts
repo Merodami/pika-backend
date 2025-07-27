@@ -1,9 +1,8 @@
 import { userAdmin, userPublic } from '@pika/api'
 import { adaptMulterFile, RequestContext, validateResponse } from '@pika/http'
 import { ErrorFactory } from '@pika/shared'
-import type { NextFunction, Request, Response } from 'express'
-
 import type { IUserService } from '@user/services/UserService.js'
+import type { NextFunction, Request, Response } from 'express'
 
 /**
  * Handles admin user management operations

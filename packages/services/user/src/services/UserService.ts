@@ -21,14 +21,13 @@ import {
   UserStatus,
   VerificationType,
 } from '@pika/types'
-import bcrypt from 'bcrypt'
-import { randomInt } from 'crypto'
-
 import type {
   IUserRepository,
   UserSearchParams,
 } from '@user/repositories/UserRepository.js'
 import type { IInternalUserService } from '@user/services/InternalUserService.js'
+import bcrypt from 'bcrypt'
+import { randomInt } from 'crypto'
 
 // Unified verification system using proper enums
 export interface VerificationRequest {

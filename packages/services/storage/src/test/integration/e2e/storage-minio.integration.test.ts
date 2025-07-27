@@ -33,6 +33,7 @@ import {
   type TestDatabaseResult,
 } from '@pika/tests'
 import { FileStatus, StorageProvider } from '@pika/types'
+import { createStorageServer } from '@storage/server.js'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import {
@@ -44,8 +45,6 @@ import {
   expect,
   it,
 } from 'vitest'
-
-import { createStorageServer } from '../../../server.js'
 
 describe('Storage Service with MinIO Integration Tests', () => {
   let testDb: TestDatabaseResult

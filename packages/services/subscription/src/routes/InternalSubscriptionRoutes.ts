@@ -3,12 +3,11 @@ import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
+import { InternalSubscriptionController } from '@subscription/controllers/InternalSubscriptionController.js'
+import { PlanRepository } from '@subscription/repositories/PlanRepository.js'
+import { SubscriptionRepository } from '@subscription/repositories/SubscriptionRepository.js'
+import { SubscriptionService } from '@subscription/services/SubscriptionService.js'
 import { Router } from 'express'
-
-import { InternalSubscriptionController } from '../controllers/InternalSubscriptionController.js'
-import { PlanRepository } from '../repositories/PlanRepository.js'
-import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
-import { SubscriptionService } from '../services/SubscriptionService.js'
 
 export function createInternalSubscriptionRouter(
   prisma: PrismaClient,

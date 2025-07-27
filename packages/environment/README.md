@@ -1,6 +1,13 @@
-# Environment Package
+# 🌍 @pika/environment - Type-Safe Configuration Management
 
-Centralized environment variable management and configuration for the Pika platform, providing type-safe access to all environment settings.
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue?logo=typescript)
+![dotenv](https://img.shields.io/badge/dotenv-17.2.1-yellow)
+![Status](https://img.shields.io/badge/Status-Production-success)
+![Zero Dependencies](https://img.shields.io/badge/Core_Dependencies-3-green)
+
+## 🎯 Purpose & Vision
+
+The Environment package serves as the **centralized configuration hub** for the entire Pika platform. It provides type-safe access to all environment variables, standardized parsers, intelligent defaults, and automatic validation. This ensures consistent configuration management across all microservices while preventing runtime configuration errors.
 
 ## 🚀 Quick Start
 
@@ -11,249 +18,445 @@ yarn install
 # Build the package
 yarn nx run @pika/environment:build
 
-# Test configuration
-yarn nx run @pikant:test
+# Run tests
+yarn nx run @pika/environment:test
+
+# Validate configuration
+yarn nx run @pika/environment:validate
 ```
 
 ## 📋 Overview
 
-The Environment package manages all configuration and environment variables for the Pika platform:
+The Environment package is an enterprise-grade configuration management system that:
 
-- **Type-Safe Configuration**: TypeScript interfaces for all environment variables
-- **Validation**: Runtime validation of required configuration
-- **Default Values**: Sensible defaults for development
-- **Environment Loading**: Automatic .env file loading
-- **Service Configuration**: Pre-configured settings for all services
-- **Feature Flags**: Environment-based feature toggles
+- **Provides Type Safety**: Full TypeScript support for all configuration values
+- **Validates at Runtime**: Ensures required variables exist with proper types
+- **Supports Multiple Environments**: Development, staging, production configs
+- **Offers Smart Defaults**: Sensible development defaults for rapid setup
+- **Enables Feature Flags**: Environment-based feature toggles
+- **Centralizes Service Config**: All service ports, URLs, and settings
+- **Parses Complex Types**: Automatic parsing of numbers, booleans, arrays
+- **Handles Cloud Config**: Support for cloud provider URL formats (Redis, etc.)
+
+### Key Features
+
+- 🔐 **Security First**: JWT, API keys, and secrets management
+- 🌐 **Service Discovery**: All microservice URLs and ports
+- 📊 **Infrastructure Config**: Database, Redis, AWS, Stripe settings
+- 🚀 **Zero Config Development**: Works out-of-box with defaults
+- 🔄 **Hot Reload Support**: Automatic .env file detection
+- 📝 **Comprehensive Types**: Every variable is properly typed
+- 🛡️ **Validation Layer**: Fail fast on missing critical config
+- 🌍 **i18n Support**: Default language and supported locales
 
 ## 🏗️ Architecture
 
+### Package Structure
+
 ```
 src/
-├── constants/             # Configuration constants
+├── constants/             # Organized configuration modules
 │   ├── apiGateway.ts     # API Gateway settings
 │   ├── apiUrls.ts        # Service URL configuration
 │   ├── appInfo.ts        # Application metadata
-│   ├── auth.ts           # Authentication settings
-│   ├── aws.ts            # AWS configuration
-│   ├── communication.ts  # Communication settings
-│   ├── database.ts       # Database configuration
-│   ├── email.ts          # Email provider settings
+│   ├── auth.ts           # Authentication (JWT, API keys)
+│   ├── aws.ts            # AWS services configuration
+│   ├── communication.ts  # Email/SMS providers
+│   ├── currency.ts       # Currency settings
+│   ├── database.ts       # PostgreSQL configuration
+│   ├── email.ts          # Email service settings
 │   ├── features.ts       # Feature flags
 │   ├── geolocation.ts    # Location services
-│   ├── healthCheck.ts    # Health check settings
-│   ├── monitoring.ts     # Monitoring configuration
-│   ├── node.ts           # Node.js settings
-│   ├── pagination.ts     # Pagination defaults
-│   ├── rateLimiting.ts   # Rate limiting settings
-│   ├── redis.ts          # Redis configuration
-│   ├── seed.ts           # Database seeding
-│   ├── service.ts        # Service configuration
+│   ├── healthCheck.ts    # Health check intervals
+│   ├── monitoring.ts     # Telemetry configuration
+│   ├── node.ts           # Node.js runtime settings
+│   ├── pagination.ts     # Default pagination values
+│   ├── rateLimiting.ts   # Rate limit configuration
+│   ├── redis.ts          # Redis cache settings
+│   ├── seed.ts           # Database seeding config
+│   ├── service.ts        # All service ports/hosts
 │   ├── stripe.ts         # Payment processing
-│   └── testIds.ts        # Test user IDs
-├── getEnvVariable.ts      # Environment variable getter
-├── loadEnv.ts            # Environment file loader
-├── parsers.ts            # Type parsers and validators
+│   ├── testIds.ts        # Test data identifiers
+│   └── index.ts          # Module exports
+├── getEnvVariable.ts      # Core environment getter
+├── loadEnv.ts            # .env file loader
+├── parsers.ts            # Type parsing utilities
 ├── version.ts            # Version information
 └── index.ts              # Package exports
 ```
 
-## 🔧 Usage
+### Configuration Flow
 
-### Basic Configuration Access
+```mermaid
+graph LR
+    A[.env Files] --> B[loadEnv]
+    B --> C[getEnvVariable]
+    C --> D[Type Parsers]
+    D --> E[Validated Config]
+    E --> F[Service Import]
 
-```typescript
-import { DATABASE_CONFIG, REDIS_CONFIG, AUTH_CONFIG, SERVICE_PORTS } from '@pikant'
-
-// Database configuration
-const dbUrl = DATABASE_CONFIG.url
-const dbPoolSize = DATABASE_CONFIG.connectionLimit
-
-// Redis configuration
-const redisHost = REDIS_CONFIG.host
-const redisPort = REDIS_CONFIG.port
-
-// Service ports
-const userServicePort = SERVICE_PORTS.USER_SERVICE
-const authServicePort = SERVICE_PORTS.AUTH_SERVICE
+    G[process.env] --> C
+    H[Default Values] --> C
 ```
 
-### Environment Variable Validation
+## 🔧 Core Utilities
+
+### Environment Variable Getter
 
 ```typescript
-import { getEnvVariable } from '@pikant'
+// Core function with type safety
+export function getEnvVariable<T>(key: string, parser: (value: string) => T = String as any, defaultValue?: T): T {
+  const value = process.env[key]
 
-// Required environment variable
-const jwtSecret = getEnvVariable('JWT_SECRET')
+  if (value === undefined) {
+    if (defaultValue !== undefined) return defaultValue
+    throw new Error(`Missing required environment variable: ${key}`)
+  }
 
-// Optional with default
-const logLevel = getEnvVariable('LOG_LEVEL', 'info')
-
-// Parsed as number
-const port = parseInt(getEnvVariable('PORT', '3000'))
-
-// Parsed as boolean
-const debugMode = getEnvVariable('DEBUG', 'false') === 'true'
+  return parser(value)
+}
 ```
 
-### Feature Flags
+### Type Parsers
 
 ```typescript
-import { FEATURE_FLAGS } from '@pikant'
-
-if (FEATURE_FLAGS.SOCIAL_FEATURES_ENABLED) {
-  // Enable social functionality
+// Built-in parsers for common types
+export const parseString = (value: string): string => value
+export const parseNumber = (value: string): number => {
+  const num = Number(value)
+  if (isNaN(num)) throw new Error(`Invalid number: ${value}`)
+  return num
 }
-
-if (FEATURE_FLAGS.PAYMENT_PROCESSING_ENABLED) {
-  // Enable payment features
-}
+export const parseBoolean = (value: string): boolean => value.toLowerCase() === 'true'
+export const parseArray = (value: string): string[] => value.split(',').map((s) => s.trim())
 ```
 
 ## 📊 Configuration Categories
 
-### Core Application
+### 🔐 Authentication Configuration
 
 ```typescript
-export const APP_CONFIG = {
-  name: getEnvVariable('APP_NAME', 'Pika'),
-  version: getEnvVariable('APP_VERSION', '1.0.0'),
-  environment: getEnvVariable('NODE_ENV', 'development'),
-  port: parseInt(getEnvVariable('PORT', '3000')),
-  host: getEnvVariable('HOST', '0.0.0.0'),
-}
+// JWT Configuration with RS256 support
+export const JWT_SECRET = getEnvVariable('JWT_SECRET', String, 'dev-secret')
+export const JWT_ALGORITHM = getEnvVariable('JWT_ALGORITHM', parseString, 'RS256')
+export const JWT_PRIVATE_KEY = getEnvVariable('JWT_PRIVATE_KEY', (value) => value.replace(/\\n/g, '\n'), '')
+export const JWT_PUBLIC_KEY = getEnvVariable('JWT_PUBLIC_KEY', (value) => value.replace(/\\n/g, '\n'), '')
+
+// Token Expiry
+export const JWT_ACCESS_EXPIRY = getEnvVariable('JWT_ACCESS_EXPIRY', parseString, '15m')
+export const JWT_REFRESH_EXPIRY = getEnvVariable('JWT_REFRESH_EXPIRY', parseString, '7d')
+
+// Service-to-Service Auth
+export const SERVICE_API_KEY = getEnvVariable('SERVICE_API_KEY', parseString, 'default-service-api-key')
+export const INTERNAL_API_TOKEN = getEnvVariable('INTERNAL_API_TOKEN', String, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...')
 ```
 
-### Database Configuration
+### 🗄️ Database Configuration
 
 ```typescript
-export const DATABASE_CONFIG = {
-  url: getEnvVariable('DATABASE_URL'),
-  schema: getEnvVariable('DATABASE_SCHEMA', 'public'),
-  connectionLimit: parseInt(getEnvVariable('DATABASE_CONNECTION_LIMIT', '20')),
-  poolTimeout: parseInt(getEnvVariable('DATABASE_POOL_TIMEOUT', '20000')),
-  logging: getEnvVariable('DATABASE_LOGGING', 'false') === 'true',
-}
+export const DATABASE_URL = getEnvVariable('DATABASE_URL', parseString)
+export const DATABASE_POOL_MIN = getEnvVariable('DATABASE_POOL_MIN', parseNumber, 2)
+export const DATABASE_POOL_MAX = getEnvVariable('DATABASE_POOL_MAX', parseNumber, 10)
+export const DATABASE_IDLE_TIMEOUT = getEnvVariable('DATABASE_IDLE_TIMEOUT', parseNumber, 10000)
+export const DATABASE_CONNECT_TIMEOUT = getEnvVariable('DATABASE_CONNECT_TIMEOUT', parseNumber, 5000)
+export const DATABASE_LOGGING = getEnvVariable('DATABASE_LOGGING', parseBoolean, false)
 ```
 
-### Service URLs
+### 🚀 Redis Configuration
 
 ```typescript
+// Smart Redis URL parsing for cloud providers
+if (process.env.REDIS_URL && !process.env.REDIS_HOST) {
+  const url = new URL(process.env.REDIS_URL)
+  process.env.REDIS_HOST = url.hostname
+  process.env.REDIS_PORT = url.port || '6379'
+  if (url.password) process.env.REDIS_PASSWORD = url.password
+}
+
+export const REDIS_HOST = getEnvVariable('REDIS_HOST', parseString, 'localhost')
+export const REDIS_PORT = getEnvVariable('REDIS_PORT', parseNumber, 6380)
+export const REDIS_PASSWORD = getEnvVariable('REDIS_PASSWORD', parseString, '')
+export const REDIS_PREFIX = getEnvVariable('REDIS_PREFIX', String, 'pika:')
+export const REDIS_DEFAULT_TTL = getEnvVariable('REDIS_DEFAULT_TTL', Number, 3600)
+```
+
+### 🌐 Service Configuration
+
+```typescript
+// Service ports and hosts
+export const USER_SERVICE_PORT = getEnvVariable('USER_SERVICE_PORT', parseNumber, 5501)
+export const AUTH_SERVICE_PORT = getEnvVariable('AUTH_SERVICE_PORT', parseNumber, 5502)
+export const PAYMENT_SERVICE_PORT = getEnvVariable('PAYMENT_SERVICE_PORT', parseNumber, 5505)
+export const BUSINESS_SERVICE_PORT = getEnvVariable('BUSINESS_SERVICE_PORT', parseNumber, 5511)
+export const CATEGORY_SERVICE_PORT = getEnvVariable('CATEGORY_SERVICE_PORT', parseNumber, 5512)
+export const VOUCHER_SERVICE_PORT = getEnvVariable('VOUCHER_SERVICE_PORT', parseNumber, 5514)
+
+// Service URLs (computed from host/port)
 export const SERVICE_URLS = {
-  AUTH_SERVICE: getEnvVariable('AUTH_SERVICE_URL', 'http://localhost:5502'),
-  USER_SERVICE: getEnvVariable('USER_SERVICE_URL', 'http://localhost:5501'),
-  GYM_SERVICE: getEnvVariable('GYM_SERVICE_URL', 'http://localhost:5503'),
-  SESSION_SERVICE: getEnvVariable('SESSION_SERVICE_URL', 'http://localhost:5504'),
-  PAYMENT_SERVICE: getEnvVariable('PAYMENT_SERVICE_URL', 'http://localhost:5505'),
+  USER: `http://${USER_SERVICE_HOST}:${USER_SERVICE_PORT}`,
+  AUTH: `http://${AUTH_SERVICE_HOST}:${AUTH_SERVICE_PORT}`,
+  PAYMENT: `http://${PAYMENT_SERVICE_HOST}:${PAYMENT_SERVICE_PORT}`,
+  // ... etc
+}
+
+// i18n Configuration
+export const DEFAULT_LANGUAGE = getEnvVariable('DEFAULT_LANGUAGE', String, 'es')
+export const SUPPORTED_LANGUAGES = ['es', 'en', 'gn'] as const
+```
+
+### 💳 Payment Configuration (Stripe)
+
+```typescript
+export const STRIPE_SECRET_KEY = getEnvVariable('STRIPE_SECRET_KEY', parseString, '')
+export const STRIPE_WEBHOOK_SECRET = getEnvVariable('STRIPE_WEBHOOK_SECRET', parseString, '')
+export const STRIPE_API_VERSION = getEnvVariable('STRIPE_API_VERSION', parseString, '2025-01-27')
+export const STRIPE_WEBHOOK_TOLERANCE = getEnvVariable('STRIPE_WEBHOOK_TOLERANCE', parseNumber, 300)
+```
+
+### 🚩 Feature Flags
+
+```typescript
+export const FEATURE_FLAGS = {
+  VOUCHER_SYSTEM_ENABLED: getEnvVariable('FEATURE_VOUCHER_SYSTEM', parseBoolean, true),
+  PAYMENT_PROCESSING_ENABLED: getEnvVariable('FEATURE_PAYMENTS', parseBoolean, true),
+  MULTI_LANGUAGE_ENABLED: getEnvVariable('FEATURE_MULTI_LANG', parseBoolean, true),
+  GEOLOCATION_ENABLED: getEnvVariable('FEATURE_GEOLOCATION', parseBoolean, false),
+  ANALYTICS_ENABLED: getEnvVariable('FEATURE_ANALYTICS', parseBoolean, true),
+  PDF_GENERATION_ENABLED: getEnvVariable('FEATURE_PDF', parseBoolean, true),
+}
+```
+
+## 🔌 Usage Examples
+
+### Basic Import and Usage
+
+```typescript
+import { DATABASE_URL, REDIS_HOST, REDIS_PORT, JWT_SECRET, SERVICE_URLS, FEATURE_FLAGS, DEFAULT_LANGUAGE } from '@pika/environment'
+
+// Direct usage
+const prisma = new PrismaClient({ datasourceUrl: DATABASE_URL })
+const redis = new Redis({ host: REDIS_HOST, port: REDIS_PORT })
+
+// Feature flag checking
+if (FEATURE_FLAGS.VOUCHER_SYSTEM_ENABLED) {
+  app.use('/vouchers', voucherRoutes)
+}
+
+// Service communication
+const userServiceClient = new UserServiceClient(SERVICE_URLS.USER)
+```
+
+### Custom Environment Variables
+
+```typescript
+import { getEnvVariable, parseNumber, parseArray } from '@pika/environment'
+
+// Custom parsing
+const customTimeout = getEnvVariable('CUSTOM_TIMEOUT', parseNumber, 5000)
+const allowedOrigins = getEnvVariable('ALLOWED_ORIGINS', parseArray, ['http://localhost:3000'])
+
+// Complex parsing
+const complexConfig = getEnvVariable(
+  'COMPLEX_CONFIG',
+  (value) => {
+    return JSON.parse(value)
+  },
+  { default: 'config' },
+)
+```
+
+### Environment Validation
+
+```typescript
+// Validate all required variables on startup
+import { validateEnvironment } from '@pika/environment'
+
+const validation = validateEnvironment()
+if (!validation.isValid) {
+  console.error('❌ Missing environment variables:', validation.missing)
+  console.error('❌ Invalid environment variables:', validation.invalid)
+  process.exit(1)
 }
 ```
 
 ## 🧪 Testing
 
-```bash
-# Run configuration tests
-yarn nx run @pikant:test
+### Unit Tests
 
-# Test environment loading
-yarn test --grep "environment"
+```typescript
+describe('Environment Configuration', () => {
+  it('should parse numbers correctly', () => {
+    process.env.TEST_NUMBER = '42'
+    const value = getEnvVariable('TEST_NUMBER', parseNumber)
+    expect(value).toBe(42)
+  })
 
-# Validate required variables
-yarn test --grep "validation"
+  it('should use defaults when variable missing', () => {
+    delete process.env.TEST_MISSING
+    const value = getEnvVariable('TEST_MISSING', String, 'default')
+    expect(value).toBe('default')
+  })
+
+  it('should throw on missing required variable', () => {
+    delete process.env.TEST_REQUIRED
+    expect(() => getEnvVariable('TEST_REQUIRED')).toThrow()
+  })
+})
 ```
 
-## 🔧 Environment Files
+### Environment File Examples
 
-### Development (.env.local)
+#### Development (.env.local)
 
 ```bash
-# Application
+# Core
 NODE_ENV=development
-APP_NAME=Pika
-PORT=5500
+LOG_LEVEL=debug
 
 # Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:6436/pika
+DATABASE_URL=postgresql://postgres:postgres@localhost:5435/pika
 DATABASE_LOGGING=true
 
 # Redis
 REDIS_HOST=localhost
-REDIS_PORT=7381
+REDIS_PORT=6380
 
-# Authentication
-JWT_SECRET=your-development-secret
-JWT_EXPIRES_IN=15m
+# Auth
+JWT_SECRET=dev-secret-change-in-production
+JWT_ACCESS_EXPIRY=15m
+JWT_REFRESH_EXPIRY=7d
+
+# Services
+USER_SERVICE_PORT=5501
+AUTH_SERVICE_PORT=5502
+BUSINESS_SERVICE_PORT=5511
+
+# Features
+FEATURE_VOUCHER_SYSTEM=true
+FEATURE_PAYMENTS=false
 ```
 
-### Production (.env)
+#### Production (.env)
 
 ```bash
-# Application
+# Core
 NODE_ENV=production
-APP_NAME=Pika
-PORT=5500
+LOG_LEVEL=info
 
-# Database
+# Database (from cloud provider)
 DATABASE_URL=${DATABASE_URL}
-DATABASE_CONNECTION_LIMIT=50
+DATABASE_POOL_MAX=50
 
-# Redis
+# Redis (from cloud provider)
 REDIS_URL=${REDIS_URL}
 
-# Authentication
-JWT_SECRET=${JWT_SECRET}
-JWT_EXPIRES_IN=15m
+# Auth (from secrets manager)
+JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+SERVICE_API_KEY=${SERVICE_API_KEY}
+
+# Stripe
+STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
 ```
 
-## 🚨 Validation & Error Handling
+## 🔒 Security Best Practices
+
+### Secret Management
+
+1. **Never commit secrets**: Use `.env.local` for local development
+2. **Use placeholders**: Production .env should reference external vars
+3. **Rotate regularly**: Implement secret rotation for API keys
+4. **Audit access**: Log access to sensitive configuration
+
+### Configuration Hierarchy
+
+```
+1. Environment Variables (highest priority)
+2. .env.local (development only)
+3. .env (base configuration)
+4. Default values in code (lowest priority)
+```
+
+## 🚨 Error Handling
+
+### Missing Required Variables
 
 ```typescript
-// Automatic validation on import
 try {
-  const config = await import('@pikant')
-  console.log('✅ Configuration loaded successfully')
+  const config = await import('@pika/environment')
 } catch (error) {
-  console.error('❌ Configuration validation failed:', error.message)
-  process.exit(1)
-}
-
-// Manual validation
-import { validateEnvironment } from '@pikant'
-
-const validationResult = validateEnvironment()
-if (!validationResult.isValid) {
-  console.error('Missing required environment variables:', validationResult.missing)
+  if (error.message.includes('Missing required environment variable')) {
+    console.error('❌ Configuration Error:', error.message)
+    console.error('💡 Tip: Copy .env.example to .env.local and fill in values')
+    process.exit(1)
+  }
+  throw error
 }
 ```
 
-## 📊 Configuration Reference
+### Invalid Variable Format
 
-### Required Variables
+```typescript
+// Parser errors provide context
+try {
+  const port = getEnvVariable('PORT', parseNumber)
+} catch (error) {
+  console.error(`❌ Invalid PORT value: ${process.env.PORT}`)
+  console.error('💡 PORT must be a valid number')
+}
+```
 
-- `DATABASE_URL` - PostgreSQL connection string
-- `JWT_SECRET` - JWT signing secret
-- `REDIS_HOST` - Redis server host
+## 📈 Performance Considerations
 
-### Optional Variables (with defaults)
+- **Singleton Pattern**: Configuration is loaded once and cached
+- **Lazy Loading**: Environment files loaded on first import
+- **Type Safety**: No runtime overhead after initial parsing
+- **Tree Shaking**: Import only needed configuration modules
 
-- `NODE_ENV` - Environment (development)
-- `PORT` - Server port (5500)
-- `LOG_LEVEL` - Logging level (info)
-- `REDIS_PORT` - Redis port (6379)
+## 🤝 Contributing
 
-### Service-Specific Variables
+### Adding New Configuration
 
-- `STRIPE_SECRET_KEY` - Payment processing
-- `AWS_ACCESS_KEY_ID` - AWS services
-- `EMAIL_PROVIDER` - Email service provider
-- `STORAGE_PROVIDER` - File storage provider
+1. **Create Module**: Add new file in `src/constants/`
+2. **Define Variables**: Use `getEnvVariable` with proper types
+3. **Export Constants**: Add to `constants/index.ts`
+4. **Document Usage**: Update this README
+5. **Add Tests**: Ensure parsers work correctly
 
-## 🔄 Future Enhancements
+### Best Practices
 
-- [ ] Configuration schema validation
-- [ ] Environment-specific overrides
-- [ ] Runtime configuration updates
-- [ ] Configuration management UI
-- [ ] Encrypted configuration values
-- [ ] Configuration versioning
-- [ ] Multi-environment deployment
-- [ ] Configuration templates
+- Use descriptive variable names
+- Always provide sensible defaults for development
+- Use appropriate parsers for type safety
+- Group related configuration together
+- Document required vs optional variables
+
+## 🔄 Migration Guide
+
+From scattered process.env usage:
+
+```typescript
+// Before
+const port = parseInt(process.env.PORT || '3000')
+const redisHost = process.env.REDIS_HOST || 'localhost'
+
+// After
+import { SERVICE_PORT, REDIS_HOST } from '@pika/environment'
+```
+
+## 📝 Changelog
+
+### Recent Updates
+
+- Added RS256 JWT support with key pair configuration
+- Implemented smart Redis URL parsing for cloud providers
+- Enhanced service configuration with all microservice ports
+- Added comprehensive type parsers
+- Implemented feature flag system
+
+---
+
+**Package Version**: 1.0.0  
+**Last Updated**: 2025-01-27  
+**Maintainer**: Platform Team

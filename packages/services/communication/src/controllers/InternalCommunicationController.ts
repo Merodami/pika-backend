@@ -1,3 +1,9 @@
+import type {
+  EmailService,
+  SendEmailInput,
+} from '@communication/services/EmailService.js'
+import type { INotificationService } from '@communication/services/NotificationService.js'
+import { createChannelResults } from '@communication/utils/channelHelpers.js'
 import { communicationInternal } from '@pika/api'
 import {
   getValidatedQuery,
@@ -12,10 +18,6 @@ import {
 import { ErrorFactory, logger } from '@pika/shared'
 import { EmailTemplateId } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { EmailService, SendEmailInput } from '../services/EmailService.js'
-import type { INotificationService } from '../services/NotificationService.js'
-import { createChannelResults } from '../utils/channelHelpers.js'
 
 /**
  * Controller for internal service-to-service communication

@@ -1,8 +1,7 @@
+import { createStripeInstance } from '@payment/config/stripe.config.js'
 import { STRIPE_MOCK_HOST } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
 import Stripe from 'stripe'
-
-import { createStripeInstance } from '../config/stripe.config.js'
 
 export interface IStripeService {
   createPaymentIntent(

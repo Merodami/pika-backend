@@ -1,3 +1,9 @@
+import { EmailController } from '@communication/controllers/EmailController.js'
+import { CommunicationLogRepository } from '@communication/repositories/CommunicationLogRepository.js'
+import {
+  type EmailConfig,
+  EmailService,
+} from '@communication/services/EmailService.js'
 import { communicationCommon, communicationPublic } from '@pika/api'
 import {
   requireAuth,
@@ -8,10 +14,6 @@ import {
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
-
-import { EmailController } from '../controllers/EmailController.js'
-import { CommunicationLogRepository } from '../repositories/CommunicationLogRepository.js'
-import { type EmailConfig, EmailService } from '../services/EmailService.js'
 
 export function createEmailRouter(
   prisma: PrismaClient,

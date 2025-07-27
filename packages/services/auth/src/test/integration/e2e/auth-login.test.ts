@@ -12,6 +12,13 @@ vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 
+import { createAuthServer } from '@auth-service/server.js'
+import {
+  createSharedAuthTestData,
+  type SharedAuthTestData,
+} from '@auth-service/test/helpers/authTestHelpers.js'
+import { CommunicationServiceClientMock } from '@auth-service/test/mocks/CommunicationServiceClientMock.js'
+import { UserServiceClientMock } from '@auth-service/test/mocks/UserServiceClientMock.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -23,14 +30,6 @@ import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createAuthServer } from '../../../server.js'
-import {
-  createSharedAuthTestData,
-  type SharedAuthTestData,
-} from '../../helpers/authTestHelpers.js'
-import { CommunicationServiceClientMock } from '../../mocks/CommunicationServiceClientMock.js'
-import { UserServiceClientMock } from '../../mocks/UserServiceClientMock.js'
 
 describe('Auth Login Integration Tests', () => {
   let testDb: TestDatabaseResult

@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   resolve: {
     alias: {
-      // Core package aliases (short form)
+      // Core package aliases (for internal imports within packages)
       '@shared': resolve(__dirname, './packages/shared/src'),
       '@api': resolve(__dirname, './packages/api/src'),
       '@types': resolve(__dirname, './packages/types/src'),
@@ -17,57 +17,24 @@ export default defineConfig({
       '@auth': resolve(__dirname, './packages/auth/src'),
       '@tests': resolve(__dirname, './packages/tests/src'),
       '@environment': resolve(__dirname, './packages/environment/src'),
-      // Full @pika/ package aliases
-      '@pika/shared': resolve(__dirname, './packages/shared/src'),
-      '@pika/api': resolve(__dirname, './packages/api/src'),
-      '@pika/types': resolve(__dirname, './packages/types/src'),
-      '@pika/sdk': resolve(__dirname, './packages/sdk/src'),
-      '@pika/http': resolve(__dirname, './packages/http/src'),
-      '@pika/redis': resolve(__dirname, './packages/redis/src'),
-      '@pika/auth': resolve(__dirname, './packages/auth/src'),
-      '@pika/database': resolve(__dirname, './packages/database/src'),
-      '@pika/environment': resolve(__dirname, './packages/environment/src'),
-      '@pika/tests': resolve(__dirname, './packages/tests/src'),
-      // Service aliases
-      '@pika/user': resolve(__dirname, './packages/services/user/src'),
-      '@pika/gym': resolve(__dirname, './packages/services/gym/src'),
-      '@pika/auth-service': resolve(__dirname, './packages/services/auth/src'),
-      '@pika/session': resolve(__dirname, './packages/services/session/src'),
-      '@pika/subscription': resolve(
-        __dirname,
-        './packages/services/subscription/src',
-      ),
-      '@pika/payment': resolve(__dirname, './packages/services/payment/src'),
-      '@pika/communication': resolve(
-        __dirname,
-        './packages/services/communication/src',
-      ),
+      // Service aliases (for internal imports within services)
+      '@user': resolve(__dirname, './packages/services/user/src'),
+      '@auth-service': resolve(__dirname, './packages/services/auth/src'),
+      '@business': resolve(__dirname, './packages/services/business/src'),
+      '@category': resolve(__dirname, './packages/services/category/src'),
       '@communication': resolve(
         __dirname,
         './packages/services/communication/src',
       ),
-      '@pika/support': resolve(__dirname, './packages/services/support/src'),
-      '@pika/file-storage': resolve(
-        __dirname,
-        './packages/services/file-storage/src',
-      ),
-      '@pika/social': resolve(__dirname, './packages/services/social/src'),
-      '@pika/pdf': resolve(__dirname, './packages/services/pdf/src'),
-      // Service-specific aliases
+      '@payment': resolve(__dirname, './packages/services/payment/src'),
+      '@pdf': resolve(__dirname, './packages/services/pdf/src'),
+      '@storage': resolve(__dirname, './packages/services/storage/src'),
       '@subscription': resolve(
         __dirname,
         './packages/services/subscription/src',
       ),
-      '@social': resolve(__dirname, './packages/services/social/src'),
-      '@pdf': resolve(__dirname, './packages/services/pdf/src'),
-      '@category': resolve(__dirname, './packages/services/category/src'),
-      '@business': resolve(__dirname, './packages/services/business/src'),
-      '@voucher': resolve(__dirname, './packages/services/voucher/src'),
-      '@user': resolve(__dirname, './packages/services/user/src'),
-      '@auth-service': resolve(__dirname, './packages/services/auth/src'),
-      '@payment': resolve(__dirname, './packages/services/payment/src'),
       '@support': resolve(__dirname, './packages/services/support/src'),
-      '@storage': resolve(__dirname, './packages/services/storage/src'),
+      '@voucher': resolve(__dirname, './packages/services/voucher/src'),
     },
   },
   test: {

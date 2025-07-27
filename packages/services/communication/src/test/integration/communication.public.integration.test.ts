@@ -11,6 +11,8 @@ vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 
+import { createCommunicationServer } from '@communication/server.js'
+import { createSharedCommunicationTestData } from '@communication/test/helpers/communicationTestHelpers.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -25,9 +27,6 @@ import { UserRole, UserStatus } from '@pika/types'
 import type { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createCommunicationServer } from '../../server.js'
-import { createSharedCommunicationTestData } from '../helpers/communicationTestHelpers.js'
 
 describe('Communication Service - Public API Integration Tests', () => {
   let testDb: TestDatabaseResult

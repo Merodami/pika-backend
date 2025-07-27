@@ -2,11 +2,10 @@ import { supportPublic } from '@pika/api'
 import { requireAuth, validateBody, validateQuery } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
+import { ProblemController } from '@support/controllers/ProblemController.js'
+import { ProblemRepository } from '@support/repositories/ProblemRepository.js'
+import { ProblemService } from '@support/services/ProblemService.js'
 import { Router } from 'express'
-
-import { ProblemController } from '../controllers/ProblemController.js'
-import { ProblemRepository } from '../repositories/ProblemRepository.js'
-import { ProblemService } from '../services/ProblemService.js'
 
 export function createProblemRouter(
   prisma: PrismaClient,

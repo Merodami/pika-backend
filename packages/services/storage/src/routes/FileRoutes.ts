@@ -9,15 +9,14 @@ import {
 import type { ICacheService } from '@pika/redis'
 import { ErrorFactory } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
-import { NextFunction, Request, Response, Router } from 'express'
-import multer from 'multer'
-
-import { FileController } from '../controllers/FileController.js'
-import { FileStorageLogRepository } from '../repositories/FileStorageLogRepository.js'
+import { FileController } from '@storage/controllers/FileController.js'
+import { FileStorageLogRepository } from '@storage/repositories/FileStorageLogRepository.js'
 import {
   type StorageConfig,
   StorageService,
-} from '../services/StorageService.js'
+} from '@storage/services/StorageService.js'
+import { NextFunction, Request, Response, Router } from 'express'
+import multer from 'multer'
 
 // Configure multer for memory storage
 const upload = multer({

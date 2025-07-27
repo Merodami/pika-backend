@@ -11,9 +11,8 @@ import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import { UserRole } from '@pika/types'
-import type { NextFunction, Request, Response } from 'express'
-
 import type { IUserService } from '@user/services/UserService.js'
+import type { NextFunction, Request, Response } from 'express'
 
 /**
  * Handles user management operations

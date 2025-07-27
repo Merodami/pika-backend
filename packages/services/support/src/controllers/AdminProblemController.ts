@@ -4,9 +4,8 @@ import { getValidatedQuery, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
+import type { IProblemService } from '@support/services/ProblemService.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { IProblemService } from '../services/ProblemService.js'
 
 /**
  * Handles admin problem management operations

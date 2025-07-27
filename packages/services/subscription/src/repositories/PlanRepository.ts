@@ -5,8 +5,7 @@ import { ErrorFactory, logger } from '@pika/shared'
 import type { BillingIntervalType, PaginatedResult } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
-
-import type { PlanSearchParams } from '../types/search.js'
+import type { PlanSearchParams } from '@subscription/types/search.js'
 
 export interface CreatePlanInput {
   name: string

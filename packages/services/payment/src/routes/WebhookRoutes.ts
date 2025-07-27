@@ -1,10 +1,9 @@
+import { WebhookController } from '@payment/controllers/WebhookController.js'
+import { StripeService } from '@payment/services/StripeService.js'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import express, { Router } from 'express'
 import type Stripe from 'stripe'
-
-import { WebhookController } from '../controllers/WebhookController.js'
-import { StripeService } from '../services/StripeService.js'
 
 export function createWebhookRouter(
   prisma: PrismaClient,

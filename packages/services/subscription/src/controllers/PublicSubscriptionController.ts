@@ -3,9 +3,8 @@ import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
+import type { ISubscriptionService } from '@subscription/services/SubscriptionService.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { ISubscriptionService } from '../services/SubscriptionService.js'
 
 /**
  * Handles public subscription operations (customer-facing)

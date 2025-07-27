@@ -9,13 +9,12 @@ import {
 import type { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, PaymentServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
+import { AdminSubscriptionController } from '@subscription/controllers/AdminSubscriptionController.js'
+import { PlanRepository } from '@subscription/repositories/PlanRepository.js'
+import { SubscriptionRepository } from '@subscription/repositories/SubscriptionRepository.js'
+import { PlanService } from '@subscription/services/PlanService.js'
+import { SubscriptionService } from '@subscription/services/SubscriptionService.js'
 import { Router } from 'express'
-
-import { AdminSubscriptionController } from '../controllers/AdminSubscriptionController.js'
-import { PlanRepository } from '../repositories/PlanRepository.js'
-import { SubscriptionRepository } from '../repositories/SubscriptionRepository.js'
-import { PlanService } from '../services/PlanService.js'
-import { SubscriptionService } from '../services/SubscriptionService.js'
 
 /**
  * Creates admin subscription routes

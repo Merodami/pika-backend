@@ -8,11 +8,10 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
+import { AdminSupportController } from '@support/controllers/AdminSupportController.js'
+import { ProblemRepository } from '@support/repositories/ProblemRepository.js'
+import { ProblemService } from '@support/services/ProblemService.js'
 import { Router } from 'express'
-
-import { AdminSupportController } from '../controllers/AdminSupportController.js'
-import { ProblemRepository } from '../repositories/ProblemRepository.js'
-import { ProblemService } from '../services/ProblemService.js'
 
 export function createAdminSupportRouter(
   prisma: PrismaClient,

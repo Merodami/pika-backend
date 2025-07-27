@@ -1,7 +1,6 @@
+import { StripeService } from '@payment/services/StripeService.js'
 import { StripeMockHelper } from '@pika/tests'
 import { beforeAll, describe, expect, it } from 'vitest'
-
-import { StripeService } from '../../services/StripeService.js'
 
 describe('StripeService', () => {
   let stripeService: StripeService

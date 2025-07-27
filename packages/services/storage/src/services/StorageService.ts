@@ -8,12 +8,12 @@ import type {
 } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
-import { v4 as uuid } from 'uuid'
-
 import type {
   FileStorageLogSearchParams,
   IFileStorageLogRepository,
-} from '../repositories/FileStorageLogRepository.js'
+} from '@storage/repositories/FileStorageLogRepository.js'
+import { v4 as uuid } from 'uuid'
+
 import {
   type ProviderConfig,
   ProviderFactory,

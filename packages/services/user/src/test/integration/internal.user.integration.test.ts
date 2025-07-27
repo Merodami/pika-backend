@@ -40,17 +40,16 @@ import {
   InternalAPITestHelper,
 } from '@pika/tests'
 import { UserRole, UserStatus } from '@pika/types'
-import bcrypt from 'bcrypt'
-import type { Express } from 'express'
-import supertest from 'supertest'
-import { v4 as uuid } from 'uuid'
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
 import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,
   type SharedUserTestData,
 } from '@user/test/helpers/userTestHelpers.js'
+import bcrypt from 'bcrypt'
+import type { Express } from 'express'
+import supertest from 'supertest'
+import { v4 as uuid } from 'uuid'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 describe('User Service - Internal API Integration Tests', () => {
   let app: Express

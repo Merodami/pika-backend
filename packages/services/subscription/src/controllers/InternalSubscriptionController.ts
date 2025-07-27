@@ -3,10 +3,9 @@ import { validateResponse } from '@pika/http'
 import { SubscriptionMapper } from '@pika/sdk'
 import type { CommunicationServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
+import type { ISubscriptionService } from '@subscription/services/SubscriptionService.js'
+import { TEMPLATE_KEYS } from '@subscription/types/constants.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { ISubscriptionService } from '../services/SubscriptionService.js'
-import { TEMPLATE_KEYS } from '../types/constants.js'
 
 /**
  * Handles internal subscription operations for service-to-service communication
