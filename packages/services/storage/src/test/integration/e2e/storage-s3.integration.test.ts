@@ -4,6 +4,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 import {
   AWS_S3_ACCESS_KEY_ID,

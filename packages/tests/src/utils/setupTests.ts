@@ -306,6 +306,117 @@ vi.mock('@pika/shared', async () => {
       GENERATED: 'generated',
       CLIENT: 'client',
     },
+    // Add missing utility functions
+    parseIncludeParam: vi
+      .fn()
+      .mockImplementation((include?: string, allowedRelations?: string[]) => {
+        if (!include || include.trim() === '') return {}
+
+        const relations = include
+          .split(',')
+          .map((rel) => rel.trim())
+          .filter(Boolean)
+
+        if (allowedRelations && allowedRelations.length > 0) {
+          return relations
+            .filter((rel) => allowedRelations.includes(rel))
+            .reduce((acc, rel) => ({ ...acc, [rel]: true }), {})
+        }
+
+        return relations.reduce((acc, rel) => ({ ...acc, [rel]: true }), {})
+      }),
+    // Add service clients
+    CommunicationServiceClient: vi.fn().mockImplementation(() => ({
+      sendEmail: vi
+        .fn()
+        .mockResolvedValue({ id: 'mock-email-id', status: 'sent' }),
+      sendTemplatedEmail: vi
+        .fn()
+        .mockResolvedValue({ id: 'mock-email-id', status: 'sent' }),
+      createNotification: vi
+        .fn()
+        .mockResolvedValue({ id: 'mock-notification-id', status: 'sent' }),
+    })),
+    PaymentServiceClient: vi.fn().mockImplementation(() => ({
+      processSubscriptionCredits: vi
+        .fn()
+        .mockResolvedValue({ credits: {}, transactionId: 'mock-tx' }),
+      getUserCredits: vi.fn().mockResolvedValue({ totalAmount: 100 }),
+      hasCredits: vi.fn().mockResolvedValue(true),
+    })),
+    UserServiceClient: vi.fn().mockImplementation(() => ({
+      getUserById: vi
+        .fn()
+        .mockResolvedValue({ id: 'test-user', email: 'test@example.com' }),
+      updateUserMembership: vi.fn().mockResolvedValue({ success: true }),
+    })),
+    BusinessServiceClient: vi.fn().mockImplementation(() => ({
+      getBusinessById: vi
+        .fn()
+        .mockResolvedValue({ id: 'test-business', name: 'Test Business' }),
+    })),
+    StorageServiceClient: vi.fn().mockImplementation(() => ({
+      uploadFile: vi
+        .fn()
+        .mockResolvedValue({ url: 'https://example.com/file.jpg' }),
+      deleteFile: vi.fn().mockResolvedValue(true),
+    })),
+    SubscriptionServiceClient: vi.fn().mockImplementation(() => ({
+      getSubscription: vi
+        .fn()
+        .mockResolvedValue({ id: 'test-sub', status: 'active' }),
+    })),
+    // Add relation utility functions
+    toPrismaInclude: vi
+      .fn()
+      .mockImplementation((parsedIncludes: Record<string, any>) => {
+        return parsedIncludes
+      }),
+    createRelationValidator: vi
+      .fn()
+      .mockImplementation((allowedRelations: string[]) => {
+        return (include?: string) => {
+          if (!include || include.trim() === '') return {}
+
+          const relations = include
+            .split(',')
+            .map((rel) => rel.trim())
+            .filter(Boolean)
+
+          return relations
+            .filter((rel) => allowedRelations.includes(rel))
+            .reduce((acc, rel) => ({ ...acc, [rel]: true }), {})
+        }
+      }),
+    includesRelation: vi
+      .fn()
+      .mockImplementation((includes: Record<string, any>, relation: string) => {
+        return includes[relation] === true
+      }),
+    mergeIncludes: vi
+      .fn()
+      .mockImplementation((...includes: Record<string, any>[]) => {
+        return includes.reduce(
+          (merged, current) => ({ ...merged, ...current }),
+          {},
+        )
+      }),
+    // Add API sorting functions
+    convertApiSortParams: vi.fn().mockImplementation((params: any) => {
+      const result: any = {}
+
+      if (params.sort) {
+        const parts = params.sort.split(':')
+
+        result.sortBy = parts[0]
+        result.sortOrder = parts[1] === 'desc' ? 'desc' : 'asc'
+      }
+      if (params.sortBy) result.sortBy = params.sortBy
+      if (params.sortOrder) result.sortOrder = params.sortOrder
+
+      return result
+    }),
+    DEFAULT_SORT_DIRECTION: 'asc',
     RequestContext: class RequestContext {
       constructor(public data: any) {}
     },

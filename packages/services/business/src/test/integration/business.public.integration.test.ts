@@ -13,6 +13,7 @@ vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/translation')
+vi.unmock('@pika/shared') // Unmock shared to use real error classes with real middleware
 
 import { createBusinessServer } from '@business/server.js'
 import {

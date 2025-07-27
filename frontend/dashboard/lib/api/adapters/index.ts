@@ -6,16 +6,17 @@ export { voucherAdapter as voucher } from '../voucher-adapter'
 // Export the raw SDK API client for direct access when needed
 export { api as sdk } from '../client'
 
-// Re-export commonly used types
+// Re-export commonly used types from generated SDK
 export type {
-  AuthResponse,
-  BusinessProfile,
-  Category,
+  AuthTokensResponse,
+  AuthUserResponse,
+  BusinessListResponse,
+  BusinessResponse,
   CategoryListResponse,
-  Login,
-  Review,
-  UserProfile,
-  UserRegistration,
-  Voucher,
+  CategoryResponse,
+  RegisterRequest,
+  TokenRequest,
+  UserProfileResponse,
   VoucherListResponse,
-} from '@pika/sdk'
+  VoucherResponse,
+} from '../generated'

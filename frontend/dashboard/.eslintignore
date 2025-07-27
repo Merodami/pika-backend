@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Generated files
+lib/api/generated/
+
+# Environment
+.env*.local
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts

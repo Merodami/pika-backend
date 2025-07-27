@@ -12,27 +12,17 @@ import { Alert, Button, Divider, Form, Input, Select } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
 import { useAuthStore } from '@/store/auth.store'
 import { showError, showSuccess } from '@/store/notifications.store'
+import {
+  RegisterFormSchema,
+  type RegisterFormData,
+  transformRegisterToAPI,
+} from '@/lib/validations/auth'
 
-const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
-    email: z.string().email('Please enter a valid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirmPassword: z.string(),
-    accountType: z.enum(['BUSINESS', 'ADMIN'], {
-      errorMap: () => ({ message: 'Please select an account type' }),
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
-
-type RegisterFormData = z.infer<typeof registerSchema>
+// Use the standardized schema from backend (includes password confirmation)
+const registerSchema = RegisterFormSchema
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -55,7 +45,17 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       clearError()
-      await registerUser(data.email, data.password, data.name)
+
+      // Transform frontend form data to backend API format
+      const apiData = transformRegisterToAPI(data)
+
+      // Register user with standardized data
+      await registerUser(
+        apiData.email,
+        apiData.password,
+        `${apiData.firstName} ${apiData.lastName}`
+      )
+
       showSuccess(
         'Registration successful',
         'Welcome to Pika Dashboard! Please verify your email.'

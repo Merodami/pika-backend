@@ -12,6 +12,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 vi.mock('../../services/providers/ProviderFactory.js', async () => {
   const { MockEmailProvider, MockSmsProvider } = await import(

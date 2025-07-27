@@ -8,6 +8,7 @@
 // Auth Service
 export * as authAdmin from './auth/admin/index.js'
 export * as authCommon from './auth/common/index.js'
+export * as authFrontend from './auth/frontend/index.js'
 export * as authInternal from './auth/internal/index.js'
 export * as authPublic from './auth/public/index.js'
 

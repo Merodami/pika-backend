@@ -12,6 +12,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 // Mock @pika/shared to provide CommunicationServiceClient
 vi.mock('@pika/shared', async () => {
