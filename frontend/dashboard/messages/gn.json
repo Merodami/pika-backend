@@ -1,0 +1,146 @@
+{
+  "common": {
+    "button": {
+      "save": "Ñongatu",
+      "cancel": "Jeheja",
+      "delete": "Mboguete",
+      "edit": "Moambue",
+      "create": "Moheñói",
+      "back": "Guevi",
+      "next": "Upeigua",
+      "previous": "Yma",
+      "close": "Mboty",
+      "confirm": "Moneĩ",
+      "search": "Heka",
+      "filter": "Mbogua",
+      "refresh": "Mbopyahu",
+      "export": "Gueraha",
+      "import": "Gueru"
+    },
+    "status": {
+      "loading": "Henyhẽhína...",
+      "saving": "Oñeñongatúhina...",
+      "deleting": "Oñemboguetehína...",
+      "success": "Oĩporã",
+      "error": "Jejavy",
+      "warning": "Jesarekorã",
+      "info": "Marandu"
+    },
+    "message": {
+      "confirmDelete": "Añetehápe remboguetesépa ko mba'e?",
+      "changesSaved": "Umi ñemoambue oñeñongatu porã",
+      "errorOccurred": "Oiko peteĩ jejavy",
+      "noData": "Ndaipóri mba'ekuaarã",
+      "required": "Ko tenda oñeikotevẽ"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Eike",
+      "subtitle": "Emoinge nde mba'ekuaarã eike hag̃ua",
+      "email": "Ñanduti veve",
+      "password": "Ñe'ẽñemi",
+      "rememberMe": "Chemomandu'a",
+      "forgotPassword": "Nderesaráipa nde ñe'ẽñemi?",
+      "noAccount": "Ndereguerekoĩpa cuenta?",
+      "signUp": "Eñemboguapy",
+      "button": "Eike",
+      "error": "Mba'ekuaarã ndoikói"
+    },
+    "register": {
+      "title": "Emoheñói cuenta",
+      "subtitle": "Emyenyhẽ ko formulario eñemboguapy hag̃ua",
+      "firstName": "Téra",
+      "lastName": "Terajoapy",
+      "email": "Ñanduti veve",
+      "password": "Ñe'ẽñemi",
+      "confirmPassword": "Emoneĩ ñe'ẽñemi",
+      "acceptTerms": "Amoneĩ umi térã ha kondisión",
+      "marketingConsent": "Ajepotáse og̃uahẽ chéve marandu promocional",
+      "button": "Ñemboguapy",
+      "haveAccount": "Eguerekomápa cuenta?",
+      "signIn": "Eike"
+    },
+    "logout": {
+      "button": "Sẽ",
+      "confirm": "Añetehápe resésepa?"
+    }
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "businesses": "Negósio",
+    "vouchers": "Kupón",
+    "voucherBooks": "Kupón Kuatia",
+    "users": "Puruhára",
+    "analytics": "Jehechaukaha",
+    "settings": "Ñemboheko",
+    "profile": "Che Perfil",
+    "myBusiness": "Che Negósio"
+  },
+  "dashboard": {
+    "title": "Panel Ñangarekoha",
+    "welcome": "Tereg̃uahẽ porãite, {name}",
+    "metrics": {
+      "totalVouchers": "Kupón Opavave",
+      "activeVouchers": "Kupón Hendýva",
+      "totalRedemptions": "Jepuru Opavave",
+      "revenue": "Jehupytyrã",
+      "growth": "Ñembotuichave"
+    }
+  },
+  "vouchers": {
+    "title": "Kupón",
+    "create": {
+      "title": "Emoheñói Kupón",
+      "button": "Kupón Pyahu"
+    },
+    "edit": {
+      "title": "Embosakói Kupón"
+    },
+    "fields": {
+      "title": "Moñe'ẽrã",
+      "description": "Ñemombe'u",
+      "discount": "Ñemboguejy",
+      "validFrom": "Oikóta guive",
+      "validUntil": "Oikóta peve",
+      "maxRedemptions": "Jepuru hetave",
+      "termsAndConditions": "Térã ha kondisión"
+    },
+    "status": {
+      "active": "Hendy",
+      "expired": "Ndoikovéima",
+      "draft": "Moã'anga",
+      "suspended": "Ojejoko"
+    }
+  },
+  "businesses": {
+    "title": "Negósio",
+    "fields": {
+      "name": "Negósio réra",
+      "email": "Ñanduti veve",
+      "phone": "Pumbyry",
+      "address": "Kundahápe",
+      "category": "Jehechaukaha",
+      "status": "Tekove"
+    },
+    "status": {
+      "active": "Hendy",
+      "pending": "Oha'arõ",
+      "suspended": "Ojejoko",
+      "verified": "Ojehechapyréva"
+    }
+  },
+  "language": {
+    "selector": {
+      "label": "Ñe'ẽ",
+      "change": "Emoambue ñe'ẽ"
+    }
+  },
+  "errors": {
+    "unauthorized": "Noñemoneĩri",
+    "forbidden": "Ndaikatúi eike",
+    "notFound": "Ndojejuhúi",
+    "serverError": "Servidor jejavy",
+    "networkError": "Jeike jejavy"
+  }
+}

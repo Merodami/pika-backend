@@ -1,0 +1,133 @@
+'use client'
+
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Button, Form, Input, Alert } from 'antd'
+import { LockOutlined, MailOutlined } from '@ant-design/icons'
+import Link from 'next/link'
+import { login } from '@/app/actions/auth'
+import { authPublic } from '@pika/api'
+
+// Use the backend schema for validation
+const loginSchema = z.object({
+  email: authPublic.Email,
+  password: z.string().min(1, 'Password is required'),
+})
+
+type LoginFormData = z.infer<typeof loginSchema>
+
+export function LoginForm() {
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
+
+  const onSubmit = async (data: LoginFormData) => {
+    setError(null)
+    setIsLoading(true)
+    
+    try {
+      const result = await login({
+        grantType: 'password' as const,
+        username: data.email,
+        password: data.password,
+      })
+      
+      if (result?.error) {
+        setError(result.error)
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      {error && (
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          closable
+          onClose={() => setError(null)}
+          className="mb-4"
+        />
+      )}
+
+      <Form
+        layout="vertical"
+        onFinish={handleSubmit(onSubmit)}
+        autoComplete="off"
+      >
+        <Form.Item
+          label="Email address"
+          validateStatus={errors.email ? 'error' : ''}
+          help={errors.email?.message}
+        >
+          <Input
+            {...register('email')}
+            prefix={<MailOutlined />}
+            placeholder="Enter your email"
+            size="large"
+            autoComplete="email"
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Password"
+          validateStatus={errors.password ? 'error' : ''}
+          help={errors.password?.message}
+        >
+          <Input.Password
+            {...register('password')}
+            prefix={<LockOutlined />}
+            placeholder="Enter your password"
+            size="large"
+            autoComplete="current-password"
+          />
+        </Form.Item>
+
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:text-blue-500"
+          >
+            Forgot your password?
+          </Link>
+        </div>
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isLoading}
+            size="large"
+            className="w-full"
+          >
+            Sign in
+          </Button>
+        </Form.Item>
+
+        <div className="text-center">
+          <span className="text-gray-600">Don't have an account? </span>
+          <Link
+            href="/register"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
+            Sign up
+          </Link>
+        </div>
+      </Form>
+    </div>
+  )
+}

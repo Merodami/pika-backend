@@ -1,0 +1,151 @@
+'use client'
+
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Button, Form, Input, Alert, Checkbox } from 'antd'
+import { LockOutlined, MailOutlined } from '@ant-design/icons'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { authFrontend } from '@pika/api'
+import { login } from '@/app/actions/auth'
+import { useAppStore } from '@/store/app.store'
+
+// Use the admin/business login schema with enhanced password requirements
+const loginSchema = authFrontend.AdminBusinessLoginFormSchema
+
+type LoginFormData = z.infer<typeof loginSchema>
+
+export function LoginForm() {
+  const t = useTranslations('auth.login')
+  const router = useRouter()
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const { formDrafts, saveFormDraft, clearFormDraft } = useAppStore()
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: formDrafts['login'] || {},
+  })
+
+  const onSubmit = async (data: LoginFormData) => {
+    setError(null)
+    setIsLoading(true)
+    
+    try {
+      // Transform to backend format
+      const tokenRequest = authFrontend.transformLoginToTokenRequest(data)
+      const result = await login(tokenRequest)
+      
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        // Clear form draft on success
+        clearFormDraft('login')
+      }
+    } catch (err) {
+      setError(t('error'))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Save form draft on input change
+  const handleInputChange = (field: keyof LoginFormData, value: any) => {
+    const currentData = formDrafts['login'] || {}
+    saveFormDraft('login', { ...currentData, [field]: value })
+  }
+
+  return (
+    <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      {error && (
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          closable
+          onClose={() => setError(null)}
+          className="mb-4"
+        />
+      )}
+
+      <Form
+        layout="vertical"
+        onFinish={handleSubmit(onSubmit)}
+        autoComplete="off"
+      >
+        <Form.Item
+          label={t('email')}
+          validateStatus={errors.email ? 'error' : ''}
+          help={errors.email?.message}
+        >
+          <Input
+            {...register('email')}
+            prefix={<MailOutlined />}
+            placeholder={t('email')}
+            size="large"
+            autoComplete="email"
+            onChange={(e) => handleInputChange('email', e.target.value)}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={t('password')}
+          validateStatus={errors.password ? 'error' : ''}
+          help={errors.password?.message}
+        >
+          <Input.Password
+            {...register('password')}
+            prefix={<LockOutlined />}
+            placeholder={t('password')}
+            size="large"
+            autoComplete="current-password"
+            onChange={(e) => handleInputChange('password', e.target.value)}
+          />
+        </Form.Item>
+
+        <Form.Item>
+          <div className="flex items-center justify-between">
+            <Checkbox {...register('rememberMe')}>
+              {t('rememberMe')}
+            </Checkbox>
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-600 hover:text-blue-500"
+            >
+              {t('forgotPassword')}
+            </Link>
+          </div>
+        </Form.Item>
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isLoading}
+            size="large"
+            className="w-full"
+          >
+            {t('button')}
+          </Button>
+        </Form.Item>
+
+        <div className="text-center">
+          <span className="text-gray-600">{t('noAccount')} </span>
+          <Link
+            href="/register"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
+            {t('signUp')}
+          </Link>
+        </div>
+      </Form>
+    </div>
+  )
+}

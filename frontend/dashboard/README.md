@@ -5,6 +5,7 @@ A modern, enterprise-grade admin and business management dashboard built with Ne
 ## Table of Contents
 
 - [Architecture Overview](#architecture-overview)
+- [Role-Based Access Control (RBAC)](#role-based-access-control-rbac)
 - [Technology Stack](#technology-stack)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
@@ -30,6 +31,116 @@ This dashboard follows industry-standard patterns for modern React applications:
 - **Authentication**: JWT-based with automatic token refresh
 - **Real-time Updates**: Firebase integration for live notifications (currently optional)
 - **Multi-tenant**: Supports both Admin and Business user roles
+
+## Role-Based Access Control (RBAC)
+
+The dashboard is a **shared application** that serves both business owners and platform administrators with different feature sets based on their roles.
+
+### User Roles and Permissions
+
+#### Business Owner Role
+- **View Own Business**: Read-only access to their business information
+- **Create Individual Vouchers**: Can create single vouchers (not voucher books)
+- **View Own Vouchers**: See and manage their created vouchers
+- **Limited Dashboard**: Access to business-specific metrics and analytics
+
+#### Admin Role (Platform Administrators)
+- **Full Business Management**: Create, read, update, delete all businesses
+- **Complete Voucher Control**: Manage all vouchers across the platform
+- **Voucher Book Builder**: Exclusive access to create and manage voucher books
+- **User Management**: View and manage all platform users
+- **Platform Analytics**: Access to comprehensive platform metrics
+- **System Configuration**: Access to platform settings and configurations
+
+### Implementation Strategy
+
+#### 1. Route Protection
+```typescript
+// Business routes - accessible by business owners and admins
+/business/*
+
+// Admin routes - accessible only by admins
+/admin/*
+
+// Shared routes with role-based content
+/dashboard (shows different content based on role)
+/vouchers (filtered by ownership for business, all for admin)
+```
+
+#### 2. Component-Level Access Control
+```typescript
+// Example: Role-based component rendering
+export function VoucherActions({ user, voucher }: Props) {
+  const isAdmin = user.role === 'ADMIN'
+  const isOwner = voucher.businessId === user.businessId
+  
+  return (
+    <>
+      {(isAdmin || isOwner) && (
+        <Button onClick={onEdit}>Edit</Button>
+      )}
+      {isAdmin && (
+        <Button onClick={onDelete} danger>Delete</Button>
+      )}
+    </>
+  )
+}
+```
+
+#### 3. API-Level Security
+- All API calls include JWT tokens with role information
+- Backend enforces role-based permissions
+- Frontend role checks are for UX only - security is enforced server-side
+
+#### 4. Navigation Structure
+```typescript
+// Dynamic navigation based on user role
+const getNavigationItems = (user: User) => {
+  const baseItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: 'home' },
+    { path: '/vouchers', label: 'Vouchers', icon: 'ticket' }
+  ]
+  
+  if (user.role === 'BUSINESS') {
+    return [
+      ...baseItems,
+      { path: '/business/profile', label: 'My Business', icon: 'building' }
+    ]
+  }
+  
+  if (user.role === 'ADMIN') {
+    return [
+      ...baseItems,
+      { path: '/admin/businesses', label: 'Businesses', icon: 'building' },
+      { path: '/admin/users', label: 'Users', icon: 'users' },
+      { path: '/admin/voucher-books', label: 'Voucher Books', icon: 'book' },
+      { path: '/admin/analytics', label: 'Analytics', icon: 'chart' }
+    ]
+  }
+}
+```
+
+### Feature Matrix
+
+| Feature | Business Owner | Admin |
+|---------|---------------|--------|
+| View Dashboard | ✅ (Own metrics) | ✅ (Platform metrics) |
+| View Business | ✅ (Own only) | ✅ (All businesses) |
+| Edit Business | ❌ | ✅ |
+| Create Voucher | ✅ (Individual) | ✅ (Individual) |
+| Create Voucher Book | ❌ | ✅ |
+| View Vouchers | ✅ (Own only) | ✅ (All vouchers) |
+| Manage Users | ❌ | ✅ |
+| Platform Settings | ❌ | ✅ |
+| Export Reports | ✅ (Own data) | ✅ (All data) |
+
+### Development Guidelines
+
+1. **Always check roles on both frontend and backend**
+2. **Use TypeScript discriminated unions for role-specific types**
+3. **Implement loading states while checking permissions**
+4. **Provide clear feedback for unauthorized actions**
+5. **Test both roles thoroughly during development**
 
 ## Technology Stack
 

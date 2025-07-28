@@ -63,21 +63,25 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null })
 
         try {
-          const loginRequest: Login = { email, password }
-          const response = await api.auth.loginUser({
-            requestBody: loginRequest,
+          const response = await api.auth.postAuthToken({
+            requestBody: {
+              grantType: 'password' as const,
+              username: email,
+              password: password,
+            },
           })
 
           // Store tokens
-          if (response.tokens?.access_token && response.tokens?.refresh_token) {
+          if (response.accessToken && response.refreshToken) {
             setTokens(
-              response.tokens.access_token,
-              response.tokens.refresh_token
+              response.accessToken,
+              response.refreshToken
             )
           }
 
-          // Use user from login response
-          const user = mapUserDtoToUser(response.user)
+          // Get user profile after login
+          const userResponse = await api.users.getUsersProfile()
+          const user = mapUserDtoToUser(userResponse.data)
 
           setStoredUser(user)
 
@@ -113,15 +117,22 @@ export const useAuthStore = create<AuthState>()(
             last_name: lastName,
             role: 'CUSTOMER' as const,
           }
-          const response = await api.auth.registerUser({
-            requestBody: registerRequest,
+          const response = await api.auth.postAuthRegister({
+            requestBody: {
+              email,
+              password,
+              firstName,
+              lastName,
+              acceptTerms: true,
+              marketingConsent: false,
+            },
           })
 
           // Store tokens
-          if (response.tokens?.access_token && response.tokens?.refresh_token) {
+          if (response.tokens?.accessToken && response.tokens?.refreshToken) {
             setTokens(
-              response.tokens.access_token,
-              response.tokens.refresh_token
+              response.tokens.accessToken,
+              response.tokens.refreshToken
             )
           }
 
@@ -178,8 +189,8 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           // Verify token is still valid by fetching user profile
-          const userResponse = await api.users.getCurrentUser()
-          const user = mapUserDtoToUser(userResponse)
+          const userResponse = await api.users.getUsersProfile()
+          const user = mapUserDtoToUser(userResponse.data)
 
           setStoredUser(user)
           set({ user, isAuthenticated: true })

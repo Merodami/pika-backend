@@ -77,7 +77,8 @@ export class AuthController {
           message:
             result.message ||
             'Registration successful. Please check your email to verify your account.',
-          user: UserMapper.toDTO(result.user),
+          userId: result.user.id,
+          emailSent: result.emailSent ?? true, // Use actual email sending status from service
         }
         const validatedResponse = validateResponse(
           authPublic.RegisterResponse,

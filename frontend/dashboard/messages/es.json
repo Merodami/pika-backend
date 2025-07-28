@@ -1,0 +1,176 @@
+{
+  "common": {
+    "button": {
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "create": "Crear",
+      "back": "Volver",
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "close": "Cerrar",
+      "confirm": "Confirmar",
+      "search": "Buscar",
+      "filter": "Filtrar",
+      "refresh": "Actualizar",
+      "export": "Exportar",
+      "import": "Importar"
+    },
+    "status": {
+      "loading": "Cargando...",
+      "saving": "Guardando...",
+      "deleting": "Eliminando...",
+      "success": "Éxito",
+      "error": "Error",
+      "warning": "Advertencia",
+      "info": "Información"
+    },
+    "message": {
+      "confirmDelete": "¿Estás seguro de que quieres eliminar este elemento?",
+      "changesSaved": "Los cambios se han guardado correctamente",
+      "errorOccurred": "Ha ocurrido un error",
+      "noData": "No hay datos disponibles",
+      "required": "Este campo es obligatorio"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Ingresa tus credenciales para acceder al panel",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "rememberMe": "Recordarme",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUp": "Regístrate",
+      "button": "Iniciar sesión",
+      "error": "Credenciales inválidas"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Completa el formulario para registrarte",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "acceptTerms": "Acepto los términos y condiciones",
+      "marketingConsent": "Deseo recibir comunicaciones promocionales",
+      "button": "Registrarse",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "signIn": "Inicia sesión"
+    },
+    "logout": {
+      "button": "Cerrar sesión",
+      "confirm": "¿Estás seguro de que quieres cerrar sesión?"
+    }
+  },
+  "navigation": {
+    "dashboard": "Panel",
+    "businesses": "Negocios",
+    "vouchers": "Cupones",
+    "voucherBooks": "Libros de Cupones",
+    "users": "Usuarios",
+    "analytics": "Analíticas",
+    "settings": "Configuración",
+    "profile": "Mi Perfil",
+    "myBusiness": "Mi Negocio",
+    "payments": "Pagos",
+    "support": "Soporte",
+    "reports": "Informes",
+    "customers": "Clientes",
+    "bookings": "Reservas",
+    "messages": "Mensajes"
+  },
+  "dashboard": {
+    "title": "Panel de Control",
+    "welcome": "Bienvenido, {name}",
+    "admin": {
+      "subtitle": "Aquí está el resumen de tu plataforma"
+    },
+    "business": {
+      "subtitle": "Aquí está el rendimiento de tu negocio"
+    },
+    "metrics": {
+      "totalVouchers": "Cupones Totales",
+      "activeVouchers": "Cupones Activos",
+      "totalRedemptions": "Canjes Totales",
+      "revenue": "Ingresos",
+      "growth": "Crecimiento",
+      "totalUsers": "Usuarios Totales",
+      "totalBusinesses": "Negocios Totales",
+      "monthlyGrowth": "Crecimiento Mensual",
+      "newCustomers": "Nuevos Clientes"
+    },
+    "recentActivity": "Actividad Reciente",
+    "viewAllActivity": "Ver toda la actividad"
+  },
+  "vouchers": {
+    "title": "Cupones",
+    "create": {
+      "title": "Crear Cupón",
+      "button": "Nuevo Cupón"
+    },
+    "edit": {
+      "title": "Editar Cupón"
+    },
+    "fields": {
+      "title": "Título",
+      "description": "Descripción",
+      "discount": "Descuento",
+      "validFrom": "Válido desde",
+      "validUntil": "Válido hasta",
+      "maxRedemptions": "Canjes máximos",
+      "termsAndConditions": "Términos y condiciones"
+    },
+    "status": {
+      "active": "Activo",
+      "expired": "Expirado",
+      "draft": "Borrador",
+      "suspended": "Suspendido"
+    }
+  },
+  "businesses": {
+    "title": "Negocios",
+    "fields": {
+      "name": "Nombre del negocio",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "category": "Categoría",
+      "status": "Estado"
+    },
+    "status": {
+      "active": "Activo",
+      "pending": "Pendiente",
+      "suspended": "Suspendido",
+      "verified": "Verificado"
+    }
+  },
+  "language": {
+    "selector": {
+      "label": "Idioma",
+      "change": "Cambiar idioma"
+    }
+  },
+  "errors": {
+    "unauthorized": "No autorizado",
+    "forbidden": "Acceso denegado",
+    "notFound": "No encontrado",
+    "serverError": "Error del servidor",
+    "networkError": "Error de conexión"
+  },
+  "user": {
+    "role": {
+      "admin": "Administrador",
+      "business": "Negocio",
+      "customer": "Cliente"
+    },
+    "menu": {
+      "profile": "Perfil",
+      "settings": "Configuración",
+      "logout": "Cerrar sesión"
+    }
+  }
+}

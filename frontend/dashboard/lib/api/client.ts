@@ -31,20 +31,7 @@ OpenAPI.TOKEN = async () => {
   return token ? `Bearer ${token}` : ''
 }
 
-// Configuration for retry
-const RETRY_CONFIG = {
-  maxRetries: 3,
-  timeout: 30000,
-  retryableStatusCodes: [408, 429, 500, 502, 503, 504],
-  retryOnNetworkError: true,
-}
-
 // Token management
-async function getAuthToken(): Promise<string> {
-  const token = getAccessToken()
-
-  return token ? `Bearer ${token}` : ''
-}
 
 // Refresh token logic
 async function refreshAccessToken(): Promise<string | null> {
@@ -55,14 +42,17 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 
   try {
-    const response = await AuthenticationService.refreshToken({
-      requestBody: { refresh_token: refreshToken },
+    const response = await AuthenticationService.postAuthToken({
+      requestBody: { 
+        grantType: 'refreshToken' as const,
+        refreshToken: refreshToken 
+      },
     })
 
-    if (response.tokens?.access_token && response.tokens?.refresh_token) {
-      setTokens(response.tokens.access_token, response.tokens.refresh_token)
+    if (response.accessToken && response.refreshToken) {
+      setTokens(response.accessToken, response.refreshToken)
 
-      return response.tokens.access_token
+      return response.accessToken
     }
   } catch (error) {
     console.error('Token refresh failed:', error)
@@ -88,9 +78,7 @@ function handleApiError(error: any): never {
 
 // Create wrapper for 401 handling
 function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(
-  fn: T,
-  serviceName: string,
-  methodName: string
+  fn: T
 ): T {
   return (async (...args: any[]) => {
     try {
@@ -127,9 +115,7 @@ function wrapService<T extends Record<string, any>>(
   Object.keys(service).forEach((key) => {
     if (typeof service[key] === 'function') {
       wrappedService[key] = wrapWithAuth(
-        service[key].bind(service),
-        serviceName,
-        key
+        service[key].bind(service)
       )
     } else {
       wrappedService[key] = service[key]

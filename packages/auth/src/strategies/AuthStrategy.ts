@@ -59,6 +59,7 @@ export interface AuthResult {
   message?: string
   requiresVerification?: boolean
   requiresMfa?: boolean
+  emailSent?: boolean
 }
 
 export interface RefreshResult {
