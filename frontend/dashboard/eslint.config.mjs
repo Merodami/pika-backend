@@ -95,6 +95,7 @@ const eslintConfig = [
       '*.config.js',
       '*.config.mjs',
       '*.config.ts',
+      'lib/api/generated/**',
     ],
   },
 ]

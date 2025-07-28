@@ -10,6 +10,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 import { createCommunicationServer } from '@communication/server.js'
 import { createSharedCommunicationTestData } from '@communication/test/helpers/communicationTestHelpers.js'

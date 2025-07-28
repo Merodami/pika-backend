@@ -4,6 +4,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http') // Ensures real createExpressServer is used
 vi.unmock('@pika/api') // Ensures real schemas from @pika/api
 vi.unmock('@pika/redis') // Ensures real cache decorators from @pika/redis
+vi.unmock('@pika/shared') // Ensures real error classes are used
 
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {

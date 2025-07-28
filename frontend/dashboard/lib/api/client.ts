@@ -1,5 +1,3 @@
-import { API, createRetryApiClient } from '@pika/sdk'
-import { get, set } from 'lodash-es'
 import { toast } from 'sonner'
 
 import {
@@ -9,16 +7,37 @@ import {
   setTokens,
 } from '@/lib/auth/tokens'
 
-// Configuration for retry client
+import { OpenAPI } from './generated/core/OpenAPI'
+import { AuthenticationService } from './generated/services/AuthenticationService'
+import { BusinessManagementService } from './generated/services/BusinessManagementService'
+import { CategoriesService } from './generated/services/CategoriesService'
+import { CategoryManagementService } from './generated/services/CategoryManagementService'
+import { CommunicationManagementService } from './generated/services/CommunicationManagementService'
+import { FinancialManagementService } from './generated/services/FinancialManagementService'
+import { MyBusinessService } from './generated/services/MyBusinessService'
+import { StorageService } from './generated/services/StorageService'
+import { SupportService } from './generated/services/SupportService'
+import { UserManagementService } from './generated/services/UserManagementService'
+import { UsersService } from './generated/services/UsersService'
+import { VoucherManagementService } from './generated/services/VoucherManagementService'
+import { VouchersService } from './generated/services/VouchersService'
+
+// Configure OpenAPI client
+OpenAPI.BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5500/api/v1'
+OpenAPI.WITH_CREDENTIALS = true
+OpenAPI.TOKEN = async () => {
+  const token = getAccessToken()
+
+  return token ? `Bearer ${token}` : ''
+}
+
+// Configuration for retry
 const RETRY_CONFIG = {
   maxRetries: 3,
   timeout: 30000,
   retryableStatusCodes: [408, 429, 500, 502, 503, 504],
   retryOnNetworkError: true,
 }
-
-// Create a singleton instance
-let apiInstance: API | null = null
 
 // Token management
 async function getAuthToken(): Promise<string> {
@@ -36,12 +55,7 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 
   try {
-    // Use a temporary client without auth for refresh
-    const tempClient = new API({
-      BASE: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api/v1',
-    })
-
-    const response = await tempClient.auth.refreshToken({
+    const response = await AuthenticationService.refreshToken({
       requestBody: { refresh_token: refreshToken },
     })
 
@@ -75,19 +89,20 @@ function handleApiError(error: any): never {
 // Create wrapper for 401 handling
 function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(
   fn: T,
-  context: any
+  serviceName: string,
+  methodName: string
 ): T {
   return (async (...args: any[]) => {
     try {
-      return await fn.apply(context, args)
+      return await fn(...args)
     } catch (error: any) {
       if (error?.status === 401) {
         const newToken = await refreshAccessToken()
 
         if (newToken) {
-          // Retry the request - the token function will provide the new token
+          // Retry the request
           try {
-            return await fn.apply(context, args)
+            return await fn(...args)
           } catch (retryError) {
             handleApiError(retryError)
           }
@@ -102,75 +117,68 @@ function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(
   }) as T
 }
 
-// Create and configure the API client
-export function createApiClient(): API {
-  if (!apiInstance) {
-    apiInstance = createRetryApiClient(
-      {
-        BASE: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api/v1',
-        TOKEN: getAuthToken,
-        WITH_CREDENTIALS: true,
-        HEADERS: {
-          'Content-Type': 'application/json',
-        },
-      },
-      RETRY_CONFIG
-    )
+// Wrap service methods with auth handling
+function wrapService<T extends Record<string, any>>(
+  service: T,
+  serviceName: string
+): T {
+  const wrappedService = {} as T
 
-    // Wrap all service methods with auth handling
-    const services = [
-      'auth',
-      'categories',
-      'messaging',
-      'notifications',
-      'payments',
-      'businesses',
-      'redemptions',
-      'reviews',
-      'system',
-      'users',
-      'vouchers',
-    ] as const
+  Object.keys(service).forEach((key) => {
+    if (typeof service[key] === 'function') {
+      wrappedService[key] = wrapWithAuth(
+        service[key].bind(service),
+        serviceName,
+        key
+      )
+    } else {
+      wrappedService[key] = service[key]
+    }
+  })
 
-    services.forEach((serviceName) => {
-      const service = get(apiInstance, serviceName)
-
-      if (service) {
-        Object.getOwnPropertyNames(Object.getPrototypeOf(service))
-          .filter(
-            (name) =>
-              name !== 'constructor' && typeof get(service, name) === 'function'
-          )
-          .forEach((methodName) => {
-            const originalMethod = get(service, methodName).bind(service)
-
-            set(service, methodName, wrapWithAuth(originalMethod, service))
-          })
-      }
-    })
-  }
-
-  return apiInstance
+  return wrappedService
 }
 
-// Export the default API client instance
-export const api = createApiClient()
+// Create API client interface
+export const api = {
+  auth: wrapService(AuthenticationService, 'auth'),
+  categories: wrapService(CategoriesService, 'categories'),
+  categoryManagement: wrapService(
+    CategoryManagementService,
+    'categoryManagement'
+  ),
+  businesses: wrapService(MyBusinessService, 'businesses'),
+  businessManagement: wrapService(
+    BusinessManagementService,
+    'businessManagement'
+  ),
+  users: wrapService(UsersService, 'users'),
+  userManagement: wrapService(UserManagementService, 'userManagement'),
+  vouchers: wrapService(VouchersService, 'vouchers'),
+  voucherManagement: wrapService(VoucherManagementService, 'voucherManagement'),
+  communication: wrapService(CommunicationManagementService, 'communication'),
+  storage: wrapService(StorageService, 'storage'),
+  support: wrapService(SupportService, 'support'),
+  financial: wrapService(FinancialManagementService, 'financial'),
+}
 
 // Helper to reset the client (useful for logout)
 export function resetApiClient() {
-  apiInstance = null
+  // Clear any cached data if needed
+  OpenAPI.TOKEN = async () => ''
 }
 
-// Re-export types for convenience
+// Re-export common types from generated SDK
 export type {
-  AuthResponse,
-  BusinessProfile,
-  Category,
+  AuthTokensResponse,
+  AuthUserResponse,
+  BusinessListResponse,
+  BusinessResponse,
   CategoryListResponse,
-  Login,
-  Review,
-  UserProfile,
-  UserRegistration,
-  Voucher,
+  CategoryResponse,
+  RegisterRequest,
+  TokenRequest,
+  UserProfileResponse,
   VoucherListResponse,
-} from '@pika/sdk'
+  VoucherResponse,
+} from './generated'

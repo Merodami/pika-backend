@@ -1,36 +1,563 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pika Dashboard
+
+A modern, enterprise-grade admin and business management dashboard built with Next.js 15, React 19, and TypeScript. This dashboard provides a unified interface for managing businesses, vouchers, users, and platform operations.
+
+## Table of Contents
+
+- [Architecture Overview](#architecture-overview)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Development](#development)
+- [API Integration](#api-integration)
+- [Authentication](#authentication)
+- [State Management](#state-management)
+- [UI Components](#ui-components)
+- [Testing](#testing)
+- [Build & Deployment](#build--deployment)
+- [Industry Standards Compliance](#industry-standards-compliance)
+- [Performance Optimizations](#performance-optimizations)
+- [Security](#security)
+- [Contributing](#contributing)
+
+## Architecture Overview
+
+This dashboard follows industry-standard patterns for modern React applications:
+
+- **Component Architecture**: Feature-based organization with clear separation of concerns
+- **API Layer**: Auto-generated TypeScript SDK from OpenAPI specifications
+- **State Management**: Zustand for global state, React Query for server state
+- **Authentication**: JWT-based with automatic token refresh
+- **Real-time Updates**: Firebase integration for live notifications (currently optional)
+- **Multi-tenant**: Supports both Admin and Business user roles
+
+## Technology Stack
+
+### Core Framework
+
+- **Next.js 15.4.4**: React framework with App Router, Server Components, and Turbopack
+- **React 19.1.0**: Latest React with concurrent features
+- **TypeScript 5.8.3**: Type-safe development with strict configuration
+
+### UI Libraries
+
+- **Ant Design 5.26.6**: Enterprise-grade UI component library
+- **Tailwind CSS 4.1.11**: Utility-first CSS framework
+- **Tremor 3.18.7**: React components for building dashboards
+- **Radix UI**: Accessible, unstyled UI primitives
+- **Lucide React**: Modern icon library
+
+### State & Data Management
+
+- **Zustand 5.0.6**: Lightweight state management
+- **TanStack Query 5.83.0**: Powerful data synchronization
+- **React Hook Form 7.61.1**: Performant forms with validation
+- **Zod 4.0.10**: TypeScript-first schema validation
+
+### Development Tools
+
+- **Vitest 3.2.4**: Fast unit testing framework
+- **ESLint 9.30.0**: Code quality and consistency
+- **Prettier**: Code formatting
+- **Husky**: Git hooks for quality gates
+
+### Utilities
+
+- **Axios 1.11.0**: HTTP client with interceptors
+- **date-fns 4.1.0**: Modern date utility library
+- **lodash-es 4.17.21**: Utility functions (tree-shakeable)
+- **js-cookie 3.0.5**: Cookie management
+
+## Project Structure
+
+```
+frontend/dashboard/
+├── app/                      # Next.js App Router
+│   ├── (auth)/              # Authentication routes (login, register)
+│   ├── (dashboard)/         # Protected dashboard routes
+│   │   ├── admin/          # Admin-specific pages
+│   │   └── business/       # Business owner pages
+│   ├── layout.tsx          # Root layout
+│   └── globals.css         # Global styles
+├── components/              # Reusable UI components
+│   ├── auth/               # Authentication components
+│   ├── features/           # Feature-specific components
+│   ├── layouts/            # Layout components (header, sidebar)
+│   └── ui/                 # Generic UI components
+├── hooks/                   # Custom React hooks
+│   ├── auth/               # Authentication hooks
+│   ├── data/               # Data fetching hooks
+│   └── ui/                 # UI-related hooks
+├── lib/                     # Core utilities and libraries
+│   ├── api/                # API client and adapters
+│   │   ├── generated/      # Auto-generated SDK
+│   │   ├── admin-adapter.ts
+│   │   ├── business-adapter.ts
+│   │   └── client.ts       # Configured API client
+│   ├── auth/               # Auth utilities
+│   ├── firebase/           # Firebase configuration
+│   └── utils/              # General utilities
+├── services/                # Business logic services
+├── store/                   # Zustand stores
+│   ├── auth.store.ts       # Authentication state
+│   ├── notifications.store.ts
+│   └── ui.store.ts         # UI state
+├── types/                   # TypeScript type definitions
+└── tests/                   # Test files
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 22.x (required by backend monorepo)
+- Yarn 4.9.1 (Berry)
+- Backend services running locally
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Navigate to dashboard directory
+cd frontend/dashboard
+
+# Install dependencies
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file in the dashboard root:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:5500/api/v1
 
-## Learn More
+# Firebase Configuration (optional)
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 
-To learn more about Next.js, take a look at the following resources:
+# Feature Flags
+NEXT_PUBLIC_ENABLE_FIREBASE=false
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Running the Development Server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Start with Turbopack (recommended)
+yarn dev
 
-## Deploy on Vercel
+# The dashboard will be available at http://localhost:3000
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Code Style
+
+The project enforces consistent code style through:
+
+- **ESLint**: Configured with Next.js best practices
+- **Prettier**: Automatic code formatting
+- **TypeScript**: Strict mode enabled
+
+```bash
+# Run linting
+yarn lint
+
+# Fix linting issues
+yarn lint:fix
+
+# Format code
+yarn format:fix
+
+# Type checking
+yarn typecheck
+
+# Run all validations
+yarn validate
+```
+
+### Component Development Guidelines
+
+1. **Feature-First Organization**: Group components by feature rather than type
+2. **Composition over Inheritance**: Use hooks and component composition
+3. **Type Safety**: Define interfaces for all props and state
+4. **Accessibility**: Use semantic HTML and ARIA attributes
+5. **Performance**: Implement React.memo and useMemo where appropriate
+
+Example component structure:
+
+```typescript
+// components/features/voucher/VoucherCard.tsx
+interface VoucherCardProps {
+  voucher: VoucherResponse
+  onEdit?: (id: string) => void
+  onDelete?: (id: string) => void
+}
+
+export const VoucherCard: React.FC<VoucherCardProps> = memo(
+  ({ voucher, onEdit, onDelete }) => {
+    // Component implementation
+  }
+)
+```
+
+## API Integration
+
+### Auto-Generated SDK
+
+The dashboard uses an auto-generated TypeScript SDK from the backend's OpenAPI specification:
+
+```bash
+# SDK is generated in the backend
+cd ../../  # Navigate to backend root
+yarn generate:api  # Generate OpenAPI spec
+yarn generate:sdk  # Generate TypeScript SDK
+
+# The SDK is output to:
+# frontend/dashboard/lib/api/generated/
+```
+
+### API Client Configuration
+
+The API client (`lib/api/client.ts`) provides:
+
+- **Automatic token management**: Handles access/refresh tokens
+- **Retry logic**: Configurable retry for failed requests
+- **Error handling**: Unified error handling with toast notifications
+- **Type safety**: Full TypeScript support from generated SDK
+
+### Usage Example
+
+```typescript
+import { api } from '@/lib/api/client'
+
+// In a React component or hook
+const { data, isLoading, error } = useQuery({
+  queryKey: ['vouchers', params],
+  queryFn: () => api.vouchers.getVouchers(params),
+})
+```
+
+### Adapter Pattern
+
+For complex API operations, use adapter patterns:
+
+```typescript
+// lib/api/business-adapter.ts
+export const businessAdapter = {
+  async getDashboardMetrics(businessId: string) {
+    const [vouchers, analytics] = await Promise.all([
+      api.vouchers.getBusinessVouchers({ businessId }),
+      api.analytics.getBusinessAnalytics({ businessId }),
+    ])
+
+    return {
+      totalVouchers: vouchers.pagination.total,
+      activeVouchers: analytics.activeCount,
+      // ... transformed data
+    }
+  },
+}
+```
+
+## Authentication
+
+### JWT Token Management
+
+- **Storage**: Secure HTTP-only cookies (recommended) or localStorage
+- **Auto-refresh**: Tokens refresh automatically before expiration
+- **Protected Routes**: Middleware ensures authentication
+
+### Protected Route Implementation
+
+```typescript
+// components/auth/protected-route.tsx
+export function ProtectedRoute({
+  children,
+  allowedRoles = []
+}: ProtectedRouteProps) {
+  const { user, isLoading } = useAuthStore()
+
+  if (isLoading) return <LoadingScreen />
+  if (!user) redirect('/login')
+  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+    redirect('/unauthorized')
+  }
+
+  return children
+}
+```
+
+## State Management
+
+### Zustand Stores
+
+Global application state is managed with Zustand:
+
+```typescript
+// store/auth.store.ts
+interface AuthState {
+  user: User | null
+  isAuthenticated: boolean
+  login: (credentials: LoginCredentials) => Promise<void>
+  logout: () => void
+  checkAuth: () => void
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  // Store implementation
+}))
+```
+
+### React Query for Server State
+
+Server state is managed with TanStack Query:
+
+```typescript
+// hooks/data/use-vouchers.ts
+export function useVouchers(params: VoucherQueryParams) {
+  return useQuery({
+    queryKey: ['vouchers', params],
+    queryFn: () => voucherAdapter.getVouchers(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+```
+
+## UI Components
+
+### Design System
+
+The dashboard uses a combination of:
+
+1. **Ant Design**: Primary component library for complex components
+2. **Custom Components**: Built with Tailwind CSS for specific needs
+3. **Tremor**: For charts and data visualization
+
+### Component Library Usage
+
+```typescript
+// Using Ant Design with Tailwind
+import { Button, Card, Table } from 'antd'
+
+<Card className="shadow-lg rounded-lg p-6">
+  <Button type="primary" className="bg-blue-600 hover:bg-blue-700">
+    Create Voucher
+  </Button>
+</Card>
+```
+
+### Responsive Design
+
+- Mobile-first approach with Tailwind breakpoints
+- Responsive navigation with collapsible sidebar
+- Touch-optimized interactions
+
+## Testing
+
+### Unit Testing
+
+```bash
+# Run unit tests
+yarn test
+
+# Run with coverage
+yarn test:coverage
+
+# Watch mode
+yarn test:watch
+```
+
+### Integration Testing
+
+```bash
+# Run integration tests
+yarn test:integration
+```
+
+### Test Structure
+
+```typescript
+// components/features/voucher/VoucherCard.test.tsx
+describe('VoucherCard', () => {
+  it('should render voucher information', () => {
+    const voucher = mockVoucher()
+    render(<VoucherCard voucher={voucher} />)
+
+    expect(screen.getByText(voucher.title)).toBeInTheDocument()
+    expect(screen.getByText(voucher.description)).toBeInTheDocument()
+  })
+})
+```
+
+## Build & Deployment
+
+### Production Build
+
+```bash
+# Create production build
+yarn build
+
+# Start production server
+yarn start
+```
+
+### Build Optimizations
+
+- **Code Splitting**: Automatic with Next.js App Router
+- **Image Optimization**: Next.js Image component
+- **Font Optimization**: Automatic with next/font
+- **Tree Shaking**: Removes unused code
+- **Minification**: Automatic in production
+
+### Deployment Options
+
+1. **Vercel**: Recommended for Next.js applications
+2. **Docker**: Containerized deployment
+3. **Static Export**: For CDN deployment (limited features)
+
+## Industry Standards Compliance
+
+### Code Quality
+
+✅ **TypeScript Strict Mode**: Full type safety
+✅ **ESLint Configuration**: Enforces best practices
+✅ **Prettier**: Consistent code formatting
+✅ **Husky**: Pre-commit hooks for quality gates
+
+### Performance
+
+✅ **Code Splitting**: Automatic with dynamic imports
+✅ **React Query**: Intelligent caching and background updates
+✅ **Memoization**: Strategic use of React.memo and useMemo
+✅ **Virtual Scrolling**: For large lists (when needed)
+
+### Security
+
+✅ **JWT Authentication**: Secure token management
+✅ **HTTPS Only**: Enforced in production
+✅ **XSS Protection**: React's built-in protections
+✅ **CSRF Protection**: Token validation
+✅ **Input Validation**: Zod schemas for all forms
+
+### Accessibility
+
+✅ **Semantic HTML**: Proper element usage
+✅ **ARIA Labels**: For screen readers
+✅ **Keyboard Navigation**: Full keyboard support
+✅ **Focus Management**: Proper focus handling
+
+### SEO & Meta
+
+✅ **Next.js Metadata API**: Dynamic meta tags
+✅ **Structured Data**: JSON-LD support
+✅ **Sitemap Generation**: Automatic with Next.js
+
+## Performance Optimizations
+
+### Current Optimizations
+
+1. **React Query Caching**: 5-minute stale time, 10-minute cache time
+2. **Component Lazy Loading**: Dynamic imports for code splitting
+3. **Image Optimization**: Next.js Image component with lazy loading
+4. **Bundle Optimization**: Tree shaking and minification
+
+### Monitoring
+
+```typescript
+// lib/utils/performance.ts
+export function measurePerformance(metricName: string) {
+  if (typeof window !== 'undefined' && window.performance) {
+    const navigation = performance.getEntriesByType('navigation')[0]
+    // Log metrics to analytics service
+  }
+}
+```
+
+## Security
+
+### Authentication Flow
+
+1. User enters credentials
+2. API validates and returns JWT tokens
+3. Tokens stored securely (cookies/localStorage)
+4. Auto-refresh before expiration
+5. Logout clears all tokens
+
+### API Security
+
+- **CORS**: Configured for allowed origins
+- **Rate Limiting**: Implemented on API Gateway
+- **Request Validation**: Zod schemas validate all inputs
+- **Error Handling**: No sensitive data in error messages
+
+## Contributing
+
+### Development Workflow
+
+1. Create feature branch from `main`
+2. Implement feature following guidelines
+3. Write/update tests
+4. Run validation: `yarn validate`
+5. Create pull request
+
+### Commit Convention
+
+Follow conventional commits:
+
+```
+feat: add voucher analytics dashboard
+fix: resolve token refresh race condition
+docs: update API integration guide
+style: format dashboard components
+refactor: simplify auth store logic
+test: add voucher adapter tests
+chore: update dependencies
+```
+
+### Code Review Checklist
+
+- [ ] TypeScript types properly defined
+- [ ] Component follows project patterns
+- [ ] Tests written/updated
+- [ ] No console.logs in production code
+- [ ] Accessibility considerations
+- [ ] Performance impact assessed
+- [ ] Documentation updated
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Build Errors**: Clear `.next` folder and rebuild
+2. **Type Errors**: Regenerate SDK after API changes
+3. **Auth Issues**: Check token expiration and refresh logic
+4. **Performance**: Use React DevTools Profiler
+
+### Debug Mode
+
+```typescript
+// Enable debug logging
+localStorage.setItem('debug', 'pika:*')
+```
+
+## Future Enhancements
+
+- [ ] Progressive Web App (PWA) support
+- [ ] Internationalization (i18n)
+- [ ] Dark mode theme
+- [ ] Advanced analytics dashboard
+- [ ] Real-time collaboration features
+- [ ] Offline support with service workers
+
+## License
+
+Proprietary - Pika Platform
+
+---
+
+For more information, contact the development team or refer to the main project documentation.

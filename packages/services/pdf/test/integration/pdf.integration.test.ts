@@ -12,6 +12,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'

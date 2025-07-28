@@ -8,6 +8,7 @@ import { vi } from 'vitest'
 
 // --- START MOCKING CONFIGURATION ---
 vi.unmock('@pika/http')
+vi.unmock('@pika/shared')
 
 vi.mock('@pika/api', async () => {
   const actualApi =
