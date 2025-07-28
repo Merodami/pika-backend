@@ -1,3 +1,7 @@
+import type {
+  INotificationRepository,
+  NotificationSearchParams,
+} from '@communication/repositories/NotificationRepository.js'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
 import type {
@@ -8,10 +12,6 @@ import type {
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 
-import type {
-  INotificationRepository,
-  NotificationSearchParams,
-} from '../repositories/NotificationRepository.js'
 import type { IEmailService } from './EmailService.js'
 
 export interface INotificationService {

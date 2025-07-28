@@ -1,11 +1,10 @@
+import { AuthController } from '@auth-service/controllers/AuthController.js'
+import { AuthService } from '@auth-service/services/AuthService.js'
 import { authPublic } from '@pika/api'
 import { requireAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, UserServiceClient } from '@pika/shared'
 import { Router } from 'express'
-
-import { AuthController } from '../controllers/AuthController.js'
-import { AuthService } from '../services/AuthService.js'
 
 export function createAuthRouter(
   cache: ICacheService,

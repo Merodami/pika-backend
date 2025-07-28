@@ -4,6 +4,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 import {
   AWS_S3_ACCESS_KEY_ID,
@@ -21,6 +22,7 @@ import {
   S3TestHelper,
 } from '@pika/tests'
 import { FileStatus, StorageProvider } from '@pika/types'
+import { createStorageServer } from '@storage/server.js'
 import {
   cleanupTestDatabase,
   clearTestDatabase,
@@ -38,8 +40,6 @@ import {
   expect,
   it,
 } from 'vitest'
-
-import { createStorageServer } from '../../../server.js'
 
 describe('Storage Service with S3/MinIO Integration Tests', () => {
   let testDb: TestDatabaseResult

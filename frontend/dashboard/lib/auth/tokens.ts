@@ -115,7 +115,7 @@ export function decodeToken(token: string): any | null {
         .map((c) => {
           const hex = c.charCodeAt(0).toString(16)
 
-          return '%' + ('00' + hex).slice(-2)
+          return `%${`00${hex}`.slice(-2)}`
         })
         .join('')
     )

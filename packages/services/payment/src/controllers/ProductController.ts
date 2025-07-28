@@ -1,9 +1,8 @@
+import type { IProductService } from '@payment/services/ProductService.js'
 import { paymentPublic } from '@pika/api'
 import { getValidatedQuery, validateResponse } from '@pika/http'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { IProductService } from '../services/ProductService.js'
 
 /**
  * Handles Stripe product and price management

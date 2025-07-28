@@ -1,6 +1,13 @@
-# HTTP Package
+# ⚡ @pika/http - Express.js Framework Foundation
 
-Express.js framework utilities and middleware for the Pika platform, providing standardized HTTP server creation, authentication, validation, and cross-cutting concerns.
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue?logo=typescript)
+![Architecture](https://img.shields.io/badge/Architecture-Clean-green)
+![Express](https://img.shields.io/badge/Express-5.1.0-black?logo=express)
+![Status](https://img.shields.io/badge/Status-Production-success)
+
+## 🎯 Purpose & Vision
+
+The HTTP package is the **foundational framework layer** for all Pika microservices. It provides a comprehensive Express.js foundation with opinionated defaults, standardized middleware stack, and enterprise-grade cross-cutting concerns. The package enables rapid service development while maintaining consistency, security, and observability across the entire platform.
 
 ## 🚀 Quick Start
 
@@ -26,6 +33,19 @@ The HTTP package provides a comprehensive Express.js foundation for all Pika mic
 - **Security**: Helmet, CORS, rate limiting, and security headers
 - **Observability**: Request logging, health checks, and metrics
 - **File Upload**: Multer integration with validation and limits
+- **Idempotency**: Duplicate request prevention for critical operations
+- **Context Management**: Correlation IDs and request tracking
+
+### Key Features
+
+- 🚀 **One-Line Server Setup**: Complete Express server with single function call
+- 🔐 **Enterprise Security**: JWT, API keys, CORS, rate limiting, security headers
+- ✅ **Request Validation**: Zod schema validation with detailed error responses
+- 🏥 **Health Monitoring**: Built-in health checks with dependency validation
+- 📝 **Request Logging**: Structured logging with correlation ID tracking
+- 🔄 **Idempotency**: Prevent duplicate processing of critical operations
+- 📊 **Observability**: Metrics, tracing, and performance monitoring
+- 🔧 **Highly Configurable**: Extensive options for customization
 
 ## 🏗️ Architecture
 
@@ -456,12 +476,64 @@ const app = await createExpressServer({
 })
 ```
 
-## 🔄 Future Enhancements
+## 🎯 Best Practices
 
-- [ ] WebSocket support
-- [ ] gRPC gateway
-- [ ] OpenTelemetry integration
-- [ ] Circuit breaker pattern
-- [ ] Advanced rate limiting
-- [ ] Request/response caching
-- [ ] API versioning utilities
+### Server Setup
+
+1. **Use Factory Pattern**: Always use `createExpressServer()` for consistency
+2. **Configure Security**: Enable all security features for production
+3. **Validate Everything**: Use Zod schemas for all input validation
+4. **Handle Errors Gracefully**: Let the framework handle error formatting
+5. **Monitor Health**: Include dependency checks in health endpoints
+
+### Performance Tips
+
+1. **Enable Compression**: Automatic gzip reduces bandwidth
+2. **Use Keep-Alive**: HTTP connection reuse improves performance
+3. **Implement Idempotency**: Prevent duplicate operations
+4. **Cache Responses**: Use appropriate cache headers
+5. **Monitor Metrics**: Track response times and error rates
+
+### Security Guidelines
+
+1. **JWT Best Practices**: Short expiration times, secure secrets
+2. **API Key Rotation**: Regular rotation of service API keys
+3. **CORS Configuration**: Restrictive origins for production
+4. **Rate Limiting**: Protect against abuse and DoS attacks
+5. **Input Validation**: Never trust user input
+
+## 📝 Dependencies
+
+### Core Dependencies
+
+- **express**: Web application framework
+- **helmet**: Security middleware collection
+- **cors**: Cross-origin resource sharing
+- **compression**: Response compression
+- **express-rate-limit**: Rate limiting middleware
+
+### Internal Dependencies
+
+- **@pika/shared**: Error handling and utilities
+- **@pika/auth**: JWT token validation
+- **@pika/redis**: Caching and session storage
+- **@pika/environment**: Configuration management
+
+## 📝 Changelog
+
+### Recent Updates
+
+- Implemented standardized Express server factory
+- Added comprehensive middleware stack
+- Created idempotency middleware for critical operations
+- Added request context and correlation ID tracking
+- Implemented health check framework
+- Added file upload validation and processing
+- Created service-to-service authentication
+- Enhanced error handling and response formatting
+
+---
+
+**Package Version**: 1.0.0  
+**Last Updated**: 2025-01-27  
+**Maintainer**: Platform Team

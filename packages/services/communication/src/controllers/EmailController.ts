@@ -1,3 +1,8 @@
+import type {
+  BulkEmailInput,
+  IEmailService,
+  SendEmailInput,
+} from '@communication/services/EmailService.js'
 import { communicationCommon, communicationPublic } from '@pika/api'
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
@@ -10,12 +15,6 @@ import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { CommunicationLogMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
-
-import type {
-  BulkEmailInput,
-  IEmailService,
-  SendEmailInput,
-} from '../services/EmailService.js'
 
 export interface IEmailController {
   sendEmail(

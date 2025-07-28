@@ -9,11 +9,10 @@ import {
 import type { ICacheService } from '@pika/redis'
 import { PaymentServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
+import { PlanController } from '@subscription/controllers/PlanController.js'
+import { PlanRepository } from '@subscription/repositories/PlanRepository.js'
+import { PlanService } from '@subscription/services/PlanService.js'
 import { Router } from 'express'
-
-import { PlanController } from '../controllers/PlanController.js'
-import { PlanRepository } from '../repositories/PlanRepository.js'
-import { PlanService } from '../services/PlanService.js'
 
 export function createPlanRouter(
   prisma: PrismaClient,

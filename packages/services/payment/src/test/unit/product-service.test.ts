@@ -1,7 +1,6 @@
+import { ProductService } from '@payment/services/ProductService.js'
+import type { IStripeService } from '@payment/services/StripeService.js'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import { ProductService } from '../../services/ProductService.js'
-import type { IStripeService } from '../../services/StripeService.js'
 
 describe('ProductService', () => {
   let productService: ProductService

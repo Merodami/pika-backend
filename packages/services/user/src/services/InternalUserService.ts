@@ -1,9 +1,8 @@
 import { ICacheService } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
+import type { IUserRepository } from '@user/repositories/UserRepository.js'
 import { randomBytes } from 'crypto'
-
-import type { IUserRepository } from '../repositories/UserRepository.js'
 
 // Domain interface for auth-specific data
 interface UserAuthData {

@@ -9,11 +9,11 @@ import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 
 import type {
+  CommentSearchParams,
   CreateSupportCommentInput,
   ISupportCommentRepository,
   UpdateSupportCommentInput,
 } from '../repositories/SupportCommentRepository.js'
-import type { CommentSearchParams } from './SupportCommentService.js'
 
 export interface IAdminSupportCommentService {
   getAllComments(

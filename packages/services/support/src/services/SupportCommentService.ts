@@ -9,18 +9,11 @@ import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 
 import type {
+  CommentSearchParams,
   CreateSupportCommentInput,
   ISupportCommentRepository,
   UpdateSupportCommentInput,
 } from '../repositories/SupportCommentRepository.js'
-
-export interface CommentSearchParams {
-  problemId: string
-  page?: number
-  limit?: number
-  sortBy?: string
-  sortOrder?: 'ASC' | 'DESC'
-}
 
 export interface ISupportCommentService {
   getCommentsByProblemId(

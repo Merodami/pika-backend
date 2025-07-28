@@ -8,11 +8,10 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
+import { AdminCommentController } from '@support/controllers/AdminCommentController.js'
+import { SupportCommentRepository } from '@support/repositories/SupportCommentRepository.js'
+import { AdminSupportCommentService } from '@support/services/AdminSupportCommentService.js'
 import { Router } from 'express'
-
-import { AdminCommentController } from '../controllers/AdminCommentController.js'
-import { SupportCommentRepository } from '../repositories/SupportCommentRepository.js'
-import { AdminSupportCommentService } from '../services/AdminSupportCommentService.js'
 
 export function createAdminCommentRouter(
   prisma: PrismaClient,

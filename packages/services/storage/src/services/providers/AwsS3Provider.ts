@@ -25,6 +25,20 @@ export class AwsS3Provider implements StorageProvider {
   private bucketName: string
   private providerName: string
 
+  /**
+   * Helper to construct S3 key from params
+   */
+  private getS3Key(params: {
+    storageKey?: string
+    folder?: string
+    fileId: string
+  }): string {
+    return (
+      params.storageKey ||
+      (params.folder ? `${params.folder}/${params.fileId}` : params.fileId)
+    )
+  }
+
   constructor(
     private readonly config: {
       region?: string
@@ -149,10 +163,7 @@ export class AwsS3Provider implements StorageProvider {
     }
 
     try {
-      // Use storageKey if provided, otherwise reconstruct from folder and fileId
-      const key =
-        params.storageKey ||
-        (params.folder ? `${params.folder}/${params.fileId}` : params.fileId)
+      const key = this.getS3Key(params)
 
       const command = new DeleteObjectCommand({
         Bucket: this.bucketName,
@@ -184,10 +195,7 @@ export class AwsS3Provider implements StorageProvider {
     }
 
     try {
-      // Use storageKey if provided, otherwise reconstruct from folder and fileId
-      const key =
-        params.storageKey ||
-        (params.folder ? `${params.folder}/${params.fileId}` : params.fileId)
+      const key = this.getS3Key(params)
 
       const url = await this.getSignedDownloadUrl(key, params.expiresIn)
       const expiresAt = new Date(Date.now() + (params.expiresIn || 3600) * 1000)

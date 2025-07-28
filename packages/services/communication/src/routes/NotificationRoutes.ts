@@ -1,3 +1,9 @@
+import { NotificationController } from '@communication/controllers/NotificationController.js'
+import { CommunicationLogRepository } from '@communication/repositories/CommunicationLogRepository.js'
+import { NotificationRepository } from '@communication/repositories/NotificationRepository.js'
+import type { EmailConfig } from '@communication/services/EmailService.js'
+import { EmailService } from '@communication/services/EmailService.js'
+import { NotificationService } from '@communication/services/NotificationService.js'
 import { communicationCommon, communicationPublic } from '@pika/api'
 import {
   requireAuth,
@@ -8,13 +14,6 @@ import {
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
-
-import { NotificationController } from '../controllers/NotificationController.js'
-import { CommunicationLogRepository } from '../repositories/CommunicationLogRepository.js'
-import { NotificationRepository } from '../repositories/NotificationRepository.js'
-import type { EmailConfig } from '../services/EmailService.js'
-import { EmailService } from '../services/EmailService.js'
-import { NotificationService } from '../services/NotificationService.js'
 
 export function createNotificationRouter(
   prisma: PrismaClient,

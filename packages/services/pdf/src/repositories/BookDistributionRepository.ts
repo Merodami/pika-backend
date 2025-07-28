@@ -7,7 +7,13 @@ import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
 
-import type { BusinessDistributionStats } from '../services/BookDistributionService.js'
+export interface BusinessDistributionStats {
+  businessName: string
+  totalDistributions: number
+  totalRequested: number
+  totalShipped: number
+  statusBreakdown: Record<string, number>
+}
 
 /**
  * Book distribution repository interface

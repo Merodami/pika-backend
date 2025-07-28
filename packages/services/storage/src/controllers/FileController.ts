@@ -9,10 +9,8 @@ import {
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { FileStorageLogMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
+import type { IStorageService } from '@storage/services/StorageService.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { FileStorageLogSearchParams } from '../repositories/FileStorageLogRepository.js'
-import type { IStorageService } from '../services/StorageService.js'
 
 export interface IFileController {
   uploadFile(
@@ -296,7 +294,7 @@ export class FileController implements IFileController {
         getValidatedQuery<storagePublic.GetFileHistoryQuery>(request)
 
       // Transform API query to service params
-      const params: FileStorageLogSearchParams = {
+      const params = {
         page: query.page,
         limit: query.limit,
         status: query.status,

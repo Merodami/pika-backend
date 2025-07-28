@@ -1,3 +1,4 @@
+import type { IBusinessService } from '@business/services/BusinessService.js'
 import { businessAdmin, businessPublic, mapSortOrder } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
@@ -9,8 +10,6 @@ import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { IBusinessService } from '../services/BusinessService.js'
 
 /**
  * Handles admin business management operations

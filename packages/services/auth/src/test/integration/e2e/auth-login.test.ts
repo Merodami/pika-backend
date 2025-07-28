@@ -11,14 +11,20 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
+import { createAuthServer } from '@auth-service/server.js'
+import {
+  createSharedAuthTestData,
+  type SharedAuthTestData,
+} from '@auth-service/test/helpers/authTestHelpers.js'
+import { CommunicationServiceClientMock } from '@auth-service/test/mocks/CommunicationServiceClientMock.js'
+import { UserServiceClientMock } from '@auth-service/test/mocks/UserServiceClientMock.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
-  createE2EAuthHelper,
   createTestDatabase,
-  E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
 import { UserRole } from '@pika/types'
@@ -26,20 +32,11 @@ import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { createAuthServer } from '../../../server.js'
-import {
-  createSharedAuthTestData,
-  type SharedAuthTestData,
-} from '../../helpers/authTestHelpers.js'
-import { CommunicationServiceClientMock } from '../../mocks/CommunicationServiceClientMock.js'
-import { UserServiceClientMock } from '../../mocks/UserServiceClientMock.js'
-
 describe('Auth Login Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
   let request: supertest.SuperTest<supertest.Test>
   let cacheService: MemoryCacheService
-  let authHelper: E2EAuthHelper
 
   // Shared test data created once
   let sharedTestData: SharedAuthTestData
@@ -77,7 +74,6 @@ describe('Auth Login Integration Tests', () => {
     request = supertest(app)
 
     // Initialize E2E Authentication Helper
-    authHelper = createE2EAuthHelper(app)
 
     // Create shared test data once for all tests
     logger.debug('Creating shared test data...')

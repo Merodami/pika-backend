@@ -1,8 +1,7 @@
+import { AwsS3Provider } from '@storage/services/providers/AwsS3Provider.js'
+import { ConsoleStorageProvider } from '@storage/services/providers/ConsoleStorageProvider.js'
+import { ProviderFactory } from '@storage/services/providers/ProviderFactory.js'
 import { beforeEach, describe, expect, it } from 'vitest'
-
-import { AwsS3Provider } from '../../services/providers/AwsS3Provider.js'
-import { ConsoleStorageProvider } from '../../services/providers/ConsoleStorageProvider.js'
-import { ProviderFactory } from '../../services/providers/ProviderFactory.js'
 
 describe('ProviderFactory Security Tests', () => {
   let factory: ProviderFactory

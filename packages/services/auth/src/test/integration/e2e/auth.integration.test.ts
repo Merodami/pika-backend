@@ -4,6 +4,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 // Force Vitest to use the actual implementation
 vi.mock('@pika/api', async () => {
@@ -20,6 +21,7 @@ vi.mock('@pika/shared', async () => {
   return actualShared
 })
 
+import { createAuthServer } from '@auth-service/server.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -35,8 +37,6 @@ import {
 import { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createAuthServer } from '../../../server.js'
 
 // Use shared mocks
 const mockUserServiceClient = new UserServiceClientMock()

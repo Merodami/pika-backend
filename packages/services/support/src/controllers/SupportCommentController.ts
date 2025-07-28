@@ -8,9 +8,8 @@ import {
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
+import type { ISupportCommentService } from '@support/services/SupportCommentService.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { ISupportCommentService } from '../services/SupportCommentService.js'
 
 /**
  * Handles support ticket comments

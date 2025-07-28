@@ -1,6 +1,5 @@
+import type { ProviderConfig } from '@communication/services/providers/ProviderFactory.js'
 import { LOCALSTACK_ENDPOINT } from '@pika/environment'
-
-import type { ProviderConfig } from '../services/providers/ProviderFactory.js'
 
 export function getEnvironmentConfig(): ProviderConfig {
   const environment = (process.env.NODE_ENV || 'development') as

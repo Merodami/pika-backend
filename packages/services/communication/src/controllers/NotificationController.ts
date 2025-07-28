@@ -1,3 +1,4 @@
+import type { INotificationService } from '@communication/services/NotificationService.js'
 import {
   // communicationAdmin, // TODO: Uncomment when admin schemas are available
   communicationCommon,
@@ -14,8 +15,6 @@ import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { NotificationMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { INotificationService } from '../services/NotificationService.js'
 
 export interface INotificationController {
   /**

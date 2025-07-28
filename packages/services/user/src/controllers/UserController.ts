@@ -11,9 +11,8 @@ import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import { UserRole } from '@pika/types'
+import type { IUserService } from '@user/services/UserService.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { IUserService } from '../services/UserService.js'
 
 /**
  * Handles user management operations
@@ -33,7 +32,6 @@ export class UserController {
     this.banUser = this.banUser.bind(this)
     this.unbanUser = this.unbanUser.bind(this)
     this.uploadAvatar = this.uploadAvatar.bind(this)
-    this.getUserFriends = this.getUserFriends.bind(this)
     this.getMe = this.getMe.bind(this)
     this.updateMe = this.updateMe.bind(this)
     this.uploadMyAvatar = this.uploadMyAvatar.bind(this)
@@ -114,12 +112,8 @@ export class UserController {
   ): Promise<void> {
     try {
       const { id: userId } = req.params
-      const query = getValidatedQuery<userPublic.GetUserByIdQuery>(req)
-      const { includeFriends } = query
 
-      const user = await this.userService.getUserById(userId, {
-        includeFriends: includeFriends,
-      })
+      const user = await this.userService.getUserById(userId)
 
       const dto = UserMapper.toDTO(user)
       const validatedResponse = validateResponse(
@@ -416,32 +410,6 @@ export class UserController {
         userPublic.UserProfileResponse,
         dto,
         'UserController.unbanUser',
-      )
-
-      res.json(validatedResponse)
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  /**
-   * GET /users/:user_id/friends
-   * Get user's friends list
-   */
-  async getUserFriends(
-    req: Request<userAdmin.UserIdParam>,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    try {
-      const { id: userId } = req.params
-      const friends = await this.userService.getUserFriends(userId)
-
-      const response = { guests: friends }
-      const validatedResponse = validateResponse(
-        userPublic.UserFriendsResponse,
-        response,
-        'UserController.getUserFriends',
       )
 
       res.json(validatedResponse)

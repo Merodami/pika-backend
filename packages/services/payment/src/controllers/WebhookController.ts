@@ -1,9 +1,8 @@
+import type { IStripeService } from '@payment/services/StripeService.js'
 import { STRIPE_WEBHOOK_SECRET } from '@pika/environment'
 import { ErrorFactory, logger, SubscriptionServiceClient } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 import Stripe from 'stripe'
-
-import type { IStripeService } from '../services/StripeService.js'
 
 /**
  * Handles Stripe webhook events

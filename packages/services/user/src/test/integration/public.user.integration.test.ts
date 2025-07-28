@@ -12,6 +12,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
@@ -41,17 +42,16 @@ import {
   type TestDatabaseResult,
 } from '@pika/tests'
 import { UserRole } from '@pika/types'
-import { Express } from 'express'
-import supertest from 'supertest'
-import { v4 as uuid } from 'uuid'
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createUserServer } from '../../server.js'
+import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,
   seedTestUsers,
   type SharedUserTestData,
-} from '../helpers/userTestHelpers.js'
+} from '@user/test/helpers/userTestHelpers.js'
+import { Express } from 'express'
+import supertest from 'supertest'
+import { v4 as uuid } from 'uuid'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 interface FileStoragePort {
   saveFile: (
@@ -74,7 +74,6 @@ describe('User Service - Public API Integration Tests', () => {
   // Authenticated clients for different user types
   let customerClient: AuthenticatedRequestClient
   let businessClient: AuthenticatedRequestClient
-  let adminClient: AuthenticatedRequestClient
 
   // Shared test data created once
   let sharedTestData: SharedUserTestData
@@ -135,7 +134,6 @@ describe('User Service - Public API Integration Tests', () => {
     // Get authenticated clients for different user types
     customerClient = await authHelper.getUserClient(testDb.prisma)
     businessClient = await authHelper.getBusinessClient(testDb.prisma)
-    adminClient = await authHelper.getAdminClient(testDb.prisma)
 
     logger.debug('E2E authentication setup complete')
 

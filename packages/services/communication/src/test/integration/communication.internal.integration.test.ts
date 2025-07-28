@@ -11,6 +11,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 vi.mock('../../services/providers/ProviderFactory.js', async () => {
   const { MockEmailProvider, MockSmsProvider } = await import(
@@ -32,6 +33,11 @@ vi.mock('../../services/providers/ProviderFactory.js', async () => {
   }
 })
 
+import { createCommunicationServer } from '@communication/server.js'
+import {
+  createSharedCommunicationTestData,
+  type SharedCommunicationTestData,
+} from '@communication/test/helpers/communicationTestHelpers.js'
 import { SERVICE_API_KEY } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
@@ -45,12 +51,6 @@ import { EmailTemplateId } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createCommunicationServer } from '../../server.js'
-import {
-  createSharedCommunicationTestData,
-  type SharedCommunicationTestData,
-} from '../helpers/communicationTestHelpers.js'
 
 describe('Communication Service - Internal API Integration Tests', () => {
   let testDb: TestDatabaseResult

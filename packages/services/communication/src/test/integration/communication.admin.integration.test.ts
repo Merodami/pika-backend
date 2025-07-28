@@ -12,6 +12,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
 vi.mock('../../services/providers/ProviderFactory.js', async () => {
   const { MockEmailProvider, MockSmsProvider } = await import(
@@ -33,6 +34,11 @@ vi.mock('../../services/providers/ProviderFactory.js', async () => {
   }
 })
 
+import { createCommunicationServer } from '@communication/server.js'
+import {
+  createSharedCommunicationTestData,
+  type SharedCommunicationTestData,
+} from '@communication/test/helpers/communicationTestHelpers.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -46,12 +52,6 @@ import {
 import { EmailTemplateId } from '@pika/types'
 import type { Express } from 'express'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createCommunicationServer } from '../../server.js'
-import {
-  createSharedCommunicationTestData,
-  type SharedCommunicationTestData,
-} from '../helpers/communicationTestHelpers.js'
 
 describe.skip('Communication Service - Admin API Integration Tests', () => {
   let testDb: TestDatabaseResult
@@ -179,7 +179,7 @@ describe.skip('Communication Service - Admin API Integration Tests', () => {
       })
 
       it.skip('should support metadata in global notifications', async () => {
-        const response = await adminClient
+        await adminClient
           .post('/notifications/global')
           .send({
             title: 'New Feature Released',

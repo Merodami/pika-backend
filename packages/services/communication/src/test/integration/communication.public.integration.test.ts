@@ -10,7 +10,10 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
+vi.unmock('@pika/shared')
 
+import { createCommunicationServer } from '@communication/server.js'
+import { createSharedCommunicationTestData } from '@communication/test/helpers/communicationTestHelpers.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -26,9 +29,6 @@ import type { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { createCommunicationServer } from '../../server.js'
-import { createSharedCommunicationTestData } from '../helpers/communicationTestHelpers.js'
-
 describe('Communication Service - Public API Integration Tests', () => {
   let testDb: TestDatabaseResult
   let app: Express
@@ -36,7 +36,6 @@ describe('Communication Service - Public API Integration Tests', () => {
   let cacheService: MemoryCacheService
   let customerClient: AuthenticatedRequestClient
   let regularUserId: string
-  let sharedTestData: any
 
   beforeAll(async () => {
     logger.info(
@@ -74,7 +73,7 @@ describe('Communication Service - Public API Integration Tests', () => {
 
     regularUserId = regularUser!.id
 
-    sharedTestData = await createSharedCommunicationTestData(testDb.prisma, {
+    await createSharedCommunicationTestData(testDb.prisma, {
       userCount: 2,
       emailCount: 4,
       notificationCount: 4,

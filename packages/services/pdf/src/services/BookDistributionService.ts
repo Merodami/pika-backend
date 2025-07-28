@@ -5,6 +5,7 @@ import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 
 import type {
+  BusinessDistributionStats,
   IBookDistributionRepository,
   IVoucherBookRepository,
 } from '../repositories/index.js'
@@ -58,14 +59,6 @@ export interface BookDistributionSearchParams {
 }
 
 // Use PaginatedResult from @pika/types
-
-export interface BusinessDistributionStats {
-  businessName: string
-  totalDistributions: number
-  totalRequested: number
-  totalShipped: number
-  statusBreakdown: Record<string, number>
-}
 
 export interface IBookDistributionService {
   createDistribution(

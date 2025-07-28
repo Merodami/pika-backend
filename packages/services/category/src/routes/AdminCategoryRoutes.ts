@@ -1,3 +1,4 @@
+import type { AdminCategoryController } from '@category/controllers/AdminCategoryController.js'
 import { categoryAdmin, categoryCommon } from '@pika/api'
 import {
   requirePermissions,
@@ -6,8 +7,6 @@ import {
   validateQuery,
 } from '@pika/http'
 import { Router } from 'express'
-
-import type { AdminCategoryController } from '../controllers/AdminCategoryController.js'
 
 /**
  * Creates admin category routes

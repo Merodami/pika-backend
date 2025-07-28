@@ -1,3 +1,4 @@
+import { UserServiceClientAdapter } from '@auth-service/adapters/UserServiceClientAdapter.js'
 import {
   AuthStrategy,
   createLocalAuthStrategy,
@@ -20,8 +21,6 @@ import {
   UserServiceClient,
 } from '@pika/shared'
 import { UserRole } from '@pika/types'
-
-import { UserServiceClientAdapter } from '../adapters/UserServiceClientAdapter.js'
 
 export interface IAuthService {
   login(email: string, password: string): Promise<LoginResult>

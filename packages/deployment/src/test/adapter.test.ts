@@ -13,32 +13,32 @@ vi.mock('@pika/auth-service', () => ({
   createAuthServer: () => testHarness.serviceFactory.createAuthServer(),
 }))
 
-vi.mock('@pikanication', () => ({
+vi.mock('@pika/communication', () => ({
   createCommunicationServer: () =>
     testHarness.serviceFactory.createCommunicationServer(),
 }))
 
-vi.mock('@pika/gym', () => ({
+vi.mock('@gym/server.js', () => ({
   createGymServer: () => testHarness.serviceFactory.createGymServer(),
 }))
 
-vi.mock('@pikant', () => ({
+vi.mock('@pika/payment', () => ({
   createPaymentServer: () => testHarness.serviceFactory.createPaymentServer(),
 }))
 
-vi.mock('@pikaon', () => ({
+vi.mock('@session/server.js', () => ({
   createSessionServer: () => testHarness.serviceFactory.createSessionServer(),
 }))
 
-vi.mock('@pikal', () => ({
+vi.mock('@social/server.js', () => ({
   createSocialServer: () => testHarness.serviceFactory.createSocialServer(),
 }))
 
-vi.mock('@pikage', () => ({
+vi.mock('@pika/storage', () => ({
   createStorageServer: () => testHarness.serviceFactory.createStorageServer(),
 }))
 
-vi.mock('@pikaription', () => ({
+vi.mock('@pika/subscription', () => ({
   createSubscriptionServer: () =>
     testHarness.serviceFactory.createSubscriptionServer(),
 }))

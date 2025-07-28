@@ -9,9 +9,8 @@ import {
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
+import type { IAdminSupportCommentService } from '@support/services/AdminSupportCommentService.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { IAdminSupportCommentService } from '../services/AdminSupportCommentService.js'
 
 /**
  * Handles admin comment management operations

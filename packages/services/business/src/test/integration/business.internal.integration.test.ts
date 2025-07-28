@@ -13,7 +13,14 @@ vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/translation')
+vi.unmock('@pika/shared') // Unmock shared to use real error classes with real middleware
 
+import { createBusinessServer } from '@business/server.js'
+import {
+  createSharedBusinessTestData,
+  seedTestBusinesses,
+  type SharedBusinessTestData,
+} from '@business/test/helpers/businessTestHelpers.js'
 import { SERVICE_API_KEY } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
@@ -28,13 +35,6 @@ import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createBusinessServer } from '../../server.js'
-import {
-  createSharedBusinessTestData,
-  seedTestBusinesses,
-  type SharedBusinessTestData,
-} from '../helpers/businessTestHelpers.js'
 
 // Note: Using shared helper from businessTestHelpers.js
 

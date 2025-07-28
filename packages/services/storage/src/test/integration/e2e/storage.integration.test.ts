@@ -4,6 +4,7 @@ import { vi } from 'vitest'
 vi.unmock('@pika/http') // Ensures real createExpressServer is used
 vi.unmock('@pika/api') // Ensures real schemas from @pika/api
 vi.unmock('@pika/redis') // Ensures real cache decorators from @pika/redis
+vi.unmock('@pika/shared') // Ensures real error classes are used
 
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
@@ -40,11 +41,10 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
+import { createStorageServer } from '@storage/server.js'
 import { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { createStorageServer } from '../../../server.js'
 
 describe('Storage API Integration Tests', () => {
   let testDb: TestDatabaseResult

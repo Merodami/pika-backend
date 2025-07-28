@@ -11,9 +11,8 @@ import type {
 } from '@pika/types'
 import { ProblemPriority, ProblemStatus, ProblemType } from '@prisma/client'
 import { Prisma, PrismaClient } from '@prisma/client'
+import type { SearchParams } from '@support/types/search.js'
 import { get } from 'lodash-es'
-
-import type { SearchParams } from '../types/search.js'
 
 export interface CreateProblemInput {
   userId: string

@@ -40,6 +40,10 @@ eslint_report.json
 *.tar
 .history
 
+# Code quality reports
+reports/
+.size-limit-cache/
+
 # Yarn
 .yarn/*
 !.yarn/cache

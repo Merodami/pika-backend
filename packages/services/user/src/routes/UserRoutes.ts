@@ -10,12 +10,11 @@ import {
 import { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
+import { UserController } from '@user/controllers/UserController.js'
+import { UserRepository } from '@user/repositories/UserRepository.js'
+import { InternalUserService } from '@user/services/InternalUserService.js'
+import { UserService } from '@user/services/UserService.js'
 import { Router } from 'express'
-
-import { UserController } from '../controllers/UserController.js'
-import { UserRepository } from '../repositories/UserRepository.js'
-import { InternalUserService } from '../services/InternalUserService.js'
-import { UserService } from '../services/UserService.js'
 
 // User route definitions for Pika gym platform
 
@@ -149,14 +148,6 @@ export async function createUserRouter(
     validateParams(userAdmin.UserIdParam),
     validateBody(userAdmin.UnbanUserRequest),
     controller.unbanUser,
-  )
-
-  // GET /users/:id/friends - Get user friends/guests
-  router.get(
-    '/:id/friends',
-    requireAuth(),
-    validateParams(userAdmin.UserIdParam),
-    controller.getUserFriends,
   )
 
   // POST /users/:id/avatar - Upload user avatar (admin or self)

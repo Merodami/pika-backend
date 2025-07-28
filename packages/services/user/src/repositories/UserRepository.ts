@@ -18,14 +18,9 @@ export interface UserSearchParams {
   sortOrder?: 'asc' | 'desc'
 }
 
-import type { IncludeOptions } from '../services/UserService.js'
-
 export interface IUserRepository {
   findAll(params: UserSearchParams): Promise<PaginatedResult<UserDomain>>
-  findById(
-    id: string,
-    includeOptions?: IncludeOptions,
-  ): Promise<UserDomain | null>
+  findById(id: string): Promise<UserDomain | null>
   findByEmail(email: string): Promise<UserDomain | null>
   findByPhone(phone: string): Promise<UserDomain | null>
   findBySubToken(subToken: string): Promise<UserDomain | null>
@@ -151,31 +146,13 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async findById(
-    id: string,
-    includeOptions?: IncludeOptions,
-  ): Promise<UserDomain | null> {
+  async findById(id: string): Promise<UserDomain | null> {
     try {
-      const include: any = {}
-
-      // Professional and PARQ includes removed - no longer exist
-      if (includeOptions?.includeFriends) {
-        include.friends = true
-      }
-
-      // If no specific includes requested, include common relations
-      if (Object.keys(include).length === 0) {
-        // These relations were removed during schema cleanup
-        // include.professional = true
-        // include.parq = true
-      }
-
       const user = await this.prisma.user.findFirst({
         where: {
           id,
           deletedAt: null,
         },
-        include,
       })
 
       return user ? UserMapper.fromDocument(user) : null

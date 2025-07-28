@@ -9,10 +9,9 @@ import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { BillingInterval } from '@pika/types'
+import type { IPlanService } from '@subscription/services/PlanService.js'
+import type { PlanSearchParams } from '@subscription/types/search.js'
 import type { NextFunction, Request, Response } from 'express'
-
-import type { IPlanService } from '../services/PlanService.js'
-import type { PlanSearchParams } from '../types/search.js'
 
 /**
  * Handles subscription plan management operations

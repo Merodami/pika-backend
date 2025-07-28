@@ -13,9 +13,8 @@ import {
 } from '@pika/shared'
 import type { BillingIntervalType, PaginatedResult } from '@pika/types'
 import { BillingInterval } from '@pika/types'
-
-import type { IPlanRepository } from '../repositories/PlanRepository.js'
-import type { PlanSearchParams } from '../types/search.js'
+import type { IPlanRepository } from '@subscription/repositories/PlanRepository.js'
+import type { PlanSearchParams } from '@subscription/types/search.js'
 
 export interface IPlanService {
   createPlan(data: CreateSubscriptionPlanDTO): Promise<SubscriptionPlanDomain>

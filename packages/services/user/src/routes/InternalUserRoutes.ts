@@ -2,11 +2,10 @@ import { userInternal } from '@pika/api'
 import { requireServiceAuth, validateBody, validateParams } from '@pika/http'
 import { ICacheService } from '@pika/redis'
 import { PrismaClient } from '@prisma/client'
+import { InternalUserController } from '@user/controllers/InternalUserController.js'
+import { UserRepository } from '@user/repositories/UserRepository.js'
+import { InternalUserService } from '@user/services/InternalUserService.js'
 import { Router } from 'express'
-
-import { InternalUserController } from '../controllers/InternalUserController.js'
-import { UserRepository } from '../repositories/UserRepository.js'
-import { InternalUserService } from '../services/InternalUserService.js'
 
 /**
  * Internal API routes for service-to-service communication

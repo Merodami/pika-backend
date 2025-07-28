@@ -1,14 +1,18 @@
-# Pika - Modern Microservices Platform
+# 🏢 Pika - Enterprise Microservices Platform
 
 <div align="center">
 
-![Node.js](https://img.shields.io/badge/Node.js-22.x-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)
-![NX](https://img.shields.io/badge/NX-21.1.3-lightblue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.2-blue)
-![Redis](https://img.shields.io/badge/Redis-7.2-red)
+![Node.js](https://img.shields.io/badge/Node.js-22.x-green?logo=node.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue?logo=typescript)
+![NX](https://img.shields.io/badge/NX-21.1.3-lightblue?logo=nx)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.2-blue?logo=postgresql)
+![Redis](https://img.shields.io/badge/Redis-7.x-red?logo=redis)
+![Express](https://img.shields.io/badge/Express-5.1.0-black?logo=express)
+![Prisma](https://img.shields.io/badge/Prisma-6.9.0-indigo?logo=prisma)
 
-_A fitness platform built with modern microservices architecture, clean code principles, and developer-first experience._
+_A comprehensive business platform built with modern microservices architecture, Clean Architecture principles, and enterprise-grade patterns._
+
+**🚀 Modern Stack** • **⚡ High Performance** • **🛡️ Production Ready** • **🧪 Testing First** • **📖 Self-Documenting**
 
 </div>
 
@@ -72,39 +76,65 @@ yarn tsx tools/api-testing/generate-test-tokens.ts
 
 ---
 
-## 📁 Architecture Overview
+## 🏗️ Architecture Overview
 
-Pika follows **Clean Architecture** principles with a **microservices** design orchestrated through **NX monorepo**:
+Pika is built on **Clean Architecture** principles with a **microservices** design orchestrated through **NX monorepo**. The platform features enterprise-grade patterns including three-tier API design, comprehensive caching strategies, and production-ready deployment patterns.
+
+### 📦 Package Organization
 
 ```
 packages/
-├── services/              # Microservices (Clean Architecture)
-│   ├── auth/             # Authentication & JWT management
-│   ├── user/             # User profiles & management
-│   ├── gym/              # Gym locations & equipment
-│   ├── session/          # Workout sessions & booking
-│   ├── payment/          # Billing & transactions
-│   └── support/          # Help desk & problem reporting
-├── shared/               # Cross-service utilities & errors
-├── api/                 # OpenAPI specifications & schemas
-├── api-gateway/         # Service orchestration & routing
-├── database/            # Prisma schema & migrations
-├── redis/               # Caching layer & decorators
-├── http/                # Express server utilities
-├── sdk/                 # Generated client & mappers
-├── environment/         # Configuration management
-├── types/               # Shared TypeScript definitions
-└── tests/               # Integration test utilities
+├── services/              # 🎯 Microservices (Clean Architecture)
+│   ├── business/         # 🏪 Business directory & management
+│   ├── category/         # 📂 Hierarchical category system
+│   ├── user/             # 👤 User profiles & management
+│   └── pdf/              # 📄 PDF generation & documents
+├── infrastructure/        # 🔧 Core Infrastructure
+│   ├── api-gateway/      # 🌐 Service orchestration & routing
+│   ├── database/         # 🗃️ Multi-schema PostgreSQL with PostGIS
+│   ├── redis/            # 🔴 High-performance caching layer
+│   └── http/             # ⚡ Express.js framework foundation
+├── application/           # 📱 Application Layer
+│   ├── api/              # 📋 OpenAPI 3.1 specifications & schemas
+│   ├── sdk/              # 🛠️ Generated client SDKs & mappers
+│   └── auth/             # 🔐 JWT authentication framework
+├── domain/                # 🧠 Domain Layer
+│   ├── shared/           # 🤝 Cross-service utilities & errors
+│   ├── types/            # 📝 Centralized type system
+│   └── environment/      # ⚙️ Configuration management
+├── testing/               # 🧪 Testing Infrastructure
+│   ├── tests/            # Integration test utilities
+│   └── deployment/       # 🚀 Platform deployment adapters
+└── localization/          # 🌐 Internationalization
+    └── translation/       # Multi-language support system
 ```
 
-### Clean Architecture Layers
+### 🎯 Clean Architecture Implementation
 
-Each microservice follows the **Controller → Service → Repository** pattern:
+Each microservice strictly follows the **Controller → Service → Repository** pattern with comprehensive data mapping:
 
-- **Controllers**: Handle HTTP requests, parameter extraction, response formatting
-- **Services**: Business logic, validation, orchestration between repositories
-- **Repositories**: Data access layer, database operations, caching
-- **Mappers**: Data transformation between database, domain, and API layers
+- **🎮 Controllers**: HTTP request handling, parameter extraction, response formatting
+- **⚙️ Services**: Business logic, validation, cross-service orchestration
+- **📊 Repositories**: Data access layer, database operations, caching integration
+- **🔄 Mappers**: Data transformation between database, domain, and API layers
+- **📝 DTOs**: Type-safe data transfer objects with Zod validation
+
+### 🌐 Three-Tier API Design
+
+The platform implements a sophisticated three-tier API architecture:
+
+- **🌍 Public API**: Customer-facing endpoints with public access
+- **👑 Admin API**: Administrative operations with role-based access
+- **🔒 Internal API**: Service-to-service communication with API key authentication
+
+### 📊 Multi-Schema Database Architecture
+
+PostgreSQL implementation with logical separation:
+
+- **13 Logical Schemas**: Domain-driven database organization
+- **PostGIS Extensions**: Geospatial features for location-based services
+- **Prisma ORM**: Type-safe database operations with code generation
+- **Migration System**: Version-controlled schema evolution
 
 ---
 
@@ -171,112 +201,149 @@ yarn vitest packages/services/gym
 
 ### Service Ports
 
-| Service               | Port | Description                      |
-| --------------------- | ---- | -------------------------------- |
-| API Gateway           | 5500 | Main entry point & documentation |
-| User Service          | 5501 | User profiles & management       |
-| Auth Service          | 5502 | Authentication & authorization   |
-| Gym Service           | 5503 | Gym locations & equipment        |
-| Session Service       | 5504 | Workout sessions & booking       |
-| Payment Service       | 5505 | Billing & transactions           |
-| Subscription Service  | 5506 | Subscription management          |
-| Communication Service | 5507 | Email & notifications            |
-| Support Service       | 5508 | Help desk & problem reporting    |
-| Social Service        | 5509 | Social features                  |
-| File Storage Service  | 5510 | File upload & management         |
+| Service              | Port | Description                         |
+| -------------------- | ---- | ----------------------------------- |
+| **API Gateway**      | 5500 | 🌐 Main entry point & documentation |
+| **User Service**     | 5501 | 👤 User profiles & management       |
+| **Business Service** | 5510 | 🏪 Business directory & locations   |
+| **Category Service** | 5512 | 📂 Hierarchical category management |
+| **PDF Service**      | 5514 | 📄 Document generation & processing |
 
 ### Infrastructure Services
 
-| Service    | Port | Credentials             |
-| ---------- | ---- | ----------------------- |
-| PostgreSQL | 6436 | `postgres:postgres@pika |
-| Redis      | 7381 | No authentication (dev) |
+| Service        | Port | Credentials              | Purpose                          |
+| -------------- | ---- | ------------------------ | -------------------------------- |
+| **PostgreSQL** | 5435 | `postgres:postgres@pika` | 🗃️ Primary database with PostGIS |
+| **Redis**      | 6380 | No authentication (dev)  | 🔴 Caching & session storage     |
+
+### Development URLs
+
+- **🌐 API Gateway**: http://127.0.0.1:5500
+- **📖 API Documentation**: http://127.0.0.1:5500/docs (Interactive Scalar UI)
+- **🗃️ Database**: postgresql://postgres:postgres@127.0.0.1:5435/pika
+- **🔴 Redis**: redis://127.0.0.1:6380
 
 ---
 
 ## 🔧 Technology Stack
 
-### Core Technologies
+### 🚀 Core Technologies
 
-- **Runtime**: Node.js 22.x with ESM modules
-- **Language**: TypeScript 5.8.3 (strict mode)
-- **Framework**: Express 4.x with custom middleware
-- **Database**: PostgreSQL 17.2 with Prisma 6.9.0 ORM
-- **Caching**: Redis 7.2 with ioredis client
-- **Monorepo**: NX 21.1.3 with Yarn 4.9.1 workspaces
+- **Runtime**: Node.js 22.x with ESM modules and modern JavaScript features
+- **Language**: TypeScript 5.8.3 with strict configuration and advanced types
+- **Framework**: Express 5.1.0 with comprehensive middleware stack
+- **Database**: PostgreSQL 17.2 with PostGIS extensions and Prisma 6.9.0 ORM
+- **Caching**: Redis 7.x with ioredis client and advanced caching patterns
+- **Monorepo**: NX 21.1.3 with Yarn 4.9.1 Berry workspaces
 
-### Development Tools
+### 🛠️ Development Tools
 
-- **Build System**: esbuild 0.25.5 with tsc-alias path resolution
-- **Testing**: Vitest 3.2.2 with Testcontainers 11.0.1
-- **Code Quality**: ESLint 9.28.0, Prettier 3.5.3, Husky git hooks
-- **Hot Reload**: tsx 4.19.4 for TypeScript execution
-- **Process Management**: concurrently, fkill-cli for service orchestration
+- **Build System**: esbuild 0.25.5 with tsc-alias path resolution for blazing-fast builds
+- **Testing**: Vitest 3.2.2 with Testcontainers 11.0.1 for real database testing
+- **Code Quality**: ESLint 9.28.0, Prettier 3.5.3, Husky git hooks for consistency
+- **Hot Reload**: tsx 4.19.4 for instant TypeScript execution and development
+- **Process Management**: concurrently, fkill-cli for multi-service orchestration
+- **API Generation**: OpenAPI 3.1 spec generation with Scalar documentation
 
-### Key Features
+### 🎯 Platform Features
 
-- **🏗️ Clean Architecture**: Strict separation of concerns across all services
-- **🔒 Type Safety**: 100% TypeScript with strict configuration
-- **⚡ Fast Builds**: 60% faster builds with esbuild and NX caching
-- **🧪 Integration Testing**: Real PostgreSQL/Redis testing with Testcontainers
-- **📊 Caching Strategy**: Two-tier caching (Redis + method-level decorators)
-- **🛡️ Security**: JWT authentication, request validation, CORS protection
-- **📖 Auto Documentation**: OpenAPI specs generated from code
+- **🏗️ Clean Architecture**: Strict separation of concerns with Controller → Service → Repository pattern
+- **🔒 Type Safety**: 100% TypeScript coverage with strict configuration and runtime validation
+- **⚡ Performance**: Sub-millisecond caching, connection pooling, and optimized builds
+- **🧪 Testing Strategy**: Integration-first testing with real services and databases
+- **📊 Caching Strategy**: Multi-tier caching (Redis + method decorators + HTTP headers)
+- **🛡️ Enterprise Security**: JWT authentication, API keys, CORS, rate limiting, input validation
+- **📖 Self-Documenting**: OpenAPI specs generated from code with interactive documentation
+- **🌐 Internationalization**: Multi-language support with translation key system
+- **🚀 Deployment Ready**: Docker containers, health checks, metrics, and monitoring
+- **🔄 Service Communication**: HTTP-based with automatic retries, circuit breakers, and service discovery
+
+### 🌟 Enterprise Patterns
+
+- **API Gateway**: Centralized routing with dual deployment modes (proxy/embedded)
+- **Service Mesh**: HTTP-based inter-service communication with authentication
+- **Event Sourcing**: Audit trails and state management
+- **CQRS**: Command-query separation for optimal performance
+- **Idempotency**: Duplicate request prevention for critical operations
+- **Circuit Breakers**: Fault tolerance and graceful degradation
+- **Distributed Tracing**: Correlation IDs and request tracking
+- **Health Monitoring**: Comprehensive health checks and dependency validation
 
 ---
 
-## 🏛️ Microservices
+## 🏛️ Microservices Architecture
 
-### Auth Service (`@pikauth`)
+The platform features a comprehensive microservices ecosystem with specialized services for different business domains:
 
-- User registration & authentication
-- JWT token management (access + refresh)
-- Multi-strategy authentication (local, OAuth)
-- Password security & validation
+### 🏪 Business Service (`@pika/business-service`)
 
-### User Service (`@pikaser`)
+**Business Directory & Location Management**
 
-- User profile management
-- Account preferences & settings
-- User status & role management
+- **Core Features**: Business registration, profile management, location-based services
+- **Architecture**: Clean Architecture with i18n translation key system
+- **Capabilities**: Geospatial search with PostGIS, business categorization, hours management
+- **Performance**: Redis caching with intelligent cache invalidation
+- **API Tiers**: Public, Admin, and Internal endpoints with role-based access
 
-### Gym Service (`@pikaym`)
+### 📂 Category Service (`@pika/category-service`)
 
-- Gym location management
-- Equipment & amenities tracking
-- Gym availability & pricing
-- Induction scheduling
+**Hierarchical Category Management System**
 
-### Session Service (`@pikaession`)
+- **Core Features**: Multi-level category trees with unlimited nesting
+- **Architecture**: Materialized path pattern for fast hierarchy queries
+- **Capabilities**: Path traversal, breadcrumb generation, bulk operations
+- **Performance**: Aggressive caching strategies with dependency tracking
+- **Data Integrity**: Circular reference prevention, sort order management
 
-- Workout session booking & management
-- Session scheduling with trainer assignment
-- Waiting list functionality
-- Session reviews & feedback
-- Denormalized data storage for performance (gymName, trainerName)
-- Support for 20-200 sessions per user history
+### 👤 User Service (`@pika/user-service`)
 
-### Payment Service (`@pikaayment`)
+**User Management & Authentication**
 
-- Credit pack management
-- Membership subscriptions
-- Payment processing (Stripe integration)
-- Promo codes & discounts
+- **Core Features**: User profiles, authentication, role-based access control
+- **Architecture**: JWT-based authentication with refresh token rotation
+- **Capabilities**: Multi-tier user roles, profile management, preferences
+- **Security**: Password hashing, account verification, security audit trails
+- **Integration**: Cross-service user context and session management
 
-### Support Service (`@pikaupport`)
+### 📄 PDF Service (`@pika/pdf-service`)
 
-- Problem reporting system
-- Help desk functionality
-- Issue tracking & resolution
+**Document Generation & Processing**
 
-### Communication Service (`@pikaommunication`)
+- **Core Features**: A5 voucher book generation, QR code integration
+- **Architecture**: Dynamic page layout engine with content optimization
+- **Capabilities**: Multi-language support, image processing, print-quality output
+- **Performance**: Streaming PDF generation with memory optimization
+- **Security**: Input validation, secure image fetching, JWT-secured QR codes
 
-- Email & SMS notifications
-- Template management system
-- Multi-provider support (AWS SES, Resend, Console)
-- Bulk email capabilities
-- Communication history tracking
-- In-app notifications
+### 🌐 API Gateway (`@pika/api-gateway`)
+
+**Service Orchestration & Routing**
+
+- **Core Features**: Centralized request routing and service discovery
+- **Architecture**: Dual deployment modes (proxy for microservices, embedded for serverless)
+- **Capabilities**: Load balancing, rate limiting, request/response transformation
+- **Security**: Authentication gateway, CORS handling, DDoS protection
+- **Monitoring**: Request tracing, performance metrics, health aggregation
+
+### 🔐 Authentication Framework (`@pika/auth`)
+
+**Enterprise Authentication System**
+
+- **Core Features**: JWT token management with RS256 signing
+- **Architecture**: Stateless authentication with Redis token blacklisting
+- **Capabilities**: Multi-strategy auth, refresh token rotation, session management
+- **Security**: Secure token storage, automatic token refresh, role-based permissions
+- **Integration**: Cross-service authentication with API key management
+
+### 🌐 Translation Service (`@pika/translation`)
+
+**Internationalization & Localization**
+
+- **Core Features**: Multi-language content management system
+- **Architecture**: Translation key-based system with intelligent caching
+- **Capabilities**: Dynamic language detection, user preferences, content localization
+- **Performance**: Aggressive caching with smart invalidation strategies
+- **Scalability**: Support for multiple languages with easy content updates
 
 ---
 
@@ -525,25 +592,80 @@ yarn build                   # Rebuild everything
 
 ---
 
+## 📚 Package Documentation
+
+Each package includes comprehensive documentation:
+
+- **🌐 [@pika/api-gateway](packages/api-gateway/README.md)** - Service orchestration & dual deployment modes
+- **📋 [@pika/api](packages/api/README.md)** - OpenAPI 3.1 specifications & three-tier API design
+- **🗃️ [@pika/database](packages/database/README.md)** - Multi-schema PostgreSQL with PostGIS extensions
+- **⚙️ [@pika/environment](packages/environment/README.md)** - Type-safe configuration management
+- **🤝 [@pika/shared](packages/shared/README.md)** - Cross-service utilities & error handling
+- **🔐 [@pika/auth](packages/auth/README.md)** - JWT authentication framework
+- **🛠️ [@pika/sdk](packages/sdk/README.md)** - Domain models, DTOs & mappers
+- **🌐 [@pika/translation](packages/translation/README.md)** - Multi-language support system
+- **⚡ [@pika/http](packages/http/README.md)** - Express.js framework foundation
+- **🔴 [@pika/redis](packages/redis/README.md)** - High-performance caching layer
+- **📝 [@pika/types](packages/types/README.md)** - Centralized type system
+- **🚀 [@pika/deployment](packages/deployment/README.md)** - Platform deployment adapters
+- **🏪 [@pika/business-service](packages/services/business/README.md)** - Business directory & management
+- **📂 [@pika/category-service](packages/services/category/README.md)** - Hierarchical category system
+- **📄 [@pika/pdf-service](packages/services/pdf/README.md)** - Document generation & processing
+
+## 🎯 Platform Highlights
+
+### 🏗️ Enterprise Architecture
+
+- **Clean Architecture** with strict layer separation
+- **Three-tier API design** (Public/Admin/Internal)
+- **Multi-schema database** with domain separation
+- **Service mesh** with HTTP-based communication
+
+### ⚡ Performance & Scalability
+
+- **Sub-millisecond caching** with Redis and method decorators
+- **Connection pooling** for database and cache operations
+- **Optimized builds** with esbuild and NX caching
+- **Dual deployment modes** for microservices and serverless
+
+### 🛡️ Security & Reliability
+
+- **JWT authentication** with RS256 signing and token blacklisting
+- **Input validation** with Zod schemas and runtime type checking
+- **Service authentication** with API keys and correlation tracking
+- **Error handling** with comprehensive error classification
+
+### 🌐 Developer Experience
+
+- **Self-documenting APIs** with OpenAPI 3.1 generation
+- **Type safety** with 100% TypeScript coverage
+- **Integration testing** with real databases and services
+- **Hot reload** development with instant feedback
+
 ## 📚 Additional Resources
 
-- **Architecture Documentation**: `CLAUDE.md` - Comprehensive development guide
-- **Previous Architecture**: `previous-architecture/` - Legacy codebase reference
-- **API Specifications**: `packages/api/src/` - OpenAPI schemas
-- **Type Definitions**: `packages/types/src/` - Shared TypeScript types
+- **🏗️ Architecture Guide**: `CLAUDE.md` - Comprehensive development patterns and best practices
+- **📊 Documentation Plan**: `ADVANCED_DOCUMENTATION_PLAN.md` - Standardized documentation strategy
+- **📈 Documentation Status**: `DOCUMENTATION_STATUS.md` - Package documentation tracking
+- **📋 API Specifications**: `packages/api/src/` - OpenAPI schemas and validation
+- **📝 Type Definitions**: `packages/types/src/` - Shared TypeScript definitions
 
 ---
 
 ## 📝 License
 
-Pika platform - Internal development project.
+Pika Enterprise Platform - Internal development project.
 
 ---
 
 <div align="center">
 
+**🚀 Quick Start Command**
+
 ```bash
 yarn install && yarn docker:local && yarn local:generate && yarn local
 ```
+
+**Built with ❤️ using Modern TypeScript, Clean Architecture, and Enterprise Patterns**
 
 </div>

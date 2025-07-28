@@ -1,3 +1,6 @@
+import { BusinessController } from '@business/controllers/BusinessController.js'
+import { BusinessRepository } from '@business/repositories/BusinessRepository.js'
+import { BusinessService } from '@business/services/BusinessService.js'
 import { businessPublic, shared } from '@pika/api'
 import {
   requireAuth,
@@ -10,10 +13,6 @@ import type { ICacheService } from '@pika/redis'
 import type { TranslationClient } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
-
-import { BusinessController } from '../controllers/BusinessController.js'
-import { BusinessRepository } from '../repositories/BusinessRepository.js'
-import { BusinessService } from '../services/BusinessService.js'
 
 /**
  * Creates public business routes

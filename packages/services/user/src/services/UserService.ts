@@ -21,18 +21,13 @@ import {
   UserStatus,
   VerificationType,
 } from '@pika/types'
-import bcrypt from 'bcrypt'
-import { randomInt } from 'crypto'
-
 import type {
   IUserRepository,
   UserSearchParams,
-} from '../repositories/UserRepository.js'
-import type { IInternalUserService } from './InternalUserService.js'
-
-export interface IncludeOptions {
-  includeFriends?: boolean
-}
+} from '@user/repositories/UserRepository.js'
+import type { IInternalUserService } from '@user/services/InternalUserService.js'
+import bcrypt from 'bcrypt'
+import { randomInt } from 'crypto'
 
 // Unified verification system using proper enums
 export interface VerificationRequest {
@@ -53,7 +48,7 @@ export interface ResendRequest {
 
 export interface IUserService {
   getAllUsers(params: UserSearchParams): Promise<PaginatedResult<UserDomain>>
-  getUserById(id: string, includeOptions?: IncludeOptions): Promise<UserDomain>
+  getUserById(id: string): Promise<UserDomain>
   getUserByEmail(email: string): Promise<UserDomain>
   getUserBySubToken(subToken: string): Promise<UserDomain>
   createUser(data: any): Promise<UserDomain>
@@ -64,7 +59,6 @@ export interface IUserService {
   banUser(id: string): Promise<UserDomain>
   unbanUser(id: string): Promise<UserDomain>
   uploadUserAvatar(userId: string, file: any): Promise<string>
-  getUserFriends(userId: string): Promise<string[]>
 
   // Unified verification system
   verify(request: VerificationRequest): Promise<UserDomain>
@@ -101,19 +95,16 @@ export class UserService implements IUserService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:user',
-    keyGenerator: (id, options) => `${id}:${JSON.stringify(options || {})}`,
+    keyGenerator: (id) => id,
   })
-  async getUserById(
-    id: string,
-    includeOptions?: IncludeOptions,
-  ): Promise<UserDomain> {
+  async getUserById(id: string): Promise<UserDomain> {
     try {
       // Validate UUID format
       if (!isUuidV4(id)) {
         throw ErrorFactory.badRequest('Invalid user ID format')
       }
 
-      const user = await this.repository.findById(id, includeOptions)
+      const user = await this.repository.findById(id)
 
       if (!user) {
         throw ErrorFactory.resourceNotFound('User', id)
@@ -331,22 +322,6 @@ export class UserService implements IUserService {
 
   async unbanUser(id: string): Promise<UserDomain> {
     return this.updateUserStatus(id, UserStatus.ACTIVE)
-  }
-
-  async getUserFriends(userId: string): Promise<string[]> {
-    try {
-      const user = await this.repository.findById(userId)
-
-      if (!user) {
-        throw ErrorFactory.resourceNotFound('User', userId)
-      }
-
-      // Guests feature removed
-      return []
-    } catch (error) {
-      logger.error('Failed to get user friends', { error, userId })
-      throw ErrorFactory.fromError(error)
-    }
   }
 
   async uploadUserAvatar(userId: string, file: any): Promise<string> {
