@@ -107,10 +107,12 @@ frontend/dashboard/
 ## 📊 Dependencies Updated
 
 ### Added
+
 - `next-intl@4.3.4` - Internationalization
 - `@ant-design/nextjs-registry@1.1.0` - Ant Design integration
 
 ### Updated to Latest
+
 - `next@15.4.4` - Latest Next.js
 - `react@19.1.1` - Latest React
 - `antd@5.26.6` - Latest Ant Design
@@ -118,6 +120,7 @@ frontend/dashboard/
 - `zod@4.0.10` - Latest validation
 
 ### Removed
+
 - All Firebase dependencies
 - Unused development dependencies
 

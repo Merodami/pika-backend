@@ -1,7 +1,8 @@
 import {
-  MyBusinessService,
-  VouchersService,
   BusinessServiceService,
+  MyBusinessService,
+  VoucherManagementService,
+  VouchersService,
 } from './generated'
 
 /**
@@ -11,38 +12,37 @@ import {
 export const businessAdapter = {
   // My business profile
   profile: {
-    get: MyBusinessService.getBusinessesMy,
-    create: MyBusinessService.postBusinessesMy,
-    update: MyBusinessService.putBusinessesMy,
+    get: MyBusinessService.getMyBusiness,
+    create: MyBusinessService.postMyBusiness,
+    update: MyBusinessService.putMyBusiness,
+    delete: MyBusinessService.deleteMyBusiness,
   },
 
-  // Business vouchers
+  // Business voucher management (for business owners)
   vouchers: {
-    list: VouchersService.getVouchers,
-    get: VouchersService.getVouchersId,
-    create: VouchersService.postVouchers,
-    update: VouchersService.putVouchersId,
-    delete: VouchersService.deleteVouchersId,
-    scan: VouchersService.postVouchersIdScan,
-    redeem: VouchersService.postVouchersIdRedeem,
-    validate: VouchersService.postVouchersValidate,
+    // Management operations
+    list: VoucherManagementService.getVouchers,
+    create: VoucherManagementService.postVouchers,
+    get: VoucherManagementService.getVouchers1, // Auto-generated name for GET /vouchers/{id}
+    update: VoucherManagementService.putVouchers,
+    delete: VoucherManagementService.deleteVouchers,
+    bulkUpdate: VoucherManagementService.patchVouchersBulkUpdate,
+    analytics: VoucherManagementService.getVouchersAnalytics,
+
+    // Customer-facing operations
+    scan: VouchersService.postVouchersScan,
     claim: VouchersService.postVouchersClaim,
+    redeem: VouchersService.postVouchersRedeem,
+    getUserVouchers: VouchersService.getUsersVouchers,
   },
 
-  // Voucher books
-  voucherBooks: {
-    list: VouchersService.getVouchersBooks,
-    get: VouchersService.getVouchersBooksId,
-    create: VouchersService.postVouchersBooks,
-    update: VouchersService.putVouchersBooksId,
-    publish: VouchersService.postVouchersBooksIdPublish,
-    archive: VouchersService.postVouchersBooksIdArchive,
-  },
-
-  // Business internal API (for service-to-service calls)
-  internal: {
-    get: BusinessServiceService.getBusinessesInternalBusinessesId,
-    list: BusinessServiceService.getBusinessesInternalBusinesses,
-    getByUser: BusinessServiceService.postBusinessesInternalByUser,
+  // Public business API
+  public: {
+    list: BusinessServiceService.getBusinesses,
+    listByCategory: BusinessServiceService.getCategoriesBusinesses,
+    bulkGet: BusinessServiceService.postBusinessesBulk,
+    validate: BusinessServiceService.postBusinessesValidate,
+    getByUser: BusinessServiceService.postBusinessesByUser,
+    checkExists: BusinessServiceService.postBusinessesExists,
   },
 }

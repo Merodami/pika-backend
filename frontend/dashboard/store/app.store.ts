@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+
 import type { Locale } from '@/i18n/config'
 
 interface AppState {
@@ -55,6 +56,7 @@ export const useAppStore = create<AppState>()(
       clearFormDraft: (formId) =>
         set((state) => {
           const { [formId]: _, ...rest } = state.formDrafts
+
           return { formDrafts: rest }
         }),
 

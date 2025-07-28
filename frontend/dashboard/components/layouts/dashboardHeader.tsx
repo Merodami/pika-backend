@@ -1,5 +1,4 @@
 import { getTranslations } from 'next-intl/server'
-import { User } from 'lucide-react'
 
 import { LanguageSwitcher } from '@/components/ui/languageSwitcher'
 import { ThemeToggle } from '@/components/ui/themeToggle'

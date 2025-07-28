@@ -484,6 +484,7 @@ vercel --prod --force
 #### Vercel-Specific Configuration
 
 1. **vercel.json** - Deployment configuration:
+
 ```json
 {
   "buildCommand": "yarn build:vercel",
@@ -515,6 +516,7 @@ vercel --prod --force
 ```
 
 2. **Critical Environment Variables**:
+
 ```bash
 # Required for Vercel deployment
 DEPLOYMENT_PLATFORM=vercel

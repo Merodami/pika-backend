@@ -41,7 +41,7 @@ export default function BusinessDashboardPage() {
         totalVouchers: 25,
         activeVouchers: 18,
         totalRedemptions: 142,
-        totalRevenue: 3420.50,
+        totalRevenue: 3420.5,
         conversionRate: 12.8,
         growth: {
           vouchers: 15.2,

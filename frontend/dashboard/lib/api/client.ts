@@ -25,11 +25,18 @@ import { VouchersService } from './generated/services/VouchersService'
 // Configure OpenAPI client
 OpenAPI.BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5500/api/v1'
 OpenAPI.WITH_CREDENTIALS = true
+
+// Dynamic token resolver
 OpenAPI.TOKEN = async () => {
   const token = getAccessToken()
 
   return token ? `Bearer ${token}` : ''
 }
+
+// Dynamic headers resolver
+OpenAPI.HEADERS = async () => ({
+  'x-correlation-id': crypto.randomUUID(),
+})
 
 // Token management
 
@@ -104,16 +111,14 @@ function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(fn: T): T {
 }
 
 // Wrap service methods with auth handling
-function wrapService<T extends Record<string, any>>(
-  service: T
-): T {
+function wrapService<T extends Record<string, any>>(service: T): T {
   const wrappedService = {} as T
 
   Object.keys(service).forEach((key) => {
     if (typeof service[key] === 'function') {
-      (wrappedService as any)[key] = wrapWithAuth(service[key].bind(service))
+      ;(wrappedService as any)[key] = wrapWithAuth(service[key].bind(service))
     } else {
-      (wrappedService as any)[key] = service[key]
+      ;(wrappedService as any)[key] = service[key]
     }
   })
 

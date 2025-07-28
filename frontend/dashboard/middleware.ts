@@ -1,13 +1,15 @@
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import createMiddleware from 'next-intl/middleware'
-import { locales, defaultLocale } from './i18n/config'
+
+import { defaultLocale, locales } from './i18n/config'
 
 // Create the i18n middleware
 const intlMiddleware = createMiddleware({
   locales,
   defaultLocale,
   localePrefix: 'always',
+  localeDetection: true,
 })
 
 // Public routes that don't require authentication
@@ -24,13 +26,8 @@ export async function middleware(request: NextRequest) {
   // Get locale preference from header (sent by client)
   const preferredLocale = request.headers.get('x-preferred-locale')
 
-  // Create intl middleware with locale detection
-  const response = createMiddleware({
-    locales,
-    defaultLocale,
-    localePrefix: 'always',
-    localeDetection: true,
-  })(request)
+  // Apply intl middleware
+  const response = intlMiddleware(request)
 
   // Extract locale from pathname
   const pathnameHasLocale = locales.some(
@@ -60,12 +57,15 @@ export async function middleware(request: NextRequest) {
 
     // Redirect to login if no token
     const url = new URL(`/${locale}/login`, request.url)
+
     url.searchParams.set('from', pathname)
+
     return NextResponse.redirect(url)
   }
 
   // Add security headers
   const headers = new Headers(response.headers)
+
   headers.set('X-Frame-Options', 'DENY')
   headers.set('X-Content-Type-Options', 'nosniff')
   headers.set('X-XSS-Protection', '1; mode=block')

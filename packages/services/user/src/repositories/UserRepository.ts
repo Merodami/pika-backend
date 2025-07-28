@@ -261,7 +261,10 @@ export class UserRepository implements IUserRepository {
       } = data
 
       // Convert dateOfBirth to ISO datetime if provided as YYYY-MM-DD
-      if (userData.dateOfBirth && /^\d{4}-\d{2}-\d{2}$/.test(userData.dateOfBirth)) {
+      if (
+        userData.dateOfBirth &&
+        /^\d{4}-\d{2}-\d{2}$/.test(userData.dateOfBirth)
+      ) {
         userData.dateOfBirth = new Date(userData.dateOfBirth).toISOString()
       }
 

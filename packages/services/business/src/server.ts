@@ -37,12 +37,12 @@ export async function createBusinessServer({
       defaultTTL: 86400, // 24 hours
       methods: ['POST', 'PUT', 'PATCH'],
       excludeRoutes: [
-        '/health', 
+        '/health',
         '/metrics',
         // Exclude admin toggle endpoints that don't need idempotency
         '/admin/businesses/:id/activate',
         '/admin/businesses/:id/deactivate',
-        '/admin/businesses/:id/verify'
+        '/admin/businesses/:id/verify',
       ],
     },
     authOptions: {
@@ -88,7 +88,6 @@ export async function createBusinessServer({
       },
     ],
   })
-
 
   // Register business routes
   const businessRouter = createBusinessRoutes(

@@ -20,7 +20,6 @@ export default async function DashboardLayout({
   // Ensure user is authenticated
   const user = await requireAuth()
   const { locale } = await params
-  const t = await getTranslations({ locale })
 
   // Role-based sidebar component
   const Sidebar = user.role === 'ADMIN' ? AdminSidebar : BusinessSidebar

@@ -1,10 +1,6 @@
 import { User } from 'lucide-react'
 
-interface RecentCustomersProps {
-  businessId: string
-}
-
-export function RecentCustomers({ businessId }: RecentCustomersProps) {
+export function RecentCustomers() {
   // Mock data - in production this would come from API
   const customers = [
     {

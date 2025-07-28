@@ -11,10 +11,9 @@ import {
   TagOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { useQuery } from '@tanstack/react-query'
 import { Card, Col, Row, Spin, Statistic, Table } from 'antd'
-
-import { adminAdapter } from '@/lib/api/adminAdapter'
+import { useApiQuery, useBusinesses, useUsers } from '@/hooks/api'
+import type { AdminBusinessListResponse } from '@/lib/api/generated'
 
 interface AdminMetrics {
   totalUsers: number
@@ -29,59 +28,57 @@ interface AdminMetrics {
   }
 }
 
-interface RecentBusiness {
-  id: string
-  name: string
-  email: string
-  status: 'pending' | 'verified' | 'suspended'
-  createdAt: string
-}
-
 export default function AdminOverviewPage() {
-  const { data: metrics, isLoading: metricsLoading } = useQuery({
-    queryKey: ['admin', 'overview'],
-    queryFn: async (): Promise<AdminMetrics> => {
-      // Mock data for now - replace with actual platform analytics endpoint
-      return {
-        totalUsers: 1250,
-        totalBusinesses: 450,
-        totalVouchers: 2800,
-        totalRedemptions: 15600,
-        growth: {
-          users: 12.5,
-          businesses: 8.3,
-          vouchers: 23.1,
-          redemptions: 18.7,
-        },
-      }
-    },
-  })
+  const { data: metrics, isLoading: metricsLoading } =
+    useApiQuery<AdminMetrics>({
+      queryKey: ['admin', 'overview'],
+      queryFn: async (): Promise<AdminMetrics> => {
+        // Mock data for now - replace with actual platform analytics endpoint
+        return {
+          totalUsers: 1250,
+          totalBusinesses: 450,
+          totalVouchers: 2800,
+          totalRedemptions: 15600,
+          growth: {
+            users: 12.5,
+            businesses: 8.3,
+            vouchers: 23.1,
+            redemptions: 18.7,
+          },
+        }
+      },
+    })
 
-  const { data: recentBusinesses, isLoading: businessesLoading } = useQuery({
-    queryKey: ['admin', 'recent-businesses'],
-    queryFn: async (): Promise<RecentBusiness[]> => {
-      const response = await adminAdapter.businesses.list({ page: 1, limit: 5 })
+  const { data: businessesResponse, isLoading: businessesLoading } =
+    useBusinesses({
+      page: 1,
+      limit: 5,
+      include: 'user', // Include user data for email
+    })
 
-      return response.data?.items || []
-    },
-  })
+  const recentBusinesses = businessesResponse?.data || []
 
   const businessColumns = [
     {
       title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'businessNameKey',
+      key: 'businessNameKey',
     },
     {
       title: 'Email',
-      dataIndex: 'email',
       key: 'email',
+      render: (record: AdminBusinessListResponse['data'][0]) =>
+        record.user?.email || 'No email',
     },
     {
       title: 'Status',
-      dataIndex: 'status',
       key: 'status',
-      render: (status: string) => {
+      render: (record: AdminBusinessListResponse['data'][0]) => {
+        const status = record.verified
+          ? 'verified'
+          : record.active
+            ? 'pending'
+            : 'suspended'
         const colors = {
           pending: 'orange',
           verified: 'green',
@@ -90,7 +87,7 @@ export default function AdminOverviewPage() {
 
         return (
           <span
-            className={`px-2 py-1 rounded text-xs bg-${colors[status as keyof typeof colors]}-100 text-${colors[status as keyof typeof colors]}-800`}
+            className={`px-2 py-1 rounded text-xs bg-${colors[status]}-100 text-${colors[status]}-800`}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </span>
