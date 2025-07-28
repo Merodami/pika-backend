@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { App, ConfigProvider, Layout } from 'antd'
 import { useEffect } from 'react'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from 'react-hot-toast'
+import { Toaster } from 'sonner'
 
 import { ProtectedRoute } from '@/components/auth/protectedRoute'
 import { NotificationBusiness } from '@/components/businesses/notificationBusiness'

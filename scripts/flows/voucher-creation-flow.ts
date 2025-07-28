@@ -118,53 +118,65 @@ async function loginAsBusinessOwner(): Promise<string> {
 }
 
 // Setup functions
-async function getOrCreateBusiness(businessOwnerToken: string, adminToken: string, categoryId: string): Promise<any> {
-  // First try to get existing business
-  logRequest('GET', '/businesses/me')
+async function getBusinessForUser(businessOwnerToken: string, adminToken: string, categoryId: string): Promise<any> {
+  // Get user info to find their business via admin endpoint
+  const userResponse = await api.get('/auth/me', {
+    headers: { Authorization: `Bearer ${businessOwnerToken}` },
+  })
+  const userId = userResponse.data.id
+  
+  logInfo(`Looking for business for user: ${userId}`)
+  
+  // Try to find business via admin endpoint
+  logRequest('GET', `/admin/businesses?userId=${userId}`)
   
   try {
-    const response = await api.get('/businesses/me', {
-      headers: { Authorization: `Bearer ${businessOwnerToken}` },
+    const businessesResponse = await api.get(`/admin/businesses?userId=${userId}`, {
+      headers: { Authorization: `Bearer ${adminToken}` },
     })
     
-    logSuccess('Existing business found')
-    return response.data
-  } catch (error: any) {
-    if (error.response?.status === 404) {
+    if (businessesResponse.data.data.length > 0) {
+      const business = businessesResponse.data.data[0]
+      logSuccess(`Found existing business: ${business.id}`)
+      
+      // Make sure it's verified and active
+      if (!business.verified || !business.active) {
+        logInfo('Updating business status...')
+        await api.post(`/admin/businesses/${business.id}/verify`, { verified: true }, {
+          headers: { Authorization: `Bearer ${adminToken}` },
+        })
+        await api.post(`/admin/businesses/${business.id}/activate`, {}, {
+          headers: { Authorization: `Bearer ${adminToken}` },
+        })
+        logSuccess('Business verified and activated')
+      }
+      
+      return business
+    } else {
       logInfo('No business found, creating one...')
       
-      // Create a business for the business owner
+      // Create a business via admin endpoint
       const businessData = {
+        userId: userId,
         businessName: `Test Voucher Business ${timestamp}`,
         businessDescription: 'A test business for voucher creation flow',
         categoryId: categoryId,
+        verified: true,
+        active: true,
       }
       
-      logRequest('POST', '/businesses/me', businessData)
+      logRequest('POST', '/admin/businesses', businessData)
       
-      try {
-        const createResponse = await api.post('/businesses/me', businessData, {
-          headers: { Authorization: `Bearer ${businessOwnerToken}` },
-        })
-        
-        logSuccess('Business created successfully')
-        
-        // Verify the business as admin so we can create vouchers
-        const businessId = createResponse.data.id
-        await api.post(`/admin/businesses/${businessId}/verify`, { verified: true }, {
-          headers: { Authorization: `Bearer ${adminToken}` },
-        })
-        
-        logSuccess('Business verified by admin')
-        return createResponse.data
-      } catch (createError: any) {
-        logError(`Failed to create business: ${createError.response?.data?.message || createError.message}`)
-        throw createError
-      }
-    } else {
-      logError(`Failed to get business details: ${error.response?.data?.message || error.message}`)
-      throw error
+      const createResponse = await api.post('/admin/businesses', businessData, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      
+      logSuccess('Business created and verified successfully')
+      return createResponse.data
     }
+  } catch (error: any) {
+    logError(`Failed to get/create business: ${error.response?.data?.message || error.message}`)
+    throw error
   }
 }
 
@@ -373,7 +385,7 @@ async function runVoucherCreationFlow() {
     
     logStep(3, 'Setup Business Details')
     const businessOwnerToken = await loginAsBusinessOwner()
-    businessDetails = await getOrCreateBusiness(businessOwnerToken, adminToken, selectedCategory.id)
+    businessDetails = await getBusinessForUser(businessOwnerToken, adminToken, selectedCategory.id)
     
     // Phase 2: Voucher Creation
     log(`\n${colors.bright}=== Phase 2: Create Different Types of Vouchers ===${colors.reset}`)

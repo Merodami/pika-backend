@@ -7,8 +7,7 @@
     "previous-architecture",
     "ai",
     "pika",
-    "pika-old",
-    "frontend/dashboard"
+    "pika-old"
   ],
   "tasksRunnerOptions": {
     "default": {
