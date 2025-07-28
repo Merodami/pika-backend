@@ -148,6 +148,9 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
   }
 
   private async initializeInfrastructure(): Promise<void> {
+    // Run migrations on first startup if needed
+    await this.runMigrationsIfNeeded()
+    
     // Initialize Prisma
     const databaseUrl = this.config.infrastructure.database.url
 
@@ -225,6 +228,62 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
         req.url = route.target + req.url.substring(route.path.length)
         next()
       })
+    }
+  }
+
+  private async runMigrationsIfNeeded(): Promise<void> {
+    try {
+      // Check if we have a migration database URL (direct connection for migrations)
+      const migrationUrl = process.env.MIGRATION_DATABASE_URL
+      if (!migrationUrl) {
+        logger.info('No MIGRATION_DATABASE_URL set, skipping migrations')
+        return
+      }
+
+      logger.info('Running database migrations on startup...')
+      
+      // Create a temporary Prisma client for migrations using direct connection
+      const { spawn } = await import('child_process')
+      
+      const migrationProcess = spawn('npx', [
+        'prisma',
+        'migrate',
+        'deploy',
+        '--schema=packages/database/prisma/schema.prisma'
+      ], {
+        env: {
+          ...process.env,
+          DATABASE_URL: migrationUrl,
+        },
+        stdio: 'pipe'
+      })
+
+      let output = ''
+      let errorOutput = ''
+
+      migrationProcess.stdout?.on('data', (data) => {
+        output += data.toString()
+      })
+
+      migrationProcess.stderr?.on('data', (data) => {
+        errorOutput += data.toString()
+      })
+
+      await new Promise((resolve, reject) => {
+        migrationProcess.on('close', (code) => {
+          if (code === 0) {
+            logger.info('Database migrations completed successfully', { output })
+            resolve(code)
+          } else {
+            logger.error('Database migrations failed', { code, errorOutput, output })
+            reject(new Error(`Migration failed with code ${code}: ${errorOutput}`))
+          }
+        })
+      })
+    } catch (error) {
+      logger.error('Error running migrations:', error)
+      // Don't throw - let the app start even if migrations fail
+      // This prevents deployment failures and allows manual migration fixes
     }
   }
 }

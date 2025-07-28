@@ -36,7 +36,7 @@
     "test:auth-all": "yarn test:auth && yarn test:auth-gateway",
     "test:all": "yarn test",
     "build": "nx run-many --target=build --all --parallel=100 --output-style=stream --skip-nx-cache",
-    "build:vercel": "yarn db:generate && DATABASE_URL=\"${MIGRATION_DATABASE_URL:-$DATABASE_URL}\" yarn db:migrate:deploy && nx run-many --target=build --projects=@pika/types,@pika/environment,@pika/api,@pika/sdk,@pika/shared,@pika/database,@pika/redis,@pika/http,@pika/deployment,@pika/api-gateway,@pika/auth,@pika/user,@pika/payment,@pika/subscription,@pika/communication,@pika/support,@pika/storage,@pika/business,@pika/category,@pika/voucher-service,@pika/pdf --parallel=100 --output-style=stream",
+    "build:vercel": "yarn db:generate && nx run-many --target=build --projects=@pika/types,@pika/environment,@pika/api,@pika/sdk,@pika/shared,@pika/database,@pika/redis,@pika/http,@pika/deployment,@pika/api-gateway,@pika/auth,@pika/user,@pika/payment,@pika/subscription,@pika/communication,@pika/support,@pika/storage,@pika/business,@pika/category,@pika/voucher-service,@pika/pdf --parallel=100 --output-style=stream",
     "typecheck": "nx run-many --target=typecheck --parallel=100",
     "lint": "nx format:check && eslint '**/*.{js,tsx,jsx,ts}' && prettier --check .",
     "lint:fix": "prettier --write . && eslint '**/*.{js,tsx,jsx,ts}' --fix",
