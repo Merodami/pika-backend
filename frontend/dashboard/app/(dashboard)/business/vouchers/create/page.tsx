@@ -94,7 +94,7 @@ export default function CreateVoucherPage() {
   // Create voucher mutation
   const createVoucherMutation = useMutation({
     mutationFn: async (voucher: VoucherDesign) => {
-      const response = await voucherAdapter.create(voucher)
+      const response = await voucherAdapter.business.create(voucher)
 
       return response.data
     },
@@ -110,7 +110,7 @@ export default function CreateVoucherPage() {
   // Save draft mutation
   const saveDraftMutation = useMutation({
     mutationFn: async (voucher: VoucherDesign) => {
-      const response = await voucherAdapter.saveDraft(voucher)
+      const response = await voucherAdapter.business.create(voucher) // Save as draft - placeholder
 
       return response.data
     },

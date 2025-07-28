@@ -333,7 +333,6 @@ export type DeregisterServiceResponse = z.infer<
  * Service configuration request
  */
 export const ServiceConfigRequest = z.object({
-  serviceName: z.string(),
   environment: EnvironmentType.optional(),
   configKeys: z.array(z.string()).optional(),
 })
