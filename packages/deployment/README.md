@@ -474,8 +474,73 @@ vercel
 
 # Environment setup
 vercel env pull
-vercel secrets add database-url postgresql://...
+vercel env add DATABASE_URL
+vercel env add CACHE_DISABLED  # Set to "true" to avoid Redis connection limits
+
+# Redeploy after environment changes
+vercel --prod --force
 ```
+
+#### Vercel-Specific Configuration
+
+1. **vercel.json** - Deployment configuration:
+```json
+{
+  "buildCommand": "yarn build:vercel",
+  "outputDirectory": ".",
+  "installCommand": "yarn install --immutable",
+  "framework": null,
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
+  "rewrites": [
+    { "source": "/health", "destination": "/api" },
+    { "source": "/api/v1/:path*", "destination": "/api" },
+    { "source": "/auth/:path*", "destination": "/api" },
+    { "source": "/users/:path*", "destination": "/api" },
+    { "source": "/businesses/:path*", "destination": "/api" },
+    { "source": "/categories/:path*", "destination": "/api" },
+    { "source": "/payments/:path*", "destination": "/api" },
+    { "source": "/subscriptions/:path*", "destination": "/api" },
+    { "source": "/communications/:path*", "destination": "/api" },
+    { "source": "/support/:path*", "destination": "/api" },
+    { "source": "/storage/:path*", "destination": "/api" },
+    { "source": "/pdf/:path*", "destination": "/api" },
+    { "source": "/vouchers/:path*", "destination": "/api" }
+  ]
+}
+```
+
+2. **Critical Environment Variables**:
+```bash
+# Required for Vercel deployment
+DEPLOYMENT_PLATFORM=vercel
+CACHE_DISABLED=true              # Prevents Redis connection overload
+NODE_ENV=production
+
+# Database (use pooler connection)
+DATABASE_URL=postgres://user:pass@host:6543/db?sslmode=require&pgbouncer=true
+MIGRATION_DATABASE_URL=postgres://user:pass@host:5432/db  # Direct connection for migrations
+
+# Service URLs
+API_GATEWAY_BASE_URL=https://your-app.vercel.app
+BASE_URL=https://your-app.vercel.app
+
+# Authentication
+JWT_SECRET=<generated-secret>
+JWT_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n<key>\n-----END PRIVATE KEY-----
+JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\n<key>\n-----END PUBLIC KEY-----
+```
+
+3. **Common Issues & Solutions**:
+
+- **Redis Connection Errors**: Set `CACHE_DISABLED=true`
+- **Build Failures**: Ensure `yarn install --immutable` works locally
+- **Cold Starts**: First request may take 5-10 seconds
+- **Database Timeouts**: Use pooler connection string, not direct
 
 ### AWS Deployment
 

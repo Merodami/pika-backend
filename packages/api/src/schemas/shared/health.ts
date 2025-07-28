@@ -8,7 +8,7 @@ import { DateTime } from './primitives.js'
 
 // ============= Health Status =============
 
-export const HealthStatus = z.enum(['HEALTHY', 'DEGRADED', 'UNHEALTHY'])
+export const HealthStatus = z.enum(['healthy', 'degraded', 'unhealthy'])
 export type HealthStatus = z.infer<typeof HealthStatus>
 
 // ============= Service Health =============

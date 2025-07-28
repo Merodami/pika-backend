@@ -473,6 +473,122 @@ yarn docker:local:down
 yarn docker:restart
 ```
 
+### 🚀 Vercel Deployment
+
+Pika supports deployment to Vercel using an embedded services architecture where all microservices run within a single serverless function. This is ideal for MVPs and smaller deployments.
+
+**Production URL**: https://pika-backend.vercel.app
+
+#### Prerequisites
+
+- Vercel account with a project created
+- Environment variables configured in Vercel dashboard
+- Database (Supabase/PostgreSQL) accessible from Vercel
+- Frontend workspace excluded from build (handled automatically)
+
+#### Configuration
+
+1. **Environment Variables** - Set these in Vercel Dashboard:
+
+```bash
+# Core Configuration
+NODE_ENV=production
+DEPLOYMENT_PLATFORM=vercel
+CACHE_DISABLED=true                    # Required to avoid Redis connection limits
+
+# Database (Supabase example)
+DATABASE_URL=postgres://postgres.PROJECT_ID:PASSWORD@aws-0-sa-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+MIGRATION_DATABASE_URL=postgres://postgres:PASSWORD@db.PROJECT_ID.supabase.co:5432/postgres
+PG_HOST=aws-0-sa-east-1.pooler.supabase.com
+PG_PORT=6543
+PG_USER=postgres.PROJECT_ID
+PG_PASSWORD=your-password
+PG_DATABASE=postgres
+PG_SSL=true
+
+# URLs
+API_GATEWAY_BASE_URL=https://pika-backend.vercel.app
+BASE_URL=https://pika-backend.vercel.app
+FRONTEND_URL=https://your-frontend.vercel.app
+
+# Authentication (Generated)
+JWT_SECRET=your-jwt-secret
+JWT_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----
+JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----
+INTERNAL_API_TOKEN=your-api-token
+SERVICE_API_KEY=your-service-key
+
+# Optional Services
+REDIS_URL=redis://...                  # Only if CACHE_DISABLED=false
+STRIPE_SECRET_KEY=sk_live_...
+RESEND_API_KEY=re_...
+```
+
+2. **Build Configuration** - Vercel automatically detects:
+   - Build Command: `yarn build:vercel`
+   - Output Directory: `api`
+   - Install Command: `yarn install --immutable`
+
+3. **Database Migrations** - Automatic on deployment:
+
+**Automatic Migrations**: Database migrations run automatically during deployment to main branch. The `build:vercel` script includes `yarn db:migrate:deploy` which applies any pending migrations.
+
+For manual migrations or first-time setup:
+
+```bash
+# Use Supabase SQL Editor if Prisma times out
+# Go to Supabase Dashboard → SQL Editor → Run the migration SQL
+
+# Or use Prisma directly
+export DATABASE_URL="postgres://postgres:PASSWORD@db.PROJECT_ID.supabase.co:5432/postgres"
+npx prisma migrate deploy --schema packages/database/prisma/schema.prisma
+```
+
+#### Deployment Process
+
+```bash
+# 1. Install Vercel CLI
+npm i -g vercel
+
+# 2. Link to your project
+vercel link
+
+# 3. Deploy to production
+vercel --prod
+
+# Or push to GitHub for automatic deployment
+git push origin main
+```
+
+#### Architecture Notes
+
+- **Embedded Services**: All microservices run in a single Node.js process
+- **API Gateway**: Handles routing to embedded services
+- **Cold Starts**: First request may take 5-10 seconds
+- **Redis**: Disabled by default to avoid connection limits (uses memory cache)
+- **File Storage**: Configure cloud storage (S3/Cloudinary) for production
+
+#### Troubleshooting Vercel Deployment
+
+**Redis Connection Errors:**
+- Set `CACHE_DISABLED=true` to use in-memory caching
+- See `FIX_REDIS_MULTIPLE_CONNECTIONS.md` for details
+
+**Build Failures:**
+- Ensure all environment variables are set
+- Check build logs for missing dependencies
+- Verify `yarn install --immutable` succeeds locally
+
+**Runtime Errors:**
+- Check function logs in Vercel dashboard
+- Verify database connectivity
+- Ensure JWT keys are properly formatted with `\n`
+
+**Performance:**
+- Enable caching headers for static responses
+- Consider edge functions for frequently accessed endpoints
+- Monitor function execution time and memory usage
+
 ---
 
 ## 📖 API Documentation

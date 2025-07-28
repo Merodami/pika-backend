@@ -18,6 +18,7 @@
     }
   },
   "dependencies": {
+    "@pika/api": "workspace:^",
     "@pika/auth": "workspace:^",
     "@pika/environment": "workspace:^",
     "@pika/http": "workspace:^",

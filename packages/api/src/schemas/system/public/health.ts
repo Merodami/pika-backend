@@ -49,13 +49,13 @@ export type MemoryUsage = z.infer<typeof MemoryUsage>
  * All services health
  */
 export const ServicesHealth = z.object({
+  auth: ServiceHealth,
   user: ServiceHealth,
-  gym: ServiceHealth,
   payment: ServiceHealth,
-  communication: ServiceHealth,
   subscription: ServiceHealth,
-  social: ServiceHealth,
-  storage: ServiceHealth,
+  communication: ServiceHealth,
+  support: ServiceHealth,
+  'file-storage': ServiceHealth,
 })
 
 export type ServicesHealth = z.infer<typeof ServicesHealth>
