@@ -276,6 +276,7 @@ export class LocalAuthStrategy implements AuthStrategy {
               frontendUrl: FRONTEND_URL,
             },
           })
+
           emailSent = emailResult.success
         }
       } catch (emailError) {

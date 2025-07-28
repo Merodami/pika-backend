@@ -149,10 +149,24 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
 
   private async initializeInfrastructure(): Promise<void> {
     // Initialize Prisma
+    const databaseUrl = this.config.infrastructure.database.url
+
+    // Check if using Supabase pooler or PgBouncer (connection pooling)
+    const isUsingPooler =
+      databaseUrl.includes('pooler.supabase.com') ||
+      databaseUrl.includes('pgbouncer') ||
+      databaseUrl.includes('6543') // Common pooler port
+
+    // Append pgbouncer mode if using connection pooling
+    const finalDatabaseUrl =
+      isUsingPooler && !databaseUrl.includes('pgbouncer=true')
+        ? `${databaseUrl}${databaseUrl.includes('?') ? '&' : '?'}pgbouncer=true&connection_limit=1`
+        : databaseUrl
+
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: this.config.infrastructure.database.url,
+          url: finalDatabaseUrl,
         },
       },
       log:

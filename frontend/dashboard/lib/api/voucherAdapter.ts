@@ -1,40 +1,31 @@
-import { VouchersService, VoucherServiceService } from './generated'
+import { VoucherManagementService, VouchersService } from './generated'
 
 /**
  * Voucher API Adapter
  * Provides simplified access to voucher-specific API endpoints
  */
 export const voucherAdapter = {
-  // Public voucher operations
+  // Public voucher operations (customer-facing)
   public: {
-    list: VouchersService.getVouchers,
-    get: VouchersService.getVouchersId,
+    scan: VouchersService.postVouchersScan,
     claim: VouchersService.postVouchersClaim,
-    validate: VouchersService.postVouchersValidate,
-    getUserVouchers: VouchersService.getVouchersUser,
+    redeem: VouchersService.postVouchersRedeem,
+    getUserVouchers: VouchersService.getUsersVouchers,
   },
 
-  // Business voucher operations
-  business: {
-    create: VouchersService.postVouchers,
-    update: VouchersService.putVouchersId,
-    delete: VouchersService.deleteVouchersId,
-    scan: VouchersService.postVouchersIdScan,
-    redeem: VouchersService.postVouchersIdRedeem,
-  },
-
-  // Voucher books
-  books: {
-    list: VouchersService.getVouchersBooks,
-    get: VouchersService.getVouchersBooksId,
-    create: VouchersService.postVouchersBooks,
-    update: VouchersService.putVouchersBooksId,
-    publish: VouchersService.postVouchersBooksIdPublish,
-    archive: VouchersService.postVouchersBooksIdArchive,
+  // Admin/Business voucher management
+  management: {
+    list: VoucherManagementService.getVouchers,
+    create: VoucherManagementService.postVouchers,
+    get: VoucherManagementService.getVouchers1, // Auto-generated name for GET /vouchers/{id}
+    update: VoucherManagementService.putVouchers,
+    delete: VoucherManagementService.deleteVouchers,
+    bulkUpdate: VoucherManagementService.patchVouchersBulkUpdate,
+    analytics: VoucherManagementService.getVouchersAnalytics,
   },
 
   // Internal voucher API (for service-to-service calls)
   internal: {
-    getByIds: VoucherServiceService.postVouchersInternalByIds,
+    // Add methods as they become available in VoucherServiceService
   },
 }

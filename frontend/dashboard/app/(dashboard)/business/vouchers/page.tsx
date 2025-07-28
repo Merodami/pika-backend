@@ -14,14 +14,12 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Button,
   Card,
   Col,
   Dropdown,
   Input,
-  message,
   Modal,
   Row,
   Select,
@@ -34,7 +32,13 @@ import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { voucherAdapter } from '@/lib/api/voucherAdapter'
+import {
+  useVouchers,
+  useDeleteVoucher,
+  useUpdateVoucher,
+  usePrefetchVoucher,
+} from '@/hooks/api'
+import type { AdminVoucherQueryParams } from '@/lib/api/generated'
 
 const { Title, Text } = Typography
 const { Search } = Input
@@ -59,73 +63,32 @@ interface Voucher {
 
 export default function VouchersPage() {
   const router = useRouter()
-  const queryClient = useQueryClient()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
 
-  // Fetch vouchers
-  const { data: vouchersData, isLoading } = useQuery({
-    queryKey: [
-      'vouchers',
-      page,
-      pageSize,
-      searchTerm,
-      statusFilter,
-      categoryFilter,
-    ],
-    queryFn: async () => {
-      const params: any = {
-        page,
-        limit: pageSize,
-      }
+  // Build filters object
+  const filters: AdminVoucherQueryParams = {
+    page,
+    limit: pageSize,
+    ...(searchTerm && { search: searchTerm }),
+    ...(statusFilter !== 'all' && {
+      state: statusFilter as AdminVoucherQueryParams.state,
+    }),
+    ...(categoryFilter !== 'all' && { categoryId: categoryFilter }),
+  }
 
-      if (searchTerm) params.search = searchTerm
-      if (statusFilter !== 'all') params.status = statusFilter
-      if (categoryFilter !== 'all') params.category = categoryFilter
+  // Use our custom hooks
+  const { data: vouchersResponse, isLoading } = useVouchers(filters)
+  const deleteVoucher = useDeleteVoucher()
+  const updateVoucher = useUpdateVoucher()
+  const prefetchVoucher = usePrefetchVoucher()
 
-      const response = await voucherAdapter.getAll(params)
-
-      return response.data
-    },
-  })
-
-  // Delete voucher mutation
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => voucherAdapter.delete(id),
-    onSuccess: () => {
-      message.success('Voucher deleted successfully')
-      queryClient.invalidateQueries({ queryKey: ['vouchers'] })
-    },
-    onError: () => {
-      message.error('Failed to delete voucher')
-    },
-  })
-
-  // Pause/Resume mutations
-  const pauseMutation = useMutation({
-    mutationFn: (id: string) => voucherAdapter.pause(id),
-    onSuccess: () => {
-      message.success('Voucher paused')
-      queryClient.invalidateQueries({ queryKey: ['vouchers'] })
-    },
-    onError: () => {
-      message.error('Failed to pause voucher')
-    },
-  })
-
-  const resumeMutation = useMutation({
-    mutationFn: (id: string) => voucherAdapter.resume(id),
-    onSuccess: () => {
-      message.success('Voucher resumed')
-      queryClient.invalidateQueries({ queryKey: ['vouchers'] })
-    },
-    onError: () => {
-      message.error('Failed to resume voucher')
-    },
-  })
+  // Extract data from response
+  const vouchersData = vouchersResponse?.data
+  const pagination = vouchersResponse?.pagination
 
   const handleDelete = (id: string, title: string) => {
     Modal.confirm({
@@ -134,20 +97,34 @@ export default function VouchersPage() {
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
-      onOk: () => deleteMutation.mutate(id),
+      onOk: () => deleteVoucher.mutate(id),
+    })
+  }
+
+  const handleStatusUpdate = (
+    id: string,
+    status: 'published' | 'suspended'
+  ) => {
+    updateVoucher.mutate({
+      id,
+      data: { status },
     })
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
+      case 'published':
         return 'green'
-      case 'paused':
+      case 'suspended':
         return 'orange'
       case 'draft':
         return 'blue'
       case 'expired':
         return 'red'
+      case 'claimed':
+        return 'purple'
+      case 'redeemed':
+        return 'cyan'
       default:
         return 'default'
     }
@@ -185,23 +162,23 @@ export default function VouchersPage() {
       label: 'Analytics',
       onClick: () => router.push(`/business/vouchers/${voucher.id}/analytics`),
     },
-    ...(voucher.status === 'active'
+    ...(voucher.status === 'published'
       ? [
           {
-            key: 'pause',
+            key: 'suspend',
             icon: <PauseCircleOutlined />,
-            label: 'Pause',
-            onClick: () => pauseMutation.mutate(voucher.id),
+            label: 'Suspend',
+            onClick: () => handleStatusUpdate(voucher.id, 'suspended'),
           },
         ]
       : []),
-    ...(voucher.status === 'paused'
+    ...(voucher.status === 'suspended'
       ? [
           {
-            key: 'resume',
+            key: 'publish',
             icon: <PlayCircleOutlined />,
-            label: 'Resume',
-            onClick: () => resumeMutation.mutate(voucher.id),
+            label: 'Publish',
+            onClick: () => handleStatusUpdate(voucher.id, 'published'),
           },
         ]
       : []),
@@ -386,10 +363,12 @@ export default function VouchersPage() {
               placeholder="Status"
             >
               <Option value="all">All Status</Option>
-              <Option value="active">Active</Option>
+              <Option value="published">Published</Option>
               <Option value="draft">Draft</Option>
-              <Option value="paused">Paused</Option>
+              <Option value="claimed">Claimed</Option>
+              <Option value="redeemed">Redeemed</Option>
               <Option value="expired">Expired</Option>
+              <Option value="suspended">Suspended</Option>
             </Select>
           </Col>
           <Col xs={24} sm={4}>
@@ -417,10 +396,13 @@ export default function VouchersPage() {
           dataSource={vouchers}
           rowKey="id"
           loading={isLoading}
+          onRow={(record) => ({
+            onMouseEnter: () => prefetchVoucher(record.id),
+          })}
           pagination={{
             current: page,
             pageSize,
-            total,
+            total: pagination?.total || 0,
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (totalCount, range) =>

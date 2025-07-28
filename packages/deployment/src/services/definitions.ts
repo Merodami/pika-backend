@@ -7,9 +7,13 @@ import { createPDFServer } from '@pika/pdf'
 import { createStorageServer } from '@pika/storage'
 import { createSubscriptionServer } from '@pika/subscription'
 import { createSupportServer } from '@pika/support'
+import {
+  createTranslationResolver,
+  createTranslationService,
+  TranslationClient,
+} from '@pika/translation'
 import { createUserServer } from '@pika/user'
 import { createVoucherServer } from '@pika/voucher-service'
-import { TranslationClient, createTranslationService, createTranslationResolver } from '@pika/translation'
 
 import type { ServiceDefinition, ServiceDependencies } from '../types/index.js'
 
@@ -54,9 +58,12 @@ export function getServiceDefinitions(): ServiceDefinition[] {
       healthCheck: '/health',
       createApp: async (deps: ServiceDependencies) => {
         // Create translation service and client with proper dependencies
-        const translationService = createTranslationService(deps.prisma, deps.cache as any)
+        const translationService = createTranslationService(
+          deps.prisma,
+          deps.cache as any,
+        )
         const translationClient = new TranslationClient(translationService)
-        
+
         const app = await createBusinessServer({
           prisma: deps.prisma,
           cacheService: deps.cache,
@@ -73,9 +80,12 @@ export function getServiceDefinitions(): ServiceDefinition[] {
       healthCheck: '/health',
       createApp: async (deps: ServiceDependencies) => {
         // Create translation service and client with proper dependencies
-        const translationService = createTranslationService(deps.prisma, deps.cache as any)
+        const translationService = createTranslationService(
+          deps.prisma,
+          deps.cache as any,
+        )
         const translationClient = new TranslationClient(translationService)
-        
+
         const { app } = await createCategoryServer({
           prisma: deps.prisma,
           cacheService: deps.cache,
@@ -208,24 +218,27 @@ export function getServiceDefinitions(): ServiceDefinition[] {
       healthCheck: '/health',
       createApp: async (deps: ServiceDependencies) => {
         // Create translation service and client with proper dependencies
-        const translationService = createTranslationService(deps.prisma, deps.cache as any)
+        const translationService = createTranslationService(
+          deps.prisma,
+          deps.cache as any,
+        )
         const translationClient = new TranslationClient(translationService)
         const translationResolver = createTranslationResolver(translationClient)
-        
+
         // Use the storage service client instead of direct file storage
         // This allows the storage service to handle the backend configuration
         const fileStorage = deps.services?.storage || {
-          saveFile: async (file: any) => ({ 
+          saveFile: async (file: any) => ({
             url: `/storage/files/${Date.now()}-${file.filename}`,
             size: file.size || 0,
             mimetype: file.mimetype || 'application/octet-stream',
             originalFilename: file.filename || 'unknown',
             filename: `${Date.now()}-${file.filename}`,
-            path: `uploads/${Date.now()}-${file.filename}`
+            path: `uploads/${Date.now()}-${file.filename}`,
           }),
           deleteFile: async () => {},
         }
-        
+
         const app = await createVoucherServer({
           prisma: deps.prisma,
           cacheService: deps.cache,

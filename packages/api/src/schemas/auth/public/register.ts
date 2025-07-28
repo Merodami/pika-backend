@@ -41,7 +41,9 @@ export const RegisterRequest = openapi(
         'Last name can only contain letters, spaces, hyphens, and apostrophes',
       ),
     phoneNumber: PhoneNumber.optional(),
-    dateOfBirth: DateOnlyString.optional().describe('Date of birth in YYYY-MM-DD format'),
+    dateOfBirth: DateOnlyString.optional().describe(
+      'Date of birth in YYYY-MM-DD format',
+    ),
     acceptTerms: z
       .literal(true)
       .refine((value) => value === true, {

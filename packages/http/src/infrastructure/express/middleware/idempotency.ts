@@ -26,6 +26,7 @@ function routePatternToRegex(pattern: string): RegExp {
   const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   // Replace :param with regex to match any non-slash characters
   const regexPattern = escaped.replace(/:([^/]+)/g, '([^/]+)')
+
   // Add anchors to match the full path
   return new RegExp(`^${regexPattern}$`)
 }
@@ -34,12 +35,14 @@ function routePatternToRegex(pattern: string): RegExp {
  * Check if a URL matches any of the excluded route patterns
  */
 function isExcludedRoute(url: string, excludeRoutes: string[]): boolean {
-  return excludeRoutes.some(route => {
+  return excludeRoutes.some((route) => {
     // If route contains : it's a pattern, otherwise do simple prefix match
     if (route.includes(':')) {
       const regex = routePatternToRegex(route)
+
       return regex.test(url)
     }
+
     return url.startsWith(route)
   })
 }
@@ -86,7 +89,7 @@ export function idempotencyMiddleware(
     if (!methods.includes(req.method)) {
       return next()
     }
-    
+
     // Debug logging for path investigation
     if (req.path.includes('deactivate')) {
       logger.debug('Idempotency: Processing deactivate request', {
@@ -94,7 +97,7 @@ export function idempotencyMiddleware(
         url: req.url,
         originalUrl: req.originalUrl,
         method: req.method,
-        excludeRoutes
+        excludeRoutes,
       })
     }
 
@@ -102,8 +105,9 @@ export function idempotencyMiddleware(
     if (isExcludedRoute(req.path, excludeRoutes)) {
       logger.debug('Idempotency: Skipping excluded route', {
         path: req.path,
-        method: req.method
+        method: req.method,
       })
+
       return next()
     }
 

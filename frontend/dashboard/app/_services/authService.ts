@@ -1,4 +1,5 @@
 import 'server-only'
+
 import { cookies } from 'next/headers'
 import { cache } from 'react'
 
@@ -25,6 +26,7 @@ const REFRESH_TOKEN_COOKIE = 'pika-refresh-token'
 export const getCurrentUser = cache(async (): Promise<User | null> => {
   try {
     const token = await getAccessToken()
+
     if (!token) return null
 
     const response = await UsersService.getUsersProfile()
@@ -40,17 +42,20 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
     }
   } catch (error) {
     console.error('Failed to get current user:', error)
+
     return null
   }
 })
 
 export async function getAccessToken(): Promise<string | null> {
   const cookieStore = await cookies()
+
   return cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ?? null
 }
 
 export async function getRefreshToken(): Promise<string | null> {
   const cookieStore = await cookies()
+
   return cookieStore.get(REFRESH_TOKEN_COOKIE)?.value ?? null
 }
 
@@ -75,6 +80,7 @@ export async function setTokens(accessToken: string, refreshToken: string) {
 
 export async function clearTokens() {
   const cookieStore = await cookies()
+
   cookieStore.delete(ACCESS_TOKEN_COOKIE)
   cookieStore.delete(REFRESH_TOKEN_COOKIE)
 }
@@ -82,9 +88,11 @@ export async function clearTokens() {
 // Protect server actions and pages
 export async function requireAuth() {
   const user = await getCurrentUser()
+
   if (!user) {
     throw new Error('Unauthorized')
   }
+
   return user
 }
 

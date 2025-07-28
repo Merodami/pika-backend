@@ -1,6 +1,7 @@
-import { getRequestConfig } from 'next-intl/server'
 import { cookies } from 'next/headers'
-import { isValidLocale, defaultLocale } from './config'
+import { getRequestConfig } from 'next-intl/server'
+
+import { defaultLocale, isValidLocale } from './config'
 
 export default getRequestConfig(async ({ requestLocale }) => {
   // Determine the locale

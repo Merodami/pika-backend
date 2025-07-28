@@ -1,10 +1,11 @@
 'use server'
 
-import { redirect } from 'next/navigation'
-import { AuthenticationService } from '@/lib/api/generated'
-import { setTokens, clearTokens } from '@/app/_services/authService'
-import type { z } from 'zod'
 import { authPublic } from '@pika/api'
+import { redirect } from 'next/navigation'
+import type { z } from 'zod'
+
+import { clearTokens, setTokens } from '@/app/_services/authService'
+import { AuthenticationService } from '@/lib/api/generated'
 
 // Server action for login
 export async function login(data: z.infer<typeof authPublic.TokenRequest>) {

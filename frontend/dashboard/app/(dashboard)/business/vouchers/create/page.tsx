@@ -4,15 +4,14 @@
 export const dynamic = 'force-dynamic'
 
 import { EyeOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons'
-import { useMutation } from '@tanstack/react-query'
-import { Button, Col, message, Row, Typography } from 'antd'
+import { Button, Col, Row, Typography } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { VoucherDesignForm } from '@/components/features/voucher/voucherDesignForm'
 import { VoucherPreview } from '@/components/features/voucher/voucherPreview'
 import { VoucherTemplate } from '@/components/features/voucher/voucherTemplate'
-import { voucherAdapter } from '@/lib/api/voucherAdapter'
+import { useCreateVoucher } from '@/hooks/api'
 
 const { Title, Text } = Typography
 
@@ -94,7 +93,7 @@ export default function CreateVoucherPage() {
   // Create voucher mutation
   const createVoucherMutation = useMutation({
     mutationFn: async (voucher: VoucherDesign) => {
-      const response = await voucherAdapter.business.create(voucher)
+      const response = await voucherAdapter.management.create(voucher)
 
       return response.data
     },
@@ -110,7 +109,7 @@ export default function CreateVoucherPage() {
   // Save draft mutation
   const saveDraftMutation = useMutation({
     mutationFn: async (voucher: VoucherDesign) => {
-      const response = await voucherAdapter.business.create(voucher) // Save as draft - placeholder
+      const response = await voucherAdapter.management.create(voucher) // Save as draft - placeholder
 
       return response.data
     },

@@ -33,7 +33,9 @@ const services: ServiceHealthCheck[] = [
   { name: 'file-storage', url: FILE_STORAGE_API_URL },
 ]
 
-async function checkService(service: ServiceHealthCheck): Promise<systemPublic.ServiceHealth> {
+async function checkService(
+  service: ServiceHealthCheck,
+): Promise<systemPublic.ServiceHealth> {
   const startTime = Date.now()
 
   try {
@@ -105,9 +107,12 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
 
   const formatBytes = (bytes: number) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
+
     if (bytes === 0) return '0 Bytes'
+
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]
+
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i]
   }
 
   const formatUptime = (seconds: number) => {
@@ -116,10 +121,12 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
     const minutes = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
     const parts = []
+
     if (days > 0) parts.push(`${days}d`)
     if (hours > 0) parts.push(`${hours}h`)
     if (minutes > 0) parts.push(`${minutes}m`)
     if (secs > 0 || parts.length === 0) parts.push(`${secs}s`)
+
     return parts.join(' ')
   }
 
@@ -359,7 +366,9 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
         </div>
         
         <div class="grid">
-            ${Object.entries(data.services).map(([name, service]) => `
+            ${Object.entries(data.services)
+              .map(
+                ([name, service]) => `
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">${name.charAt(0).toUpperCase() + name.slice(1).replace('-', ' ')} Service</h3>
@@ -376,7 +385,9 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
                         <span class="metric-value">${service.responseTime}ms</span>
                     </div>
                 </div>
-            `).join('')}
+            `,
+              )
+              .join('')}
             
             <div class="card">
                 <div class="card-header">
@@ -512,9 +523,10 @@ export async function handleHealthCheck(req: Request, res: Response) {
 
     // Check if client accepts HTML
     const acceptsHTML = req.headers.accept?.includes('text/html')
-    
+
     if (acceptsHTML) {
       const html = generateHealthHTML(response)
+
       res.status(statusCode).header('Content-Type', 'text/html').send(html)
     } else {
       res.status(statusCode).json(response)

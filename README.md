@@ -571,20 +571,24 @@ git push origin main
 #### Troubleshooting Vercel Deployment
 
 **Redis Connection Errors:**
+
 - Set `CACHE_DISABLED=true` to use in-memory caching
 - See `FIX_REDIS_MULTIPLE_CONNECTIONS.md` for details
 
 **Build Failures:**
+
 - Ensure all environment variables are set
 - Check build logs for missing dependencies
 - Verify `yarn install --immutable` succeeds locally
 
 **Runtime Errors:**
+
 - Check function logs in Vercel dashboard
 - Verify database connectivity
 - Ensure JWT keys are properly formatted with `\n`
 
 **Performance:**
+
 - Enable caching headers for static responses
 - Consider edge functions for frequently accessed endpoints
 - Monitor function execution time and memory usage

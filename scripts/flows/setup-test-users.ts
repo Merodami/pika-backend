@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
+import { UserRole, UserStatus } from '@pika/types'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
-import { UserRole, UserStatus } from '@pika/types'
 import dotenv from 'dotenv'
 
 // Load environment variables
@@ -61,13 +61,13 @@ async function createTestUsers() {
     try {
       // Check if user already exists
       const existingUser = await prisma.user.findUnique({
-        where: { email: userData.email }
+        where: { email: userData.email },
       })
 
       if (existingUser) {
         // Update user to ensure correct state
         const hashedPassword = await bcrypt.hash(userData.password, 10)
-        
+
         await prisma.user.update({
           where: { id: existingUser.id },
           data: {
@@ -79,9 +79,9 @@ async function createTestUsers() {
             firstName: userData.firstName,
             lastName: userData.lastName,
             phoneNumber: userData.phoneNumber,
-          }
+          },
         })
-        
+
         console.log(`✅ Updated existing user: ${userData.email}`)
       } else {
         // Create new user
@@ -98,7 +98,7 @@ async function createTestUsers() {
             status: UserStatus.ACTIVE,
             emailVerified: userData.emailVerified,
             phoneVerified: userData.phoneVerified,
-          }
+          },
         })
 
         console.log(`✅ Created new user: ${userData.email}`)
@@ -108,7 +108,6 @@ async function createTestUsers() {
       console.log(`   Email Verified: ${userData.emailVerified}`)
       console.log(`   Password: ${userData.password}`)
       console.log()
-
     } catch (error) {
       console.error(`❌ Failed to process user ${userData.email}:`, error)
     }
@@ -116,14 +115,19 @@ async function createTestUsers() {
 
   console.log('\n📋 Summary of test users:')
   console.log('========================')
+
   for (const user of TEST_USERS) {
-    console.log(`${user.email} - ${user.role} - Verified: ${user.emailVerified}`)
+    console.log(
+      `${user.email} - ${user.role} - Verified: ${user.emailVerified}`,
+    )
   }
+
   console.log('\n✨ Test user setup complete!')
 }
 
 // Run if called directly
 import { fileURLToPath } from 'url'
+
 const isMainModule = process.argv[1] === fileURLToPath(import.meta.url)
 
 if (isMainModule) {

@@ -132,7 +132,10 @@ export const Password = z
  */
 export const SecurePassword = z
   .string()
-  .min(12, 'Password must be at least 12 characters for admin/business accounts')
+  .min(
+    12,
+    'Password must be at least 12 characters for admin/business accounts',
+  )
   .max(128, 'Password must not exceed 128 characters')
   .refine((password) => {
     // Check for lowercase letter
@@ -151,6 +154,7 @@ export const SecurePassword = z
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
       return false
     }
+
     return true
   }, 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
   .refine((password) => {
@@ -171,16 +175,17 @@ export const SecurePassword = z
       'pika1234',
       'pika@123',
     ]
-    
+
     // Check against common patterns
     const lowerPassword = password.toLowerCase()
-    return !commonWeakPasswords.some(weak => lowerPassword.includes(weak))
+
+    return !commonWeakPasswords.some((weak) => lowerPassword.includes(weak))
   }, 'This password contains common patterns. Please choose a more unique password')
   .refine((password) => {
     // Check for sequential characters (123, abc, etc.)
     const hasSequential = /(.)\1{2,}/.test(password) // same character 3+ times
     const hasKeyboardPattern = /(qwerty|asdfgh|zxcvbn)/i.test(password)
-    
+
     return !hasSequential && !hasKeyboardPattern
   }, 'Password should not contain repeated characters or keyboard patterns')
   .describe('High-security password for admin and business accounts')

@@ -43,7 +43,7 @@ export default async function BusinessDashboardPage({
 
         {/* Recent Customers */}
         <Suspense fallback={<LoadingSkeleton />}>
-          <RecentCustomers businessId={businessId} />
+          <RecentCustomers />
         </Suspense>
       </div>
     </div>

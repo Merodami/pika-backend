@@ -1,20 +1,19 @@
 import { z } from 'zod'
 
+import { CreateBusinessRequest } from '../../business/admin/management.js'
 // Note: Not using openapi() wrapper for frontend schemas as they don't need OpenAPI examples
 import { Email } from '../../shared/branded.js'
-import { SecurePassword } from '../../shared/primitives.js'
 import { UserRole, UserStatus } from '../../shared/enums.js'
-import { TokenRequest } from '../public/oauth.js'
-import {
-  ForgotPasswordRequest,
-  ResetPasswordRequest,
-  ChangePasswordRequest,
-} from '../public/password.js'
-import { RegisterRequest } from '../public/register.js'
-
+import { SecurePassword } from '../../shared/primitives.js'
 // Import admin schemas we need to extend
 import { AdminCreateUserRequest } from '../../user/admin/management.js'
-import { CreateBusinessRequest } from '../../business/admin/management.js'
+import { TokenRequest } from '../public/oauth.js'
+import {
+  ChangePasswordRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+} from '../public/password.js'
+import { RegisterRequest } from '../public/register.js'
 
 /**
  * Frontend-optimized authentication schemas
@@ -40,13 +39,16 @@ export const LoginFormSchema = z.object({
  * Admin/Business login form - extends base with stricter validation
  */
 export const AdminBusinessLoginFormSchema = LoginFormSchema.extend({
-  password: z.string()
+  password: z
+    .string()
     .min(12, 'Admin/Business passwords must be at least 12 characters')
     .max(128, 'Password must not exceed 128 characters'),
 })
 
 export type LoginFormData = z.infer<typeof LoginFormSchema>
-export type AdminBusinessLoginFormData = z.infer<typeof AdminBusinessLoginFormSchema>
+export type AdminBusinessLoginFormData = z.infer<
+  typeof AdminBusinessLoginFormSchema
+>
 
 /**
  * Transform login form data to backend TokenRequest format
@@ -204,8 +206,10 @@ export function combineRegistrationSteps(
  * Admin creates business user form
  * Properly extends backend AdminCreateUserRequest with frontend needs
  */
-export const AdminCreateBusinessUserSchema = AdminCreateUserRequest
-  .omit({ role: true, status: true }) // Remove fields we'll set automatically
+export const AdminCreateBusinessUserSchema = AdminCreateUserRequest.omit({
+  role: true,
+  status: true,
+}) // Remove fields we'll set automatically
   .extend({
     // Add password fields
     temporaryPassword: SecurePassword,
@@ -219,7 +223,9 @@ export const AdminCreateBusinessUserSchema = AdminCreateUserRequest
     path: ['confirmPassword'],
   })
 
-export type AdminCreateBusinessUserData = z.infer<typeof AdminCreateBusinessUserSchema>
+export type AdminCreateBusinessUserData = z.infer<
+  typeof AdminCreateBusinessUserSchema
+>
 
 /**
  * Frontend options returned with the user creation
@@ -234,12 +240,20 @@ export interface AdminCreateUserOptions {
  * Transform to backend AdminCreateUserRequest with type-safe enums
  * Returns both the user request and frontend options
  */
-export function transformToAdminCreateUser(formData: AdminCreateBusinessUserData): {
+export function transformToAdminCreateUser(
+  formData: AdminCreateBusinessUserData,
+): {
   createUser: z.infer<typeof AdminCreateUserRequest>
   options: AdminCreateUserOptions
 } {
-  const { confirmPassword, temporaryPassword, sendWelcomeEmail, requirePasswordChange, ...userData } = formData
-  
+  const {
+    confirmPassword,
+    temporaryPassword,
+    sendWelcomeEmail,
+    requirePasswordChange,
+    ...userData
+  } = formData
+
   return {
     createUser: {
       ...userData,
@@ -250,12 +264,12 @@ export function transformToAdminCreateUser(formData: AdminCreateBusinessUserData
       temporaryPassword,
       sendWelcomeEmail,
       requirePasswordChange,
-    }
+    },
   }
 }
 
 /**
- * Admin creates business form  
+ * Admin creates business form
  * Properly extends backend CreateBusinessRequest - no changes needed
  */
 export const AdminCreateBusinessSchema = CreateBusinessRequest
@@ -266,8 +280,9 @@ export type AdminCreateBusinessData = z.infer<typeof AdminCreateBusinessSchema>
  * Admin/Business change password form
  * Properly extends base ChangePasswordRequest
  */
-export const AdminBusinessChangePasswordSchema = ChangePasswordRequest
-  .omit({ newPassword: true })
+export const AdminBusinessChangePasswordSchema = ChangePasswordRequest.omit({
+  newPassword: true,
+})
   .extend({
     newPassword: SecurePassword,
     confirmPassword: z.string().min(1, 'Please confirm your password'),
@@ -277,23 +292,28 @@ export const AdminBusinessChangePasswordSchema = ChangePasswordRequest
     path: ['confirmPassword'],
   })
 
-export type AdminBusinessChangePasswordData = z.infer<typeof AdminBusinessChangePasswordSchema>
+export type AdminBusinessChangePasswordData = z.infer<
+  typeof AdminBusinessChangePasswordSchema
+>
 
 /**
  * Transform to backend ChangePasswordRequest
  */
-export function transformToChangePassword(formData: AdminBusinessChangePasswordData): z.infer<typeof ChangePasswordRequest> {
+export function transformToChangePassword(
+  formData: AdminBusinessChangePasswordData,
+): z.infer<typeof ChangePasswordRequest> {
   const { confirmPassword, ...requestData } = formData
+
   return requestData
 }
 
 // ============= Export All =============
 
 export {
+  ChangePasswordRequest,
   ForgotPasswordRequest,
   // Re-export backend schemas for convenience
   RegisterRequest,
   ResetPasswordRequest,
   TokenRequest,
-  ChangePasswordRequest,
 } from '../public/index.js'

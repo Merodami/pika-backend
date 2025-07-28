@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { UserRole, UserStatus } from '../../shared/enums.js'
-import { DateOnly, DateOnlyString, DateTime } from '../../shared/primitives.js'
+import { DateOnlyString, DateTime } from '../../shared/primitives.js'
 
 /**
  * Internal user service schemas for service-to-service communication
