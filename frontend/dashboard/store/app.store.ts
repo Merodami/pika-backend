@@ -7,13 +7,13 @@ interface AppState {
   sidebarCollapsed: boolean
   theme: 'light' | 'dark'
   locale: Locale | null // User's preferred locale
-  
+
   // Form Drafts (persisted during language switches)
   formDrafts: Record<string, any>
-  
+
   // Language switching state
   isLanguageSwitching: boolean
-  
+
   // Actions
   toggleSidebar: () => void
   setSidebarCollapsed: (collapsed: boolean) => void
@@ -34,30 +34,33 @@ export const useAppStore = create<AppState>()(
       locale: null,
       formDrafts: {},
       isLanguageSwitching: false,
-      
+
       // Actions
-      toggleSidebar: () => set((state) => ({ 
-        sidebarCollapsed: !state.sidebarCollapsed 
-      })),
-      
+      toggleSidebar: () =>
+        set((state) => ({
+          sidebarCollapsed: !state.sidebarCollapsed,
+        })),
+
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
-      
+
       setTheme: (theme) => set({ theme }),
-      
+
       setLocale: (locale) => set({ locale }),
-      
-      saveFormDraft: (formId, data) => set((state) => ({
-        formDrafts: { ...state.formDrafts, [formId]: data }
-      })),
-      
-      clearFormDraft: (formId) => set((state) => {
-        const { [formId]: _, ...rest } = state.formDrafts
-        return { formDrafts: rest }
-      }),
-      
+
+      saveFormDraft: (formId, data) =>
+        set((state) => ({
+          formDrafts: { ...state.formDrafts, [formId]: data },
+        })),
+
+      clearFormDraft: (formId) =>
+        set((state) => {
+          const { [formId]: _, ...rest } = state.formDrafts
+          return { formDrafts: rest }
+        }),
+
       clearAllDrafts: () => set({ formDrafts: {} }),
-      
-      setLanguageSwitching: (value) => set({ isLanguageSwitching: value })
+
+      setLanguageSwitching: (value) => set({ isLanguageSwitching: value }),
     }),
     {
       name: 'pika-app-storage',
@@ -66,7 +69,7 @@ export const useAppStore = create<AppState>()(
         theme: state.theme,
         locale: state.locale, // Persist locale preference
         formDrafts: state.formDrafts, // Persist form drafts
-      })
+      }),
     }
   )
 )

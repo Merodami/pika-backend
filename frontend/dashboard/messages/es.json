@@ -100,8 +100,13 @@
       "growth": "Crecimiento",
       "totalUsers": "Usuarios Totales",
       "totalBusinesses": "Negocios Totales",
+      "activeBusinesses": "Negocios Activos",
       "monthlyGrowth": "Crecimiento Mensual",
-      "newCustomers": "Nuevos Clientes"
+      "newCustomers": "Nuevos Clientes",
+      "voucherBooks": "Libros de Cupones",
+      "pendingFraudCases": "Casos de Fraude Pendientes",
+      "totalScans": "Escaneos Totales",
+      "uniqueCustomers": "Clientes Únicos"
     },
     "recentActivity": "Actividad Reciente",
     "viewAllActivity": "Ver toda la actividad"

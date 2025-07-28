@@ -6,13 +6,12 @@ import { useEffect } from 'react'
 // import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast'
 
-import { ProtectedRoute } from '@/components/auth/protected-route'
-import { NotificationBusiness } from '@/components/businesses/notification-business'
+import { ProtectedRoute } from '@/components/auth/protectedRoute'
+import { NotificationBusiness } from '@/components/businesses/notificationBusiness'
 import { Header } from '@/components/layouts/header'
 import { Sidebar } from '@/components/layouts/sidebar'
-import { useFirebaseNotifications } from '@/hooks/firebase/use-firebase-notifications'
-import { useOnline } from '@/hooks/use-online'
-import { useSessionTimeout } from '@/hooks/use-session-timeout'
+import { useOnline } from '@/hooks/useOnline'
+import { useSessionTimeout } from '@/hooks/useSessionTimeout'
 import { useAuthStore } from '@/store/auth.store'
 
 const { Content } = Layout
@@ -62,8 +61,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   // Online/offline detection
   const isOnline = useOnline()
 
-  // Firebase real-time notifications
-  useFirebaseNotifications()
+  // Real-time notifications removed (was Firebase)
 
   return (
     <>

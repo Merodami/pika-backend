@@ -1,6 +1,6 @@
 import { getRequestConfig } from 'next-intl/server'
 import { cookies } from 'next/headers'
-import { type Locale, isValidLocale, defaultLocale } from './config'
+import { isValidLocale, defaultLocale } from './config'
 
 export default getRequestConfig(async ({ requestLocale }) => {
   // Determine the locale
@@ -11,7 +11,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     // Try to get from cookie
     const cookieStore = await cookies()
     const savedLocale = cookieStore.get('pika-locale')?.value
-    
+
     if (savedLocale && isValidLocale(savedLocale)) {
       locale = savedLocale
     } else {

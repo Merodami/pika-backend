@@ -1,43 +1,36 @@
 #!/usr/bin/env tsx
 
 import axios, { AxiosInstance } from 'axios'
-import { ADMIN_USER, createAdminUser } from './admin-setup.js'
+import { createTestUsers, TEST_USERS } from './setup-test-users.js'
 
 // API Configuration
 const API_GATEWAY_URL = process.env.API_GATEWAY_URL || 'http://127.0.0.1:5500'
 const API_PREFIX = '/api/v1'
 
-// Test data
-const testAdmin = ADMIN_USER
+// Test data - use pre-created verified users
+const testAdmin = TEST_USERS.find(u => u.role === 'admin')!
+const testCustomer = TEST_USERS.find(u => u.role === 'customer' && u.emailVerified)!
 
-const testCustomer = {
-  email: `customer-${Date.now()}@example.com`,
-  password: 'CustomerPassword123!',
-  firstName: 'Test',
-  lastName: 'Customer',
-  phoneNumber: `+1555${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
-  dateOfBirth: '1990-01-01',
-  acceptTerms: true,
-  marketingConsent: false,
-}
+// Add timestamp to make categories unique
+const timestamp = Date.now()
 
 const testCategories = [
   {
-    nameKey: 'category.fitness',
+    nameKey: `category.fitness.${timestamp}`,
     descriptionKey: 'category.fitness.description',
     icon: 'fitness',
     isActive: true,
     sortOrder: 1,
   },
   {
-    nameKey: 'category.wellness',
+    nameKey: `category.wellness.${timestamp}`,
     descriptionKey: 'category.wellness.description',
     icon: 'wellness',
     isActive: true,
     sortOrder: 2,
   },
   {
-    nameKey: 'category.sports',
+    nameKey: `category.sports.${timestamp}`,
     descriptionKey: 'category.sports.description',
     icon: 'sports',
     isActive: true,
@@ -48,7 +41,7 @@ const testCategories = [
 // Subcategories
 const testSubcategories = [
   {
-    nameKey: 'category.fitness.gym',
+    nameKey: `category.fitness.gym.${timestamp}`,
     descriptionKey: 'category.fitness.gym.description',
     icon: 'gym',
     isActive: true,
@@ -56,7 +49,7 @@ const testSubcategories = [
     // parentId will be set dynamically
   },
   {
-    nameKey: 'category.fitness.yoga',
+    nameKey: `category.fitness.yoga.${timestamp}`,
     descriptionKey: 'category.fitness.yoga.description',
     icon: 'yoga',
     isActive: true,
@@ -150,40 +143,30 @@ async function loginAsAdmin(): Promise<string> {
   }
 }
 
-async function registerAndLoginCustomer(): Promise<string> {
-  logInfo('Registering new customer...')
+async function loginAsCustomer(): Promise<string> {
+  logInfo('Logging in as customer...')
   
   try {
-    // Register
-    await api.post('/auth/register', testCustomer)
-    logInfo('Customer registered (email verification pending)')
+    const response = await api.post('/auth/token', {
+      grantType: 'password',
+      username: testCustomer.email,
+      password: testCustomer.password,
+    })
     
-    // Note: In real scenario, email verification would be required
-    // For testing, we'll attempt login anyway
-    try {
-      const response = await api.post('/auth/token', {
-        grantType: 'password',
-        username: testCustomer.email,
-        password: testCustomer.password,
-      })
-      return response.data.accessToken
-    } catch (loginError: any) {
-      logInfo('Login blocked - email verification required (expected behavior)')
-      // For demo purposes, return empty token
-      return ''
-    }
+    logSuccess('Customer logged in successfully')
+    return response.data.accessToken
   } catch (error: any) {
-    logError(`Customer registration failed: ${error.response?.data?.message || error.message}`)
+    logError(`Customer login failed: ${error.response?.data?.message || error.message}`)
     throw error
   }
 }
 
 // Category management functions (Admin)
 async function createCategory(token: string, categoryData: any): Promise<string> {
-  logRequest('POST', '/categories/admin/categories', categoryData)
+  logRequest('POST', '/admin/categories', categoryData)
   
   try {
-    const response = await api.post('/categories/admin/categories', categoryData, {
+    const response = await api.post('/admin/categories', categoryData, {
       headers: { Authorization: `Bearer ${token}` },
     })
     
@@ -196,10 +179,10 @@ async function createCategory(token: string, categoryData: any): Promise<string>
 }
 
 async function updateCategory(token: string, categoryId: string, updateData: any): Promise<void> {
-  logRequest('PUT', `/categories/admin/categories/${categoryId}`, updateData)
+  logRequest('PATCH', `/admin/categories/${categoryId}`, updateData)
   
   try {
-    await api.put(`/categories/admin/categories/${categoryId}`, updateData, {
+    await api.patch(`/admin/categories/${categoryId}`, updateData, {
       headers: { Authorization: `Bearer ${token}` },
     })
     
@@ -211,10 +194,10 @@ async function updateCategory(token: string, categoryId: string, updateData: any
 }
 
 async function toggleCategoryActivation(token: string, categoryId: string, isActive: boolean): Promise<void> {
-  logRequest('PUT', `/categories/admin/categories/${categoryId}/activation`, { isActive })
+  logRequest('POST', `/admin/categories/${categoryId}/toggle-status`, { isActive })
   
   try {
-    await api.put(`/categories/admin/categories/${categoryId}/activation`, { isActive }, {
+    await api.post(`/admin/categories/${categoryId}/toggle-status`, { isActive }, {
       headers: { Authorization: `Bearer ${token}` },
     })
     
@@ -226,10 +209,10 @@ async function toggleCategoryActivation(token: string, categoryId: string, isAct
 }
 
 async function deleteCategory(token: string, categoryId: string): Promise<void> {
-  logRequest('DELETE', `/categories/admin/categories/${categoryId}`)
+  logRequest('DELETE', `/admin/categories/${categoryId}`)
   
   try {
-    await api.delete(`/categories/admin/categories/${categoryId}`, {
+    await api.delete(`/admin/categories/${categoryId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
     
@@ -256,11 +239,13 @@ async function listPublicCategories(token?: string): Promise<void> {
   }
 }
 
-async function getCategoryHierarchy(): Promise<void> {
+async function getCategoryHierarchy(token: string): Promise<void> {
   logRequest('GET', '/categories/hierarchy')
   
   try {
-    const response = await api.get('/categories/hierarchy')
+    const response = await api.get('/categories/hierarchy', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
     
     logSuccess(`Retrieved category hierarchy with ${response.data.data.length} root categories`)
   } catch (error: any) {
@@ -269,11 +254,13 @@ async function getCategoryHierarchy(): Promise<void> {
   }
 }
 
-async function getCategoryPath(categoryId: string): Promise<void> {
+async function getCategoryPath(categoryId: string, token: string): Promise<void> {
   logRequest('GET', `/categories/${categoryId}/path`)
   
   try {
-    const response = await api.get(`/categories/${categoryId}/path`)
+    const response = await api.get(`/categories/${categoryId}/path`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
     
     logSuccess(`Retrieved category path with ${response.data.data.length} levels`)
   } catch (error: any) {
@@ -292,9 +279,40 @@ async function runCategoryFlow() {
   const createdCategoryIds: string[] = []
   
   try {
-    // Ensure admin user exists
-    log(`\n${colors.bright}=== Setup: Ensuring Admin User ===${colors.reset}`)
-    await createAdminUser()
+    // Ensure test users exist
+    log(`\n${colors.bright}=== Setup: Ensuring Test Users ===${colors.reset}`)
+    await createTestUsers()
+    
+    // Clean up any existing test categories
+    logInfo('Cleaning up existing test categories...')
+    adminToken = await loginAsAdmin()
+    
+    try {
+      const response = await api.get('/admin/categories?limit=100', {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      
+      const existingCategories = response.data.data.filter((cat: any) => 
+        cat.nameKey.startsWith('category.fitness') || 
+        cat.nameKey.startsWith('category.wellness') || 
+        cat.nameKey.startsWith('category.sports')
+      )
+      
+      // Sort by level descending to delete children first
+      existingCategories.sort((a: any, b: any) => (b.level || 1) - (a.level || 1))
+      
+      for (const cat of existingCategories) {
+        try {
+          await deleteCategory(adminToken, cat.id)
+          logInfo(`Cleaned up existing category: ${cat.nameKey}`)
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+      }
+    } catch (error) {
+      // Ignore cleanup errors
+    }
+    
     // Phase 1: Admin Category Management
     log(`\n${colors.bright}=== Phase 1: Admin Category Management ===${colors.reset}`)
     
@@ -333,19 +351,19 @@ async function runCategoryFlow() {
     // Phase 2: Public Category Browsing
     log(`\n${colors.bright}=== Phase 2: Public Category Browsing ===${colors.reset}`)
     
-    logStep(5, 'Public Category List (Anonymous)')
-    await listPublicCategories()
+    logStep(5, 'Customer Login')
+    customerToken = await loginAsCustomer()
     
-    logStep(6, 'Customer Registration & Category Browsing')
-    customerToken = await registerAndLoginCustomer()
+    logStep(6, 'Public Category List (Authenticated Customer)')
+    await listPublicCategories(customerToken)
     
     logStep(7, 'Category Hierarchy')
-    await getCategoryHierarchy()
+    await getCategoryHierarchy(customerToken)
     
     logStep(8, 'Category Path')
     if (createdCategoryIds.length > 3) {
       // Get path for a subcategory
-      await getCategoryPath(createdCategoryIds[3])
+      await getCategoryPath(createdCategoryIds[3], customerToken)
     }
     
     // Phase 3: Cleanup

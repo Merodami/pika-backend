@@ -1,12 +1,16 @@
 import { Metadata } from 'next'
 import { useTranslations } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
-import { LoginForm } from './login-form'
+import { LoginForm } from './loginForm'
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'auth.login' })
-  
+
   return {
     title: t('title'),
     description: t('subtitle'),
@@ -15,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 
 export default function LoginPage() {
   const t = useTranslations('auth.login')
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">

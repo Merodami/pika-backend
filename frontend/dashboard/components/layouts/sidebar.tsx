@@ -159,7 +159,7 @@ export function Sidebar() {
       <Menu
         mode="inline"
         selectedKeys={[pathname]}
-        items={filteredMenuItems}
+        items={filteredMenuItems as any}
         onClick={({ key }) => handleMenuClick(key)}
         className="border-r-0"
       />

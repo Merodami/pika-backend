@@ -6,7 +6,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { ConfigProvider } from 'antd'
 import { Toaster } from 'sonner'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
 })

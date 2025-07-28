@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 
 import { BusinessSidebarClient } from './businessSidebarClient'
-import type { User } from '@/app/_services/auth.service'
+import type { User } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
 
 interface BusinessSidebarProps {
@@ -19,7 +19,7 @@ interface BusinessSidebarProps {
   locale: Locale
 }
 
-export async function BusinessSidebar({ user, locale }: BusinessSidebarProps) {
+export async function BusinessSidebar({ locale }: BusinessSidebarProps) {
   const t = await getTranslations({ locale, namespace: 'navigation' })
 
   const navItems = [

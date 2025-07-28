@@ -3,6 +3,7 @@
 ## Executive Summary
 
 A modern, enterprise-grade dashboard built with Next.js 15, React 19, and TypeScript, featuring:
+
 - React Server Components (RSC) first approach
 - Internationalization (i18n) with next-intl
 - Role-based access control (RBAC)
@@ -12,6 +13,7 @@ A modern, enterprise-grade dashboard built with Next.js 15, React 19, and TypeSc
 ## Core Architecture Principles
 
 ### 1. Server-First Approach
+
 - **Default to RSC**: Client components only when needed
 - **Server Actions**: For all mutations
 - **Streaming SSR**: With Suspense boundaries
@@ -25,7 +27,7 @@ A modern, enterprise-grade dashboard built with Next.js 15, React 19, and TypeSc
 // This is a Server Component but still dynamic!
 export default async function VoucherList() {
   const vouchers = await getVouchers() // Fresh data on each request
-  
+
   return (
     <div>
       {vouchers.map(voucher => (
@@ -42,7 +44,7 @@ export default async function VoucherList() {
 'use client'
 function VoucherActions({ voucherId }: Props) {
   const [isEditing, setIsEditing] = useState(false)
-  
+
   return (
     <>
       <button onClick={() => setIsEditing(true)}>Edit</button>
@@ -56,6 +58,7 @@ function VoucherActions({ voucherId }: Props) {
 ```
 
 **How RSC Provides Fluid Updates**:
+
 1. **Server Actions**: Update data without full page reload
 2. **Revalidation**: `revalidatePath()` updates specific components
 3. **Streaming**: Progressive rendering of UI sections
@@ -63,6 +66,7 @@ function VoucherActions({ voucherId }: Props) {
 5. **Soft Navigation**: Next.js router preserves client state
 
 **Example: Dynamic Voucher Management**
+
 ```typescript
 // Server action for instant updates
 async function deleteVoucher(formData: FormData) {
@@ -76,12 +80,14 @@ async function deleteVoucher(formData: FormData) {
 ```
 
 ### 2. Type Safety Throughout
+
 - **End-to-end types**: From API to UI via Generated SDK
 - **Generated SDK**: From OpenAPI spec with proper enums
 - **Frontend validation**: Using SDK types, not backend schemas
 - **Type-safe translations**: Generated from JSON
 
 ### 3. Performance Optimized
+
 - **Minimal client JS**: RSC by default
 - **Code splitting**: Automatic with App Router
 - **Image optimization**: Next.js Image component
@@ -90,30 +96,31 @@ async function deleteVoucher(formData: FormData) {
 ## Technology Stack
 
 ### Core Dependencies
+
 ```json
 {
   "dependencies": {
-    "next": "^15.4.4",              // Framework
-    "react": "^19.1.0",             // UI library
-    "react-dom": "^19.1.0",         
-    "next-intl": "^3.x",            // i18n
-    "zustand": "^5.0.6",            // State management
-    "antd": "^5.26.6",              // UI components
-    "react-hook-form": "^7.61.1",   // Forms
+    "next": "^15.4.4", // Framework
+    "react": "^19.1.0", // UI library
+    "react-dom": "^19.1.0",
+    "next-intl": "^3.x", // i18n
+    "zustand": "^5.0.6", // State management
+    "antd": "^5.26.6", // UI components
+    "react-hook-form": "^7.61.1", // Forms
     "@hookform/resolvers": "^5.2.0",
-    "zod": "^4.0.10",               // Validation (frontend forms only)
-    "tailwindcss": "^4.1.11",       // Styling
-    "clsx": "^2.1.1",               // Class utilities
+    "zod": "^4.0.10", // Validation (frontend forms only)
+    "tailwindcss": "^4.1.11", // Styling
+    "clsx": "^2.1.1", // Class utilities
     "tailwind-merge": "^3.3.1",
-    "lucide-react": "^0.526.0",     // Icons
-    "recharts": "^3.1.0",           // Charts
-    "date-fns": "^4.1.0",           // Date utils
-    "sonner": "^2.0.6",             // Toast notifications
-    "server-only": "^0.0.1",        // Server code safety
-    "axios": "^1.x"                 // HTTP client (used by generated SDK)
+    "lucide-react": "^0.526.0", // Icons
+    "recharts": "^3.1.0", // Charts
+    "date-fns": "^4.1.0", // Date utils
+    "sonner": "^2.0.6", // Toast notifications
+    "server-only": "^0.0.1", // Server code safety
+    "axios": "^1.x" // HTTP client (used by generated SDK)
   },
   "devDependencies": {
-    "@pika/api": "workspace:^",     // Backend schemas for form extensions (dev only)
+    "@pika/api": "workspace:^", // Backend schemas for form extensions (dev only)
     "openapi-typescript-codegen": "^0.x" // SDK generator
   }
 }
@@ -176,15 +183,15 @@ interface AppState {
   // UI State
   sidebarCollapsed: boolean
   theme: 'light' | 'dark'
-  
+
   // Form Drafts (persisted)
   formDrafts: Record<string, any>
-  
+
   // Actions
   toggleSidebar: () => void
   saveFormDraft: (formId: string, data: any) => void
   clearFormDraft: (formId: string) => void
-  
+
   // Language switch helper
   isLanguageSwitching: boolean
   setLanguageSwitching: (value: boolean) => void
@@ -194,7 +201,7 @@ interface AppState {
 interface AuthState {
   // Cached user data
   user: User | null
-  
+
   // Actions
   setUser: (user: User | null) => void
   clearAuth: () => void
@@ -209,22 +216,25 @@ export const useAppStore = create<AppState>()(
       theme: 'light',
       formDrafts: {},
       isLanguageSwitching: false,
-      
+
       // Actions
-      toggleSidebar: () => set((state) => ({ 
-        sidebarCollapsed: !state.sidebarCollapsed 
-      })),
-      
-      saveFormDraft: (formId, data) => set((state) => ({
-        formDrafts: { ...state.formDrafts, [formId]: data }
-      })),
-      
-      clearFormDraft: (formId) => set((state) => {
-        const { [formId]: _, ...rest } = state.formDrafts
-        return { formDrafts: rest }
-      }),
-      
-      setLanguageSwitching: (value) => set({ isLanguageSwitching: value })
+      toggleSidebar: () =>
+        set((state) => ({
+          sidebarCollapsed: !state.sidebarCollapsed,
+        })),
+
+      saveFormDraft: (formId, data) =>
+        set((state) => ({
+          formDrafts: { ...state.formDrafts, [formId]: data },
+        })),
+
+      clearFormDraft: (formId) =>
+        set((state) => {
+          const { [formId]: _, ...rest } = state.formDrafts
+          return { formDrafts: rest }
+        }),
+
+      setLanguageSwitching: (value) => set({ isLanguageSwitching: value }),
     }),
     {
       name: 'pika-app-storage',
@@ -232,7 +242,7 @@ export const useAppStore = create<AppState>()(
         sidebarCollapsed: state.sidebarCollapsed,
         theme: state.theme,
         formDrafts: state.formDrafts, // Persist form drafts
-      })
+      }),
     }
   )
 )
@@ -298,25 +308,33 @@ import { z } from 'zod'
 import { userAdmin, shared } from '@pika/api'
 
 // EXTEND backend schema with UI concerns
-export const AdminCreateBusinessUserSchema = userAdmin.AdminCreateUserRequest
-  .omit({ role: true, status: true }) // Remove auto-set fields
-  .extend({
-    // Reuse backend validation
-    temporaryPassword: shared.SecurePassword,
-    confirmPassword: z.string().min(1),
-    // Frontend-specific fields
-    sendWelcomeEmail: z.boolean().default(true),
-    requirePasswordChange: z.boolean().default(true),
-  })
-  .refine((data) => data.temporaryPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
+export const AdminCreateBusinessUserSchema =
+  userAdmin.AdminCreateUserRequest.omit({ role: true, status: true }) // Remove auto-set fields
+    .extend({
+      // Reuse backend validation
+      temporaryPassword: shared.SecurePassword,
+      confirmPassword: z.string().min(1),
+      // Frontend-specific fields
+      sendWelcomeEmail: z.boolean().default(true),
+      requirePasswordChange: z.boolean().default(true),
+    })
+    .refine((data) => data.temporaryPassword === data.confirmPassword, {
+      message: "Passwords don't match",
+      path: ['confirmPassword'],
+    })
 
 // Transform function for API calls
-export function transformToAPI(formData: z.infer<typeof AdminCreateBusinessUserSchema>) {
-  const { confirmPassword, temporaryPassword, sendWelcomeEmail, requirePasswordChange, ...userData } = formData
-  
+export function transformToAPI(
+  formData: z.infer<typeof AdminCreateBusinessUserSchema>
+) {
+  const {
+    confirmPassword,
+    temporaryPassword,
+    sendWelcomeEmail,
+    requirePasswordChange,
+    ...userData
+  } = formData
+
   return {
     createUser: {
       ...userData,
@@ -327,20 +345,20 @@ export function transformToAPI(formData: z.infer<typeof AdminCreateBusinessUserS
       temporaryPassword,
       sendWelcomeEmail,
       requirePasswordChange,
-    }
+    },
   }
 }
 ```
 
 ### Why This Architecture Works
 
-| Aspect | Build Time | Runtime |
-|--------|------------|---------|
-| **Validation** | Import Zod schemas from `@pika/api` | Use extended schemas |
-| **Types** | Extend backend interfaces | Use SDK types |
-| **Enums** | N/A | Use SDK enums |
-| **API Calls** | N/A | Use SDK services |
-| **Bundle Size** | Tree-shaken, only validation logic | Full SDK included |
+| Aspect          | Build Time                          | Runtime              |
+| --------------- | ----------------------------------- | -------------------- |
+| **Validation**  | Import Zod schemas from `@pika/api` | Use extended schemas |
+| **Types**       | Extend backend interfaces           | Use SDK types        |
+| **Enums**       | N/A                                 | Use SDK enums        |
+| **API Calls**   | N/A                                 | Use SDK services     |
+| **Bundle Size** | Tree-shaken, only validation logic  | Full SDK included    |
 
 ### Benefits of the Balanced Approach
 
@@ -355,12 +373,14 @@ export function transformToAPI(formData: z.infer<typeof AdminCreateBusinessUserS
 ### Generated SDK Limitations
 
 The SDK **provides**:
+
 - Types and interfaces
 - Enums for API values
 - Service classes for API calls
 - HTTP client configuration
 
 The SDK **does NOT provide**:
+
 - Zod validation schemas
 - Complex validation logic
 - Transform functions
@@ -381,7 +401,7 @@ import type { UserProfileResponse } from '@/lib/api/generated'
 export async function getCurrentUser(): Promise<UserProfileResponse | null> {
   const token = cookies().get('pika-access-token')
   if (!token) return null
-  
+
   try {
     // SDK service handles the API call
     const user = await UserService.getUserProfile()
@@ -413,7 +433,7 @@ export default async function DashboardLayout({
   params: { locale }
 }: Props) {
   const user = await requireAuth()
-  
+
   return (
     <DashboardProvider user={user} locale={locale}>
       <div className="flex h-screen">
@@ -437,9 +457,24 @@ export const locales = ['es', 'en', 'gn'] as const
 export const defaultLocale = 'es'
 
 export const localeConfig = {
-  es: { name: 'Español', flag: '🇪🇸', currency: 'EUR', dateFormat: 'dd/MM/yyyy' },
-  en: { name: 'English', flag: '🇺🇸', currency: 'USD', dateFormat: 'MM/dd/yyyy' },
-  gn: { name: 'Guaraní', flag: '🇵🇾', currency: 'PYG', dateFormat: 'dd/MM/yyyy' }
+  es: {
+    name: 'Español',
+    flag: '🇪🇸',
+    currency: 'EUR',
+    dateFormat: 'dd/MM/yyyy',
+  },
+  en: {
+    name: 'English',
+    flag: '🇺🇸',
+    currency: 'USD',
+    dateFormat: 'MM/dd/yyyy',
+  },
+  gn: {
+    name: 'Guaraní',
+    flag: '🇵🇾',
+    currency: 'PYG',
+    dateFormat: 'dd/MM/yyyy',
+  },
 }
 ```
 
@@ -454,7 +489,7 @@ export function LanguageSwitcher() {
   const router = useRouter()
   const { saveFormDraft, setLanguageSwitching } = useAppStore()
   const [isPending, startTransition] = useTransition()
-  
+
   const handleLanguageChange = (newLocale: string) => {
     // Save any active form data
     const activeForm = document.querySelector('form[data-form-id]')
@@ -463,17 +498,17 @@ export function LanguageSwitcher() {
       const formData = new FormData(activeForm)
       saveFormDraft(formId!, Object.fromEntries(formData))
     }
-    
+
     // Set switching state for loading UI
     setLanguageSwitching(true)
-    
+
     // Perform soft navigation
     startTransition(() => {
       const newPath = pathname.replace(/^\/[^\/]+/, `/${newLocale}`)
       router.push(newPath)
     })
   }
-  
+
   return (
     <Select
       onChange={handleLanguageChange}
@@ -502,11 +537,11 @@ async function getEntityTranslations(keys: string[], locale: string) {
 export default async function CategoryList({ locale }: Props) {
   const t = await getTranslations(locale)
   const categories = await getCategories()
-  
+
   // Fetch dynamic translations for category names
   const translationKeys = categories.map(c => c.nameKey)
   const translations = await getEntityTranslations(translationKeys, locale)
-  
+
   return (
     <div>
       <h1>{t('categories.title')}</h1> {/* Static */}
@@ -530,13 +565,13 @@ import { BusinessService, VoucherService } from '@/lib/api/generated'
 
 export default async function BusinessDashboard() {
   const user = await getCurrentUser()
-  
+
   // Use SDK services for API calls
   const business = await BusinessService.getMyBusiness()
   const vouchers = await VoucherService.getBusinessVouchers({
     businessId: business.id
   })
-  
+
   return <DashboardView business={business} vouchers={vouchers} />
 }
 ```
@@ -553,7 +588,7 @@ import type { CreateVoucherRequest } from '@/lib/api/generated'
 
 export async function createVoucher(data: FormData) {
   const user = await requireBusiness()
-  
+
   // Prepare request using SDK types
   const request: CreateVoucherRequest = {
     title: data.get('title') as string,
@@ -561,12 +596,12 @@ export async function createVoucher(data: FormData) {
     businessId: user.businessId,
     // ... other fields
   }
-  
+
   // Use SDK service for API call
   const voucher = await VoucherService.createVoucher({
-    requestBody: request
+    requestBody: request,
   })
-  
+
   revalidatePath('/business/vouchers')
   redirect(`/business/vouchers/${voucher.id}`)
 }
@@ -583,20 +618,20 @@ import { createVoucher } from '@/actions/vouchers'
 export function VoucherForm() {
   const { pending } = useFormStatus()
   const { formDrafts, clearFormDraft } = useAppStore()
-  
+
   // Restore draft if exists
   const draft = formDrafts['create-voucher']
-  
+
   return (
-    <form 
-      action={createVoucher} 
+    <form
+      action={createVoucher}
       data-form-id="create-voucher"
       onSubmit={() => clearFormDraft('create-voucher')}
     >
-      <input 
-        name="title" 
+      <input
+        name="title"
         defaultValue={draft?.title}
-        required 
+        required
       />
       <button disabled={pending}>
         {pending ? 'Creating...' : 'Create Voucher'}
@@ -630,11 +665,11 @@ interface RoleGateProps {
 
 export async function RoleGate({ roles, fallback, children }: RoleGateProps) {
   const user = await getCurrentUser()
-  
+
   if (!user || !roles.includes(user.role)) {
     return fallback || null
   }
-  
+
   return children
 }
 
@@ -647,6 +682,7 @@ export async function RoleGate({ roles, fallback, children }: RoleGateProps) {
 ### Admin Voucher Management
 
 Admins have complete control over ALL vouchers:
+
 - Create/Edit/Delete any individual voucher (from any business)
 - Create/Edit/Delete voucher books
 - View all vouchers across the platform
@@ -682,7 +718,7 @@ export default async function BusinessProfile() {
     getBusinessVouchers(),
     getBusinessAnalytics()
   ])
-  
+
   return <ProfileView {...{ business, vouchers, analytics }} />
 }
 ```
@@ -744,24 +780,28 @@ yarn build
 ## Migration Strategy
 
 ### Phase 1: Foundation (Week 1)
+
 - [x] Remove outdated patterns
 - [ ] Set up new directory structure
 - [ ] Implement auth with middleware
 - [ ] Create base layouts
 
 ### Phase 2: Core Features (Week 2)
+
 - [ ] Convert pages to RSC
 - [ ] Implement server actions
 - [ ] Add i18n support
 - [ ] Role-based routing
 
 ### Phase 3: Integration (Week 3)
+
 - [ ] Connect to backend APIs
 - [ ] Implement caching strategy
 - [ ] Add error boundaries
 - [ ] Performance optimization
 
 ### Phase 4: Polish (Week 4)
+
 - [ ] Complete UI components
 - [ ] Add loading states
 - [ ] Implement analytics

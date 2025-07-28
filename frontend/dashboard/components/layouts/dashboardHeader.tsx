@@ -1,11 +1,11 @@
 import { getTranslations } from 'next-intl/server'
-import { Bell, User } from 'lucide-react'
+import { User } from 'lucide-react'
 
 import { LanguageSwitcher } from '@/components/ui/languageSwitcher'
 import { ThemeToggle } from '@/components/ui/themeToggle'
 import { NotificationDropdown } from '@/components/features/notificationDropdown'
 import { UserMenu } from '@/components/features/userMenu'
-import type { User as UserType } from '@/app/_services/auth.service'
+import type { User as UserType } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
 
 interface DashboardHeaderProps {
@@ -30,13 +30,13 @@ export async function DashboardHeader({ user, locale }: DashboardHeaderProps) {
         <div className="flex items-center gap-4">
           {/* Language Switcher */}
           <LanguageSwitcher />
-          
+
           {/* Theme Toggle */}
           <ThemeToggle />
-          
+
           {/* Notifications */}
           <NotificationDropdown userId={user.id} />
-          
+
           {/* User Menu */}
           <UserMenu user={user} />
         </div>

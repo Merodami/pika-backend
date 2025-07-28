@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 
-import { requireBusiness } from '@/app/_services/auth.service'
+import { requireBusiness } from '@/app/_services/authService'
 import { BusinessDashboardMetrics } from '@/components/features/businessDashboardMetrics'
 import { VoucherPerformance } from '@/components/features/voucherPerformance'
 import { RecentCustomers } from '@/components/features/recentCustomers'
@@ -12,8 +12,12 @@ interface BusinessDashboardPageProps {
   params: Promise<{ locale: Locale }>
 }
 
-export default async function BusinessDashboardPage({ params }: BusinessDashboardPageProps) {
-  const { user, businessId } = await requireBusiness()
+export default async function BusinessDashboardPage({
+  params,
+}: BusinessDashboardPageProps) {
+  const user = await requireBusiness()
+  // TODO: Fetch businessId from business service
+  const businessId = 'placeholder-business-id'
   const { locale } = await params
   const t = await getTranslations({ locale })
 

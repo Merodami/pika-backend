@@ -21,7 +21,7 @@ export function LanguageSwitcher() {
       const formId = activeForm.getAttribute('data-form-id')
       const formData = new FormData(activeForm as HTMLFormElement)
       const data = Object.fromEntries(formData)
-      
+
       // Save to Zustand store
       useAppStore.getState().saveFormDraft(formId!, data)
     }
@@ -33,25 +33,26 @@ export function LanguageSwitcher() {
     startTransition(() => {
       // Replace current locale in path with new locale
       const newPath = pathname.replace(/^\/[^\/]+/, `/${newLocale}`)
-      
+
       // Save locale preference to Zustand (persisted to localStorage)
       setLocale(newLocale as Locale)
-      
+
       // Navigate to new locale path
       router.push(newPath)
-      
+
       // Update user preference in backend (if logged in)
       // In modern architecture, we should use the auth store for token
-      const token = sessionStorage.getItem('pika-access-token') || 
-                   localStorage.getItem('pika-access-token')
-      
+      const token =
+        sessionStorage.getItem('pika-access-token') ||
+        localStorage.getItem('pika-access-token')
+
       if (token) {
         // Fire and forget - don't block navigation
         fetch('/api/user/language', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             'x-user-language': newLocale,
           },
           body: JSON.stringify({ language: newLocale }),
@@ -82,7 +83,9 @@ export function LanguageSwitcher() {
       options={options}
       className="min-w-[150px]"
       disabled={isPending}
-      suffixIcon={isPending ? <span className="animate-spin">⟳</span> : undefined}
+      suffixIcon={
+        isPending ? <span className="animate-spin">⟳</span> : undefined
+      }
     />
   )
 }

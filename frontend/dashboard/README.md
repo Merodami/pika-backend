@@ -28,9 +28,9 @@ This dashboard follows industry-standard patterns for modern React applications:
 - **Component Architecture**: Feature-based organization with clear separation of concerns
 - **API Layer**: Auto-generated TypeScript SDK from OpenAPI specifications
 - **State Management**: Zustand for global state, React Query for server state
-- **Authentication**: JWT-based with automatic token refresh
-- **Real-time Updates**: Firebase integration for live notifications (currently optional)
+- **Authentication**: OAuth 2.0 JWT-based with automatic token refresh
 - **Multi-tenant**: Supports both Admin and Business user roles
+- **Internationalization**: Multi-language support with next-intl (Spanish, English, Guaraní)
 
 ## Role-Based Access Control (RBAC)
 
@@ -39,12 +39,14 @@ The dashboard is a **shared application** that serves both business owners and p
 ### User Roles and Permissions
 
 #### Business Owner Role
+
 - **View Own Business**: Read-only access to their business information
 - **Create Individual Vouchers**: Can create single vouchers (not voucher books)
 - **View Own Vouchers**: See and manage their created vouchers
 - **Limited Dashboard**: Access to business-specific metrics and analytics
 
 #### Admin Role (Platform Administrators)
+
 - **Full Business Management**: Create, read, update, delete all businesses
 - **Complete Voucher Control**: Manage all vouchers across the platform
 - **Voucher Book Builder**: Exclusive access to create and manage voucher books
@@ -55,6 +57,7 @@ The dashboard is a **shared application** that serves both business owners and p
 ### Implementation Strategy
 
 #### 1. Route Protection
+
 ```typescript
 // Business routes - accessible by business owners and admins
 /business/*
@@ -68,12 +71,13 @@ The dashboard is a **shared application** that serves both business owners and p
 ```
 
 #### 2. Component-Level Access Control
+
 ```typescript
 // Example: Role-based component rendering
 export function VoucherActions({ user, voucher }: Props) {
   const isAdmin = user.role === 'ADMIN'
   const isOwner = voucher.businessId === user.businessId
-  
+
   return (
     <>
       {(isAdmin || isOwner) && (
@@ -88,33 +92,35 @@ export function VoucherActions({ user, voucher }: Props) {
 ```
 
 #### 3. API-Level Security
+
 - All API calls include JWT tokens with role information
 - Backend enforces role-based permissions
 - Frontend role checks are for UX only - security is enforced server-side
 
 #### 4. Navigation Structure
+
 ```typescript
 // Dynamic navigation based on user role
 const getNavigationItems = (user: User) => {
   const baseItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'home' },
-    { path: '/vouchers', label: 'Vouchers', icon: 'ticket' }
+    { path: '/vouchers', label: 'Vouchers', icon: 'ticket' },
   ]
-  
+
   if (user.role === 'BUSINESS') {
     return [
       ...baseItems,
-      { path: '/business/profile', label: 'My Business', icon: 'building' }
+      { path: '/business/profile', label: 'My Business', icon: 'building' },
     ]
   }
-  
+
   if (user.role === 'ADMIN') {
     return [
       ...baseItems,
       { path: '/admin/businesses', label: 'Businesses', icon: 'building' },
       { path: '/admin/users', label: 'Users', icon: 'users' },
       { path: '/admin/voucher-books', label: 'Voucher Books', icon: 'book' },
-      { path: '/admin/analytics', label: 'Analytics', icon: 'chart' }
+      { path: '/admin/analytics', label: 'Analytics', icon: 'chart' },
     ]
   }
 }
@@ -122,17 +128,17 @@ const getNavigationItems = (user: User) => {
 
 ### Feature Matrix
 
-| Feature | Business Owner | Admin |
-|---------|---------------|--------|
-| View Dashboard | ✅ (Own metrics) | ✅ (Platform metrics) |
-| View Business | ✅ (Own only) | ✅ (All businesses) |
-| Edit Business | ❌ | ✅ |
-| Create Voucher | ✅ (Individual) | ✅ (Individual) |
-| Create Voucher Book | ❌ | ✅ |
-| View Vouchers | ✅ (Own only) | ✅ (All vouchers) |
-| Manage Users | ❌ | ✅ |
-| Platform Settings | ❌ | ✅ |
-| Export Reports | ✅ (Own data) | ✅ (All data) |
+| Feature             | Business Owner   | Admin                 |
+| ------------------- | ---------------- | --------------------- |
+| View Dashboard      | ✅ (Own metrics) | ✅ (Platform metrics) |
+| View Business       | ✅ (Own only)    | ✅ (All businesses)   |
+| Edit Business       | ❌               | ✅                    |
+| Create Voucher      | ✅ (Individual)  | ✅ (Individual)       |
+| Create Voucher Book | ❌               | ✅                    |
+| View Vouchers       | ✅ (Own only)    | ✅ (All vouchers)     |
+| Manage Users        | ❌               | ✅                    |
+| Platform Settings   | ❌               | ✅                    |
+| Export Reports      | ✅ (Own data)    | ✅ (All data)         |
 
 ### Development Guidelines
 
@@ -147,37 +153,32 @@ const getNavigationItems = (user: User) => {
 ### Core Framework
 
 - **Next.js 15.4.4**: React framework with App Router, Server Components, and Turbopack
-- **React 19.1.0**: Latest React with concurrent features
+- **React 19.1.1**: Latest React with concurrent features
 - **TypeScript 5.8.3**: Type-safe development with strict configuration
 
 ### UI Libraries
 
 - **Ant Design 5.26.6**: Enterprise-grade UI component library
-- **Tailwind CSS 4.1.11**: Utility-first CSS framework
-- **Tremor 3.18.7**: React components for building dashboards
-- **Radix UI**: Accessible, unstyled UI primitives
-- **Lucide React**: Modern icon library
+- **Tailwind CSS 3.4.18**: Utility-first CSS framework
+- **Lucide React 0.532.0**: Modern icon library
 
 ### State & Data Management
 
 - **Zustand 5.0.6**: Lightweight state management
-- **TanStack Query 5.83.0**: Powerful data synchronization
 - **React Hook Form 7.61.1**: Performant forms with validation
 - **Zod 4.0.10**: TypeScript-first schema validation
+- **next-intl 4.3.4**: Internationalization for Next.js
 
 ### Development Tools
 
-- **Vitest 3.2.4**: Fast unit testing framework
-- **ESLint 9.30.0**: Code quality and consistency
-- **Prettier**: Code formatting
-- **Husky**: Git hooks for quality gates
+- **ESLint 9.32.0**: Code quality and consistency
+- **Prettier 3.6.2**: Code formatting
 
 ### Utilities
 
-- **Axios 1.11.0**: HTTP client with interceptors
 - **date-fns 4.1.0**: Modern date utility library
-- **lodash-es 4.17.21**: Utility functions (tree-shakeable)
-- **js-cookie 3.0.5**: Cookie management
+- **clsx 2.1.1**: Utility for constructing className strings
+- **tailwind-merge 3.3.1**: Merge Tailwind CSS classes without conflicts
 
 ## Project Structure
 
@@ -188,6 +189,12 @@ frontend/dashboard/
 │   ├── (dashboard)/         # Protected dashboard routes
 │   │   ├── admin/          # Admin-specific pages
 │   │   └── business/       # Business owner pages
+│   ├── [locale]/            # Internationalized routes
+│   │   ├── (auth)/         # Localized auth pages
+│   │   └── (dashboard)/    # Localized dashboard
+│   ├── _services/           # Server-side services
+│   │   └── authService.ts  # Auth utilities
+│   ├── actions/             # Server actions
 │   ├── layout.tsx          # Root layout
 │   └── globals.css         # Global styles
 ├── components/              # Reusable UI components
@@ -202,17 +209,26 @@ frontend/dashboard/
 ├── lib/                     # Core utilities and libraries
 │   ├── api/                # API client and adapters
 │   │   ├── generated/      # Auto-generated SDK
-│   │   ├── admin-adapter.ts
-│   │   ├── business-adapter.ts
+│   │   ├── adminAdapter.ts # Admin API adapter
+│   │   ├── businessAdapter.ts # Business API adapter
+│   │   ├── voucherAdapter.ts # Voucher API adapter
 │   │   └── client.ts       # Configured API client
-│   ├── auth/               # Auth utilities
-│   ├── firebase/           # Firebase configuration
+│   ├── validations/        # Zod schemas
+│   │   └── auth.ts         # Auth form validation
 │   └── utils/              # General utilities
 ├── services/                # Business logic services
 ├── store/                   # Zustand stores
 │   ├── auth.store.ts       # Authentication state
+│   ├── app.store.ts        # App preferences (language)
 │   ├── notifications.store.ts
 │   └── ui.store.ts         # UI state
+├── i18n/                    # Internationalization
+│   ├── config.ts           # i18n configuration
+│   └── request.ts          # Server-side helpers
+├── messages/                # Translation files
+│   ├── en.json            # English
+│   ├── es.json            # Spanish
+│   └── gn.json            # Guaraní
 ├── types/                   # TypeScript type definitions
 └── tests/                   # Test files
 ```
@@ -225,14 +241,16 @@ frontend/dashboard/
 - Yarn 4.9.1 (Berry)
 - Backend services running locally
 
+> **Note**: The frontend dashboard is registered as a Yarn workspace in the monorepo
+
 ### Installation
 
 ```bash
-# Navigate to dashboard directory
-cd frontend/dashboard
-
-# Install dependencies
+# Install dependencies from root (workspace setup)
+cd /path/to/pika-backend
 yarn install
+
+# The frontend dashboard is automatically included as a workspace
 ```
 
 ### Environment Variables
@@ -242,17 +260,12 @@ Create a `.env.local` file in the dashboard root:
 ```env
 # API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:5500/api/v1
-
-# Firebase Configuration (optional)
-NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+NEXT_PUBLIC_API_GATEWAY_URL=http://localhost:5500
+NEXT_PUBLIC_ENV=development
 
 # Feature Flags
-NEXT_PUBLIC_ENABLE_FIREBASE=false
+NEXT_PUBLIC_ENABLE_OFFLINE=true
+NEXT_PUBLIC_ENABLE_PWA=false
 ```
 
 ### Running the Development Server
@@ -591,13 +604,15 @@ export function measurePerformance(metricName: string) {
 
 ## Security
 
-### Authentication Flow
+### OAuth 2.0 Authentication Flow
 
-1. User enters credentials
-2. API validates and returns JWT tokens
-3. Tokens stored securely (cookies/localStorage)
-4. Auto-refresh before expiration
-5. Logout clears all tokens
+1. **Registration**: User registers → backend returns userId, emailSent (no tokens)
+2. **Email Verification**: User verifies email via link
+3. **Login**: User logs in → backend returns access/refresh tokens
+4. **Token Management**: Tokens stored in secure HTTP-only cookies
+5. **Auto-refresh**: Tokens refresh automatically before expiration
+6. **Server-side Auth**: Protected routes use server-side auth checks
+7. **Logout**: Server action clears all tokens
 
 ### API Security
 
@@ -656,10 +671,46 @@ chore: update dependencies
 localStorage.setItem('debug', 'pika:*')
 ```
 
+## Internationalization (i18n)
+
+### Supported Languages
+
+- **Spanish (es)** - Default language
+- **English (en)**
+- **Guaraní (gn)** - Indigenous language of Paraguay
+
+### Implementation
+
+```typescript
+// URL-based routing with locale
+/[locale]/dashboard  // e.g., /es/dashboard, /en/dashboard
+
+// Server Components with translations
+import { getTranslations } from 'next-intl/server'
+
+export default async function Page({ params }) {
+  const t = await getTranslations('dashboard')
+  return <h1>{t('title')}</h1>
+}
+
+// Client Components with translations
+import { useTranslations } from 'next-intl'
+
+export function Component() {
+  const t = useTranslations('common')
+  return <button>{t('save')}</button>
+}
+```
+
+### Language Switching
+
+- Language switcher in header preserves current route
+- User preference synced with backend
+- Supports soft navigation for smooth UX
+
 ## Future Enhancements
 
 - [ ] Progressive Web App (PWA) support
-- [ ] Internationalization (i18n)
 - [ ] Dark mode theme
 - [ ] Advanced analytics dashboard
 - [ ] Real-time collaboration features

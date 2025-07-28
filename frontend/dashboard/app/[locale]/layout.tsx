@@ -13,7 +13,7 @@ export default async function LocaleLayout({
   params,
 }: LocaleLayoutProps) {
   const { locale } = await params
-  
+
   // Validate locale
   if (!locales.includes(locale as any)) {
     notFound()
@@ -21,7 +21,7 @@ export default async function LocaleLayout({
 
   // Load messages for the locale
   const messages = await getMessages()
-  
+
   // Get locale configuration
   const config = localeConfig[locale as keyof typeof localeConfig]
 

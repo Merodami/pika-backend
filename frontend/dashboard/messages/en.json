@@ -100,8 +100,13 @@
       "growth": "Growth",
       "totalUsers": "Total Users",
       "totalBusinesses": "Total Businesses",
+      "activeBusinesses": "Active Businesses",
       "monthlyGrowth": "Monthly Growth",
-      "newCustomers": "New Customers"
+      "newCustomers": "New Customers",
+      "voucherBooks": "Voucher Books",
+      "pendingFraudCases": "Pending Fraud Cases",
+      "totalScans": "Total Scans",
+      "uniqueCustomers": "Unique Customers"
     },
     "recentActivity": "Recent Activity",
     "viewAllActivity": "View all activity"

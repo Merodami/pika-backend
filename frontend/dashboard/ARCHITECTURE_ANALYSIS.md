@@ -10,7 +10,7 @@ This document analyzes the current dashboard architecture against modern React a
 
 1. **Over-reliance on Client Components**
    - `'use client'` is used extensively throughout the app
-   - Missing leverage of React Server Components (RSC) 
+   - Missing leverage of React Server Components (RSC)
    - No server-side data fetching patterns
    - Forces all rendering to client-side, losing Next.js 15 benefits
 
@@ -92,11 +92,11 @@ const handleSubmit = async (data) => {
 
 // ✅ Modern approach (server action)
 // app/actions/vouchers.ts
-'use server'
+;('use server')
 export async function createVoucher(data: FormData) {
   const session = await auth()
   if (!session) throw new Error('Unauthorized')
-  
+
   // Direct DB call or service call
   return await voucherService.create(data)
 }
@@ -159,19 +159,22 @@ import { auth } from '@/auth'
 
 export async function middleware(request) {
   const session = await auth()
-  
+
   if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
-  
+
   // Role-based routing
-  if (session?.user.role === 'BUSINESS' && request.nextUrl.pathname.startsWith('/admin')) {
+  if (
+    session?.user.role === 'BUSINESS' &&
+    request.nextUrl.pathname.startsWith('/admin')
+  ) {
     return NextResponse.redirect(new URL('/unauthorized', request.url))
   }
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }
 ```
 
@@ -251,7 +254,7 @@ export function VoucherForm({ onSuccess }: Props) {
 // Hybrid Pattern
 export default async function VoucherPage() {
   const categories = await getCategories() // Server
-  
+
   return (
     <div>
       <h1>Create Voucher</h1>
@@ -274,24 +277,28 @@ export default async function VoucherPage() {
 ## Migration Strategy
 
 ### Phase 1: Foundation (Week 1)
+
 1. Set up proper authentication with NextAuth.js
 2. Implement middleware for route protection
 3. Create server-side service layer
 4. Set up server actions
 
 ### Phase 2: Core Features (Week 2)
+
 1. Convert dashboard pages to RSC
 2. Implement role-based routing
 3. Create server actions for mutations
 4. Remove client-side data fetching
 
 ### Phase 3: Optimization (Week 3)
+
 1. Add streaming with Suspense
 2. Implement error boundaries
 3. Add loading states
 4. Optimize bundle size
 
 ### Phase 4: Polish (Week 4)
+
 1. Add proper caching strategies
 2. Implement optimistic updates
 3. Add proper error handling
@@ -309,12 +316,14 @@ export default async function VoucherPage() {
 ## Industry Standards Alignment
 
 ### ✅ Following Standards
+
 - TypeScript for type safety
 - OpenAPI for API contracts
 - Component-based architecture
 - Automated testing setup
 
 ### ❌ Not Following Standards
+
 - Client-side heavy architecture
 - Outdated data fetching patterns
 - Security concerns with client auth

@@ -15,9 +15,11 @@ export async function SystemHealthStatus() {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">{t('systemHealth')}</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          {t('systemHealth')}
+        </h2>
       </div>
-      
+
       <div className="p-6 space-y-4">
         {services.map((service) => (
           <div key={service.name} className="flex items-center justify-between">
@@ -31,9 +33,11 @@ export async function SystemHealthStatus() {
               {service.status === 'down' && (
                 <XCircle className="w-5 h-5 text-red-500" />
               )}
-              <span className="text-sm font-medium text-gray-900">{service.name}</span>
+              <span className="text-sm font-medium text-gray-900">
+                {service.name}
+              </span>
             </div>
-            
+
             <div className="text-sm text-gray-500">
               {service.uptime}% {t('uptime')}
             </div>

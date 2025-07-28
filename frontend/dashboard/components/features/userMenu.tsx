@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 
-import type { User as UserType } from '@/app/_services/auth.service'
+import type { User as UserType } from '@/app/_services/authService'
 
 interface UserMenuProps {
   user: UserType
@@ -30,7 +30,8 @@ export function UserMenu({ user }: UserMenuProps) {
         className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
       >
         <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
-          {user.firstName[0]}{user.lastName[0]}
+          {user.firstName[0]}
+          {user.lastName[0]}
         </div>
         <span className="text-sm font-medium text-gray-700">
           {user.firstName} {user.lastName}
@@ -48,7 +49,7 @@ export function UserMenu({ user }: UserMenuProps) {
               {t(`role.${user.role.toLowerCase()}`)}
             </span>
           </div>
-          
+
           <div className="py-2">
             <Link
               href="/profile"

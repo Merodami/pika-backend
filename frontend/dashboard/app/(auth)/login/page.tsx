@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { LoginForm } from './login-form'
+import { LoginForm } from './loginForm'
 
 export const metadata: Metadata = {
   title: 'Login - Pika Dashboard',

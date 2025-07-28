@@ -31,7 +31,8 @@
     "test:auth": "yarn vitest \"packages/tests/src/integration/auth-e2e.test.ts\"",
     "flow:auth": "tsx scripts/flows/auth-flow.ts",
     "flow:category": "tsx scripts/flows/category-flow.ts",
-    "flow:admin-setup": "tsx scripts/flows/admin-setup.ts",
+    "flow:business": "tsx scripts/flows/business-flow.ts",
+    "flow:setup-users": "tsx scripts/flows/setup-test-users.ts",
     "test:auth-gateway": "yarn vitest \"packages/api-gateway/src/test/integration/auth-gateway.integration.test.ts\"",
     "test:auth-all": "yarn test:auth && yarn test:auth-gateway",
     "test:all": "yarn test && yarn test:dashboard",
@@ -137,6 +138,7 @@
   "workspaces": [
     "packages/**",
     "tools/**",
+    "frontend/dashboard",
     "!api-microservices-sdk"
   ],
   "packageManager": "yarn@4.9.1",

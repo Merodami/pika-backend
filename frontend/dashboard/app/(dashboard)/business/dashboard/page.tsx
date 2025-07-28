@@ -14,9 +14,9 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { Card, Col, Row, Spin, Statistic, Typography } from 'antd'
 
-import { VoucherActivityFeed } from '@/components/features/voucher-activity-feed'
-import { VoucherRealtimeStats } from '@/components/features/voucher-realtime-stats'
-import { businessAdapter } from '@/lib/api/business-adapter'
+import { VoucherActivityFeed } from '@/components/features/voucherActivityFeed'
+import { VoucherRealtimeStats } from '@/components/features/voucherRealtimeStats'
+import { businessAdapter } from '@/lib/api/businessAdapter'
 
 const { Title, Text } = Typography
 
@@ -60,7 +60,7 @@ export default function BusinessDashboardPage() {
         </Text>
       </div>
 
-      {/* Real-time stats from Firebase */}
+      {/* Real-time stats (placeholder data) */}
       <div className="mb-4">
         <Title level={4} className="mb-3">
           Real-time Statistics
@@ -166,10 +166,10 @@ export default function BusinessDashboardPage() {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={16}>
           <Card
-            title="Real-time Activity Feed"
+            title="Activity Feed"
             extra={
               <Text type="secondary" className="text-xs">
-                Live updates from Firebase
+                Recent activity
               </Text>
             }
           >

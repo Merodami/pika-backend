@@ -2,7 +2,7 @@ import 'server-only'
 import { cookies } from 'next/headers'
 import { cache } from 'react'
 
-import { AuthenticationService, UsersService } from '@/lib/api/generated'
+import { UsersService } from '@/lib/api/generated'
 
 // Types
 export type UserRole = 'CUSTOMER' | 'BUSINESS' | 'ADMIN'
@@ -13,7 +13,6 @@ export interface User {
   firstName: string
   lastName: string
   role: UserRole
-  businessId?: string
   createdAt: string
   updatedAt: string
 }
@@ -29,16 +28,15 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
     if (!token) return null
 
     const response = await UsersService.getUsersProfile()
-    
+
     return {
-      id: response.data.id,
-      email: response.data.email,
-      firstName: response.data.firstName,
-      lastName: response.data.lastName,
-      role: response.data.role as UserRole,
-      businessId: response.data.businessId,
-      createdAt: response.data.createdAt,
-      updatedAt: response.data.updatedAt,
+      id: response.id,
+      email: response.email,
+      firstName: response.firstName,
+      lastName: response.lastName,
+      role: response.role as UserRole,
+      createdAt: response.createdAt,
+      updatedAt: response.updatedAt,
     }
   } catch (error) {
     console.error('Failed to get current user:', error)
@@ -58,7 +56,7 @@ export async function getRefreshToken(): Promise<string | null> {
 
 export async function setTokens(accessToken: string, refreshToken: string) {
   const cookieStore = await cookies()
-  
+
   // Set secure, httpOnly cookies
   cookieStore.set(ACCESS_TOKEN_COOKIE, accessToken, {
     httpOnly: true,
@@ -66,7 +64,7 @@ export async function setTokens(accessToken: string, refreshToken: string) {
     sameSite: 'lax',
     maxAge: 60 * 60 * 24, // 24 hours
   })
-  
+
   cookieStore.set(REFRESH_TOKEN_COOKIE, refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -93,22 +91,23 @@ export async function requireAuth() {
 export async function requireRole(role: UserRole | UserRole[]) {
   const user = await requireAuth()
   const roles = Array.isArray(role) ? role : [role]
-  
+
   if (!roles.includes(user.role)) {
     throw new Error('Forbidden')
   }
-  
+
   return user
 }
 
 export async function requireBusiness() {
   const user = await requireAuth()
-  
-  if (user.role !== 'BUSINESS' || !user.businessId) {
+
+  if (user.role !== 'BUSINESS') {
     throw new Error('Business access required')
   }
-  
-  return { user, businessId: user.businessId }
+
+  // Business ID will need to be fetched separately from the business service
+  return user
 }
 
 export async function requireAdmin() {

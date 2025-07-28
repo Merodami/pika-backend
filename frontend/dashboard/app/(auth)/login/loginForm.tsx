@@ -4,62 +4,46 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Button, Form, Input, Alert, Checkbox } from 'antd'
+import { Button, Form, Input, Alert } from 'antd'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
-import { authFrontend } from '@pika/api'
 import { login } from '@/app/actions/auth'
-import { useAppStore } from '@/store/app.store'
+import { authFrontend } from '@pika/api'
 
-// Use the admin/business login schema with enhanced password requirements
-const loginSchema = authFrontend.AdminBusinessLoginFormSchema
+// Use the frontend login schema
+const loginSchema = authFrontend.LoginFormSchema
 
 type LoginFormData = z.infer<typeof loginSchema>
 
 export function LoginForm() {
-  const t = useTranslations('auth.login')
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const { formDrafts, saveFormDraft, clearFormDraft } = useAppStore()
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: formDrafts['login'] || {},
+    resolver: zodResolver(loginSchema) as any, // Type assertion needed due to branded types
   })
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null)
     setIsLoading(true)
-    
+
     try {
-      // Transform to backend format
+      // Use the transform function to convert to backend format
       const tokenRequest = authFrontend.transformLoginToTokenRequest(data)
       const result = await login(tokenRequest)
-      
+
       if (result?.error) {
         setError(result.error)
-      } else {
-        // Clear form draft on success
-        clearFormDraft('login')
       }
     } catch (err) {
-      setError(t('error'))
+      setError('An unexpected error occurred')
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // Save form draft on input change
-  const handleInputChange = (field: keyof LoginFormData, value: any) => {
-    const currentData = formDrafts['login'] || {}
-    saveFormDraft('login', { ...currentData, [field]: value })
   }
 
   return (
@@ -81,48 +65,41 @@ export function LoginForm() {
         autoComplete="off"
       >
         <Form.Item
-          label={t('email')}
+          label="Email address"
           validateStatus={errors.email ? 'error' : ''}
           help={errors.email?.message}
         >
           <Input
             {...register('email')}
             prefix={<MailOutlined />}
-            placeholder={t('email')}
+            placeholder="Enter your email"
             size="large"
             autoComplete="email"
-            onChange={(e) => handleInputChange('email', e.target.value)}
           />
         </Form.Item>
 
         <Form.Item
-          label={t('password')}
+          label="Password"
           validateStatus={errors.password ? 'error' : ''}
           help={errors.password?.message}
         >
           <Input.Password
             {...register('password')}
             prefix={<LockOutlined />}
-            placeholder={t('password')}
+            placeholder="Enter your password"
             size="large"
             autoComplete="current-password"
-            onChange={(e) => handleInputChange('password', e.target.value)}
           />
         </Form.Item>
 
-        <Form.Item>
-          <div className="flex items-center justify-between">
-            <Checkbox {...register('rememberMe')}>
-              {t('rememberMe')}
-            </Checkbox>
-            <Link
-              href="/forgot-password"
-              className="text-sm text-blue-600 hover:text-blue-500"
-            >
-              {t('forgotPassword')}
-            </Link>
-          </div>
-        </Form.Item>
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:text-blue-500"
+          >
+            Forgot your password?
+          </Link>
+        </div>
 
         <Form.Item>
           <Button
@@ -132,17 +109,17 @@ export function LoginForm() {
             size="large"
             className="w-full"
           >
-            {t('button')}
+            Sign in
           </Button>
         </Form.Item>
 
         <div className="text-center">
-          <span className="text-gray-600">{t('noAccount')} </span>
+          <span className="text-gray-600">Don't have an account? </span>
           <Link
             href="/register"
             className="font-medium text-blue-600 hover:text-blue-500"
           >
-            {t('signUp')}
+            Sign up
           </Link>
         </div>
       </Form>

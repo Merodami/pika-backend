@@ -29,7 +29,7 @@ interface AuthState {
 
   // Actions
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, name: string) => Promise<void>
+  register: (email: string, password: string, name: string) => Promise<any>
   logout: () => Promise<void>
   checkAuth: () => Promise<void>
   clearError: () => void
@@ -73,15 +73,12 @@ export const useAuthStore = create<AuthState>()(
 
           // Store tokens
           if (response.accessToken && response.refreshToken) {
-            setTokens(
-              response.accessToken,
-              response.refreshToken
-            )
+            setTokens(response.accessToken, response.refreshToken)
           }
 
           // Get user profile after login
           const userResponse = await api.users.getUsersProfile()
-          const user = mapUserDtoToUser(userResponse.data)
+          const user = mapUserDtoToUser(userResponse)
 
           setStoredUser(user)
 
@@ -110,13 +107,6 @@ export const useAuthStore = create<AuthState>()(
           const firstName = nameParts[0] || name
           const lastName = nameParts.slice(1).join(' ') || ''
 
-          const registerRequest = {
-            email,
-            password,
-            first_name: firstName,
-            last_name: lastName,
-            role: 'CUSTOMER' as const,
-          }
           const response = await api.auth.postAuthRegister({
             requestBody: {
               email,
@@ -128,24 +118,15 @@ export const useAuthStore = create<AuthState>()(
             },
           })
 
-          // Store tokens
-          if (response.tokens?.accessToken && response.tokens?.refreshToken) {
-            setTokens(
-              response.tokens.accessToken,
-              response.tokens.refreshToken
-            )
-          }
-
-          // Use user from registration response
-          const user = mapUserDtoToUser(response.user)
-
-          setStoredUser(user)
-
+          // Registration successful but no tokens yet
+          // User needs to verify email first
           set({
-            user,
-            isAuthenticated: true,
             isLoading: false,
+            error: null,
           })
+
+          // Return the response so caller knows what happened
+          return response
         } catch (error: any) {
           set({
             error:
@@ -190,7 +171,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           // Verify token is still valid by fetching user profile
           const userResponse = await api.users.getUsersProfile()
-          const user = mapUserDtoToUser(userResponse.data)
+          const user = mapUserDtoToUser(userResponse)
 
           setStoredUser(user)
           set({ user, isAuthenticated: true })

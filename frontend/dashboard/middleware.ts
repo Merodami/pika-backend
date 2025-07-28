@@ -11,14 +11,19 @@ const intlMiddleware = createMiddleware({
 })
 
 // Public routes that don't require authentication
-const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
+const publicRoutes = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+]
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
+
   // Get locale preference from header (sent by client)
   const preferredLocale = request.headers.get('x-preferred-locale')
-  
+
   // Create intl middleware with locale detection
   const response = createMiddleware({
     locales,
@@ -26,31 +31,33 @@ export async function middleware(request: NextRequest) {
     localePrefix: 'always',
     localeDetection: true,
   })(request)
-  
+
   // Extract locale from pathname
   const pathnameHasLocale = locales.some(
-    locale => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
-  
+
   // Get the pathname without locale
   const pathnameWithoutLocale = pathnameHasLocale
     ? pathname.slice(3) // Remove /xx/
     : pathname
-  
+
   // Check if it's a public route
-  const isPublicRoute = publicRoutes.some(route => 
+  const isPublicRoute = publicRoutes.some((route) =>
     pathnameWithoutLocale.startsWith(route)
   )
-  
+
   // Modern auth check: Look for token in multiple places
-  const accessToken = request.cookies.get('pika-access-token') || 
-                     request.headers.get('Authorization')?.replace('Bearer ', '')
-  
+  const accessToken =
+    request.cookies.get('pika-access-token') ||
+    request.headers.get('Authorization')?.replace('Bearer ', '')
+
   if (!isPublicRoute && !accessToken) {
     // Get locale for redirect (prefer stored locale, then pathname, then default)
-    const locale = preferredLocale || 
-                  (pathnameHasLocale ? pathname.substring(1, 3) : defaultLocale)
-    
+    const locale =
+      preferredLocale ||
+      (pathnameHasLocale ? pathname.substring(1, 3) : defaultLocale)
+
     // Redirect to login if no token
     const url = new URL(`/${locale}/login`, request.url)
     url.searchParams.set('from', pathname)
@@ -77,11 +84,13 @@ export async function middleware(request: NextRequest) {
         "style-src 'self' 'unsafe-inline'; " +
         "img-src 'self' data: https:; " +
         "font-src 'self' data:; " +
-        "connect-src 'self' " + (process.env.NEXT_PUBLIC_API_URL || '') + "; " +
+        "connect-src 'self' " +
+        (process.env.NEXT_PUBLIC_API_URL || '') +
+        '; ' +
         "frame-ancestors 'none';"
     )
   }
-  
+
   return NextResponse.next({
     headers,
     request: {

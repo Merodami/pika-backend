@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/app/_services/auth.service'
+import { getCurrentUser } from '@/app/_services/authService'
 
 interface PageProps {
   params: Promise<{ locale: string }>

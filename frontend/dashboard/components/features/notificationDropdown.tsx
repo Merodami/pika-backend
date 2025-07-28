@@ -7,7 +7,7 @@ interface NotificationDropdownProps {
   userId: string
 }
 
-export function NotificationDropdown({ userId }: NotificationDropdownProps) {
+export function NotificationDropdown({}: NotificationDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [unreadCount] = useState(3) // This would come from a real-time subscription
 

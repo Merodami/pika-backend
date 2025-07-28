@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server'
-import { Ticket, Users, TrendingUp, DollarSign } from 'lucide-react'
+import { Ticket, Users, TrendingUp, QrCode } from 'lucide-react'
 
 import { MetricCard } from '@/components/ui/metricCard'
 
@@ -7,15 +7,16 @@ interface BusinessDashboardMetricsProps {
   businessId: string
 }
 
-export async function BusinessDashboardMetrics({ businessId }: BusinessDashboardMetricsProps) {
+export async function BusinessDashboardMetrics({}: BusinessDashboardMetricsProps) {
   const t = await getTranslations('dashboard.metrics')
 
   // Fetch business-specific metrics
+  // In production, these would come from the API
   const metrics = {
-    activeVouchers: 12,
+    activeVouchers: 8,
     totalRedemptions: 234,
-    monthlyRevenue: 4567.89,
-    newCustomers: 45,
+    totalScans: 567,
+    uniqueCustomers: 89,
   }
 
   return (
@@ -33,14 +34,14 @@ export async function BusinessDashboardMetrics({ businessId }: BusinessDashboard
         trend={{ value: 12.8, isPositive: true }}
       />
       <MetricCard
-        title={t('revenue')}
-        value={`$${metrics.monthlyRevenue.toLocaleString()}`}
-        icon={DollarSign}
-        trend={{ value: 8.3, isPositive: true }}
+        title={t('totalScans')}
+        value={metrics.totalScans.toLocaleString()}
+        icon={QrCode}
+        trend={{ value: 18.3, isPositive: true }}
       />
       <MetricCard
-        title={t('newCustomers')}
-        value={metrics.newCustomers.toString()}
+        title={t('uniqueCustomers')}
+        value={metrics.uniqueCustomers.toString()}
         icon={Users}
         trend={{ value: 22.5, isPositive: true }}
       />

@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 
-import { requireAdmin } from '@/app/_services/auth.service'
+import { requireAdmin } from '@/app/_services/authService'
 import { AdminDashboardMetrics } from '@/components/features/adminDashboardMetrics'
 import { RecentActivityFeed } from '@/components/features/recentActivityFeed'
 import { SystemHealthStatus } from '@/components/features/systemHealthStatus'
@@ -12,7 +12,9 @@ interface AdminDashboardPageProps {
   params: Promise<{ locale: Locale }>
 }
 
-export default async function AdminDashboardPage({ params }: AdminDashboardPageProps) {
+export default async function AdminDashboardPage({
+  params,
+}: AdminDashboardPageProps) {
   const user = await requireAdmin()
   const { locale } = await params
   const t = await getTranslations({ locale })

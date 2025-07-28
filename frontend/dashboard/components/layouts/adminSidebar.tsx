@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 
 import { AdminSidebarClient } from './adminSidebarClient'
-import type { User } from '@/app/_services/auth.service'
+import type { User } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
 
 interface AdminSidebarProps {
@@ -21,7 +21,7 @@ interface AdminSidebarProps {
   locale: Locale
 }
 
-export async function AdminSidebar({ user, locale }: AdminSidebarProps) {
+export async function AdminSidebar({ locale }: AdminSidebarProps) {
   const t = await getTranslations({ locale, namespace: 'navigation' })
 
   // Prepare translated nav items
