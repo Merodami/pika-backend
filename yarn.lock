@@ -4746,6 +4746,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pika/api-gateway@workspace:packages/api-gateway"
   dependencies:
+    "@pika/api": "workspace:^"
     "@pika/auth": "workspace:^"
     "@pika/environment": "workspace:^"
     "@pika/http": "workspace:^"

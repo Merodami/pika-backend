@@ -33,7 +33,7 @@ export type StripeEventType = z.infer<typeof StripeEventType>
  */
 export const StripePaymentIntent = z.object({
   id: z.string(),
-  object: z.literal('payment_intent'),
+  objectType: z.literal('payment_intent'),
   amount: z.number().int().positive(),
   currency: z.string().length(3),
   customer: z.string().nullable(),
@@ -56,7 +56,7 @@ export type StripePaymentIntent = z.infer<typeof StripePaymentIntent>
  */
 export const StripeSubscription = z.object({
   id: z.string(),
-  object: z.literal('subscription'),
+  objectType: z.literal('subscription'),
   customer: z.string(),
   status: z.enum([
     'active',
@@ -78,7 +78,7 @@ export type StripeSubscription = z.infer<typeof StripeSubscription>
  */
 export const StripeCheckoutSession = z.object({
   id: z.string(),
-  object: z.literal('checkout.session'),
+  objectType: z.literal('checkout.session'),
   customer: z.string().nullable(),
   payment_intent: z.string().nullable(),
   subscription: z.string().nullable(),
@@ -94,7 +94,7 @@ export type StripeCheckoutSession = z.infer<typeof StripeCheckoutSession>
  */
 export const StripeInvoice = z.object({
   id: z.string(),
-  object: z.literal('invoice'),
+  objectType: z.literal('invoice'),
   customer: z.string(),
   subscription: z.string().nullable(),
   amount_paid: z.number().int(),
@@ -114,10 +114,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   // Payment Intent Events
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('payment_intent.succeeded'),
     data: z.object({
-      object: StripePaymentIntent,
+      objectData: StripePaymentIntent,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -131,10 +130,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   }),
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('payment_intent.payment_failed'),
     data: z.object({
-      object: StripePaymentIntent,
+      objectData: StripePaymentIntent,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -148,10 +146,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   }),
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('payment_intent.canceled'),
     data: z.object({
-      object: StripePaymentIntent,
+      objectData: StripePaymentIntent,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -166,10 +163,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   // Subscription Events
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('customer.subscription.created'),
     data: z.object({
-      object: StripeSubscription,
+      objectData: StripeSubscription,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -183,10 +179,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   }),
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('customer.subscription.updated'),
     data: z.object({
-      object: StripeSubscription,
+      objectData: StripeSubscription,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -200,10 +195,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   }),
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('customer.subscription.deleted'),
     data: z.object({
-      object: StripeSubscription,
+      objectData: StripeSubscription,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -218,10 +212,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   // Invoice Events
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('invoice.payment_succeeded'),
     data: z.object({
-      object: StripeInvoice,
+      objectData: StripeInvoice,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -235,10 +228,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   }),
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('invoice.payment_failed'),
     data: z.object({
-      object: StripeInvoice,
+      objectData: StripeInvoice,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -253,10 +245,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   // Checkout Session Events
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('checkout.session.completed'),
     data: z.object({
-      object: StripeCheckoutSession,
+      objectData: StripeCheckoutSession,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
@@ -270,10 +261,9 @@ export const StripeWebhookEvent = z.discriminatedUnion('type', [
   }),
   z.object({
     id: z.string(),
-    object: z.literal('event'),
     type: z.literal('checkout.session.expired'),
     data: z.object({
-      object: StripeCheckoutSession,
+      objectData: StripeCheckoutSession,
     }),
     created: z.number().int(),
     livemode: z.boolean(),
