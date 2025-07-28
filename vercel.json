@@ -28,6 +28,14 @@
       "destination": "/api"
     },
     {
+      "source": "/businesses/:path*",
+      "destination": "/api"
+    },
+    {
+      "source": "/categories/:path*",
+      "destination": "/api"
+    },
+    {
       "source": "/payments/:path*",
       "destination": "/api"
     },
@@ -45,6 +53,14 @@
     },
     {
       "source": "/storage/:path*",
+      "destination": "/api"
+    },
+    {
+      "source": "/pdf/:path*",
+      "destination": "/api"
+    },
+    {
+      "source": "/vouchers/:path*",
       "destination": "/api"
     }
   ],

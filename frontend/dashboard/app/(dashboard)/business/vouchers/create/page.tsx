@@ -9,10 +9,10 @@ import { Button, Col, message, Row, Typography } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { VoucherDesignForm } from '@/components/features/voucher/voucher-design-form'
-import { VoucherPreview } from '@/components/features/voucher/voucher-preview'
-import { VoucherTemplate } from '@/components/features/voucher/voucher-template'
-import { voucherAdapter } from '@/lib/api/voucher-adapter'
+import { VoucherDesignForm } from '@/components/features/voucher/voucherDesignForm'
+import { VoucherPreview } from '@/components/features/voucher/voucherPreview'
+import { VoucherTemplate } from '@/components/features/voucher/voucherTemplate'
+import { voucherAdapter } from '@/lib/api/voucherAdapter'
 
 const { Title, Text } = Typography
 

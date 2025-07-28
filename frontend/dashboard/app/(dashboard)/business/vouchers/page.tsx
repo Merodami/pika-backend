@@ -34,7 +34,7 @@ import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { voucherAdapter } from '@/lib/api/voucher-adapter'
+import { voucherAdapter } from '@/lib/api/voucherAdapter'
 
 const { Title, Text } = Typography
 const { Search } = Input

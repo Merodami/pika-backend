@@ -94,7 +94,7 @@ export function setupProxyRoutes(app: Express, isLocalDev: boolean): void {
             // Cast req to any to access body property from Express
             const expressReq = req as any
 
-            if (expressReq.body && Object.keys(expressReq.body).length > 0) {
+            if (expressReq.body !== undefined) {
               const bodyData = JSON.stringify(expressReq.body)
 
               // Update headers

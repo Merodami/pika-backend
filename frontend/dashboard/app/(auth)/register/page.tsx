@@ -8,7 +8,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Alert, Button, Divider, Form, Input, Select } from 'antd'
+import { Alert, Button, Checkbox, Divider, Form, Input } from 'antd'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -39,7 +39,7 @@ export default function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(registerSchema) as any, // Type assertion needed due to branded types
   })
 
   const onSubmit = async (data: RegisterFormData) => {
@@ -58,11 +58,11 @@ export default function RegisterPage() {
 
       showSuccess(
         'Registration successful',
-        'Welcome to Pika Dashboard! Please verify your email.'
+        'Please check your email to verify your account.'
       )
 
-      // Redirect to dashboard
-      router.push('/dashboard')
+      // Redirect to login page (user needs to verify email first)
+      router.push('/login')
     } catch (err: any) {
       showError('Registration failed', err.message || 'Please try again')
     }
@@ -103,14 +103,27 @@ export default function RegisterPage() {
         autoComplete="off"
       >
         <Form.Item
-          label="Full Name"
-          validateStatus={errors.name ? 'error' : ''}
-          help={errors.name?.message}
+          label="First Name"
+          validateStatus={errors.firstName ? 'error' : ''}
+          help={errors.firstName?.message}
         >
           <Input
-            {...register('name')}
+            {...register('firstName')}
             prefix={<UserOutlined />}
-            placeholder="Enter your full name"
+            placeholder="Enter your first name"
+            size="large"
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Last Name"
+          validateStatus={errors.lastName ? 'error' : ''}
+          help={errors.lastName?.message}
+        >
+          <Input
+            {...register('lastName')}
+            prefix={<UserOutlined />}
+            placeholder="Enter your last name"
             size="large"
           />
         </Form.Item>
@@ -125,38 +138,6 @@ export default function RegisterPage() {
             prefix={<MailOutlined />}
             placeholder="Enter your email"
             size="large"
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Account Type"
-          validateStatus={errors.accountType ? 'error' : ''}
-          help={errors.accountType?.message}
-        >
-          <Select
-            {...register('accountType')}
-            placeholder="Select your account type"
-            size="large"
-            options={[
-              {
-                value: 'BUSINESS',
-                label: 'Business Owner',
-                description: 'Create and manage vouchers for your business',
-              },
-              {
-                value: 'ADMIN',
-                label: 'Administrator',
-                description: 'Manage the platform and user accounts',
-              },
-            ]}
-            optionRender={(option) => (
-              <div>
-                <div>{option.label}</div>
-                <div className="text-sm text-gray-500">
-                  {option.data.description}
-                </div>
-              </div>
-            )}
           />
         </Form.Item>
 
@@ -190,6 +171,29 @@ export default function RegisterPage() {
               visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
             }
           />
+        </Form.Item>
+
+        <Form.Item
+          valuePropName="checked"
+          validateStatus={errors.acceptTerms ? 'error' : ''}
+          help={errors.acceptTerms?.message}
+        >
+          <Checkbox {...register('acceptTerms')}>
+            I accept the{' '}
+            <Link
+              href="/terms"
+              className="text-indigo-600 hover:text-indigo-500"
+            >
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link
+              href="/privacy"
+              className="text-indigo-600 hover:text-indigo-500"
+            >
+              Privacy Policy
+            </Link>
+          </Checkbox>
         </Form.Item>
 
         <Form.Item>

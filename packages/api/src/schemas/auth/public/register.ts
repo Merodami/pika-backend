@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
-import { PhoneNumber } from '../../shared/primitives.js'
+import { DateOnlyString, PhoneNumber } from '../../shared/primitives.js'
 
 /**
  * User registration schemas for public API
@@ -41,7 +41,7 @@ export const RegisterRequest = openapi(
         'Last name can only contain letters, spaces, hyphens, and apostrophes',
       ),
     phoneNumber: PhoneNumber.optional(),
-    dateOfBirth: z.string().datetime().optional().describe('Date of birth'),
+    dateOfBirth: DateOnlyString.optional().describe('Date of birth in YYYY-MM-DD format'),
     acceptTerms: z
       .literal(true)
       .refine((value) => value === true, {

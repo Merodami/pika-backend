@@ -258,6 +258,7 @@ export class LocalAuthStrategy implements AuthStrategy {
 
       // 5. Generate email verification token
       let verificationToken: string | undefined
+      let emailSent = false
 
       try {
         verificationToken = await this.userService.createEmailVerificationToken(
@@ -266,7 +267,7 @@ export class LocalAuthStrategy implements AuthStrategy {
 
         // 6. Send verification email
         if (this.communicationClient && verificationToken) {
-          await this.communicationClient.sendEmail({
+          const emailResult = await this.communicationClient.sendEmail({
             to: user.email,
             templateId: EmailTemplateId.EMAIL_VERIFICATION,
             templateParams: {
@@ -275,6 +276,7 @@ export class LocalAuthStrategy implements AuthStrategy {
               frontendUrl: FRONTEND_URL,
             },
           })
+          emailSent = emailResult.success
         }
       } catch (emailError) {
         logger.error('Failed to send verification email', emailError as Error, {
@@ -310,6 +312,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         },
         message:
           'Registration successful. Please check your email to verify your account.',
+        emailSent,
       }
     } catch (error) {
       logger.error('Local registration failed', error as Error, {

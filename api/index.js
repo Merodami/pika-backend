@@ -6,7 +6,7 @@ if (
   process.env.NODE_ENV !== 'production' &&
   process.env.DEPLOYMENT_PLATFORM !== 'vercel'
 ) {
-  const { getLocalEnv } = await import('@pikanvironment')
+  const { getLocalEnv } = await import('@pika/environment')
   getLocalEnv()
 }
 

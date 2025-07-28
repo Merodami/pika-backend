@@ -29,7 +29,7 @@ interface AuthState {
 
   // Actions
   login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, name: string) => Promise<void>
+  register: (email: string, password: string, name: string) => Promise<any>
   logout: () => Promise<void>
   checkAuth: () => Promise<void>
   clearError: () => void
@@ -63,21 +63,22 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null })
 
         try {
-          const loginRequest: Login = { email, password }
-          const response = await api.auth.loginUser({
-            requestBody: loginRequest,
+          const response = await api.auth.postAuthToken({
+            requestBody: {
+              grantType: 'password' as const,
+              username: email,
+              password: password,
+            },
           })
 
           // Store tokens
-          if (response.tokens?.access_token && response.tokens?.refresh_token) {
-            setTokens(
-              response.tokens.access_token,
-              response.tokens.refresh_token
-            )
+          if (response.accessToken && response.refreshToken) {
+            setTokens(response.accessToken, response.refreshToken)
           }
 
-          // Use user from login response
-          const user = mapUserDtoToUser(response.user)
+          // Get user profile after login
+          const userResponse = await api.users.getUsersProfile()
+          const user = mapUserDtoToUser(userResponse)
 
           setStoredUser(user)
 
@@ -106,35 +107,26 @@ export const useAuthStore = create<AuthState>()(
           const firstName = nameParts[0] || name
           const lastName = nameParts.slice(1).join(' ') || ''
 
-          const registerRequest = {
-            email,
-            password,
-            first_name: firstName,
-            last_name: lastName,
-            role: 'CUSTOMER' as const,
-          }
-          const response = await api.auth.registerUser({
-            requestBody: registerRequest,
+          const response = await api.auth.postAuthRegister({
+            requestBody: {
+              email,
+              password,
+              firstName,
+              lastName,
+              acceptTerms: true,
+              marketingConsent: false,
+            },
           })
 
-          // Store tokens
-          if (response.tokens?.access_token && response.tokens?.refresh_token) {
-            setTokens(
-              response.tokens.access_token,
-              response.tokens.refresh_token
-            )
-          }
-
-          // Use user from registration response
-          const user = mapUserDtoToUser(response.user)
-
-          setStoredUser(user)
-
+          // Registration successful but no tokens yet
+          // User needs to verify email first
           set({
-            user,
-            isAuthenticated: true,
             isLoading: false,
+            error: null,
           })
+
+          // Return the response so caller knows what happened
+          return response
         } catch (error: any) {
           set({
             error:
@@ -178,7 +170,7 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           // Verify token is still valid by fetching user profile
-          const userResponse = await api.users.getCurrentUser()
+          const userResponse = await api.users.getUsersProfile()
           const user = mapUserDtoToUser(userResponse)
 
           setStoredUser(user)

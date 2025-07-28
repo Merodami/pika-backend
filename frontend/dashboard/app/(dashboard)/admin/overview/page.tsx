@@ -14,7 +14,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { Card, Col, Row, Spin, Statistic, Table } from 'antd'
 
-import { adminAdapter } from '@/lib/api/admin-adapter'
+import { adminAdapter } from '@/lib/api/adminAdapter'
 
 interface AdminMetrics {
   totalUsers: number

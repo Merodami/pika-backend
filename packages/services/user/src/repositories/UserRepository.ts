@@ -260,6 +260,11 @@ export class UserRepository implements IUserRepository {
         ...userData
       } = data
 
+      // Convert dateOfBirth to ISO datetime if provided as YYYY-MM-DD
+      if (userData.dateOfBirth && /^\d{4}-\d{2}-\d{2}$/.test(userData.dateOfBirth)) {
+        userData.dateOfBirth = new Date(userData.dateOfBirth).toISOString()
+      }
+
       // Create user (professional profile removed)
       const user = await this.prisma.user.create({
         data: {
