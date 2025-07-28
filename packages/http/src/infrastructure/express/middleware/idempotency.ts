@@ -18,6 +18,33 @@ declare global {
 }
 
 /**
+ * Convert Express route pattern to regex for matching
+ * Handles patterns like /admin/businesses/:id/deactivate
+ */
+function routePatternToRegex(pattern: string): RegExp {
+  // Escape special regex characters except for :
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  // Replace :param with regex to match any non-slash characters
+  const regexPattern = escaped.replace(/:([^/]+)/g, '([^/]+)')
+  // Add anchors to match the full path
+  return new RegExp(`^${regexPattern}$`)
+}
+
+/**
+ * Check if a URL matches any of the excluded route patterns
+ */
+function isExcludedRoute(url: string, excludeRoutes: string[]): boolean {
+  return excludeRoutes.some(route => {
+    // If route contains : it's a pattern, otherwise do simple prefix match
+    if (route.includes(':')) {
+      const regex = routePatternToRegex(route)
+      return regex.test(url)
+    }
+    return url.startsWith(route)
+  })
+}
+
+/**
  * Express middleware for handling idempotent requests
  *
  * This middleware provides system-wide idempotency support by:
@@ -59,9 +86,24 @@ export function idempotencyMiddleware(
     if (!methods.includes(req.method)) {
       return next()
     }
+    
+    // Debug logging for path investigation
+    if (req.path.includes('deactivate')) {
+      logger.debug('Idempotency: Processing deactivate request', {
+        path: req.path,
+        url: req.url,
+        originalUrl: req.originalUrl,
+        method: req.method,
+        excludeRoutes
+      })
+    }
 
-    // Skip excluded routes
-    if (excludeRoutes.some((route) => req.url.startsWith(route))) {
+    // Skip excluded routes (now handles parameterized routes)
+    if (isExcludedRoute(req.path, excludeRoutes)) {
+      logger.debug('Idempotency: Skipping excluded route', {
+        path: req.path,
+        method: req.method
+      })
       return next()
     }
 

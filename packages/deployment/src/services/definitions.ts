@@ -1,10 +1,15 @@
 import { createAuthServer } from '@pika/auth-service'
+import { createBusinessServer } from '@pika/business'
+import { createCategoryServer } from '@pika/category'
 import { createCommunicationServer } from '@pika/communication'
 import { createPaymentServer } from '@pika/payment'
+import { createPDFServer } from '@pika/pdf'
 import { createStorageServer } from '@pika/storage'
 import { createSubscriptionServer } from '@pika/subscription'
 import { createSupportServer } from '@pika/support'
 import { createUserServer } from '@pika/user'
+import { createVoucherServer } from '@pika/voucher-service'
+import { TranslationClient, createTranslationService, createTranslationResolver } from '@pika/translation'
 
 import type { ServiceDefinition, ServiceDependencies } from '../types/index.js'
 
@@ -37,6 +42,44 @@ export function getServiceDefinitions(): ServiceDefinition[] {
           cacheService: deps.cache,
           fileStorage: deps.services?.fileStorage,
           communicationClient: deps.services?.communication,
+        })
+
+        return app
+      },
+    },
+    {
+      name: 'business',
+      port: 5511,
+      basePath: '/businesses',
+      healthCheck: '/health',
+      createApp: async (deps: ServiceDependencies) => {
+        // Create translation service and client with proper dependencies
+        const translationService = createTranslationService(deps.prisma, deps.cache as any)
+        const translationClient = new TranslationClient(translationService)
+        
+        const app = await createBusinessServer({
+          prisma: deps.prisma,
+          cacheService: deps.cache,
+          translationClient,
+        })
+
+        return app
+      },
+    },
+    {
+      name: 'category',
+      port: 5512,
+      basePath: '/categories',
+      healthCheck: '/health',
+      createApp: async (deps: ServiceDependencies) => {
+        // Create translation service and client with proper dependencies
+        const translationService = createTranslationService(deps.prisma, deps.cache as any)
+        const translationClient = new TranslationClient(translationService)
+        
+        const app = await createCategoryServer({
+          prisma: deps.prisma,
+          cacheService: deps.cache,
+          translationClient,
         })
 
         return app
@@ -93,12 +136,12 @@ export function getServiceDefinitions(): ServiceDefinition[] {
     },
     {
       name: 'support',
-      port: 5509,
+      port: 5508,
       basePath: '/support',
       healthCheck: '/health',
       createApp: async (deps: ServiceDependencies) => {
         const { app } = await createSupportServer({
-          port: 5509,
+          port: 5508,
           prisma: deps.prisma,
           cacheService: deps.cache,
         })
@@ -117,12 +160,78 @@ export function getServiceDefinitions(): ServiceDefinition[] {
           prisma: deps.prisma,
           cacheService: deps.cache,
           storageConfig: {
+            // For Vercel deployment, use console provider for local development
+            // This logs file operations instead of actually storing files
             region: process.env.STORAGE_REGION || 'us-east-1',
             bucketName: process.env.STORAGE_BUCKET || 'pika-storage',
             accessKeyId: process.env.STORAGE_ACCESS_KEY,
             secretAccessKey: process.env.STORAGE_SECRET_KEY,
             endpoint: process.env.STORAGE_ENDPOINT,
           },
+        })
+
+        return app
+      },
+    },
+    {
+      name: 'pdf',
+      port: 5513,
+      basePath: '/pdf',
+      healthCheck: '/health',
+      createApp: async (deps: ServiceDependencies) => {
+        const app = await createPDFServer({
+          prisma: deps.prisma,
+          cacheService: deps.cache,
+        })
+
+        return app
+      },
+    },
+    {
+      name: 'pdf',
+      port: 5513,
+      basePath: '/pdf',
+      healthCheck: '/health',
+      createApp: async (deps: ServiceDependencies) => {
+        const app = await createPDFServer({
+          prisma: deps.prisma,
+          cacheService: deps.cache,
+        })
+
+        return app
+      },
+    },
+    {
+      name: 'voucher',
+      port: 5514,
+      basePath: '/vouchers',
+      healthCheck: '/health',
+      createApp: async (deps: ServiceDependencies) => {
+        // Create translation service and client with proper dependencies
+        const translationService = createTranslationService(deps.prisma, deps.cache as any)
+        const translationClient = new TranslationClient(translationService)
+        const translationResolver = createTranslationResolver(translationClient)
+        
+        // Use the storage service client instead of direct file storage
+        // This allows the storage service to handle the backend configuration
+        const fileStorage = deps.services?.storage || {
+          saveFile: async (file: any) => ({ 
+            url: `/storage/files/${Date.now()}-${file.filename}`,
+            size: file.size || 0,
+            mimetype: file.mimetype || 'application/octet-stream',
+            originalFilename: file.filename || 'unknown',
+            filename: `${Date.now()}-${file.filename}`,
+            path: `uploads/${Date.now()}-${file.filename}`
+          }),
+          deleteFile: async () => {},
+        }
+        
+        const app = await createVoucherServer({
+          prisma: deps.prisma,
+          cacheService: deps.cache,
+          fileStorage,
+          translationClient,
+          translationResolver,
         })
 
         return app

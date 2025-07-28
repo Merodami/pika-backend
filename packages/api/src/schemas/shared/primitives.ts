@@ -52,6 +52,22 @@ export const DateOnly = z
   .describe('Date in YYYY-MM-DD format')
 
 /**
+ * DateOnlyString - Date in YYYY-MM-DD format (no transformation)
+ */
+export const DateOnlyString = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, { message: 'Must be in YYYY-MM-DD format' })
+  .refine(
+    (date) => {
+      const parsed = new Date(date)
+
+      return !isNaN(parsed.getTime())
+    },
+    { message: 'Must be a valid date' },
+  )
+  .describe('Date string in YYYY-MM-DD format')
+
+/**
  * TimeOnly - Time in HH:MM or HH:MM:SS format
  */
 export const TimeOnly = z
@@ -81,7 +97,7 @@ export const PhoneNumber = z
   .describe('Phone number in E.164 format')
 
 /**
- * Password - Modern validation following updated best practices
+ * Password - Basic validation for general users
  * Based on NIST 800-63B: favor length over complexity
  */
 export const Password = z
@@ -109,6 +125,65 @@ export const Password = z
     'Passwords under 12 characters must contain lowercase, uppercase, and numbers',
   )
   .describe('Password with modern security requirements - longer is better')
+
+/**
+ * SecurePassword - Enhanced validation for admin/business users
+ * Requires stronger complexity for sensitive accounts
+ */
+export const SecurePassword = z
+  .string()
+  .min(12, 'Password must be at least 12 characters for admin/business accounts')
+  .max(128, 'Password must not exceed 128 characters')
+  .refine((password) => {
+    // Check for lowercase letter
+    if (!/[a-z]/.test(password)) {
+      return false
+    }
+    // Check for uppercase letter
+    if (!/[A-Z]/.test(password)) {
+      return false
+    }
+    // Check for number
+    if (!/\d/.test(password)) {
+      return false
+    }
+    // Check for special character
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return false
+    }
+    return true
+  }, 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
+  .refine((password) => {
+    // Prevent the most common weak passwords (extended list)
+    const commonWeakPasswords = [
+      'password',
+      'password1',
+      'password123',
+      '12345678',
+      'qwerty123',
+      'admin123',
+      'letmein',
+      'welcome123',
+      'administrator',
+      'business123',
+      'admin@123',
+      'business@123',
+      'pika1234',
+      'pika@123',
+    ]
+    
+    // Check against common patterns
+    const lowerPassword = password.toLowerCase()
+    return !commonWeakPasswords.some(weak => lowerPassword.includes(weak))
+  }, 'This password contains common patterns. Please choose a more unique password')
+  .refine((password) => {
+    // Check for sequential characters (123, abc, etc.)
+    const hasSequential = /(.)\1{2,}/.test(password) // same character 3+ times
+    const hasKeyboardPattern = /(qwerty|asdfgh|zxcvbn)/i.test(password)
+    
+    return !hasSequential && !hasKeyboardPattern
+  }, 'Password should not contain repeated characters or keyboard patterns')
+  .describe('High-security password for admin and business accounts')
 
 // ============= Numeric Types =============
 

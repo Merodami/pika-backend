@@ -83,6 +83,7 @@ export interface RegisterResult {
   accessToken?: string
   refreshToken?: string
   message?: string
+  emailSent?: boolean
 }
 
 export interface RefreshResult {
@@ -192,6 +193,7 @@ export class AuthService implements IAuthService {
         message:
           result.message ||
           'Registration successful. Please check your email to verify your account.',
+        emailSent: result.emailSent,
       }
     }
 

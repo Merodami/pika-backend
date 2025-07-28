@@ -25,7 +25,6 @@ export const {
   RegisterFormSchema,
   ForgotPasswordFormSchema,
   ResetPasswordFormSchema,
-  ChangePasswordFormSchema,
 
   // Multi-step registration
   RegistrationStep1Schema,
