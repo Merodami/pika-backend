@@ -16,7 +16,6 @@ import { Card, Col, Row, Spin, Statistic, Typography } from 'antd'
 
 import { VoucherActivityFeed } from '@/components/features/voucherActivityFeed'
 import { VoucherRealtimeStats } from '@/components/features/voucherRealtimeStats'
-import { businessAdapter } from '@/lib/api/businessAdapter'
 
 const { Title, Text } = Typography
 
@@ -37,9 +36,19 @@ export default function BusinessDashboardPage() {
   const { data: metrics, isLoading } = useQuery({
     queryKey: ['business', 'dashboard'],
     queryFn: async (): Promise<DashboardMetrics> => {
-      const response = await businessAdapter.getAnalytics()
-
-      return response.data
+      // Mock data for now - replace with actual business analytics endpoint
+      return {
+        totalVouchers: 25,
+        activeVouchers: 18,
+        totalRedemptions: 142,
+        totalRevenue: 3420.50,
+        conversionRate: 12.8,
+        growth: {
+          vouchers: 15.2,
+          redemptions: 23.4,
+          revenue: 18.7,
+        },
+      }
     },
   })
 

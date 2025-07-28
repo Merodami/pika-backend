@@ -76,7 +76,7 @@ export function getServiceDefinitions(): ServiceDefinition[] {
         const translationService = createTranslationService(deps.prisma, deps.cache as any)
         const translationClient = new TranslationClient(translationService)
         
-        const app = await createCategoryServer({
+        const { app } = await createCategoryServer({
           prisma: deps.prisma,
           cacheService: deps.cache,
           translationClient,

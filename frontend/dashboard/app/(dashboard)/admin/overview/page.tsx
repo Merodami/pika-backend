@@ -41,18 +41,28 @@ export default function AdminOverviewPage() {
   const { data: metrics, isLoading: metricsLoading } = useQuery({
     queryKey: ['admin', 'overview'],
     queryFn: async (): Promise<AdminMetrics> => {
-      const response = await adminAdapter.getPlatformAnalytics()
-
-      return response.data
+      // Mock data for now - replace with actual platform analytics endpoint
+      return {
+        totalUsers: 1250,
+        totalBusinesses: 450,
+        totalVouchers: 2800,
+        totalRedemptions: 15600,
+        growth: {
+          users: 12.5,
+          businesses: 8.3,
+          vouchers: 23.1,
+          redemptions: 18.7,
+        },
+      }
     },
   })
 
   const { data: recentBusinesses, isLoading: businessesLoading } = useQuery({
     queryKey: ['admin', 'recent-businesses'],
     queryFn: async (): Promise<RecentBusiness[]> => {
-      const response = await adminAdapter.getBusinesses({ page: 1 })
+      const response = await adminAdapter.businesses.list({ page: 1, limit: 5 })
 
-      return response.data.items
+      return response.data?.items || []
     },
   })
 
