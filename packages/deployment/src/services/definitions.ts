@@ -198,20 +198,6 @@ export function getServiceDefinitions(): ServiceDefinition[] {
       },
     },
     {
-      name: 'pdf',
-      port: 5513,
-      basePath: '/pdf',
-      healthCheck: '/health',
-      createApp: async (deps: ServiceDependencies) => {
-        const app = await createPDFServer({
-          prisma: deps.prisma,
-          cacheService: deps.cache,
-        })
-
-        return app
-      },
-    },
-    {
       name: 'voucher',
       port: 5514,
       basePath: '/vouchers',
