@@ -1,31 +1,21 @@
-'use client'
+import { redirect } from 'next/navigation'
 
-import { Spin } from 'antd'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { getCurrentUser } from '@/app/_services/authService'
+import { UserRole } from '@pika/types'
 
-import { useAuthStore } from '@/store/authStore'
+export default async function HomePage() {
+  const user = await getCurrentUser()
 
-export default function HomePage() {
-  const router = useRouter()
-  const { isAuthenticated, user } = useAuthStore()
+  if (!user) {
+    redirect('/es/login')
+  }
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Redirect authenticated users to their dashboard
-      router.replace('/dashboard')
-    } else {
-      // Redirect unauthenticated users to login
-      router.replace('/login')
-    }
-  }, [isAuthenticated, user, router])
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <Spin size="large" />
-        <p className="mt-4 text-gray-600">Loading...</p>
-      </div>
-    </div>
-  )
+  switch (user.role) {
+    case UserRole.ADMIN:
+      redirect('/es/admin')
+    case UserRole.BUSINESS:
+      redirect('/es/business')
+    default:
+      redirect('/es/unauthorized')
+  }
 }

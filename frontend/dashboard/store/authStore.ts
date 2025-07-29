@@ -2,21 +2,29 @@ import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { api } from '@/lib/api/client'
-import {
-  clearTokens,
-  getStoredUser,
-  setStoredUser,
-  setTokens,
-} from '@/lib/auth/tokens'
+import { UserRole, type UserRoleType } from '@pika/types'
 
-export type UserRole = 'CUSTOMER' | 'BUSINESS' | 'ADMIN'
+// Simple storage helpers (since we removed lib/auth/tokens.ts)
+function getStoredUser(): User | null {
+  if (typeof window === 'undefined') return null
+  const stored = localStorage.getItem('pika-user')
+  return stored ? JSON.parse(stored) : null
+}
+
+function setStoredUser(user: User): void {
+  localStorage.setItem('pika-user', JSON.stringify(user))
+}
+
+function clearStoredUser(): void {
+  localStorage.removeItem('pika-user')
+}
 
 export interface User {
   id: string
   email: string
   name: string
-  role: UserRole
-  businessId?: string // For BUSINESS role
+  role: UserRoleType
+  businessId?: string
   createdAt: string
   updatedAt: string
 }
@@ -44,7 +52,7 @@ function mapUserDtoToUser(dto: any): User {
       dto.first_name && dto.last_name
         ? `${dto.first_name} ${dto.last_name}`
         : dto.email,
-    role: dto.role as UserRole,
+    role: dto.role as UserRoleType,
     businessId: dto.business_id || undefined,
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
@@ -71,10 +79,7 @@ export const useAuthStore = create<AuthState>()(
             },
           })
 
-          // Store tokens
-          if (response.accessToken && response.refreshToken) {
-            setTokens(response.accessToken, response.refreshToken)
-          }
+          // Tokens are handled server-side via actions
 
           // Get user profile after login
           const userResponse = await api.users.getUserProfile()
@@ -148,15 +153,12 @@ export const useAuthStore = create<AuthState>()(
           console.error('Logout API call failed:', error)
         }
 
-        clearTokens()
+        clearStoredUser()
         set({
           user: null,
           isAuthenticated: false,
           isLoading: false,
         })
-
-        // Redirect to login
-        window.location.href = '/login'
       },
 
       checkAuth: async () => {
@@ -177,7 +179,7 @@ export const useAuthStore = create<AuthState>()(
           set({ user, isAuthenticated: true })
         } catch {
           // Token is invalid
-          clearTokens()
+          clearStoredUser()
           set({ user: null, isAuthenticated: false })
         }
       },
