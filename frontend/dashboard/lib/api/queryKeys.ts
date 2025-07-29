@@ -12,9 +12,9 @@ export const queryKeys = {
       [...queryKeys.vouchers.lists(), filters] as const,
     details: () => [...queryKeys.vouchers.all(), 'detail'] as const,
     detail: (id: string) => [...queryKeys.vouchers.details(), id] as const,
-    // analytics: (id: string) => [...queryKeys.vouchers.all(), 'analytics', id] as const, // Unused
-    // codes: (id: string) => [...queryKeys.vouchers.all(), 'codes', id] as const, // Unused
-    // stats: (businessId: string) => [...queryKeys.vouchers.all(), 'stats', businessId] as const, // Unused
+    // analytics: (id: string) => [...queryKeys.vouchers.all(), 'analytics', id] as const, // Unused: no references in hooks
+    // codes: (id: string) => [...queryKeys.vouchers.all(), 'codes', id] as const, // Unused: no references in hooks
+    // stats: (businessId: string) => [...queryKeys.vouchers.all(), 'stats', businessId] as const, // Unused: no references in hooks
   },
 
   // Business query keys
@@ -43,7 +43,7 @@ export const queryKeys = {
   },
 
   // UNUSED QUERY KEYS - Commented out during cleanup, can be restored if needed
-  // 
+  //
   // // Category query keys
   // categories: {
   //   all: () => [...queryKeys.all, 'categories'] as const,

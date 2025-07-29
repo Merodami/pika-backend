@@ -3,9 +3,9 @@ import { z } from 'zod'
 
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
+import { AnalyticsGroupBySchema } from '../../shared/query.js'
 import {
   AdminVoucherSortBySchema,
-  AnalyticsGroupBySchema,
   VoucherDiscountTypeSchema,
   VoucherStateSchema,
 } from '../common/enums.js'

@@ -156,9 +156,7 @@ export function RegisterForm() {
           validateStatus={errors.acceptTerms ? 'error' : ''}
           help={errors.acceptTerms?.message}
         >
-          <Checkbox {...register('acceptTerms')}>
-            {t('acceptTerms')}
-          </Checkbox>
+          <Checkbox {...register('acceptTerms')}>{t('acceptTerms')}</Checkbox>
         </Form.Item>
 
         <Form.Item>

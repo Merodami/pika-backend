@@ -128,10 +128,3 @@ export const BatchOperationTypeSchema = openapi(BatchOperationType, {
   description: 'Type of batch operation to perform',
   example: 'publish',
 })
-
-export const AnalyticsGroupBy = z.enum(['day', 'week', 'month'])
-
-export const AnalyticsGroupBySchema = openapi(AnalyticsGroupBy, {
-  description: 'Analytics grouping period',
-  example: 'day',
-})

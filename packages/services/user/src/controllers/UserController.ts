@@ -376,8 +376,8 @@ export class UserController {
     try {
       const { id: userId } = req.params
 
-      // TODO: Update service method to accept reason, duration, and notifyUser from req.body
-      await this.userService.banUser(userId)
+      const { reason, duration, notifyUser } = req.body
+      await this.userService.banUser(userId, { reason, duration, notifyUser })
 
       // No content response
       res.status(204).send()
@@ -398,8 +398,8 @@ export class UserController {
     try {
       const { id: userId } = req.params
 
-      // TODO: Update service method to accept reason and notifyUser from req.body
-      await this.userService.unbanUser(userId)
+      const { reason, notifyUser } = req.body
+      await this.userService.unbanUser(userId, { reason, notifyUser })
 
       // No content response
       res.status(204).send()

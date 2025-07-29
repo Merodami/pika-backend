@@ -28,3 +28,18 @@ export enum TimestampSortBy {
  * Type definition for timestamp sort by - use this for type annotations
  */
 export type TimestampSortByType = `${TimestampSortBy}`
+
+/**
+ * Analytics grouping periods for time-based aggregations
+ * Used for analytics queries across different services
+ */
+export enum AnalyticsGroupBy {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+}
+
+/**
+ * Type definition for analytics group by - use this for type annotations
+ */
+export type AnalyticsGroupByType = `${AnalyticsGroupBy}`

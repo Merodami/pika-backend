@@ -2,14 +2,13 @@ import type { ICacheService } from '@pika/redis'
 import type { ProblemDomain } from '@pika/sdk'
 import { ProblemMapper } from '@pika/sdk'
 import { ErrorFactory, toPrismaInclude } from '@pika/shared'
-import type {
-  PaginatedResult,
-  ParsedIncludes,
+import {
+  type PaginatedResult,
+  type ParsedIncludes,
   TicketPriority,
   TicketStatus,
   TicketType,
 } from '@pika/types'
-import { ProblemPriority, ProblemStatus, ProblemType } from '@prisma/client'
 import { Prisma, PrismaClient } from '@prisma/client'
 import type { SearchParams } from '@support/types/search.js'
 import { get } from 'lodash-es'
@@ -240,9 +239,9 @@ export class ProblemRepository implements IProblemRepository {
           userId: data.userId,
           title: data.title,
           description: data.description,
-          priority: data.priority || ProblemPriority.medium,
-          status: ProblemStatus.open,
-          type: data.type || ProblemType.general,
+          priority: data.priority || TicketPriority.MEDIUM,
+          status: TicketStatus.OPEN,
+          type: data.type || TicketType.GENERAL,
           files: data.files || [],
         },
       })
@@ -270,9 +269,9 @@ export class ProblemRepository implements IProblemRepository {
       // Set resolvedAt automatically when status changes to RESOLVED
       const updateData: any = { ...data }
 
-      if (data.status === ProblemStatus.resolved && !data.resolvedAt) {
+      if (data.status === TicketStatus.RESOLVED && !data.resolvedAt) {
         updateData.resolvedAt = new Date()
-      } else if (data.status && data.status !== ProblemStatus.resolved) {
+      } else if (data.status && data.status !== TicketStatus.RESOLVED) {
         updateData.resolvedAt = null
       }
 
