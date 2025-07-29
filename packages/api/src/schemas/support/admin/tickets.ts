@@ -1,15 +1,26 @@
+import { SortOrder, TimestampSortBy } from '@pika/types'
+import {
+  AdminTicketSortBy,
+  TicketPriority,
+  TicketStatus,
+  TicketType,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { SortOrderSchema, TimestampSortBySchema } from '../../common/enums.js'
 import { UserId } from '../../shared/branded.js'
-import { SortOrder, TimestampSortBy } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { createIncludeParam } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { TicketPriority, TicketStatus, TicketType } from '../common/enums.js'
-import { AdminTicketSortBy } from '../common/index.js'
+import {
+  AdminTicketSortBySchema,
+  TicketPrioritySchema,
+  TicketStatusSchema,
+  TicketTypeSchema,
+} from '../common/enums.js'
 
 /**
  * Admin support ticket management schemas
@@ -43,9 +54,9 @@ export const AdminTicketDetailResponse = openapi(
     // Ticket details
     title: z.string(),
     description: z.string(),
-    type: TicketType,
-    status: TicketStatus,
-    priority: TicketPriority,
+    type: TicketTypeSchema,
+    status: TicketStatusSchema,
+    priority: TicketPrioritySchema,
     resolvedAt: DateTime.optional(),
 
     // Essential admin fields
@@ -74,13 +85,13 @@ export const AdminTicketQueryParams = z.object({
   ticketNumber: z.string().optional(),
   userId: UserId.optional(),
   assignedTo: UserId.optional(),
-  status: TicketStatus.optional(),
-  priority: TicketPriority.optional(),
-  type: TicketType.optional(),
+  status: TicketStatusSchema.optional(),
+  priority: TicketPrioritySchema.optional(),
+  type: TicketTypeSchema.optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
-  sortBy: AdminTicketSortBy.default('createdAt'),
-  sortOrder: SortOrder.default(SortOrder.enum.desc),
+  sortBy: AdminTicketSortBySchema.default(AdminTicketSortBy.CREATED_AT),
+  sortOrder: SortOrderSchema.default(SortOrder.DESC),
   ...createIncludeParam(ADMIN_PROBLEM_RELATIONS).shape,
 })
 
@@ -104,9 +115,9 @@ export const AdminUpdateProblemRequest = openapi(
   z.object({
     title: z.string().min(1).max(200).optional(),
     description: z.string().min(1).max(5000).optional(),
-    priority: TicketPriority.optional(),
-    type: TicketType.optional(),
-    status: TicketStatus.optional(),
+    priority: TicketPrioritySchema.optional(),
+    type: TicketTypeSchema.optional(),
+    status: TicketStatusSchema.optional(),
     assignedTo: UserId.optional(),
     resolvedAt: DateTime.optional(),
     files: z.array(z.string()).optional(),
@@ -128,7 +139,7 @@ export const AssignTicketRequest = openapi(
   z.object({
     assigneeId: UserId,
     note: z.string().max(500).optional(),
-    priority: TicketPriority.optional(),
+    priority: TicketPrioritySchema.optional(),
   }),
   {
     description: 'Assign ticket to agent',
@@ -142,7 +153,7 @@ export type AssignTicketRequest = z.infer<typeof AssignTicketRequest>
  */
 export const UpdateTicketStatusRequest = openapi(
   z.object({
-    status: TicketStatus,
+    status: TicketStatusSchema,
     note: z.string().max(1000).optional(),
     notifyUser: z.boolean().default(true),
   }),
@@ -161,7 +172,7 @@ export type UpdateTicketStatusRequest = z.infer<
 export const EscalateTicketRequest = openapi(
   z.object({
     reason: z.string().max(1000),
-    priority: TicketPriority.optional(),
+    priority: TicketPrioritySchema.optional(),
     assignToSupervisor: z.boolean().default(true),
   }),
   {
@@ -222,30 +233,38 @@ export const SupportMetrics = openapi(
       .describe('Average resolution time in hours'),
 
     // Status breakdown
-    ticketsByStatus: z.object(
-      Object.fromEntries(
-        TicketStatus.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
-    ticketsByPriority: z.object(
-      Object.fromEntries(
-        TicketPriority.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
-    ticketsByType: z.object(
-      Object.fromEntries(
-        TicketType.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
+    ticketsByStatus: z.object({
+      [TicketStatus.OPEN]: z.number().int().nonnegative().optional(),
+      [TicketStatus.ASSIGNED]: z.number().int().nonnegative().optional(),
+      [TicketStatus.IN_PROGRESS]: z.number().int().nonnegative().optional(),
+      [TicketStatus.WAITING_CUSTOMER]: z
+        .number()
+        .int()
+        .nonnegative()
+        .optional(),
+      [TicketStatus.WAITING_INTERNAL]: z
+        .number()
+        .int()
+        .nonnegative()
+        .optional(),
+      [TicketStatus.RESOLVED]: z.number().int().nonnegative().optional(),
+      [TicketStatus.CLOSED]: z.number().int().nonnegative().optional(),
+    }),
+    ticketsByPriority: z.object({
+      [TicketPriority.LOW]: z.number().int().nonnegative().optional(),
+      [TicketPriority.MEDIUM]: z.number().int().nonnegative().optional(),
+      [TicketPriority.HIGH]: z.number().int().nonnegative().optional(),
+      [TicketPriority.URGENT]: z.number().int().nonnegative().optional(),
+      [TicketPriority.CRITICAL]: z.number().int().nonnegative().optional(),
+    }),
+    ticketsByType: z.object({
+      [TicketType.BILLING]: z.number().int().nonnegative().optional(),
+      [TicketType.TECHNICAL]: z.number().int().nonnegative().optional(),
+      [TicketType.ACCOUNT]: z.number().int().nonnegative().optional(),
+      [TicketType.GENERAL]: z.number().int().nonnegative().optional(),
+      [TicketType.BUG_REPORT]: z.number().int().nonnegative().optional(),
+      [TicketType.FEATURE_REQUEST]: z.number().int().nonnegative().optional(),
+    }),
 
     // Agent performance
     agentStats: z
@@ -281,8 +300,8 @@ export const BulkTicketUpdateRequest = openapi(
   z.object({
     ticketIds: z.array(UUID).min(1).max(100),
     updates: z.object({
-      status: TicketStatus.optional(),
-      priority: TicketPriority.optional(),
+      status: TicketStatusSchema.optional(),
+      priority: TicketPrioritySchema.optional(),
       assignedTo: UserId.optional(),
       tags: z.array(z.string()).optional(),
     }),
@@ -357,8 +376,8 @@ export const AdminGetAllCommentsQuery = openapi(
   z.object({
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(20),
-    sortBy: TimestampSortBy.default('createdAt'),
-    sortOrder: SortOrder.default(SortOrder.enum.desc),
+    sortBy: TimestampSortBySchema.default(TimestampSortBy.CREATED_AT),
+    sortOrder: SortOrderSchema.default(SortOrder.DESC),
     search: z.string().optional(),
     problemId: z.string().optional(),
     isInternal: z.coerce.boolean().optional(),

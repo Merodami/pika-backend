@@ -289,6 +289,30 @@ describe('User Service - Admin API Integration Tests', () => {
       expect(response.body.data.length).toBeLessThanOrEqual(5)
     })
 
+    it('should include hasNext and hasPrev in pagination response', async () => {
+      await seedTestUsers(testDb.prisma, { count: 10 })
+
+      // Test first page
+      const firstPageResponse = await adminClient
+        .get('/users?page=1&limit=5')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(firstPageResponse.body.pagination).toHaveProperty('hasNext')
+      expect(firstPageResponse.body.pagination).toHaveProperty('hasPrev')
+      expect(firstPageResponse.body.pagination.hasPrev).toBe(false)
+      expect(firstPageResponse.body.pagination.hasNext).toBe(true)
+
+      // Test second page
+      const secondPageResponse = await adminClient
+        .get('/users?page=2&limit=5')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(secondPageResponse.body.pagination.hasPrev).toBe(true)
+      expect(secondPageResponse.body.pagination.hasNext).toBe(true)
+    })
+
     it('should return 403 for non-admin users', async () => {
       await customerClient
         .get('/users')
@@ -688,6 +712,176 @@ describe('User Service - Admin API Integration Tests', () => {
         .delete(`/users/${testUsers.users[0].id}`)
         .set('Accept', 'application/json')
         .expect(403)
+    })
+  })
+
+  // Admin User Get By ID Tests
+  describe('GET /admin/users/:id', () => {
+    it('should return user by ID with admin details', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      const response = await adminClient
+        .get(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.id).toBe(targetUser.id)
+      expect(response.body.email).toBe(targetUser.email)
+      expect(response.body.firstName).toBe(targetUser.firstName)
+      expect(response.body.lastName).toBe(targetUser.lastName)
+      expect(response.body.role).toBe(targetUser.role)
+      expect(response.body.status).toBe(targetUser.status)
+      expect(response.body.emailVerified).toBe(targetUser.emailVerified)
+      expect(response.body.phoneVerified).toBe(targetUser.phoneVerified)
+      expect(response.body).toHaveProperty('createdAt')
+      expect(response.body).toHaveProperty('updatedAt')
+    })
+
+    it('should return 404 for non-existent user', async () => {
+      const nonExistentId = uuid()
+
+      await adminClient
+        .get(`/admin/users/${nonExistentId}`)
+        .set('Accept', 'application/json')
+        .expect(404)
+    })
+
+    it('should require admin privileges', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      await customerClient
+        .get(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+
+    it('should validate UUID format', async () => {
+      await adminClient
+        .get('/admin/users/not-a-valid-uuid')
+        .set('Accept', 'application/json')
+        .expect(400)
+    })
+  })
+
+  // Admin Profile Tests
+  describe('GET /admin/users/me', () => {
+    it('should return current admin user profile', async () => {
+      const response = await adminClient
+        .get('/admin/users/me')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.email).toBe('admin@e2etest.com')
+      expect(response.body.role).toBe(UserRole.ADMIN)
+      expect(response.body).toHaveProperty('id')
+      expect(response.body).toHaveProperty('firstName')
+      expect(response.body).toHaveProperty('lastName')
+      expect(response.body).toHaveProperty('status')
+      expect(response.body).toHaveProperty('emailVerified')
+      expect(response.body).toHaveProperty('phoneVerified')
+      expect(response.body).toHaveProperty('createdAt')
+      expect(response.body).toHaveProperty('updatedAt')
+    })
+
+    it('should require admin privileges', async () => {
+      await customerClient
+        .get('/admin/users/me')
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+  })
+
+  describe('PATCH /admin/users/me', () => {
+    it('should update current admin user profile', async () => {
+      const updateData = {
+        firstName: 'UpdatedAdmin',
+        lastName: 'UpdatedLast',
+        phoneNumber: '+1234567890',
+      }
+
+      const response = await adminClient
+        .patch('/admin/users/me')
+        .send(updateData)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.firstName).toBe(updateData.firstName)
+      expect(response.body.lastName).toBe(updateData.lastName)
+      expect(response.body.phoneNumber).toBe(updateData.phoneNumber)
+      expect(response.body.email).toBe('admin@e2etest.com') // Email should not change
+      expect(response.body.role).toBe(UserRole.ADMIN) // Role should not change
+    })
+
+    it('should validate update data', async () => {
+      const invalidData = {
+        firstName: '', // Empty string should fail validation
+      }
+
+      await adminClient
+        .patch('/admin/users/me')
+        .send(invalidData)
+        .set('Accept', 'application/json')
+        .expect(400)
+    })
+
+    it('should require admin privileges', async () => {
+      const updateData = {
+        firstName: 'NotAllowed',
+      }
+
+      await customerClient
+        .patch('/admin/users/me')
+        .send(updateData)
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+  })
+
+  // Admin User Deletion Tests
+  describe('DELETE /admin/users/:id', () => {
+    it('should delete user by ID', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      await adminClient
+        .delete(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(204)
+
+      // Verify user is soft deleted
+      const deletedUser = await testDb.prisma.user.findUnique({
+        where: { id: targetUser.id },
+      })
+
+      expect(deletedUser?.deletedAt).not.toBeNull()
+    })
+
+    it('should return 404 for non-existent user', async () => {
+      const nonExistentId = uuid()
+
+      await adminClient
+        .delete(`/admin/users/${nonExistentId}`)
+        .set('Accept', 'application/json')
+        .expect(404)
+    })
+
+    it('should require admin privileges', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      await customerClient
+        .delete(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+
+    it('should validate UUID format', async () => {
+      await adminClient
+        .delete('/admin/users/not-a-valid-uuid')
+        .set('Accept', 'application/json')
+        .expect(400)
     })
   })
 

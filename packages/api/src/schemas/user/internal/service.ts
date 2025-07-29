@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
-import { UserRole, UserStatus } from '../../shared/enums.js'
 import { DateOnlyString, DateTime } from '../../shared/primitives.js'
+import { UserRoleSchema, UserStatusSchema } from '../common/enums.js'
 
 /**
  * Internal user service schemas for service-to-service communication
@@ -23,7 +23,7 @@ export const InternalUserData = openapi(
     phoneNumber: z.string().optional(),
     isActive: z.boolean(),
     isVerified: z.boolean(),
-    role: UserRole,
+    role: UserRoleSchema,
     createdAt: DateTime,
 
     // Service-specific flags
@@ -266,8 +266,8 @@ export const UserAuthData = openapi(
     firstName: z.string(),
     lastName: z.string(),
     phoneNumber: z.string().optional(),
-    role: UserRole,
-    status: UserStatus,
+    role: UserRoleSchema,
+    status: UserStatusSchema,
     emailVerified: z.boolean(),
     createdAt: DateTime,
     lastLoginAt: DateTime.optional(),
@@ -292,7 +292,7 @@ export const CreateUserRequest = openapi(
     dateOfBirth: DateOnlyString.optional(),
     acceptTerms: z.boolean(),
     marketingConsent: z.boolean().optional(),
-    role: UserRole,
+    role: UserRoleSchema,
     avatarUrl: z.string().url().optional(),
   }),
   {

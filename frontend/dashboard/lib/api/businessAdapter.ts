@@ -1,4 +1,5 @@
 import {
+  BusinessManagementService,
   BusinessServiceService,
   MyBusinessService,
   VoucherManagementService,
@@ -34,6 +35,19 @@ export const businessAdapter = {
     claim: VouchersService.postVouchersClaim,
     redeem: VouchersService.postVouchersRedeem,
     getUserVouchers: VouchersService.getUsersVouchers,
+  },
+
+  // Admin business management
+  admin: {
+    list: BusinessManagementService.getBusinesses,
+    create: BusinessManagementService.postBusinesses,
+    update: BusinessManagementService.putBusinesses,
+    delete: BusinessManagementService.deleteBusinesses,
+    verify: BusinessManagementService.patchBusinessesVerification,
+    activate: BusinessManagementService.patchBusinessesActivation,
+    updateRating: BusinessManagementService.patchBusinessesRating,
+    bulkUpdate: BusinessManagementService.patchBusinessesBulk,
+    bulkDelete: BusinessManagementService.deleteBusinessesBulk,
   },
 
   // Public business API

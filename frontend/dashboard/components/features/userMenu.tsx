@@ -1,10 +1,10 @@
 'use client'
 
 import { LogOut, Settings, User } from 'lucide-react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 import type { User as UserType } from '@/app/_services/authService'
 

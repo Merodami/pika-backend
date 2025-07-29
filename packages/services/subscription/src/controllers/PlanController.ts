@@ -8,7 +8,7 @@ import {
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
-import type { BillingInterval } from '@pika/types'
+// Plan controller
 import type { IPlanService } from '@subscription/services/PlanService.js'
 import type { PlanSearchParams } from '@subscription/types/search.js'
 import type { NextFunction, Request, Response } from 'express'
@@ -82,7 +82,6 @@ export class PlanController {
         page: query.page,
         limit: query.limit,
         isActive: query.isActive,
-        interval: query.interval as BillingInterval, // Safe: validated by Zod
         search: undefined, // Not in API schema
         // Removed gym-related properties
       }

@@ -1,5 +1,5 @@
-import { getTranslations } from 'next-intl/server'
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 export async function SystemHealthStatus() {
   const t = await getTranslations('dashboard.system')

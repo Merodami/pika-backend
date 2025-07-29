@@ -1,12 +1,14 @@
 import './globals.css'
 
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import { ConfigProvider } from 'antd'
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
-import { QueryProvider } from './providers/QueryProvider'
+
 import { ApiErrorBoundary } from '@/components/providers/ApiErrorBoundary'
+
+import { QueryProvider } from './providers/QueryProvider'
 
 const inter = Inter({
   subsets: ['latin'],

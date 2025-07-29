@@ -151,7 +151,7 @@ export const SecurePassword = z
       return false
     }
     // Check for special character
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       return false
     }
 

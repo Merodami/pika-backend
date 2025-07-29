@@ -1,3 +1,4 @@
+import { TicketPriority, TicketType } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -7,10 +8,9 @@ import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
-  ProblemSortBy,
-  TicketPriority,
-  TicketStatus,
-  TicketType,
+  TicketPrioritySchema,
+  TicketStatusSchema,
+  TicketTypeSchema,
 } from '../common/enums.js'
 
 /**
@@ -23,8 +23,8 @@ export const CreateSupportProblemRequest = openapi(
   z.object({
     title: z.string().min(1).max(200),
     description: z.string().min(1).max(5000),
-    priority: TicketPriority.default('medium'),
-    type: TicketType.default('general'),
+    priority: TicketPrioritySchema.default(TicketPriority.MEDIUM),
+    type: TicketTypeSchema.default(TicketType.GENERAL),
     files: z.array(z.string()).default([]),
   }),
   {
@@ -39,8 +39,8 @@ export const UpdateSupportProblemRequest = openapi(
   z.object({
     title: z.string().min(1).max(200).optional(),
     description: z.string().min(1).max(5000).optional(),
-    priority: TicketPriority.optional(),
-    type: TicketType.optional(),
+    priority: TicketPrioritySchema.optional(),
+    type: TicketTypeSchema.optional(),
     files: z.array(z.string()).optional(),
   }),
   {
@@ -60,9 +60,9 @@ export const SupportProblemResponse = openapi(
     userId: UserId,
     title: z.string(),
     description: z.string(),
-    status: TicketStatus,
-    priority: TicketPriority,
-    type: TicketType,
+    status: TicketStatusSchema,
+    priority: TicketPrioritySchema,
+    type: TicketTypeSchema,
     resolvedAt: DateTime.optional(),
     assignedTo: UserId.optional(),
     files: z.array(z.string()).default([]),
@@ -86,10 +86,12 @@ export type SupportProblemListResponse = z.infer<
 
 // Search schema following standard pattern
 export const SupportProblemSearchParams = SearchParams.extend({
-  status: TicketStatus.optional(),
-  priority: TicketPriority.optional(),
-  type: TicketType.optional(),
-  sortBy: ProblemSortBy.default('createdAt'),
+  status: TicketStatusSchema.optional(),
+  priority: TicketPrioritySchema.optional(),
+  type: TicketTypeSchema.optional(),
+  sortBy: z
+    .enum(['createdAt', 'updatedAt', 'priority', 'status'])
+    .default('createdAt'),
 })
 export type SupportProblemSearchParams = z.infer<
   typeof SupportProblemSearchParams

@@ -15,6 +15,11 @@ import {
   SearchOutlined,
 } from '@ant-design/icons'
 import {
+  VoucherState,
+  VoucherDiscountType,
+  type VoucherStateType,
+} from '@pika/types'
+import {
   Button,
   Card,
   Col,
@@ -35,8 +40,8 @@ import { useState } from 'react'
 import {
   useVouchers,
   useDeleteVoucher,
-  useUpdateVoucher,
   usePrefetchVoucher,
+  useBulkUpdateVouchers,
 } from '@/hooks/api'
 import type { AdminVoucherQueryParams } from '@/lib/api/generated'
 
@@ -44,22 +49,8 @@ const { Title, Text } = Typography
 const { Search } = Input
 const { Option } = Select
 
-interface Voucher {
-  id: string
-  title: string
-  description: string
-  category: string
-  discountType: 'percentage' | 'fixed_amount' | 'buy_one_get_one'
-  discountValue: number
-  status: 'draft' | 'active' | 'paused' | 'expired'
-  validFrom: string
-  validUntil: string
-  maxRedemptions?: number
-  currentRedemptions: number
-  businessName: string
-  createdAt: string
-  updatedAt: string
-}
+// Use the SDK type
+type Voucher = NonNullable<ReturnType<typeof useVouchers>['data']>['data'][0]
 
 export default function VouchersPage() {
   const router = useRouter()
@@ -75,7 +66,7 @@ export default function VouchersPage() {
     limit: pageSize,
     ...(searchTerm && { search: searchTerm }),
     ...(statusFilter !== 'all' && {
-      state: statusFilter as AdminVoucherQueryParams.state,
+      state: statusFilter as VoucherStateType,
     }),
     ...(categoryFilter !== 'all' && { categoryId: categoryFilter }),
   }
@@ -83,7 +74,7 @@ export default function VouchersPage() {
   // Use our custom hooks
   const { data: vouchersResponse, isLoading } = useVouchers(filters)
   const deleteVoucher = useDeleteVoucher()
-  const updateVoucher = useUpdateVoucher()
+  const bulkUpdateVouchers = useBulkUpdateVouchers()
   const prefetchVoucher = usePrefetchVoucher()
 
   // Extract data from response
@@ -101,29 +92,38 @@ export default function VouchersPage() {
     })
   }
 
-  const handleStatusUpdate = (
-    id: string,
-    status: 'published' | 'suspended'
-  ) => {
-    updateVoucher.mutate({
-      id,
-      data: { status },
+  const handleStatusUpdate = (id: string, state: 'published' | 'suspended') => {
+    const action = state === 'published' ? 'publish' : 'suspend'
+
+    Modal.confirm({
+      title: `${action === 'publish' ? 'Publish' : 'Suspend'} Voucher`,
+      content: `Are you sure you want to ${action} this voucher?`,
+      okText: action === 'publish' ? 'Publish' : 'Suspend',
+      okType: action === 'publish' ? 'primary' : 'default',
+      cancelText: 'Cancel',
+      onOk: () => {
+        bulkUpdateVouchers.mutate({
+          voucherIds: [id],
+          updates: { state },
+          reason: `Voucher ${action}ed by business owner`,
+        })
+      },
     })
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'published':
+      case VoucherState.published:
         return 'green'
-      case 'suspended':
+      case VoucherState.suspended:
         return 'orange'
-      case 'draft':
+      case VoucherState.draft:
         return 'blue'
-      case 'expired':
+      case VoucherState.expired:
         return 'red'
-      case 'claimed':
+      case VoucherState.claimed:
         return 'purple'
-      case 'redeemed':
+      case VoucherState.redeemed:
         return 'cyan'
       default:
         return 'default'
@@ -132,12 +132,10 @@ export default function VouchersPage() {
 
   const getDiscountDisplay = (voucher: Voucher) => {
     switch (voucher.discountType) {
-      case 'percentage':
+      case VoucherDiscountType.percentage:
         return `${voucher.discountValue}% OFF`
-      case 'fixed_amount':
+      case VoucherDiscountType.fixed:
         return `$${voucher.discountValue} OFF`
-      case 'buy_one_get_one':
-        return 'BOGO'
       default:
         return 'OFFER'
     }
@@ -162,7 +160,7 @@ export default function VouchersPage() {
       label: 'Analytics',
       onClick: () => router.push(`/business/vouchers/${voucher.id}/analytics`),
     },
-    ...(voucher.status === 'published'
+    ...(voucher.state === VoucherState.published
       ? [
           {
             key: 'suspend',
@@ -172,7 +170,7 @@ export default function VouchersPage() {
           },
         ]
       : []),
-    ...(voucher.status === 'suspended'
+    ...(voucher.state === VoucherState.draft
       ? [
           {
             key: 'publish',
@@ -205,7 +203,7 @@ export default function VouchersPage() {
             {voucher.description}
           </div>
           <Tag color="blue" className="mt-1">
-            {voucher.category}
+            {voucher.category?.name || 'No Category'}
           </Tag>
         </div>
       ),
@@ -223,8 +221,8 @@ export default function VouchersPage() {
       title: 'Status',
       key: 'status',
       render: (voucher: Voucher) => (
-        <Tag color={getStatusColor(voucher.status)}>
-          {voucher.status.toUpperCase()}
+        <Tag color={getStatusColor(voucher.state)}>
+          {voucher.state.toUpperCase()}
         </Tag>
       ),
     },
@@ -235,7 +233,7 @@ export default function VouchersPage() {
         <div className="text-sm">
           <div>{format(new Date(voucher.validFrom), 'MMM dd, yyyy')}</div>
           <div className="text-gray-500">
-            to {format(new Date(voucher.validUntil), 'MMM dd, yyyy')}
+            to {format(new Date(voucher.expiresAt), 'MMM dd, yyyy')}
           </div>
         </div>
       ),
@@ -245,7 +243,7 @@ export default function VouchersPage() {
       key: 'usage',
       render: (voucher: Voucher) => (
         <div className="text-sm">
-          <div className="font-medium">{voucher.currentRedemptions}</div>
+          <div className="font-medium">{voucher.currentRedemptions || 0}</div>
           <div className="text-gray-500">
             {voucher.maxRedemptions ? `/ ${voucher.maxRedemptions}` : '/ ∞'}
           </div>
@@ -277,13 +275,12 @@ export default function VouchersPage() {
     },
   ]
 
-  const vouchers = vouchersData?.vouchers || []
-  const total = vouchersData?.total || 0
-  const stats = vouchersData?.stats || {
-    total: 0,
-    active: 0,
-    draft: 0,
-    paused: 0,
+  const vouchers = vouchersData || []
+  const stats = {
+    total: vouchers.length,
+    active: vouchers.filter((v) => v.state === VoucherState.published).length,
+    draft: vouchers.filter((v) => v.state === VoucherState.draft).length,
+    paused: vouchers.filter((v) => v.state === VoucherState.suspended).length,
   }
 
   return (

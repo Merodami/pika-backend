@@ -12,7 +12,7 @@ import { Header } from '@/components/layouts/header'
 import { Sidebar } from '@/components/layouts/sidebar'
 import { useOnline } from '@/hooks/useOnline'
 import { useSessionTimeout } from '@/hooks/useSessionTimeout'
-import { useAuthStore } from '@/store/auth.store'
+import { useAuthStore } from '@/store/authStore'
 
 const { Content } = Layout
 

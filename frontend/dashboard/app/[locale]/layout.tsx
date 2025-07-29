@@ -1,6 +1,7 @@
+import { notFound } from 'next/navigation'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { notFound } from 'next/navigation'
+
 import { locales, localeConfig } from '@/i18n/config'
 
 interface LocaleLayoutProps {

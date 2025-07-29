@@ -4,7 +4,7 @@
 export const dynamic = 'force-dynamic'
 
 import { EyeOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons'
-import { Button, Col, Row, Typography } from 'antd'
+import { Button, Col, Row, Typography, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -12,6 +12,7 @@ import { VoucherDesignForm } from '@/components/features/voucher/voucherDesignFo
 import { VoucherPreview } from '@/components/features/voucher/voucherPreview'
 import { VoucherTemplate } from '@/components/features/voucher/voucherTemplate'
 import { useCreateVoucher } from '@/hooks/api'
+import type { CreateVoucherRequest } from '@/lib/api/generated'
 
 const { Title, Text } = Typography
 
@@ -82,6 +83,47 @@ const defaultVoucherDesign: VoucherDesign = {
   status: 'draft',
 }
 
+// Mapper function to convert VoucherDesign to CreateVoucherRequest
+const mapVoucherDesignToCreateRequest = (
+  design: VoucherDesign,
+  businessId: string,
+  categoryId: string
+): CreateVoucherRequest => ({
+  businessId,
+  categoryId,
+  // Convert single language to translations object (defaulting to English)
+  title: { en: design.title },
+  description: { en: design.description },
+  termsAndConditions: {
+    en: design.terms.length > 0 ? `${design.terms.join('. ')}.` : '',
+  },
+  discountType: design.discountType === 'fixed_amount' ? 'fixed' : 'percentage',
+  discountValue: design.discountValue,
+  currency: 'USD', // Default currency
+  validFrom: design.validFrom,
+  expiresAt: design.validUntil,
+  maxRedemptions: design.maxRedemptions || null,
+  maxRedemptionsPerUser: design.maxRedemptionsPerUser,
+  imageUrl: design.bannerImageUrl || null,
+  location: design.coordinates
+    ? {
+        type: 'Point',
+        coordinates: [design.coordinates.lng, design.coordinates.lat],
+      }
+    : null,
+  metadata: {
+    template: design.template,
+    primaryColor: design.primaryColor,
+    backgroundColor: design.backgroundColor,
+    textColor: design.textColor,
+    businessName: design.businessName,
+    businessAddress: design.businessAddress,
+    businessPhone: design.businessPhone,
+    businessWebsite: design.businessWebsite,
+    minimumPurchase: design.minimumPurchase,
+  },
+})
+
 export default function CreateVoucherPage() {
   const router = useRouter()
   const [voucherDesign, setVoucherDesign] =
@@ -91,35 +133,10 @@ export default function CreateVoucherPage() {
   const [previewMode, setPreviewMode] = useState<'edit' | 'preview'>('edit')
 
   // Create voucher mutation
-  const createVoucherMutation = useMutation({
-    mutationFn: async (voucher: VoucherDesign) => {
-      const response = await voucherAdapter.management.create(voucher)
+  const createVoucherMutation = useCreateVoucher()
 
-      return response.data
-    },
-    onSuccess: () => {
-      message.success('Voucher created successfully!')
-      router.push('/business/vouchers')
-    },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || 'Failed to create voucher')
-    },
-  })
-
-  // Save draft mutation
-  const saveDraftMutation = useMutation({
-    mutationFn: async (voucher: VoucherDesign) => {
-      const response = await voucherAdapter.management.create(voucher) // Save as draft - placeholder
-
-      return response.data
-    },
-    onSuccess: () => {
-      message.success('Draft saved successfully!')
-    },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || 'Failed to save draft')
-    },
-  })
+  // Save draft mutation (using create voucher with draft status)
+  const saveDraftMutation = useCreateVoucher()
 
   const handleVoucherChange = (field: keyof VoucherDesign, value: any) => {
     setVoucherDesign((prev) => ({
@@ -137,17 +154,58 @@ export default function CreateVoucherPage() {
   }
 
   const handleSaveDraft = () => {
-    saveDraftMutation.mutate({
-      ...voucherDesign,
-      status: 'draft',
-    })
+    // TODO: Get actual businessId from user profile or context
+    // TODO: Get actual categoryId by mapping category name to ID
+    const businessId = 'temp-business-id' // This should come from user context
+    const categoryId = 'temp-category-id' // This should be mapped from category name
+
+    try {
+      const createRequest = mapVoucherDesignToCreateRequest(
+        voucherDesign,
+        businessId,
+        categoryId
+      )
+
+      saveDraftMutation.mutate(createRequest, {
+        onSuccess: () => {
+          message.success('Draft saved successfully!')
+        },
+        onError: (error: any) => {
+          message.error(error.response?.data?.message || 'Failed to save draft')
+        },
+      })
+    } catch (error) {
+      message.error('Invalid voucher data. Please check all required fields.')
+    }
   }
 
   const handlePublish = () => {
-    createVoucherMutation.mutate({
-      ...voucherDesign,
-      status: 'active',
-    })
+    // TODO: Get actual businessId from user profile or context
+    // TODO: Get actual categoryId by mapping category name to ID
+    const businessId = 'temp-business-id' // This should come from user context
+    const categoryId = 'temp-category-id' // This should be mapped from category name
+
+    try {
+      const createRequest = mapVoucherDesignToCreateRequest(
+        voucherDesign,
+        businessId,
+        categoryId
+      )
+
+      createVoucherMutation.mutate(createRequest, {
+        onSuccess: () => {
+          message.success('Voucher created successfully!')
+          router.push('/business/vouchers')
+        },
+        onError: (error: any) => {
+          message.error(
+            error.response?.data?.message || 'Failed to create voucher'
+          )
+        },
+      })
+    } catch (error) {
+      message.error('Invalid voucher data. Please check all required fields.')
+    }
   }
 
   const isFormValid = () =>

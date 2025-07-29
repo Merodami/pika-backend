@@ -5,7 +5,6 @@ model SubscriptionPlan {
   description      String?
   price            Float    // Price per billing period
   currency         String   @default("usd")
-  interval         String   // "day" | "week" | "month" | "year"
   intervalCount    Int      @default(1) @map("interval_count")
   // Credits feature removed - no longer needed
   trialPeriodDays  Int?     @map("trial_period_days")
@@ -21,7 +20,6 @@ model SubscriptionPlan {
   subscriptions Subscription[]
 
   @@index([isActive])
-  @@index([interval])
   @@map("subscription_plans")
   @@schema("payments")
 }

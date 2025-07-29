@@ -219,37 +219,28 @@ export class AdminBusinessController {
   }
 
   /**
-   * POST /admin/businesses/:business_id/verify
-   * Verify a business (admin)
+   * PATCH /admin/businesses/:business_id/verification
+   * Update business verification status (admin)
    */
   async verifyBusiness(
     req: Request<
       businessPublic.BusinessPathParams,
       {},
-      businessAdmin.ToggleBusinessVerificationRequest
+      businessAdmin.PatchBusinessVerificationRequest
     >,
-    res: Response<businessAdmin.AdminBusinessResponse>,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: businessId } = req.params
       const { verified } = req.body
 
-      const business = await this.businessService.updateBusiness(businessId, {
+      await this.businessService.updateBusiness(businessId, {
         verified,
       })
 
-      // Transform to DTO
-      const response = BusinessMapper.toDTO(business)
-
-      // Validate response against Zod schema
-      const validatedResponse = validateResponse(
-        businessAdmin.AdminBusinessResponse,
-        response,
-        'AdminBusinessController.verifyBusiness',
-      )
-
-      res.json(validatedResponse)
+      // No content response
+      res.status(204).send()
     } catch (error) {
       next(error)
     }
@@ -261,25 +252,16 @@ export class AdminBusinessController {
    */
   async deactivateBusiness(
     req: Request<businessPublic.BusinessPathParams>,
-    res: Response<businessAdmin.AdminBusinessResponse>,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: businessId } = req.params
 
-      const business = await this.businessService.deactivateBusiness(businessId)
+      await this.businessService.deactivateBusiness(businessId)
 
-      // Transform to DTO
-      const response = BusinessMapper.toDTO(business)
-
-      // Validate response against Zod schema
-      const validatedResponse = validateResponse(
-        businessAdmin.AdminBusinessResponse,
-        response,
-        'AdminBusinessController.deactivateBusiness',
-      )
-
-      res.json(validatedResponse)
+      // No content response
+      res.status(204).send()
     } catch (error) {
       next(error)
     }
@@ -291,27 +273,18 @@ export class AdminBusinessController {
    */
   async activateBusiness(
     req: Request<businessPublic.BusinessPathParams>,
-    res: Response<businessAdmin.AdminBusinessResponse>,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: businessId } = req.params
 
-      const business = await this.businessService.updateBusiness(businessId, {
+      await this.businessService.updateBusiness(businessId, {
         active: true,
       })
 
-      // Transform to DTO
-      const response = BusinessMapper.toDTO(business)
-
-      // Validate response against Zod schema
-      const validatedResponse = validateResponse(
-        businessAdmin.AdminBusinessResponse,
-        response,
-        'AdminBusinessController.activateBusiness',
-      )
-
-      res.json(validatedResponse)
+      // No content response
+      res.status(204).send()
     } catch (error) {
       next(error)
     }

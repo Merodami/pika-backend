@@ -10,7 +10,6 @@ export interface SubscriptionPlanDocument {
   description: string | null
   price: number
   currency: string
-  interval: string
   intervalCount: number
   trialPeriodDays: number | null
   features: string[]
@@ -70,7 +69,6 @@ export class SubscriptionPlanMapper {
       description: doc.description || undefined,
       price: doc.price,
       currency: doc.currency,
-      interval: doc.interval,
       intervalCount: doc.intervalCount,
       trialPeriodDays: doc.trialPeriodDays || undefined,
       features: doc.features,
@@ -90,7 +88,6 @@ export class SubscriptionPlanMapper {
       description: domain.description,
       price: domain.price,
       currency: domain.currency,
-      interval: domain.interval,
       intervalCount: domain.intervalCount,
       trialPeriodDays: domain.trialPeriodDays,
       features: domain.features,
@@ -110,7 +107,6 @@ export class SubscriptionPlanMapper {
       description: dto.description,
       price: dto.price,
       currency: dto.currency,
-      interval: dto.interval,
       intervalCount: dto.intervalCount,
       trialPeriodDays: dto.trialPeriodDays,
       features: dto.features,

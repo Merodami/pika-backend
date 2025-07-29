@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import { useAuthStore } from '@/store/auth.store'
+import { useAuthStore } from '@/store/authStore'
 import { showWarning } from '@/store/notifications.store'
 
 interface UseSessionTimeoutOptions {

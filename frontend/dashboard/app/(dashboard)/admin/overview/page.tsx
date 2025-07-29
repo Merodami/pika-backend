@@ -12,7 +12,8 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 import { Card, Col, Row, Spin, Statistic, Table } from 'antd'
-import { useApiQuery, useBusinesses, useUsers } from '@/hooks/api'
+
+import { useApiQuery, useBusinesses } from '@/hooks/api'
 import type { AdminBusinessListResponse } from '@/lib/api/generated'
 
 interface AdminMetrics {
@@ -32,9 +33,9 @@ export default function AdminOverviewPage() {
   const { data: metrics, isLoading: metricsLoading } =
     useApiQuery<AdminMetrics>({
       queryKey: ['admin', 'overview'],
-      queryFn: async (): Promise<AdminMetrics> => {
+      queryFn: async (): Promise<AdminMetrics> =>
         // Mock data for now - replace with actual platform analytics endpoint
-        return {
+        ({
           totalUsers: 1250,
           totalBusinesses: 450,
           totalVouchers: 2800,
@@ -45,8 +46,7 @@ export default function AdminOverviewPage() {
             vouchers: 23.1,
             redemptions: 18.7,
           },
-        }
-      },
+        }),
     })
 
   const { data: businessesResponse, isLoading: businessesLoading } =

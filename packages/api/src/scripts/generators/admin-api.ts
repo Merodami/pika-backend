@@ -1,24 +1,27 @@
 // Updated imports to use @api paths
 import type { ZodRegistry } from '@api/common/registry/base.js'
 import * as adminBusinessSchemas from '@api/schemas/business/admin/management.js'
+import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as adminCategorySchemas from '@api/schemas/category/admin/management.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
+import * as categorySchemas from '@api/schemas/category/public/category.js'
 import * as adminPaymentSchemas from '@api/schemas/payment/admin/transactions.js'
 import * as adminPdfSchemas from '@api/schemas/pdf/admin/voucher-book.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import { UserId } from '@api/schemas/shared/branded.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
 import { DateTime, UUID } from '@api/schemas/shared/primitives.js'
-import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as adminStorageSchemas from '@api/schemas/storage/admin/management.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import * as adminSupportSchemas from '@api/schemas/support/admin/tickets.js'
 import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
 import * as adminUserSchemas from '@api/schemas/user/admin/index.js'
+import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
 import * as userVerificationSchemas from '@api/schemas/user/public/verification.js'
 import * as adminVoucherSchemas from '@api/schemas/voucher/admin/management.js'
 import * as adminVoucherQueries from '@api/schemas/voucher/admin/queries.js'
+import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import { z } from 'zod'
 
@@ -26,6 +29,37 @@ import { z } from 'zod'
  * Register all admin API schemas and routes
  */
 export function registerAdminAPI(registry: ZodRegistry): void {
+  // ============= Enum Schemas =============
+  // User enums
+  registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)
+  registry.registerSchema('UserRole', userEnumSchemas.UserRoleSchema)
+  registry.registerSchema('UserSortBy', userEnumSchemas.UserSortBySchema)
+  registry.registerSchema(
+    'AdminUserSortBy',
+    userEnumSchemas.AdminUserSortBySchema,
+  )
+
+  // Business enums
+  registry.registerSchema(
+    'BusinessSortBy',
+    businessEnumSchemas.BusinessSortBySchema,
+  )
+  registry.registerSchema(
+    'BusinessStatusFilter',
+    businessEnumSchemas.BusinessStatusFilterSchema,
+  )
+  registry.registerSchema(
+    'AdminBusinessSortBy',
+    businessEnumSchemas.AdminBusinessSortBySchema,
+  )
+
+  // Voucher enums
+  registry.registerSchema('VoucherState', voucherEnumSchemas.VoucherStateSchema)
+  registry.registerSchema(
+    'VoucherDiscountType',
+    voucherEnumSchemas.VoucherDiscountTypeSchema,
+  )
+
   // ============= Business Management Schemas =============
   registry.registerSchema(
     'AdminBusinessResponse',
@@ -71,9 +105,19 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'UpdateBusinessRatingRequest',
     adminBusinessSchemas.UpdateBusinessRatingRequest,
   )
+  registry.registerSchema(
+    'PatchBusinessVerificationRequest',
+    adminBusinessSchemas.PatchBusinessVerificationRequest,
+  )
+  registry.registerSchema(
+    'PatchBusinessVerificationResponse',
+    adminBusinessSchemas.PatchBusinessVerificationResponse,
+  )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
 
   // ============= Category Management Schemas =============
+  // Register public category schema used in business responses
+  registry.registerSchema('CategoryResponse', categorySchemas.CategoryResponse)
   registry.registerSchema(
     'AdminCategoryResponse',
     adminCategorySchemas.AdminCategoryResponse,
@@ -278,12 +322,12 @@ export function registerAdminAPI(registry: ZodRegistry): void {
 
   // ============= User Management Schemas =============
   registry.registerSchema(
-    'AdminUserListResponse',
-    adminUserSchemas.AdminUserListResponse,
-  )
-  registry.registerSchema(
     'AdminUserDetailResponse',
     adminUserSchemas.AdminUserDetailResponse,
+  )
+  registry.registerSchema(
+    'AdminUserListResponse',
+    adminUserSchemas.AdminUserListResponse,
   )
   registry.registerSchema(
     'AdminUserQueryParams',
@@ -389,6 +433,18 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'UnifiedVerificationResponse',
     userVerificationSchemas.UnifiedVerificationResponse,
+  )
+  registry.registerSchema(
+    'VerifyUserResponse',
+    adminUserSchemas.VerifyUserResponse,
+  )
+  registry.registerSchema(
+    'ResendVerificationResponse',
+    adminUserSchemas.ResendVerificationResponse,
+  )
+  registry.registerSchema(
+    'UserVerificationStatusResponse',
+    adminUserSchemas.UserVerificationStatusResponse,
   )
 
   // ============= Register Routes =============
@@ -836,11 +892,11 @@ function registerAdminRoutes(registry: ZodRegistry): void {
     },
   })
 
-  // Toggle business verification
+  // Update business verification
   registry.registerRoute({
     method: 'patch',
     path: '/businesses/{id}/verification',
-    summary: 'Toggle business verification status',
+    summary: 'Update business verification status',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
     request: {
@@ -848,48 +904,48 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.ToggleBusinessVerificationRequest,
+            schema: adminBusinessSchemas.PatchBusinessVerificationRequest,
           },
         },
       },
     },
     responses: {
-      200: {
-        description: 'Business verification updated',
-        content: {
-          'application/json': {
-            schema: adminBusinessSchemas.AdminBusinessResponse,
-          },
-        },
+      204: {
+        description: 'Business verification updated successfully',
       },
     },
   })
 
-  // Toggle business activation
+  // Activate business
   registry.registerRoute({
-    method: 'patch',
-    path: '/businesses/{id}/activation',
-    summary: 'Toggle business activation status',
+    method: 'post',
+    path: '/businesses/{id}/activate',
+    summary: 'Activate a business',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
     request: {
       params: businessParameters.BusinessIdParam,
-      body: {
-        content: {
-          'application/json': {
-            schema: adminBusinessSchemas.ToggleBusinessActivationRequest,
-          },
-        },
-      },
     },
     responses: {
-      200: {
-        description: 'Business activation updated',
-        content: {
-          'application/json': {
-            schema: adminBusinessSchemas.AdminBusinessResponse,
-          },
-        },
+      204: {
+        description: 'Business activated successfully',
+      },
+    },
+  })
+
+  // Deactivate business
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/{id}/deactivate',
+    summary: 'Deactivate a business',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+    },
+    responses: {
+      204: {
+        description: 'Business deactivated successfully',
       },
     },
   })
@@ -1511,22 +1567,14 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: z.object({
-              reason: z.string(),
-              duration: z.number().optional(),
-            }),
+            schema: adminUserSchemas.BanUserRequest,
           },
         },
       },
     },
     responses: {
-      200: {
-        description: 'User banned',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
+      204: {
+        description: 'User banned successfully',
       },
     },
   })
@@ -1541,15 +1589,17 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       params: z.object({
         id: z.string().uuid(),
       }),
-    },
-    responses: {
-      200: {
-        description: 'User unbanned',
+      body: {
         content: {
           'application/json': {
-            schema: MessageResponse,
+            schema: adminUserSchemas.UnbanUserRequest,
           },
         },
+      },
+    },
+    responses: {
+      204: {
+        description: 'User unbanned successfully',
       },
     },
   })
@@ -1710,17 +1760,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       },
     },
     responses: {
-      200: {
-        description: 'Verification successful',
-        content: {
-          'application/json': {
-            schema: z.object({
-              success: z.boolean(),
-              message: z.string(),
-              user: adminUserSchemas.AdminUserDetailResponse,
-            }),
-          },
-        },
+      204: {
+        description: 'User verified successfully',
       },
       400: {
         description: 'Bad request',

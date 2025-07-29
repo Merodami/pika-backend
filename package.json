@@ -70,7 +70,7 @@
     "generate": "yarn generate:api && yarn generate:docs",
     "generate:api": "yarn generate:openapi && yarn generate:sdk",
     "generate:openapi": "cd packages/api && yarn generate:openapi && cd ../.. && nx run @pika/api:build",
-    "generate:sdk": "cd frontend/dashboard && npx openapi-typescript-codegen --input ../../packages/api/generated/openapi/all-apis.json --output lib/api/generated --client axios --useOptions --exportSchemas true",
+    "generate:sdk": "cd frontend/dashboard && npx openapi-typescript-codegen --input ../../packages/api/generated/openapi/all-apis.json --output lib/api/generated --client axios --useOptions --exportSchemas true --useUnionTypes",
     "generate:docs": "cd packages/api && yarn generate:docs",
     "git-hooks-prepare": "husky install",
     "open:docs": "nx run @pika/api:open:docs",
@@ -137,6 +137,7 @@
   "workspaces": [
     "packages/**",
     "tools/**",
+    "frontend/**",
     "!api-microservices-sdk"
   ],
   "packageManager": "yarn@4.9.1",

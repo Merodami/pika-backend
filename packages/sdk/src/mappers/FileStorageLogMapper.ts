@@ -1,4 +1,4 @@
-import { FileType, FileTypeType } from '@pika/types'
+import { FileType } from '@pika/types'
 
 import type {
   FileStorageLogDomain,
@@ -134,7 +134,7 @@ export class FileStorageLogMapper {
   /**
    * Helper to determine file type from MIME type using FileType enum
    */
-  private static determineFileType(mimeType: string): FileTypeType {
+  private static determineFileType(mimeType: string): FileType {
     if (mimeType.startsWith('image/')) return FileType.IMAGE
     if (mimeType.startsWith('video/')) return FileType.VIDEO
     if (mimeType.startsWith('audio/')) return FileType.AUDIO

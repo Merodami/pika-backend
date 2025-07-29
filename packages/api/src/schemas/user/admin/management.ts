@@ -1,12 +1,17 @@
+import {
+  UserRole as UserRoleEnum,
+  UserStatus as UserStatusEnum,
+} from '@pika/types'
+import { AdminUserSortBy as AdminUserSortByEnum } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
-import { UserRole, UserStatus } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateOnly, DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { AdminUserSortBy } from '../common/enums.js'
+import { UserRoleSchema, UserStatusSchema } from '../common/enums.js'
+import { AdminUserSortBySchema } from '../common/enums.js'
 
 /**
  * Admin user management schemas
@@ -38,8 +43,8 @@ export const AdminUserDetailResponse = openapi(
     phoneNumber: z.string().optional(),
     dateOfBirth: DateOnly.optional(),
     avatarUrl: z.string().url().optional(),
-    status: UserStatus,
-    role: UserRole,
+    status: UserStatusSchema,
+    role: UserRoleSchema,
 
     // Verification info (only fields that exist in database)
     emailVerified: z.boolean(),
@@ -63,8 +68,8 @@ export type AdminUserDetailResponse = z.infer<typeof AdminUserDetailResponse>
 export const AdminUserQueryParams = z.object({
   search: z.string().optional().describe('Search in name, email, phone'),
   email: Email.optional(),
-  status: UserStatus.optional(),
-  role: UserRole.optional(),
+  status: UserStatusSchema.optional(),
+  role: UserRoleSchema.optional(),
   emailVerified: z.boolean().optional(),
   phoneVerified: z.boolean().optional(),
   registeredFrom: DateTime.optional(),
@@ -76,7 +81,7 @@ export const AdminUserQueryParams = z.object({
   hasReports: z.boolean().optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
-  sortBy: AdminUserSortBy.default('createdAt'),
+  sortBy: AdminUserSortBySchema.default(AdminUserSortByEnum.CREATED_AT),
   sortOrder: z.enum(['ASC', 'DESC']).default('DESC'),
 })
 
@@ -96,7 +101,7 @@ export type AdminUserListResponse = z.infer<typeof AdminUserListResponse>
  */
 export const UpdateUserStatusRequest = openapi(
   z.object({
-    status: UserStatus,
+    status: UserStatusSchema,
     reason: z.string().max(500).optional(),
     duration: z
       .number()
@@ -118,7 +123,7 @@ export type UpdateUserStatusRequest = z.infer<typeof UpdateUserStatusRequest>
  */
 export const UpdateUserRoleRequest = openapi(
   z.object({
-    role: UserRole,
+    role: UserRoleSchema,
     reason: z.string().max(500),
   }),
   {
@@ -192,8 +197,8 @@ export const BulkUserUpdateRequest = openapi(
   z.object({
     userIds: z.array(UserId).min(1).max(100),
     updates: z.object({
-      status: UserStatus.optional(),
-      role: UserRole.optional(),
+      status: UserStatusSchema.optional(),
+      role: UserRoleSchema.optional(),
     }),
     reason: z.string().max(500),
   }),
@@ -230,8 +235,8 @@ export const AdminCreateUserRequest = openapi(
     lastName: z.string().min(1).max(50),
     phoneNumber: z.string().min(1),
     dateOfBirth: DateOnly.optional(),
-    role: UserRole.default(UserRole.enum.customer),
-    status: UserStatus.default(UserStatus.enum.unconfirmed),
+    role: UserRoleSchema.default(UserRoleEnum.CUSTOMER),
+    status: UserStatusSchema.default(UserStatusEnum.UNCONFIRMED),
     appVersion: z.string().optional(),
     alias: z.string().optional(),
   }),
@@ -248,8 +253,8 @@ export const AdminUpdateUserRequest = openapi(
     lastName: z.string().min(1).max(50).optional(),
     phoneNumber: z.string().optional(),
     dateOfBirth: DateOnly.optional(),
-    role: UserRole.optional(),
-    status: UserStatus.optional(),
+    role: UserRoleSchema.optional(),
+    status: UserStatusSchema.optional(),
     appVersion: z.string().optional(),
     alias: z.string().optional(),
     activeMembership: z.boolean().optional(),
@@ -402,6 +407,7 @@ export const VerifyUserResponse = openapi(
   z.object({
     success: z.boolean().default(true),
     message: z.string().optional(),
+    user: AdminUserDetailResponse.optional(),
   }),
   {
     description: 'User verification response',

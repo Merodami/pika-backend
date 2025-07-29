@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { useTranslations } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
+
 import { LoginForm } from './loginForm'
 
 export async function generateMetadata({

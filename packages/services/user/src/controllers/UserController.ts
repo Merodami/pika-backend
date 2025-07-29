@@ -370,22 +370,17 @@ export class UserController {
    */
   async banUser(
     req: Request<userAdmin.UserIdParam, {}, userAdmin.BanUserRequest>,
-    res: Response,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: userId } = req.params
+
       // TODO: Update service method to accept reason, duration, and notifyUser from req.body
-      const user = await this.userService.banUser(userId)
+      await this.userService.banUser(userId)
 
-      const dto = UserMapper.toDTO(user)
-      const validatedResponse = validateResponse(
-        userPublic.UserProfileResponse,
-        dto,
-        'UserController.banUser',
-      )
-
-      res.json(validatedResponse)
+      // No content response
+      res.status(204).send()
     } catch (error) {
       next(error)
     }
@@ -397,22 +392,17 @@ export class UserController {
    */
   async unbanUser(
     req: Request<userAdmin.UserIdParam, {}, userAdmin.UnbanUserRequest>,
-    res: Response,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: userId } = req.params
+
       // TODO: Update service method to accept reason and notifyUser from req.body
-      const user = await this.userService.unbanUser(userId)
+      await this.userService.unbanUser(userId)
 
-      const dto = UserMapper.toDTO(user)
-      const validatedResponse = validateResponse(
-        userPublic.UserProfileResponse,
-        dto,
-        'UserController.unbanUser',
-      )
-
-      res.json(validatedResponse)
+      // No content response
+      res.status(204).send()
     } catch (error) {
       next(error)
     }

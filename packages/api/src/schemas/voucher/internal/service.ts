@@ -6,10 +6,10 @@ import { paginatedResponse } from '../../shared/responses.js'
 import { AdminVoucherDetailResponse } from '../admin/management.js'
 import {
   BatchOperationType,
-  CustomerVoucherStatus,
+  CustomerVoucherStatusSchema,
   UserVoucherStatusFilter,
-  VoucherBookStatus,
-  VoucherState,
+  VoucherBookStatusSchema,
+  VoucherStateSchema,
 } from '../common/enums.js'
 
 /**
@@ -110,7 +110,7 @@ export type ValidateVoucherResponse = z.infer<typeof ValidateVoucherResponse>
 export const InternalUpdateVoucherStateRequest = openapi(
   z.object({
     voucherId: UUID,
-    state: VoucherState,
+    state: VoucherStateSchema,
     reason: z.string().optional().describe('Reason for state change'),
     serviceId: z.string().describe('ID of the service making the change'),
   }),
@@ -129,8 +129,8 @@ export type InternalUpdateVoucherStateRequest = z.infer<
 export const InternalUpdateVoucherStateResponse = openapi(
   z.object({
     success: z.boolean(),
-    previousState: VoucherState,
-    newState: VoucherState,
+    previousState: VoucherStateSchema,
+    newState: VoucherStateSchema,
   }),
   {
     description: 'State update result',
@@ -189,7 +189,7 @@ export type CheckVoucherExistsResponse = z.infer<
 export const GetVouchersByBusinessRequest = openapi(
   z.object({
     businessId: UUID,
-    state: VoucherState.optional(),
+    state: VoucherStateSchema.optional(),
     includeExpired: z.boolean().default(false),
     includeDeleted: z.boolean().default(false),
     page: z.number().int().positive().default(1),
@@ -223,7 +223,7 @@ export type GetVouchersByBusinessResponse = z.infer<
 export const GetVouchersByCategoryRequest = openapi(
   z.object({
     categoryId: UUID,
-    state: VoucherState.optional(),
+    state: VoucherStateSchema.optional(),
     includeExpired: z.boolean().default(false),
     page: z.number().int().positive().default(1),
     limit: z.number().int().positive().max(100).default(20),
@@ -274,7 +274,7 @@ export const GetUserVouchersResponse = paginatedResponse(
   z.object({
     voucher: AdminVoucherDetailResponse,
     claimedAt: z.string().datetime(),
-    status: CustomerVoucherStatus,
+    status: CustomerVoucherStatusSchema,
     redeemedAt: z.string().datetime().nullable(),
   }),
 )
@@ -378,7 +378,7 @@ export const BatchUpdateVoucherStateRequest = openapi(
       .array(
         z.object({
           voucherId: UUID,
-          state: VoucherState,
+          state: VoucherStateSchema,
           reason: z.string().optional(),
         }),
       )
@@ -410,8 +410,8 @@ export const BatchUpdateVoucherStateResponse = openapi(
       z.object({
         voucherId: UUID,
         success: z.boolean(),
-        oldState: VoucherState.optional(),
-        newState: VoucherState.optional(),
+        oldState: VoucherStateSchema.optional(),
+        newState: VoucherStateSchema.optional(),
         error: z.string().optional(),
       }),
     ),
@@ -541,8 +541,8 @@ export type GenerateVoucherTokensResponse = z.infer<
  */
 export const ValidateBookStateTransitionRequest = openapi(
   z.object({
-    currentStatus: VoucherBookStatus,
-    newStatus: VoucherBookStatus,
+    currentStatus: VoucherBookStatusSchema,
+    newStatus: VoucherBookStatusSchema,
   }),
   {
     description: 'Validate if a voucher book state transition is allowed',

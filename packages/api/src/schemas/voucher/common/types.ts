@@ -2,10 +2,10 @@ import { z } from 'zod'
 
 import { DateTime, UUID } from '../../shared/primitives.js'
 import {
-  CustomerVoucherStatus,
-  VoucherCodeType,
-  VoucherScanSource,
-  VoucherScanType,
+  CustomerVoucherStatusSchema,
+  VoucherCodeTypeSchema,
+  VoucherScanSourceSchema,
+  VoucherScanTypeSchema,
 } from './enums.js'
 
 /**
@@ -31,7 +31,7 @@ export type LocationPoint = z.infer<typeof LocationPoint>
 export const VoucherCode = z.object({
   id: UUID,
   code: z.string().max(500),
-  type: VoucherCodeType,
+  type: VoucherCodeTypeSchema,
   isActive: z.boolean(),
   metadata: z.record(z.string(), z.any()).nullable(),
   createdAt: DateTime,
@@ -60,8 +60,8 @@ export type VoucherRedemption = z.infer<typeof VoucherRedemption>
 export const VoucherScan = z.object({
   id: UUID,
   userId: UUID.nullable(),
-  scanType: VoucherScanType,
-  scanSource: VoucherScanSource,
+  scanType: VoucherScanTypeSchema,
+  scanSource: VoucherScanSourceSchema,
   location: LocationPoint.nullable(),
   deviceInfo: z.record(z.string(), z.any()),
   scannedAt: DateTime,
@@ -77,7 +77,7 @@ export const CustomerVoucher = z.object({
   id: UUID,
   customerId: UUID,
   claimedAt: DateTime,
-  status: CustomerVoucherStatus,
+  status: CustomerVoucherStatusSchema,
   notificationPreferences: z.record(z.string(), z.any()).nullable(),
   redeemedAt: DateTime.nullable(),
   createdAt: DateTime,

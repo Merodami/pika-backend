@@ -5,10 +5,10 @@ import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
-  SubscriptionEvent,
-  SubscriptionNotificationType,
-  SubscriptionStatus,
-  UsageType,
+  SubscriptionEventSchema,
+  SubscriptionNotificationTypeSchema,
+  SubscriptionStatusSchema,
+  UsageTypeSchema,
 } from '../common/enums.js'
 
 /**
@@ -23,7 +23,7 @@ import {
 export const ProcessSubscriptionWebhookRequest = openapi(
   z.object({
     event: z.object({
-      type: SubscriptionEvent,
+      type: SubscriptionEventSchema,
       data: z.object({
         object: z.any(), // Stripe event object
       }),
@@ -66,7 +66,7 @@ export type ProcessSubscriptionWebhookResponse = z.infer<
 export const UpdateSubscriptionFromPaymentRequest = openapi(
   z.object({
     stripeSubscriptionId: z.string(),
-    status: SubscriptionStatus,
+    status: SubscriptionStatusSchema,
     currentPeriodStart: DateTime.optional(),
     currentPeriodEnd: DateTime.optional(),
     canceledAt: DateTime.optional(),
@@ -214,7 +214,7 @@ export type SubscriptionListResponse = z.infer<typeof SubscriptionListResponse>
 export const SendSubscriptionNotificationRequest = openapi(
   z.object({
     userId: UserId,
-    type: SubscriptionNotificationType,
+    type: SubscriptionNotificationTypeSchema,
     subscriptionData: z.object({
       planName: z.string(),
       planType: z.string().optional(),
@@ -345,7 +345,7 @@ export const ProcessSubscriptionUsageRequest = openapi(
   z.object({
     userId: UserId,
     subscriptionId: UUID,
-    usageType: UsageType,
+    usageType: UsageTypeSchema,
     amount: z.number().positive().optional(),
     metadata: z.record(z.string(), z.any()).optional(),
   }),

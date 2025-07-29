@@ -20,7 +20,6 @@ export function useApiError() {
     // Our backend returns errors in this format:
     // { statusCode: number, error: string, message: string, details?: Array }
     const errorMessage = body?.message || error?.message || 'An error occurred'
-    const errorType = body?.error // e.g., "Bad Request", "Unauthorized"
     const details = body?.details
 
     // Check if the error message contains specific error codes from backend

@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+
 import { LoginForm } from './loginForm'
 
 export const metadata: Metadata = {

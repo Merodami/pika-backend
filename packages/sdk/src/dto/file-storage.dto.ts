@@ -1,6 +1,6 @@
 // File Storage DTOs
 
-import type { FileTypeType } from '@pika/types'
+import type { FileType } from '@pika/types'
 
 export interface FileStorageLogDTO {
   id: string
@@ -9,7 +9,7 @@ export interface FileStorageLogDTO {
   fileName: string
   fileSize: number
   mimeType: string
-  fileType: FileTypeType
+  fileType: FileType
   status: string
   provider: string
   bucketName?: string

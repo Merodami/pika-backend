@@ -1,9 +1,10 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
-import { useTransition } from 'react'
 import { Select } from 'antd'
+import { useRouter, usePathname } from 'next/navigation'
 import { useLocale } from 'next-intl'
+import { useTransition } from 'react'
+
 import { locales, localeConfig, type Locale } from '@/i18n/config'
 import { useAppStore } from '@/store/app.store'
 

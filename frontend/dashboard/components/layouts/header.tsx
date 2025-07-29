@@ -9,7 +9,7 @@ import {
 import type { MenuProps } from 'antd'
 import { Avatar, Badge, Button, Dropdown, Layout, Space } from 'antd'
 
-import { useAuthStore } from '@/store/auth.store'
+import { useAuthStore } from '@/store/authStore'
 import { useNotificationStore } from '@/store/notifications.store'
 
 const { Header: AntHeader } = Layout

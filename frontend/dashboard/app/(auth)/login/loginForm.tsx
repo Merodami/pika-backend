@@ -1,14 +1,15 @@
 'use client'
 
+import { LockOutlined, MailOutlined } from '@ant-design/icons'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { authFrontend } from '@pika/api'
+import { Button, Form, Input, Alert } from 'antd'
+import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Button, Form, Input, Alert } from 'antd'
-import { LockOutlined, MailOutlined } from '@ant-design/icons'
-import Link from 'next/link'
+
 import { login } from '@/app/actions/auth'
-import { authFrontend } from '@pika/api'
 
 // Use the frontend login schema
 const loginSchema = authFrontend.LoginFormSchema

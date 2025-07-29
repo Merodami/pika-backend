@@ -1,4 +1,3 @@
-import { getTranslations } from 'next-intl/server'
 import {
   LayoutDashboard,
   Users,
@@ -11,10 +10,12 @@ import {
   CreditCard,
   MessageSquare,
 } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
-import { AdminSidebarClient } from './adminSidebarClient'
 import type { User } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
+
+import { AdminSidebarClient } from './adminSidebarClient'
 
 interface AdminSidebarProps {
   user: User

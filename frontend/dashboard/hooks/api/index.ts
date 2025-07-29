@@ -5,6 +5,7 @@ export { useApiQuery } from './base/useApiQuery'
 
 // Voucher hooks
 export {
+  useBulkUpdateVouchers,
   useCreateVoucher,
   useDeleteVoucher,
   useInfiniteVouchers,

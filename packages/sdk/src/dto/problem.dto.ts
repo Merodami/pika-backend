@@ -1,8 +1,4 @@
-import type {
-  ProblemPriorityType,
-  ProblemStatusType,
-  ProblemTypeType,
-} from '@pika/types'
+import type { TicketPriority, TicketStatus, TicketType } from '@pika/types'
 
 import type { SupportCommentDTO } from './supportComment.dto.js'
 import type { UserDTO } from './user.dto.js'
@@ -12,9 +8,9 @@ export interface ProblemDTO {
   userId: string
   title: string
   description: string
-  status: ProblemStatusType
-  priority: ProblemPriorityType
-  type: ProblemTypeType
+  status: TicketStatus
+  priority: TicketPriority
+  type: TicketType
   createdAt: string
   updatedAt?: string | null
   resolvedAt?: string | null
@@ -32,17 +28,17 @@ export interface CreateProblemDTO {
   userId: string
   title: string
   description: string
-  priority?: ProblemPriorityType
-  type?: ProblemTypeType
+  priority?: TicketPriority
+  type?: TicketType
   files?: string[]
 }
 
 export interface UpdateProblemDTO {
   title?: string
   description?: string
-  status?: ProblemStatusType
-  priority?: ProblemPriorityType
-  type?: ProblemTypeType
+  status?: TicketStatus
+  priority?: TicketPriority
+  type?: TicketType
   resolvedAt?: string | null
   assignedTo?: string | null
   files?: string[]

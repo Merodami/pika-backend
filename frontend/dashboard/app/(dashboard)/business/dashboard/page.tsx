@@ -35,9 +35,9 @@ interface DashboardMetrics {
 export default function BusinessDashboardPage() {
   const { data: metrics, isLoading } = useQuery({
     queryKey: ['business', 'dashboard'],
-    queryFn: async (): Promise<DashboardMetrics> => {
+    queryFn: async (): Promise<DashboardMetrics> =>
       // Mock data for now - replace with actual business analytics endpoint
-      return {
+      ({
         totalVouchers: 25,
         activeVouchers: 18,
         totalRedemptions: 142,
@@ -48,8 +48,7 @@ export default function BusinessDashboardPage() {
           redemptions: 23.4,
           revenue: 18.7,
         },
-      }
-    },
+      }),
   })
 
   if (isLoading) {

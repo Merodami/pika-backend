@@ -5,7 +5,6 @@ export interface SubscriptionPlanDomain {
   description?: string
   price: number
   currency: string
-  interval: string
   intervalCount: number
   trialPeriodDays?: number
   features: string[]

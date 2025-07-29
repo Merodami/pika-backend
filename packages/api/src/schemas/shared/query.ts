@@ -1,6 +1,7 @@
+import { SortOrder } from '@pika/types'
 import { z } from 'zod'
 
-import { SortOrder } from './enums.js'
+import { SortOrderSchema } from '../common/enums.js'
 import { PaginationParams } from './pagination.js'
 
 /**
@@ -20,7 +21,7 @@ export function createSortParams<T extends readonly string[]>(
     sortBy: z
       .enum(sortFields as unknown as [string, ...string[]])
       .default(defaultField),
-    sortOrder: SortOrder.default(SortOrder.enum.desc),
+    sortOrder: SortOrderSchema.default(SortOrder.DESC),
   })
 }
 

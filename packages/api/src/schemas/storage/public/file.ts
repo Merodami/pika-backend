@@ -1,3 +1,4 @@
+import { FileSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -6,11 +7,11 @@ import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
-  FileSortBy,
-  FileStatus,
-  FileType,
-  StorageProvider,
-} from '../common/index.js'
+  FileSortBySchema,
+  FileStatusSchema,
+  FileTypeSchema,
+  StorageProviderSchema,
+} from '../common/enums.js'
 
 /**
  * File storage schemas for public API
@@ -31,9 +32,9 @@ export const FileStorageLog = openapi(
     fileName: z.string(),
     fileSize: z.number().int().positive().describe('Size in bytes'),
     mimeType: z.string(),
-    fileType: FileType,
-    status: FileStatus,
-    provider: StorageProvider,
+    fileType: FileTypeSchema,
+    status: FileStatusSchema,
+    provider: StorageProviderSchema,
     bucketName: z.string().optional(),
     region: z.string().optional(),
     uploadedAt: DateTime.optional(),
@@ -61,9 +62,9 @@ export const FileUploadResponse = openapi(
     fileName: z.string(),
     fileSize: z.number(),
     mimeType: z.string(),
-    fileType: FileType,
-    status: FileStatus,
-    provider: StorageProvider,
+    fileType: FileTypeSchema,
+    status: FileStatusSchema,
+    provider: StorageProviderSchema,
     url: z.string().url().optional().describe('Presigned URL if applicable'),
     uploadedAt: DateTime,
     metadata: z
@@ -135,7 +136,7 @@ export const GetFileHistoryQuery = openapi(
     toDate: DateTime.optional(),
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(20),
-    sortBy: FileSortBy.default('uploadedAt'),
+    sortBy: FileSortBySchema.default(FileSortBy.UPLOADED_AT),
     sortOrder: z.enum(['asc', 'desc']).default('desc'),
   }),
   {

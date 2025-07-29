@@ -4,6 +4,7 @@ import {
   clearTokens,
   getAccessToken,
   getRefreshToken,
+  isTokenExpired,
   setTokens,
 } from '@/lib/auth/tokens'
 
@@ -26,9 +27,18 @@ import { VouchersService } from './generated/services/VouchersService'
 OpenAPI.BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5500/api/v1'
 OpenAPI.WITH_CREDENTIALS = true
 
-// Dynamic token resolver
+// Dynamic token resolver with proactive refresh
 OpenAPI.TOKEN = async () => {
-  const token = getAccessToken()
+  let token = getAccessToken()
+
+  // Check if token is expired or will expire soon (within 5 minutes)
+  if (token && isTokenExpired(token, 5)) {
+    console.log('Access token expired or expiring soon, attempting refresh...')
+
+    const newToken = await refreshAccessToken()
+
+    token = newToken || token
+  }
 
   return token ? `Bearer ${token}` : ''
 }
@@ -52,7 +62,7 @@ async function refreshAccessToken(): Promise<string | null> {
     const response = await AuthenticationService.postAuthToken({
       requestBody: {
         grantType: 'refreshToken' as const,
-        refreshToken: refreshToken,
+        refreshToken,
       },
     })
 

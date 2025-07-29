@@ -3,8 +3,8 @@ import { Suspense } from 'react'
 
 import { requireBusiness } from '@/app/_services/authService'
 import { BusinessDashboardMetrics } from '@/components/features/businessDashboardMetrics'
-import { VoucherPerformance } from '@/components/features/voucherPerformance'
 import { RecentCustomers } from '@/components/features/recentCustomers'
+import { VoucherPerformance } from '@/components/features/voucherPerformance'
 import { LoadingSkeleton } from '@/components/ui/loadingSkeleton'
 import type { Locale } from '@/i18n/config'
 

@@ -3,6 +3,7 @@ import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
+import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as businessSchemas from '@api/schemas/business/public/business.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
@@ -21,9 +22,11 @@ import * as subscriptionPlanSchemas from '@api/schemas/subscription/public/index
 import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
 import * as supportCommentSchemas from '@api/schemas/support/public/comment.js'
 import * as supportProblemSchemas from '@api/schemas/support/public/problem.js'
+import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
 import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
+import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
 
@@ -31,6 +34,29 @@ import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
  * Register all public API schemas and routes
  */
 export function registerPublicAPI(registry: ZodRegistry): void {
+  // ============= Enum Schemas =============
+  // User enums
+  registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)
+  registry.registerSchema('UserRole', userEnumSchemas.UserRoleSchema)
+  registry.registerSchema('UserSortBy', userEnumSchemas.UserSortBySchema)
+
+  // Business enums
+  registry.registerSchema(
+    'BusinessSortBy',
+    businessEnumSchemas.BusinessSortBySchema,
+  )
+  registry.registerSchema(
+    'BusinessStatusFilter',
+    businessEnumSchemas.BusinessStatusFilterSchema,
+  )
+
+  // Voucher enums
+  registry.registerSchema('VoucherState', voucherEnumSchemas.VoucherStateSchema)
+  registry.registerSchema(
+    'VoucherDiscountType',
+    voucherEnumSchemas.VoucherDiscountTypeSchema,
+  )
+
   // ============= Authentication Schemas =============
   // Common auth schemas
   registry.registerSchema(

@@ -1,11 +1,13 @@
 import { VerificationType } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
+
 /**
  * Unified verification request schema
  */
 export const UnifiedVerificationRequest = z.object({
-  type: z.nativeEnum(VerificationType),
+  type: createZodEnum(VerificationType),
   token: z.string().optional(),
   code: z.string().length(6).optional(),
   userId: z.string().uuid().optional(),

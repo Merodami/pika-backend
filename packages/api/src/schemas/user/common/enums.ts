@@ -1,104 +1,181 @@
+import {
+  AccountFlag as AccountFlagEnum,
+  AdminNoteCategory as AdminNoteCategoryEnum,
+  AdminUserSortBy as AdminUserSortByEnum,
+  SortOrder as SortOrderEnum,
+  UserActivityCategory as UserActivityCategoryEnum,
+  UserRole as UserRoleEnum,
+  UserSortBy as UserSortByEnum,
+  UserStatus as UserStatusEnum,
+  VerificationStatus as VerificationStatusEnum,
+  VerificationType as VerificationTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
+
 /**
- * User-specific enums
+ * User-specific enum schemas
+ * Following the standardized pattern with Schema suffix
  */
 
-export const UserSortBy = z.enum([
-  'name',
-  'email',
-  'createdAt',
-  'updatedAt',
-  'lastLogin',
-])
+// User sort by schema
+export const UserSortBySchema = openapi(createZodEnum(UserSortByEnum), {
+  description: 'Field to sort users by',
+  example: UserSortByEnum.NAME,
+})
 
-export type UserSortBy = z.infer<typeof UserSortBy>
+// User role schema
+export const UserRoleSchema = openapi(createZodEnum(UserRoleEnum), {
+  description: 'User role in the system',
+  example: UserRoleEnum.CUSTOMER,
+})
 
-export const UserRole = z.enum(['admin', 'customer', 'business'])
+// User status schema
+export const UserStatusSchema = openapi(createZodEnum(UserStatusEnum), {
+  description: 'User account status',
+  example: UserStatusEnum.ACTIVE,
+})
 
-export type UserRole = z.infer<typeof UserRole>
-
-export const UserStatus = z.enum([
+// API-specific status filter (includes composite filters)
+export const UserStatusFilter = z.enum([
   'active',
   'inactive',
   'suspended',
   'pending_verification',
 ])
 
-export type UserStatus = z.infer<typeof UserStatus>
+export const UserStatusFilterSchema = openapi(UserStatusFilter, {
+  description: 'Filter users by status (includes composite filters)',
+  example: 'active',
+})
 
-export const VerificationStatus = z.enum(['verified', 'unverified', 'pending'])
+// Verification status schema
+export const VerificationStatusSchema = openapi(
+  createZodEnum(VerificationStatusEnum),
+  {
+    description: 'Verification status',
+    example: VerificationStatusEnum.VERIFIED,
+  },
+)
 
-export type VerificationStatus = z.infer<typeof VerificationStatus>
+// Verification type schema
+export const VerificationTypeSchema = openapi(
+  createZodEnum(VerificationTypeEnum),
+  {
+    description: 'Type of verification',
+    example: VerificationTypeEnum.EMAIL,
+  },
+)
 
-export const VerificationType = z.enum(['email', 'phone', 'identity'])
+// Account flag schema
+export const AccountFlagSchema = openapi(createZodEnum(AccountFlagEnum), {
+  description: 'Account flag or special property',
+  example: AccountFlagEnum.VERIFIED,
+})
 
-export type VerificationType = z.infer<typeof VerificationType>
+// Admin user sort by schema
+export const AdminUserSortBySchema = openapi(
+  createZodEnum(AdminUserSortByEnum),
+  {
+    description: 'Field to sort users by (admin view)',
+    example: AdminUserSortByEnum.CREATED_AT,
+  },
+)
 
-export const AccountFlag = z.enum([
-  'verified',
-  'premium',
-  'suspicious',
-  'reported',
-  'vip',
-])
+// Sort order schema
+export const SortOrderSchema = openapi(createZodEnum(SortOrderEnum), {
+  description: 'Sort order direction',
+  example: SortOrderEnum.ASC,
+})
 
-export type AccountFlag = z.infer<typeof AccountFlag>
+// Admin note category schema
+export const AdminNoteCategorySchema = openapi(
+  createZodEnum(AdminNoteCategoryEnum),
+  {
+    description: 'Category for admin notes',
+    example: AdminNoteCategoryEnum.GENERAL,
+  },
+)
 
-export const AdminUserSortBy = z.enum(['createdAt', 'lastLoginAt', 'email'])
-
-export type AdminUserSortBy = z.infer<typeof AdminUserSortBy>
-
-export const SortOrder = z.enum(['asc', 'desc'])
-
-export type SortOrder = z.infer<typeof SortOrder>
-
-export const AdminNoteCategory = z.enum([
-  'general',
-  'security',
-  'support',
-  'billing',
-])
-
-export type AdminNoteCategory = z.infer<typeof AdminNoteCategory>
-
-export const UserActivityCategory = z.enum([
-  'auth',
-  'profile',
-  'payment',
-  'other',
-])
-
-export type UserActivityCategory = z.infer<typeof UserActivityCategory>
+// User activity category schema
+export const UserActivityCategorySchema = openapi(
+  createZodEnum(UserActivityCategoryEnum),
+  {
+    description: 'Category for user activities',
+    example: UserActivityCategoryEnum.AUTH,
+  },
+)
 
 // ============= Profile Enums =============
 
-export const ImageFormat = z.enum(['jpeg', 'png', 'webp'])
+import {
+  CreditOperation as CreditOperationEnum,
+  ImageFormat as ImageFormatEnum,
+  PermissionAction as PermissionActionEnum,
+  ProfileVisibility as ProfileVisibilityEnum,
+  Theme as ThemeEnum,
+  VerificationLevel as VerificationLevelEnum,
+} from '@pika/types'
 
-export type ImageFormat = z.infer<typeof ImageFormat>
+// Image format schema
+export const ImageFormatSchema = openapi(createZodEnum(ImageFormatEnum), {
+  description: 'Supported image formats',
+  example: ImageFormatEnum.JPEG,
+})
 
-export const Theme = z.enum(['light', 'dark', 'system'])
+// Theme schema
+export const ThemeSchema = openapi(createZodEnum(ThemeEnum), {
+  description: 'UI theme preference',
+  example: ThemeEnum.SYSTEM,
+})
 
-export type Theme = z.infer<typeof Theme>
-
-export const ProfileVisibility = z.enum(['public', 'private'])
-
-export type ProfileVisibility = z.infer<typeof ProfileVisibility>
+// Profile visibility schema
+export const ProfileVisibilitySchema = openapi(
+  createZodEnum(ProfileVisibilityEnum),
+  {
+    description: 'Profile visibility setting',
+    example: ProfileVisibilityEnum.PUBLIC,
+  },
+)
 
 // ============= Internal Service Enums =============
 
+// Keep internal verification type as is since it's different from domain VerificationType
 export const InternalVerificationType = z.enum(['email', 'phone', 'identity'])
 
-export type InternalVerificationType = z.infer<typeof InternalVerificationType>
+export const InternalVerificationTypeSchema = openapi(
+  InternalVerificationType,
+  {
+    description: 'Internal verification type for services',
+    example: 'email',
+  },
+)
 
-export const VerificationLevel = z.enum(['none', 'email', 'phone', 'full'])
+// Verification level schema
+export const VerificationLevelSchema = openapi(
+  createZodEnum(VerificationLevelEnum),
+  {
+    description: 'Account verification level',
+    example: VerificationLevelEnum.EMAIL,
+  },
+)
 
-export type VerificationLevel = z.infer<typeof VerificationLevel>
+// Credit operation schema
+export const CreditOperationSchema = openapi(
+  createZodEnum(CreditOperationEnum),
+  {
+    description: 'Credit balance operation type',
+    example: CreditOperationEnum.ADD,
+  },
+)
 
-export const CreditOperation = z.enum(['add', 'subtract', 'set'])
-
-export type CreditOperation = z.infer<typeof CreditOperation>
-
-export const PermissionAction = z.enum(['read', 'create', 'update', 'delete'])
-
-export type PermissionAction = z.infer<typeof PermissionAction>
+// Permission action schema
+export const PermissionActionSchema = openapi(
+  createZodEnum(PermissionActionEnum),
+  {
+    description: 'Permission action for access control',
+    example: PermissionActionEnum.READ,
+  },
+)

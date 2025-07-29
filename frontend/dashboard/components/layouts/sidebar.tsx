@@ -15,7 +15,7 @@ import {
 import { Layout, Menu, Typography } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
 
-import { useAuthStore } from '@/store/auth.store'
+import { useAuthStore } from '@/store/authStore'
 import { useUIStore } from '@/store/ui.store'
 
 const { Sider } = Layout

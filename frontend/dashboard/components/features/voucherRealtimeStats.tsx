@@ -1,6 +1,5 @@
 'use client'
 
-import { Card, Col, Row, Statistic } from 'antd'
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
@@ -9,6 +8,7 @@ import {
   TagOutlined,
   TeamOutlined,
 } from '@ant-design/icons'
+import { Card, Col, Row, Statistic } from 'antd'
 
 // Temporary placeholder data
 const mockStats = {

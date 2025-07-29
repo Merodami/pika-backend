@@ -2,9 +2,13 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import { AdSize, ContentType, PageLayoutType } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
+import {
+  AdSizeSchema,
+  ContentTypeSchema,
+  PageLayoutTypeSchema,
+} from '../common/enums.js'
 
 /**
  * Admin page and placement management schemas
@@ -20,7 +24,7 @@ export const AdminVoucherBookPageResponse = openapi(
     id: UUID,
     bookId: UUID.describe('Parent voucher book ID'),
     pageNumber: z.number().int().min(1).describe('Page number within the book'),
-    layoutType: PageLayoutType.describe('Layout type for the page'),
+    layoutType: PageLayoutTypeSchema,
     metadata: z
       .record(z.string(), z.any())
       .optional()
@@ -60,7 +64,7 @@ export type AdminVoucherBookPageResponse = z.infer<
 export const UpsertPageRequest = openapi(
   z.object({
     pageNumber: z.number().int().min(1).describe('Page number within the book'),
-    layoutType: PageLayoutType.describe('Layout type for the page'),
+    layoutType: PageLayoutTypeSchema,
     metadata: z
       .record(z.string(), z.any())
       .optional()
@@ -82,14 +86,14 @@ export const AdminAdPlacementResponse = openapi(
   withTimestamps({
     id: UUID,
     pageId: UUID.describe('Parent page ID'),
-    contentType: ContentType.describe('Type of content'),
+    contentType: ContentTypeSchema,
     position: z
       .number()
       .int()
       .min(1)
       .max(8)
       .describe('Position on the page (1-8)'),
-    size: AdSize.describe('Size of the ad placement'),
+    size: AdSizeSchema,
     spacesUsed: z
       .number()
       .int()
@@ -143,14 +147,14 @@ export type AdminAdPlacementResponse = z.infer<typeof AdminAdPlacementResponse>
  */
 export const CreateAdPlacementRequest = openapi(
   z.object({
-    contentType: ContentType.describe('Type of content'),
+    contentType: ContentTypeSchema,
     position: z
       .number()
       .int()
       .min(1)
       .max(8)
       .describe('Position on the page (1-8)'),
-    size: AdSize.describe('Size of the ad placement'),
+    size: AdSizeSchema,
     imageUrl: z.string().url().optional().describe('Content image URL'),
     qrCodePayload: z
       .string()
@@ -176,7 +180,7 @@ export type CreateAdPlacementRequest = z.infer<typeof CreateAdPlacementRequest>
  */
 export const UpdateAdPlacementRequest = openapi(
   z.object({
-    contentType: ContentType.optional().describe('Type of content'),
+    contentType: ContentTypeSchema.optional(),
     position: z
       .number()
       .int()
@@ -184,7 +188,7 @@ export const UpdateAdPlacementRequest = openapi(
       .max(8)
       .optional()
       .describe('Position on the page (1-8)'),
-    size: AdSize.optional().describe('Size of the ad placement'),
+    size: AdSizeSchema.optional(),
     imageUrl: z.string().url().optional().describe('Content image URL'),
     qrCodePayload: z
       .string()
@@ -213,7 +217,7 @@ export type UpdateAdPlacementRequest = z.infer<typeof UpdateAdPlacementRequest>
  */
 export const PageLayoutPreviewRequest = openapi(
   z.object({
-    layoutType: PageLayoutType.describe('Layout type for preview'),
+    layoutType: PageLayoutTypeSchema,
     placements: z
       .array(
         z.object({
@@ -223,8 +227,8 @@ export const PageLayoutPreviewRequest = openapi(
             .min(1)
             .max(8)
             .describe('Position on the page'),
-          size: AdSize.describe('Size of the placement'),
-          contentType: ContentType.describe('Type of content'),
+          size: AdSizeSchema,
+          contentType: ContentTypeSchema,
           title: z.string().optional().describe('Content title for preview'),
         }),
       )

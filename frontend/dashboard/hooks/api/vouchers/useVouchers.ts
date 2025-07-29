@@ -14,9 +14,11 @@ import type {
   AdminVoucherDetailResponse,
   AdminVoucherListResponse,
   AdminVoucherQueryParams,
+  BulkVoucherUpdateRequest,
   CreateVoucherRequest,
   UpdateVoucherRequest,
 } from '@/lib/api/generated'
+// Using SDK types directly - no adapters needed!
 import { queryKeys } from '@/lib/api/queryKeys'
 
 import { useApiMutation } from '../base/useApiMutation'
@@ -39,7 +41,7 @@ export function useVouchers(filters?: AdminVoucherQueryParams) {
 
   return useApiQuery<AdminVoucherListResponse>({
     queryKey: queryKeys.vouchers.list(cleaned),
-    queryFn: () => businessAdapter.vouchers.list(cleaned),
+    queryFn: () => businessAdapter.vouchers.list(cleaned || {}),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     placeholderData: (previousData) => previousData,
@@ -52,7 +54,7 @@ export function useVouchers(filters?: AdminVoucherQueryParams) {
 export function useVoucher(id: string, options?: { enabled?: boolean }) {
   return useApiQuery<AdminVoucherDetailResponse>({
     queryKey: queryKeys.vouchers.detail(id),
-    queryFn: () => businessAdapter.vouchers.get(id),
+    queryFn: () => businessAdapter.vouchers.get({ id }),
     enabled: options?.enabled ?? !!id,
     staleTime: 5 * 60 * 1000,
   })
@@ -273,4 +275,40 @@ export function useInfiniteVouchers(filters?: AdminVoucherQueryParams) {
     ...query,
     loadMore: loadMoreRef.current,
   }
+}
+
+/**
+ * Hook to bulk update vouchers (for state changes like publish/suspend)
+ */
+export function useBulkUpdateVouchers() {
+  const queryClient = useQueryClient()
+
+  return useApiMutation<void, Error, BulkVoucherUpdateRequest>({
+    mutationFn: (data) =>
+      businessAdapter.vouchers.bulkUpdate({ requestBody: data }),
+    successMessage: (_, variables) =>
+      `Successfully updated ${variables.voucherIds.length} voucher${variables.voucherIds.length > 1 ? 's' : ''}`,
+
+    onSuccess: (_, variables) => {
+      // Update individual voucher caches optimistically
+      variables.voucherIds.forEach((id) => {
+        const cachedVoucher =
+          queryClient.getQueryData<AdminVoucherDetailResponse>(
+            queryKeys.vouchers.detail(id)
+          )
+
+        if (cachedVoucher && variables.updates.state) {
+          queryClient.setQueryData(queryKeys.vouchers.detail(id), {
+            ...cachedVoucher,
+            state: variables.updates.state,
+          })
+        }
+      })
+
+      // Invalidate all voucher lists to refetch with updated data
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.vouchers.lists(),
+      })
+    },
+  })
 }

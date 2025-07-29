@@ -1,5 +1,5 @@
-import { getTranslations } from 'next-intl/server'
 import { Ticket, Users, TrendingUp, QrCode } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 import { MetricCard } from '@/components/ui/metricCard'
 

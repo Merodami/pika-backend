@@ -1,5 +1,5 @@
-import { getTranslations } from 'next-intl/server'
 import { Clock, User, Ticket, Building2 } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 export async function RecentActivityFeed() {
   const t = await getTranslations('dashboard')

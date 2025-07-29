@@ -1,18 +1,20 @@
+import { SortOrder } from '@pika/types'
+import { FileSortBy, FileStatus, FileType, StorageProvider } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { SortOrderSchema } from '../../common/enums.js'
 import { UserId } from '../../shared/branded.js'
-import { SortOrder } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { createIncludeParam } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
-  FileSortBy,
-  FileStatus,
-  FileType,
-  StorageProvider,
-} from '../common/index.js'
+  FileSortBySchema,
+  FileStatusSchema,
+  FileTypeSchema,
+  StorageProviderSchema,
+} from '../common/enums.js'
 
 /**
  * Storage service admin management schemas
@@ -34,9 +36,9 @@ export const AdminFileDetailResponse = openapi(
     fileName: z.string(),
     fileSize: z.number().int().positive(),
     mimeType: z.string(),
-    fileType: FileType,
-    status: FileStatus,
-    provider: StorageProvider,
+    fileType: FileTypeSchema,
+    status: FileStatusSchema,
+    provider: StorageProviderSchema,
     bucketName: z.string().optional(),
     region: z.string().optional(),
     uploadedAt: DateTime.optional(),
@@ -59,9 +61,9 @@ export const AdminFileQueryParams = openapi(
   z.object({
     search: z.string().optional().describe('Search in filename or file key'),
     userId: UserId.optional(),
-    fileType: FileType.optional(),
-    status: FileStatus.optional(),
-    provider: StorageProvider.optional(),
+    fileType: FileTypeSchema.optional(),
+    status: FileStatusSchema.optional(),
+    provider: StorageProviderSchema.optional(),
     mimeType: z.string().optional(),
     minSize: z.coerce.number().int().positive().optional(),
     maxSize: z.coerce.number().int().positive().optional(),
@@ -70,8 +72,8 @@ export const AdminFileQueryParams = openapi(
     toDate: DateTime.optional(),
     page: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(20),
-    sortBy: FileSortBy.default('uploadedAt'),
-    sortOrder: SortOrder.default(SortOrder.enum.desc),
+    sortBy: FileSortBySchema.default(FileSortBy.UPLOADED_AT),
+    sortOrder: SortOrderSchema.default(SortOrder.DESC),
     ...createIncludeParam(ADMIN_FILE_RELATIONS).shape,
   }),
   {
@@ -88,7 +90,7 @@ export type AdminFileListResponse = z.infer<typeof AdminFileListResponse>
 export const AdminUpdateFileRequest = openapi(
   z.object({
     fileName: z.string().optional(),
-    status: FileStatus.optional(),
+    status: FileStatusSchema.optional(),
     isPublic: z.boolean().optional(),
     metadata: z.record(z.string(), z.string()).optional(),
   }),
@@ -102,7 +104,7 @@ export const AdminBulkFileActionRequest = openapi(
   z.object({
     fileIds: z.array(UUID).min(1).max(100),
     action: z.enum(['delete', 'make_public', 'make_private', 'change_status']),
-    newStatus: FileStatus.optional(),
+    newStatus: FileStatusSchema.optional(),
   }),
   {
     description: 'Bulk action on multiple files',
@@ -146,38 +148,31 @@ export const StorageAnalyticsResponse = openapi(
     newFiles: z.number().int().nonnegative(),
     deletedFiles: z.number().int().nonnegative(),
     averageFileSize: z.number().optional().describe('Average size in bytes'),
-    filesByType: z.object(
-      Object.fromEntries(
-        FileType.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
-    filesByStatus: z.object(
-      Object.fromEntries(
-        FileStatus.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
-    filesByProvider: z.object(
-      Object.fromEntries(
-        StorageProvider.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
-    storageByProvider: z.object(
-      Object.fromEntries(
-        StorageProvider.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
+    filesByType: z.object({
+      [FileType.IMAGE]: z.number().int().nonnegative().optional(),
+      [FileType.VIDEO]: z.number().int().nonnegative().optional(),
+      [FileType.DOCUMENT]: z.number().int().nonnegative().optional(),
+      [FileType.AUDIO]: z.number().int().nonnegative().optional(),
+      [FileType.OTHER]: z.number().int().nonnegative().optional(),
+    }),
+    filesByStatus: z.object({
+      [FileStatus.PENDING]: z.number().int().nonnegative().optional(),
+      [FileStatus.UPLOADED]: z.number().int().nonnegative().optional(),
+      [FileStatus.PROCESSING]: z.number().int().nonnegative().optional(),
+      [FileStatus.PROCESSED]: z.number().int().nonnegative().optional(),
+      [FileStatus.FAILED]: z.number().int().nonnegative().optional(),
+      [FileStatus.DELETED]: z.number().int().nonnegative().optional(),
+    }),
+    filesByProvider: z.object({
+      [StorageProvider.AWS_S3]: z.number().int().nonnegative().optional(),
+      [StorageProvider.LOCAL]: z.number().int().nonnegative().optional(),
+      [StorageProvider.MINIO]: z.number().int().nonnegative().optional(),
+    }),
+    storageByProvider: z.object({
+      [StorageProvider.AWS_S3]: z.number().int().nonnegative().optional(),
+      [StorageProvider.LOCAL]: z.number().int().nonnegative().optional(),
+      [StorageProvider.MINIO]: z.number().int().nonnegative().optional(),
+    }),
     topUsers: z
       .array(
         z.object({
@@ -201,7 +196,7 @@ export const StorageConfigurationResponse = openapi(
   z.object({
     providers: z.array(
       z.object({
-        name: StorageProvider,
+        name: StorageProviderSchema,
         isActive: z.boolean(),
         isDefault: z.boolean(),
         config: z.object({
@@ -231,7 +226,7 @@ export type StorageConfigurationResponse = z.infer<
 
 export const UpdateStorageConfigurationRequest = openapi(
   z.object({
-    provider: StorageProvider,
+    provider: StorageProviderSchema,
     config: z
       .object({
         bucket: z.string().optional(),

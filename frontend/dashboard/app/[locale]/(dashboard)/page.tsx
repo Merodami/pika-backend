@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+
 import { requireAuth } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
 

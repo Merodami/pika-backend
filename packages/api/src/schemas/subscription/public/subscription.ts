@@ -1,3 +1,4 @@
+import { SubscriptionSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -6,7 +7,10 @@ import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { SubscriptionSortBy, SubscriptionStatus } from '../common/enums.js'
+import {
+  SubscriptionSortBySchema,
+  SubscriptionStatusSchema,
+} from '../common/enums.js'
 import { SubscriptionPlan } from './subscriptionPlan.js'
 
 /**
@@ -29,7 +33,7 @@ export const Subscription = openapi(
     userId: UserId,
     planId: UUID.optional(),
     planType: z.string().describe('Plan type (for backward compatibility)'),
-    status: SubscriptionStatus,
+    status: SubscriptionStatusSchema,
     billingInterval: z
       .string()
       .describe('Billing interval (for backward compatibility)'),
@@ -102,7 +106,7 @@ export type CreateSubscriptionRequest = z.infer<
 export const UpdateSubscriptionRequest = openapi(
   z.object({
     planId: UUID.optional(),
-    status: SubscriptionStatus.optional(),
+    status: SubscriptionStatusSchema.optional(),
     currentPeriodStart: DateTime.optional(),
     currentPeriodEnd: DateTime.optional(),
     trialEnd: DateTime.optional(),
@@ -125,11 +129,11 @@ export type UpdateSubscriptionRequest = z.infer<
  * Subscription query parameters
  */
 export const SubscriptionQueryParams = SearchParams.extend({
-  status: SubscriptionStatus.optional(),
+  status: SubscriptionStatusSchema.optional(),
   userId: UserId.optional(),
   planId: UUID.optional(),
   cancelAtPeriodEnd: z.boolean().optional(),
-  sortBy: SubscriptionSortBy.default('createdAt'),
+  sortBy: SubscriptionSortBySchema.default(SubscriptionSortBy.CREATED_AT),
 })
 
 export type SubscriptionQueryParams = z.infer<typeof SubscriptionQueryParams>

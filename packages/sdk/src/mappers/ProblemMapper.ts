@@ -1,9 +1,4 @@
-import type {
-  ProblemPriorityType,
-  ProblemStatusType,
-  ProblemTypeType,
-} from '@pika/types'
-import { ProblemPriority, ProblemStatus, ProblemType } from '@pika/types'
+import { TicketPriority, TicketStatus, TicketType } from '@pika/types'
 
 import type { ProblemDomain } from '../domain/problem.js'
 import type {
@@ -48,9 +43,9 @@ export class ProblemMapper {
       userId: doc.userId,
       title: doc.title,
       description: doc.description,
-      status: doc.status as ProblemStatusType,
-      priority: doc.priority as ProblemPriorityType,
-      type: doc.type as ProblemTypeType,
+      status: doc.status as TicketStatus,
+      priority: doc.priority as TicketPriority,
+      type: doc.type as TicketType,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       resolvedAt: doc.resolvedAt,
@@ -132,9 +127,9 @@ export class ProblemMapper {
       userId: dto.userId,
       title: dto.title,
       description: dto.description,
-      priority: dto.priority || ProblemPriority.MEDIUM,
-      status: ProblemStatus.OPEN,
-      type: ProblemType.GENERAL,
+      priority: dto.priority || TicketPriority.MEDIUM,
+      status: TicketStatus.OPEN,
+      type: TicketType.GENERAL,
       files: [],
     }
   }

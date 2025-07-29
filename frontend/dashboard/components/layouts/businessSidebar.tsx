@@ -1,4 +1,3 @@
-import { getTranslations } from 'next-intl/server'
 import {
   LayoutDashboard,
   Ticket,
@@ -9,10 +8,12 @@ import {
   Calendar,
   MessageSquare,
 } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
-import { BusinessSidebarClient } from './businessSidebarClient'
 import type { User } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
+
+import { BusinessSidebarClient } from './businessSidebarClient'
 
 interface BusinessSidebarProps {
   user: User

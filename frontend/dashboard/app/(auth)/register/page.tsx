@@ -13,13 +13,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
-import { useAuthStore } from '@/store/auth.store'
-import { showError, showSuccess } from '@/store/notifications.store'
 import {
   RegisterFormSchema,
   type RegisterFormData,
   transformRegisterToAPI,
 } from '@/lib/validations/auth'
+import { useAuthStore } from '@/store/authStore'
+import { showError, showSuccess } from '@/store/notifications.store'
 
 // Use the standardized schema from backend (includes password confirmation)
 const registerSchema = RegisterFormSchema

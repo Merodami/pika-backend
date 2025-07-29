@@ -1,12 +1,9 @@
-import type { BillingIntervalType } from '@pika/types'
-
 // Subscription Plan DTOs
 export interface CreateSubscriptionPlanDTO {
   name: string
   description?: string
   price: number
   currency?: string
-  interval: BillingIntervalType
   intervalCount?: number
   trialPeriodDays?: number
   features: string[]
@@ -29,7 +26,6 @@ export interface SubscriptionPlanDTO {
   description?: string
   price: number
   currency: string
-  interval: string
   intervalCount: number
   trialPeriodDays?: number
   features: string[]

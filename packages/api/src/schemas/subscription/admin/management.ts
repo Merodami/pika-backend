@@ -1,3 +1,6 @@
+import {
+  SubscriptionSortBy,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -5,9 +8,9 @@ import { UserId } from '../../shared/branded.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import {
-  BillingInterval,
-  SubscriptionSortBy,
-  SubscriptionStatus,
+  BillingIntervalSchema,
+  SubscriptionSortBySchema,
+  SubscriptionStatusSchema,
 } from '../common/enums.js'
 
 /**
@@ -22,13 +25,13 @@ import {
 export const AdminGetSubscriptionsQuery = openapi(
   SearchParams.extend({
     userId: UserId.optional(),
-    status: SubscriptionStatus.optional(),
-    interval: BillingInterval.optional(),
+    status: SubscriptionStatusSchema.optional(),
+    interval: BillingIntervalSchema.optional(),
     planId: UUID.optional(),
     cancelAtPeriodEnd: z.coerce.boolean().optional(),
     fromDate: DateTime.optional(),
     toDate: DateTime.optional(),
-    sortBy: SubscriptionSortBy.default('createdAt'),
+    sortBy: SubscriptionSortBySchema.default(SubscriptionSortBy.CREATED_AT),
   }),
   {
     description: 'Query parameters for admin subscription listing',
@@ -67,7 +70,7 @@ export type AdminCreateSubscriptionRequest = z.infer<
 export const AdminUpdateSubscriptionRequest = openapi(
   z.object({
     planId: UUID.optional(),
-    status: SubscriptionStatus.optional(),
+    status: SubscriptionStatusSchema.optional(),
     currentPeriodStart: DateTime.optional(),
     currentPeriodEnd: DateTime.optional(),
     trialEnd: DateTime.optional(),
@@ -129,7 +132,7 @@ export type AdminGetSubscriptionsResponse = z.infer<
 export const AdminGetPlansQuery = openapi(
   SearchParams.extend({
     isActive: z.coerce.boolean().optional(),
-    interval: BillingInterval.optional(),
+    interval: BillingIntervalSchema.optional(),
     minPrice: z.coerce.number().optional(),
     maxPrice: z.coerce.number().optional(),
     search: z.string().optional(),
@@ -151,7 +154,7 @@ export const AdminCreatePlanRequest = openapi(
     description: z.string().optional(),
     price: z.number().nonnegative(),
     currency: z.string().length(3).default('usd'),
-    interval: BillingInterval,
+    interval: BillingIntervalSchema,
     intervalCount: z.number().int().positive().default(1),
     trialPeriodDays: z.number().int().nonnegative().optional(),
     features: z.array(z.string()),

@@ -1,5 +1,5 @@
 import type { ICacheService } from '@pika/redis'
-import type { BillingInterval, SubscriptionStatus } from '@pika/types'
+import type { SubscriptionStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 
 // Service configuration interfaces
@@ -41,7 +41,6 @@ export interface PlanCreationData {
   description?: string
   price: number
   currency: string
-  interval: BillingInterval
   intervalCount: number
   trialPeriodDays?: number
   features: string[]

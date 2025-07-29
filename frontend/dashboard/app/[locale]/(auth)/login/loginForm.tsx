@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button, Form, Input, Alert, Checkbox } from 'antd'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { authFrontend } from '@pika/api'
+import { Button, Form, Input, Alert, Checkbox } from 'antd'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { authFrontend } from '@pika/api'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+
 import { login } from '@/app/actions/auth'
 import { useAppStore } from '@/store/app.store'
 

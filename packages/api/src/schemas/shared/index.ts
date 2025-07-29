@@ -1,6 +1,5 @@
 // Shared schemas exports
 export * from './branded.js'
-export * from './enums.js'
 export * from './errors.js'
 export * from './fileUpload.js'
 export * from './geo.js'

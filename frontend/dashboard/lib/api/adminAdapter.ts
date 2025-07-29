@@ -18,7 +18,8 @@ export const adminAdapter = {
     delete: BusinessManagementService.deleteBusinesses,
     bulkUpdate: BusinessManagementService.patchBusinessesBulk,
     bulkDelete: BusinessManagementService.deleteBusinessesBulk,
-    toggleActive: BusinessManagementService.patchBusinessesActivation,
+    activate: BusinessManagementService.postBusinessesActivate,
+    deactivate: BusinessManagementService.postBusinessesDeactivate,
     toggleVerified: BusinessManagementService.patchBusinessesVerification,
   },
 

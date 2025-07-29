@@ -126,12 +126,13 @@ export function decodeToken(token: string): any | null {
   }
 }
 
-export function isTokenExpired(token: string): boolean {
+export function isTokenExpired(token: string, bufferMinutes = 0): boolean {
   const decoded = decodeToken(token)
 
   if (!decoded || !decoded.exp) return true
 
   const currentTime = Date.now() / 1000
+  const bufferTime = bufferMinutes * 60 // Convert minutes to seconds
 
-  return decoded.exp < currentTime
+  return decoded.exp < currentTime + bufferTime
 }

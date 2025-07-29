@@ -150,7 +150,7 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
   private async initializeInfrastructure(): Promise<void> {
     // Run migrations on first startup if needed
     await this.runMigrationsIfNeeded()
-    
+
     // Initialize Prisma
     const databaseUrl = this.config.infrastructure.database.url
 
@@ -235,28 +235,34 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
     try {
       // Check if we have a migration database URL (direct connection for migrations)
       const migrationUrl = process.env.MIGRATION_DATABASE_URL
+
       if (!migrationUrl) {
         logger.info('No MIGRATION_DATABASE_URL set, skipping migrations')
+
         return
       }
 
       logger.info('Running database migrations on startup...')
-      
+
       // Create a temporary Prisma client for migrations using direct connection
       const { spawn } = await import('child_process')
-      
-      const migrationProcess = spawn('npx', [
-        'prisma',
-        'migrate',
-        'deploy',
-        '--schema=packages/database/prisma/schema.prisma'
-      ], {
-        env: {
-          ...process.env,
-          DATABASE_URL: migrationUrl,
+
+      const migrationProcess = spawn(
+        'npx',
+        [
+          'prisma',
+          'migrate',
+          'deploy',
+          '--schema=packages/database/prisma/schema.prisma',
+        ],
+        {
+          env: {
+            ...process.env,
+            DATABASE_URL: migrationUrl,
+          },
+          stdio: 'pipe',
         },
-        stdio: 'pipe'
-      })
+      )
 
       let output = ''
       let errorOutput = ''
@@ -272,11 +278,19 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
       await new Promise((resolve, reject) => {
         migrationProcess.on('close', (code) => {
           if (code === 0) {
-            logger.info('Database migrations completed successfully', { output })
+            logger.info('Database migrations completed successfully', {
+              output,
+            })
             resolve(code)
           } else {
-            logger.error('Database migrations failed', { code, errorOutput, output })
-            reject(new Error(`Migration failed with code ${code}: ${errorOutput}`))
+            logger.error('Database migrations failed', {
+              code,
+              errorOutput,
+              output,
+            })
+            reject(
+              new Error(`Migration failed with code ${code}: ${errorOutput}`),
+            )
           }
         })
       })

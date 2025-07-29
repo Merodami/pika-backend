@@ -1,55 +1,63 @@
-import { z } from 'zod'
+import {
+  AdminTicketSortBy,
+  CommentSortBy,
+  TicketPriority,
+  TicketStatus,
+  TicketType,
+} from '@pika/types'
+
+import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 /**
- * Support service enums
+ * Support service enum schemas
+ *
+ * Naming convention:
+ * - TypeScript enums from @pika/types: Original name (e.g., TicketStatus)
+ * - Zod schemas: Add 'Schema' suffix (e.g., TicketStatusSchema)
  */
 
-export const AdminTicketSortBy = z.enum([
-  'createdAt',
-  'updatedAt',
-  'resolvedAt',
-  'priority',
-  'status',
-])
-export type AdminTicketSortBy = z.infer<typeof AdminTicketSortBy>
+// ============= Support Service Enum Schemas =============
 
-export const TicketStatus = z.enum([
-  'open',
-  'assigned',
-  'in_progress',
-  'waiting_customer',
-  'waiting_internal',
-  'resolved',
-  'closed',
-])
-export type TicketStatus = z.infer<typeof TicketStatus>
+/**
+ * Admin ticket sorting fields schema
+ */
+export const AdminTicketSortBySchema = openapi(
+  createZodEnum(AdminTicketSortBy),
+  {
+    description: 'Field to sort admin tickets by',
+    example: AdminTicketSortBy.CREATED_AT,
+  },
+)
 
-export const TicketPriority = z.enum([
-  'low',
-  'medium',
-  'high',
-  'urgent',
-  'critical',
-])
-export type TicketPriority = z.infer<typeof TicketPriority>
+/**
+ * Ticket status schema
+ */
+export const TicketStatusSchema = openapi(createZodEnum(TicketStatus), {
+  description: 'Support ticket status',
+  example: TicketStatus.OPEN,
+})
 
-export const TicketType = z.enum([
-  'billing',
-  'technical',
-  'account',
-  'general',
-  'bug_report',
-  'feature_request',
-])
-export type TicketType = z.infer<typeof TicketType>
+/**
+ * Ticket priority schema
+ */
+export const TicketPrioritySchema = openapi(createZodEnum(TicketPriority), {
+  description: 'Support ticket priority level',
+  example: TicketPriority.MEDIUM,
+})
 
-export const ProblemSortBy = z.enum([
-  'createdAt',
-  'updatedAt',
-  'priority',
-  'status',
-])
-export type ProblemSortBy = z.infer<typeof ProblemSortBy>
+/**
+ * Ticket type schema
+ */
+export const TicketTypeSchema = openapi(createZodEnum(TicketType), {
+  description: 'Support ticket category/type',
+  example: TicketType.TECHNICAL,
+})
 
-export const CommentSortBy = z.enum(['createdAt', 'updatedAt'])
-export type CommentSortBy = z.infer<typeof CommentSortBy>
+/**
+ * Comment sorting fields schema
+ */
+export const CommentSortBySchema = openapi(createZodEnum(CommentSortBy), {
+  description: 'Field to sort comments by',
+  example: CommentSortBy.CREATED_AT,
+})
