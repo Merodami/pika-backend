@@ -35,6 +35,10 @@ export enum EmailTemplateId {
   SUBSCRIPTION_ACTIVATED = 'subscription-activated',
   SUBSCRIPTION_EXPIRING = 'subscription-expiring',
   SUBSCRIPTION_EXPIRED = 'subscription-expired',
+
+  // Account status templates
+  ACCOUNT_BANNED = 'account-banned',
+  ACCOUNT_UNBANNED = 'account-unbanned',
 }
 
 /**

@@ -1179,8 +1179,10 @@ describe('User Service - Admin API Integration Tests', () => {
   describe('User Ban/Unban Management', () => {
     describe('PUT /users/:id/ban', () => {
       it('should ban a user with reason and notification', async () => {
-        const targetUser = sharedTestData.allUsers.find(u => u.role === 'customer')!
-        
+        const targetUser = sharedTestData.allUsers.find(
+          (u) => u.role === 'customer',
+        )!
+
         const response = await adminClient
           .put(`/users/${targetUser.id}/ban`)
           .send({
@@ -1189,14 +1191,14 @@ describe('User Service - Admin API Integration Tests', () => {
             notifyUser: true,
           })
           .expect(204)
-        
+
         // Verify user is banned
         const userResponse = await adminClient
           .get(`/users/${targetUser.id}`)
           .expect(200)
-        
+
         expect(userResponse.body.status).toBe('banned')
-        
+
         // Verify email was sent
         expect(mockCommunicationClient.sendEmail).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -1207,13 +1209,15 @@ describe('User Service - Admin API Integration Tests', () => {
               reason: 'Violation of Terms of Service',
               duration: 30,
             }),
-          })
+          }),
         )
       })
-      
+
       it('should ban a user without notification', async () => {
-        const targetUser = sharedTestData.allUsers.find(u => u.role === 'business')!
-        
+        const targetUser = sharedTestData.allUsers.find(
+          (u) => u.role === 'business',
+        )!
+
         await adminClient
           .put(`/users/${targetUser.id}/ban`)
           .send({
@@ -1221,47 +1225,50 @@ describe('User Service - Admin API Integration Tests', () => {
             notifyUser: false,
           })
           .expect(204)
-        
+
         // Verify user is banned
         const userResponse = await adminClient
           .get(`/users/${targetUser.id}`)
           .expect(200)
-        
+
         expect(userResponse.body.status).toBe('banned')
-        
+
         // Verify no email was sent for this ban
         const emailCalls = mockCommunicationClient.sendEmail.mock.calls
         const banEmailForUser = emailCalls.find(
-          call => call[0].to === targetUser.email && call[0].subject === 'Account Suspended'
+          (call) =>
+            call[0].to === targetUser.email &&
+            call[0].subject === 'Account Suspended',
         )
+
         expect(banEmailForUser).toBeUndefined()
       })
-      
+
       it('should ban a user with minimal parameters', async () => {
         const targetUser = sharedTestData.allUsers[2]
-        
+
         await adminClient
           .put(`/users/${targetUser.id}/ban`)
           .send({})
           .expect(204)
-        
+
         // Verify user is banned
         const userResponse = await adminClient
           .get(`/users/${targetUser.id}`)
           .expect(200)
-        
+
         expect(userResponse.body.status).toBe('banned')
       })
-      
+
       it('should require admin privileges to ban users', async () => {
         const targetUser = sharedTestData.allUsers[0]
-        
+
         await customerClient
           .put(`/users/${targetUser.id}/ban`)
           .send({ reason: 'Test' })
           .expect(403)
       })
-      
+
       it('should return 404 for non-existent user', async () => {
         await adminClient
           .put('/users/00000000-0000-0000-0000-000000000000/ban')
@@ -1269,19 +1276,20 @@ describe('User Service - Admin API Integration Tests', () => {
           .expect(404)
       })
     })
-    
+
     describe('PUT /users/:id/unban', () => {
       it('should unban a user with notification', async () => {
         // First ban a user
         const targetUser = sharedTestData.allUsers[3]
+
         await adminClient
           .put(`/users/${targetUser.id}/ban`)
           .send({ reason: 'Test ban' })
           .expect(204)
-        
+
         // Clear previous mock calls
         mockCommunicationClient.sendEmail.mockClear()
-        
+
         // Now unban with notification
         await adminClient
           .put(`/users/${targetUser.id}/unban`)
@@ -1290,14 +1298,14 @@ describe('User Service - Admin API Integration Tests', () => {
             notifyUser: true,
           })
           .expect(204)
-        
+
         // Verify user is active
         const userResponse = await adminClient
           .get(`/users/${targetUser.id}`)
           .expect(200)
-        
+
         expect(userResponse.body.status).toBe('active')
-        
+
         // Verify email was sent
         expect(mockCommunicationClient.sendEmail).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -1307,18 +1315,19 @@ describe('User Service - Admin API Integration Tests', () => {
             data: expect.objectContaining({
               reason: 'Ban appeal approved',
             }),
-          })
+          }),
         )
       })
-      
+
       it('should unban a user without notification', async () => {
         // First ban a user
         const targetUser = sharedTestData.allUsers[4]
+
         await adminClient
           .put(`/users/${targetUser.id}/ban`)
           .send({ reason: 'Test ban' })
           .expect(204)
-        
+
         // Now unban without notification
         await adminClient
           .put(`/users/${targetUser.id}/unban`)
@@ -1326,18 +1335,18 @@ describe('User Service - Admin API Integration Tests', () => {
             notifyUser: false,
           })
           .expect(204)
-        
+
         // Verify user is active
         const userResponse = await adminClient
           .get(`/users/${targetUser.id}`)
           .expect(200)
-        
+
         expect(userResponse.body.status).toBe('active')
       })
-      
+
       it('should require admin privileges to unban users', async () => {
         const targetUser = sharedTestData.allUsers[0]
-        
+
         await customerClient
           .put(`/users/${targetUser.id}/unban`)
           .send({ reason: 'Test' })

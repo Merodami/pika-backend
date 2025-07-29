@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 
 import axios, { AxiosInstance } from 'axios'
+import { get } from 'lodash'
 
 import { createTestUsers, TEST_USERS } from './setup-test-users.js'
 
@@ -452,7 +453,11 @@ async function runCategoryFlow() {
     // Delete in reverse order (children first)
     for (let i = createdCategoryIds.length - 1; i >= 0; i--) {
       try {
-        await deleteCategory(adminToken, createdCategoryIds[i])
+        const categoryId = get(createdCategoryIds, i)
+
+        if (categoryId) {
+          await deleteCategory(adminToken, categoryId)
+        }
       } catch (error) {
         // Ignore errors during cleanup
       }

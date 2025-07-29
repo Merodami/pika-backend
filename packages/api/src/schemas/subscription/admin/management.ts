@@ -1,6 +1,4 @@
-import {
-  SubscriptionSortBy,
-} from '@pika/types'
+import { SubscriptionSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'

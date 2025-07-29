@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 
 import axios, { AxiosInstance } from 'axios'
+import { get } from 'lodash'
 
 import { createTestUsers, TEST_USERS } from './setup-test-users.js'
 
@@ -423,9 +424,9 @@ async function runBusinessCategoryFlow() {
         categoryId,
       )
 
-      logInfo(
-        `${testCategories[index].nameKey}: ${result.data.length} businesses`,
-      )
+      const categoryName = get(testCategories, [index, 'nameKey'], 'Unknown')
+
+      logInfo(`${categoryName}: ${result.data.length} businesses`)
     }
 
     // Phase 6: Cleanup
