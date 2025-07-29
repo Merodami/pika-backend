@@ -1,13 +1,5 @@
 import { toast } from 'sonner'
 
-import {
-  clearTokens,
-  getAccessToken,
-  getRefreshToken,
-  isTokenExpired,
-  setTokens,
-} from '@/lib/auth/tokens'
-
 import { OpenAPI } from './generated/core/OpenAPI'
 import { AuthenticationService } from './generated/services/AuthenticationService'
 import { BusinessManagementService } from './generated/services/BusinessManagementService'
@@ -23,61 +15,21 @@ import { UsersService } from './generated/services/UsersService'
 import { VoucherManagementService } from './generated/services/VoucherManagementService'
 import { VouchersService } from './generated/services/VouchersService'
 
-// Configure OpenAPI client
-OpenAPI.BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5500/api/v1'
+// Configure OpenAPI client to use Next.js API routes as proxy
+// This follows the BFF (Backend for Frontend) pattern for security
+OpenAPI.BASE = '/api/proxy'
 OpenAPI.WITH_CREDENTIALS = true
 
-// Dynamic token resolver with proactive refresh
-OpenAPI.TOKEN = async () => {
-  let token = getAccessToken()
-
-  // Check if token is expired or will expire soon (within 5 minutes)
-  if (token && isTokenExpired(token, 5)) {
-    console.log('Access token expired or expiring soon, attempting refresh...')
-
-    const newToken = await refreshAccessToken()
-
-    token = newToken || token
-  }
-
-  return token ? `Bearer ${token}` : ''
-}
+// No token management needed - handled server-side via httpOnly cookies
+OpenAPI.TOKEN = async () => ''
 
 // Dynamic headers resolver
 OpenAPI.HEADERS = async () => ({
   'x-correlation-id': crypto.randomUUID(),
 })
 
-// Token management
-
-// Refresh token logic
-async function refreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken()
-
-  if (!refreshToken) {
-    return null
-  }
-
-  try {
-    const response = await AuthenticationService.authToken({
-      requestBody: {
-        grantType: 'refreshToken' as const,
-        refreshToken,
-      },
-    })
-
-    if (response.accessToken && response.refreshToken) {
-      setTokens(response.accessToken, response.refreshToken)
-
-      return response.accessToken
-    }
-  } catch (error) {
-    console.error('Token refresh failed:', error)
-    clearTokens()
-  }
-
-  return null
-}
+// Token refresh is handled server-side in the API route handler
+// No client-side token management needed with BFF pattern
 
 // Handle API errors with toast notifications
 function handleApiError(error: any): never {

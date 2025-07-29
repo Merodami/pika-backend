@@ -1,10 +1,4 @@
-import {
-  BusinessManagementService,
-  CategoryManagementService,
-  CategoryServiceService,
-  UserManagementService,
-  VoucherManagementService,
-} from './generated'
+import { BusinessManagementService, UserManagementService } from './generated'
 
 /**
  * Admin API Adapter

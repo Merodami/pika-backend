@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { showInfo, showWarning } from '@/store/notifications.store'
+import { toast } from 'sonner'
 
 export function useOnline() {
   const [isOnline, setIsOnline] = useState(
@@ -10,14 +10,13 @@ export function useOnline() {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true)
-      showInfo('Connection Restored', 'You are back online')
+      toast.success('Connection Restored: You are back online')
     }
 
     const handleOffline = () => {
       setIsOnline(false)
-      showWarning(
-        'Connection Lost',
-        'You are currently offline. Some features may be limited.'
+      toast.warning(
+        'Connection Lost: You are currently offline. Some features may be limited.'
       )
     }
 

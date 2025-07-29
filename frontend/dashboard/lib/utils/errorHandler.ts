@@ -1,6 +1,5 @@
 import { AxiosError } from 'axios'
-
-import { showError } from '@/store/notifications.store'
+import { toast } from 'sonner'
 
 export interface ApiError {
   message: string
@@ -75,9 +74,8 @@ export function handleApiError(error: unknown): ApiError {
 if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', (event) => {
     console.error('Unhandled promise rejection:', event.reason)
-    showError(
-      'An unexpected error occurred',
-      'Please refresh the page and try again'
+    toast.error(
+      'An unexpected error occurred: Please refresh the page and try again'
     )
   })
 }

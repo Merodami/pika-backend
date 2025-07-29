@@ -1,10 +1,10 @@
 import 'server-only'
 
+import { UserRole, type UserRoleType } from '@pika/types'
 import { cookies } from 'next/headers'
 import { cache } from 'react'
 
 import { UsersService } from '@/lib/api/generated'
-import { UserRole, type UserRoleType } from '@pika/types'
 
 export interface User {
   id: string

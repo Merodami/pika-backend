@@ -14,8 +14,8 @@ import type {
   AdminVoucherDetailResponse,
   AdminVoucherListResponse,
   AdminVoucherQueryParams,
-  BulkVoucherUpdateRequest,
   BulkVoucherOperationResponse,
+  BulkVoucherUpdateRequest,
   CreateVoucherRequest,
   UpdateVoucherRequest,
 } from '@/lib/api/generated'

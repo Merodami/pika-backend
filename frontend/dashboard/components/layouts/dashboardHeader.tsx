@@ -34,7 +34,7 @@ export async function DashboardHeader({ user, locale }: DashboardHeaderProps) {
           <ThemeToggle />
 
           {/* Notifications */}
-          <NotificationDropdown userId={user.id} />
+          <NotificationDropdown />
 
           {/* User Menu */}
           <UserMenu user={user} />

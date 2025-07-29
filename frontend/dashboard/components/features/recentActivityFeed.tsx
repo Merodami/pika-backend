@@ -1,8 +1,12 @@
 import { Clock, User, Ticket, Building2 } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
-export async function RecentActivityFeed() {
-  const t = await getTranslations('dashboard')
+import type { LocaleProps } from '@/types/common'
+
+type RecentActivityFeedProps = LocaleProps
+
+export async function RecentActivityFeed({ locale }: RecentActivityFeedProps) {
+  const t = await getTranslations({ locale, namespace: 'dashboard' })
 
   // Mock activity data - would come from API
   const activities = [

@@ -2,9 +2,14 @@ import { Ticket, Building2, BookOpen, AlertTriangle } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
 import { MetricCard } from '@/components/ui/metricCard'
+import type { LocaleProps } from '@/types/common'
 
-export async function AdminDashboardMetrics() {
-  const t = await getTranslations('dashboard.metrics')
+type AdminDashboardMetricsProps = LocaleProps
+
+export async function AdminDashboardMetrics({
+  locale,
+}: AdminDashboardMetricsProps) {
+  const t = await getTranslations({ locale, namespace: 'dashboard.metrics' })
 
   // Fetch real metrics from API
   try {

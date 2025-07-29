@@ -1,13 +1,15 @@
+import { type UserRoleType } from '@pika/types'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { api } from '@/lib/api/client'
-import { UserRole, type UserRoleType } from '@pika/types'
 
 // Simple storage helpers (since we removed lib/auth/tokens.ts)
 function getStoredUser(): User | null {
   if (typeof window === 'undefined') return null
+
   const stored = localStorage.getItem('pika-user')
+
   return stored ? JSON.parse(stored) : null
 }
 
@@ -71,7 +73,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null })
 
         try {
-          const response = await api.auth.authToken({
+          await api.auth.authToken({
             requestBody: {
               grantType: 'password' as const,
               username: email,

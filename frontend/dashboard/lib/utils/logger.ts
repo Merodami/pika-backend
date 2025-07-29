@@ -16,12 +16,14 @@ class ConsoleLogger implements Logger {
 
   debug(message: string, ...args: any[]): void {
     if (this.isDevelopment && !this.isTest) {
+      // eslint-disable-next-line no-console
       console.debug(`[DEBUG] ${message}`, ...args)
     }
   }
 
   info(message: string, ...args: any[]): void {
     if (this.isDevelopment && !this.isTest) {
+      // eslint-disable-next-line no-console
       console.info(`[INFO] ${message}`, ...args)
     }
   }

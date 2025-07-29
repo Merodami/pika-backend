@@ -3,7 +3,7 @@
 import { CheckOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Typography } from 'antd'
 
-import type { VoucherDesign } from '@/app/(dashboard)/business/vouchers/create/page'
+import type { VoucherDesign } from '@/types/voucher'
 
 const { Title, Text } = Typography
 

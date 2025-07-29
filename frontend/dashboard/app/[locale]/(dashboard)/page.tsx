@@ -1,8 +1,8 @@
+import { UserRole } from '@pika/types'
 import { redirect } from 'next/navigation'
 
 import { requireAuth } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
-import { UserRole } from '@pika/types'
 
 interface DashboardPageProps {
   params: Promise<{ locale: Locale }>
@@ -15,8 +15,10 @@ export default async function DashboardPage({ params }: DashboardPageProps) {
   switch (user.role) {
     case UserRole.ADMIN:
       redirect(`/${locale}/admin`)
+      break
     case UserRole.BUSINESS:
       redirect(`/${locale}/business`)
+      break
     default:
       redirect(`/${locale}/unauthorized`)
   }

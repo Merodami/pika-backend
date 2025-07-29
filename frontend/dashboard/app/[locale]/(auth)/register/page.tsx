@@ -8,7 +8,7 @@ interface RegisterPageProps {
 
 export default async function RegisterPage({ params }: RegisterPageProps) {
   const { locale } = await params
-  const t = await getTranslations('auth.register')
+  const t = await getTranslations({ locale, namespace: 'auth.register' })
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

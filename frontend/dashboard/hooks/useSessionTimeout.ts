@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 import { useAuthStore } from '@/store/authStore'
-import { showWarning } from '@/store/notifications.store'
+import { toast } from 'sonner'
 
 interface UseSessionTimeoutOptions {
   timeout?: number // in milliseconds, default 30 minutes
@@ -23,9 +23,8 @@ export function useSessionTimeout({
     if (onTimeout) {
       onTimeout()
     } else {
-      showWarning(
-        'Session Expired',
-        'Your session has expired. Please login again.'
+      toast.warning(
+        'Session Expired: Your session has expired. Please login again.'
       )
       logout()
     }
@@ -43,9 +42,8 @@ export function useSessionTimeout({
 
     // Set warning timer
     warningRef.current = setTimeout(() => {
-      showWarning(
-        'Session Expiring Soon',
-        'Your session will expire in 5 minutes. Please save your work.'
+      toast.warning(
+        'Session Expiring Soon: Your session will expire in 5 minutes. Please save your work.'
       )
     }, timeout - warningTime)
 

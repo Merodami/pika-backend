@@ -20,7 +20,7 @@ import { Color } from 'antd/es/color-picker'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
-import type { VoucherDesign } from '@/app/(dashboard)/business/vouchers/create/page'
+import type { VoucherDesign } from '@/types/voucher'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -374,7 +374,10 @@ export function VoucherDesignForm({
                   beforeUpload={() => false}
                   onChange={(info) => {
                     // Handle file upload logic here
-                    console.log('Banner upload:', info)
+                    console.error(
+                      'Banner upload - TODO: Implement upload handler',
+                      info
+                    )
                   }}
                 >
                   <Button icon={<UploadOutlined />}>Upload Banner</Button>
@@ -407,7 +410,7 @@ export function VoucherDesignForm({
 
           {voucherDesign.terms.length > 0 && (
             <div className="space-y-2">
-              {voucherDesign.terms.map((term, index) => (
+              {voucherDesign.terms.map((term: string, index: number) => (
                 <Tag
                   key={index}
                   closable

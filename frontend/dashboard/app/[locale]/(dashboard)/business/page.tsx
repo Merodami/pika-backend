@@ -32,13 +32,13 @@ export default async function BusinessDashboardPage({
 
       {/* Business Metrics */}
       <Suspense fallback={<LoadingSkeleton />}>
-        <BusinessDashboardMetrics businessId={businessId} />
+        <BusinessDashboardMetrics businessId={businessId} locale={locale} />
       </Suspense>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Voucher Performance */}
         <Suspense fallback={<LoadingSkeleton />}>
-          <VoucherPerformance businessId={businessId} />
+          <VoucherPerformance businessId={businessId} locale={locale} />
         </Suspense>
 
         {/* Recent Customers */}
