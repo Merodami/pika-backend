@@ -943,9 +943,7 @@ describe('User Service - Admin API Integration Tests', () => {
             type: 'EMAIL',
             userId: user.id,
           })
-          .expect(200)
-
-        expect(response.body.success).toBe(true)
+          .expect(204)
 
         // Verify the user was actually updated in the database
         const updatedUser = await testDb.prisma.user.findUnique({
@@ -1025,9 +1023,7 @@ describe('User Service - Admin API Integration Tests', () => {
             userId: user.id,
             code: '123456',
           })
-          .expect(200)
-
-        expect(response.body.success).toBe(true)
+          .expect(204)
 
         // Verify the user was actually updated in the database
         const updatedUser = await testDb.prisma.user.findUnique({
@@ -1116,9 +1112,7 @@ describe('User Service - Admin API Integration Tests', () => {
             type: 'ACCOUNT_CONFIRMATION',
             userId: user.id,
           })
-          .expect(200)
-
-        expect(response.body.success).toBe(true)
+          .expect(204)
 
         // Verify the user status was updated
         const updatedUser = await testDb.prisma.user.findUnique({

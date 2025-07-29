@@ -13,7 +13,6 @@
     "**/build/**/*",
     "**/previous-architecture/**/*",
     "**/pika-old/**/*",
-    "**/api-microservices-sdk/**/*",
     "**/packages/api/generated/**/*",
     "**/packages/database/prisma/migrations/**/*"
   ],

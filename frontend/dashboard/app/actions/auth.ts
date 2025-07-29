@@ -15,7 +15,7 @@ export async function login(data: z.infer<typeof authPublic.TokenRequest>) {
       throw new Error('Invalid grant type')
     }
 
-    const response = await AuthenticationService.postAuthToken({
+    const response = await AuthenticationService.authToken({
       requestBody: data,
     })
 
@@ -37,7 +37,7 @@ export async function register(
   data: z.infer<typeof authPublic.RegisterRequest>
 ) {
   try {
-    await AuthenticationService.postAuthRegister({
+    await AuthenticationService.authRegister({
       requestBody: data,
     })
 

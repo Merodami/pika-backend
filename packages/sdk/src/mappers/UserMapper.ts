@@ -155,6 +155,29 @@ export class UserMapper {
   }
 
   /**
+   * Maps a domain entity to an Admin API DTO
+   * Admin responses include branded types and formatted date strings
+   */
+  static toAdminDTO(domain: UserDomain): any {
+    return {
+      id: domain.id, // UserId branded type
+      email: domain.email, // Email branded type
+      firstName: domain.firstName,
+      lastName: domain.lastName,
+      phoneNumber: domain.phoneNumber || undefined,
+      dateOfBirth: formatDateOnlyOrUndefined(domain.dateOfBirth), // YYYY-MM-DD format
+      avatarUrl: domain.avatarUrl || undefined,
+      status: domain.status, // UserStatus enum value
+      role: domain.role, // UserRole enum value
+      emailVerified: domain.emailVerified,
+      phoneVerified: domain.phoneVerified,
+      lastLoginAt: formatDateToISOOrUndefined(domain.lastLoginAt), // ISO string or undefined
+      createdAt: formatDateToISO(domain.createdAt), // ISO string
+      updatedAt: formatDateToISO(domain.updatedAt), // ISO string
+    }
+  }
+
+  /**
    * Maps an API DTO to a domain entity
    * Transforms snake_case to camelCase and handles date parsing
    */

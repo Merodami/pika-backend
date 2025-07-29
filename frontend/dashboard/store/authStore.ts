@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null })
 
         try {
-          const response = await api.auth.postAuthToken({
+          const response = await api.auth.authToken({
             requestBody: {
               grantType: 'password' as const,
               username: email,
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // Get user profile after login
-          const userResponse = await api.users.getUsersProfile()
+          const userResponse = await api.users.getUserProfile()
           const user = mapUserDtoToUser(userResponse)
 
           setStoredUser(user)
@@ -107,7 +107,7 @@ export const useAuthStore = create<AuthState>()(
           const firstName = nameParts[0] || name
           const lastName = nameParts.slice(1).join(' ') || ''
 
-          const response = await api.auth.postAuthRegister({
+          const response = await api.auth.authRegister({
             requestBody: {
               email,
               password,
@@ -170,7 +170,7 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           // Verify token is still valid by fetching user profile
-          const userResponse = await api.users.getUsersProfile()
+          const userResponse = await api.users.getUserProfile()
           const user = mapUserDtoToUser(userResponse)
 
           setStoredUser(user)

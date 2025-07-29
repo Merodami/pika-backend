@@ -5,9 +5,9 @@ import { ErrorFactory, toPrismaInclude } from '@pika/shared'
 import type {
   PaginatedResult,
   ParsedIncludes,
-  ProblemPriorityType,
-  ProblemStatusType,
-  ProblemTypeType,
+  TicketPriority,
+  TicketStatus,
+  TicketType,
 } from '@pika/types'
 import { ProblemPriority, ProblemStatus, ProblemType } from '@prisma/client'
 import { Prisma, PrismaClient } from '@prisma/client'
@@ -18,21 +18,21 @@ export interface CreateProblemInput {
   userId: string
   title: string
   description: string
-  priority?: ProblemPriorityType
-  type?: ProblemTypeType
+  priority?: TicketPriority
+  type?: TicketType
   files?: string[]
 }
 
 export interface UpdateProblemInput extends Partial<CreateProblemInput> {
-  status?: ProblemStatusType
+  status?: TicketStatus
   resolvedAt?: Date | null
   assignedTo?: string | null
 }
 
 export interface ProblemSearchParams extends SearchParams {
-  status?: ProblemStatusType
-  priority?: ProblemPriorityType
-  type?: ProblemTypeType
+  status?: TicketStatus
+  priority?: TicketPriority
+  type?: TicketType
   userId?: string
   assignedTo?: string
   ticketNumber?: string

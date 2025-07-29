@@ -53,6 +53,15 @@ vi.mock('@pika/user', () => ({
 
 // Mock shared service clients
 vi.mock('@pika/shared', () => ({
+  BaseServiceClient: class {
+    constructor(config: any) {
+      this.serviceName = config.serviceName
+    }
+    
+    protected async request(path: string, config: any = {}, context?: any) {
+      return { data: { status: 'ok' } }
+    }
+  },
   logger: {
     info: vi.fn(),
     error: vi.fn(),

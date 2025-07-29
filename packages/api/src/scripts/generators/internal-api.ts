@@ -544,6 +544,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/businesses/bulk',
+    operationId: 'bulkGetInternalBusinesses',
     summary: 'Get multiple businesses by IDs',
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
@@ -572,6 +573,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/businesses/validate',
+    operationId: 'validateInternalBusinesses',
     summary: 'Validate businesses exist and meet criteria',
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
@@ -600,6 +602,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/businesses/by-user',
+    operationId: 'getInternalBusinessesByUser',
     summary: 'Get all businesses owned by a user',
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
@@ -628,6 +631,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/businesses/{id}',
+    operationId: 'getInternalBusinessById',
     summary: 'Get business details by ID',
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
@@ -651,6 +655,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/{categoryId}/businesses',
+    operationId: 'getInternalBusinessesByCategory',
     summary: 'Get businesses in a specific category',
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
@@ -674,6 +679,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/businesses/exists',
+    operationId: 'checkInternalBusinessExists',
     summary: 'Check if business exists and is active',
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
@@ -704,6 +710,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/categories/bulk',
+    operationId: 'bulkGetInternalCategories',
     summary: 'Get multiple categories by IDs',
     tags: ['Category Service'],
     security: [{ 'x-api-key': [] }],
@@ -732,6 +739,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/categories/validate',
+    operationId: 'validateInternalCategories',
     summary: 'Validate categories exist and are active',
     tags: ['Category Service'],
     security: [{ 'x-api-key': [] }],
@@ -760,6 +768,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/categories/exists',
+    operationId: 'checkInternalCategoryExists',
     summary: 'Check if category exists',
     tags: ['Category Service'],
     security: [{ 'x-api-key': [] }],
@@ -788,6 +797,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/hierarchy',
+    operationId: 'getInternalCategoryHierarchy',
     summary: 'Get category hierarchy for internal use',
     tags: ['Category Service'],
     security: [{ 'x-api-key': [] }],
@@ -810,6 +820,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories',
+    operationId: 'getInternalCategoryList',
     summary: 'Get internal category list',
     tags: ['Category Service'],
     security: [{ 'x-api-key': [] }],
@@ -834,6 +845,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/files',
+    operationId: 'createInternalFile',
     summary: 'Create file record',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -862,6 +874,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/files/{fileId}',
+    operationId: 'getInternalFileById',
     summary: 'Get file record by ID',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -892,6 +905,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/storage/files/bulk',
+    operationId: 'bulkDeleteInternalFiles',
     summary: 'Bulk delete files',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -920,6 +934,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/users/files',
+    operationId: 'getInternalUserFiles',
     summary: 'Get files for a user',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -948,6 +963,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/users/{userId}/summary',
+    operationId: 'getInternalUserFileSummary',
     summary: 'Get user file summary',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -972,6 +988,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/quota/check',
+    operationId: 'checkInternalUserQuota',
     summary: 'Check user storage quota',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -1000,6 +1017,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/files/migrate',
+    operationId: 'migrateInternalFile',
     summary: 'Migrate file between providers',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -1028,6 +1046,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/cleanup/orphaned',
+    operationId: 'cleanupInternalOrphanedFiles',
     summary: 'Cleanup orphaned files',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -1056,6 +1075,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/health',
+    operationId: 'getInternalStorageHealth',
     summary: 'Storage service health check',
     tags: ['Storage Service'],
     security: [{ 'x-api-key': [] }],
@@ -1077,6 +1097,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/vouchers/bulk',
+    operationId: 'bulkGetInternalVouchers',
     summary: 'Get multiple vouchers by IDs',
     tags: ['Voucher Service'],
     security: [{ 'x-api-key': [] }],
@@ -1105,6 +1126,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/vouchers/validate',
+    operationId: 'validateInternalVoucher',
     summary: 'Validate voucher availability',
     tags: ['Voucher Service'],
     security: [{ 'x-api-key': [] }],
@@ -1133,6 +1155,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/health',
+    operationId: 'getInternalServiceHealth',
     summary: 'Service health check',
     tags: ['Health'],
     security: [{ 'x-api-key': [] }],
@@ -1152,6 +1175,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/services/registry',
+    operationId: 'getInternalServiceRegistry',
     summary: 'Get service registry',
     tags: ['Service Discovery'],
     security: [{ 'x-api-key': [] }],
@@ -1174,6 +1198,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/services/register',
+    operationId: 'registerInternalService',
     summary: 'Register service instance',
     tags: ['Service Discovery'],
     security: [{ 'x-api-key': [] }],
@@ -1210,6 +1235,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/services/{instanceId}/deregister',
+    operationId: 'deregisterInternalService',
     summary: 'Deregister service instance',
     tags: ['Service Discovery'],
     security: [{ 'x-api-key': [] }],
@@ -1249,6 +1275,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/services/{serviceName}/endpoints',
+    operationId: 'getInternalServiceEndpoints',
     summary: 'Get service endpoints',
     tags: ['Service Discovery'],
     security: [{ 'x-api-key': [] }],
@@ -1285,6 +1312,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/config/{serviceName}',
+    operationId: 'getInternalServiceConfig',
     summary: 'Get service configuration',
     tags: ['Service Discovery'],
     security: [{ 'x-api-key': [] }],
@@ -1318,6 +1346,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/validate-token',
+    operationId: 'validateInternalToken',
     summary: 'Validate JWT token',
     tags: ['Auth Service'],
     security: [{ 'x-api-key': [] }],
@@ -1345,6 +1374,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/user-by-email',
+    operationId: 'getInternalUserByEmail',
     summary: 'Get user by email',
     tags: ['Auth Service'],
     security: [{ 'x-api-key': [] }],
@@ -1381,6 +1411,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/notifications/system',
+    operationId: 'sendInternalSystemNotification',
     summary: 'Send system notification',
     tags: ['Communication Service'],
     security: [{ 'x-api-key': [] }],
@@ -1408,6 +1439,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/emails/transactional',
+    operationId: 'sendInternalTransactionalEmail',
     summary: 'Send transactional email',
     tags: ['Communication Service'],
     security: [{ 'x-api-key': [] }],
@@ -1436,6 +1468,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/users/{id}',
+    operationId: 'getInternalUserById',
     summary: 'Get user details',
     tags: ['User Service'],
     security: [{ 'x-api-key': [] }],
@@ -1467,6 +1500,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/users/batch',
+    operationId: 'batchGetInternalUsers',
     summary: 'Get multiple users',
     tags: ['User Service'],
     security: [{ 'x-api-key': [] }],
@@ -1499,6 +1533,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/subscriptions/user-membership',
+    operationId: 'updateInternalUserMembership',
     summary: 'Update user membership status',
     tags: ['Subscription Service'],
     security: [{ 'x-api-key': [] }],
@@ -1527,6 +1562,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/subscriptions/from-stripe',
+    operationId: 'createInternalSubscriptionFromStripe',
     summary: 'Create subscription from Stripe',
     tags: ['Subscription Service'],
     security: [{ 'x-api-key': [] }],
@@ -1558,6 +1594,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/subscriptions/status',
+    operationId: 'updateInternalSubscriptionStatus',
     summary: 'Update subscription status',
     tags: ['Subscription Service'],
     security: [{ 'x-api-key': [] }],

@@ -48,7 +48,7 @@ export function LoginForm() {
         // Clear form draft on success
         clearFormDraft('login')
       }
-    } catch (err) {
+    } catch {
       setError(t('error'))
     } finally {
       setIsLoading(false)

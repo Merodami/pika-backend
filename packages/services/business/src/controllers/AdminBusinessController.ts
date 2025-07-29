@@ -228,19 +228,19 @@ export class AdminBusinessController {
       {},
       businessAdmin.PatchBusinessVerificationRequest
     >,
-    res: Response<void>,
+    res: Response<businessAdmin.AdminBusinessDetailResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: businessId } = req.params
       const { verified } = req.body
 
-      await this.businessService.updateBusiness(businessId, {
+      const updatedBusiness = await this.businessService.updateBusiness(businessId, {
         verified,
       })
 
-      // No content response
-      res.status(204).send()
+      // Return the updated business data
+      res.status(200).json(BusinessMapper.toAdminDTO(updatedBusiness))
     } catch (error) {
       next(error)
     }

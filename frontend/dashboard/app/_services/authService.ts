@@ -29,7 +29,7 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
 
     if (!token) return null
 
-    const response = await UsersService.getUsersProfile()
+    const response = await UsersService.getUserProfile()
 
     return {
       id: response.id,

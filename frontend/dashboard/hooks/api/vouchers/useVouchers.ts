@@ -15,6 +15,7 @@ import type {
   AdminVoucherListResponse,
   AdminVoucherQueryParams,
   BulkVoucherUpdateRequest,
+  BulkVoucherOperationResponse,
   CreateVoucherRequest,
   UpdateVoucherRequest,
 } from '@/lib/api/generated'
@@ -95,7 +96,8 @@ export function useUpdateVoucher() {
   return useApiMutation<
     AdminVoucherDetailResponse,
     Error,
-    { id: string; data: UpdateVoucherRequest }
+    { id: string; data: UpdateVoucherRequest },
+    { previousVoucher?: AdminVoucherDetailResponse }
   >({
     mutationFn: ({ id, data }) =>
       businessAdapter.vouchers.update({
@@ -283,11 +285,15 @@ export function useInfiniteVouchers(filters?: AdminVoucherQueryParams) {
 export function useBulkUpdateVouchers() {
   const queryClient = useQueryClient()
 
-  return useApiMutation<void, Error, BulkVoucherUpdateRequest>({
+  return useApiMutation<
+    BulkVoucherOperationResponse,
+    Error,
+    BulkVoucherUpdateRequest
+  >({
     mutationFn: (data) =>
       businessAdapter.vouchers.bulkUpdate({ requestBody: data }),
-    successMessage: (_, variables) =>
-      `Successfully updated ${variables.voucherIds.length} voucher${variables.voucherIds.length > 1 ? 's' : ''}`,
+    successMessage: (result) =>
+      `Successfully updated ${result.successful} voucher${result.successful !== 1 ? 's' : ''}`,
 
     onSuccess: (_, variables) => {
       // Update individual voucher caches optimistically

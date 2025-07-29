@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty, isNil, omitBy } from 'lodash-es'
 
+import { adminAdapter } from '@/lib/api/adminAdapter'
 import { businessAdapter } from '@/lib/api/businessAdapter'
 import type {
   AdminBusinessListResponse,
@@ -8,7 +9,6 @@ import type {
   AdminBusinessResponse,
   CreateBusinessRequest,
   PatchBusinessVerificationRequest,
-  PatchBusinessVerificationResponse,
   UpdateBusinessRequest,
 } from '@/lib/api/generated'
 import { queryKeys } from '@/lib/api/queryKeys'
@@ -44,8 +44,11 @@ export function useBusinesses(filters?: AdminBusinessQueryParams) {
  * Note: Currently uses list endpoint with filtering since single business endpoint doesn't exist
  */
 export function useBusiness(id: string, options?: { enabled?: boolean }) {
-  // TODO: Implement single business endpoint when available in backend
-  throw new Error('Single business endpoint not yet implemented')
+  return useApiQuery<AdminBusinessResponse>({
+    queryKey: queryKeys.businesses.detail(id),
+    queryFn: () => adminAdapter.businesses.get({ id }),
+    enabled: options?.enabled ?? !!id,
+  })
 }
 
 /**
@@ -80,7 +83,11 @@ export function useUpdateBusiness() {
     mutationFn: ({ id, data }) =>
       businessAdapter.admin.update({ id, requestBody: data }),
     successMessage: 'Business updated successfully',
-    invalidateQueries: [queryKeys.businesses.lists()],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.businesses.lists(),
+      })
+    },
   })
 }
 
@@ -91,16 +98,13 @@ export function useVerifyBusiness() {
   const queryClient = useQueryClient()
 
   return useApiMutation<
-    PatchBusinessVerificationResponse,
+    void,
     Error,
     { id: string } & PatchBusinessVerificationRequest
   >({
     mutationFn: ({ id, verified }) =>
       businessAdapter.admin.verify({ id, requestBody: { verified } }),
-    successMessage: (_, variables) =>
-      variables.verified
-        ? 'Business verified successfully'
-        : 'Business unverified',
+    successMessage: 'Business verification status updated',
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.businesses.lists(),
@@ -117,14 +121,10 @@ export function useToggleBusinessActive() {
 
   return useApiMutation<void, Error, { id: string; active: boolean }>({
     mutationFn: ({ id, active }) =>
-      businessAdapter.admin.update({
-        id,
-        requestBody: { active },
-      }),
-    successMessage: (_, variables) =>
-      variables.active
-        ? 'Business activated successfully'
-        : 'Business deactivated',
+      active
+        ? businessAdapter.admin.activate({ id })
+        : businessAdapter.admin.deactivate({ id }),
+    successMessage: 'Business status updated successfully',
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.businesses.detail(id),
@@ -165,7 +165,7 @@ export function useDeleteBusiness() {
 export function useBusinessStats(id: string, options?: { enabled?: boolean }) {
   return useApiQuery({
     queryKey: queryKeys.businesses.stats(id),
-    queryFn: () => businessAdapter.admin.get({ id }),
+    queryFn: () => adminAdapter.businesses.get({ id }),
     enabled: options?.enabled ?? !!id,
     staleTime: 1 * 60 * 1000, // 1 minute
   })

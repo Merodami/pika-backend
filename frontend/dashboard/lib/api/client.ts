@@ -59,7 +59,7 @@ async function refreshAccessToken(): Promise<string | null> {
   }
 
   try {
-    const response = await AuthenticationService.postAuthToken({
+    const response = await AuthenticationService.authToken({
       requestBody: {
         grantType: 'refreshToken' as const,
         refreshToken,

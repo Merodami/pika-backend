@@ -31,7 +31,6 @@ packages/database/prisma/*
 **/schema.prisma/**
 **/.next/**
 previous-architecture/**
-api-microservices-sdk/**
 ai/**
 pika/**
 pika-old/**

@@ -76,6 +76,31 @@ export class BusinessMapper {
   }
 
   /**
+   * Maps a domain entity to an Admin API DTO
+   * Admin responses include branded types and Date objects
+   */
+  static toAdminDTO(domain: BusinessDomain): any {
+    return {
+      id: domain.id,
+      userId: domain.userId,
+      businessNameKey: domain.businessNameKey,
+      businessDescriptionKey: domain.businessDescriptionKey || undefined,
+      categoryId: domain.categoryId,
+      verified: domain.verified,
+      active: domain.active,
+      avgRating: domain.avgRating,
+      createdAt: domain.createdAt,
+      updatedAt: domain.updatedAt,
+      deletedAt: domain.deletedAt || undefined,
+      // Relations using existing mappers
+      user: domain.user ? UserMapper.toAdminDTO(domain.user) : undefined,
+      category: domain.category
+        ? CategoryMapper.toDTO(domain.category)
+        : undefined,
+    }
+  }
+
+  /**
    * Maps a domain entity to an API DTO
    */
   static toDTO(domain: BusinessDomain): BusinessDTO {

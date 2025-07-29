@@ -40,7 +40,7 @@ export function LoginForm() {
       if (result?.error) {
         setError(result.error)
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     } finally {
       setIsLoading(false)
@@ -115,7 +115,7 @@ export function LoginForm() {
         </Form.Item>
 
         <div className="text-center">
-          <span className="text-gray-600">Don't have an account? </span>
+          <span className="text-gray-600">Don&apos;t have an account? </span>
           <Link
             href="/register"
             className="font-medium text-blue-600 hover:text-blue-500"

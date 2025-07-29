@@ -42,7 +42,7 @@ export class AdminUserController {
 
       await this.userService.verify(verificationRequest)
 
-      // No content response
+      // No content response - verification operations don't need response body
       res.status(204).send()
     } catch (error) {
       next(error)
@@ -141,26 +141,8 @@ export class AdminUserController {
         throw ErrorFactory.resourceNotFound('User', userId)
       }
 
-      // Use UserMapper to get the DTO
-      const dto = UserMapper.toDTO(user)
-
-      // Map DTO to admin detail response format
-      const adminResponse: userAdmin.AdminUserDetailResponse = {
-        id: dto.id,
-        email: dto.email,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        phoneNumber: dto.phoneNumber,
-        dateOfBirth: dto.dateOfBirth,
-        avatarUrl: dto.avatarUrl,
-        status: dto.status,
-        role: dto.role,
-        emailVerified: dto.emailVerified,
-        phoneVerified: dto.phoneVerified,
-        lastLoginAt: dto.lastLoginAt,
-        createdAt: dto.createdAt,
-        updatedAt: dto.updatedAt,
-      }
+      // Use toAdminDTO which returns data in the format expected by the schema
+      const adminResponse = UserMapper.toAdminDTO(user)
 
       const validatedResponse = validateResponse(
         userAdmin.AdminUserDetailResponse,
@@ -197,26 +179,8 @@ export class AdminUserController {
         throw ErrorFactory.resourceNotFound('User', userId)
       }
 
-      // Use UserMapper to get the DTO
-      const dto = UserMapper.toDTO(user)
-
-      // Map user to admin detail response format
-      const adminResponse: userAdmin.AdminUserDetailResponse = {
-        id: dto.id,
-        email: dto.email,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        phoneNumber: dto.phoneNumber,
-        dateOfBirth: dto.dateOfBirth,
-        avatarUrl: dto.avatarUrl,
-        status: dto.status,
-        role: dto.role,
-        emailVerified: dto.emailVerified,
-        phoneVerified: dto.phoneVerified,
-        lastLoginAt: dto.lastLoginAt,
-        createdAt: dto.createdAt,
-        updatedAt: dto.updatedAt,
-      }
+      // Use toAdminDTO which returns data in the format expected by the schema
+      const adminResponse = UserMapper.toAdminDTO(user)
 
       const validatedResponse = validateResponse(
         userAdmin.AdminUserDetailResponse,
@@ -260,26 +224,8 @@ export class AdminUserController {
 
       // TODO: Handle adminNotes update separately if needed
 
-      // Use UserMapper to get the DTO
-      const dto = UserMapper.toDTO(updatedUser)
-
-      // Return updated profile in same format as getMyProfile
-      const adminResponse: userAdmin.AdminUserDetailResponse = {
-        id: dto.id,
-        email: dto.email,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        phoneNumber: dto.phoneNumber,
-        dateOfBirth: dto.dateOfBirth,
-        avatarUrl: dto.avatarUrl,
-        status: dto.status,
-        role: dto.role,
-        emailVerified: dto.emailVerified,
-        phoneVerified: dto.phoneVerified,
-        lastLoginAt: dto.lastLoginAt,
-        createdAt: dto.createdAt,
-        updatedAt: dto.updatedAt,
-      }
+      // Use toAdminDTO which returns data in the format expected by the schema
+      const adminResponse = UserMapper.toAdminDTO(updatedUser)
 
       const validatedResponse = validateResponse(
         userAdmin.AdminUserDetailResponse,
@@ -311,8 +257,8 @@ export class AdminUserController {
         throw ErrorFactory.resourceNotFound('User', id)
       }
 
-      // Use UserMapper to get the DTO
-      const dto = UserMapper.toDTO(user)
+      // Use toAdminDTO to get proper types
+      const dto = UserMapper.toAdminDTO(user)
 
       const verificationStatus: userAdmin.UserVerificationStatusResponse = {
         userId: dto.id,

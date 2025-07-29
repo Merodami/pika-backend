@@ -14,49 +14,51 @@ export const businessAdapter = {
   // My business profile
   profile: {
     get: MyBusinessService.getMyBusiness,
-    create: MyBusinessService.postMyBusiness,
-    update: MyBusinessService.putMyBusiness,
+    create: MyBusinessService.createMyBusiness,
+    update: MyBusinessService.updateMyBusiness,
     delete: MyBusinessService.deleteMyBusiness,
   },
 
   // Business voucher management (for business owners)
   vouchers: {
     // Management operations
-    list: VoucherManagementService.getVouchers,
-    create: VoucherManagementService.postVouchers,
-    get: VoucherManagementService.getVouchers1, // Auto-generated name for GET /vouchers/{id}
-    update: VoucherManagementService.putVouchers,
-    delete: VoucherManagementService.deleteVouchers,
+    list: VoucherManagementService.getAdminVoucherList,
+    create: VoucherManagementService.createAdminVoucher,
+    get: VoucherManagementService.getAdminVoucherById,
+    update: VoucherManagementService.updateAdminVoucher,
+    delete: VoucherManagementService.deleteAdminVoucher,
     bulkUpdate: VoucherManagementService.patchVouchersBulkUpdate,
     analytics: VoucherManagementService.getVouchersAnalytics,
 
     // Customer-facing operations
-    scan: VouchersService.postVouchersScan,
-    claim: VouchersService.postVouchersClaim,
-    redeem: VouchersService.postVouchersRedeem,
-    getUserVouchers: VouchersService.getUsersVouchers,
+    scan: VouchersService.scanVoucher,
+    claim: VouchersService.claimVoucher,
+    redeem: VouchersService.redeemVoucher,
+    getUserVouchers: VouchersService.getUserVouchers,
   },
 
   // Admin business management
   admin: {
-    list: BusinessManagementService.getBusinesses,
-    create: BusinessManagementService.postBusinesses,
-    update: BusinessManagementService.putBusinesses,
-    delete: BusinessManagementService.deleteBusinesses,
-    verify: BusinessManagementService.patchBusinessesVerification,
-    activate: BusinessManagementService.patchBusinessesActivation,
-    updateRating: BusinessManagementService.patchBusinessesRating,
-    bulkUpdate: BusinessManagementService.patchBusinessesBulk,
-    bulkDelete: BusinessManagementService.deleteBusinessesBulk,
+    list: BusinessManagementService.getAdminBusinessList,
+    get: BusinessManagementService.getAdminBusinessById,
+    create: BusinessManagementService.createAdminBusiness,
+    update: BusinessManagementService.updateAdminBusiness,
+    delete: BusinessManagementService.deleteAdminBusiness,
+    verify: BusinessManagementService.updateAdminBusinessVerification,
+    activate: BusinessManagementService.activateAdminBusiness,
+    deactivate: BusinessManagementService.deactivateAdminBusiness,
+    updateRating: BusinessManagementService.updateAdminBusinessRating,
+    bulkUpdate: BusinessManagementService.bulkUpdateAdminBusinesses,
+    bulkDelete: BusinessManagementService.bulkDeleteAdminBusinesses,
   },
 
   // Public business API
   public: {
-    list: BusinessServiceService.getBusinesses,
-    listByCategory: BusinessServiceService.getCategoriesBusinesses,
-    bulkGet: BusinessServiceService.postBusinessesBulk,
-    validate: BusinessServiceService.postBusinessesValidate,
-    getByUser: BusinessServiceService.postBusinessesByUser,
-    checkExists: BusinessServiceService.postBusinessesExists,
+    get: BusinessServiceService.getInternalBusinessById,
+    listByCategory: BusinessServiceService.getInternalBusinessesByCategory,
+    bulkGet: BusinessServiceService.bulkGetInternalBusinesses,
+    validate: BusinessServiceService.validateInternalBusinesses,
+    getByUser: BusinessServiceService.getInternalBusinessesByUser,
+    checkExists: BusinessServiceService.checkInternalBusinessExists,
   },
 }

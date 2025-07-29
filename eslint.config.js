@@ -32,7 +32,6 @@ export default [
       '**/web/**',
       '**/previous-architecture/**',
       '**/packages/sdk/src/openapi/**',
-      'api-microservices-sdk/**',
       'ai/**',
       'pika-old/**',
       'docs/**',

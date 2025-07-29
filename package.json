@@ -137,8 +137,7 @@
   "workspaces": [
     "packages/**",
     "tools/**",
-    "frontend/**",
-    "!api-microservices-sdk"
+    "frontend/**"
   ],
   "packageManager": "yarn@4.9.1",
   "engines": {

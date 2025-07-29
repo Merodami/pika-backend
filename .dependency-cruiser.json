@@ -70,8 +70,7 @@
         "build",
         ".next",
         "previous-architecture",
-        "pika-old",
-        "api-microservices-sdk"
+        "pika-old"
       ]
     },
     "tsPreCompilationDeps": true,
