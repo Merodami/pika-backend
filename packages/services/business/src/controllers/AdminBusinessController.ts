@@ -228,7 +228,7 @@ export class AdminBusinessController {
       {},
       businessAdmin.PatchBusinessVerificationRequest
     >,
-    res: Response<businessAdmin.AdminBusinessDetailResponse>,
+    res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {

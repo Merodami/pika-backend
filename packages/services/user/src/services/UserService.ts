@@ -337,8 +337,8 @@ export class UserService implements IUserService {
         await this.communicationClient.sendEmail({
           to: user.email,
           subject: 'Account Suspended',
-          template: 'account-banned',
-          data: {
+          templateId: EmailTemplateId.ACCOUNT_BANNED,
+          templateParams: {
             reason: options.reason || 'Terms of Service violation',
             duration: options.duration,
           },
@@ -370,8 +370,8 @@ export class UserService implements IUserService {
         await this.communicationClient.sendEmail({
           to: user.email,
           subject: 'Account Reinstated',
-          template: 'account-unbanned',
-          data: {
+          templateId: EmailTemplateId.ACCOUNT_UNBANNED,
+          templateParams: {
             reason: options.reason || 'Your account has been reinstated',
           },
         }).catch((error) => {

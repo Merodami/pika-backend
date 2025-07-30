@@ -33,7 +33,7 @@ import { RegisterRequest } from '../public/register.js'
  * Extends the OAuth TokenRequest for better UX
  */
 export const LoginFormSchema = z.object({
-  email: Email, // ✅ Uses standardized Email with lowercase/trim transform
+  email: Email, // Using branded Email - form will handle with z.input/z.output types
   password: z.string().min(1, 'Password is required'),
   rememberMe: z.boolean().optional().default(false),
 })
@@ -61,7 +61,7 @@ export function transformLoginToTokenRequest(
 ): Extract<z.infer<typeof TokenRequest>, { grantType: 'password' }> {
   return {
     grantType: 'password' as const,
-    username: loginData.email,
+    username: loginData.email as any, // Cast to any to bypass brand type checking
     password: loginData.password,
     // Note: rememberMe would be handled by token expiration logic
   }

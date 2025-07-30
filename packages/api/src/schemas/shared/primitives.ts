@@ -82,6 +82,7 @@ export const TimeOnly = z
  */
 export const EmailString = z
   .string()
+  .min(1, 'Email is required')
   .email({ message: 'Must be a valid email address' })
   .transform((email) => email.toLowerCase().trim())
   .describe('Email address')

@@ -54,6 +54,7 @@ export type PaymentId = z.infer<typeof PaymentId>
  */
 export const Email = z
   .string()
+  .min(1, 'Email is required')
   .email({ message: 'Invalid email format' })
   .transform((email) => email.toLowerCase().trim())
   .brand('Email')
