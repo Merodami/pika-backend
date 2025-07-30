@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 
 import { getCurrentUser } from '@/app/_services/authService'
 
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: Promise<{ locale: string }>
 }

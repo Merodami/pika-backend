@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 
 import { getCurrentUser } from '@/app/_services/authService'
 
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const user = await getCurrentUser()
 

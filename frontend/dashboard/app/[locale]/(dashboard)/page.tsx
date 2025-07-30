@@ -4,6 +4,9 @@ import { redirect } from 'next/navigation'
 import { requireAuth } from '@/app/_services/authService'
 import type { Locale } from '@/i18n/config'
 
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
+
 interface DashboardPageProps {
   params: Promise<{ locale: Locale }>
 }

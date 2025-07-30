@@ -8,6 +8,9 @@ import { VoucherPerformance } from '@/components/features/voucherPerformance'
 import { LoadingSkeleton } from '@/components/ui/loadingSkeleton'
 import type { Locale } from '@/i18n/config'
 
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
+
 interface BusinessDashboardPageProps {
   params: Promise<{ locale: Locale }>
 }

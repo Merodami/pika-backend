@@ -139,6 +139,9 @@
     "tools/**",
     "frontend/**"
   ],
+  "installConfig": {
+    "hoistingLimits": "workspaces"
+  },
   "packageManager": "yarn@4.9.1",
   "engines": {
     "node": ">=22.0.0 <23.0.0"

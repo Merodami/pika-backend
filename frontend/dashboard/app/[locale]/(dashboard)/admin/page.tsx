@@ -8,6 +8,9 @@ import { SystemHealthStatus } from '@/components/features/systemHealthStatus'
 import { LoadingSkeleton } from '@/components/ui/loadingSkeleton'
 import type { Locale } from '@/i18n/config'
 
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
+
 interface AdminDashboardPageProps {
   params: Promise<{ locale: Locale }>
 }
