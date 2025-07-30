@@ -27,7 +27,7 @@ const { Option } = Select
 
 interface VoucherDesignFormProps {
   voucherDesign: VoucherDesign
-  onChange: (field: keyof VoucherDesign, value: any) => void
+  onChange: (field: keyof VoucherDesign, value: VoucherDesign[keyof VoucherDesign]) => void
 }
 
 const categories = [
@@ -148,14 +148,14 @@ export function VoucherDesignForm({
                     voucherDesign.discountType === 'percentage' ? 100 : 10000
                   }
                   value={voucherDesign.discountValue}
-                  onChange={(value) => onChange('discountValue', value || 0)}
+                  onChange={(value) => onChange('discountValue', value ?? 0)}
                   style={{ width: '100%' }}
                 />
               </Form.Item>
             </Col>
           </Row>
 
-          {voucherDesign.discountType !== 'buy_one_get_one' && (
+          {voucherDesign.discountType && (
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -165,7 +165,7 @@ export function VoucherDesignForm({
                   <InputNumber
                     min={0}
                     value={voucherDesign.originalPrice}
-                    onChange={(value) => onChange('originalPrice', value)}
+                    onChange={(value) => onChange('originalPrice', value ?? 0)}
                     style={{ width: '100%' }}
                     placeholder="0.00"
                   />
@@ -179,7 +179,7 @@ export function VoucherDesignForm({
                   <InputNumber
                     min={0}
                     value={voucherDesign.minimumPurchase}
-                    onChange={(value) => onChange('minimumPurchase', value)}
+                    onChange={(value) => onChange('minimumPurchase', value ?? 0)}
                     style={{ width: '100%' }}
                     placeholder="0.00"
                   />
@@ -242,7 +242,7 @@ export function VoucherDesignForm({
                 <InputNumber
                   min={1}
                   value={voucherDesign.maxRedemptions}
-                  onChange={(value) => onChange('maxRedemptions', value)}
+                  onChange={(value) => onChange('maxRedemptions', value ?? 1)}
                   style={{ width: '100%' }}
                   placeholder="Unlimited"
                 />
@@ -257,7 +257,7 @@ export function VoucherDesignForm({
                   min={1}
                   max={voucherDesign.maxRedemptions || 100}
                   value={voucherDesign.maxRedemptionsPerUser}
-                  onChange={(value) => onChange('maxRedemptionsPerUser', value)}
+                  onChange={(value) => onChange('maxRedemptionsPerUser', value ?? 1)}
                   style={{ width: '100%' }}
                   placeholder="Unlimited"
                 />

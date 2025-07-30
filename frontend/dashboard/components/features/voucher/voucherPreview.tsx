@@ -10,8 +10,8 @@ import {
 } from '@ant-design/icons'
 import { VoucherDiscountType } from '@pika/types'
 import { Card, Divider, QRCode, Space, Tag, Typography } from 'antd'
-import { format } from 'date-fns'
 
+import { formatDate } from '@/lib/utils/date'
 import type { VoucherDesign } from '@/types/voucher'
 
 const { Title, Text, Paragraph } = Typography
@@ -64,23 +64,8 @@ export function VoucherPreview({
           borderRadius: '4px',
           borderWidth: '1px',
         }
-      case 'bold':
-        return {
-          ...baseStyles,
-          borderRadius: '12px',
-          borderWidth: '3px',
-          background: `linear-gradient(45deg, ${voucherDesign.primaryColor}20 0%, ${voucherDesign.backgroundColor} 50%, ${voucherDesign.primaryColor}20 100%)`,
-        }
       default:
         return baseStyles
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'MMM dd, yyyy')
-    } catch {
-      return dateString
     }
   }
 

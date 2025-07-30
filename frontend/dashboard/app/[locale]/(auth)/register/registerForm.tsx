@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 import { register as registerAction } from '@/app/actions/auth'
 import {
@@ -20,6 +21,10 @@ import {
   transformRegisterToAPI,
   type RegisterFormData,
 } from '@/lib/validations/auth'
+
+// Extract input and output types for proper branded type handling
+type RegisterFormInput = z.input<typeof RegisterFormSchema>
+type RegisterFormOutput = z.output<typeof RegisterFormSchema>
 
 export function RegisterForm() {
   const t = useTranslations('auth.register')
@@ -30,8 +35,8 @@ export function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(RegisterFormSchema) as any, // Type assertion needed due to branded types
+  } = useForm<RegisterFormInput, unknown, RegisterFormOutput>({
+    resolver: zodResolver(RegisterFormSchema)
   })
 
   const onSubmit = async (data: RegisterFormData) => {

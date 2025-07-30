@@ -8,7 +8,7 @@ export const queryKeys = {
   vouchers: {
     all: () => [...queryKeys.all, 'vouchers'] as const,
     lists: () => [...queryKeys.vouchers.all(), 'list'] as const,
-    list: (filters?: Record<string, any>) =>
+    list: (filters?: Record<string, unknown>) =>
       [...queryKeys.vouchers.lists(), filters] as const,
     details: () => [...queryKeys.vouchers.all(), 'detail'] as const,
     detail: (id: string) => [...queryKeys.vouchers.details(), id] as const,
@@ -21,7 +21,7 @@ export const queryKeys = {
   businesses: {
     all: () => [...queryKeys.all, 'businesses'] as const,
     lists: () => [...queryKeys.businesses.all(), 'list'] as const,
-    list: (filters?: Record<string, any>) =>
+    list: (filters?: Record<string, unknown>) =>
       [...queryKeys.businesses.lists(), filters] as const,
     detail: (id: string) =>
       [...queryKeys.businesses.all(), 'detail', id] as const,
@@ -35,7 +35,7 @@ export const queryKeys = {
   users: {
     all: () => [...queryKeys.all, 'users'] as const,
     lists: () => [...queryKeys.users.all(), 'list'] as const,
-    list: (filters?: Record<string, any>) =>
+    list: (filters?: Record<string, unknown>) =>
       [...queryKeys.users.lists(), filters] as const,
     me: () => [...queryKeys.users.all(), 'me'] as const,
     detail: (id: string) => [...queryKeys.users.all(), id] as const,

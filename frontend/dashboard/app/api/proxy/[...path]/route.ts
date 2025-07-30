@@ -6,42 +6,42 @@ const API_BASE_URL = process.env.API_URL || 'http://localhost:5500/api/v1'
 // Proxy all API requests through Next.js
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, { params }, 'GET')
+  return handleRequest(request, await params, 'GET')
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, { params }, 'POST')
+  return handleRequest(request, await params, 'POST')
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, { params }, 'PUT')
+  return handleRequest(request, await params, 'PUT')
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, { params }, 'PATCH')
+  return handleRequest(request, await params, 'PATCH')
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, { params }, 'DELETE')
+  return handleRequest(request, await params, 'DELETE')
 }
 
 async function handleRequest(
   request: NextRequest,
-  { params }: { params: { path: string[] } },
+  params: { path: string[] },
   method: string
 ) {
   const cookieStore = cookies()

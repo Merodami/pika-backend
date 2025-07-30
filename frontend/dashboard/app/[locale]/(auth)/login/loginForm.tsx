@@ -16,7 +16,10 @@ import { useAppStore } from '@/store/app.store'
 // Use the admin/business login schema with enhanced password requirements
 const loginSchema = authFrontend.AdminBusinessLoginFormSchema
 
-type LoginFormData = z.infer<typeof loginSchema>
+// Extract input and output types for proper branded type handling
+type LoginFormInput = z.input<typeof loginSchema>
+type LoginFormOutput = z.output<typeof loginSchema>
+type LoginFormData = LoginFormOutput
 
 export function LoginForm() {
   const t = useTranslations('auth.login')
@@ -28,8 +31,8 @@ export function LoginForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema) as any, // Type assertion needed due to branded types
+  } = useForm<LoginFormInput, unknown, LoginFormOutput>({
+    resolver: zodResolver(loginSchema),
     defaultValues: formDrafts['login'] || {},
   })
 
@@ -56,7 +59,7 @@ export function LoginForm() {
   }
 
   // Save form draft on input change
-  const handleInputChange = (field: keyof LoginFormData, value: any) => {
+  const handleInputChange = (field: keyof LoginFormData, value: string | boolean) => {
     const currentData = formDrafts['login'] || {}
     saveFormDraft('login', { ...currentData, [field]: value })
   }

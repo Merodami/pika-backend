@@ -177,5 +177,16 @@
       "settings": "Settings",
       "logout": "Sign out"
     }
+  },
+  "error": {
+    "title": "Something went wrong",
+    "message": "Sorry, we encountered an error while processing your request.",
+    "tryAgain": "Try Again",
+    "goHome": "Go Home"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "Sorry, the page you visited does not exist.",
+    "backHome": "Back Home"
   }
 }

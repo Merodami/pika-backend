@@ -15,7 +15,13 @@ declare global {
   }
 }
 
-export function reportWebVitals(metric: any) {
+interface WebVital {
+  name: string
+  value: number
+  rating: string
+}
+
+export function reportWebVitals(metric: WebVital) {
   const { name, value, rating } = metric
 
   // Log to console in development
@@ -37,7 +43,7 @@ export function reportWebVitals(metric: any) {
 }
 
 // Performance observer for custom metrics
-export function measureApiCall(name: string, fn: () => Promise<any>) {
+export function measureApiCall<T>(name: string, fn: () => Promise<T>): Promise<T> {
   const startTime = performance.now()
 
   return fn().finally(() => {

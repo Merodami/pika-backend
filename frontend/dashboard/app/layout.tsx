@@ -26,22 +26,24 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className={inter.className}>
-      <QueryProvider>
-        <AntdRegistry>
-          <ConfigProvider
-            theme={{
-              token: {
-                colorPrimary: '#1890ff',
-                borderRadius: 6,
-              },
-            }}
-          >
-            <ApiErrorBoundary>{children}</ApiErrorBoundary>
-            <Toaster position="top-right" richColors />
-          </ConfigProvider>
-        </AntdRegistry>
-      </QueryProvider>
-    </div>
+    <html suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
+        <QueryProvider>
+          <AntdRegistry>
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorPrimary: '#1890ff',
+                  borderRadius: 6,
+                },
+              }}
+            >
+              <ApiErrorBoundary>{children}</ApiErrorBoundary>
+              <Toaster position="top-right" richColors />
+            </ConfigProvider>
+          </AntdRegistry>
+        </QueryProvider>
+      </body>
+    </html>
   )
 }

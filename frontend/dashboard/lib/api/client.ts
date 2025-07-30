@@ -1,3 +1,4 @@
+import { mapValues, isFunction } from 'lodash-es'
 import { toast } from 'sonner'
 
 import { OpenAPI } from './generated/core/OpenAPI'
@@ -31,41 +32,41 @@ OpenAPI.HEADERS = async () => ({
 // Token refresh is handled server-side in the API route handler
 // No client-side token management needed with BFF pattern
 
+// API error type
+interface ApiError {
+  status?: number
+  body?: {
+    message?: string
+  }
+  message?: string
+}
+
 // Handle API errors with toast notifications
-function handleApiError(error: any): never {
-  if (error?.status >= 400 && error?.status < 500) {
-    const message = error?.body?.message || error?.message || 'Request failed'
+function handleApiError(error: unknown): never {
+  const apiError = error as ApiError
+  if (apiError?.status && apiError.status >= 400 && apiError.status < 500) {
+    const message = apiError?.body?.message || apiError?.message || 'Request failed'
 
     toast.error(message)
-  } else if (error?.status >= 500) {
+  } else if (apiError?.status && apiError.status >= 500) {
     toast.error('Server error. Please try again later.')
-  } else if (error?.message) {
-    toast.error(error.message)
+  } else if (apiError?.message) {
+    toast.error(apiError.message)
   }
   throw error
 }
 
 // Create wrapper for 401 handling
-function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(fn: T): T {
-  return (async (...args: any[]) => {
+function wrapWithAuth<T extends (...args: unknown[]) => Promise<unknown>>(fn: T): T {
+  return (async (...args: unknown[]) => {
     try {
       return await fn(...args)
-    } catch (error: any) {
-      if (error?.status === 401) {
-        const newToken = await refreshAccessToken()
-
-        if (newToken) {
-          // Retry the request
-          try {
-            return await fn(...args)
-          } catch (retryError) {
-            handleApiError(retryError)
-          }
-        } else {
-          clearTokens()
-          window.location.href = '/login'
-          throw error
-        }
+    } catch (error) {
+      const apiError = error as ApiError
+      if (apiError?.status === 401) {
+        // Token expired, redirect to login
+        window.location.href = '/login'
+        throw error
       }
       handleApiError(error)
     }
@@ -73,18 +74,17 @@ function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(fn: T): T {
 }
 
 // Wrap service methods with auth handling
-function wrapService<T extends Record<string, any>>(service: T): T {
-  const wrappedService = {} as T
-
-  Object.keys(service).forEach((key) => {
-    if (typeof service[key] === 'function') {
-      ;(wrappedService as any)[key] = wrapWithAuth(service[key].bind(service))
-    } else {
-      ;(wrappedService as any)[key] = service[key]
+function wrapService<T>(service: T): T {
+  // Use lodash mapValues to transform object properties
+  return mapValues(service as object, (value) => {
+    if (isFunction(value)) {
+      // Wrap functions with auth handling
+      // Type assertion needed because lodash isFunction doesn't narrow types
+      const fn = value as (...args: unknown[]) => Promise<unknown>
+      return wrapWithAuth(fn.bind(service))
     }
-  })
-
-  return wrappedService
+    return value
+  }) as T
 }
 
 // Create API client interface

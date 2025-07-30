@@ -1,7 +1,9 @@
-export const locales = ['es', 'en', 'gn'] as const
-export type Locale = (typeof locales)[number]
+import { SupportedLanguage, type LanguageCode } from '@pika/types'
 
-export const defaultLocale: Locale = 'es'
+export const locales = Object.values(SupportedLanguage)
+export type Locale = LanguageCode
+
+export const defaultLocale: Locale = SupportedLanguage.SPANISH
 
 export const localeConfig = {
   es: {

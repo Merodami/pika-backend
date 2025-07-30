@@ -5,15 +5,15 @@ export interface ApiError {
   message: string
   code?: string
   status?: number
-  details?: any
+  details?: unknown
 }
 
 export class AppError extends Error {
   public code?: string
   public status?: number
-  public details?: any
+  public details?: unknown
 
-  constructor(message: string, code?: string, status?: number, details?: any) {
+  constructor(message: string, code?: string, status?: number, details?: unknown) {
     super(message)
     this.name = 'AppError'
     this.code = code
