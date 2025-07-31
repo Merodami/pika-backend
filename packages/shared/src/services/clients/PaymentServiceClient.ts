@@ -1,5 +1,5 @@
 import { PAYMENT_API_URL } from '@pika/environment'
-import type { BillingIntervalType, ServiceContext } from '@pika/types'
+import type { ServiceContext } from '@pika/types'
 
 import { BaseServiceClient } from '../BaseServiceClient.js'
 
@@ -68,7 +68,6 @@ export interface CreatePriceRequest {
   productId: string
   amount: number
   currency: string
-  interval?: BillingIntervalType
   intervalCount?: number
 }
 
@@ -87,7 +86,6 @@ export interface PriceResponse {
   currency: string
   active: boolean
   recurring?: {
-    interval: string
     intervalCount: number
   }
 }

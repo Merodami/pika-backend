@@ -1,3 +1,4 @@
+import { PlanSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -5,7 +6,11 @@ import { activeStatus, withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { BillingInterval, PlanSortBy, PlanType } from '../common/enums.js'
+import {
+  BillingIntervalSchema,
+  PlanSortBySchema,
+  PlanTypeSchema,
+} from '../common/enums.js'
 
 /**
  * Subscription plan schemas for public API
@@ -30,7 +35,7 @@ export const SubscriptionPlan = openapi(
       .length(3)
       .default('usd')
       .describe('Currency code (e.g., usd, gbp)'),
-    interval: BillingInterval,
+    interval: BillingIntervalSchema,
     intervalCount: z
       .number()
       .int()
@@ -69,7 +74,7 @@ export const CreateSubscriptionPlanRequest = openapi(
     description: z.string().optional(),
     price: z.number().nonnegative(),
     currency: z.string().length(3).default('usd'),
-    interval: BillingInterval,
+    interval: BillingIntervalSchema,
     intervalCount: z.number().int().positive().default(1),
     trialPeriodDays: z.number().int().nonnegative().optional(),
     features: z.array(z.string()),
@@ -132,9 +137,9 @@ export type PlanSyncResponse = z.infer<typeof PlanSyncResponse>
  */
 export const SubscriptionPlanQueryParams = SearchParams.extend({
   isActive: z.coerce.boolean().optional(),
-  interval: BillingInterval.optional(),
-  planType: PlanType.optional(),
-  sortBy: PlanSortBy.default('name'),
+  interval: BillingIntervalSchema.optional(),
+  planType: PlanTypeSchema.optional(),
+  sortBy: PlanSortBySchema.default(PlanSortBy.NAME),
 })
 
 export type SubscriptionPlanQueryParams = z.infer<

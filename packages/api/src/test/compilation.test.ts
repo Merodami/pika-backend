@@ -1,3 +1,4 @@
+import { UserRole } from '@pika/types'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
@@ -163,7 +164,7 @@ describe('Type Inference', () => {
         email: 'test@example.com' as any,
         firstName: 'Test',
         lastName: 'User',
-        role: 'CUSTOMER',
+        role: UserRole.CUSTOMER,
         profilePicture: 'https://example.com/pic.jpg',
       },
     }

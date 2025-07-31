@@ -1,9 +1,14 @@
+import { TicketPriority, TicketStatus, TicketType } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import { UUID } from '../../shared/primitives.js'
-import { TicketPriority, TicketStatus, TicketType } from '../common/index.js'
+import {
+  TicketPrioritySchema,
+  TicketStatusSchema,
+  TicketTypeSchema,
+} from '../common/enums.js'
 
 /**
  * Internal support service schemas for service-to-service communication
@@ -39,8 +44,8 @@ export const NotifyTicketUpdate = openapi(
       'assigned',
       'escalated',
     ]),
-    oldStatus: TicketStatus.optional(),
-    newStatus: TicketStatus.optional(),
+    oldStatus: TicketStatusSchema.optional(),
+    newStatus: TicketStatusSchema.optional(),
     assignedToId: UserId.optional(),
     message: z.string().optional(),
   }),
@@ -72,14 +77,14 @@ export const UserTicketSummaryResponse = openapi(
     resolvedTickets: z.number().int().nonnegative(),
     averageResolutionTime: z.number().optional().describe('In hours'),
     lastTicketDate: z.string().datetime().optional(),
-    ticketsByCategory: z.object(
-      Object.fromEntries(
-        TicketType.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
+    ticketsByCategory: z.object({
+      [TicketType.BILLING]: z.number().int().nonnegative().optional(),
+      [TicketType.TECHNICAL]: z.number().int().nonnegative().optional(),
+      [TicketType.ACCOUNT]: z.number().int().nonnegative().optional(),
+      [TicketType.GENERAL]: z.number().int().nonnegative().optional(),
+      [TicketType.BUG_REPORT]: z.number().int().nonnegative().optional(),
+      [TicketType.FEATURE_REQUEST]: z.number().int().nonnegative().optional(),
+    }),
   }),
   {
     description: 'User ticket summary',
@@ -99,8 +104,8 @@ export const BulkCreateTicketsRequest = openapi(
           userId: UserId,
           title: z.string(),
           description: z.string(),
-          category: TicketType,
-          priority: TicketPriority.default('medium'),
+          category: TicketTypeSchema,
+          priority: TicketPrioritySchema.default(TicketPriority.MEDIUM),
           metadata: z.record(z.string(), z.unknown()).optional(),
         }),
       )
@@ -143,7 +148,7 @@ export const EscalateTicketInternalRequest = openapi(
       'system',
     ]),
     reason: z.string(),
-    targetPriority: TicketPriority,
+    targetPriority: TicketPrioritySchema,
     notifyManagement: z.boolean().default(true),
   }),
   {
@@ -188,30 +193,38 @@ export const TicketAnalyticsResponse = openapi(
       firstContactResolutionRate: z.number().min(0).max(100),
     }),
     distribution: z.object({
-      byPriority: z.object(
-        Object.fromEntries(
-          TicketPriority.options.map((key) => [
-            key,
-            z.number().int().nonnegative().optional(),
-          ]),
-        ),
-      ),
-      byCategory: z.object(
-        Object.fromEntries(
-          TicketType.options.map((key) => [
-            key,
-            z.number().int().nonnegative().optional(),
-          ]),
-        ),
-      ),
-      byStatus: z.object(
-        Object.fromEntries(
-          TicketStatus.options.map((key) => [
-            key,
-            z.number().int().nonnegative().optional(),
-          ]),
-        ),
-      ),
+      byPriority: z.object({
+        [TicketPriority.LOW]: z.number().int().nonnegative().optional(),
+        [TicketPriority.MEDIUM]: z.number().int().nonnegative().optional(),
+        [TicketPriority.HIGH]: z.number().int().nonnegative().optional(),
+        [TicketPriority.URGENT]: z.number().int().nonnegative().optional(),
+        [TicketPriority.CRITICAL]: z.number().int().nonnegative().optional(),
+      }),
+      byCategory: z.object({
+        [TicketType.BILLING]: z.number().int().nonnegative().optional(),
+        [TicketType.TECHNICAL]: z.number().int().nonnegative().optional(),
+        [TicketType.ACCOUNT]: z.number().int().nonnegative().optional(),
+        [TicketType.GENERAL]: z.number().int().nonnegative().optional(),
+        [TicketType.BUG_REPORT]: z.number().int().nonnegative().optional(),
+        [TicketType.FEATURE_REQUEST]: z.number().int().nonnegative().optional(),
+      }),
+      byStatus: z.object({
+        [TicketStatus.OPEN]: z.number().int().nonnegative().optional(),
+        [TicketStatus.ASSIGNED]: z.number().int().nonnegative().optional(),
+        [TicketStatus.IN_PROGRESS]: z.number().int().nonnegative().optional(),
+        [TicketStatus.WAITING_CUSTOMER]: z
+          .number()
+          .int()
+          .nonnegative()
+          .optional(),
+        [TicketStatus.WAITING_INTERNAL]: z
+          .number()
+          .int()
+          .nonnegative()
+          .optional(),
+        [TicketStatus.RESOLVED]: z.number().int().nonnegative().optional(),
+        [TicketStatus.CLOSED]: z.number().int().nonnegative().optional(),
+      }),
     }),
   }),
   {

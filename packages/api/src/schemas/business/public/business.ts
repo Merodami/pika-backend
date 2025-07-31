@@ -1,3 +1,4 @@
+import { BusinessSortBy as BusinessSortByEnum } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -76,7 +77,7 @@ export const BusinessQueryParams = SearchParams.extend({
     .max(5)
     .optional()
     .describe('Minimum rating filter'),
-  sortBy: BusinessSortBy.default('businessName'),
+  sortBy: BusinessSortBy.default(BusinessSortByEnum.BUSINESS_NAME),
 })
 
 export type BusinessQueryParams = z.infer<typeof BusinessQueryParams>

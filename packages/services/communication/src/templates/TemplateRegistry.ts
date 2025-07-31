@@ -169,6 +169,25 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     description: 'Subscription expired notification',
     requiredVariables: ['firstName', 'planName', 'renewalUrl'],
   },
+
+  [EmailTemplateId.ACCOUNT_BANNED]: {
+    key: EmailTemplateId.ACCOUNT_BANNED,
+    category: TemplateCategory.SYSTEM,
+    filePath: 'system/account-banned.hbs',
+    subject: 'Account Suspended',
+    description: 'Account suspension notification',
+    requiredVariables: ['reason'],
+    optionalVariables: ['duration'],
+  },
+
+  [EmailTemplateId.ACCOUNT_UNBANNED]: {
+    key: EmailTemplateId.ACCOUNT_UNBANNED,
+    category: TemplateCategory.SYSTEM,
+    filePath: 'system/account-unbanned.hbs',
+    subject: 'Account Reinstated',
+    description: 'Account reinstatement notification',
+    requiredVariables: ['reason'],
+  },
 }
 
 /**

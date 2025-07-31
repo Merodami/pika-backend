@@ -20,14 +20,17 @@ import { Color } from 'antd/es/color-picker'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
-import type { VoucherDesign } from '@/app/(dashboard)/business/vouchers/create/page'
+import type { VoucherDesign } from '@/types/voucher'
 
 const { TextArea } = Input
 const { Option } = Select
 
 interface VoucherDesignFormProps {
   voucherDesign: VoucherDesign
-  onChange: (field: keyof VoucherDesign, value: any) => void
+  onChange: (
+    field: keyof VoucherDesign,
+    value: VoucherDesign[keyof VoucherDesign]
+  ) => void
 }
 
 const categories = [
@@ -148,14 +151,14 @@ export function VoucherDesignForm({
                     voucherDesign.discountType === 'percentage' ? 100 : 10000
                   }
                   value={voucherDesign.discountValue}
-                  onChange={(value) => onChange('discountValue', value || 0)}
+                  onChange={(value) => onChange('discountValue', value ?? 0)}
                   style={{ width: '100%' }}
                 />
               </Form.Item>
             </Col>
           </Row>
 
-          {voucherDesign.discountType !== 'buy_one_get_one' && (
+          {voucherDesign.discountType && (
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
@@ -165,7 +168,7 @@ export function VoucherDesignForm({
                   <InputNumber
                     min={0}
                     value={voucherDesign.originalPrice}
-                    onChange={(value) => onChange('originalPrice', value)}
+                    onChange={(value) => onChange('originalPrice', value ?? 0)}
                     style={{ width: '100%' }}
                     placeholder="0.00"
                   />
@@ -179,7 +182,9 @@ export function VoucherDesignForm({
                   <InputNumber
                     min={0}
                     value={voucherDesign.minimumPurchase}
-                    onChange={(value) => onChange('minimumPurchase', value)}
+                    onChange={(value) =>
+                      onChange('minimumPurchase', value ?? 0)
+                    }
                     style={{ width: '100%' }}
                     placeholder="0.00"
                   />
@@ -242,7 +247,7 @@ export function VoucherDesignForm({
                 <InputNumber
                   min={1}
                   value={voucherDesign.maxRedemptions}
-                  onChange={(value) => onChange('maxRedemptions', value)}
+                  onChange={(value) => onChange('maxRedemptions', value ?? 1)}
                   style={{ width: '100%' }}
                   placeholder="Unlimited"
                 />
@@ -257,7 +262,9 @@ export function VoucherDesignForm({
                   min={1}
                   max={voucherDesign.maxRedemptions || 100}
                   value={voucherDesign.maxRedemptionsPerUser}
-                  onChange={(value) => onChange('maxRedemptionsPerUser', value)}
+                  onChange={(value) =>
+                    onChange('maxRedemptionsPerUser', value ?? 1)
+                  }
                   style={{ width: '100%' }}
                   placeholder="Unlimited"
                 />
@@ -374,7 +381,10 @@ export function VoucherDesignForm({
                   beforeUpload={() => false}
                   onChange={(info) => {
                     // Handle file upload logic here
-                    console.log('Banner upload:', info)
+                    console.error(
+                      'Banner upload - TODO: Implement upload handler',
+                      info
+                    )
                   }}
                 >
                   <Button icon={<UploadOutlined />}>Upload Banner</Button>
@@ -407,7 +417,7 @@ export function VoucherDesignForm({
 
           {voucherDesign.terms.length > 0 && (
             <div className="space-y-2">
-              {voucherDesign.terms.map((term, index) => (
+              {voucherDesign.terms.map((term: string, index: number) => (
                 <Tag
                   key={index}
                   closable

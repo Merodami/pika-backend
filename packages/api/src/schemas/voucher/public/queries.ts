@@ -1,8 +1,12 @@
+import { UserVoucherSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { SearchParams } from '../../shared/pagination.js'
-import { UserVoucherSortBy, UserVoucherStatusFilter } from '../common/enums.js'
+import {
+  UserVoucherSortBySchema,
+  UserVoucherStatusFilterSchema,
+} from '../common/enums.js'
 
 /**
  * Public voucher query parameters
@@ -13,10 +17,8 @@ import { UserVoucherSortBy, UserVoucherStatusFilter } from '../common/enums.js'
  * Extends SearchParams with user voucher specific filters
  */
 export const UserVouchersQueryParams = SearchParams.extend({
-  status: UserVoucherStatusFilter.default('all').describe(
-    'Filter by voucher status',
-  ),
-  sortBy: UserVoucherSortBy.default('claimedAt'),
+  status: UserVoucherStatusFilterSchema.default('all'),
+  sortBy: UserVoucherSortBySchema.default(UserVoucherSortBy.CLAIMED_AT),
 })
 
 export type UserVouchersQueryParams = z.infer<typeof UserVouchersQueryParams>

@@ -6,9 +6,9 @@ import { createBulkOperationResponse } from '../../shared/operations.js'
 import { DateTime, Decimal, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
-  VoucherCodeType,
-  VoucherDiscountType,
-  VoucherState,
+  VoucherCodeTypeSchema,
+  VoucherDiscountTypeSchema,
+  VoucherStateSchema,
 } from '../common/enums.js'
 import {
   CustomerVoucher,
@@ -36,7 +36,7 @@ export const AdminVoucherDetailResponse = openapi(
     categoryId: UUID,
 
     // Lifecycle
-    state: VoucherState,
+    state: VoucherStateSchema,
 
     // Resolved content only - no translation keys exposed
     title: z.string().describe('Voucher title in requested language'),
@@ -48,7 +48,7 @@ export const AdminVoucherDetailResponse = openapi(
       .describe('Voucher terms and conditions in requested language'),
 
     // Discount configuration
-    discountType: VoucherDiscountType,
+    discountType: VoucherDiscountTypeSchema,
     discountValue: Decimal,
     currency: z.string().default('PYG'),
 
@@ -158,7 +158,7 @@ export const CreateVoucherRequest = openapi(
       .describe('Terms and conditions translations by language code'),
 
     // Discount configuration
-    discountType: VoucherDiscountType,
+    discountType: VoucherDiscountTypeSchema,
     discountValue: z.number().positive(),
     currency: z.string().default('PYG'),
 
@@ -206,7 +206,7 @@ export const UpdateVoucherRequest = openapi(
       .describe('Terms and conditions translations by language code'),
 
     // Discount configuration
-    discountType: VoucherDiscountType.optional(),
+    discountType: VoucherDiscountTypeSchema.optional(),
     discountValue: z.number().positive().optional(),
     currency: z.string().optional(),
 
@@ -239,7 +239,7 @@ export type UpdateVoucherRequest = z.infer<typeof UpdateVoucherRequest>
  */
 export const UpdateVoucherStateRequest = openapi(
   z.object({
-    state: VoucherState,
+    state: VoucherStateSchema,
     reason: z.string().max(500).optional(),
   }),
   {
@@ -256,7 +256,7 @@ export type UpdateVoucherStateRequest = z.infer<
  */
 export const GenerateVoucherCodesRequest = openapi(
   z.object({
-    codeType: VoucherCodeType,
+    codeType: VoucherCodeTypeSchema,
     quantity: z.number().int().positive().max(1000).default(1),
     customCodes: z
       .array(z.string().max(500))
@@ -356,7 +356,7 @@ export const BulkVoucherUpdateRequest = openapi(
   z.object({
     voucherIds: z.array(UUID).min(1).max(100),
     updates: z.object({
-      state: VoucherState.optional(),
+      state: VoucherStateSchema.optional(),
       expiresAt: DateTime.optional(),
       maxRedemptions: z.number().int().positive().nullable().optional(),
       maxRedemptionsPerUser: z.number().int().positive().optional(),

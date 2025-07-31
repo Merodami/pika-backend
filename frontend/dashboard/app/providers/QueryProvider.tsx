@@ -20,9 +20,12 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             gcTime: 10 * 60 * 1000, // 10 minutes
 
             // Retry configuration
-            retry: (failureCount, error: any) => {
+            retry: (failureCount, error) => {
               // Don't retry on 4xx errors (client errors)
-              if (error?.status >= 400 && error?.status < 500) return false
+              if (error && typeof error === 'object' && 'status' in error) {
+                const status = (error as { status: number }).status
+                if (status >= 400 && status < 500) return false
+              }
               // Retry up to 3 times for other errors
               return failureCount < 3
             },
@@ -42,7 +45,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             retry: false,
 
             // Log mutation errors in development
-            onError: (error: any) => {
+            onError: (error) => {
               if (process.env.NODE_ENV === 'development') {
                 console.error('Mutation error:', error)
               }
@@ -56,11 +59,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       {children}
       {process.env.NODE_ENV === 'development' && (
-        <ReactQueryDevtools
-          initialIsOpen={false}
-          position="bottom-right"
-          panelPosition="right"
-        />
+        <ReactQueryDevtools initialIsOpen={false} />
       )}
     </QueryClientProvider>
   )

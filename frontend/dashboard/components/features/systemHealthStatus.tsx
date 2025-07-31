@@ -1,8 +1,12 @@
-import { getTranslations } from 'next-intl/server'
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
-export async function SystemHealthStatus() {
-  const t = await getTranslations('dashboard.system')
+import type { LocaleProps } from '@/types/common'
+
+type SystemHealthStatusProps = LocaleProps
+
+export async function SystemHealthStatus({ locale }: SystemHealthStatusProps) {
+  const t = await getTranslations({ locale, namespace: 'dashboard.system' })
 
   // Mock system health data
   const services = [

@@ -381,14 +381,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known Issues
 
-- **🔴 CRITICAL**: SDK generation pipeline broken due to missing `api-microservices-sdk` directory
-  - External SDK project no longer exists, needs integration into frontend dashboard
-  - Currently blocks Category service completion and frontend development
-  - `yarn generate:sdk` silently fails, no typed API client available
-  - **Status**: Documented in `SDK_INTEGRATION_ISSUE.md`, requires immediate resolution
-  - **Impact**: High - affects developer experience and type safety
-  - **Solution**: Create internal `packages/frontend-sdk/` package for SDK generation
-
 ### Schema Standardization Progress
 
 #### ✅ Completed Services (Following Category Template)

@@ -1,10 +1,10 @@
 import { getTranslations } from 'next-intl/server'
 
-import { LanguageSwitcher } from '@/components/ui/languageSwitcher'
-import { ThemeToggle } from '@/components/ui/themeToggle'
+import type { User as UserType } from '@/app/_services/authService'
 import { NotificationDropdown } from '@/components/features/notificationDropdown'
 import { UserMenu } from '@/components/features/userMenu'
-import type { User as UserType } from '@/app/_services/authService'
+import { LanguageSwitcher } from '@/components/ui/languageSwitcher'
+import { ThemeToggle } from '@/components/ui/themeToggle'
 import type { Locale } from '@/i18n/config'
 
 interface DashboardHeaderProps {
@@ -34,7 +34,7 @@ export async function DashboardHeader({ user, locale }: DashboardHeaderProps) {
           <ThemeToggle />
 
           {/* Notifications */}
-          <NotificationDropdown userId={user.id} />
+          <NotificationDropdown />
 
           {/* User Menu */}
           <UserMenu user={user} />

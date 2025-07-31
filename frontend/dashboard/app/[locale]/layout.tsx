@@ -1,7 +1,8 @@
+import { notFound } from 'next/navigation'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
-import { notFound } from 'next/navigation'
-import { locales, localeConfig } from '@/i18n/config'
+
+import { locales } from '@/i18n/config'
 
 interface LocaleLayoutProps {
   children: React.ReactNode
@@ -12,27 +13,25 @@ export default async function LocaleLayout({
   children,
   params,
 }: LocaleLayoutProps) {
+  console.log('LocaleLayout: params:', params)
   const { locale } = await params
+  console.log('LocaleLayout: locale:', locale)
 
   // Validate locale
-  if (!locales.includes(locale as any)) {
+  if (!locales.includes(locale as (typeof locales)[number])) {
+    console.log('LocaleLayout: Invalid locale:', locale)
     notFound()
   }
 
   // Load messages for the locale
-  const messages = await getMessages()
-
-  // Get locale configuration
-  const config = localeConfig[locale as keyof typeof localeConfig]
+  console.log('LocaleLayout: Before getMessages with locale:', locale)
+  const messages = await getMessages({ locale })
+  console.log('LocaleLayout: After getMessages')
 
   return (
-    <html lang={locale} dir={config.direction}>
-      <body>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      {children}
+    </NextIntlClientProvider>
   )
 }
 

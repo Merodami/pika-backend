@@ -1,3 +1,4 @@
+import { VoucherSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -6,11 +7,11 @@ import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import {
-  CustomerVoucherStatus,
+  CustomerVoucherStatusSchema,
   VoucherCodeTypeSchema,
   VoucherDiscountTypeSchema,
   VoucherScanSourceSchema,
-  VoucherSortBy,
+  VoucherSortBySchema,
   VoucherStateSchema,
 } from '../common/enums.js'
 import {
@@ -109,7 +110,7 @@ export const VoucherQueryParams = SearchParams.extend({
     .describe('Filter vouchers with available uses'),
 
   // Override default sorting with voucher-specific sort fields
-  sortBy: VoucherSortBy.default('createdAt'),
+  sortBy: VoucherSortBySchema.default(VoucherSortBy.CREATED_AT),
 })
   .merge(GeographicSearchParams)
   .merge(VoucherFilterParams)
@@ -248,7 +249,7 @@ export const UserVoucherResponse = openapi(
   z.object({
     voucher: VoucherResponse,
     claimedAt: z.string().datetime(),
-    status: CustomerVoucherStatus,
+    status: CustomerVoucherStatusSchema,
     redeemedAt: z.string().datetime().nullable().optional(),
   }),
   {

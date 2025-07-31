@@ -2,15 +2,15 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import {
-  AdSize,
-  ContentType,
-  PageLayoutType,
-  VoucherBookStatus,
-  VoucherBookType,
-} from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
+import {
+  AdSizeSchema,
+  ContentTypeSchema,
+  PageLayoutTypeSchema,
+  VoucherBookStatusSchema,
+  VoucherBookTypeSchema,
+} from '../common/enums.js'
 
 /**
  * Internal PDF service schemas - service-to-service communication
@@ -27,7 +27,7 @@ export const InternalVoucherBookResponse = openapi(
     id: UUID,
     title: z.string().max(255).describe('Voucher book title'),
     edition: z.string().max(100).optional().describe('Book edition'),
-    bookType: VoucherBookType.describe('Type of voucher book'),
+    bookType: VoucherBookTypeSchema,
     month: z
       .number()
       .int()
@@ -36,7 +36,7 @@ export const InternalVoucherBookResponse = openapi(
       .optional()
       .describe('Month for monthly books'),
     year: z.number().int().min(2020).max(2100).describe('Year of publication'),
-    status: VoucherBookStatus.describe('Current status of the book'),
+    status: VoucherBookStatusSchema,
     totalPages: z
       .number()
       .int()
@@ -186,7 +186,7 @@ export const InternalBookWithRelationsResponse = openapi(
         z.object({
           id: UUID,
           pageNumber: z.number().int().min(1).describe('Page number'),
-          layoutType: PageLayoutType.describe('Layout type'),
+          layoutType: PageLayoutTypeSchema,
           metadata: z
             .record(z.string(), z.any())
             .optional()
@@ -195,14 +195,14 @@ export const InternalBookWithRelationsResponse = openapi(
             .array(
               z.object({
                 id: UUID,
-                contentType: ContentType.describe('Content type'),
+                contentType: ContentTypeSchema,
                 position: z
                   .number()
                   .int()
                   .min(1)
                   .max(8)
                   .describe('Position (1-8)'),
-                size: AdSize.describe('Ad size'),
+                size: AdSizeSchema,
                 spacesUsed: z
                   .number()
                   .int()

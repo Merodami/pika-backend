@@ -1,11 +1,11 @@
 import { createSortFieldMapper } from '@api/common/utils/sorting.js'
 
-import { AdminUserSortBy, UserSortBy } from './enums.js'
+import { AdminUserSortBySchema, UserSortBySchema } from './enums.js'
 
 /**
  * Maps public API sort fields to database column names
  */
-export const userSortFieldMapper = createSortFieldMapper(UserSortBy, {
+export const userSortFieldMapper = createSortFieldMapper(UserSortBySchema, {
   name: 'firstName', // Maps 'name' to firstName for sorting
   email: 'email',
   createdAt: 'createdAt',
@@ -16,8 +16,11 @@ export const userSortFieldMapper = createSortFieldMapper(UserSortBy, {
 /**
  * Maps admin API sort fields to database column names
  */
-export const adminUserSortFieldMapper = createSortFieldMapper(AdminUserSortBy, {
-  createdAt: 'createdAt',
-  lastLoginAt: 'lastLoginAt',
-  email: 'email',
-})
+export const adminUserSortFieldMapper = createSortFieldMapper(
+  AdminUserSortBySchema,
+  {
+    createdAt: 'createdAt',
+    lastLoginAt: 'lastLoginAt',
+    email: 'email',
+  },
+)

@@ -3,11 +3,7 @@
 import { Bell } from 'lucide-react'
 import { useState } from 'react'
 
-interface NotificationDropdownProps {
-  userId: string
-}
-
-export function NotificationDropdown({}: NotificationDropdownProps) {
+export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false)
   const [unreadCount] = useState(3) // This would come from a real-time subscription
 

@@ -1,38 +1,45 @@
-import { z } from 'zod'
+import {
+  DeviceType,
+  GrantType,
+  OAuthError,
+  OAuthProvider,
+  TokenType,
+} from '@pika/types'
+
+import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 /**
- * Auth-specific enums
+ * Auth-specific enum schemas
+ * Following the standardized pattern with Schema suffix
  */
 
-export const TokenType = z.enum(['accessToken', 'refreshToken'])
+// Token type schema
+export const TokenTypeSchema = openapi(createZodEnum(TokenType), {
+  description: 'Type of authentication token',
+  example: TokenType.ACCESS_TOKEN,
+})
 
-export type TokenType = z.infer<typeof TokenType>
+// Grant type schema
+export const GrantTypeSchema = openapi(createZodEnum(GrantType), {
+  description: 'OAuth2 grant type',
+  example: GrantType.PASSWORD,
+})
 
-export const GrantType = z.enum([
-  'password',
-  'refreshToken',
-  'clientCredentials',
-])
+// OAuth provider schema
+export const OAuthProviderSchema = openapi(createZodEnum(OAuthProvider), {
+  description: 'Third-party OAuth provider',
+  example: OAuthProvider.GOOGLE,
+})
 
-export type GrantType = z.infer<typeof GrantType>
+// OAuth error schema
+export const OAuthErrorSchema = openapi(createZodEnum(OAuthError), {
+  description: 'OAuth2 error codes',
+  example: OAuthError.INVALID_REQUEST,
+})
 
-export const OAuthProvider = z.enum(['google', 'facebook', 'apple'])
-
-export type OAuthProvider = z.infer<typeof OAuthProvider>
-
-export const OAuthError = z.enum([
-  'invalidRequest',
-  'invalidClient',
-  'invalidGrant',
-  'unauthorizedClient',
-  'unsupportedGrantType',
-  'invalidScope',
-  'serverError',
-  'temporarilyUnavailable',
-])
-
-export type OAuthError = z.infer<typeof OAuthError>
-
-export const DeviceType = z.enum(['mobile', 'tablet', 'desktop', 'other'])
-
-export type DeviceType = z.infer<typeof DeviceType>
+// Device type schema
+export const DeviceTypeSchema = openapi(createZodEnum(DeviceType), {
+  description: 'Type of device used for authentication',
+  example: DeviceType.MOBILE,
+})

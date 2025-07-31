@@ -1,3 +1,4 @@
+import { BusinessSortBy as BusinessSortByEnum } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -155,7 +156,7 @@ export const AdminBusinessQueryParams = SearchParams.extend({
   createdTo: z.string().datetime().optional().describe('Created date to'),
   updatedFrom: z.string().datetime().optional().describe('Updated date from'),
   updatedTo: z.string().datetime().optional().describe('Updated date to'),
-  sortBy: BusinessSortBy.default('businessName'),
+  sortBy: BusinessSortBy.default(BusinessSortByEnum.BUSINESS_NAME),
 }).merge(createIncludeParam(BUSINESS_RELATIONS))
 
 export type AdminBusinessQueryParams = z.infer<typeof AdminBusinessQueryParams>
@@ -289,4 +290,31 @@ export const UpdateBusinessRatingRequest = openapi(
 
 export type UpdateBusinessRatingRequest = z.infer<
   typeof UpdateBusinessRatingRequest
+>
+
+// ============= Business Verification Management =============
+
+/**
+ * Business verification update request for PATCH endpoint
+ */
+export const PatchBusinessVerificationRequest = openapi(
+  z.object({
+    verified: z.boolean().describe('New verification status'),
+  }),
+  {
+    description: 'Update business verification status via PATCH',
+  },
+)
+
+export type PatchBusinessVerificationRequest = z.infer<
+  typeof PatchBusinessVerificationRequest
+>
+
+/**
+ * Business verification update response
+ */
+export const PatchBusinessVerificationResponse = AdminBusinessResponse
+
+export type PatchBusinessVerificationResponse = z.infer<
+  typeof PatchBusinessVerificationResponse
 >

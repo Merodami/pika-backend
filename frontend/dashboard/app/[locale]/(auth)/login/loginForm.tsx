@@ -1,35 +1,45 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Button, Form, Input, Alert, Checkbox } from 'antd'
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { authFrontend } from '@pika/api'
+import { Button, Form, Input, Alert, Checkbox } from 'antd'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { z } from 'zod'
+
 import { login } from '@/app/actions/auth'
 import { useAppStore } from '@/store/app.store'
+import { LocalizedLink } from '@/components/ui/LocalizedLink'
+import { useLocalizedRouter } from '@/hooks/useLocalizedRouter'
 
 // Use the admin/business login schema with enhanced password requirements
 const loginSchema = authFrontend.AdminBusinessLoginFormSchema
 
-type LoginFormData = z.infer<typeof loginSchema>
+// Extract input and output types for proper branded type handling
+type LoginFormInput = z.input<typeof loginSchema>
+type LoginFormOutput = z.output<typeof loginSchema>
+type LoginFormData = LoginFormOutput
 
 export function LoginForm() {
   const t = useTranslations('auth.login')
+  const router = useLocalizedRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const { formDrafts, saveFormDraft, clearFormDraft } = useAppStore()
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema) as any, // Type assertion needed due to branded types
-    defaultValues: formDrafts['login'] || {},
+  } = useForm<LoginFormInput, unknown, LoginFormOutput>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: formDrafts['login'] || {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
   })
 
   const onSubmit = async (data: LoginFormData) => {
@@ -43,11 +53,16 @@ export function LoginForm() {
 
       if (result?.error) {
         setError(result.error)
-      } else {
+      } else if (result?.success) {
         // Clear form draft on success
         clearFormDraft('login')
+
+        // Industry standard approach: refresh router to update server component state
+        // then navigate to home page
+        router.refresh()
+        router.push(`/${router.locale}`)
       }
-    } catch (err) {
+    } catch {
       setError(t('error'))
     } finally {
       setIsLoading(false)
@@ -55,7 +70,10 @@ export function LoginForm() {
   }
 
   // Save form draft on input change
-  const handleInputChange = (field: keyof LoginFormData, value: any) => {
+  const handleInputChange = (
+    field: keyof LoginFormData,
+    value: string | boolean
+  ) => {
     const currentData = formDrafts['login'] || {}
     saveFormDraft('login', { ...currentData, [field]: value })
   }
@@ -83,13 +101,22 @@ export function LoginForm() {
           validateStatus={errors.email ? 'error' : ''}
           help={errors.email?.message}
         >
-          <Input
-            {...register('email')}
-            prefix={<MailOutlined />}
-            placeholder={t('email')}
-            size="large"
-            autoComplete="email"
-            onChange={(e) => handleInputChange('email', e.target.value)}
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                prefix={<MailOutlined />}
+                placeholder={t('email')}
+                size="large"
+                autoComplete="email"
+                onChange={(e) => {
+                  field.onChange(e)
+                  handleInputChange('email', e.target.value)
+                }}
+              />
+            )}
           />
         </Form.Item>
 
@@ -98,25 +125,48 @@ export function LoginForm() {
           validateStatus={errors.password ? 'error' : ''}
           help={errors.password?.message}
         >
-          <Input.Password
-            {...register('password')}
-            prefix={<LockOutlined />}
-            placeholder={t('password')}
-            size="large"
-            autoComplete="current-password"
-            onChange={(e) => handleInputChange('password', e.target.value)}
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <Input.Password
+                {...field}
+                prefix={<LockOutlined />}
+                placeholder={t('password')}
+                size="large"
+                autoComplete="current-password"
+                onChange={(e) => {
+                  field.onChange(e)
+                  handleInputChange('password', e.target.value)
+                }}
+              />
+            )}
           />
         </Form.Item>
 
         <Form.Item>
           <div className="flex items-center justify-between">
-            <Checkbox {...register('rememberMe')}>{t('rememberMe')}</Checkbox>
-            <Link
+            <Controller
+              name="rememberMe"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <Checkbox
+                  checked={value}
+                  onChange={(e) => {
+                    onChange(e.target.checked)
+                    handleInputChange('rememberMe', e.target.checked)
+                  }}
+                >
+                  {t('rememberMe')}
+                </Checkbox>
+              )}
+            />
+            <LocalizedLink
               href="/forgot-password"
               className="text-sm text-blue-600 hover:text-blue-500"
             >
               {t('forgotPassword')}
-            </Link>
+            </LocalizedLink>
           </div>
         </Form.Item>
 
@@ -134,12 +184,12 @@ export function LoginForm() {
 
         <div className="text-center">
           <span className="text-gray-600">{t('noAccount')} </span>
-          <Link
+          <LocalizedLink
             href="/register"
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             {t('signUp')}
-          </Link>
+          </LocalizedLink>
         </div>
       </Form>
     </div>

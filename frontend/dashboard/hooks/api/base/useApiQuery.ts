@@ -25,9 +25,10 @@ export function useApiQuery<TData, TError = Error>(
     refetchOnReconnect: 'always',
     staleTime: options.staleTime ?? 5 * 60 * 1000, // 5 minutes default
     gcTime: options.gcTime ?? 10 * 60 * 1000, // 10 minutes default
-    onError: (error) => {
+    throwOnError: (error: any) => {
       handleError(error)
-      options.onError?.(error)
+
+      return false // Don't throw, let component handle gracefully
     },
   })
 }

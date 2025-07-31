@@ -1,7 +1,7 @@
 // src/types/search.ts
 import type { ParsedIncludes } from '@pika/types'
 import type { SearchParams } from '@pika/types'
-import type { BillingInterval, SubscriptionStatus } from '@pika/types'
+import type { SubscriptionStatus } from '@pika/types'
 
 /**
  * Public search parameters
@@ -56,7 +56,6 @@ export interface InternalSubscriptionSearchParams extends SearchParams {
 export interface PlanSearchParams extends SearchParams {
   // Filters
   isActive?: boolean
-  interval?: BillingInterval
   minPrice?: number
   maxPrice?: number
   search?: string

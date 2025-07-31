@@ -1,45 +1,69 @@
-import { z } from 'zod'
+import {
+  AllowedMimeTypes,
+  FileSortBy,
+  FileStatus,
+  FileType,
+  HealthStatus,
+  StorageProvider,
+} from '@pika/types'
+
+import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 /**
- * Storage service enums
+ * Storage service enum schemas
+ *
+ * Naming convention:
+ * - TypeScript enums from @pika/types: Original name (e.g., FileType)
+ * - Zod schemas: Add 'Schema' suffix (e.g., FileTypeSchema)
  */
 
-export const FileType = z.enum(['image', 'video', 'document', 'audio', 'other'])
-export type FileType = z.infer<typeof FileType>
+// ============= Storage Service Enum Schemas =============
 
-export const FileStatus = z.enum(['pending', 'uploaded', 'failed', 'deleted'])
-export type FileStatus = z.infer<typeof FileStatus>
+/**
+ * File type schema
+ */
+export const FileTypeSchema = openapi(createZodEnum(FileType), {
+  description: 'File type category',
+  example: FileType.IMAGE,
+})
 
-export const StorageProvider = z.enum(['aws_s3', 'local', 'minio'])
-export type StorageProvider = z.infer<typeof StorageProvider>
+/**
+ * File status schema
+ */
+export const FileStatusSchema = openapi(createZodEnum(FileStatus), {
+  description: 'File processing status',
+  example: FileStatus.UPLOADED,
+})
 
-export const AllowedMimeTypes = z.enum([
-  // Images
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml',
-  // Documents
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  // Videos
-  'video/mp4',
-  'video/mpeg',
-  'video/quicktime',
-  'video/x-msvideo',
-  // Audio
-  'audio/mpeg',
-  'audio/wav',
-  'audio/ogg',
-])
-export type AllowedMimeTypes = z.infer<typeof AllowedMimeTypes>
+/**
+ * Storage provider schema
+ */
+export const StorageProviderSchema = openapi(createZodEnum(StorageProvider), {
+  description: 'Supported storage provider',
+  example: StorageProvider.AWS_S3,
+})
 
-export const FileSortBy = z.enum(['uploadedAt', 'fileSize', 'fileName'])
-export type FileSortBy = z.infer<typeof FileSortBy>
+/**
+ * File sorting fields schema
+ */
+export const FileSortBySchema = openapi(createZodEnum(FileSortBy), {
+  description: 'Field to sort files by',
+  example: FileSortBy.UPLOADED_AT,
+})
 
-export const HealthStatus = z.enum(['healthy', 'degraded', 'unhealthy'])
-export type HealthStatus = z.infer<typeof HealthStatus>
+/**
+ * Health status schema
+ */
+export const HealthStatusSchema = openapi(createZodEnum(HealthStatus), {
+  description: 'System health status',
+  example: HealthStatus.HEALTHY,
+})
+
+/**
+ * Allowed MIME types schema
+ */
+export const AllowedMimeTypesSchema = openapi(createZodEnum(AllowedMimeTypes), {
+  description: 'Allowed MIME types for file uploads',
+  example: AllowedMimeTypes.JPEG,
+})

@@ -8,10 +8,11 @@ import {
   PhoneOutlined,
   ShopOutlined,
 } from '@ant-design/icons'
+import { VoucherDiscountType } from '@pika/types'
 import { Card, Divider, QRCode, Space, Tag, Typography } from 'antd'
-import { format } from 'date-fns'
 
-import type { VoucherDesign } from '@/app/(dashboard)/business/vouchers/create/page'
+import { formatDate } from '@/lib/utils/date'
+import type { VoucherDesign } from '@/types/voucher'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -28,12 +29,10 @@ export function VoucherPreview({
 }: VoucherPreviewProps) {
   const getDiscountDisplay = () => {
     switch (voucherDesign.discountType) {
-      case 'percentage':
+      case VoucherDiscountType.percentage:
         return `${voucherDesign.discountValue}% OFF`
-      case 'fixed_amount':
+      case VoucherDiscountType.fixed:
         return `$${voucherDesign.discountValue} OFF`
-      case 'buy_one_get_one':
-        return 'BUY 1 GET 1'
       default:
         return 'SPECIAL OFFER'
     }
@@ -65,23 +64,8 @@ export function VoucherPreview({
           borderRadius: '4px',
           borderWidth: '1px',
         }
-      case 'bold':
-        return {
-          ...baseStyles,
-          borderRadius: '12px',
-          borderWidth: '3px',
-          background: `linear-gradient(45deg, ${voucherDesign.primaryColor}20 0%, ${voucherDesign.backgroundColor} 50%, ${voucherDesign.primaryColor}20 100%)`,
-        }
       default:
         return baseStyles
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'MMM dd, yyyy')
-    } catch {
-      return dateString
     }
   }
 
@@ -268,7 +252,7 @@ export function VoucherPreview({
                 </Text>
               </Space>
               <ul className="mt-2 ml-4">
-                {voucherDesign.terms.map((term, index) => (
+                {voucherDesign.terms.map((term: string, index: number) => (
                   <li key={index}>
                     <Text
                       style={{

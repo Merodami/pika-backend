@@ -1,12 +1,13 @@
+import { AdminVoucherSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
+import { AnalyticsGroupBySchema } from '../../shared/query.js'
 import {
-  AdminVoucherSortBy,
-  AnalyticsGroupBy,
-  VoucherDiscountType,
-  VoucherState,
+  AdminVoucherSortBySchema,
+  VoucherDiscountTypeSchema,
+  VoucherStateSchema,
 } from '../common/enums.js'
 import {
   GeographicSearchParams,
@@ -27,8 +28,8 @@ export const AdminVoucherQueryParams = SearchParams.extend({
   // Voucher-specific filters
   businessId: UUID.optional(),
   categoryId: UUID.optional(),
-  state: VoucherState.optional(),
-  discountType: VoucherDiscountType.optional(),
+  state: VoucherStateSchema.optional(),
+  discountType: VoucherDiscountTypeSchema.optional(),
   minDiscount: z.number().nonnegative().optional(),
   maxDiscount: z.number().nonnegative().optional(),
   currency: z.string().optional(),
@@ -51,7 +52,7 @@ export const AdminVoucherQueryParams = SearchParams.extend({
   isDeleted: z.boolean().optional(),
 
   // Override sortBy with service-specific enum
-  sortBy: AdminVoucherSortBy.default('createdAt'),
+  sortBy: AdminVoucherSortBySchema.default(AdminVoucherSortBy.CREATED_AT),
 
   // Include relations (industry standard pattern)
   include: z
@@ -72,7 +73,7 @@ export type AdminVoucherQueryParams = z.infer<typeof AdminVoucherQueryParams>
 export const VoucherAnalyticsQueryParams = z.object({
   startDate: DateTime.optional(),
   endDate: DateTime.optional(),
-  groupBy: AnalyticsGroupBy.optional(),
+  groupBy: AnalyticsGroupBySchema.optional(),
 })
 
 export type VoucherAnalyticsQueryParams = z.infer<
@@ -85,7 +86,7 @@ export type VoucherAnalyticsQueryParams = z.infer<
 export const BusinessVoucherStatsQueryParams = z.object({
   startDate: DateTime.optional(),
   endDate: DateTime.optional(),
-  groupBy: AnalyticsGroupBy.optional(),
+  groupBy: AnalyticsGroupBySchema.optional(),
 })
 
 export type BusinessVoucherStatsQueryParams = z.infer<

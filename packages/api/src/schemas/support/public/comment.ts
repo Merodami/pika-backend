@@ -1,12 +1,14 @@
+import { CommentSortBy, SortOrder } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { SortOrderSchema } from '../../common/enums.js'
 import { UserId } from '../../shared/branded.js'
-import { SortOrder } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import { CommentSortBySchema } from '../common/enums.js'
 
 /**
  * Public support comment schemas
@@ -68,12 +70,10 @@ export type SupportCommentListResponse = z.infer<
 
 // ProblemIdForCommentsParam is now imported from common/parameters.ts
 
-import { CommentSortBy } from '../common/enums.js'
-
 // Search schema following standard pattern
 export const SupportCommentSearchParams = SearchParams.extend({
-  sortBy: CommentSortBy.default('createdAt'),
-  sortOrder: SortOrder.default(SortOrder.enum.asc), // Comments should be chronological by default
+  sortBy: CommentSortBySchema.default(CommentSortBy.CREATED_AT),
+  sortOrder: SortOrderSchema.default(SortOrder.ASC), // Comments should be chronological by default
 })
 export type SupportCommentSearchParams = z.infer<
   typeof SupportCommentSearchParams

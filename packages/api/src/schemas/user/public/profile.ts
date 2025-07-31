@@ -2,13 +2,13 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
-import { UserRole, UserStatus } from '../../shared/enums.js'
 import {
   DateOnly,
   DateTime,
   LanguageCode,
   PhoneNumber,
 } from '../../shared/primitives.js'
+import { UserRoleSchema, UserStatusSchema } from '../common/enums.js'
 
 /**
  * User profile schemas for public API
@@ -54,8 +54,8 @@ export const CurrentUserProfile = openapi(
     bio: z.string().max(500).optional(),
     dateOfBirth: DateOnly.optional(),
     preferredLanguage: LanguageCode.optional(),
-    role: UserRole,
-    status: UserStatus,
+    role: UserRoleSchema,
+    status: UserStatusSchema,
     emailVerified: z.boolean(),
     phoneVerified: z.boolean().optional(),
     createdAt: DateTime,

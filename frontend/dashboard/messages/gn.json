@@ -142,5 +142,16 @@
     "notFound": "Ndojejuhúi",
     "serverError": "Servidor jejavy",
     "networkError": "Jeike jejavy"
+  },
+  "error": {
+    "title": "Ojejavy mbaʼe",
+    "message": "Disculpa, ojejavy ore rembiapo ejerure jave.",
+    "tryAgain": "Eñehaʼã jey",
+    "goHome": "Ehoka ñepyrũme"
+  },
+  "notFound": {
+    "title": "Toguahápe ndojejuhu",
+    "message": "Disculpa, toguahá eike hague ndopĩri.",
+    "backHome": "Take ñepyrũme"
   }
 }

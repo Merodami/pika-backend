@@ -13,7 +13,6 @@
     "**/*.integration-test.ts",
     "**/previous-architecture/**",
     "**/pika-old/**",
-    "**/api-microservices-sdk/**",
     "**/packages/api/generated/**",
     "**/packages/api/src/scripts/generators/**",
     "**/packages/database/prisma/migrations/**",

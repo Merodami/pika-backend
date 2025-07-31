@@ -1,14 +1,17 @@
-import { getTranslations } from 'next-intl/server'
 import { Ticket, Users, TrendingUp, QrCode } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 import { MetricCard } from '@/components/ui/metricCard'
+import type { LocaleProps } from '@/types/common'
 
-interface BusinessDashboardMetricsProps {
+interface BusinessDashboardMetricsProps extends LocaleProps {
   businessId: string
 }
 
-export async function BusinessDashboardMetrics({}: BusinessDashboardMetricsProps) {
-  const t = await getTranslations('dashboard.metrics')
+export async function BusinessDashboardMetrics({
+  locale,
+}: BusinessDashboardMetricsProps) {
+  const t = await getTranslations({ locale, namespace: 'dashboard.metrics' })
 
   // Fetch business-specific metrics
   // In production, these would come from the API

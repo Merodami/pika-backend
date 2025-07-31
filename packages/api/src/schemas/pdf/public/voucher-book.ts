@@ -1,12 +1,15 @@
+import { VoucherBookSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
-import { VoucherBookType } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { VoucherBookSortBy } from '../common/enums.js'
+import {
+  VoucherBookSortBySchema,
+  VoucherBookTypeSchema,
+} from '../common/enums.js'
 
 /**
  * Public PDF voucher book schemas (read-only operations)
@@ -27,7 +30,7 @@ export const VoucherBookResponse = openapi(
       .nullable()
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
-    bookType: VoucherBookType.describe('Type of voucher book'),
+    bookType: VoucherBookTypeSchema,
     month: z
       .number()
       .int()
@@ -84,7 +87,7 @@ export type VoucherBookResponse = z.infer<typeof VoucherBookResponse>
  * Voucher book search/filter parameters - matches original Pika implementation
  */
 export const VoucherBookQueryParams = SearchParams.extend({
-  bookType: VoucherBookType.optional().describe('Filter by book type'),
+  bookType: VoucherBookTypeSchema.optional(),
   year: z.coerce
     .number()
     .int()
@@ -100,7 +103,7 @@ export const VoucherBookQueryParams = SearchParams.extend({
     .optional()
     .describe('Filter by month'),
   search: z.string().optional().describe('Search in title and edition'),
-  sortBy: VoucherBookSortBy.default('publishedAt'),
+  sortBy: VoucherBookSortBySchema.default(VoucherBookSortBy.PUBLISHED_AT),
   // Note: status is always PUBLISHED for public API - no status filtering needed
 })
 

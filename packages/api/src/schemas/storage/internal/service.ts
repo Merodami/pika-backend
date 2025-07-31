@@ -1,14 +1,19 @@
+import {
+  FileStatus,
+  FileType,
+  StorageProvider,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import {
-  FileStatus,
-  FileType,
-  HealthStatus,
-  StorageProvider,
-} from '../common/index.js'
+  FileStatusSchema,
+  FileTypeSchema,
+  HealthStatusSchema,
+  StorageProviderSchema,
+} from '../common/enums.js'
 
 /**
  * Internal storage service schemas for service-to-service communication
@@ -19,13 +24,13 @@ import {
 export const StorageServiceHealthCheck = openapi(
   z.object({
     service: z.literal('storage'),
-    status: HealthStatus,
+    status: HealthStatusSchema,
     timestamp: z.string().datetime(),
-    providersStatus: z.object(
-      Object.fromEntries(
-        StorageProvider.options.map((key) => [key, HealthStatus.optional()]),
-      ),
-    ),
+    providersStatus: z.object({
+      [StorageProvider.AWS_S3]: HealthStatusSchema.optional(),
+      [StorageProvider.LOCAL]: HealthStatusSchema.optional(),
+      [StorageProvider.MINIO]: HealthStatusSchema.optional(),
+    }),
     totalFiles: z.number().int().nonnegative(),
     totalStorageUsed: z
       .number()
@@ -56,8 +61,8 @@ export const InternalCreateFileRequest = openapi(
     fileName: z.string(),
     fileSize: z.number().int().positive(),
     mimeType: z.string(),
-    fileType: FileType,
-    provider: StorageProvider,
+    fileType: FileTypeSchema,
+    provider: StorageProviderSchema,
     bucketName: z.string().optional(),
     region: z.string().optional(),
     isPublic: z.boolean().default(false),
@@ -79,9 +84,9 @@ export const InternalFileResponse = openapi(
     fileName: z.string(),
     fileSize: z.number().int().positive(),
     mimeType: z.string(),
-    fileType: FileType,
-    status: FileStatus,
-    provider: StorageProvider,
+    fileType: FileTypeSchema,
+    status: FileStatusSchema,
+    provider: StorageProviderSchema,
     bucketName: z.string().optional(),
     region: z.string().optional(),
     isPublic: z.boolean(),
@@ -139,8 +144,8 @@ export type InternalBulkDeleteResponse = z.infer<
 export const GetUserFilesRequest = openapi(
   z.object({
     userId: UserId,
-    fileType: FileType.optional(),
-    status: FileStatus.optional(),
+    fileType: FileTypeSchema.optional(),
+    status: FileStatusSchema.optional(),
     limit: z.number().int().positive().max(1000).default(100),
     offset: z.number().int().nonnegative().default(0),
   }),
@@ -155,22 +160,21 @@ export const UserFileSummaryResponse = openapi(
     userId: UserId,
     totalFiles: z.number().int().nonnegative(),
     totalSize: z.number().int().nonnegative().describe('Total size in bytes'),
-    filesByType: z.object(
-      Object.fromEntries(
-        FileType.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
-    filesByStatus: z.object(
-      Object.fromEntries(
-        FileStatus.options.map((key) => [
-          key,
-          z.number().int().nonnegative().optional(),
-        ]),
-      ),
-    ),
+    filesByType: z.object({
+      [FileType.IMAGE]: z.number().int().nonnegative().optional(),
+      [FileType.VIDEO]: z.number().int().nonnegative().optional(),
+      [FileType.DOCUMENT]: z.number().int().nonnegative().optional(),
+      [FileType.AUDIO]: z.number().int().nonnegative().optional(),
+      [FileType.OTHER]: z.number().int().nonnegative().optional(),
+    }),
+    filesByStatus: z.object({
+      [FileStatus.PENDING]: z.number().int().nonnegative().optional(),
+      [FileStatus.UPLOADED]: z.number().int().nonnegative().optional(),
+      [FileStatus.PROCESSING]: z.number().int().nonnegative().optional(),
+      [FileStatus.PROCESSED]: z.number().int().nonnegative().optional(),
+      [FileStatus.FAILED]: z.number().int().nonnegative().optional(),
+      [FileStatus.DELETED]: z.number().int().nonnegative().optional(),
+    }),
     oldestFile: DateTime.optional(),
     newestFile: DateTime.optional(),
   }),
@@ -186,7 +190,7 @@ export const CheckUserQuotaRequest = openapi(
   z.object({
     userId: UserId,
     fileSize: z.number().int().positive(),
-    fileType: FileType.optional(),
+    fileType: FileTypeSchema.optional(),
   }),
   {
     description: 'Check if user can upload file within quota',
@@ -224,7 +228,7 @@ export type UserQuotaResponse = z.infer<typeof UserQuotaResponse>
 export const MigrateFileRequest = openapi(
   z.object({
     fileId: UUID,
-    targetProvider: StorageProvider,
+    targetProvider: StorageProviderSchema,
     targetBucket: z.string().optional(),
     targetRegion: z.string().optional(),
     deleteOriginal: z.boolean().default(true),
@@ -238,8 +242,8 @@ export type MigrateFileRequest = z.infer<typeof MigrateFileRequest>
 export const MigrateFileResponse = openapi(
   z.object({
     fileId: UUID,
-    oldProvider: StorageProvider,
-    newProvider: StorageProvider,
+    oldProvider: StorageProviderSchema,
+    newProvider: StorageProviderSchema,
     oldFileKey: z.string(),
     newFileKey: z.string(),
     migrationStatus: z.enum(['success', 'failed', 'partial']),
@@ -258,7 +262,7 @@ export const CleanupOrphanedFilesRequest = openapi(
   z.object({
     olderThan: DateTime.describe('Delete files older than this date'),
     dryRun: z.boolean().default(true),
-    provider: StorageProvider.optional(),
+    provider: StorageProviderSchema.optional(),
     batchSize: z.number().int().positive().max(1000).default(100),
   }),
   {

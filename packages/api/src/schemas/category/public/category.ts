@@ -1,14 +1,15 @@
+import { CategorySortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
-import { CategorySortBy } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { createIncludeParam } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
+import { CategorySortBySchema } from '../common/enums.js'
 import { CATEGORY_RELATIONS } from '../common/enums.js'
 
 /**
@@ -78,7 +79,7 @@ export type CategoryResponse = z.infer<typeof CategoryResponse>
 export const CategoryQueryParams = SearchParams.extend({
   parentId: UUID.optional().describe('Filter by parent category'),
   isActive: optionalBoolean().describe('Filter by active status'),
-  sortBy: CategorySortBy.default('sortOrder'),
+  sortBy: CategorySortBySchema.default(CategorySortBy.SORT_ORDER),
 }).merge(createIncludeParam(CATEGORY_RELATIONS))
 
 export type CategoryQueryParams = z.infer<typeof CategoryQueryParams>

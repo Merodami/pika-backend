@@ -1,8 +1,4 @@
-import type {
-  ProblemPriorityType,
-  ProblemStatusType,
-  ProblemTypeType,
-} from '@pika/types'
+import type { TicketPriority, TicketStatus, TicketType } from '@pika/types'
 
 import type { SupportCommentDomain } from './supportComment.js'
 import type { UserDomain } from './user.js'
@@ -12,9 +8,9 @@ export interface ProblemDomain {
   userId: string
   title: string
   description: string
-  status: ProblemStatusType
-  priority: ProblemPriorityType
-  type: ProblemTypeType
+  status: TicketStatus
+  priority: TicketPriority
+  type: TicketType
   createdAt: Date
   updatedAt?: Date | null
   resolvedAt?: Date | null

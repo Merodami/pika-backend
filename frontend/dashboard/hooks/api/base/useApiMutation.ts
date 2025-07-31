@@ -15,7 +15,7 @@ interface ApiMutationOptions<TData, TError, TVariables, TContext>
   mutationFn: (variables: TVariables) => Promise<TData>
   successMessage?: string | ((data: TData) => string)
   errorMessage?: string
-  invalidateQueries?: Array<unknown[]>
+  invalidateQueries?: Array<ReadonlyArray<unknown>>
   showProgress?: boolean
 }
 

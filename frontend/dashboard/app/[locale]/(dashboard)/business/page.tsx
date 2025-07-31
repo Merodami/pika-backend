@@ -3,10 +3,13 @@ import { Suspense } from 'react'
 
 import { requireBusiness } from '@/app/_services/authService'
 import { BusinessDashboardMetrics } from '@/components/features/businessDashboardMetrics'
-import { VoucherPerformance } from '@/components/features/voucherPerformance'
 import { RecentCustomers } from '@/components/features/recentCustomers'
+import { VoucherPerformance } from '@/components/features/voucherPerformance'
 import { LoadingSkeleton } from '@/components/ui/loadingSkeleton'
 import type { Locale } from '@/i18n/config'
+
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
 
 interface BusinessDashboardPageProps {
   params: Promise<{ locale: Locale }>
@@ -32,13 +35,13 @@ export default async function BusinessDashboardPage({
 
       {/* Business Metrics */}
       <Suspense fallback={<LoadingSkeleton />}>
-        <BusinessDashboardMetrics businessId={businessId} />
+        <BusinessDashboardMetrics businessId={businessId} locale={locale} />
       </Suspense>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Voucher Performance */}
         <Suspense fallback={<LoadingSkeleton />}>
-          <VoucherPerformance businessId={businessId} />
+          <VoucherPerformance businessId={businessId} locale={locale} />
         </Suspense>
 
         {/* Recent Customers */}

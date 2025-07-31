@@ -56,8 +56,14 @@ export interface IUserService {
   updateUser(id: string, data: any): Promise<UserDomain>
   deleteUser(id: string): Promise<void>
   updateUserStatus(id: string, status: string): Promise<UserDomain>
-  banUser(id: string): Promise<UserDomain>
-  unbanUser(id: string): Promise<UserDomain>
+  banUser(
+    id: string,
+    options?: { reason?: string; duration?: number; notifyUser?: boolean },
+  ): Promise<UserDomain>
+  unbanUser(
+    id: string,
+    options?: { reason?: string; notifyUser?: boolean },
+  ): Promise<UserDomain>
   uploadUserAvatar(userId: string, file: any): Promise<string>
 
   // Unified verification system
@@ -316,12 +322,69 @@ export class UserService implements IUserService {
     }
   }
 
-  async banUser(id: string): Promise<UserDomain> {
-    return this.updateUserStatus(id, UserStatus.BANNED)
+  async banUser(
+    id: string,
+    options?: { reason?: string; duration?: number; notifyUser?: boolean },
+  ): Promise<UserDomain> {
+    try {
+      logger.debug(`Banning user ${id}`, options)
+      
+      // Update user status to banned
+      const user = await this.updateUserStatus(id, UserStatus.BANNED)
+      
+      // Send notification if requested
+      if (options?.notifyUser && this.communicationClient) {
+        await this.communicationClient.sendEmail({
+          to: user.email,
+          subject: 'Account Suspended',
+          templateId: EmailTemplateId.ACCOUNT_BANNED,
+          templateParams: {
+            reason: options.reason || 'Terms of Service violation',
+            duration: options.duration,
+          },
+        }).catch((error) => {
+          logger.error('Failed to send ban notification:', error)
+          // Don't fail the ban operation if notification fails
+        })
+      }
+      
+      return user
+    } catch (error) {
+      logger.error(`Error banning user ${id}:`, error)
+      throw ErrorFactory.fromError(error, 'Failed to ban user')
+    }
   }
 
-  async unbanUser(id: string): Promise<UserDomain> {
-    return this.updateUserStatus(id, UserStatus.ACTIVE)
+  async unbanUser(
+    id: string,
+    options?: { reason?: string; notifyUser?: boolean },
+  ): Promise<UserDomain> {
+    try {
+      logger.debug(`Unbanning user ${id}`, options)
+      
+      // Update user status to active
+      const user = await this.updateUserStatus(id, UserStatus.ACTIVE)
+      
+      // Send notification if requested
+      if (options?.notifyUser && this.communicationClient) {
+        await this.communicationClient.sendEmail({
+          to: user.email,
+          subject: 'Account Reinstated',
+          templateId: EmailTemplateId.ACCOUNT_UNBANNED,
+          templateParams: {
+            reason: options.reason || 'Your account has been reinstated',
+          },
+        }).catch((error) => {
+          logger.error('Failed to send unban notification:', error)
+          // Don't fail the unban operation if notification fails
+        })
+      }
+      
+      return user
+    } catch (error) {
+      logger.error(`Error unbanning user ${id}:`, error)
+      throw ErrorFactory.fromError(error, 'Failed to unban user')
+    }
   }
 
   async uploadUserAvatar(userId: string, file: any): Promise<string> {

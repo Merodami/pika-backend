@@ -1,7 +1,6 @@
 {
-  "name": "pika-dashboard",
+  "name": "@pika/dashboard",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "implicitDependencies": ["@pika/api"],
   "targets": {
     "typecheck": {
       "executor": "nx:run-commands",
@@ -35,7 +34,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Dashboard build is temporarily disabled. Use yarn nx run pika-dashboard:build-actual to build'",
+        "command": "echo 'Dashboard build is temporarily disabled. Use yarn nx run @pika/dashboard:build-actual to build'",
         "cwd": "{projectRoot}"
       }
     },

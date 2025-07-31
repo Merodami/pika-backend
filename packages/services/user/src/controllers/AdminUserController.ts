@@ -1,5 +1,6 @@
 import { userAdmin, userPublic } from '@pika/api'
 import { adaptMulterFile, RequestContext, validateResponse } from '@pika/http'
+import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { IUserService } from '@user/services/UserService.js'
 import type { NextFunction, Request, Response } from 'express'
@@ -16,6 +17,8 @@ export class AdminUserController {
     this.getMyProfile = this.getMyProfile.bind(this)
     this.updateMyProfile = this.updateMyProfile.bind(this)
     this.getUserVerificationStatus = this.getUserVerificationStatus.bind(this)
+    this.getUserById = this.getUserById.bind(this)
+    this.deleteUser = this.deleteUser.bind(this)
   }
 
   /**
@@ -24,7 +27,7 @@ export class AdminUserController {
    */
   async verifyUser(
     req: Request<{}, {}, userPublic.UnifiedVerificationRequest>,
-    res: Response,
+    res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -37,38 +40,10 @@ export class AdminUserController {
         )
       }
 
-      const user = await this.userService.verify(verificationRequest)
+      await this.userService.verify(verificationRequest)
 
-      // Map to admin detail response format
-      const adminResponse: userAdmin.AdminUserDetailResponse = {
-        id: user.id as any,
-        email: user.email as any,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phoneNumber: user.phoneNumber || undefined,
-        dateOfBirth: user.dateOfBirth || undefined,
-        avatarUrl: user.avatarUrl || undefined,
-        status: user.status as any,
-        role: user.role as any,
-        emailVerified: user.emailVerified,
-        phoneVerified: user.phoneVerified,
-        lastLoginAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      }
-
-      const response = {
-        success: true,
-        message: `User ${user.email} verified successfully`,
-        user: adminResponse,
-      }
-      const validatedResponse = validateResponse(
-        userAdmin.VerifyUserResponse,
-        response,
-        'AdminUserController.verifyUser',
-      )
-
-      res.json(validatedResponse)
+      // No content response - verification operations don't need response body
+      res.status(204).send()
     } catch (error) {
       next(error)
     }
@@ -149,6 +124,39 @@ export class AdminUserController {
   }
 
   /**
+   * GET /admin/users/:id
+   * Get user by ID with admin details
+   */
+  async getUserById(
+    req: Request<userAdmin.UserIdParam>,
+    res: Response<userAdmin.AdminUserDetailResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: userId } = req.params
+
+      const user = await this.userService.getUserById(userId)
+
+      if (!user) {
+        throw ErrorFactory.resourceNotFound('User', userId)
+      }
+
+      // Use toAdminDTO which returns data in the format expected by the schema
+      const adminResponse = UserMapper.toAdminDTO(user)
+
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserDetailResponse,
+        adminResponse,
+        'AdminUserController.getUserById',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
    * GET /admin/users/me
    * Get current admin user profile
    */
@@ -171,23 +179,8 @@ export class AdminUserController {
         throw ErrorFactory.resourceNotFound('User', userId)
       }
 
-      // Map user to admin detail response format
-      const adminResponse: userAdmin.AdminUserDetailResponse = {
-        id: user.id as any,
-        email: user.email as any,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phoneNumber: user.phoneNumber || undefined,
-        dateOfBirth: user.dateOfBirth || undefined,
-        avatarUrl: user.avatarUrl || undefined,
-        status: user.status as any, // Status enum mapping
-        role: user.role as any, // Role enum mapping
-        emailVerified: user.emailVerified,
-        phoneVerified: user.phoneVerified,
-        lastLoginAt: user.lastLoginAt ? user.lastLoginAt : undefined,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      }
+      // Use toAdminDTO which returns data in the format expected by the schema
+      const adminResponse = UserMapper.toAdminDTO(user)
 
       const validatedResponse = validateResponse(
         userAdmin.AdminUserDetailResponse,
@@ -231,25 +224,8 @@ export class AdminUserController {
 
       // TODO: Handle adminNotes update separately if needed
 
-      // Return updated profile in same format as getMyProfile
-      const adminResponse: userAdmin.AdminUserDetailResponse = {
-        id: updatedUser.id as any,
-        email: updatedUser.email as any,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        phoneNumber: updatedUser.phoneNumber || undefined,
-        dateOfBirth: updatedUser.dateOfBirth || undefined,
-        avatarUrl: updatedUser.avatarUrl || undefined,
-        status: updatedUser.status as any,
-        role: updatedUser.role as any,
-        emailVerified: updatedUser.emailVerified,
-        phoneVerified: updatedUser.phoneVerified,
-        lastLoginAt: updatedUser.lastLoginAt
-          ? updatedUser.lastLoginAt
-          : undefined,
-        createdAt: updatedUser.createdAt,
-        updatedAt: updatedUser.updatedAt,
-      }
+      // Use toAdminDTO which returns data in the format expected by the schema
+      const adminResponse = UserMapper.toAdminDTO(updatedUser)
 
       const validatedResponse = validateResponse(
         userAdmin.AdminUserDetailResponse,
@@ -281,12 +257,15 @@ export class AdminUserController {
         throw ErrorFactory.resourceNotFound('User', id)
       }
 
+      // Use toAdminDTO to get proper types
+      const dto = UserMapper.toAdminDTO(user)
+
       const verificationStatus: userAdmin.UserVerificationStatusResponse = {
-        userId: user.id as any,
-        emailVerified: user.emailVerified,
-        phoneVerified: user.phoneVerified,
+        userId: dto.id,
+        emailVerified: dto.emailVerified,
+        phoneVerified: dto.phoneVerified,
         verificationDate:
-          user.emailVerified && user.updatedAt ? user.updatedAt : undefined,
+          dto.emailVerified && dto.updatedAt ? dto.updatedAt : undefined,
       }
 
       const validatedResponse = validateResponse(
@@ -296,6 +275,27 @@ export class AdminUserController {
       )
 
       res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * DELETE /admin/users/:id
+   * Delete user by ID (soft delete)
+   */
+  async deleteUser(
+    req: Request<userAdmin.UserIdParam>,
+    res: Response<void>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: userId } = req.params
+
+      await this.userService.deleteUser(userId)
+
+      // No content response
+      res.status(204).send()
     } catch (error) {
       next(error)
     }

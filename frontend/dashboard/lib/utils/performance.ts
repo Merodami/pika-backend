@@ -1,3 +1,5 @@
+import { logger } from './logger'
+
 // Extend Window interface for gtag
 declare global {
   interface Window {
@@ -13,12 +15,18 @@ declare global {
   }
 }
 
-export function reportWebVitals(metric: any) {
+interface WebVital {
+  name: string
+  value: number
+  rating: string
+}
+
+export function reportWebVitals(metric: WebVital) {
   const { name, value, rating } = metric
 
   // Log to console in development
   if (process?.env?.NODE_ENV === 'development') {
-    console.log(`[Web Vital] ${name}:`, value, rating)
+    logger.debug(`[Web Vital] ${name}:`, value, rating)
   }
 
   // Send to analytics service in production
@@ -35,14 +43,17 @@ export function reportWebVitals(metric: any) {
 }
 
 // Performance observer for custom metrics
-export function measureApiCall(name: string, fn: () => Promise<any>) {
+export function measureApiCall<T>(
+  name: string,
+  fn: () => Promise<T>
+): Promise<T> {
   const startTime = performance.now()
 
   return fn().finally(() => {
     const duration = performance.now() - startTime
 
     if (process?.env?.NODE_ENV === 'development') {
-      console.log(`[API Performance] ${name}:`, `${duration.toFixed(2)}ms`)
+      logger.debug(`[API Performance] ${name}:`, `${duration.toFixed(2)}ms`)
     }
 
     // Track slow API calls

@@ -34,60 +34,6 @@ export enum UserStatus {
 export type UserStatusType = `${UserStatus}`
 
 /**
- * Days of the week
- * Used for scheduling and pricing
- */
-export enum WeekDay {
-  SUNDAY = 'SUNDAY',
-  MONDAY = 'MONDAY',
-  TUESDAY = 'TUESDAY',
-  WEDNESDAY = 'WEDNESDAY',
-  THURSDAY = 'THURSDAY',
-  FRIDAY = 'FRIDAY',
-  SATURDAY = 'SATURDAY',
-}
-
-/**
- * Type definition for week day - use this for type annotations
- */
-export type WeekDayType = `${WeekDay}`
-
-/**
- * Subscription status in the system
- * Must match Prisma schema definitions and Stripe statuses
- */
-export enum SubscriptionStatus {
-  ACTIVE = 'active',
-  CANCELED = 'canceled',
-  INCOMPLETE = 'incomplete',
-  INCOMPLETE_EXPIRED = 'incompleteExpired',
-  PAST_DUE = 'pastDue',
-  TRIALING = 'trialing',
-  UNPAID = 'unpaid',
-}
-
-/**
- * Type definition for subscription status - use this for type annotations
- */
-export type SubscriptionStatusType = `${SubscriptionStatus}`
-
-/**
- * Billing interval for subscriptions
- * Used for recurring billing cycles
- */
-export enum BillingInterval {
-  DAY = 'day',
-  WEEK = 'week',
-  MONTH = 'month',
-  YEAR = 'year',
-}
-
-/**
- * Type definition for billing interval - use this for type annotations
- */
-export type BillingIntervalType = `${BillingInterval}`
-
-/**
  * Communication channels for notifications and messages
  * Used for multi-channel communication delivery
  */
@@ -136,212 +82,244 @@ export enum VerificationStatus {
 export type VerificationStatusType = `${VerificationStatus}`
 
 /**
- * Problem/Ticket status in the support system
- * Must match Prisma schema definitions
+ * Business sort fields
+ * Used for sorting business listings and admin panels
  */
-export enum ProblemStatus {
-  OPEN = 'open',
-  ASSIGNED = 'assigned',
-  IN_PROGRESS = 'in_progress',
-  WAITING_CUSTOMER = 'waiting_customer',
-  WAITING_INTERNAL = 'waiting_internal',
-  RESOLVED = 'resolved',
-  CLOSED = 'closed',
+export enum BusinessSortBy {
+  BUSINESS_NAME = 'businessName',
+  AVG_RATING = 'avgRating',
+  VERIFIED = 'verified',
+  ACTIVE = 'active',
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
 }
 
 /**
- * Type definition for problem status - use this for type annotations
+ * Type definition for business sort by - use this for type annotations
  */
-export type ProblemStatusType = `${ProblemStatus}`
+export type BusinessSortByType = `${BusinessSortBy}`
 
 /**
- * Problem/Ticket priority levels
- * Must match Prisma schema definitions
+ * Admin business sort fields (includes additional admin-only fields)
+ * Used for admin panel business management
  */
-export enum ProblemPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  URGENT = 'urgent',
-  CRITICAL = 'critical',
+export enum AdminBusinessSortBy {
+  BUSINESS_NAME = 'businessName',
+  AVG_RATING = 'avgRating',
+  VERIFIED = 'verified',
+  ACTIVE = 'active',
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
+  USER_ID = 'userId',
+  CATEGORY_ID = 'categoryId',
 }
 
 /**
- * Type definition for problem priority - use this for type annotations
+ * Type definition for admin business sort by - use this for type annotations
  */
-export type ProblemPriorityType = `${ProblemPriority}`
+export type AdminBusinessSortByType = `${AdminBusinessSortBy}`
 
 /**
- * Problem/Ticket types (categories)
- * Must match Prisma schema definitions
+ * Business status filters
+ * Used for filtering business listings by status
  */
-export enum ProblemType {
-  BILLING = 'billing',
-  TECHNICAL = 'technical',
-  ACCOUNT = 'account',
+export enum BusinessStatusFilter {
+  ALL = 'all',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  VERIFIED = 'verified',
+  UNVERIFIED = 'unverified',
+}
+
+/**
+ * Type definition for business status filter - use this for type annotations
+ */
+export type BusinessStatusFilterType = `${BusinessStatusFilter}`
+
+/**
+ * User sort fields
+ * Used for sorting user listings and admin panels
+ */
+export enum UserSortBy {
+  NAME = 'name',
+  EMAIL = 'email',
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
+  LAST_LOGIN = 'lastLogin',
+}
+
+/**
+ * Type definition for user sort by - use this for type annotations
+ */
+export type UserSortByType = `${UserSortBy}`
+
+/**
+ * Admin user sort fields
+ * Used for admin panel user management
+ */
+export enum AdminUserSortBy {
+  CREATED_AT = 'createdAt',
+  LAST_LOGIN_AT = 'lastLoginAt',
+  EMAIL = 'email',
+}
+
+/**
+ * Type definition for admin user sort by - use this for type annotations
+ */
+export type AdminUserSortByType = `${AdminUserSortBy}`
+
+/**
+ * Admin note categories
+ * Used for categorizing admin notes on user accounts
+ */
+export enum AdminNoteCategory {
   GENERAL = 'general',
-  BUG_REPORT = 'bug_report',
-  FEATURE_REQUEST = 'feature_request',
+  SECURITY = 'security',
+  SUPPORT = 'support',
+  BILLING = 'billing',
 }
 
 /**
- * Type definition for problem type - use this for type annotations
+ * Type definition for admin note category - use this for type annotations
  */
-export type ProblemTypeType = `${ProblemType}`
+export type AdminNoteCategoryType = `${AdminNoteCategory}`
 
 /**
- * Voucher states in the system
- * Must match Prisma schema definitions
+ * User activity categories
+ * Used for tracking and categorizing user activities
  */
-export enum VoucherState {
-  draft = 'draft',
-  published = 'published',
-  claimed = 'claimed',
-  redeemed = 'redeemed',
-  expired = 'expired',
-  suspended = 'suspended',
-}
-
-/**
- * Type definition for voucher state - use this for type annotations
- */
-export type VoucherStateType = `${VoucherState}`
-
-/**
- * Voucher types in the system
- * Must match Prisma schema definitions
- */
-export enum VoucherType {
-  discount = 'discount',
-  fixedValue = 'fixedValue',
-  freeItem = 'freeItem',
-  bogo = 'bogo',
-  experience = 'experience',
-}
-
-/**
- * Type definition for voucher type - use this for type annotations
- */
-export type VoucherTypeType = `${VoucherType}`
-
-/**
- * Voucher scan source types
- * Used to track how users discovered and scanned vouchers
- */
-export enum VoucherScanSource {
-  camera = 'camera',
-  gallery = 'gallery',
-  link = 'link',
-  share = 'share',
-}
-
-/**
- * Type definition for voucher scan source - use this for type annotations
- */
-export type VoucherScanSourceType = `${VoucherScanSource}`
-
-/**
- * Voucher scan types
- * Used to distinguish between customer and business scans
- */
-export enum VoucherScanType {
-  customer = 'customer',
-  business = 'business',
-}
-
-/**
- * Type definition for voucher scan type - use this for type annotations
- */
-export type VoucherScanTypeType = `${VoucherScanType}`
-
-/**
- * Voucher code types
- * Used for different voucher code generation methods
- */
-export enum VoucherCodeType {
-  qr = 'qr',
-  short = 'short',
-  static = 'static',
-}
-
-/**
- * Type definition for voucher code type - use this for type annotations
- */
-export type VoucherCodeTypeType = `${VoucherCodeType}`
-
-/**
- * Voucher discount types
- * Used to determine how discounts are calculated
- */
-export enum VoucherDiscountType {
-  percentage = 'percentage',
-  fixed = 'fixed',
-}
-
-/**
- * Type definition for voucher discount type - use this for type annotations
- */
-export type VoucherDiscountTypeType = `${VoucherDiscountType}`
-
-/**
- * Customer voucher status
- * Used to track voucher status in customer's wallet
- */
-export enum CustomerVoucherStatus {
-  claimed = 'claimed',
-  redeemed = 'redeemed',
-  expired = 'expired',
-}
-
-/**
- * Type definition for customer voucher status - use this for type annotations
- */
-export type CustomerVoucherStatusType = `${CustomerVoucherStatus}`
-
-/**
- * File types supported by the storage system
- * Must match Prisma schema definitions
- */
-export enum FileType {
-  IMAGE = 'image',
-  VIDEO = 'video',
-  DOCUMENT = 'document',
-  AUDIO = 'audio',
+export enum UserActivityCategory {
+  AUTH = 'auth',
+  PROFILE = 'profile',
+  PAYMENT = 'payment',
   OTHER = 'other',
 }
 
 /**
- * Type definition for file type - use this for type annotations
+ * Type definition for user activity category - use this for type annotations
  */
-export type FileTypeType = `${FileType}`
+export type UserActivityCategoryType = `${UserActivityCategory}`
 
 /**
- * File status in the storage system
- * Must match Prisma schema definitions and storage operations
+ * Image formats supported by the system
+ * Used for profile pictures and image uploads
  */
-export enum FileStatus {
-  PENDING = 'pending',
-  UPLOADED = 'uploaded',
-  FAILED = 'failed',
-  DELETED = 'deleted',
+export enum ImageFormat {
+  JPEG = 'jpeg',
+  PNG = 'png',
+  WEBP = 'webp',
 }
 
 /**
- * Type definition for file status - use this for type annotations
+ * Type definition for image format - use this for type annotations
  */
-export type FileStatusType = `${FileStatus}`
+export type ImageFormatType = `${ImageFormat}`
 
 /**
- * Storage providers supported by the system
- * Must match Prisma schema definitions
+ * UI theme options
+ * Used for user interface theme preferences
  */
-export enum StorageProvider {
-  AWS_S3 = 'aws_s3',
-  LOCAL = 'local',
-  MINIO = 'minio',
+export enum Theme {
+  LIGHT = 'light',
+  DARK = 'dark',
+  SYSTEM = 'system',
 }
 
 /**
- * Type definition for storage provider - use this for type annotations
+ * Type definition for theme - use this for type annotations
  */
-export type StorageProviderType = `${StorageProvider}`
+export type ThemeType = `${Theme}`
+
+/**
+ * Profile visibility options
+ * Used for user profile privacy settings
+ */
+export enum ProfileVisibility {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+}
+
+/**
+ * Type definition for profile visibility - use this for type annotations
+ */
+export type ProfileVisibilityType = `${ProfileVisibility}`
+
+/**
+ * Verification levels for user accounts
+ * Used to track the level of account verification
+ */
+export enum VerificationLevel {
+  NONE = 'none',
+  EMAIL = 'email',
+  PHONE = 'phone',
+  FULL = 'full',
+}
+
+/**
+ * Type definition for verification level - use this for type annotations
+ */
+export type VerificationLevelType = `${VerificationLevel}`
+
+/**
+ * Credit operations for user accounts
+ * Used for credit balance adjustments
+ */
+export enum CreditOperation {
+  ADD = 'add',
+  SUBTRACT = 'subtract',
+  SET = 'set',
+}
+
+/**
+ * Type definition for credit operation - use this for type annotations
+ */
+export type CreditOperationType = `${CreditOperation}`
+
+/**
+ * Permission actions for access control
+ * Used for role-based access control systems
+ */
+export enum PermissionAction {
+  READ = 'read',
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+}
+
+/**
+ * Type definition for permission action - use this for type annotations
+ */
+export type PermissionActionType = `${PermissionAction}`
+
+/**
+ * Account flags for user accounts
+ * Used for marking special account states or properties
+ */
+export enum AccountFlag {
+  VERIFIED = 'verified',
+  PREMIUM = 'premium',
+  SUSPICIOUS = 'suspicious',
+  REPORTED = 'reported',
+  VIP = 'vip',
+}
+
+/**
+ * Type definition for account flag - use this for type annotations
+ */
+export type AccountFlagType = `${AccountFlag}`
+
+/**
+ * Category sort fields
+ * Used for sorting category listings and admin panels
+ */
+export enum CategorySortBy {
+  NAME = 'name',
+  SORT_ORDER = 'sortOrder',
+  CREATED_AT = 'createdAt',
+  UPDATED_AT = 'updatedAt',
+}
+
+/**
+ * Type definition for category sort by - use this for type annotations
+ */
+export type CategorySortByType = `${CategorySortBy}`

@@ -462,14 +462,16 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
 </html>`
 }
 
-async function checkEmbeddedService(serviceName: string): Promise<systemPublic.ServiceHealth> {
+async function checkEmbeddedService(
+  serviceName: string,
+): Promise<systemPublic.ServiceHealth> {
   const startTime = Date.now()
-  
+
   try {
     // Perform a lightweight operation to measure response time
     // This simulates what each service would do for a health check
-    await new Promise(resolve => setTimeout(resolve, Math.random() * 5)) // 0-5ms simulated operation
-    
+    await new Promise((resolve) => setTimeout(resolve, Math.random() * 5)) // 0-5ms simulated operation
+
     return {
       status: 'healthy',
       url: 'embedded',
@@ -477,7 +479,7 @@ async function checkEmbeddedService(serviceName: string): Promise<systemPublic.S
     }
   } catch (error) {
     return {
-      status: 'unhealthy', 
+      status: 'unhealthy',
       url: 'embedded',
       responseTime: Date.now() - startTime,
     }
@@ -491,12 +493,24 @@ export async function handleHealthCheck(req: Request, res: Response) {
     // In embedded mode, measure actual service response times
     if (process.env.EMBEDDED_MODE === 'true') {
       // Check all embedded services in parallel
-      const serviceNames = ['auth', 'user', 'business', 'category', 'payment', 'subscription', 'communication', 'support', 'storage', 'pdf', 'voucher']
+      const serviceNames = [
+        'auth',
+        'user',
+        'business',
+        'category',
+        'payment',
+        'subscription',
+        'communication',
+        'support',
+        'storage',
+        'pdf',
+        'voucher',
+      ]
       const serviceChecks = await Promise.all(
         serviceNames.map(async (name) => ({
           name,
           result: await checkEmbeddedService(name),
-        }))
+        })),
       )
 
       // Build services object

@@ -6,7 +6,7 @@ import {
 } from '@pika/http'
 import { SubscriptionMapper, SubscriptionPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
-import type { BillingInterval, SubscriptionStatus } from '@pika/types'
+import type { SubscriptionStatus } from '@pika/types'
 import type { IPlanService } from '@subscription/services/PlanService.js'
 import type { ISubscriptionService } from '@subscription/services/SubscriptionService.js'
 import type {
@@ -318,7 +318,6 @@ export class AdminSubscriptionController {
 
         // Filters
         isActive: query.isActive,
-        interval: query.interval as BillingInterval, // Safe: validated by Zod
         minPrice: query.minPrice,
         maxPrice: query.maxPrice,
         search: query.search,

@@ -3,6 +3,7 @@ import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
+import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as businessSchemas from '@api/schemas/business/public/business.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
@@ -13,7 +14,7 @@ import * as webhookSchemas from '@api/schemas/payment/public/webhooks.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import { MessageResponse } from '@api/schemas/shared/responses.js'
+import { MessageResponse, PaginationMetadata } from '@api/schemas/shared/responses.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import * as storageSchemas from '@api/schemas/storage/public/file.js'
 import * as subscriptionSchemas from '@api/schemas/subscription/public/index.js'
@@ -21,9 +22,11 @@ import * as subscriptionPlanSchemas from '@api/schemas/subscription/public/index
 import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
 import * as supportCommentSchemas from '@api/schemas/support/public/comment.js'
 import * as supportProblemSchemas from '@api/schemas/support/public/problem.js'
+import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
 import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
+import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
 
@@ -31,6 +34,33 @@ import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
  * Register all public API schemas and routes
  */
 export function registerPublicAPI(registry: ZodRegistry): void {
+  // ============= Common Schemas =============
+  // Register pagination metadata to ensure hasNext/hasPrev are included
+  registry.registerSchema('PaginationMetadata', PaginationMetadata)
+  
+  // ============= Enum Schemas =============
+  // User enums
+  registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)
+  registry.registerSchema('UserRole', userEnumSchemas.UserRoleSchema)
+  registry.registerSchema('UserSortBy', userEnumSchemas.UserSortBySchema)
+
+  // Business enums
+  registry.registerSchema(
+    'BusinessSortBy',
+    businessEnumSchemas.BusinessSortBySchema,
+  )
+  registry.registerSchema(
+    'BusinessStatusFilter',
+    businessEnumSchemas.BusinessStatusFilterSchema,
+  )
+
+  // Voucher enums
+  registry.registerSchema('VoucherState', voucherEnumSchemas.VoucherStateSchema)
+  registry.registerSchema(
+    'VoucherDiscountType',
+    voucherEnumSchemas.VoucherDiscountTypeSchema,
+  )
+
   // ============= Authentication Schemas =============
   // Common auth schemas
   registry.registerSchema(
@@ -502,6 +532,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/businesses',
+    operationId: 'getBusinessList',
     summary: 'List all active businesses',
     tags: ['Business'],
     request: {
@@ -523,6 +554,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/businesses/{id}',
+    operationId: 'getBusinessById',
     summary: 'Get business details',
     tags: ['Business'],
     request: {
@@ -545,6 +577,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/{categoryId}/businesses',
+    operationId: 'getBusinessesByCategory',
     summary: 'Get businesses in a specific category',
     tags: ['Business'],
     request: {
@@ -567,6 +600,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/my/business',
+    operationId: 'createMyBusiness',
     summary: 'Create my business',
     tags: ['My Business'],
     security: [{ bearerAuth: [] }],
@@ -595,6 +629,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/my/business',
+    operationId: 'getMyBusiness',
     summary: 'Get my business details',
     tags: ['My Business'],
     security: [{ bearerAuth: [] }],
@@ -614,6 +649,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/my/business',
+    operationId: 'updateMyBusiness',
     summary: 'Update my business',
     tags: ['My Business'],
     security: [{ bearerAuth: [] }],
@@ -642,6 +678,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/my/business',
+    operationId: 'deleteMyBusiness',
     summary: 'Delete my business',
     tags: ['My Business'],
     security: [{ bearerAuth: [] }],
@@ -658,6 +695,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories',
+    operationId: 'getCategoryList',
     summary: 'List all active categories',
     tags: ['Categories'],
     request: {
@@ -679,6 +717,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/{id}',
+    operationId: 'getCategoryById',
     summary: 'Get category details',
     tags: ['Categories'],
     request: {
@@ -708,6 +747,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/hierarchy',
+    operationId: 'getCategoryHierarchy',
     summary: 'Get category hierarchy tree',
     tags: ['Categories'],
     request: {
@@ -729,6 +769,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/{id}/path',
+    operationId: 'getCategoryPath',
     summary: 'Get path from root to category',
     tags: ['Categories'],
     request: {
@@ -760,6 +801,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/upload',
+    operationId: 'uploadFile',
     summary: 'Upload a file',
     tags: ['Storage'],
     security: [{ bearerAuth: [] }],
@@ -796,6 +838,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/batch-upload',
+    operationId: 'batchUploadFiles',
     summary: 'Upload multiple files',
     tags: ['Storage'],
     security: [{ bearerAuth: [] }],
@@ -832,6 +875,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/files/{fileId}/url',
+    operationId: 'getFileUrl',
     summary: 'Get presigned URL for file access',
     tags: ['Storage'],
     security: [{ bearerAuth: [] }],
@@ -863,6 +907,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/history',
+    operationId: 'getFileHistory',
     summary: 'Get user file upload history',
     tags: ['Storage'],
     security: [{ bearerAuth: [] }],
@@ -885,6 +930,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/storage/files/{fileId}',
+    operationId: 'deleteFile',
     summary: 'Delete user file',
     tags: ['Storage'],
     security: [{ bearerAuth: [] }],
@@ -912,6 +958,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/vouchers',
+    operationId: 'getVoucherList',
     summary: 'List all active vouchers',
     tags: ['Vouchers'],
     request: {
@@ -933,6 +980,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/vouchers/{id}',
+    operationId: 'getVoucherById',
     summary: 'Get voucher details',
     tags: ['Vouchers'],
     request: {
@@ -962,6 +1010,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/vouchers/{id}/scan',
+    operationId: 'scanVoucher',
     summary: 'Scan a voucher',
     tags: ['Vouchers'],
     security: [{ bearerAuth: [] }],
@@ -999,6 +1048,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/vouchers/{id}/claim',
+    operationId: 'claimVoucher',
     summary: 'Claim a voucher',
     tags: ['Vouchers'],
     security: [{ bearerAuth: [] }],
@@ -1044,6 +1094,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/vouchers/{id}/redeem',
+    operationId: 'redeemVoucher',
     summary: 'Redeem a voucher',
     tags: ['Vouchers'],
     security: [{ bearerAuth: [] }],
@@ -1089,6 +1140,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/users/vouchers',
+    operationId: 'getUserVouchers',
     summary: 'Get user claimed vouchers',
     tags: ['Vouchers'],
     security: [{ bearerAuth: [] }],
@@ -1108,6 +1160,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/token',
+    operationId: 'authToken',
     summary: 'OAuth 2.0 Token Endpoint',
     description:
       'Exchange credentials or refresh token for access tokens (RFC 6749)',
@@ -1152,6 +1205,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/register',
+    operationId: 'authRegister',
     summary: 'User registration',
     tags: ['Authentication'],
     request: {
@@ -1186,6 +1240,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/introspect',
+    operationId: 'authIntrospect',
     summary: 'OAuth 2.0 Token Introspection',
     description: 'Check if a token is active and get its metadata (RFC 7662)',
     tags: ['Authentication'],
@@ -1213,6 +1268,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/revoke',
+    operationId: 'authRevoke',
     summary: 'OAuth 2.0 Token Revocation',
     description: 'Revoke an access or refresh token (RFC 7009)',
     tags: ['Authentication'],
@@ -1240,6 +1296,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/auth/userinfo',
+    operationId: 'authUserInfo',
     summary: 'OAuth 2.0 UserInfo Endpoint',
     description: 'Get information about the authenticated user',
     tags: ['Authentication'],
@@ -1267,6 +1324,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/forgot-password',
+    operationId: 'forgotPassword',
     summary: 'Request password reset',
     tags: ['Authentication'],
     request: {
@@ -1293,6 +1351,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/reset-password',
+    operationId: 'resetPassword',
     summary: 'Reset password with token',
     tags: ['Authentication'],
     request: {
@@ -1327,6 +1386,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/auth/verify-email/{token}',
+    operationId: 'verifyEmail',
     summary: 'Verify email address',
     tags: ['Authentication'],
     request: {
@@ -1355,6 +1415,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/resend-verification',
+    operationId: 'resendVerification',
     summary: 'Resend email verification',
     tags: ['Authentication'],
     request: {
@@ -1381,6 +1442,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/auth/change-password',
+    operationId: 'changePassword',
     summary: 'Change user password',
     tags: ['Authentication'],
     security: [{ bearerAuth: [] }],
@@ -1416,7 +1478,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // User routes
   registry.registerRoute({
     method: 'get',
-    path: '/users/profile',
+    path: '/users/me',
+    operationId: 'getUserProfile',
     summary: 'Get current user profile',
     tags: ['Users'],
     security: [{ bearerAuth: [] }],
@@ -1441,8 +1504,9 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   })
 
   registry.registerRoute({
-    method: 'patch',
-    path: '/users/profile',
+    method: 'put',
+    path: '/users/me',
+    operationId: 'updateUserProfile',
     summary: 'Update user profile',
     tags: ['Users'],
     security: [{ bearerAuth: [] }],
@@ -1471,6 +1535,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/webhooks/stripe',
+    operationId: 'handleStripeWebhook',
     summary: 'Handle Stripe webhook events',
     tags: ['Webhooks'],
     description:
@@ -1517,6 +1582,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/problems',
+    operationId: 'createSupportProblem',
     summary: 'Create a new support problem',
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
@@ -1544,6 +1610,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/problems',
+    operationId: 'getUserSupportProblems',
     summary: "Get user's support problems",
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
@@ -1566,6 +1633,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/comments',
+    operationId: 'createSupportComment',
     summary: 'Create a new comment',
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
@@ -1593,6 +1661,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/comments/problem/{problemId}',
+    operationId: 'getProblemComments',
     summary: 'Get comments for a problem',
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
@@ -1614,6 +1683,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/comments/{id}',
+    operationId: 'getSupportCommentById',
     summary: 'Get comment by ID',
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
@@ -1635,6 +1705,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/comments/{id}',
+    operationId: 'updateSupportComment',
     summary: 'Update comment',
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
@@ -1663,6 +1734,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/comments/{id}',
+    operationId: 'deleteSupportComment',
     summary: 'Delete comment',
     tags: ['Support'],
     security: [{ bearerAuth: [] }],
@@ -1682,6 +1754,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/voucher-books',
+    operationId: 'getVoucherBookList',
     summary: 'List all published voucher books',
     tags: ['PDF'],
     request: {
@@ -1703,6 +1776,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/voucher-books/{id}',
+    operationId: 'getVoucherBookById',
     summary: 'Get voucher book details',
     tags: ['PDF'],
     request: {
@@ -1732,6 +1806,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/voucher-books/{id}/download',
+    operationId: 'downloadVoucherBookPdf',
     summary: 'Download voucher book PDF',
     tags: ['PDF'],
     request: {

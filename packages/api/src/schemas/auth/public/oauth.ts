@@ -1,9 +1,10 @@
+import { OAuthError, UserRole as UserRoleEnum } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, JWTToken, UserId } from '../../shared/branded.js'
-import { UserRole } from '../../shared/enums.js'
-import { OAuthError, TokenType } from '../common/enums.js'
+import { UserRoleSchema } from '../../user/common/enums.js'
+import { OAuthErrorSchema, TokenTypeSchema } from '../common/enums.js'
 import { AuthUserResponse } from './login.js'
 
 /**
@@ -85,7 +86,7 @@ export const TokenResponse = openapi(
         email: 'user@example.com' as any,
         firstName: 'John',
         lastName: 'Doe',
-        role: UserRole.enum.customer,
+        role: UserRoleEnum.CUSTOMER,
       },
     },
   },
@@ -101,7 +102,7 @@ export type TokenResponse = z.infer<typeof TokenResponse>
 export const IntrospectRequest = openapi(
   z.object({
     token: JWTToken.describe('Token to validate'),
-    tokenTypeHint: TokenType.optional().describe('Hint about token type'),
+    tokenTypeHint: TokenTypeSchema.optional(),
   }),
   {
     description: 'Token introspection request',
@@ -125,7 +126,7 @@ export const IntrospectResponse = openapi(
     // Custom fields
     userId: UserId.optional().describe('User ID'),
     userEmail: Email.optional().describe('User email'),
-    userRole: UserRole.optional(),
+    userRole: UserRoleSchema.optional(),
   }),
   {
     description: 'Token introspection response',
@@ -139,7 +140,7 @@ export const IntrospectResponse = openapi(
       sub: '123e4567-e89b-12d3-a456-426614174000' as any,
       userId: '123e4567-e89b-12d3-a456-426614174000' as any,
       userEmail: 'user@example.com' as any,
-      userRole: UserRole.enum.customer,
+      userRole: UserRoleEnum.CUSTOMER,
     },
   },
 )
@@ -154,7 +155,7 @@ export type IntrospectResponse = z.infer<typeof IntrospectResponse>
 export const RevokeTokenRequest = openapi(
   z.object({
     token: JWTToken.describe('Token to revoke'),
-    tokenTypeHint: TokenType.optional().describe('Hint about token type'),
+    tokenTypeHint: TokenTypeSchema.optional(),
     allDevices: z
       .boolean()
       .optional()
@@ -198,7 +199,7 @@ export const UserInfoResponse = openapi(
     lastName: z.string(),
     fullName: z.string().optional().describe('Combined first and last name'),
     profilePicture: z.string().url().optional(),
-    role: UserRole,
+    role: UserRoleSchema,
     permissions: z.array(z.string()).optional().describe('User permissions'),
     locale: z.string().optional().describe('User locale'),
     createdAt: z.string().datetime().optional(),
@@ -213,7 +214,7 @@ export const UserInfoResponse = openapi(
       firstName: 'John',
       lastName: 'Doe',
       fullName: 'John Doe',
-      role: UserRole.enum.customer,
+      role: UserRoleEnum.CUSTOMER,
       permissions: ['read', 'write'],
       locale: 'en-US',
       createdAt: '2024-01-01T00:00:00Z',
@@ -231,7 +232,7 @@ export type UserInfoResponse = z.infer<typeof UserInfoResponse>
  */
 export const OAuthErrorResponse = openapi(
   z.object({
-    error: OAuthError,
+    error: OAuthErrorSchema,
     errorDescription: z
       .string()
       .optional()
@@ -245,7 +246,7 @@ export const OAuthErrorResponse = openapi(
   {
     description: 'OAuth 2.0 compatible error response',
     example: {
-      error: 'invalidGrant',
+      error: OAuthError.INVALID_GRANT,
       errorDescription: 'The provided credentials are invalid',
     },
   },

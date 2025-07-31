@@ -96,6 +96,15 @@ export function createAdminUserRouter(
     controller.updateMyProfile,
   )
 
+  // GET /admin/users/:id - Get user by ID with admin details
+  router.get(
+    '/:id',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    controller.getUserById,
+  )
+
   // GET /admin/users/:id/verification-status - Get user verification status
   router.get(
     '/:id/verification-status',
@@ -103,6 +112,15 @@ export function createAdminUserRouter(
     requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
     controller.getUserVerificationStatus,
+  )
+
+  // DELETE /admin/users/:id - Delete user by ID
+  router.delete(
+    '/:id',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    controller.deleteUser,
   )
 
   return router

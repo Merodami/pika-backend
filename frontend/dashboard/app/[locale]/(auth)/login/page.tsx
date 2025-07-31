@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
-import { useTranslations } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
+
 import { LoginForm } from './loginForm'
 
 export async function generateMetadata({
@@ -17,8 +17,13 @@ export async function generateMetadata({
   }
 }
 
-export default function LoginPage() {
-  const t = useTranslations('auth.login')
+interface LoginPageProps {
+  params: Promise<{ locale: string }>
+}
+
+export default async function LoginPage({ params }: LoginPageProps) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'auth.login' })
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

@@ -11,8 +11,7 @@ import {
   logger,
   PaymentServiceClient,
 } from '@pika/shared'
-import type { BillingIntervalType, PaginatedResult } from '@pika/types'
-import { BillingInterval } from '@pika/types'
+import type { PaginatedResult } from '@pika/types'
 import type { IPlanRepository } from '@subscription/repositories/PlanRepository.js'
 import type { PlanSearchParams } from '@subscription/types/search.js'
 
@@ -42,15 +41,6 @@ export class PlanService implements IPlanService {
   ): Promise<SubscriptionPlanDomain> {
     logger.info('Creating subscription plan', { name: data.name })
 
-    // Validate interval
-    const validIntervals = Object.values(BillingInterval)
-
-    if (!validIntervals.includes(data.interval as BillingInterval)) {
-      throw ErrorFactory.badRequest(
-        `Invalid billing interval: ${data.interval}`,
-      )
-    }
-
     try {
       // Create product via payment service
       const product = await this.paymentClient.createProduct({
@@ -66,14 +56,12 @@ export class PlanService implements IPlanService {
         productId: product.id,
         amount: data.price,
         currency: data.currency || 'usd',
-        interval: data.interval as BillingIntervalType,
         intervalCount: data.intervalCount ?? 1,
       })
 
       // Create plan record
       const plan = await this.planRepository.create({
         ...data,
-        interval: data.interval as BillingIntervalType,
         stripeProductId: product.id,
         stripePriceId: price.id,
       })
@@ -207,7 +195,6 @@ export class PlanService implements IPlanService {
                 description: product.description || undefined,
                 price: price.amount, // Already converted from cents
                 currency: price.currency,
-                interval: price.recurring.interval as BillingIntervalType,
                 intervalCount: price.recurring.intervalCount,
                 features: product.metadata.features
                   ? JSON.parse(product.metadata.features)

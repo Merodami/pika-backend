@@ -1,3 +1,4 @@
+import { UserRole } from '@pika/types'
 import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 
@@ -21,8 +22,7 @@ export default async function DashboardLayout({
   const user = await requireAuth()
   const { locale } = await params
 
-  // Role-based sidebar component
-  const Sidebar = user.role === 'ADMIN' ? AdminSidebar : BusinessSidebar
+  const Sidebar = user.role === UserRole.ADMIN ? AdminSidebar : BusinessSidebar
 
   return (
     <div className="min-h-screen bg-gray-50">

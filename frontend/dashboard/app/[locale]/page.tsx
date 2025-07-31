@@ -1,5 +1,10 @@
+import { UserRole } from '@pika/types'
 import { redirect } from 'next/navigation'
+
 import { getCurrentUser } from '@/app/_services/authService'
+
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ locale: string }>
@@ -13,12 +18,13 @@ export default async function HomePage({ params }: PageProps) {
     redirect(`/${locale}/login`)
   }
 
-  // Redirect based on user role
   switch (user.role) {
-    case 'ADMIN':
-      redirect(`/${locale}/admin/dashboard`)
-    case 'BUSINESS':
-      redirect(`/${locale}/business/dashboard`)
+    case UserRole.ADMIN:
+      redirect(`/${locale}/admin`)
+      break
+    case UserRole.BUSINESS:
+      redirect(`/${locale}/business`)
+      break
     default:
       redirect(`/${locale}/unauthorized`)
   }

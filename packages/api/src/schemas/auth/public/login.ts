@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, JWTToken, UserId } from '../../shared/branded.js'
-import { UserRole } from '../../shared/enums.js'
-import { DeviceType, OAuthProvider } from '../common/enums.js'
+import { UserRoleSchema } from '../../user/common/enums.js'
+import { DeviceTypeSchema, OAuthProviderSchema } from '../common/enums.js'
 
 /**
  * Public API authentication schemas
@@ -49,7 +49,7 @@ export const AuthUserResponse = openapi(
     firstName: z.string(),
     lastName: z.string(),
     profilePicture: z.string().url().optional(),
-    role: UserRole.describe('User role'),
+    role: UserRoleSchema,
   }),
   {
     description: 'Basic user information for authentication context',
@@ -74,7 +74,7 @@ export type AuthUserResponse = z.infer<typeof AuthUserResponse>
 export const OAuthCallbackRequest = z.object({
   code: z.string().min(1).describe('OAuth authorization code'),
   state: z.string().min(1).describe('OAuth state parameter'),
-  provider: OAuthProvider,
+  provider: OAuthProviderSchema,
 })
 
 export type OAuthCallbackRequest = z.infer<typeof OAuthCallbackRequest>
@@ -83,7 +83,7 @@ export type OAuthCallbackRequest = z.infer<typeof OAuthCallbackRequest>
  * OAuth link account request
  */
 export const LinkOAuthAccountRequest = z.object({
-  provider: OAuthProvider,
+  provider: OAuthProviderSchema,
   redirectUri: z.string().url().optional().describe('Redirect after linking'),
 })
 
@@ -97,7 +97,7 @@ export type LinkOAuthAccountRequest = z.infer<typeof LinkOAuthAccountRequest>
 export const SessionInfoResponse = z.object({
   id: z.string().uuid(),
   deviceName: z.string().optional(),
-  deviceType: DeviceType.optional(),
+  deviceType: DeviceTypeSchema.optional(),
   browser: z.string().optional(),
   os: z.string().optional(),
   ip: z.string().optional(),

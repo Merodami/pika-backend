@@ -1,19 +1,18 @@
 import 'server-only'
 
+import { UserRole, type UserRoleType } from '@pika/types'
 import { cookies } from 'next/headers'
 import { cache } from 'react'
 
 import { UsersService } from '@/lib/api/generated'
-
-// Types
-export type UserRole = 'CUSTOMER' | 'BUSINESS' | 'ADMIN'
+import { configureApiClient } from '@/lib/api/serverClient'
 
 export interface User {
   id: string
   email: string
   firstName: string
   lastName: string
-  role: UserRole
+  role: UserRoleType
   createdAt: string
   updatedAt: string
 }
@@ -29,14 +28,17 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
 
     if (!token) return null
 
-    const response = await UsersService.getUsersProfile()
+    // Configure API client with the token
+    await configureApiClient()
+
+    const response = await UsersService.getUserProfile()
 
     return {
       id: response.id,
       email: response.email,
       firstName: response.firstName,
       lastName: response.lastName,
-      role: response.role as UserRole,
+      role: response.role as UserRoleType,
       createdAt: response.createdAt,
       updatedAt: response.updatedAt,
     }
@@ -96,7 +98,7 @@ export async function requireAuth() {
   return user
 }
 
-export async function requireRole(role: UserRole | UserRole[]) {
+export async function requireRole(role: UserRoleType | UserRoleType[]) {
   const user = await requireAuth()
   const roles = Array.isArray(role) ? role : [role]
 
@@ -110,14 +112,13 @@ export async function requireRole(role: UserRole | UserRole[]) {
 export async function requireBusiness() {
   const user = await requireAuth()
 
-  if (user.role !== 'BUSINESS') {
+  if (user.role !== UserRole.BUSINESS) {
     throw new Error('Business access required')
   }
 
-  // Business ID will need to be fetched separately from the business service
   return user
 }
 
 export async function requireAdmin() {
-  return requireRole('ADMIN')
+  return requireRole(UserRole.ADMIN)
 }

@@ -1,83 +1,85 @@
-import { z } from 'zod'
+import {
+  BillingInterval,
+  BulkAction,
+  PlanSortBy,
+  PlanType,
+  SubscriptionEvent,
+  SubscriptionNotificationType,
+  SubscriptionSortBy,
+  SubscriptionStatus,
+  UsageType,
+} from '@pika/types'
+
+import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 /**
- * Subscription-specific enums
+ * Subscription-specific enum schemas
+ * Following the standardized pattern with Schema suffix
  */
 
-// ============= Subscription Enums =============
+// Subscription status schema
+export const SubscriptionStatusSchema = openapi(
+  createZodEnum(SubscriptionStatus),
+  {
+    description: 'Subscription status',
+    example: SubscriptionStatus.ACTIVE,
+  },
+)
 
-export const SubscriptionStatus = z.enum([
-  'active',
-  'canceled',
-  'incomplete',
-  'incompleteExpired',
-  'pastDue',
-  'trialing',
-  'unpaid',
-])
+// Billing interval schema
+export const BillingIntervalSchema = openapi(createZodEnum(BillingInterval), {
+  description: 'Billing interval for subscriptions',
+  example: BillingInterval.MONTH,
+})
 
-export type SubscriptionStatus = z.infer<typeof SubscriptionStatus>
+// Plan type schema
+export const PlanTypeSchema = openapi(createZodEnum(PlanType), {
+  description: 'Plan type category',
+  example: PlanType.PREMIUM,
+})
 
-export const BillingInterval = z.enum(['day', 'week', 'month', 'year'])
+// Subscription sort by schema
+export const SubscriptionSortBySchema = openapi(
+  createZodEnum(SubscriptionSortBy),
+  {
+    description: 'Field to sort subscriptions by',
+    example: SubscriptionSortBy.CREATED_AT,
+  },
+)
 
-export type BillingInterval = z.infer<typeof BillingInterval>
+// Plan sort by schema
+export const PlanSortBySchema = openapi(createZodEnum(PlanSortBy), {
+  description: 'Field to sort plans by',
+  example: PlanSortBy.NAME,
+})
 
-export const PlanType = z.enum(['basic', 'premium', 'enterprise', 'trial'])
+// Subscription event schema
+export const SubscriptionEventSchema = openapi(
+  createZodEnum(SubscriptionEvent),
+  {
+    description: 'Subscription event type for webhooks and notifications',
+    example: SubscriptionEvent.CREATED,
+  },
+)
 
-export type PlanType = z.infer<typeof PlanType>
+// Usage type schema
+export const UsageTypeSchema = openapi(createZodEnum(UsageType), {
+  description: 'Usage tracking type',
+  example: UsageType.FEATURE_ACCESS,
+})
 
-export const SubscriptionSortBy = z.enum([
-  'createdAt',
-  'updatedAt',
-  'startDate',
-  'endDate',
-  'status',
-])
+// Subscription notification type schema
+export const SubscriptionNotificationTypeSchema = openapi(
+  createZodEnum(SubscriptionNotificationType),
+  {
+    description: 'Subscription notification type',
+    example: SubscriptionNotificationType.CREATED,
+  },
+)
 
-export type SubscriptionSortBy = z.infer<typeof SubscriptionSortBy>
-
-export const PlanSortBy = z.enum(['name', 'price', 'createdAt', 'updatedAt'])
-
-export type PlanSortBy = z.infer<typeof PlanSortBy>
-
-// ============= Internal Service Enums =============
-
-export const SubscriptionEvent = z.enum([
-  'customer.subscription.created',
-  'customer.subscription.updated',
-  'customer.subscription.deleted',
-  'customer.subscription.trial_will_end',
-  'invoice.payment_failed',
-  'invoice.payment_succeeded',
-  'created',
-  'cancelled',
-  'paymentFailed',
-  'creditsAllocated',
-  'renewalReminder',
-  'trialEnding',
-])
-
-export type SubscriptionEvent = z.infer<typeof SubscriptionEvent>
-
-export const UsageType = z.enum(['featureAccess', 'creditDeduction'])
-
-export type UsageType = z.infer<typeof UsageType>
-
-export const SubscriptionNotificationType = z.enum([
-  'created',
-  'cancelled',
-  'paymentFailed',
-  'creditsAllocated',
-  'renewalReminder',
-  'trialEnding',
-])
-
-export type SubscriptionNotificationType = z.infer<
-  typeof SubscriptionNotificationType
->
-
-// ============= Admin Enums =============
-
-export const BulkAction = z.enum(['cancel', 'suspend', 'reactivate'])
-
-export type BulkAction = z.infer<typeof BulkAction>
+// Bulk action schema
+export const BulkActionSchema = openapi(createZodEnum(BulkAction), {
+  description: 'Bulk action type for admin operations',
+  example: BulkAction.CANCEL,
+})

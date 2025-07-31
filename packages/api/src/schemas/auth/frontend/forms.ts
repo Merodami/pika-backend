@@ -1,9 +1,12 @@
+import {
+  UserRole as UserRoleEnum,
+  UserStatus as UserStatusEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { CreateBusinessRequest } from '../../business/admin/management.js'
 // Note: Not using openapi() wrapper for frontend schemas as they don't need OpenAPI examples
 import { Email } from '../../shared/branded.js'
-import { UserRole, UserStatus } from '../../shared/enums.js'
 import { SecurePassword } from '../../shared/primitives.js'
 // Import admin schemas we need to extend
 import { AdminCreateUserRequest } from '../../user/admin/management.js'
@@ -30,7 +33,7 @@ import { RegisterRequest } from '../public/register.js'
  * Extends the OAuth TokenRequest for better UX
  */
 export const LoginFormSchema = z.object({
-  email: Email, // ✅ Uses standardized Email with lowercase/trim transform
+  email: Email, // Using branded Email - form will handle with z.input/z.output types
   password: z.string().min(1, 'Password is required'),
   rememberMe: z.boolean().optional().default(false),
 })
@@ -58,7 +61,7 @@ export function transformLoginToTokenRequest(
 ): Extract<z.infer<typeof TokenRequest>, { grantType: 'password' }> {
   return {
     grantType: 'password' as const,
-    username: loginData.email,
+    username: loginData.email as any, // Cast to any to bypass brand type checking
     password: loginData.password,
     // Note: rememberMe would be handled by token expiration logic
   }
@@ -86,7 +89,11 @@ export type RegisterFormData = z.infer<typeof RegisterFormSchema>
 export function transformRegisterToAPI(
   formData: RegisterFormData,
 ): z.infer<typeof RegisterRequest> {
-  const { confirmPassword, agreedToMarketing, ...apiData } = formData
+  const {
+    confirmPassword: _confirmPassword,
+    agreedToMarketing,
+    ...apiData
+  } = formData
 
   // Map UI field to API field
   return {
@@ -133,7 +140,7 @@ export type ResetPasswordFormData = z.infer<typeof ResetPasswordFormSchema>
 export function transformResetPasswordToAPI(
   formData: ResetPasswordFormData,
 ): z.infer<typeof ResetPasswordRequest> {
-  const { confirmPassword, ...apiData } = formData
+  const { confirmPassword: _confirmPassword, ...apiData } = formData
 
   return apiData
 }
@@ -189,8 +196,8 @@ export function combineRegistrationSteps(
   step2: RegistrationStep2Data,
   step3: RegistrationStep3Data,
 ): z.infer<typeof RegisterRequest> {
-  const { confirmPassword, ...passwordData } = step2
-  const { agreedToTerms, ...basicData } = step1
+  const { confirmPassword: _confirmPassword, ...passwordData } = step2
+  const { agreedToTerms: _agreedToTerms, ...basicData } = step1
 
   return {
     ...basicData,
@@ -257,8 +264,8 @@ export function transformToAdminCreateUser(
   return {
     createUser: {
       ...userData,
-      role: UserRole.enum.business, // Type-safe enum value
-      status: UserStatus.enum.unconfirmed, // Type-safe enum value
+      role: UserRoleEnum.BUSINESS, // Type-safe enum value
+      status: UserStatusEnum.UNCONFIRMED, // Type-safe enum value
     },
     options: {
       temporaryPassword,

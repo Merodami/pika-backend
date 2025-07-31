@@ -1,11 +1,13 @@
 import { getTranslations } from 'next-intl/server'
 
-interface VoucherPerformanceProps {
+import type { LocaleProps } from '@/types/common'
+
+interface VoucherPerformanceProps extends LocaleProps {
   businessId: string
 }
 
-export async function VoucherPerformance({}: VoucherPerformanceProps) {
-  const t = await getTranslations('dashboard')
+export async function VoucherPerformance({ locale }: VoucherPerformanceProps) {
+  const t = await getTranslations({ locale, namespace: 'dashboard' })
 
   // Mock voucher performance data
   const topVouchers = [

@@ -5,6 +5,7 @@ export { useApiQuery } from './base/useApiQuery'
 
 // Voucher hooks
 export {
+  useBulkUpdateVouchers,
   useCreateVoucher,
   useDeleteVoucher,
   useInfiniteVouchers,
@@ -30,7 +31,6 @@ export {
 
 // User hooks
 export {
-  useBulkUpdateUsers,
   useCreateUser,
   useCurrentUser,
   useDeleteUser,
@@ -39,6 +39,5 @@ export {
   useUpdateUser,
   useUser,
   useUsers,
-  useUserStats,
   useVerifyUser,
 } from './users/useUsers'

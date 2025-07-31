@@ -289,6 +289,30 @@ describe('User Service - Admin API Integration Tests', () => {
       expect(response.body.data.length).toBeLessThanOrEqual(5)
     })
 
+    it('should include hasNext and hasPrev in pagination response', async () => {
+      await seedTestUsers(testDb.prisma, { count: 10 })
+
+      // Test first page
+      const firstPageResponse = await adminClient
+        .get('/users?page=1&limit=5')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(firstPageResponse.body.pagination).toHaveProperty('hasNext')
+      expect(firstPageResponse.body.pagination).toHaveProperty('hasPrev')
+      expect(firstPageResponse.body.pagination.hasPrev).toBe(false)
+      expect(firstPageResponse.body.pagination.hasNext).toBe(true)
+
+      // Test second page
+      const secondPageResponse = await adminClient
+        .get('/users?page=2&limit=5')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(secondPageResponse.body.pagination.hasPrev).toBe(true)
+      expect(secondPageResponse.body.pagination.hasNext).toBe(true)
+    })
+
     it('should return 403 for non-admin users', async () => {
       await customerClient
         .get('/users')
@@ -691,6 +715,176 @@ describe('User Service - Admin API Integration Tests', () => {
     })
   })
 
+  // Admin User Get By ID Tests
+  describe('GET /admin/users/:id', () => {
+    it('should return user by ID with admin details', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      const response = await adminClient
+        .get(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.id).toBe(targetUser.id)
+      expect(response.body.email).toBe(targetUser.email)
+      expect(response.body.firstName).toBe(targetUser.firstName)
+      expect(response.body.lastName).toBe(targetUser.lastName)
+      expect(response.body.role).toBe(targetUser.role)
+      expect(response.body.status).toBe(targetUser.status)
+      expect(response.body.emailVerified).toBe(targetUser.emailVerified)
+      expect(response.body.phoneVerified).toBe(targetUser.phoneVerified)
+      expect(response.body).toHaveProperty('createdAt')
+      expect(response.body).toHaveProperty('updatedAt')
+    })
+
+    it('should return 404 for non-existent user', async () => {
+      const nonExistentId = uuid()
+
+      await adminClient
+        .get(`/admin/users/${nonExistentId}`)
+        .set('Accept', 'application/json')
+        .expect(404)
+    })
+
+    it('should require admin privileges', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      await customerClient
+        .get(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+
+    it('should validate UUID format', async () => {
+      await adminClient
+        .get('/admin/users/not-a-valid-uuid')
+        .set('Accept', 'application/json')
+        .expect(400)
+    })
+  })
+
+  // Admin Profile Tests
+  describe('GET /admin/users/me', () => {
+    it('should return current admin user profile', async () => {
+      const response = await adminClient
+        .get('/admin/users/me')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.email).toBe('admin@e2etest.com')
+      expect(response.body.role).toBe(UserRole.ADMIN)
+      expect(response.body).toHaveProperty('id')
+      expect(response.body).toHaveProperty('firstName')
+      expect(response.body).toHaveProperty('lastName')
+      expect(response.body).toHaveProperty('status')
+      expect(response.body).toHaveProperty('emailVerified')
+      expect(response.body).toHaveProperty('phoneVerified')
+      expect(response.body).toHaveProperty('createdAt')
+      expect(response.body).toHaveProperty('updatedAt')
+    })
+
+    it('should require admin privileges', async () => {
+      await customerClient
+        .get('/admin/users/me')
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+  })
+
+  describe('PATCH /admin/users/me', () => {
+    it('should update current admin user profile', async () => {
+      const updateData = {
+        firstName: 'UpdatedAdmin',
+        lastName: 'UpdatedLast',
+        phoneNumber: '+1234567890',
+      }
+
+      const response = await adminClient
+        .patch('/admin/users/me')
+        .send(updateData)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.firstName).toBe(updateData.firstName)
+      expect(response.body.lastName).toBe(updateData.lastName)
+      expect(response.body.phoneNumber).toBe(updateData.phoneNumber)
+      expect(response.body.email).toBe('admin@e2etest.com') // Email should not change
+      expect(response.body.role).toBe(UserRole.ADMIN) // Role should not change
+    })
+
+    it('should validate update data', async () => {
+      const invalidData = {
+        firstName: '', // Empty string should fail validation
+      }
+
+      await adminClient
+        .patch('/admin/users/me')
+        .send(invalidData)
+        .set('Accept', 'application/json')
+        .expect(400)
+    })
+
+    it('should require admin privileges', async () => {
+      const updateData = {
+        firstName: 'NotAllowed',
+      }
+
+      await customerClient
+        .patch('/admin/users/me')
+        .send(updateData)
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+  })
+
+  // Admin User Deletion Tests
+  describe('DELETE /admin/users/:id', () => {
+    it('should delete user by ID', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      await adminClient
+        .delete(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(204)
+
+      // Verify user is soft deleted
+      const deletedUser = await testDb.prisma.user.findUnique({
+        where: { id: targetUser.id },
+      })
+
+      expect(deletedUser?.deletedAt).not.toBeNull()
+    })
+
+    it('should return 404 for non-existent user', async () => {
+      const nonExistentId = uuid()
+
+      await adminClient
+        .delete(`/admin/users/${nonExistentId}`)
+        .set('Accept', 'application/json')
+        .expect(404)
+    })
+
+    it('should require admin privileges', async () => {
+      const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
+      const targetUser = testUsers.users[0]
+
+      await customerClient
+        .delete(`/admin/users/${targetUser.id}`)
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+
+    it('should validate UUID format', async () => {
+      await adminClient
+        .delete('/admin/users/not-a-valid-uuid')
+        .set('Accept', 'application/json')
+        .expect(400)
+    })
+  })
+
   // Admin Avatar Management
   describe('POST /users/:user_id/avatar (Admin)', () => {
     it('should allow admin to upload avatar for any user', async () => {
@@ -749,9 +943,7 @@ describe('User Service - Admin API Integration Tests', () => {
             type: 'EMAIL',
             userId: user.id,
           })
-          .expect(200)
-
-        expect(response.body.success).toBe(true)
+          .expect(204)
 
         // Verify the user was actually updated in the database
         const updatedUser = await testDb.prisma.user.findUnique({
@@ -831,9 +1023,7 @@ describe('User Service - Admin API Integration Tests', () => {
             userId: user.id,
             code: '123456',
           })
-          .expect(200)
-
-        expect(response.body.success).toBe(true)
+          .expect(204)
 
         // Verify the user was actually updated in the database
         const updatedUser = await testDb.prisma.user.findUnique({
@@ -922,9 +1112,7 @@ describe('User Service - Admin API Integration Tests', () => {
             type: 'ACCOUNT_CONFIRMATION',
             userId: user.id,
           })
-          .expect(200)
-
-        expect(response.body.success).toBe(true)
+          .expect(204)
 
         // Verify the user status was updated
         const updatedUser = await testDb.prisma.user.findUnique({
@@ -982,6 +1170,177 @@ describe('User Service - Admin API Integration Tests', () => {
             type: 'EMAIL',
             userId: '00000000-0000-0000-0000-000000000000',
           })
+          .expect(403)
+      })
+    })
+  })
+
+  // Ban/Unban User Tests
+  describe('User Ban/Unban Management', () => {
+    describe('PUT /users/:id/ban', () => {
+      it('should ban a user with reason and notification', async () => {
+        const targetUser = sharedTestData.allUsers.find(u => u.role === 'customer')!
+        
+        const response = await adminClient
+          .put(`/users/${targetUser.id}/ban`)
+          .send({
+            reason: 'Violation of Terms of Service',
+            duration: 30,
+            notifyUser: true,
+          })
+          .expect(204)
+        
+        // Verify user is banned
+        const userResponse = await adminClient
+          .get(`/users/${targetUser.id}`)
+          .expect(200)
+        
+        expect(userResponse.body.status).toBe('banned')
+        
+        // Verify email was sent
+        expect(mockCommunicationClient.sendEmail).toHaveBeenCalledWith(
+          expect.objectContaining({
+            to: targetUser.email,
+            subject: 'Account Suspended',
+            template: 'account-banned',
+            data: expect.objectContaining({
+              reason: 'Violation of Terms of Service',
+              duration: 30,
+            }),
+          })
+        )
+      })
+      
+      it('should ban a user without notification', async () => {
+        const targetUser = sharedTestData.allUsers.find(u => u.role === 'business')!
+        
+        await adminClient
+          .put(`/users/${targetUser.id}/ban`)
+          .send({
+            reason: 'Suspicious activity',
+            notifyUser: false,
+          })
+          .expect(204)
+        
+        // Verify user is banned
+        const userResponse = await adminClient
+          .get(`/users/${targetUser.id}`)
+          .expect(200)
+        
+        expect(userResponse.body.status).toBe('banned')
+        
+        // Verify no email was sent for this ban
+        const emailCalls = mockCommunicationClient.sendEmail.mock.calls
+        const banEmailForUser = emailCalls.find(
+          call => call[0].to === targetUser.email && call[0].subject === 'Account Suspended'
+        )
+        expect(banEmailForUser).toBeUndefined()
+      })
+      
+      it('should ban a user with minimal parameters', async () => {
+        const targetUser = sharedTestData.allUsers[2]
+        
+        await adminClient
+          .put(`/users/${targetUser.id}/ban`)
+          .send({})
+          .expect(204)
+        
+        // Verify user is banned
+        const userResponse = await adminClient
+          .get(`/users/${targetUser.id}`)
+          .expect(200)
+        
+        expect(userResponse.body.status).toBe('banned')
+      })
+      
+      it('should require admin privileges to ban users', async () => {
+        const targetUser = sharedTestData.allUsers[0]
+        
+        await customerClient
+          .put(`/users/${targetUser.id}/ban`)
+          .send({ reason: 'Test' })
+          .expect(403)
+      })
+      
+      it('should return 404 for non-existent user', async () => {
+        await adminClient
+          .put('/users/00000000-0000-0000-0000-000000000000/ban')
+          .send({ reason: 'Test' })
+          .expect(404)
+      })
+    })
+    
+    describe('PUT /users/:id/unban', () => {
+      it('should unban a user with notification', async () => {
+        // First ban a user
+        const targetUser = sharedTestData.allUsers[3]
+        await adminClient
+          .put(`/users/${targetUser.id}/ban`)
+          .send({ reason: 'Test ban' })
+          .expect(204)
+        
+        // Clear previous mock calls
+        mockCommunicationClient.sendEmail.mockClear()
+        
+        // Now unban with notification
+        await adminClient
+          .put(`/users/${targetUser.id}/unban`)
+          .send({
+            reason: 'Ban appeal approved',
+            notifyUser: true,
+          })
+          .expect(204)
+        
+        // Verify user is active
+        const userResponse = await adminClient
+          .get(`/users/${targetUser.id}`)
+          .expect(200)
+        
+        expect(userResponse.body.status).toBe('active')
+        
+        // Verify email was sent
+        expect(mockCommunicationClient.sendEmail).toHaveBeenCalledWith(
+          expect.objectContaining({
+            to: targetUser.email,
+            subject: 'Account Reinstated',
+            template: 'account-unbanned',
+            data: expect.objectContaining({
+              reason: 'Ban appeal approved',
+            }),
+          })
+        )
+      })
+      
+      it('should unban a user without notification', async () => {
+        // First ban a user
+        const targetUser = sharedTestData.allUsers[4]
+        await adminClient
+          .put(`/users/${targetUser.id}/ban`)
+          .send({ reason: 'Test ban' })
+          .expect(204)
+        
+        // Now unban without notification
+        await adminClient
+          .put(`/users/${targetUser.id}/unban`)
+          .send({
+            notifyUser: false,
+          })
+          .expect(204)
+        
+        // Verify user is active
+        const userResponse = await adminClient
+          .get(`/users/${targetUser.id}`)
+          .expect(200)
+        
+        expect(userResponse.body.status).toBe('active')
+      })
+      
+      it('should require admin privileges to unban users', async () => {
+        const targetUser = sharedTestData.allUsers[0]
+        
+        await customerClient
+          .put(`/users/${targetUser.id}/unban`)
+          .send({ reason: 'Test' })
           .expect(403)
       })
     })

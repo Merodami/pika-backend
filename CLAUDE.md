@@ -163,14 +163,6 @@ packages/services/[service-name]/
 
 ### Frontend SDK Architecture
 
-The platform generates a **separate TypeScript SDK** (`api-microservices-sdk`) that is consumed by frontend applications:
-
-- **Generated SDK**: Auto-generated from OpenAPI specifications using `yarn generate:sdk`
-- **Distribution**: Published as a separate npm package for frontend consumption
-- **Type Safety**: Provides fully typed API clients, request/response types, and enums
-- **Frontend Integration**: Frontend applications import types and API clients from this SDK
-- **Separation of Concerns**: Backend focuses on API implementation, frontend consumes generated types
-
 This architecture ensures:
 
 - **Contract-First Development**: OpenAPI spec drives both backend and frontend types

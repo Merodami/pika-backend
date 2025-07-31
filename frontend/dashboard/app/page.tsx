@@ -1,31 +1,27 @@
-'use client'
+import { UserRole } from '@pika/types'
+import { redirect } from 'next/navigation'
 
-import { Spin } from 'antd'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { getCurrentUser } from '@/app/_services/authService'
+import { defaultLocale } from '@/i18n/config'
 
-import { useAuthStore } from '@/store/auth.store'
+// Force dynamic rendering since we use cookies for authentication
+export const dynamic = 'force-dynamic'
 
-export default function HomePage() {
-  const router = useRouter()
-  const { isAuthenticated, user } = useAuthStore()
+export default async function HomePage() {
+  const user = await getCurrentUser()
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Redirect authenticated users to their dashboard
-      router.replace('/dashboard')
-    } else {
-      // Redirect unauthenticated users to login
-      router.replace('/login')
-    }
-  }, [isAuthenticated, user, router])
+  if (!user) {
+    redirect(`/${defaultLocale}/login`)
+  }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <Spin size="large" />
-        <p className="mt-4 text-gray-600">Loading...</p>
-      </div>
-    </div>
-  )
+  switch (user.role) {
+    case UserRole.ADMIN:
+      redirect(`/${defaultLocale}/admin`)
+      break
+    case UserRole.BUSINESS:
+      redirect(`/${defaultLocale}/business`)
+      break
+    default:
+      redirect(`/${defaultLocale}/unauthorized`)
+  }
 }

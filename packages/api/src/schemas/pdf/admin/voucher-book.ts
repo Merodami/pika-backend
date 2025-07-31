@@ -1,13 +1,17 @@
+import { VoucherBookSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { UserId } from '../../shared/branded.js'
-import { VoucherBookStatus, VoucherBookType } from '../../shared/enums.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
-import { VoucherBookSortBy } from '../common/enums.js'
+import {
+  VoucherBookStatusSchema,
+  VoucherBookTypeSchema,
+} from '../common/enums.js'
+import { VoucherBookSortBySchema } from '../common/enums.js'
 
 /**
  * Admin PDF voucher book schemas - full management capabilities
@@ -27,7 +31,7 @@ export const AdminVoucherBookResponse = openapi(
       .max(100)
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
-    bookType: VoucherBookType.describe('Type of voucher book'),
+    bookType: VoucherBookTypeSchema,
     month: z
       .number()
       .int()
@@ -36,7 +40,7 @@ export const AdminVoucherBookResponse = openapi(
       .optional()
       .describe('Month for monthly books (1-12)'),
     year: z.number().int().min(2020).max(2100).describe('Year of publication'),
-    status: VoucherBookStatus.describe('Current status of the book'),
+    status: VoucherBookStatusSchema,
     totalPages: z
       .number()
       .int()
@@ -107,7 +111,7 @@ export const CreateVoucherBookRequest = openapi(
       .max(100)
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
-    bookType: VoucherBookType.describe('Type of voucher book'),
+    bookType: VoucherBookTypeSchema,
     month: z
       .number()
       .int()
@@ -156,7 +160,7 @@ export const UpdateVoucherBookRequest = openapi(
       .max(100)
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
-    bookType: VoucherBookType.optional().describe('Type of voucher book'),
+    bookType: VoucherBookTypeSchema.optional(),
     month: z
       .number()
       .int()
@@ -206,8 +210,8 @@ export type UpdateVoucherBookRequest = z.infer<typeof UpdateVoucherBookRequest>
  * Admin voucher book search parameters - comprehensive filtering
  */
 export const AdminVoucherBookQueryParams = SearchParams.extend({
-  bookType: VoucherBookType.optional().describe('Filter by book type'),
-  status: VoucherBookStatus.optional().describe('Filter by book status'),
+  bookType: VoucherBookTypeSchema.optional(),
+  status: VoucherBookStatusSchema.optional(),
   year: z
     .number()
     .int()
@@ -226,7 +230,7 @@ export const AdminVoucherBookQueryParams = SearchParams.extend({
     .boolean()
     .optional()
     .describe('Filter books with/without generated PDF'),
-  sortBy: VoucherBookSortBy.default('createdAt'),
+  sortBy: VoucherBookSortBySchema.default(VoucherBookSortBy.CREATED_AT),
 })
 
 export type AdminVoucherBookQueryParams = z.infer<
@@ -423,7 +427,7 @@ export type BulkVoucherBookOperationResponse = z.infer<
  */
 export const UpdateVoucherBookStatusRequest = openapi(
   z.object({
-    status: VoucherBookStatus.describe('New status for the voucher book'),
+    status: VoucherBookStatusSchema,
   }),
   {
     description: 'Update voucher book status',

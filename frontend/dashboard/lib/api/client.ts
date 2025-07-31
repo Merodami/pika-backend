@@ -1,11 +1,5 @@
+import { mapValues, isFunction } from 'lodash-es'
 import { toast } from 'sonner'
-
-import {
-  clearTokens,
-  getAccessToken,
-  getRefreshToken,
-  setTokens,
-} from '@/lib/auth/tokens'
 
 import { OpenAPI } from './generated/core/OpenAPI'
 import { AuthenticationService } from './generated/services/AuthenticationService'
@@ -22,88 +16,60 @@ import { UsersService } from './generated/services/UsersService'
 import { VoucherManagementService } from './generated/services/VoucherManagementService'
 import { VouchersService } from './generated/services/VouchersService'
 
-// Configure OpenAPI client
-OpenAPI.BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5500/api/v1'
+// Configure OpenAPI client to use Next.js API routes as proxy
+// This follows the BFF (Backend for Frontend) pattern for security
+OpenAPI.BASE = '/api/proxy'
 OpenAPI.WITH_CREDENTIALS = true
 
-// Dynamic token resolver
-OpenAPI.TOKEN = async () => {
-  const token = getAccessToken()
-
-  return token ? `Bearer ${token}` : ''
-}
+// No token management needed - handled server-side via httpOnly cookies
+OpenAPI.TOKEN = async () => ''
 
 // Dynamic headers resolver
 OpenAPI.HEADERS = async () => ({
   'x-correlation-id': crypto.randomUUID(),
 })
 
-// Token management
+// Token refresh is handled server-side in the API route handler
+// No client-side token management needed with BFF pattern
 
-// Refresh token logic
-async function refreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken()
-
-  if (!refreshToken) {
-    return null
+// API error type
+interface ApiError {
+  status?: number
+  body?: {
+    message?: string
   }
-
-  try {
-    const response = await AuthenticationService.postAuthToken({
-      requestBody: {
-        grantType: 'refreshToken' as const,
-        refreshToken: refreshToken,
-      },
-    })
-
-    if (response.accessToken && response.refreshToken) {
-      setTokens(response.accessToken, response.refreshToken)
-
-      return response.accessToken
-    }
-  } catch (error) {
-    console.error('Token refresh failed:', error)
-    clearTokens()
-  }
-
-  return null
+  message?: string
 }
 
 // Handle API errors with toast notifications
-function handleApiError(error: any): never {
-  if (error?.status >= 400 && error?.status < 500) {
-    const message = error?.body?.message || error?.message || 'Request failed'
+function handleApiError(error: unknown): never {
+  const apiError = error as ApiError
+  if (apiError?.status && apiError.status >= 400 && apiError.status < 500) {
+    const message =
+      apiError?.body?.message || apiError?.message || 'Request failed'
 
     toast.error(message)
-  } else if (error?.status >= 500) {
+  } else if (apiError?.status && apiError.status >= 500) {
     toast.error('Server error. Please try again later.')
-  } else if (error?.message) {
-    toast.error(error.message)
+  } else if (apiError?.message) {
+    toast.error(apiError.message)
   }
   throw error
 }
 
 // Create wrapper for 401 handling
-function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(fn: T): T {
-  return (async (...args: any[]) => {
+function wrapWithAuth<T extends (...args: unknown[]) => Promise<unknown>>(
+  fn: T
+): T {
+  return (async (...args: unknown[]) => {
     try {
       return await fn(...args)
-    } catch (error: any) {
-      if (error?.status === 401) {
-        const newToken = await refreshAccessToken()
-
-        if (newToken) {
-          // Retry the request
-          try {
-            return await fn(...args)
-          } catch (retryError) {
-            handleApiError(retryError)
-          }
-        } else {
-          clearTokens()
-          window.location.href = '/login'
-          throw error
-        }
+    } catch (error) {
+      const apiError = error as ApiError
+      if (apiError?.status === 401) {
+        // Token expired, redirect to login
+        window.location.href = '/login'
+        throw error
       }
       handleApiError(error)
     }
@@ -111,18 +77,17 @@ function wrapWithAuth<T extends (...args: any[]) => Promise<any>>(fn: T): T {
 }
 
 // Wrap service methods with auth handling
-function wrapService<T extends Record<string, any>>(service: T): T {
-  const wrappedService = {} as T
-
-  Object.keys(service).forEach((key) => {
-    if (typeof service[key] === 'function') {
-      ;(wrappedService as any)[key] = wrapWithAuth(service[key].bind(service))
-    } else {
-      ;(wrappedService as any)[key] = service[key]
+function wrapService<T>(service: T): T {
+  // Use lodash mapValues to transform object properties
+  return mapValues(service as object, (value) => {
+    if (isFunction(value)) {
+      // Wrap functions with auth handling
+      // Type assertion needed because lodash isFunction doesn't narrow types
+      const fn = value as (...args: unknown[]) => Promise<unknown>
+      return wrapWithAuth(fn.bind(service))
     }
-  })
-
-  return wrappedService
+    return value
+  }) as T
 }
 
 // Create API client interface

@@ -1,24 +1,28 @@
 // Updated imports to use @api paths
 import type { ZodRegistry } from '@api/common/registry/base.js'
 import * as adminBusinessSchemas from '@api/schemas/business/admin/management.js'
+import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as adminCategorySchemas from '@api/schemas/category/admin/management.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
+import * as categorySchemas from '@api/schemas/category/public/category.js'
 import * as adminPaymentSchemas from '@api/schemas/payment/admin/transactions.js'
 import * as adminPdfSchemas from '@api/schemas/pdf/admin/voucher-book.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import { UserId } from '@api/schemas/shared/branded.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
 import { DateTime, UUID } from '@api/schemas/shared/primitives.js'
-import { MessageResponse } from '@api/schemas/shared/responses.js'
+import { PaginationMetadata } from '@api/schemas/shared/responses.js'
 import * as adminStorageSchemas from '@api/schemas/storage/admin/management.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import * as adminSupportSchemas from '@api/schemas/support/admin/tickets.js'
 import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
 import * as adminUserSchemas from '@api/schemas/user/admin/index.js'
+import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
 import * as userVerificationSchemas from '@api/schemas/user/public/verification.js'
 import * as adminVoucherSchemas from '@api/schemas/voucher/admin/management.js'
 import * as adminVoucherQueries from '@api/schemas/voucher/admin/queries.js'
+import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import { z } from 'zod'
 
@@ -26,6 +30,41 @@ import { z } from 'zod'
  * Register all admin API schemas and routes
  */
 export function registerAdminAPI(registry: ZodRegistry): void {
+  // ============= Common Schemas =============
+  // Register pagination metadata to ensure hasNext/hasPrev are included
+  registry.registerSchema('PaginationMetadata', PaginationMetadata)
+  
+  // ============= Enum Schemas =============
+  // User enums
+  registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)
+  registry.registerSchema('UserRole', userEnumSchemas.UserRoleSchema)
+  registry.registerSchema('UserSortBy', userEnumSchemas.UserSortBySchema)
+  registry.registerSchema(
+    'AdminUserSortBy',
+    userEnumSchemas.AdminUserSortBySchema,
+  )
+
+  // Business enums
+  registry.registerSchema(
+    'BusinessSortBy',
+    businessEnumSchemas.BusinessSortBySchema,
+  )
+  registry.registerSchema(
+    'BusinessStatusFilter',
+    businessEnumSchemas.BusinessStatusFilterSchema,
+  )
+  registry.registerSchema(
+    'AdminBusinessSortBy',
+    businessEnumSchemas.AdminBusinessSortBySchema,
+  )
+
+  // Voucher enums
+  registry.registerSchema('VoucherState', voucherEnumSchemas.VoucherStateSchema)
+  registry.registerSchema(
+    'VoucherDiscountType',
+    voucherEnumSchemas.VoucherDiscountTypeSchema,
+  )
+
   // ============= Business Management Schemas =============
   registry.registerSchema(
     'AdminBusinessResponse',
@@ -71,9 +110,19 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'UpdateBusinessRatingRequest',
     adminBusinessSchemas.UpdateBusinessRatingRequest,
   )
+  registry.registerSchema(
+    'PatchBusinessVerificationRequest',
+    adminBusinessSchemas.PatchBusinessVerificationRequest,
+  )
+  registry.registerSchema(
+    'PatchBusinessVerificationResponse',
+    adminBusinessSchemas.PatchBusinessVerificationResponse,
+  )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
 
   // ============= Category Management Schemas =============
+  // Register public category schema used in business responses
+  registry.registerSchema('CategoryResponse', categorySchemas.CategoryResponse)
   registry.registerSchema(
     'AdminCategoryResponse',
     adminCategorySchemas.AdminCategoryResponse,
@@ -278,12 +327,12 @@ export function registerAdminAPI(registry: ZodRegistry): void {
 
   // ============= User Management Schemas =============
   registry.registerSchema(
-    'AdminUserListResponse',
-    adminUserSchemas.AdminUserListResponse,
-  )
-  registry.registerSchema(
     'AdminUserDetailResponse',
     adminUserSchemas.AdminUserDetailResponse,
+  )
+  registry.registerSchema(
+    'AdminUserListResponse',
+    adminUserSchemas.AdminUserListResponse,
   )
   registry.registerSchema(
     'AdminUserQueryParams',
@@ -390,6 +439,18 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'UnifiedVerificationResponse',
     userVerificationSchemas.UnifiedVerificationResponse,
   )
+  registry.registerSchema(
+    'VerifyUserResponse',
+    adminUserSchemas.VerifyUserResponse,
+  )
+  registry.registerSchema(
+    'ResendVerificationResponse',
+    adminUserSchemas.ResendVerificationResponse,
+  )
+  registry.registerSchema(
+    'UserVerificationStatusResponse',
+    adminUserSchemas.UserVerificationStatusResponse,
+  )
 
   // ============= Register Routes =============
   registerAdminRoutes(registry)
@@ -405,6 +466,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories',
+    operationId: 'getAdminCategoryList',
     summary: 'List all categories with admin details',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -427,6 +489,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/tree',
+    operationId: 'getAdminCategoryTree',
     summary: 'Get category hierarchy tree',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -446,6 +509,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/categories/{id}',
+    operationId: 'getAdminCategoryById',
     summary: 'Get category details',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -476,6 +540,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/categories',
+    operationId: 'createAdminCategory',
     summary: 'Create a new category',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -512,6 +577,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/categories/{id}',
+    operationId: 'updateAdminCategory',
     summary: 'Update category information',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -549,6 +615,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/categories/{id}',
+    operationId: 'deleteAdminCategory',
     summary: 'Delete a category',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -574,6 +641,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'patch',
     path: '/categories/{id}/move',
+    operationId: 'moveAdminCategory',
     summary: 'Move category to different parent',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -611,6 +679,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'patch',
     path: '/categories/{id}/activation',
+    operationId: 'toggleAdminCategoryActivation',
     summary: 'Toggle category activation status',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -648,6 +717,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'patch',
     path: '/categories/bulk-update',
+    operationId: 'bulkUpdateAdminCategories',
     summary: 'Update multiple categories',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -684,6 +754,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/categories/bulk-delete',
+    operationId: 'bulkDeleteAdminCategories',
     summary: 'Delete multiple categories',
     tags: ['Category Management'],
     security: [{ bearerAuth: [] }],
@@ -721,7 +792,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Get all businesses
   registry.registerRoute({
     method: 'get',
-    path: '/businesses',
+    path: '/admin/businesses',
+    operationId: 'getAdminBusinessList',
     summary: 'List all businesses with admin details',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -743,7 +815,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Create business
   registry.registerRoute({
     method: 'post',
-    path: '/businesses',
+    path: '/admin/businesses',
+    operationId: 'createAdminBusiness',
     summary: 'Create a new business',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -771,7 +844,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Get business by ID
   registry.registerRoute({
     method: 'get',
-    path: '/businesses/{id}',
+    path: '/admin/businesses/{id}',
+    operationId: 'getAdminBusinessById',
     summary: 'Get business details',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -793,7 +867,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Update business
   registry.registerRoute({
     method: 'put',
-    path: '/businesses/{id}',
+    path: '/admin/businesses/{id}',
+    operationId: 'updateAdminBusiness',
     summary: 'Update business information',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -822,7 +897,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Delete business
   registry.registerRoute({
     method: 'delete',
-    path: '/businesses/{id}',
+    path: '/admin/businesses/{id}',
+    operationId: 'deleteAdminBusiness',
     summary: 'Delete business',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -836,11 +912,12 @@ function registerAdminRoutes(registry: ZodRegistry): void {
     },
   })
 
-  // Toggle business verification
+  // Update business verification
   registry.registerRoute({
     method: 'patch',
-    path: '/businesses/{id}/verification',
-    summary: 'Toggle business verification status',
+    path: '/admin/businesses/{id}/verification',
+    operationId: 'updateAdminBusinessVerification',
+    summary: 'Update business verification status',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
     request: {
@@ -848,48 +925,50 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.ToggleBusinessVerificationRequest,
+            schema: adminBusinessSchemas.PatchBusinessVerificationRequest,
           },
         },
       },
     },
     responses: {
-      200: {
-        description: 'Business verification updated',
-        content: {
-          'application/json': {
-            schema: adminBusinessSchemas.AdminBusinessResponse,
-          },
-        },
+      204: {
+        description: 'Business verification updated successfully',
       },
     },
   })
 
-  // Toggle business activation
+  // Activate business
   registry.registerRoute({
-    method: 'patch',
-    path: '/businesses/{id}/activation',
-    summary: 'Toggle business activation status',
+    method: 'post',
+    path: '/admin/businesses/{id}/activate',
+    operationId: 'activateAdminBusiness',
+    summary: 'Activate a business',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
     request: {
       params: businessParameters.BusinessIdParam,
-      body: {
-        content: {
-          'application/json': {
-            schema: adminBusinessSchemas.ToggleBusinessActivationRequest,
-          },
-        },
-      },
     },
     responses: {
-      200: {
-        description: 'Business activation updated',
-        content: {
-          'application/json': {
-            schema: adminBusinessSchemas.AdminBusinessResponse,
-          },
-        },
+      204: {
+        description: 'Business activated successfully',
+      },
+    },
+  })
+
+  // Deactivate business
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/businesses/{id}/deactivate',
+    operationId: 'deactivateAdminBusiness',
+    summary: 'Deactivate a business',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+    },
+    responses: {
+      204: {
+        description: 'Business deactivated successfully',
       },
     },
   })
@@ -897,7 +976,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Update business rating
   registry.registerRoute({
     method: 'patch',
-    path: '/businesses/{id}/rating',
+    path: '/admin/businesses/{id}/rating',
+    operationId: 'updateAdminBusinessRating',
     summary: 'Update business rating',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -926,7 +1006,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Bulk update businesses
   registry.registerRoute({
     method: 'patch',
-    path: '/businesses/bulk',
+    path: '/admin/businesses/bulk',
+    operationId: 'bulkUpdateAdminBusinesses',
     summary: 'Update multiple businesses at once',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -954,7 +1035,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Bulk delete businesses
   registry.registerRoute({
     method: 'delete',
-    path: '/businesses/bulk',
+    path: '/admin/businesses/bulk',
+    operationId: 'bulkDeleteAdminBusinesses',
     summary: 'Delete multiple businesses',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
@@ -985,6 +1067,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/files',
+    operationId: 'getAdminFileList',
     summary: 'List all files with admin details',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1007,6 +1090,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/files/{fileId}',
+    operationId: 'getAdminFileById',
     summary: 'Get file details',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1037,6 +1121,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'patch',
     path: '/storage/files/{fileId}',
+    operationId: 'updateAdminFile',
     summary: 'Update file information',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1074,6 +1159,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/storage/files/{fileId}',
+    operationId: 'deleteAdminFile',
     summary: 'Delete a file',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1099,6 +1185,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/storage/files/bulk-action',
+    operationId: 'bulkActionAdminFiles',
     summary: 'Perform bulk actions on files',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1135,6 +1222,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/analytics',
+    operationId: 'getAdminStorageAnalytics',
     summary: 'Get storage usage analytics',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1154,6 +1242,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/storage/configuration',
+    operationId: 'getAdminStorageConfiguration',
     summary: 'Get storage service configuration',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1173,6 +1262,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/storage/configuration',
+    operationId: 'updateAdminStorageConfiguration',
     summary: 'Update storage service configuration',
     tags: ['Storage Management'],
     security: [{ bearerAuth: [] }],
@@ -1211,6 +1301,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/vouchers',
+    operationId: 'getAdminVoucherList',
     summary: 'List all vouchers with admin details',
     tags: ['Voucher Management'],
     security: [{ bearerAuth: [] }],
@@ -1233,6 +1324,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/vouchers/{id}',
+    operationId: 'getAdminVoucherById',
     summary: 'Get voucher details',
     tags: ['Voucher Management'],
     security: [{ bearerAuth: [] }],
@@ -1263,6 +1355,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/vouchers',
+    operationId: 'createAdminVoucher',
     summary: 'Create a new voucher',
     tags: ['Voucher Management'],
     security: [{ bearerAuth: [] }],
@@ -1299,6 +1392,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/vouchers/{id}',
+    operationId: 'updateAdminVoucher',
     summary: 'Update voucher information',
     tags: ['Voucher Management'],
     security: [{ bearerAuth: [] }],
@@ -1336,6 +1430,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/vouchers/{id}',
+    operationId: 'deleteAdminVoucher',
     summary: 'Delete a voucher',
     tags: ['Voucher Management'],
     security: [{ bearerAuth: [] }],
@@ -1418,7 +1513,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // User Management routes
   registry.registerRoute({
     method: 'get',
-    path: '/users',
+    path: '/admin/users',
+    operationId: 'getAdminUserList',
     summary: 'List all users with admin details',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1430,15 +1526,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'List of users',
         content: {
           'application/json': {
-            schema: z.object({
-              data: z.array(adminUserSchemas.AdminUserDetailResponse),
-              pagination: z.object({
-                page: z.number(),
-                limit: z.number(),
-                total: z.number(),
-                totalPages: z.number(),
-              }),
-            }),
+            schema: adminUserSchemas.AdminUserListResponse,
           },
         },
       },
@@ -1447,7 +1535,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
 
   registry.registerRoute({
     method: 'get',
-    path: '/users/{id}',
+    path: '/admin/users/{id}',
+    operationId: 'getAdminUserById',
     summary: 'Get user details',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1470,7 +1559,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
 
   registry.registerRoute({
     method: 'patch',
-    path: '/users/{id}/status',
+    path: '/admin/users/{id}/status',
+    operationId: 'updateAdminUserStatus',
     summary: 'Update user status',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1500,7 +1590,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
 
   registry.registerRoute({
     method: 'put',
-    path: '/users/{id}/ban',
+    path: '/admin/users/{id}/ban',
+    operationId: 'banAdminUser',
     summary: 'Ban user',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1511,29 +1602,22 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: z.object({
-              reason: z.string(),
-              duration: z.number().optional(),
-            }),
+            schema: adminUserSchemas.BanUserRequest,
           },
         },
       },
     },
     responses: {
-      200: {
-        description: 'User banned',
-        content: {
-          'application/json': {
-            schema: MessageResponse,
-          },
-        },
+      204: {
+        description: 'User banned successfully',
       },
     },
   })
 
   registry.registerRoute({
     method: 'put',
-    path: '/users/{id}/unban',
+    path: '/admin/users/{id}/unban',
+    operationId: 'unbanAdminUser',
     summary: 'Unban user',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1541,22 +1625,25 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       params: z.object({
         id: z.string().uuid(),
       }),
-    },
-    responses: {
-      200: {
-        description: 'User unbanned',
+      body: {
         content: {
           'application/json': {
-            schema: MessageResponse,
+            schema: adminUserSchemas.UnbanUserRequest,
           },
         },
+      },
+    },
+    responses: {
+      204: {
+        description: 'User unbanned successfully',
       },
     },
   })
 
   registry.registerRoute({
     method: 'post',
-    path: '/users',
+    path: '/admin/users',
+    operationId: 'createAdminUser',
     summary: 'Create a new user (admin only)',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1599,7 +1686,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
 
   registry.registerRoute({
     method: 'patch',
-    path: '/users/{id}',
+    path: '/admin/users/{id}',
+    operationId: 'updateAdminUser',
     summary: 'Update user information (admin)',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1638,7 +1726,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   // Delete user route
   registry.registerRoute({
     method: 'delete',
-    path: '/users/{id}',
+    path: '/admin/users/{id}',
+    operationId: 'deleteAdminUser',
     summary: 'Delete user (admin only)',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1664,7 +1753,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
 
   registry.registerRoute({
     method: 'get',
-    path: '/users/email/{email}',
+    path: '/admin/users/email/{email}',
+    operationId: 'getAdminUserByEmail',
     summary: 'Get user by email',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1697,6 +1787,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/admin/users/verify',
+    operationId: 'verifyAdminUser',
     summary: 'Admin verifies user email, phone, or account',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1710,17 +1801,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       },
     },
     responses: {
-      200: {
-        description: 'Verification successful',
-        content: {
-          'application/json': {
-            schema: z.object({
-              success: z.boolean(),
-              message: z.string(),
-              user: adminUserSchemas.AdminUserDetailResponse,
-            }),
-          },
-        },
+      204: {
+        description: 'User verified successfully',
       },
       400: {
         description: 'Bad request',
@@ -1744,6 +1826,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/admin/users/resend-verification',
+    operationId: 'resendAdminUserVerification',
     summary: 'Admin resends verification email or SMS',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1790,6 +1873,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/users/{id}/verification-status',
+    operationId: 'getAdminUserVerificationStatus',
     summary: 'Get user verification status',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1835,6 +1919,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/admin/users/{id}/avatar',
+    operationId: 'uploadAdminUserAvatar',
     summary: 'Upload avatar for a user (admin only)',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1879,6 +1964,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/users/me',
+    operationId: 'getAdminCurrentUser',
     summary: 'Get current admin user profile',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1913,6 +1999,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'patch',
     path: '/admin/users/me',
+    operationId: 'updateAdminCurrentUser',
     summary: 'Update current admin user profile',
     tags: ['User Management'],
     security: [{ bearerAuth: [] }],
@@ -1965,6 +2052,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/transactions',
+    operationId: 'getAdminTransactionList',
     summary: 'List all transactions',
     tags: ['Transaction Management'],
     security: [{ bearerAuth: [] }],
@@ -1994,6 +2082,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/transactions/{id}',
+    operationId: 'getAdminTransactionById',
     summary: 'Get transaction details',
     tags: ['Transaction Management'],
     security: [{ bearerAuth: [] }],
@@ -2019,6 +2108,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/payments/reports',
+    operationId: 'getAdminFinancialReports',
     summary: 'Generate financial reports',
     tags: ['Financial Management'],
     security: [{ bearerAuth: [] }],
@@ -2040,6 +2130,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/transactions/{id}/refund',
+    operationId: 'refundAdminTransaction',
     summary: 'Refund a transaction',
     tags: ['Financial Management'],
     security: [{ bearerAuth: [] }],
@@ -2314,6 +2405,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/support/tickets',
+    operationId: 'getAdminSupportTicketList',
     summary: 'List support tickets',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2343,6 +2435,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/support/tickets/{id}',
+    operationId: 'getAdminSupportTicketById',
     summary: 'Get support ticket details',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2367,6 +2460,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/support/tickets/{id}/status',
+    operationId: 'updateAdminTicketStatus',
     summary: 'Update ticket status',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2397,6 +2491,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/support/tickets/{id}/assign',
+    operationId: 'assignAdminTicketToAgent',
     summary: 'Assign ticket to agent',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2428,6 +2523,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/problems',
+    operationId: 'getAdminProblemList',
     summary: 'List all problems with admin details',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2459,6 +2555,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/problems/{id}',
+    operationId: 'getAdminProblemById',
     summary: 'Get problem details',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2482,6 +2579,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/admin/problems/{id}',
+    operationId: 'updateAdminProblem',
     summary: 'Update problem',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2512,6 +2610,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/admin/problems/{id}',
+    operationId: 'deleteAdminProblem',
     summary: 'Delete problem',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2531,6 +2630,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/comments',
+    operationId: 'getAdminCommentList',
     summary: 'List all comments',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2567,6 +2667,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/comments/problem/{problemId}',
+    operationId: 'getAdminCommentsByProblemId',
     summary: 'Get comments by problem ID',
     tags: ['Support Management'],
     security: [{ bearerAuth: [] }],
@@ -2699,6 +2800,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/voucher-books',
+    operationId: 'getAdminVoucherBookList',
     summary: 'List all voucher books with admin details',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2721,6 +2823,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/voucher-books/{id}',
+    operationId: 'getAdminVoucherBookById',
     summary: 'Get voucher book details',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2751,6 +2854,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/admin/voucher-books',
+    operationId: 'createAdminVoucherBook',
     summary: 'Create a new voucher book',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2787,6 +2891,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'put',
     path: '/admin/voucher-books/{id}',
+    operationId: 'updateAdminVoucherBook',
     summary: 'Update voucher book information',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2824,6 +2929,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'delete',
     path: '/admin/voucher-books/{id}',
+    operationId: 'deleteAdminVoucherBook',
     summary: 'Delete a voucher book',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2849,6 +2955,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'patch',
     path: '/admin/voucher-books/{id}/status',
+    operationId: 'updateAdminVoucherBookStatus',
     summary: 'Update voucher book status',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2886,6 +2993,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/admin/voucher-books/{id}/generate-pdf',
+    operationId: 'generateAdminVoucherBookPdf',
     summary: 'Generate PDF for voucher book',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2923,6 +3031,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'post',
     path: '/admin/voucher-books/bulk-archive',
+    operationId: 'bulkArchiveAdminVoucherBooks',
     summary: 'Archive multiple voucher books',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],
@@ -2967,6 +3076,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
   registry.registerRoute({
     method: 'get',
     path: '/admin/voucher-books/statistics',
+    operationId: 'getAdminVoucherBookStatistics',
     summary: 'Get voucher book statistics',
     tags: ['PDF Management'],
     security: [{ bearerAuth: [] }],

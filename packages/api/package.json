@@ -53,9 +53,6 @@
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   },
-  "resolutions": {
-    "ajv": "8.17.1"
-  },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && mkdir -p dist && cp generated/openapi/all-apis.json dist/openapi.json",
     "generate:openapi": "tsx src/scripts/generate-all-apis.ts",

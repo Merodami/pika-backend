@@ -1,9 +1,10 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
-import { useTransition } from 'react'
 import { Select } from 'antd'
+import { useRouter, usePathname } from 'next/navigation'
 import { useLocale } from 'next-intl'
+import { useTransition } from 'react'
+
 import { locales, localeConfig, type Locale } from '@/i18n/config'
 import { useAppStore } from '@/store/app.store'
 
@@ -23,7 +24,9 @@ export function LanguageSwitcher() {
       const data = Object.fromEntries(formData)
 
       // Save to Zustand store
-      useAppStore.getState().saveFormDraft(formId!, data)
+      if (formId) {
+        useAppStore.getState().saveFormDraft(formId, data)
+      }
     }
 
     // Set switching state for loading UI
@@ -32,7 +35,7 @@ export function LanguageSwitcher() {
     // Perform soft navigation with Next.js transitions
     startTransition(() => {
       // Replace current locale in path with new locale
-      const newPath = pathname.replace(/^\/[^\/]+/, `/${newLocale}`)
+      const newPath = pathname.replace(/^\/[^/]+/, `/${newLocale}`)
 
       // Save locale preference to Zustand (persisted to localStorage)
       setLocale(newLocale as Locale)

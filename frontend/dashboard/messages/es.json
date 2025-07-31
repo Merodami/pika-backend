@@ -85,12 +85,17 @@
   },
   "dashboard": {
     "title": "Panel de Control",
+    "description": "Panel de administración de Pika",
     "welcome": "Bienvenido, {name}",
     "admin": {
       "subtitle": "Aquí está el resumen de tu plataforma"
     },
     "business": {
       "subtitle": "Aquí está el rendimiento de tu negocio"
+    },
+    "system": {
+      "systemHealth": "Estado del Sistema",
+      "uptime": "tiempo activo"
     },
     "metrics": {
       "totalVouchers": "Cupones Totales",
@@ -177,5 +182,16 @@
       "settings": "Configuración",
       "logout": "Cerrar sesión"
     }
+  },
+  "error": {
+    "title": "Algo salió mal",
+    "message": "Lo sentimos, se produjo un error al procesar tu solicitud.",
+    "tryAgain": "Intentar de nuevo",
+    "goHome": "Ir al inicio"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "message": "Lo sentimos, la página que visitaste no existe.",
+    "backHome": "Volver al inicio"
   }
 }

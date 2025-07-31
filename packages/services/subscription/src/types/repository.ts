@@ -1,6 +1,6 @@
 // src/types/repository.ts
 
-import type { BillingInterval, SubscriptionStatus } from '@pika/types'
+import type { SubscriptionStatus } from '@pika/types'
 
 /**
  * Data types for repository operations
@@ -63,7 +63,6 @@ export interface CreatePlanData {
   name: string
   price: number
   currency: string
-  interval: BillingInterval
   intervalCount: number
 
   // Optional fields

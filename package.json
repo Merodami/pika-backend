@@ -53,6 +53,10 @@
     "quality:all": "yarn quality && yarn quality:bundle-size && yarn quality:unused",
     "local:generate": "yarn db:generate && nx run-many --target=build --projects=@pika/types,@pika/environment --skip-nx-cache && yarn generate:api && yarn generate:docs && yarn db:migrate && yarn db:generate-test-dump",
     "local": "nx run-many --target=local --verbose --parallel=100 --output-style=stream",
+    "dashboard:dev": "yarn workspace @pika/dashboard dev",
+    "dashboard:build": "yarn workspace @pika/dashboard build",
+    "dashboard:start": "yarn workspace @pika/dashboard start",
+    "dashboard:lint": "yarn workspace @pika/dashboard lint",
     "reset:codebase": "yarn nx reset && yarn clear && yarn cache clear",
     "kill": "yarn kill:backend; yarn kill:processes",
     "kill:backend": "fkill --force --silent :5501 :5502 :5503 :5504 :5505 :5506 :5507 :5508 :5509 :5510",
@@ -70,7 +74,7 @@
     "generate": "yarn generate:api && yarn generate:docs",
     "generate:api": "yarn generate:openapi && yarn generate:sdk",
     "generate:openapi": "cd packages/api && yarn generate:openapi && cd ../.. && nx run @pika/api:build",
-    "generate:sdk": "cd frontend/dashboard && npx openapi-typescript-codegen --input ../../packages/api/generated/openapi/all-apis.json --output lib/api/generated --client axios --useOptions --exportSchemas true",
+    "generate:sdk": "cd frontend/dashboard && npx openapi-typescript-codegen --input ../../packages/api/generated/openapi/all-apis.json --output lib/api/generated --client axios --useOptions --exportSchemas true --useUnionTypes",
     "generate:docs": "cd packages/api && yarn generate:docs",
     "git-hooks-prepare": "husky install",
     "open:docs": "nx run @pika/api:open:docs",
@@ -137,8 +141,11 @@
   "workspaces": [
     "packages/**",
     "tools/**",
-    "!api-microservices-sdk"
+    "frontend/**"
   ],
+  "installConfig": {
+    "hoistingLimits": "workspaces"
+  },
   "packageManager": "yarn@4.9.1",
   "engines": {
     "node": ">=22.0.0 <23.0.0"
