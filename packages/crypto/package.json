@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@noble/curves": "^1.9.4",
+    "@noble/curves": "^1.9.6",
     "@noble/hashes": "^1.8.0",
     "@pika/environment": "workspace:^",
     "@pika/shared": "workspace:^",
