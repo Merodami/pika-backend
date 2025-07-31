@@ -85,12 +85,17 @@
   },
   "dashboard": {
     "title": "Panel de Control",
+    "description": "Panel de administración de Pika",
     "welcome": "Bienvenido, {name}",
     "admin": {
       "subtitle": "Aquí está el resumen de tu plataforma"
     },
     "business": {
       "subtitle": "Aquí está el rendimiento de tu negocio"
+    },
+    "system": {
+      "systemHealth": "Estado del Sistema",
+      "uptime": "tiempo activo"
     },
     "metrics": {
       "totalVouchers": "Cupones Totales",

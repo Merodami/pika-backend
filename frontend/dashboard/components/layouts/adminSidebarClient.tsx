@@ -1,13 +1,38 @@
 'use client'
 
-import type { LucideIcon } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Ticket,
+  BookOpen,
+  BarChart3,
+  Settings,
+  FileText,
+  CreditCard,
+  MessageSquare,
+  type LucideIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+
+const iconMap: Record<string, LucideIcon> = {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Ticket,
+  BookOpen,
+  BarChart3,
+  Settings,
+  FileText,
+  CreditCard,
+  MessageSquare,
+}
 
 interface NavItem {
   label: string
   href: string
-  icon: LucideIcon
+  icon: string
   badge?: number
 }
 
@@ -24,7 +49,12 @@ export function AdminSidebarClient({ navItems }: AdminSidebarClientProps) {
         {navItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(`${item.href}/`)
-          const Icon = item.icon
+          const Icon = iconMap[item.icon]
+
+          if (!Icon) {
+            console.warn(`Icon ${item.icon} not found in iconMap`)
+            return null
+          }
 
           return (
             <Link

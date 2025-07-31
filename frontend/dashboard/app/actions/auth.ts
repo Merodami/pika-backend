@@ -19,13 +19,20 @@ export async function login(data: z.infer<typeof authPublic.TokenRequest>) {
       requestBody: data,
     })
 
+    console.log('Login response:', {
+      hasAccessToken: !!response.accessToken,
+      hasRefreshToken: !!response.refreshToken,
+    })
+
     if (response.accessToken && response.refreshToken) {
       await setTokens(response.accessToken, response.refreshToken)
-      redirect('/dashboard')
+      console.log('Tokens set successfully')
+      return { success: true }
     }
 
     throw new Error('Invalid response from server')
   } catch (error) {
+    console.error('Login error:', error)
     return {
       error: error instanceof Error ? error.message : 'Login failed',
     }
@@ -41,9 +48,8 @@ export async function register(
       requestBody: data,
     })
 
-    // Registration returns RegisterResponse, not tokens
-    // User needs to login after registration
-    redirect('/login')
+    // Registration successful - return success flag
+    return { success: true }
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : 'Registration failed',

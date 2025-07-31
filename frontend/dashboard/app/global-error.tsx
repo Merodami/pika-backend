@@ -9,11 +9,17 @@ export default function GlobalError({
   reset: () => void
 }) {
   // Don't render for Next.js internal navigation errors
-  if (error.message === 'NEXT_REDIRECT' || error.message?.includes('NEXT_REDIRECT')) {
+  if (
+    error.message === 'NEXT_REDIRECT' ||
+    error.message?.includes('NEXT_REDIRECT')
+  ) {
     return null
   }
-  
-  if (error.message === 'NEXT_NOT_FOUND' || error.message?.includes('NEXT_NOT_FOUND')) {
+
+  if (
+    error.message === 'NEXT_NOT_FOUND' ||
+    error.message?.includes('NEXT_NOT_FOUND')
+  ) {
     return null
   }
   return (

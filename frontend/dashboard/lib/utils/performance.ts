@@ -43,7 +43,10 @@ export function reportWebVitals(metric: WebVital) {
 }
 
 // Performance observer for custom metrics
-export function measureApiCall<T>(name: string, fn: () => Promise<T>): Promise<T> {
+export function measureApiCall<T>(
+  name: string,
+  fn: () => Promise<T>
+): Promise<T> {
   const startTime = performance.now()
 
   return fn().finally(() => {

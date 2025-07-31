@@ -1478,7 +1478,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // User routes
   registry.registerRoute({
     method: 'get',
-    path: '/users/profile',
+    path: '/users/me',
     operationId: 'getUserProfile',
     summary: 'Get current user profile',
     tags: ['Users'],
@@ -1504,8 +1504,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   })
 
   registry.registerRoute({
-    method: 'patch',
-    path: '/users/profile',
+    method: 'put',
+    path: '/users/me',
     operationId: 'updateUserProfile',
     summary: 'Update user profile',
     tags: ['Users'],

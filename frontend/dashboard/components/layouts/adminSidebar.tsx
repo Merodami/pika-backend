@@ -1,15 +1,4 @@
-import {
-  LayoutDashboard,
-  Users,
-  Building2,
-  Ticket,
-  BookOpen,
-  BarChart3,
-  Settings,
-  FileText,
-  CreditCard,
-  MessageSquare,
-} from 'lucide-react'
+// Icons are imported in the client component
 import { getTranslations } from 'next-intl/server'
 
 import type { User } from '@/app/_services/authService'
@@ -30,52 +19,52 @@ export async function AdminSidebar({ locale }: AdminSidebarProps) {
     {
       label: t('dashboard'),
       href: `/${locale}/admin`,
-      icon: LayoutDashboard,
+      icon: 'LayoutDashboard',
     },
     {
       label: t('users'),
       href: `/${locale}/admin/users`,
-      icon: Users,
+      icon: 'Users',
     },
     {
       label: t('businesses'),
       href: `/${locale}/admin/businesses`,
-      icon: Building2,
+      icon: 'Building2',
     },
     {
       label: t('vouchers'),
       href: `/${locale}/admin/vouchers`,
-      icon: Ticket,
+      icon: 'Ticket',
     },
     {
       label: t('voucherBooks'),
       href: `/${locale}/admin/voucher-books`,
-      icon: BookOpen,
+      icon: 'BookOpen',
     },
     {
       label: t('analytics'),
       href: `/${locale}/admin/analytics`,
-      icon: BarChart3,
+      icon: 'BarChart3',
     },
     {
       label: t('payments'),
       href: `/${locale}/admin/payments`,
-      icon: CreditCard,
+      icon: 'CreditCard',
     },
     {
       label: t('support'),
       href: `/${locale}/admin/support`,
-      icon: MessageSquare,
+      icon: 'MessageSquare',
     },
     {
       label: t('reports'),
       href: `/${locale}/admin/reports`,
-      icon: FileText,
+      icon: 'FileText',
     },
     {
       label: t('settings'),
       href: `/${locale}/admin/settings`,
-      icon: Settings,
+      icon: 'Settings',
     },
   ]
 

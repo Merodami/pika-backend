@@ -45,7 +45,8 @@ interface ApiError {
 function handleApiError(error: unknown): never {
   const apiError = error as ApiError
   if (apiError?.status && apiError.status >= 400 && apiError.status < 500) {
-    const message = apiError?.body?.message || apiError?.message || 'Request failed'
+    const message =
+      apiError?.body?.message || apiError?.message || 'Request failed'
 
     toast.error(message)
   } else if (apiError?.status && apiError.status >= 500) {
@@ -57,7 +58,9 @@ function handleApiError(error: unknown): never {
 }
 
 // Create wrapper for 401 handling
-function wrapWithAuth<T extends (...args: unknown[]) => Promise<unknown>>(fn: T): T {
+function wrapWithAuth<T extends (...args: unknown[]) => Promise<unknown>>(
+  fn: T
+): T {
   return (async (...args: unknown[]) => {
     try {
       return await fn(...args)

@@ -22,7 +22,7 @@ const publicRoutes = [
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
+
   console.log('Middleware: Processing path:', pathname)
 
   // Get locale preference from header (sent by client)

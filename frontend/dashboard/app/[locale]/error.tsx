@@ -21,14 +21,22 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
   }, [error])
 
   // Check if this is a Next.js redirect error
-  if (error.message === 'NEXT_REDIRECT' || error.message?.includes('NEXT_REDIRECT')) {
-    console.log('NEXT_REDIRECT error detected, this should be handled by Next.js internally')
+  if (
+    error.message === 'NEXT_REDIRECT' ||
+    error.message?.includes('NEXT_REDIRECT')
+  ) {
+    console.log(
+      'NEXT_REDIRECT error detected, this should be handled by Next.js internally'
+    )
     // Don't render error UI for redirect errors
     return null
   }
-  
+
   // Check for NEXT_NOT_FOUND errors
-  if (error.message === 'NEXT_NOT_FOUND' || error.message?.includes('NEXT_NOT_FOUND')) {
+  if (
+    error.message === 'NEXT_NOT_FOUND' ||
+    error.message?.includes('NEXT_NOT_FOUND')
+  ) {
     console.log('NEXT_NOT_FOUND error detected')
     return null
   }
@@ -40,9 +48,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">
           {t('title')}
         </h2>
-        <p className="text-gray-600 mb-8">
-          {t('message')}
-        </p>
+        <p className="text-gray-600 mb-8">{t('message')}</p>
         <div className="space-x-4">
           <button
             onClick={reset}

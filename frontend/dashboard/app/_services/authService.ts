@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { cache } from 'react'
 
 import { UsersService } from '@/lib/api/generated'
+import { configureApiClient } from '@/lib/api/serverClient'
 
 export interface User {
   id: string
@@ -26,6 +27,9 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
     const token = await getAccessToken()
 
     if (!token) return null
+
+    // Configure API client with the token
+    await configureApiClient()
 
     const response = await UsersService.getUserProfile()
 

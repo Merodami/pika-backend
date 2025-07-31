@@ -27,7 +27,10 @@ const { Option } = Select
 
 interface VoucherDesignFormProps {
   voucherDesign: VoucherDesign
-  onChange: (field: keyof VoucherDesign, value: VoucherDesign[keyof VoucherDesign]) => void
+  onChange: (
+    field: keyof VoucherDesign,
+    value: VoucherDesign[keyof VoucherDesign]
+  ) => void
 }
 
 const categories = [
@@ -179,7 +182,9 @@ export function VoucherDesignForm({
                   <InputNumber
                     min={0}
                     value={voucherDesign.minimumPurchase}
-                    onChange={(value) => onChange('minimumPurchase', value ?? 0)}
+                    onChange={(value) =>
+                      onChange('minimumPurchase', value ?? 0)
+                    }
                     style={{ width: '100%' }}
                     placeholder="0.00"
                   />
@@ -257,7 +262,9 @@ export function VoucherDesignForm({
                   min={1}
                   max={voucherDesign.maxRedemptions || 100}
                   value={voucherDesign.maxRedemptionsPerUser}
-                  onChange={(value) => onChange('maxRedemptionsPerUser', value ?? 1)}
+                  onChange={(value) =>
+                    onChange('maxRedemptionsPerUser', value ?? 1)
+                  }
                   style={{ width: '100%' }}
                   placeholder="Unlimited"
                 />
