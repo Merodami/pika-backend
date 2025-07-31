@@ -4,7 +4,6 @@ import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { authFrontend } from '@pika/api'
 import { Button, Form, Input, Alert, Checkbox } from 'antd'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -12,6 +11,7 @@ import { z } from 'zod'
 
 import { login } from '@/app/actions/auth'
 import { useAppStore } from '@/store/app.store'
+import { LocalizedLink } from '@/components/ui/LocalizedLink'
 
 // Use the admin/business login schema with enhanced password requirements
 const loginSchema = authFrontend.AdminBusinessLoginFormSchema
@@ -115,12 +115,12 @@ export function LoginForm() {
         <Form.Item>
           <div className="flex items-center justify-between">
             <Checkbox {...register('rememberMe')}>{t('rememberMe')}</Checkbox>
-            <Link
+            <LocalizedLink
               href="/forgot-password"
               className="text-sm text-blue-600 hover:text-blue-500"
             >
               {t('forgotPassword')}
-            </Link>
+            </LocalizedLink>
           </div>
         </Form.Item>
 
@@ -138,12 +138,12 @@ export function LoginForm() {
 
         <div className="text-center">
           <span className="text-gray-600">{t('noAccount')} </span>
-          <Link
+          <LocalizedLink
             href="/register"
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             {t('signUp')}
-          </Link>
+          </LocalizedLink>
         </div>
       </Form>
     </div>

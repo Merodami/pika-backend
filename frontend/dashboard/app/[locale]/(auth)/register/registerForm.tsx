@@ -9,10 +9,9 @@ import {
 } from '@ant-design/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Checkbox, Form, Input } from 'antd'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { z } from 'zod'
 
 import { register as registerAction } from '@/app/actions/auth'
@@ -21,6 +20,7 @@ import {
   transformRegisterToAPI,
   type RegisterFormData,
 } from '@/lib/validations/auth'
+import { LocalizedLink } from '@/components/ui/LocalizedLink'
 
 // Extract input and output types for proper branded type handling
 type RegisterFormInput = z.input<typeof RegisterFormSchema>
@@ -184,12 +184,12 @@ export function RegisterForm() {
 
         <div className="text-center">
           <span className="text-gray-600">{t('haveAccount')} </span>
-          <Link
+          <LocalizedLink
             href="/login"
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             {t('signIn')}
-          </Link>
+          </LocalizedLink>
         </div>
       </Form>
     </div>

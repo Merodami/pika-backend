@@ -13,15 +13,20 @@ export default async function LocaleLayout({
   children,
   params,
 }: LocaleLayoutProps) {
+  console.log('LocaleLayout: params:', params)
   const { locale } = await params
+  console.log('LocaleLayout: locale:', locale)
 
   // Validate locale
   if (!locales.includes(locale as (typeof locales)[number])) {
+    console.log('LocaleLayout: Invalid locale:', locale)
     notFound()
   }
 
   // Load messages for the locale
-  const messages = await getMessages()
+  console.log('LocaleLayout: Before getMessages with locale:', locale)
+  const messages = await getMessages({ locale })
+  console.log('LocaleLayout: After getMessages')
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

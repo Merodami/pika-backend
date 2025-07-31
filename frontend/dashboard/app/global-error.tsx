@@ -2,12 +2,20 @@
 
 // Global error boundary - fallback for when locale-specific error fails
 export default function GlobalError({
-  error: _error,
+  error,
   reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  // Don't render for Next.js internal navigation errors
+  if (error.message === 'NEXT_REDIRECT' || error.message?.includes('NEXT_REDIRECT')) {
+    return null
+  }
+  
+  if (error.message === 'NEXT_NOT_FOUND' || error.message?.includes('NEXT_NOT_FOUND')) {
+    return null
+  }
   return (
     <html>
       <body>
