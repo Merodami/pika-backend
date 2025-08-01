@@ -2,13 +2,13 @@
  * Frontend Authentication Validation
  *
  * Architecture:
- * - Zod schemas from @pika/api for validation (single source of truth)
+ * - Zod schemas from @merodami/pika-api for validation (single source of truth)
  * - Generated SDK types for API calls
  * - Following backend import patterns
  */
 
-// Import from @pika/api using the same pattern as backend services
-import { authFrontend, authPublic, shared } from '@pika/api'
+// Import from @merodami/pika-api using the same pattern as backend services
+import { authFrontend, authPublic, shared } from '@merodami/pika-api'
 
 // Import SDK types for API responses
 import type {

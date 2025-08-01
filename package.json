@@ -2,7 +2,7 @@
   "name": "pika",
   "version": "1.0.0",
   "private": true,
-  "author": "Pika",
+  "author": "Damian Meroni",
   "type": "module",
   "scripts": {
     "validate:all": "yarn typecheck && yarn lint",

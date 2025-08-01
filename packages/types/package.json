@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "Shared TypeScript type definitions and enums for Pika platform",
-  "author": "Pika",
+  "author": "Damian Meroni",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

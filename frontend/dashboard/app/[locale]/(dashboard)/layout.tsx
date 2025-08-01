@@ -1,4 +1,4 @@
-import { UserRole } from '@pika/types'
+import { UserRole } from '@merodami/pika-types'
 import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 

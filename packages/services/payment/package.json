@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Payment & Credits Service for Pika Platform",
-  "author": "Pika",
+  "author": "Damian Meroni",
   "type": "module",
   "main": "dist/index.js",
   "dependencies": {

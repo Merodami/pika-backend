@@ -1,6 +1,6 @@
 'use server'
 
-import { authPublic } from '@pika/api'
+import { authPublic } from '@merodami/pika-api'
 import { redirect } from 'next/navigation'
 import type { z } from 'zod'
 

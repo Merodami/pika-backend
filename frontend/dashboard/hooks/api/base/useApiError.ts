@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore'
 
 /**
  * Hook for centralized API error handling
- * Based on backend ErrorCode enum from @pika/types
+ * Based on backend ErrorCode enum from @merodami/pika-types
  */
 export function useApiError() {
   const router = useRouter()

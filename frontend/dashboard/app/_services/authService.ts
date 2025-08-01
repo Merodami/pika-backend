@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { UserRole, type UserRoleType } from '@pika/types'
+import { UserRole, type UserRoleType } from '@merodami/pika-types'
 import { cookies } from 'next/headers'
 import { cache } from 'react'
 

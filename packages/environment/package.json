@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "Centralized environment variable management and configuration for Pika platform",
-  "author": "Pika",
+  "author": "Damian Meroni",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

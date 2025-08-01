@@ -1,4 +1,4 @@
-import { UserRole } from '@pika/types'
+import { UserRole } from '@merodami/pika-types'
 import { redirect } from 'next/navigation'
 
 import { getCurrentUser } from '@/app/_services/authService'

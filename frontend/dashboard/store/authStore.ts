@@ -1,4 +1,4 @@
-import { type UserRoleType } from '@pika/types'
+import { type UserRoleType } from '@merodami/pika-types'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 

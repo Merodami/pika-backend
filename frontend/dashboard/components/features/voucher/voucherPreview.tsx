@@ -8,7 +8,7 @@ import {
   PhoneOutlined,
   ShopOutlined,
 } from '@ant-design/icons'
-import { VoucherDiscountType } from '@pika/types'
+import { VoucherDiscountType } from '@merodami/pika-types'
 import { Card, Divider, QRCode, Space, Tag, Typography } from 'antd'
 
 import { formatDate } from '@/lib/utils/date'

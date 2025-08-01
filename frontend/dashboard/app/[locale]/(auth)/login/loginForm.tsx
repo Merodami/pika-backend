@@ -2,7 +2,7 @@
 
 import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { authFrontend } from '@pika/api'
+import { authFrontend } from '@merodami/pika-api'
 import { Button, Form, Input, Alert, Checkbox } from 'antd'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'

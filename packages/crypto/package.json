@@ -2,6 +2,7 @@
   "name": "@pika/crypto",
   "private": true,
   "version": "0.0.0",
+  "author": "Damian Meroni",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
