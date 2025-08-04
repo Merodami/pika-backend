@@ -34,7 +34,7 @@
     "he": "^1.2.0",
     "io-ts-types": "^0.5.19",
     "supertest": "^7.1.4",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "depcheck": {

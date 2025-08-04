@@ -133,7 +133,7 @@
     "tspath": "^2.6.8",
     "tsx": "^4.20.3",
     "type-coverage": "^2.29.7",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "typescript-coverage-report": "^1.1.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
