@@ -33,7 +33,7 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   // ============= Common Schemas =============
   // Register pagination metadata to ensure hasNext/hasPrev are included
   registry.registerSchema('PaginationMetadata', PaginationMetadata)
-  
+
   // ============= Enum Schemas =============
   // User enums
   registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)

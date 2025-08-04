@@ -235,9 +235,12 @@ export class AdminBusinessController {
       const { id: businessId } = req.params
       const { verified } = req.body
 
-      const updatedBusiness = await this.businessService.updateBusiness(businessId, {
-        verified,
-      })
+      const updatedBusiness = await this.businessService.updateBusiness(
+        businessId,
+        {
+          verified,
+        },
+      )
 
       // Return the updated business data
       res.status(200).json(BusinessMapper.toAdminDTO(updatedBusiness))

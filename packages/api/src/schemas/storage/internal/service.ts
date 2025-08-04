@@ -1,8 +1,4 @@
-import {
-  FileStatus,
-  FileType,
-  StorageProvider,
-} from '@pika/types'
+import { FileStatus, FileType, StorageProvider } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'

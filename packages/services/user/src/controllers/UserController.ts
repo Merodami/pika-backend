@@ -377,6 +377,7 @@ export class UserController {
       const { id: userId } = req.params
 
       const { reason, duration, notifyUser } = req.body
+
       await this.userService.banUser(userId, { reason, duration, notifyUser })
 
       // No content response
@@ -399,6 +400,7 @@ export class UserController {
       const { id: userId } = req.params
 
       const { reason, notifyUser } = req.body
+
       await this.userService.unbanUser(userId, { reason, notifyUser })
 
       // No content response

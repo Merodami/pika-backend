@@ -14,7 +14,10 @@ import * as webhookSchemas from '@api/schemas/payment/public/webhooks.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import { MessageResponse, PaginationMetadata } from '@api/schemas/shared/responses.js'
+import {
+  MessageResponse,
+  PaginationMetadata,
+} from '@api/schemas/shared/responses.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import * as storageSchemas from '@api/schemas/storage/public/file.js'
 import * as subscriptionSchemas from '@api/schemas/subscription/public/index.js'
@@ -37,7 +40,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   // ============= Common Schemas =============
   // Register pagination metadata to ensure hasNext/hasPrev are included
   registry.registerSchema('PaginationMetadata', PaginationMetadata)
-  
+
   // ============= Enum Schemas =============
   // User enums
   registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)

@@ -1,8 +1,8 @@
 import { AnalyticsGroupBy, SortOrder } from '@pika/types'
 import { z } from 'zod'
 
-import { createZodEnum } from '../../common/utils/zodEnum.js'
 import { openapi } from '../../common/utils/openapi.js'
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 import { SortOrderSchema } from '../common/enums.js'
 import { PaginationParams } from './pagination.js'
 
@@ -15,13 +15,10 @@ import { PaginationParams } from './pagination.js'
 /**
  * Analytics grouping periods for time-based aggregations
  */
-export const AnalyticsGroupBySchema = openapi(
-  createZodEnum(AnalyticsGroupBy),
-  {
-    description: 'Analytics grouping period',
-    example: AnalyticsGroupBy.DAY,
-  },
-)
+export const AnalyticsGroupBySchema = openapi(createZodEnum(AnalyticsGroupBy), {
+  description: 'Analytics grouping period',
+  example: AnalyticsGroupBy.DAY,
+})
 
 // ============= Typed Sorting =============
 

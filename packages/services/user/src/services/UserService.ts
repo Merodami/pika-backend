@@ -328,26 +328,28 @@ export class UserService implements IUserService {
   ): Promise<UserDomain> {
     try {
       logger.debug(`Banning user ${id}`, options)
-      
+
       // Update user status to banned
       const user = await this.updateUserStatus(id, UserStatus.BANNED)
-      
+
       // Send notification if requested
       if (options?.notifyUser && this.communicationClient) {
-        await this.communicationClient.sendEmail({
-          to: user.email,
-          subject: 'Account Suspended',
-          templateId: EmailTemplateId.ACCOUNT_BANNED,
-          templateParams: {
-            reason: options.reason || 'Terms of Service violation',
-            duration: options.duration,
-          },
-        }).catch((error) => {
-          logger.error('Failed to send ban notification:', error)
-          // Don't fail the ban operation if notification fails
-        })
+        await this.communicationClient
+          .sendEmail({
+            to: user.email,
+            subject: 'Account Suspended',
+            templateId: EmailTemplateId.ACCOUNT_BANNED,
+            templateParams: {
+              reason: options.reason || 'Terms of Service violation',
+              duration: options.duration,
+            },
+          })
+          .catch((error) => {
+            logger.error('Failed to send ban notification:', error)
+            // Don't fail the ban operation if notification fails
+          })
       }
-      
+
       return user
     } catch (error) {
       logger.error(`Error banning user ${id}:`, error)
@@ -361,25 +363,27 @@ export class UserService implements IUserService {
   ): Promise<UserDomain> {
     try {
       logger.debug(`Unbanning user ${id}`, options)
-      
+
       // Update user status to active
       const user = await this.updateUserStatus(id, UserStatus.ACTIVE)
-      
+
       // Send notification if requested
       if (options?.notifyUser && this.communicationClient) {
-        await this.communicationClient.sendEmail({
-          to: user.email,
-          subject: 'Account Reinstated',
-          templateId: EmailTemplateId.ACCOUNT_UNBANNED,
-          templateParams: {
-            reason: options.reason || 'Your account has been reinstated',
-          },
-        }).catch((error) => {
-          logger.error('Failed to send unban notification:', error)
-          // Don't fail the unban operation if notification fails
-        })
+        await this.communicationClient
+          .sendEmail({
+            to: user.email,
+            subject: 'Account Reinstated',
+            templateId: EmailTemplateId.ACCOUNT_UNBANNED,
+            templateParams: {
+              reason: options.reason || 'Your account has been reinstated',
+            },
+          })
+          .catch((error) => {
+            logger.error('Failed to send unban notification:', error)
+            // Don't fail the unban operation if notification fails
+          })
       }
-      
+
       return user
     } catch (error) {
       logger.error(`Error unbanning user ${id}:`, error)
