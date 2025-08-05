@@ -26,7 +26,7 @@
     "upgrade:interactive": "yarn upgrade-interactive",
     "upgrade:all": "yarn up '*' -i",
     "graph": "nx graph",
-    "docker:local": "docker compose -f docker-compose.local.yml up -d",
+    "docker:local": "docker compose -f docker-compose.local.yml up -d --quiet-pull",
     "docker:local:down": "docker compose -f docker-compose.local.yml down",
     "docker:restart": "yarn docker:local:down && yarn docker:local",
     "mailhog": "open http://127.0.0.1:8025",

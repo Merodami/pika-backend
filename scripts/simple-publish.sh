@@ -14,8 +14,9 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Set GitHub token directly (avoid sourcing .env due to multiline keys)
-NODE_AUTH_TOKEN="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"
+# GitHub token should be set as environment variable
+# export NODE_AUTH_TOKEN="your-github-token-here"
+NODE_AUTH_TOKEN="${NODE_AUTH_TOKEN:-}"
 
 # Check if GitHub token is available
 if [ -z "$NODE_AUTH_TOKEN" ]; then

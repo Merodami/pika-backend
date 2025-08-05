@@ -2,8 +2,8 @@ services:
   postgres:
     container_name: pika_postgres
     hostname: postgres
-    image: postgis/postgis:17-3.5
-    platform: linux/amd64
+    image: imresamu/postgis:17-3.5
+    platform: linux/arm64/v8
     restart: unless-stopped
     env_file:
       - .env
@@ -18,9 +18,10 @@ services:
       - ./packages/tests/src/utils/dump/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${PG_USER} -d ${PG_DATABASE}']
-      interval: 10s
+      interval: 3s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 5s
     networks:
       - backend
 
@@ -28,6 +29,7 @@ services:
     container_name: pika_redis
     hostname: redis
     image: redis:7.2-alpine
+    platform: linux/arm64/v8
     restart: unless-stopped
     env_file:
       - .env
@@ -38,9 +40,10 @@ services:
     command: ['redis-server', '--appendonly', 'yes', '--port', '6379']
     healthcheck:
       test: ['CMD-SHELL', 'redis-cli ping || exit 1']
-      interval: 10s
+      interval: 3s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 5s
     networks:
       - backend
 
@@ -48,7 +51,7 @@ services:
     container_name: pika_stripe_mock
     hostname: stripe-mock
     image: stripe/stripe-mock:latest
-    platform: linux/amd64
+    platform: linux/arm64/v8
     restart: unless-stopped
     ports:
       - '${STRIPE_MOCK_PORT:-12111}:12111'
@@ -64,7 +67,7 @@ services:
     container_name: pika_minio
     hostname: minio
     image: minio/minio:latest
-    platform: linux/amd64
+    platform: linux/arm64/v8
     restart: unless-stopped
     env_file:
       - .env
@@ -79,15 +82,17 @@ services:
     command: server /data --console-address ":9001"
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/ready']
-      interval: 30s
-      timeout: 20s
-      retries: 3
+      interval: 5s
+      timeout: 10s
+      retries: 6
+      start_period: 10s
     networks:
       - backend
 
   # MinIO bucket initialization
   minio-init:
     image: minio/mc:latest
+    platform: linux/arm64/v8
     depends_on:
       minio:
         condition: service_healthy
@@ -105,8 +110,8 @@ services:
   mailhog:
     container_name: pika_mailhog
     hostname: mailhog
-    image: mailhog/mailhog:latest
-    platform: linux/amd64
+    image: teawithfruit/mailhog:latest
+    platform: linux/arm64/v8
     restart: unless-stopped
     ports:
       - '${MAILHOG_SMTP_PORT:-1025}:1025' # SMTP server

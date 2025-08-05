@@ -87,7 +87,7 @@ export function createDocsRouter(): Router {
     try {
       const apiPackagePath = join(
         __dirname,
-        '../../../../api/src/generated/openapi',
+        '../../../../api/generated/openapi',
       )
       const specPath = join(apiPackagePath, `${apiName}.json`)
 
