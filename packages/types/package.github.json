@@ -1,6 +1,6 @@
 {
-  "name": "@Merodami/pika-types",
-  "version": "1.0.5",
+  "name": "@merodami/pika-types",
+  "version": "1.1.1",
   "description": "Shared TypeScript types for Pika platform",
   "private": false,
   "author": "Damian Meroni",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/merodami/pika-backend.git"
+    "url": "git+https://github.com/Merodami/pika-backend.git"
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",

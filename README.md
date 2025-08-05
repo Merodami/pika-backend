@@ -762,6 +762,12 @@ Each package includes comprehensive documentation:
 - **Integration testing** with real databases and services
 - **Hot reload** development with instant feedback
 
+## 🖥️ Frontend Applications
+
+The Pika platform includes modern frontend applications built with React and TypeScript:
+
+- **📊 Dashboard**: Admin dashboard for platform management → **[pika-frontend-dashboard](https://github.com/Merodami/pika-frontend-dashboard)**
+
 ## 📚 Additional Resources
 
 - **🏗️ Architecture Guide**: `CLAUDE.md` - Comprehensive development patterns and best practices

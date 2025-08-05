@@ -36,6 +36,9 @@ export default [
       'pika-old/**',
       'docs/**',
       'scripts/vercel-test.ts',
+      'reports/**',
+      '**/generated/**',
+      '**/*.min.js',
     ],
   },
 
