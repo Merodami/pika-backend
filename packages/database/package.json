@@ -4,6 +4,7 @@
   "private": true,
   "description": "Prisma schema management, migrations, and database utilities for Pika platform",
   "author": "Damian Meroni",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

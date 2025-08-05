@@ -4,6 +4,7 @@
   "private": true,
   "description": "Authentication Service for Pika Platform",
   "author": "Damian Meroni",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "dist/index.js",
   "dependencies": {

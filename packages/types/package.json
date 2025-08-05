@@ -1,9 +1,10 @@
 {
-  "name": "@merodami/pika-types",
+  "name": "@pika/types",
   "version": "1.1.1",
   "description": "Shared TypeScript types for Pika platform",
   "private": false,
   "author": "Damian Meroni",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +18,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Merodami/pika-backend.git"
+  },
+  "homepage": "https://github.com/Merodami/pika-backend#readme",
+  "bugs": {
+    "url": "https://github.com/Merodami/pika-backend/issues"
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",

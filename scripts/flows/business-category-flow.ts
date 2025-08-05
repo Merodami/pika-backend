@@ -299,7 +299,7 @@ async function deleteCategory(
     })
 
     logSuccess('Category deleted successfully')
-  } catch (error: any) {
+  } catch {
     // Ignore errors during cleanup
   }
 }

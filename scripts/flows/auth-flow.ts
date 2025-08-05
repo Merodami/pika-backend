@@ -271,9 +271,12 @@ async function testUserInfo(accessToken: string): Promise<void> {
     logInfo(
       `Email: ${response.data.email} (verified: ${response.data.emailVerified})`,
     )
-    logInfo(
-      `Name: ${response.data.fullName || `${response.data.firstName} ${response.data.lastName}`}`,
-    )
+
+    const displayName =
+      response.data.fullName ||
+      `${response.data.firstName} ${response.data.lastName}`
+
+    logInfo(`Name: ${displayName}`)
     logInfo(`Role: ${response.data.role}`)
   } catch (error: any) {
     logError(
@@ -500,7 +503,8 @@ async function runTests() {
 
   let userId: string | null = null
   let tokens: AuthTokens | null = null
-  let profile: UserProfile | null = null
+
+  const profile: UserProfile | null = null
 
   try {
     // 1. Register new user
@@ -555,7 +559,7 @@ async function runTests() {
     await testUserInfo(tokens.accessToken)
 
     // 5. Get profile
-    profile = await testGetProfile(tokens.accessToken)
+    await testGetProfile(tokens.accessToken)
 
     // 6. Update profile
     await testUpdateProfile(tokens.accessToken)

@@ -4,6 +4,7 @@
   "private": true,
   "description": "API Gateway with rate limiting and common middleware for services",
   "author": "Damian Meroni",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "dist/api/server.js",
   "types": "dist/api/server.d.ts",

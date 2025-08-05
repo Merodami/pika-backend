@@ -3,16 +3,25 @@
   "version": "1.0.0",
   "private": true,
   "author": "Damian Meroni",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Merodami/pika-backend.git"
+  },
+  "homepage": "https://github.com/Merodami/pika-backend#readme",
+  "bugs": {
+    "url": "https://github.com/Merodami/pika-backend/issues"
+  },
   "scripts": {
     "validate:all": "yarn typecheck && yarn lint",
     "validate:everything": "yarn validate:all",
     "check": "yarn typecheck && yarn format:check && yarn lint",
     "check:fix": "yarn format && yarn lint:fix && yarn typecheck",
     "pre-commit": "yarn format && yarn lint:fix && yarn typecheck && yarn build",
-    "ci:local": "rm -rf /Users/damian/.cache/act /Users/damian/.cache/actcache 2>/dev/null || true && act push --rm --container-architecture linux/amd64 --container-options=\"--memory=8g --memory-swap=8g\"",
-    "ci:validate": "rm -rf /Users/damian/.cache/act /Users/damian/.cache/actcache 2>/dev/null || true && act -j validate --rm --container-architecture linux/amd64 --container-options=\"--memory=8g --memory-swap=8g\"",
-    "ci:test": "rm -rf /Users/damian/.cache/act /Users/damian/.cache/actcache 2>/dev/null || true && act -j test --rm --container-architecture linux/amd64 --container-options=\"--memory=8g --memory-swap=8g\"",
+    "ci:local": "rm -rf ~/.cache/act ~/.cache/actcache 2>/dev/null || true && act push --rm --container-architecture linux/amd64 --container-options=\"--memory=8g --memory-swap=8g\"",
+    "ci:validate": "rm -rf ~/.cache/act ~/.cache/actcache 2>/dev/null || true && act -j validate --rm --container-architecture linux/amd64 --container-options=\"--memory=8g --memory-swap=8g\"",
+    "ci:test": "rm -rf ~/.cache/act ~/.cache/actcache 2>/dev/null || true && act -j test --rm --container-architecture linux/amd64 --container-options=\"--memory=8g --memory-swap=8g\"",
     "upgrade:dependencies": "echo 'Use yarn upgrade-interactive to upgrade external dependencies (skip @pika/* workspace packages)'",
     "upgrade:interactive": "yarn upgrade-interactive",
     "upgrade:all": "yarn up '*' -i",

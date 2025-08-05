@@ -58,7 +58,7 @@ vi.mock('@pika/shared', () => ({
       this.serviceName = config.serviceName
     }
 
-    protected async request(path: string, config: any = {}, context?: any) {
+    protected async request(path: string) {
       return { data: { status: 'ok' } }
     }
   },
