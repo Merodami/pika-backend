@@ -31,7 +31,7 @@
         "cwd": "{projectRoot}"
       }
     },
-    "open-docs": {
+    "open:docs": {
       "executor": "nx:run-commands",
       "options": {
         "command": "open dist/api-docs-index.html",
