@@ -342,7 +342,7 @@ export class UserController {
    * Update user account status
    */
   async updateUserStatus(
-    req: Request<userAdmin.UserIdParam, {}, userAdmin.UpdateUserStatusRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminUpdateUserStatusRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -369,7 +369,7 @@ export class UserController {
    * Ban user account
    */
   async banUser(
-    req: Request<userAdmin.UserIdParam, {}, userAdmin.BanUserRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminBanUserRequest>,
     res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
@@ -392,7 +392,7 @@ export class UserController {
    * Unban user account
    */
   async unbanUser(
-    req: Request<userAdmin.UserIdParam, {}, userAdmin.UnbanUserRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminUnbanUserRequest>,
     res: Response<void>,
     next: NextFunction,
   ): Promise<void> {

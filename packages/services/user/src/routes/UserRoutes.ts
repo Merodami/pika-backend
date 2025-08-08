@@ -128,7 +128,7 @@ export async function createUserRouter(
     '/:id/status',
     requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
-    validateBody(userAdmin.UpdateUserStatusRequest),
+    validateBody(userAdmin.AdminUpdateUserStatusRequest),
     controller.updateUserStatus,
   )
 
@@ -137,7 +137,7 @@ export async function createUserRouter(
     '/:id/ban',
     requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
-    validateBody(userAdmin.BanUserRequest),
+    validateBody(userAdmin.AdminBanUserRequest),
     controller.banUser,
   )
 
@@ -146,7 +146,7 @@ export async function createUserRouter(
     '/:id/unban',
     requirePermissions('admin:users'),
     validateParams(userAdmin.UserIdParam),
-    validateBody(userAdmin.UnbanUserRequest),
+    validateBody(userAdmin.AdminUnbanUserRequest),
     controller.unbanUser,
   )
 

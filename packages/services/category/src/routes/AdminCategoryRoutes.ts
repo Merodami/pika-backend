@@ -43,7 +43,7 @@ export function createAdminCategoryRoutes(
   router.post(
     '/',
     requirePermissions('admin:categories'),
-    validateBody(categoryAdmin.CreateCategoryRequest),
+    validateBody(categoryAdmin.AdminCreateCategoryRequest),
     adminCategoryController.createCategory,
   )
 
@@ -52,7 +52,7 @@ export function createAdminCategoryRoutes(
     '/:id',
     requirePermissions('admin:categories'),
     validateParams(categoryCommon.CategoryIdParam),
-    validateBody(categoryAdmin.UpdateCategoryRequest),
+    validateBody(categoryAdmin.AdminUpdateCategoryRequest),
     adminCategoryController.updateCategory,
   )
 
@@ -77,7 +77,7 @@ export function createAdminCategoryRoutes(
     '/:id/move',
     requirePermissions('admin:categories'),
     validateParams(categoryCommon.CategoryIdParam),
-    validateBody(categoryAdmin.MoveCategoryRequest),
+    validateBody(categoryAdmin.AdminMoveCategoryRequest),
     adminCategoryController.moveCategory,
   )
 
@@ -86,7 +86,7 @@ export function createAdminCategoryRoutes(
     '/:id/sort-order',
     requirePermissions('admin:categories'),
     validateParams(categoryCommon.CategoryIdParam),
-    validateBody(categoryAdmin.UpdateCategorySortOrderRequest),
+    validateBody(categoryAdmin.AdminUpdateCategorySortOrderRequest),
     adminCategoryController.updateCategorySortOrder,
   )
 
@@ -94,7 +94,7 @@ export function createAdminCategoryRoutes(
   router.post(
     '/bulk-delete',
     requirePermissions('admin:categories'),
-    validateBody(categoryAdmin.BulkDeleteCategoriesRequest),
+    validateBody(categoryAdmin.AdminBulkDeleteCategoriesRequest),
     adminCategoryController.bulkDeleteCategories,
   )
 

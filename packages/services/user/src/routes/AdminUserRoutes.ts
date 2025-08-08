@@ -92,7 +92,7 @@ export function createAdminUserRouter(
     '/me',
     requireAuth(),
     requirePermissions('admin:users'),
-    validateBody(userAdmin.UpdateAdminProfileRequest),
+    validateBody(userAdmin.AdminUpdateProfileRequest),
     controller.updateMyProfile,
   )
 

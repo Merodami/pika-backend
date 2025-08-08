@@ -59,7 +59,7 @@ export function createAdminVoucherRoutes(
   // PUT /admin/vouchers/bulk - Bulk update vouchers (must be before /:id)
   router.put(
     '/bulk',
-    validateBody(voucherAdmin.BulkVoucherUpdateRequest),
+    validateBody(voucherAdmin.AdminBulkVoucherUpdateRequest),
     controller.bulkUpdateVouchers,
   )
 
@@ -82,7 +82,7 @@ export function createAdminVoucherRoutes(
   // POST /admin/vouchers - Create new voucher
   router.post(
     '/',
-    validateBody(voucherAdmin.CreateVoucherRequest),
+    validateBody(voucherAdmin.AdminCreateVoucherRequest),
     controller.createVoucher,
   )
 
@@ -90,7 +90,7 @@ export function createAdminVoucherRoutes(
   router.patch(
     '/:id',
     validateParams(voucherCommon.VoucherIdParam),
-    validateBody(voucherAdmin.UpdateVoucherRequest),
+    validateBody(voucherAdmin.AdminUpdateVoucherRequest),
     controller.updateVoucher,
   )
 
@@ -105,7 +105,7 @@ export function createAdminVoucherRoutes(
   router.put(
     '/:id/state',
     validateParams(voucherCommon.VoucherIdParam),
-    validateBody(voucherAdmin.UpdateVoucherStateRequest),
+    validateBody(voucherAdmin.AdminUpdateVoucherStateRequest),
     controller.updateVoucherState,
   )
 
@@ -113,7 +113,7 @@ export function createAdminVoucherRoutes(
   router.post(
     '/:id/codes',
     validateParams(voucherCommon.VoucherIdParam),
-    validateBody(voucherAdmin.GenerateVoucherCodesRequest),
+    validateBody(voucherAdmin.AdminGenerateVoucherCodesRequest),
     controller.generateVoucherCodes,
   )
 
@@ -136,7 +136,7 @@ export function createAdminVoucherRoutes(
   router.put(
     '/:id/translations',
     validateParams(voucherCommon.VoucherIdParam),
-    validateBody(voucherAdmin.UpdateVoucherTranslationsRequest),
+    validateBody(voucherAdmin.AdminUpdateVoucherTranslationsRequest),
     controller.updateVoucherTranslations,
   )
 

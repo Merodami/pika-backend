@@ -157,3 +157,30 @@ export const ServiceUnavailableResponse = openapi(
 export type ServiceUnavailableResponse = z.infer<
   typeof ServiceUnavailableResponse
 >
+
+// ============= ApiError Class (for frontend compatibility) =============
+
+/**
+ * ApiError class for frontend SDK compatibility
+ * This mimics the error structure expected by the generated API client
+ */
+export class ApiError extends Error {
+  public readonly status: number
+  public readonly statusText: string
+  public readonly body: any
+  public readonly headers: Record<string, string>
+
+  constructor(
+    status: number,
+    statusText: string,
+    body: any,
+    headers: Record<string, string> = {},
+  ) {
+    super(`${status} ${statusText}`)
+    this.name = 'ApiError'
+    this.status = status
+    this.statusText = statusText
+    this.body = body
+    this.headers = headers
+  }
+}

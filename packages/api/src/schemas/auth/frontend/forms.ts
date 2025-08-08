@@ -4,7 +4,7 @@ import {
 } from '@pika/types'
 import { z } from 'zod'
 
-import { CreateBusinessRequest } from '../../business/admin/management.js'
+import { AdminCreateBusinessRequest } from '../../business/admin/management.js'
 // Note: Not using openapi() wrapper for frontend schemas as they don't need OpenAPI examples
 import { Email } from '../../shared/branded.js'
 import { SecurePassword } from '../../shared/primitives.js'
@@ -277,9 +277,9 @@ export function transformToAdminCreateUser(
 
 /**
  * Admin creates business form
- * Properly extends backend CreateBusinessRequest - no changes needed
+ * Properly extends backend AdminCreateBusinessRequest - no changes needed
  */
-export const AdminCreateBusinessSchema = CreateBusinessRequest
+export const AdminCreateBusinessSchema = AdminCreateBusinessRequest
 
 export type AdminCreateBusinessData = z.infer<typeof AdminCreateBusinessSchema>
 

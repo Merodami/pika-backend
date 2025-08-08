@@ -75,7 +75,7 @@ export class AdminUserController {
         message: `Verification resent successfully`,
       }
       const validatedResponse = validateResponse(
-        userAdmin.ResendVerificationResponse,
+        userAdmin.AdminResendVerificationResponse,
         response,
         'AdminUserController.resendVerification',
       )
@@ -199,7 +199,7 @@ export class AdminUserController {
    * Update current admin user profile
    */
   async updateMyProfile(
-    req: Request<{}, {}, userAdmin.UpdateAdminProfileRequest>,
+    req: Request<{}, {}, userAdmin.AdminUpdateProfileRequest>,
     res: Response<userAdmin.AdminUserDetailResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -245,7 +245,7 @@ export class AdminUserController {
    */
   async getUserVerificationStatus(
     req: Request<userAdmin.UserIdParam>,
-    res: Response<userAdmin.UserVerificationStatusResponse>,
+    res: Response<userAdmin.AdminUserVerificationStatusResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -260,7 +260,7 @@ export class AdminUserController {
       // Use toAdminDTO to get proper types
       const dto = UserMapper.toAdminDTO(user)
 
-      const verificationStatus: userAdmin.UserVerificationStatusResponse = {
+      const verificationStatus: userAdmin.AdminUserVerificationStatusResponse = {
         userId: dto.id,
         emailVerified: dto.emailVerified,
         phoneVerified: dto.phoneVerified,
@@ -269,7 +269,7 @@ export class AdminUserController {
       }
 
       const validatedResponse = validateResponse(
-        userAdmin.UserVerificationStatusResponse,
+        userAdmin.AdminUserVerificationStatusResponse,
         verificationStatus,
         'AdminUserController.getUserVerificationStatus',
       )

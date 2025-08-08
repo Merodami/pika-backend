@@ -42,8 +42,12 @@ sed -i '' "s/@merodami\/pika-types\": \".*\"/@merodami\/pika-types\": \"^$VERSIO
 # Publish types
 cd "$REPO_ROOT/packages/types"
 cp package.github.json package.json
-echo -e "@merodami:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=$NODE_AUTH_TOKEN" > .npmrc
-npm publish
+# Create npmrc with proper format for GitHub Packages
+cat > .npmrc << EOF
+@merodami:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+EOF
+npm publish --registry=https://npm.pkg.github.com
 rm -f .npmrc
 git checkout package.json
 
@@ -53,8 +57,12 @@ sleep 15
 # Publish API
 cd "$REPO_ROOT/packages/api"
 cp package.github.json package.json
-echo -e "@merodami:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=$NODE_AUTH_TOKEN" > .npmrc
-npm publish
+# Create npmrc with proper format for GitHub Packages
+cat > .npmrc << EOF
+@merodami:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+EOF
+npm publish --registry=https://npm.pkg.github.com
 rm -f .npmrc
 git checkout package.json
 

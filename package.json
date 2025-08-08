@@ -80,7 +80,7 @@
     "generate:api": "yarn generate:openapi",
     "generate:openapi": "cd packages/api && yarn generate:openapi && cd ../.. && nx run @pika/api:build",
     "generate:docs": "cd packages/api && yarn generate:docs",
-    "publish:frontend:packages": "./scripts/simple-publish.sh",
+    "publish:packages": "dotenv -e .env -- ./scripts/simple-publish.sh",
     "git-hooks-prepare": "husky install",
     "open:docs": "nx run @pika/api:open:docs",
     "open:docs:all": "nx run @pika/api:open-docs-all",

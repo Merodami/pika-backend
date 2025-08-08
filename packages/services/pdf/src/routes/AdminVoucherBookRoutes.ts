@@ -49,7 +49,7 @@ export function createAdminVoucherBookRoutes(
   router.post(
     '/',
     requirePermissions('admin:voucher'),
-    validateBody(pdfAdmin.CreateVoucherBookRequest),
+    validateBody(pdfAdmin.AdminCreateVoucherBookRequest),
     adminVoucherBookController.createVoucherBook,
   )
 
@@ -58,7 +58,7 @@ export function createAdminVoucherBookRoutes(
     '/:id',
     requirePermissions('admin:voucher'),
     validateParams(pdfCommon.VoucherBookIdParam),
-    validateBody(pdfAdmin.UpdateVoucherBookRequest),
+    validateBody(pdfAdmin.AdminUpdateVoucherBookRequest),
     adminVoucherBookController.updateVoucherBook,
   )
 
@@ -75,7 +75,7 @@ export function createAdminVoucherBookRoutes(
     '/:id/status',
     requirePermissions('admin:voucher'),
     validateParams(pdfCommon.VoucherBookIdParam),
-    validateBody(pdfAdmin.UpdateVoucherBookStatusRequest),
+    validateBody(pdfAdmin.AdminUpdateVoucherBookStatusRequest),
     adminVoucherBookController.updateVoucherBookStatus,
   )
 
@@ -84,7 +84,7 @@ export function createAdminVoucherBookRoutes(
     '/:id/generate-pdf',
     requirePermissions('admin:voucher'),
     validateParams(pdfCommon.VoucherBookIdParam),
-    validateBody(pdfAdmin.GeneratePdfRequest),
+    validateBody(pdfAdmin.AdminGeneratePdfRequest),
     adminVoucherBookController.generatePDF,
   )
 

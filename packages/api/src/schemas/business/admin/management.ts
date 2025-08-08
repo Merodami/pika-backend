@@ -76,7 +76,7 @@ export type AdminBusinessResponse = z.infer<typeof AdminBusinessResponse>
 /**
  * Create business request
  */
-export const CreateBusinessRequest = openapi(
+export const AdminCreateBusinessRequest = openapi(
   z.object({
     userId: UserId.describe('User who will own this business'),
     businessName: z.string().min(1).max(255).describe('Business name'),
@@ -97,14 +97,14 @@ export const CreateBusinessRequest = openapi(
   },
 )
 
-export type CreateBusinessRequest = z.infer<typeof CreateBusinessRequest>
+export type AdminCreateBusinessRequest = z.infer<typeof AdminCreateBusinessRequest>
 
 // ============= Update Business =============
 
 /**
  * Update business request
  */
-export const UpdateBusinessRequest = openapi(
+export const AdminUpdateBusinessRequest = openapi(
   z.object({
     businessName: z
       .string()
@@ -126,7 +126,7 @@ export const UpdateBusinessRequest = openapi(
   },
 )
 
-export type UpdateBusinessRequest = z.infer<typeof UpdateBusinessRequest>
+export type AdminUpdateBusinessRequest = z.infer<typeof AdminUpdateBusinessRequest>
 
 // ============= Admin Search Businesses =============
 
@@ -179,7 +179,7 @@ export type AdminBusinessListResponse = z.infer<
 /**
  * Toggle business verification request
  */
-export const ToggleBusinessVerificationRequest = openapi(
+export const AdminToggleBusinessVerificationRequest = openapi(
   z.object({
     verified: z.boolean().describe('New verification status'),
   }),
@@ -188,14 +188,14 @@ export const ToggleBusinessVerificationRequest = openapi(
   },
 )
 
-export type ToggleBusinessVerificationRequest = z.infer<
-  typeof ToggleBusinessVerificationRequest
+export type AdminToggleBusinessVerificationRequest = z.infer<
+  typeof AdminToggleBusinessVerificationRequest
 >
 
 /**
  * Toggle business activation request
  */
-export const ToggleBusinessActivationRequest = openapi(
+export const AdminToggleBusinessActivationRequest = openapi(
   z.object({
     active: z.boolean().describe('New activation status'),
   }),
@@ -204,14 +204,14 @@ export const ToggleBusinessActivationRequest = openapi(
   },
 )
 
-export type ToggleBusinessActivationRequest = z.infer<
-  typeof ToggleBusinessActivationRequest
+export type AdminToggleBusinessActivationRequest = z.infer<
+  typeof AdminToggleBusinessActivationRequest
 >
 
 /**
  * Bulk business update request
  */
-export const BulkBusinessUpdateRequest = openapi(
+export const AdminBulkBusinessUpdateRequest = openapi(
   z.object({
     businessIds: z.array(UUID).min(1).max(100),
     updates: z.object({
@@ -225,14 +225,14 @@ export const BulkBusinessUpdateRequest = openapi(
   },
 )
 
-export type BulkBusinessUpdateRequest = z.infer<
-  typeof BulkBusinessUpdateRequest
+export type AdminBulkBusinessUpdateRequest = z.infer<
+  typeof AdminBulkBusinessUpdateRequest
 >
 
 /**
  * Bulk operation response
  */
-export const BulkBusinessOperationResponse = openapi(
+export const AdminBulkBusinessOperationResponse = openapi(
   z.object({
     successful: z.number().int().nonnegative(),
     failed: z.number().int().nonnegative(),
@@ -250,8 +250,8 @@ export const BulkBusinessOperationResponse = openapi(
   },
 )
 
-export type BulkBusinessOperationResponse = z.infer<
-  typeof BulkBusinessOperationResponse
+export type AdminBulkBusinessOperationResponse = z.infer<
+  typeof AdminBulkBusinessOperationResponse
 >
 
 // ============= Bulk Delete Businesses =============
@@ -259,7 +259,7 @@ export type BulkBusinessOperationResponse = z.infer<
 /**
  * Bulk delete businesses request
  */
-export const BulkDeleteBusinessesRequest = openapi(
+export const AdminBulkDeleteBusinessesRequest = openapi(
   z.object({
     businessIds: z.array(UUID).min(1).max(100),
   }),
@@ -268,14 +268,14 @@ export const BulkDeleteBusinessesRequest = openapi(
   },
 )
 
-export type BulkDeleteBusinessesRequest = z.infer<
-  typeof BulkDeleteBusinessesRequest
+export type AdminBulkDeleteBusinessesRequest = z.infer<
+  typeof AdminBulkDeleteBusinessesRequest
 >
 
 /**
  * Update business rating request
  */
-export const UpdateBusinessRatingRequest = openapi(
+export const AdminUpdateBusinessRatingRequest = openapi(
   z.object({
     rating: z
       .number()
@@ -288,8 +288,8 @@ export const UpdateBusinessRatingRequest = openapi(
   },
 )
 
-export type UpdateBusinessRatingRequest = z.infer<
-  typeof UpdateBusinessRatingRequest
+export type AdminUpdateBusinessRatingRequest = z.infer<
+  typeof AdminUpdateBusinessRatingRequest
 >
 
 // ============= Business Verification Management =============
@@ -297,7 +297,7 @@ export type UpdateBusinessRatingRequest = z.infer<
 /**
  * Business verification update request for PATCH endpoint
  */
-export const PatchBusinessVerificationRequest = openapi(
+export const AdminPatchBusinessVerificationRequest = openapi(
   z.object({
     verified: z.boolean().describe('New verification status'),
   }),
@@ -306,8 +306,8 @@ export const PatchBusinessVerificationRequest = openapi(
   },
 )
 
-export type PatchBusinessVerificationRequest = z.infer<
-  typeof PatchBusinessVerificationRequest
+export type AdminPatchBusinessVerificationRequest = z.infer<
+  typeof AdminPatchBusinessVerificationRequest
 >
 
 /**
