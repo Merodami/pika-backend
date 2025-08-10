@@ -1,4 +1,5 @@
 import { VoucherBookSortBy } from '@pika/types'
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -25,10 +26,10 @@ import { VoucherBookSortBySchema } from '../common/enums.js'
 export const AdminVoucherBookResponse = openapi(
   withTimestamps({
     id: UUID,
-    title: z.string().max(255).describe('Voucher book title'),
+    title: z.string().max(FIELD_LENGTH.SLUG_MAX).describe('Voucher book title'),
     edition: z
       .string()
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
     bookType: VoucherBookTypeSchema,
@@ -45,7 +46,7 @@ export const AdminVoucherBookResponse = openapi(
       .number()
       .int()
       .min(1)
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .describe('Total number of pages'),
     publishedAt: z
       .string()
@@ -105,10 +106,14 @@ export type AdminVoucherBookResponse = z.infer<typeof AdminVoucherBookResponse>
  */
 export const AdminCreateVoucherBookRequest = openapi(
   z.object({
-    title: z.string().min(1).max(255).describe('Voucher book title'),
+    title: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.SLUG_MAX)
+      .describe('Voucher book title'),
     edition: z
       .string()
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
     bookType: VoucherBookTypeSchema,
@@ -124,7 +129,7 @@ export const AdminCreateVoucherBookRequest = openapi(
       .number()
       .int()
       .min(1)
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .default(24)
       .describe('Total number of pages'),
     coverImageUrl: z
@@ -147,7 +152,9 @@ export const AdminCreateVoucherBookRequest = openapi(
   },
 )
 
-export type AdminCreateVoucherBookRequest = z.infer<typeof AdminCreateVoucherBookRequest>
+export type AdminCreateVoucherBookRequest = z.infer<
+  typeof AdminCreateVoucherBookRequest
+>
 
 /**
  * Update voucher book request
@@ -157,7 +164,7 @@ export const AdminUpdateVoucherBookRequest = openapi(
     title: z.string().min(1).max(255).optional().describe('Voucher book title'),
     edition: z
       .string()
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .optional()
       .describe('Book edition (e.g., "January 2024")'),
     bookType: VoucherBookTypeSchema.optional(),
@@ -179,7 +186,7 @@ export const AdminUpdateVoucherBookRequest = openapi(
       .number()
       .int()
       .min(1)
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .optional()
       .describe('Total number of pages'),
     coverImageUrl: z
@@ -202,7 +209,9 @@ export const AdminUpdateVoucherBookRequest = openapi(
   },
 )
 
-export type AdminUpdateVoucherBookRequest = z.infer<typeof AdminUpdateVoucherBookRequest>
+export type AdminUpdateVoucherBookRequest = z.infer<
+  typeof AdminUpdateVoucherBookRequest
+>
 
 // ============= Admin Search =============
 
@@ -297,7 +306,11 @@ export type AdminPublishVoucherBookRequest = z.infer<
  */
 export const AdminArchiveVoucherBookRequest = openapi(
   z.object({
-    reason: z.string().max(500).optional().describe('Reason for archiving'),
+    reason: z
+      .string()
+      .max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX)
+      .optional()
+      .describe('Reason for archiving'),
   }),
   {
     description: 'Archive a voucher book',
@@ -367,7 +380,7 @@ export const AdminBulkVoucherBookOperationRequest = openapi(
     bookIds: z
       .array(UUID)
       .min(1)
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .describe('Voucher book IDs to operate on'),
     operation: z
       .enum(['publish', 'archive', 'generate_pdf', 'delete'])
@@ -446,7 +459,7 @@ export const BulkArchiveVoucherBooksRequest = openapi(
     voucherBookIds: z
       .array(UUID)
       .min(1)
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .describe('Voucher book IDs to archive'),
   }),
   {

@@ -2,7 +2,12 @@ import { userAdmin, userPublic } from '@pika/api'
 import { adaptMulterFile, RequestContext, validateResponse } from '@pika/http'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
-import type { IUserService } from '@user/services/UserService.js'
+import { VerificationType } from '@pika/types'
+import type {
+  IUserService,
+  ResendRequest,
+  VerificationRequest,
+} from '@user/services/UserService.js'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -26,18 +31,28 @@ export class AdminUserController {
    * Admin verifies any user account (email, phone, or account confirmation)
    */
   async verifyUser(
-    req: Request<{}, {}, userPublic.UnifiedVerificationRequest>,
+    req: Request<{}, {}, userAdmin.AdminVerificationRequest>,
     res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const verificationRequest = req.body
+      const adminRequest = req.body
 
       // Ensure userId is provided for admin verification
-      if (!verificationRequest.userId) {
+      if (!adminRequest.userId) {
         throw ErrorFactory.badRequest(
           'userId is required for admin verification',
         )
+      }
+
+      // Map admin request to service request with proper enum
+      const verificationRequest: VerificationRequest = {
+        type: adminRequest.type as VerificationType,
+        token: adminRequest.token,
+        code: adminRequest.code,
+        userId: adminRequest.userId,
+        email: adminRequest.email,
+        phoneNumber: adminRequest.phoneNumber,
       }
 
       await this.userService.verify(verificationRequest)
@@ -54,18 +69,29 @@ export class AdminUserController {
    * Admin resends verification (email or phone) for any user
    */
   async resendVerification(
-    req: Request<{}, {}, userPublic.UnifiedResendVerificationRequest>,
+    req: Request<{}, {}, userAdmin.AdminResendVerificationRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const resendRequest = req.body
+      const adminRequest = req.body
 
       // Ensure userId is provided for admin resend
-      if (!resendRequest.userId) {
+      if (!adminRequest.userId) {
         throw ErrorFactory.badRequest(
           'userId is required for admin resend verification',
         )
+      }
+
+      // Map admin request to service request with proper enum
+      const resendRequest: ResendRequest = {
+        type: adminRequest.type as Exclude<
+          VerificationType,
+          VerificationType.ACCOUNT_CONFIRMATION
+        >,
+        userId: adminRequest.userId,
+        email: adminRequest.email,
+        phoneNumber: adminRequest.phoneNumber,
       }
 
       await this.userService.resendVerification(resendRequest)
@@ -260,13 +286,14 @@ export class AdminUserController {
       // Use toAdminDTO to get proper types
       const dto = UserMapper.toAdminDTO(user)
 
-      const verificationStatus: userAdmin.AdminUserVerificationStatusResponse = {
-        userId: dto.id,
-        emailVerified: dto.emailVerified,
-        phoneVerified: dto.phoneVerified,
-        verificationDate:
-          dto.emailVerified && dto.updatedAt ? dto.updatedAt : undefined,
-      }
+      const verificationStatus: userAdmin.AdminUserVerificationStatusResponse =
+        {
+          userId: dto.id,
+          emailVerified: dto.emailVerified,
+          phoneVerified: dto.phoneVerified,
+          verificationDate:
+            dto.emailVerified && dto.updatedAt ? dto.updatedAt : undefined,
+        }
 
       const validatedResponse = validateResponse(
         userAdmin.AdminUserVerificationStatusResponse,

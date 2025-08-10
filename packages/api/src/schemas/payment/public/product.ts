@@ -1,3 +1,4 @@
+import { FIELD_LENGTH, NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -21,8 +22,11 @@ import { Currency, PriceInterval, ProductType } from '../common/enums.js'
 export const Product = openapi(
   withTimestamps({
     id: z.string().describe('Stripe product ID'),
-    name: z.string().min(1).max(250),
-    description: z.string().max(1000).optional(),
+    name: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.NAME_EXTRA_LONG_MAX),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_LONG_MAX).optional(),
     active: z.boolean().default(true),
     metadata: z.record(z.string(), z.string()).optional(),
     type: ProductType.optional(),
@@ -64,8 +68,11 @@ export type Price = z.infer<typeof Price>
  */
 export const CreateProductRequest = openapi(
   z.object({
-    name: z.string().min(1).max(250),
-    description: z.string().max(1000).optional(),
+    name: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.NAME_EXTRA_LONG_MAX),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_LONG_MAX).optional(),
     metadata: z.record(z.string(), z.string()).optional(),
   }),
   {
@@ -82,8 +89,12 @@ export type CreateProductRequest = z.infer<typeof CreateProductRequest>
  */
 export const UpdateProductRequest = openapi(
   z.object({
-    name: z.string().min(1).max(250).optional(),
-    description: z.string().max(1000).optional(),
+    name: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.NAME_EXTRA_LONG_MAX)
+      .optional(),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_LONG_MAX).optional(),
     active: z.boolean().optional(),
     metadata: z.record(z.string(), z.string()).optional(),
   }),
@@ -124,7 +135,12 @@ export const ListProductsQuery = openapi(
     active: z.coerce.boolean().optional(),
     type: ProductType.optional(),
     page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(20),
+    limit: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX)
+      .default(NUMERIC_CONSTRAINTS.PAGE_SIZE_DEFAULT),
   }),
   {
     description: 'Query parameters for listing products',
@@ -151,7 +167,12 @@ export const ListPricesQuery = openapi(
     active: z.coerce.boolean().optional(),
     currency: Currency.optional(),
     page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(20),
+    limit: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX)
+      .default(NUMERIC_CONSTRAINTS.PAGE_SIZE_DEFAULT),
   }),
   {
     description: 'Query parameters for listing prices',

@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -22,11 +23,11 @@ import { UserRoleSchema, UserStatusSchema } from '../common/enums.js'
 export const PublicUserProfile = openapi(
   z.object({
     id: UserId,
-    firstName: z.string().max(50),
-    lastName: z.string().max(50),
-    displayName: z.string().max(100).optional(),
+    firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX),
+    lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX),
+    displayName: z.string().max(FIELD_LENGTH.DISPLAY_NAME_MAX).optional(),
     avatarUrl: z.string().url().optional(),
-    bio: z.string().max(500).optional(),
+    bio: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
     // Public fields only - no email, phone, role, status
     createdAt: DateTime,
   }),
@@ -46,12 +47,12 @@ export const CurrentUserProfile = openapi(
   z.object({
     id: UserId,
     email: Email,
-    firstName: z.string().max(50),
-    lastName: z.string().max(50),
-    displayName: z.string().max(100).optional(),
+    firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX),
+    lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX),
+    displayName: z.string().max(FIELD_LENGTH.DISPLAY_NAME_MAX).optional(),
     phoneNumber: PhoneNumber.optional(),
     avatarUrl: z.string().url().optional(),
-    bio: z.string().max(500).optional(),
+    bio: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
     dateOfBirth: DateOnly.optional(),
     preferredLanguage: LanguageCode.optional(),
     role: UserRoleSchema,
@@ -77,11 +78,11 @@ export type CurrentUserProfile = z.infer<typeof CurrentUserProfile>
 export const UpdateProfileRequest = openapi(
   z
     .object({
-      firstName: z.string().max(50).optional(),
-      lastName: z.string().max(50).optional(),
-      displayName: z.string().max(100).optional(),
+      firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX).optional(),
+      lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX).optional(),
+      displayName: z.string().max(FIELD_LENGTH.DISPLAY_NAME_MAX).optional(),
       phoneNumber: PhoneNumber.optional(),
-      bio: z.string().max(500).optional(),
+      bio: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
       dateOfBirth: DateOnly.optional(),
       preferredLanguage: LanguageCode.optional(),
     })
@@ -230,7 +231,7 @@ export const DeleteAccountRequest = openapi(
     password: z.string().min(1).describe('Current password for verification'),
     reason: z
       .string()
-      .max(500)
+      .max(FIELD_LENGTH.NOTES_MAX)
       .optional()
       .describe('Optional reason for account deletion'),
     confirmDeletion: z

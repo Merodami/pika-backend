@@ -14,6 +14,11 @@ export enum FileType {
 }
 
 /**
+ * Type definition for file type - use this for type annotations
+ */
+export type FileTypeType = `${FileType}`
+
+/**
  * File processing status
  */
 export enum FileStatus {
@@ -26,6 +31,11 @@ export enum FileStatus {
 }
 
 /**
+ * Type definition for file status - use this for type annotations
+ */
+export type FileStatusType = `${FileStatus}`
+
+/**
  * Supported storage providers
  */
 export enum StorageProvider {
@@ -33,6 +43,14 @@ export enum StorageProvider {
   LOCAL = 'local',
   MINIO = 'minio',
 }
+
+/**
+ * Type definition for storage provider - use this for type annotations
+ * Alias for compatibility
+ */
+export type StorageProviderType = `${StorageProvider}`
+export type FileProviderType = StorageProviderType
+export { StorageProvider as FileProvider }
 
 /**
  * File sorting fields

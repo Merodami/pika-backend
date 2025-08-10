@@ -549,7 +549,7 @@ export class VoucherService implements IVoucherService {
         // Check if voucher can still be claimed
         if (!alreadyClaimed) {
           canClaim =
-            voucher.state === VoucherState.published &&
+            voucher.state === VoucherState.PUBLISHED &&
             (!voucher.expiresAt || voucher.expiresAt > new Date()) &&
             (!voucher.maxRedemptions ||
               voucher.currentRedemptions < voucher.maxRedemptions)
@@ -585,7 +585,7 @@ export class VoucherService implements IVoucherService {
         scanType: data.businessId
           ? VoucherScanType.business
           : VoucherScanType.customer,
-        scanSource: data.scanSource || VoucherScanSource.camera,
+        scanSource: data.scanSource || VoucherScanSource.CAMERA,
         deviceInfo: data.deviceInfo || null,
         location: data.location || null,
         businessId: data.businessId || null,

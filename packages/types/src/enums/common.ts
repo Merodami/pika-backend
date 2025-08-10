@@ -43,3 +43,96 @@ export enum AnalyticsGroupBy {
  * Type definition for analytics group by - use this for type annotations
  */
 export type AnalyticsGroupByType = `${AnalyticsGroupBy}`
+
+/**
+ * Common status values used across entities
+ * Addresses hardcoded status literals found in API schemas
+ */
+export enum Status {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING = 'pending',
+  SUSPENDED = 'suspended',
+  DELETED = 'deleted',
+  ARCHIVED = 'archived',
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+}
+
+/**
+ * Priority levels
+ * Used in support tickets, tasks, and notifications
+ */
+export enum Priority {
+  LOW = 'low',
+  NORMAL = 'normal',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent',
+  CRITICAL = 'critical',
+}
+
+// TicketPriority is already defined in support.ts with different values
+// Keep them separate as they may have different use cases
+
+/**
+ * Bulk operation types
+ * Used for batch operations across services
+ */
+export enum BulkOperationType {
+  DELETE = 'delete',
+  ACTIVATE = 'activate',
+  DEACTIVATE = 'deactivate',
+  ARCHIVE = 'archive',
+  PUBLISH = 'publish',
+  SUSPEND = 'suspend',
+}
+
+/**
+ * Type definition for bulk operation type
+ */
+export type BulkOperationTypeType = `${BulkOperationType}`
+
+/**
+ * Service environment types
+ */
+export enum ServiceEnvironment {
+  DEVELOPMENT = 'development',
+  STAGING = 'staging',
+  PRODUCTION = 'production',
+}
+
+/**
+ * Type definition for service environment
+ */
+export type ServiceEnvironmentType = `${ServiceEnvironment}`
+
+/**
+ * Location types for geospatial data (GeoJSON)
+ */
+export enum LocationType {
+  POINT = 'Point',
+  POLYGON = 'Polygon',
+  LINESTRING = 'LineString',
+}
+
+/**
+ * Type definition for location type
+ */
+export type LocationTypeType = `${LocationType}`
+
+/**
+ * Address types
+ */
+export enum AddressType {
+  HOME = 'HOME',
+  WORK = 'WORK',
+  BILLING = 'BILLING',
+  SHIPPING = 'SHIPPING',
+  OTHER = 'OTHER',
+}
+
+/**
+ * Type definition for address type
+ */
+export type AddressTypeType = `${AddressType}`

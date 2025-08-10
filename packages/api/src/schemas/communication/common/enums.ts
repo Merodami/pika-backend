@@ -1,4 +1,7 @@
+import { MessagePriority } from '@pika/types'
 import { z } from 'zod'
+
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 /**
  * Communication-specific enums
@@ -18,7 +21,7 @@ export const EmailStatus = z.enum([
 
 export type EmailStatus = z.infer<typeof EmailStatus>
 
-export const EmailPriority = z.enum(['low', 'normal', 'high'])
+export const EmailPriority = createZodEnum(MessagePriority)
 
 export type EmailPriority = z.infer<typeof EmailPriority>
 
@@ -63,7 +66,7 @@ export const NotificationStatus = z.enum([
 
 export type NotificationStatus = z.infer<typeof NotificationStatus>
 
-export const NotificationPriority = z.enum(['low', 'normal', 'high', 'urgent'])
+export const NotificationPriority = createZodEnum(MessagePriority)
 
 export type NotificationPriority = z.infer<typeof NotificationPriority>
 

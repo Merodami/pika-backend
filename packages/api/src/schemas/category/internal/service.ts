@@ -1,3 +1,4 @@
+import { NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -51,7 +52,7 @@ export type InternalCategoryQueryParams = z.infer<
  */
 export const BulkCategoryRequest = openapi(
   z.object({
-    categoryIds: z.array(UUID).min(1).max(100),
+    categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
   }),
   {
     description: 'Get multiple categories by IDs',
@@ -74,7 +75,7 @@ export type BulkCategoryResponse = z.infer<typeof BulkCategoryResponse>
  */
 export const ValidateCategoryRequest = openapi(
   z.object({
-    categoryIds: z.array(UUID).min(1).max(100),
+    categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
     checkActive: optionalBoolean().default(true),
   }),
   {

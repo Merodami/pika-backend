@@ -251,7 +251,11 @@ export class AdminVoucherBookController {
    * Generate PDF for voucher book
    */
   async generatePDF(
-    req: Request<pdfCommon.VoucherBookIdParam, {}, pdfAdmin.AdminGeneratePdfRequest>,
+    req: Request<
+      pdfCommon.VoucherBookIdParam,
+      {},
+      pdfAdmin.AdminGeneratePdfRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

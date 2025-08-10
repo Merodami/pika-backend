@@ -24,7 +24,7 @@ import { createZodEnum } from '../../../common/utils/zodEnum.js'
 // Voucher state schema
 export const VoucherStateSchema = openapi(createZodEnum(VoucherState), {
   description: 'Current state of the voucher lifecycle',
-  example: VoucherState.published,
+  example: VoucherState.PUBLISHED,
 })
 
 // Voucher discount type schema
@@ -32,14 +32,14 @@ export const VoucherDiscountTypeSchema = openapi(
   createZodEnum(VoucherDiscountType),
   {
     description: 'Type of discount the voucher provides',
-    example: VoucherDiscountType.percentage,
+    example: VoucherDiscountType.PERCENTAGE,
   },
 )
 
 // Voucher code type schema
 export const VoucherCodeTypeSchema = openapi(createZodEnum(VoucherCodeType), {
   description: 'Type of voucher code',
-  example: VoucherCodeType.qr,
+  example: VoucherCodeType.QR,
 })
 
 // Voucher scan source schema
@@ -47,7 +47,7 @@ export const VoucherScanSourceSchema = openapi(
   createZodEnum(VoucherScanSource),
   {
     description: 'Source of the voucher scan',
-    example: VoucherScanSource.camera,
+    example: VoucherScanSource.CAMERA,
   },
 )
 
@@ -62,7 +62,7 @@ export const CustomerVoucherStatusSchema = openapi(
   createZodEnum(CustomerVoucherStatus),
   {
     description: 'Status of voucher from customer perspective',
-    example: CustomerVoucherStatus.claimed,
+    example: CustomerVoucherStatus.CLAIMED,
   },
 )
 

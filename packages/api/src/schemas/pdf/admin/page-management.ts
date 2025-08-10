@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -105,8 +106,16 @@ export const AdminAdPlacementResponse = openapi(
       .string()
       .optional()
       .describe('QR code payload for vouchers'),
-    shortCode: z.string().max(20).optional().describe('Human-readable code'),
-    title: z.string().max(255).optional().describe('Content title'),
+    shortCode: z
+      .string()
+      .max(FIELD_LENGTH.CODE_SHORT_MAX)
+      .optional()
+      .describe('Human-readable code'),
+    title: z
+      .string()
+      .max(FIELD_LENGTH.SLUG_MAX)
+      .optional()
+      .describe('Content title'),
     description: z.string().optional().describe('Content description'),
     metadata: z
       .record(z.string(), z.any())
@@ -160,8 +169,16 @@ export const CreateAdPlacementRequest = openapi(
       .string()
       .optional()
       .describe('QR code payload for vouchers'),
-    shortCode: z.string().max(20).optional().describe('Human-readable code'),
-    title: z.string().max(255).optional().describe('Content title'),
+    shortCode: z
+      .string()
+      .max(FIELD_LENGTH.CODE_SHORT_MAX)
+      .optional()
+      .describe('Human-readable code'),
+    title: z
+      .string()
+      .max(FIELD_LENGTH.SLUG_MAX)
+      .optional()
+      .describe('Content title'),
     description: z.string().optional().describe('Content description'),
     metadata: z
       .record(z.string(), z.any())
@@ -194,8 +211,16 @@ export const UpdateAdPlacementRequest = openapi(
       .string()
       .optional()
       .describe('QR code payload for vouchers'),
-    shortCode: z.string().max(20).optional().describe('Human-readable code'),
-    title: z.string().max(255).optional().describe('Content title'),
+    shortCode: z
+      .string()
+      .max(FIELD_LENGTH.CODE_SHORT_MAX)
+      .optional()
+      .describe('Human-readable code'),
+    title: z
+      .string()
+      .max(FIELD_LENGTH.SLUG_MAX)
+      .optional()
+      .describe('Content title'),
     description: z.string().optional().describe('Content description'),
     metadata: z
       .record(z.string(), z.any())
@@ -285,7 +310,7 @@ export const BulkPlacementOperationRequest = openapi(
     placementIds: z
       .array(UUID)
       .min(1)
-      .max(50)
+      .max(FIELD_LENGTH.CODE_MAX)
       .describe('Placement IDs to operate on'),
     operation: z
       .enum(['activate', 'deactivate', 'delete', 'move'])

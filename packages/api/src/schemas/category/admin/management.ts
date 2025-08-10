@@ -1,4 +1,4 @@
-import { CategorySortBy } from '@pika/types'
+import { CategorySortBy, FIELD_LENGTH, NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -23,19 +23,29 @@ import { CATEGORY_RELATIONS } from '../common/enums.js'
  */
 export const AdminCategoryResponse = withTimestamps({
   id: UUID,
-  nameKey: z.string().max(255).describe('Translation key for category name'),
+  nameKey: z
+    .string()
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .describe('Translation key for category name'),
   descriptionKey: z
     .string()
-    .max(255)
+    .max(FIELD_LENGTH.SLUG_MAX)
     .optional()
     .describe('Translation key for category description'),
-  icon: z.string().max(255).optional().describe('Category icon identifier'),
+  icon: z
+    .string()
+    .max(FIELD_LENGTH.ICON_MAX)
+    .optional()
+    .describe('Category icon identifier'),
   parentId: UUID.optional().describe(
     'Parent category ID for hierarchical structure',
   ),
   isActive: z.boolean().default(true).describe('Whether category is active'),
   sortOrder: z.number().int().default(0).describe('Sort order for display'),
-  slug: z.string().max(255).describe('URL-friendly category identifier'),
+  slug: z
+    .string()
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .describe('URL-friendly category identifier'),
   level: z
     .number()
     .int()
@@ -43,7 +53,7 @@ export const AdminCategoryResponse = withTimestamps({
     .describe('Hierarchy level (1 for root categories)'),
   path: z
     .string()
-    .max(1000)
+    .max(FIELD_LENGTH.DESCRIPTION_LONG_MAX)
     .describe('Materialized path for hierarchy navigation'),
   createdBy: UserId.describe('User who created the category'),
   updatedBy: UserId.optional().describe('User who last updated the category'),
@@ -74,14 +84,18 @@ export const AdminCreateCategoryRequest = openapi(
     nameKey: z
       .string()
       .min(1)
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .describe('Translation key for category name'),
     descriptionKey: z
       .string()
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Translation key for category description'),
-    icon: z.string().max(255).optional().describe('Category icon identifier'),
+    icon: z
+      .string()
+      .max(FIELD_LENGTH.ICON_MAX)
+      .optional()
+      .describe('Category icon identifier'),
     parentId: UUID.optional().describe('Parent category ID'),
     isActive: z.boolean().default(true).describe('Whether category is active'),
     sortOrder: z.number().int().default(0).describe('Sort order for display'),
@@ -91,7 +105,9 @@ export const AdminCreateCategoryRequest = openapi(
   },
 )
 
-export type AdminCreateCategoryRequest = z.infer<typeof AdminCreateCategoryRequest>
+export type AdminCreateCategoryRequest = z.infer<
+  typeof AdminCreateCategoryRequest
+>
 
 // ============= Update Category =============
 
@@ -103,15 +119,19 @@ export const AdminUpdateCategoryRequest = openapi(
     nameKey: z
       .string()
       .min(1)
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Translation key for category name'),
     descriptionKey: z
       .string()
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Translation key for category description'),
-    icon: z.string().max(255).optional().describe('Category icon identifier'),
+    icon: z
+      .string()
+      .max(FIELD_LENGTH.ICON_MAX)
+      .optional()
+      .describe('Category icon identifier'),
     parentId: UUID.optional().describe('Parent category ID'),
     isActive: z.boolean().optional().describe('Whether category is active'),
     sortOrder: z.number().int().optional().describe('Sort order for display'),
@@ -121,7 +141,9 @@ export const AdminUpdateCategoryRequest = openapi(
   },
 )
 
-export type AdminUpdateCategoryRequest = z.infer<typeof AdminUpdateCategoryRequest>
+export type AdminUpdateCategoryRequest = z.infer<
+  typeof AdminUpdateCategoryRequest
+>
 
 // ============= Admin Search Categories =============
 
@@ -227,7 +249,7 @@ export type AdminToggleCategoryActivationRequest = z.infer<
  */
 export const AdminBulkCategoryUpdateRequest = openapi(
   z.object({
-    categoryIds: z.array(UUID).min(1).max(100),
+    categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
     updates: z.object({
       isActive: z.boolean().optional(),
       parentId: UUID.optional(),
@@ -274,7 +296,7 @@ export type AdminBulkCategoryOperationResponse = z.infer<
  */
 export const AdminBulkDeleteCategoriesRequest = openapi(
   z.object({
-    categoryIds: z.array(UUID).min(1).max(100),
+    categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
   }),
   {
     description: 'Delete multiple categories',

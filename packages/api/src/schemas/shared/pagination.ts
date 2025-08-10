@@ -1,6 +1,8 @@
+import { NUMERIC_CONSTRAINTS,SortOrder } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../common/utils/openapi.js'
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 
 /**
  * Common pagination schemas
@@ -17,7 +19,7 @@ export const PaginationParams = z.object({
     .number()
     .int()
     .positive()
-    .max(100)
+    .max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX)
     .default(20)
     .describe('Items per page'),
 })
@@ -31,7 +33,9 @@ export type PaginationParams = z.infer<typeof PaginationParams>
  */
 export const SortParams = z.object({
   sortBy: z.string().optional().describe('Field to sort by'),
-  sortOrder: z.enum(['asc', 'desc']).default('desc').describe('Sort order'),
+  sortOrder: createZodEnum(SortOrder)
+    .default(SortOrder.DESC)
+    .describe('Sort order'),
 })
 
 export type SortParams = z.infer<typeof SortParams>
@@ -70,7 +74,7 @@ export const CursorPaginationParams = z.object({
     .number()
     .int()
     .positive()
-    .max(100)
+    .max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX)
     .default(20)
     .describe('Items per page'),
 })

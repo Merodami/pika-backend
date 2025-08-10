@@ -1,3 +1,4 @@
+import { FIELD_LENGTH, NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -44,7 +45,7 @@ export const AdminTransactionDetailResponse = openapi(
 
     // Amount details
     amount: Money,
-    currency: z.string().length(3),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
     fee: Money.optional(),
     tax: Money.optional(),
     netAmount: Money,
@@ -107,7 +108,7 @@ export const AdminTransactionQueryParams = SearchParams.merge(
   stripePaymentIntentId: z.string().optional(),
   minAmount: z.number().nonnegative().optional(),
   maxAmount: z.number().nonnegative().optional(),
-  currency: z.string().length(3).optional(),
+  currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH).optional(),
   hasDispute: z.boolean().optional(),
 })
 
@@ -214,7 +215,7 @@ export const AdminRefundTransactionRequest = openapi(
   z.object({
     amount: Money.optional().describe('Partial refund amount'),
     reason: AdminRefundReason,
-    description: z.string().max(500),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX),
     notifyUser: z.boolean().default(true),
   }),
   {
@@ -222,7 +223,9 @@ export const AdminRefundTransactionRequest = openapi(
   },
 )
 
-export type AdminRefundTransactionRequest = z.infer<typeof AdminRefundTransactionRequest>
+export type AdminRefundTransactionRequest = z.infer<
+  typeof AdminRefundTransactionRequest
+>
 
 /**
  * Manual adjustment request
@@ -233,7 +236,7 @@ export const AdminManualAdjustmentRequest = openapi(
     amount: Money,
     type: AdjustmentType,
     reason: AdjustmentReason,
-    description: z.string().max(500),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX),
     notifyUser: z.boolean().default(true),
   }),
   {
@@ -241,7 +244,9 @@ export const AdminManualAdjustmentRequest = openapi(
   },
 )
 
-export type AdminManualAdjustmentRequest = z.infer<typeof AdminManualAdjustmentRequest>
+export type AdminManualAdjustmentRequest = z.infer<
+  typeof AdminManualAdjustmentRequest
+>
 
 // ============= Payout Management =============
 
@@ -252,7 +257,7 @@ export const PayoutDetail = z.object({
   id: UUID,
   businessId: UUID,
   amount: Money,
-  currency: z.string().length(3),
+  currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
   status: PayoutStatus,
   scheduledFor: DateTime,
   processedAt: DateTime.optional(),
@@ -275,9 +280,9 @@ export type PayoutListResponse = z.infer<typeof PayoutListResponse>
  */
 export const AdminProcessPayoutRequest = openapi(
   z.object({
-    payoutIds: z.array(UUID).min(1).max(100),
+    payoutIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
     action: PayoutAction,
-    reason: z.string().max(500).optional(),
+    reason: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
     delayUntil: DateTime.optional(),
   }),
   {
@@ -285,7 +290,9 @@ export const AdminProcessPayoutRequest = openapi(
   },
 )
 
-export type AdminProcessPayoutRequest = z.infer<typeof AdminProcessPayoutRequest>
+export type AdminProcessPayoutRequest = z.infer<
+  typeof AdminProcessPayoutRequest
+>
 
 // ============= Dispute Management =============
 
@@ -311,7 +318,9 @@ export const AdminUpdateDisputeRequest = openapi(
   },
 )
 
-export type AdminUpdateDisputeRequest = z.infer<typeof AdminUpdateDisputeRequest>
+export type AdminUpdateDisputeRequest = z.infer<
+  typeof AdminUpdateDisputeRequest
+>
 
 // ============= Promo Code Management =============
 
@@ -363,10 +372,14 @@ export type AdminPromoCodeDetail = z.infer<typeof AdminPromoCodeDetail>
  */
 export const AdminCreatePromoCodeRequest = openapi(
   z.object({
-    code: z.string().min(3).max(20).toUpperCase(),
+    code: z
+      .string()
+      .min(FIELD_LENGTH.CODE_SHORT_MIN)
+      .max(FIELD_LENGTH.CODE_SHORT_MAX)
+      .toUpperCase(),
     type: PromoCodeType,
     value: z.number().positive(),
-    description: z.string().max(500).optional(),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
 
     // Usage limits
     maxUses: z.number().int().positive().optional(),
@@ -390,14 +403,16 @@ export const AdminCreatePromoCodeRequest = openapi(
   },
 )
 
-export type AdminCreatePromoCodeRequest = z.infer<typeof AdminCreatePromoCodeRequest>
+export type AdminCreatePromoCodeRequest = z.infer<
+  typeof AdminCreatePromoCodeRequest
+>
 
 /**
  * Update promo code request
  */
 export const AdminUpdatePromoCodeRequest = openapi(
   z.object({
-    description: z.string().max(500).optional(),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
 
     // Usage limits
     maxUses: z.number().int().positive().optional(),
@@ -424,7 +439,9 @@ export const AdminUpdatePromoCodeRequest = openapi(
   },
 )
 
-export type AdminUpdatePromoCodeRequest = z.infer<typeof AdminUpdatePromoCodeRequest>
+export type AdminUpdatePromoCodeRequest = z.infer<
+  typeof AdminUpdatePromoCodeRequest
+>
 
 /**
  * Promo code search parameters
@@ -498,8 +515,8 @@ export type AdminSubscriptionPlanDetail = z.infer<
  */
 export const AdminCreateSubscriptionPlanRequest = openapi(
   z.object({
-    name: z.string().min(1).max(100),
-    description: z.string().max(1000),
+    name: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.NAME_MAX),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_LONG_MAX),
 
     // Pricing
     price: Money,
@@ -531,8 +548,12 @@ export type AdminCreateSubscriptionPlanRequest = z.infer<
  */
 export const AdminUpdateSubscriptionPlanRequest = openapi(
   z.object({
-    name: z.string().min(1).max(100).optional(),
-    description: z.string().max(1000).optional(),
+    name: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.NAME_MAX)
+      .optional(),
+    description: z.string().max(FIELD_LENGTH.DESCRIPTION_LONG_MAX).optional(),
 
     // Limits
     maxUsagePerMonth: z.number().int().positive().optional(),
@@ -595,7 +616,9 @@ export const AdminFinancialReportRequest = z.object({
   format: ReportFormat.default('json'),
 })
 
-export type AdminFinancialReportRequest = z.infer<typeof AdminFinancialReportRequest>
+export type AdminFinancialReportRequest = z.infer<
+  typeof AdminFinancialReportRequest
+>
 
 /**
  * Financial report response
@@ -633,7 +656,9 @@ export const AdminFinancialReportResponse = openapi(
   },
 )
 
-export type AdminFinancialReportResponse = z.infer<typeof AdminFinancialReportResponse>
+export type AdminFinancialReportResponse = z.infer<
+  typeof AdminFinancialReportResponse
+>
 
 // PaymentStatsResponse
 export const PaymentStatsResponse = FinancialSummary

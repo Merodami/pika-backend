@@ -286,7 +286,7 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminPaymentSchemas.AdminCreatePayoutRequest,
   )
   registry.registerSchema('PayoutIdParam', adminPaymentSchemas.PayoutIdParam)
-  
+
   // Add missing financial/promo code schemas
   registry.registerSchema(
     'AdminFinancialReportRequest',
@@ -396,8 +396,14 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'AdminUpdateUserRequest',
     adminUserSchemas.AdminUpdateUserRequest,
   )
-  registry.registerSchema('AdminBanUserRequest', adminUserSchemas.AdminBanUserRequest)
-  registry.registerSchema('AdminUnbanUserRequest', adminUserSchemas.AdminUnbanUserRequest)
+  registry.registerSchema(
+    'AdminBanUserRequest',
+    adminUserSchemas.AdminBanUserRequest,
+  )
+  registry.registerSchema(
+    'AdminUnbanUserRequest',
+    adminUserSchemas.AdminUnbanUserRequest,
+  )
   registry.registerSchema(
     'AdminUploadUserAvatarRequest',
     adminUserSchemas.AdminUploadUserAvatarRequest,
@@ -423,7 +429,7 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminUserSchemas.AdminBulkUserActionRequest,
   )
   registry.registerSchema('UserIdParam', adminUserSchemas.UserIdParam)
-  
+
   // Add missing user management schemas
   registry.registerSchema(
     'AdminUpdateUserStatusRequest',
@@ -484,14 +490,6 @@ export function registerAdminAPI(registry: ZodRegistry): void {
 
   // User Verification Schemas (Admin)
   registry.registerSchema(
-    'UnifiedVerificationRequest',
-    userVerificationSchemas.UnifiedVerificationRequest,
-  )
-  registry.registerSchema(
-    'UnifiedResendVerificationRequest',
-    userVerificationSchemas.UnifiedResendVerificationRequest,
-  )
-  registry.registerSchema(
     'UnifiedVerificationResponse',
     userVerificationSchemas.UnifiedVerificationResponse,
   )
@@ -506,6 +504,14 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'AdminUserVerificationStatusResponse',
     adminUserSchemas.AdminUserVerificationStatusResponse,
+  )
+  registry.registerSchema(
+    'AdminVerificationRequest',
+    adminUserSchemas.AdminVerificationRequest,
+  )
+  registry.registerSchema(
+    'AdminResendVerificationRequest',
+    adminUserSchemas.AdminResendVerificationRequest,
   )
 
   // ============= Register Routes =============
@@ -1851,7 +1857,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: userVerificationSchemas.UnifiedVerificationRequest,
+            schema: adminUserSchemas.AdminVerificationRequest,
           },
         },
       },
@@ -1890,7 +1896,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: userVerificationSchemas.UnifiedResendVerificationRequest,
+            schema: adminUserSchemas.AdminResendVerificationRequest,
           },
         },
       },

@@ -1,4 +1,4 @@
-import { VoucherSortBy } from '@pika/types'
+import { FIELD_LENGTH,VoucherSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -130,9 +130,19 @@ export const VoucherScanRequest = openapi(
       .optional(),
     deviceInfo: z
       .object({
-        platform: z.string().min(1).max(50),
-        version: z.string().min(1).max(20),
-        model: z.string().min(1).max(100).optional(),
+        platform: z
+          .string()
+          .min(FIELD_LENGTH.NAME_MIN)
+          .max(FIELD_LENGTH.CODE_MAX),
+        version: z
+          .string()
+          .min(FIELD_LENGTH.NAME_MIN)
+          .max(FIELD_LENGTH.CODE_SHORT_MAX),
+        model: z
+          .string()
+          .min(FIELD_LENGTH.NAME_MIN)
+          .max(FIELD_LENGTH.NAME_MAX)
+          .optional(),
       })
       .optional(),
   }),

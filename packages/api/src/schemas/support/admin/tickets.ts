@@ -5,6 +5,7 @@ import {
   TicketStatus,
   TicketType,
 } from '@pika/types'
+import { NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -180,7 +181,9 @@ export const AdminEscalateTicketRequest = openapi(
   },
 )
 
-export type AdminEscalateTicketRequest = z.infer<typeof AdminEscalateTicketRequest>
+export type AdminEscalateTicketRequest = z.infer<
+  typeof AdminEscalateTicketRequest
+>
 
 /**
  * Admin comment on ticket
@@ -275,13 +278,21 @@ export const SupportMetrics = openapi(
           ticketsHandled: z.number().int().nonnegative(),
           averageResponseTime: z.number(),
           averageResolutionTime: z.number(),
-          satisfactionScore: z.number().min(0).max(5).optional(),
+          satisfactionScore: z
+            .number()
+            .min(NUMERIC_CONSTRAINTS.RATING_MIN)
+            .max(NUMERIC_CONSTRAINTS.RATING_MAX)
+            .optional(),
         }),
       )
       .optional(),
 
     // Satisfaction
-    averageSatisfaction: z.number().min(0).max(5).optional(),
+    averageSatisfaction: z
+      .number()
+      .min(NUMERIC_CONSTRAINTS.RATING_MIN)
+      .max(NUMERIC_CONSTRAINTS.RATING_MAX)
+      .optional(),
     satisfactionResponseRate: z.number().min(0).max(100).optional(),
   }),
   {
@@ -312,7 +323,9 @@ export const AdminBulkTicketUpdateRequest = openapi(
   },
 )
 
-export type AdminBulkTicketUpdateRequest = z.infer<typeof AdminBulkTicketUpdateRequest>
+export type AdminBulkTicketUpdateRequest = z.infer<
+  typeof AdminBulkTicketUpdateRequest
+>
 
 // ============= Templates =============
 

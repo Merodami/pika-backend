@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -123,7 +124,7 @@ export type PasswordResetResponse = z.infer<typeof PasswordResetResponse>
 export const ConfirmPasswordResetRequest = openapi(
   z.object({
     token: z.string(),
-    newPassword: z.string().min(8),
+    newPassword: z.string().min(FIELD_LENGTH.PASSWORD_MIN),
   }),
   {
     description: 'Confirm password reset',

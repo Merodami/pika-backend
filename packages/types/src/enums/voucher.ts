@@ -7,12 +7,12 @@
  * Must match Prisma schema definitions
  */
 export enum VoucherState {
-  draft = 'draft',
-  published = 'published',
-  claimed = 'claimed',
-  redeemed = 'redeemed',
-  expired = 'expired',
-  suspended = 'suspended',
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  CLAIMED = 'claimed',
+  REDEEMED = 'redeemed',
+  EXPIRED = 'expired',
+  SUSPENDED = 'suspended',
 }
 
 /**
@@ -42,10 +42,10 @@ export type VoucherTypeType = `${VoucherType}`
  * Used to track how users discovered and scanned vouchers
  */
 export enum VoucherScanSource {
-  camera = 'camera',
-  gallery = 'gallery',
-  link = 'link',
-  share = 'share',
+  CAMERA = 'camera',
+  GALLERY = 'gallery',
+  LINK = 'link',
+  SHARE = 'share',
 }
 
 /**
@@ -72,9 +72,9 @@ export type VoucherScanTypeType = `${VoucherScanType}`
  * Used for different voucher code generation methods
  */
 export enum VoucherCodeType {
-  qr = 'qr',
-  short = 'short',
-  static = 'static',
+  QR = 'qr',
+  SHORT = 'short',
+  STATIC = 'static',
 }
 
 /**
@@ -87,8 +87,8 @@ export type VoucherCodeTypeType = `${VoucherCodeType}`
  * Used to determine how discounts are calculated
  */
 export enum VoucherDiscountType {
-  percentage = 'percentage',
-  fixed = 'fixed',
+  FIXED = 'fixed',
+  PERCENTAGE = 'percentage',
 }
 
 /**
@@ -101,9 +101,10 @@ export type VoucherDiscountTypeType = `${VoucherDiscountType}`
  * Used to track voucher status in customer's wallet
  */
 export enum CustomerVoucherStatus {
-  claimed = 'claimed',
-  redeemed = 'redeemed',
-  expired = 'expired',
+  AVAILABLE = 'available',
+  CLAIMED = 'claimed',
+  REDEEMED = 'redeemed',
+  EXPIRED = 'expired',
 }
 
 /**

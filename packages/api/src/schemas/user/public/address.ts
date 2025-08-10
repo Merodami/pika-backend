@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -36,7 +37,11 @@ export const UserAddress = openapi(
 
     // Address metadata
     type: AddressType,
-    label: z.string().max(100).optional().describe('Custom label'),
+    label: z
+      .string()
+      .max(FIELD_LENGTH.NAME_MAX)
+      .optional()
+      .describe('Custom label'),
     isDefault: z.boolean().default(false),
     isPrimary: z.boolean().default(false),
 
@@ -47,10 +52,10 @@ export const UserAddress = openapi(
     // Additional info
     instructions: z
       .string()
-      .max(500)
+      .max(FIELD_LENGTH.NOTES_MAX)
       .optional()
       .describe('Delivery instructions'),
-    accessCode: z.string().max(50).optional(),
+    accessCode: z.string().max(FIELD_LENGTH.CODE_MAX).optional(),
   }),
   {
     description: 'User address with metadata',
@@ -66,19 +71,28 @@ export type UserAddress = z.infer<typeof UserAddress>
  */
 export const CreateAddressRequest = openapi(
   z.object({
-    street: z.string().min(1).max(255),
-    street2: z.string().max(255).optional(),
-    city: z.string().min(1).max(100),
-    state: z.string().min(1).max(100),
-    postalCode: z.string().min(1).max(20),
-    country: z.string().length(2).describe('ISO 3166-1 alpha-2 country code'),
+    street: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.ADDRESS_LINE_MAX),
+    street2: z.string().max(FIELD_LENGTH.ADDRESS_LINE_MAX).optional(),
+    city: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.CITY_MAX),
+    state: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.STATE_MAX),
+    postalCode: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.POSTAL_CODE_MAX),
+    country: z
+      .string()
+      .length(FIELD_LENGTH.COUNTRY_CODE_LENGTH)
+      .describe('ISO 3166-1 alpha-2 country code'),
 
     type: AddressType,
-    label: z.string().max(100).optional(),
+    label: z.string().max(FIELD_LENGTH.NAME_MAX).optional(),
     isDefault: z.boolean().optional(),
 
-    instructions: z.string().max(500).optional(),
-    accessCode: z.string().max(50).optional(),
+    instructions: z.string().max(FIELD_LENGTH.NOTES_MAX).optional(),
+    accessCode: z.string().max(FIELD_LENGTH.CODE_MAX).optional(),
 
     // Optional coordinates
     coordinates: GeoPoint.optional(),
@@ -113,12 +127,18 @@ export type UpdateAddressRequest = z.infer<typeof UpdateAddressRequest>
  */
 export const ValidateAddressRequest = openapi(
   z.object({
-    street: z.string().min(1).max(255),
-    street2: z.string().max(255).optional(),
-    city: z.string().min(1).max(100),
-    state: z.string().min(1).max(100),
-    postalCode: z.string().min(1).max(20),
-    country: z.string().length(2),
+    street: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.ADDRESS_LINE_MAX),
+    street2: z.string().max(FIELD_LENGTH.ADDRESS_LINE_MAX).optional(),
+    city: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.CITY_MAX),
+    state: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.STATE_MAX),
+    postalCode: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.POSTAL_CODE_MAX),
+    country: z.string().length(FIELD_LENGTH.COUNTRY_CODE_LENGTH),
   }),
   {
     description: 'Validate an address',

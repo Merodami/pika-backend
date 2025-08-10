@@ -584,7 +584,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     summary: 'Get businesses in a specific category',
     tags: ['Business'],
     request: {
-      params: categoryParameters.CategoryIdParam,
+      params: categoryParameters.CategoryIdNamedParam,
       query: businessSchemas.BusinessQueryParams,
     },
     responses: {

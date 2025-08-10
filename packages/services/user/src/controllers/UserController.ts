@@ -342,7 +342,11 @@ export class UserController {
    * Update user account status
    */
   async updateUserStatus(
-    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminUpdateUserStatusRequest>,
+    req: Request<
+      userAdmin.UserIdParam,
+      {},
+      userAdmin.AdminUpdateUserStatusRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {

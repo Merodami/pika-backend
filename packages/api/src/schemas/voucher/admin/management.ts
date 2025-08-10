@@ -184,7 +184,9 @@ export const AdminCreateVoucherRequest = openapi(
   },
 )
 
-export type AdminCreateVoucherRequest = z.infer<typeof AdminCreateVoucherRequest>
+export type AdminCreateVoucherRequest = z.infer<
+  typeof AdminCreateVoucherRequest
+>
 
 /**
  * Update voucher request
@@ -232,7 +234,9 @@ export const AdminUpdateVoucherRequest = openapi(
   },
 )
 
-export type AdminUpdateVoucherRequest = z.infer<typeof AdminUpdateVoucherRequest>
+export type AdminUpdateVoucherRequest = z.infer<
+  typeof AdminUpdateVoucherRequest
+>
 
 /**
  * Update voucher state request
@@ -368,7 +372,9 @@ export const AdminBulkVoucherUpdateRequest = openapi(
   },
 )
 
-export type AdminBulkVoucherUpdateRequest = z.infer<typeof AdminBulkVoucherUpdateRequest>
+export type AdminBulkVoucherUpdateRequest = z.infer<
+  typeof AdminBulkVoucherUpdateRequest
+>
 
 /**
  * Bulk voucher operation response
@@ -416,7 +422,9 @@ export const AdminVoucherAnalyticsResponse = openapi(
   },
 )
 
-export type AdminVoucherAnalyticsResponse = z.infer<typeof AdminVoucherAnalyticsResponse>
+export type AdminVoucherAnalyticsResponse = z.infer<
+  typeof AdminVoucherAnalyticsResponse
+>
 
 /**
  * Business voucher statistics

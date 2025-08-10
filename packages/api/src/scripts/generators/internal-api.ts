@@ -660,7 +660,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
     request: {
-      params: categoryParameters.CategoryIdParam,
+      params: categoryParameters.CategoryIdNamedParam,
       query: internalBusinessSchemas.GetBusinessesByCategoryRequest,
     },
     responses: {

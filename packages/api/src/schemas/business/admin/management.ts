@@ -1,4 +1,5 @@
 import { BusinessSortBy as BusinessSortByEnum } from '@pika/types'
+import { FIELD_LENGTH, NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -32,11 +33,11 @@ export const AdminBusinessResponse = openapi(
     userId: UserId.describe('User who owns this business'),
     businessNameKey: z
       .string()
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .describe('Translation key for business name'),
     businessDescriptionKey: z
       .string()
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Translation key for business description'),
     categoryId: UUID.describe('Category this business belongs to'),
@@ -79,7 +80,11 @@ export type AdminBusinessResponse = z.infer<typeof AdminBusinessResponse>
 export const AdminCreateBusinessRequest = openapi(
   z.object({
     userId: UserId.describe('User who will own this business'),
-    businessName: z.string().min(1).max(255).describe('Business name'),
+    businessName: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.SLUG_MAX)
+      .describe('Business name'),
     businessDescription: z
       .string()
       .max(65535)
@@ -97,7 +102,9 @@ export const AdminCreateBusinessRequest = openapi(
   },
 )
 
-export type AdminCreateBusinessRequest = z.infer<typeof AdminCreateBusinessRequest>
+export type AdminCreateBusinessRequest = z.infer<
+  typeof AdminCreateBusinessRequest
+>
 
 // ============= Update Business =============
 
@@ -109,7 +116,7 @@ export const AdminUpdateBusinessRequest = openapi(
     businessName: z
       .string()
       .min(1)
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Business name'),
     businessDescription: z
@@ -126,7 +133,9 @@ export const AdminUpdateBusinessRequest = openapi(
   },
 )
 
-export type AdminUpdateBusinessRequest = z.infer<typeof AdminUpdateBusinessRequest>
+export type AdminUpdateBusinessRequest = z.infer<
+  typeof AdminUpdateBusinessRequest
+>
 
 // ============= Admin Search Businesses =============
 
@@ -213,7 +222,7 @@ export type AdminToggleBusinessActivationRequest = z.infer<
  */
 export const AdminBulkBusinessUpdateRequest = openapi(
   z.object({
-    businessIds: z.array(UUID).min(1).max(100),
+    businessIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
     updates: z.object({
       active: z.boolean().optional(),
       verified: z.boolean().optional(),
@@ -261,7 +270,7 @@ export type AdminBulkBusinessOperationResponse = z.infer<
  */
 export const AdminBulkDeleteBusinessesRequest = openapi(
   z.object({
-    businessIds: z.array(UUID).min(1).max(100),
+    businessIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
   }),
   {
     description: 'Delete multiple businesses',

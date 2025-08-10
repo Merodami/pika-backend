@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -18,7 +19,12 @@ import { paginatedResponse } from '../../shared/responses.js'
 export const PromoCode = openapi(
   withTimestamps({
     id: UUID,
-    code: z.string().min(1).max(50).toUpperCase().describe('Unique promo code'),
+    code: z
+      .string()
+      .min(FIELD_LENGTH.CODE_MIN)
+      .max(FIELD_LENGTH.CODE_MAX)
+      .toUpperCase()
+      .describe('Unique promo code'),
     discount: Percentage.describe('Discount percentage (0-100)'),
     active: z.boolean().default(true),
     allowedTimes: z
@@ -69,7 +75,11 @@ export type PromoCodeWithUsages = z.infer<typeof PromoCodeWithUsages>
  */
 export const PublicCreatePromoCodeRequest = openapi(
   z.object({
-    code: z.string().min(1).max(50).toUpperCase(),
+    code: z
+      .string()
+      .min(FIELD_LENGTH.CODE_MIN)
+      .max(FIELD_LENGTH.CODE_MAX)
+      .toUpperCase(),
     discount: Percentage,
     active: z.boolean().optional().default(true),
     allowedTimes: z.number().int().positive(),
@@ -91,7 +101,12 @@ export type PublicCreatePromoCodeRequest = z.infer<
  */
 export const PublicUpdatePromoCodeRequest = openapi(
   z.object({
-    code: z.string().min(1).max(50).toUpperCase().optional(),
+    code: z
+      .string()
+      .min(FIELD_LENGTH.CODE_MIN)
+      .max(FIELD_LENGTH.CODE_MAX)
+      .toUpperCase()
+      .optional(),
     discount: Percentage.optional(),
     active: z.boolean().optional(),
     allowedTimes: z.number().int().positive().optional(),
@@ -114,7 +129,7 @@ export type PublicUpdatePromoCodeRequest = z.infer<
  */
 export const ValidatePromoCodeRequest = openapi(
   z.object({
-    code: z.string().min(1).max(50),
+    code: z.string().min(FIELD_LENGTH.CODE_MIN).max(FIELD_LENGTH.CODE_MAX),
     userId: UserId.optional().describe(
       'Check if specific user can use this code',
     ),
@@ -152,7 +167,7 @@ export type ValidatePromoCodeResponse = z.infer<
  */
 export const ApplyPromoCodeRequest = openapi(
   z.object({
-    code: z.string().min(1).max(50),
+    code: z.string().min(FIELD_LENGTH.CODE_MIN).max(FIELD_LENGTH.CODE_MAX),
     transactionId: z.string().optional(),
   }),
   {
@@ -248,7 +263,7 @@ export type PromoCodeIdParam = z.infer<typeof PromoCodeIdParam>
  */
 export const PromoCodeCodeParam = openapi(
   z.object({
-    code: z.string().min(1).max(50),
+    code: z.string().min(FIELD_LENGTH.CODE_MIN).max(FIELD_LENGTH.CODE_MAX),
   }),
   {
     description: 'Promo code string path parameter',
@@ -262,7 +277,7 @@ export type PromoCodeCodeParam = z.infer<typeof PromoCodeCodeParam>
  */
 export const PromoCodeUserParams = openapi(
   z.object({
-    code: z.string().min(1).max(50),
+    code: z.string().min(FIELD_LENGTH.CODE_MIN).max(FIELD_LENGTH.CODE_MAX),
     userId: UserId,
   }),
   {

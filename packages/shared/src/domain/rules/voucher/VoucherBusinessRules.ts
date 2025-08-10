@@ -23,12 +23,12 @@ export class VoucherBusinessRules {
   ): void {
     // Define allowed state transitions based on business rules
     const allowedTransitions: Record<VoucherState, VoucherState[]> = {
-      [VoucherState.draft]: [VoucherState.published],
-      [VoucherState.published]: [VoucherState.claimed, VoucherState.expired],
-      [VoucherState.claimed]: [VoucherState.redeemed, VoucherState.expired],
-      [VoucherState.redeemed]: [VoucherState.expired],
-      [VoucherState.expired]: [], // Terminal state
-      [VoucherState.suspended]: [VoucherState.published, VoucherState.expired], // Can resume or expire
+      [VoucherState.DRAFT]: [VoucherState.PUBLISHED],
+      [VoucherState.PUBLISHED]: [VoucherState.CLAIMED, VoucherState.EXPIRED],
+      [VoucherState.CLAIMED]: [VoucherState.REDEEMED, VoucherState.EXPIRED],
+      [VoucherState.REDEEMED]: [VoucherState.EXPIRED],
+      [VoucherState.EXPIRED]: [], // Terminal state
+      [VoucherState.SUSPENDED]: [VoucherState.PUBLISHED, VoucherState.EXPIRED], // Can resume or expire
     }
 
     // No transition needed if states are the same
@@ -59,7 +59,7 @@ export class VoucherBusinessRules {
     validUntil?: Date | null
   }): void {
     // First check state transition
-    this.validateStateTransition(voucher.state, VoucherState.published)
+    this.validateStateTransition(voucher.state, VoucherState.PUBLISHED)
 
     const now = new Date()
 
@@ -94,7 +94,7 @@ export class VoucherBusinessRules {
     currentRedemptions?: number
   }): void {
     // Check if voucher is published
-    if (voucher.state !== VoucherState.published) {
+    if (voucher.state !== VoucherState.PUBLISHED) {
       throw ErrorFactory.businessRuleViolation(
         'Voucher is not available for claiming',
         `Voucher state is ${voucher.state}`,
@@ -147,8 +147,8 @@ export class VoucherBusinessRules {
   ): void {
     // Voucher must be in claimed state for the user
     if (
-      voucher.state !== VoucherState.claimed &&
-      voucher.state !== VoucherState.published
+      voucher.state !== VoucherState.CLAIMED &&
+      voucher.state !== VoucherState.PUBLISHED
     ) {
       throw ErrorFactory.businessRuleViolation(
         'Voucher cannot be redeemed',
@@ -188,7 +188,7 @@ export class VoucherBusinessRules {
    * @throws BusinessRuleViolationError if voucher cannot be updated
    */
   static validateCanUpdate(currentState: VoucherState): void {
-    const nonUpdatableStates = [VoucherState.expired, VoucherState.redeemed]
+    const nonUpdatableStates = [VoucherState.EXPIRED, VoucherState.REDEEMED]
 
     if (nonUpdatableStates.includes(currentState)) {
       throw ErrorFactory.businessRuleViolation(
@@ -205,7 +205,7 @@ export class VoucherBusinessRules {
    * @throws BusinessRuleViolationError if voucher cannot be deleted
    */
   static validateCanDelete(currentState: VoucherState): void {
-    if (currentState === VoucherState.published) {
+    if (currentState === VoucherState.PUBLISHED) {
       throw ErrorFactory.businessRuleViolation(
         'Cannot delete published voucher',
         'Published vouchers can only be expired',

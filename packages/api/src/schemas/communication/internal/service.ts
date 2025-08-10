@@ -1,3 +1,4 @@
+import { MessagePriority } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -141,7 +142,7 @@ export const SendSystemNotificationRequest = openapi(
     title: z.string().max(255),
     message: z.string(),
     category: NotificationCategory,
-    priority: NotificationPriority.default('normal'),
+    priority: NotificationPriority.default(MessagePriority.NORMAL),
 
     // Channels
     channels: z.array(NotificationType).default(['inApp']),
@@ -308,7 +309,7 @@ export const SendPushNotificationRequest = openapi(
     color: z.string().optional(),
 
     // Options
-    priority: NotificationPriority.default('normal'),
+    priority: NotificationPriority.default(MessagePriority.NORMAL),
     ttl: z
       .number()
       .int()

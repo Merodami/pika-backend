@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -27,7 +28,7 @@ export const ProcessInternalPaymentRequest = openapi(
     fromUserId: UserId,
     toUserId: UserId.optional(),
     amount: Money,
-    currency: z.string().length(3).default('usd'),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH).default('usd'),
     type: InternalTransactionType,
     referenceId: z.string(),
     referenceType: z.string(),
@@ -54,7 +55,7 @@ export const ProcessInternalPaymentResponse = openapi(
     transactionId: UUID,
     status: TransactionStatus,
     amount: Money,
-    currency: z.string().length(3),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
 
     // Stripe details
     stripePaymentIntentId: z.string().optional(),
@@ -107,7 +108,7 @@ export const ProcessInternalRefundResponse = openapi(
     originalTransactionId: UUID,
     status: TransactionStatus,
     amount: Money,
-    currency: z.string().length(3),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
 
     // Refund details
     stripeRefundId: z.string().optional(),
@@ -174,7 +175,7 @@ export const ProcessPayoutRequest = openapi(
   z.object({
     businessId: UUID,
     amount: Money,
-    currency: z.string().length(3).default('usd'),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH).default('usd'),
     description: z.string(),
     bankAccountId: z.string().optional(),
     metadata: z.record(z.string(), z.any()).optional(),
@@ -194,7 +195,7 @@ export const ProcessPayoutResponse = openapi(
     payoutId: UUID,
     status: PayoutStatus,
     amount: Money,
-    currency: z.string().length(3),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
     scheduledDate: DateTime,
     stripeTransferId: z.string().optional(),
     errorMessage: z.string().optional(),
@@ -233,7 +234,7 @@ export const TransactionDetailsResponse = openapi(
     type: z.string(),
     status: z.string(),
     amount: Money,
-    currency: z.string().length(3),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
     userId: UserId.optional(),
     businessId: UUID.optional(),
     createdAt: DateTime,
@@ -277,7 +278,7 @@ export const BalanceResponse = openapi(
     // Balances
     availableBalance: Money,
     pendingBalance: Money,
-    currency: z.string().length(3),
+    currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
 
     // Last updated
     lastUpdated: DateTime,

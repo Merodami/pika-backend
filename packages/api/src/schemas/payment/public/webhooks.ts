@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -35,7 +36,7 @@ export const StripePaymentIntent = z.object({
   id: z.string(),
   objectType: z.literal('payment_intent'),
   amount: z.number().int().positive(),
-  currency: z.string().length(3),
+  currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
   customer: z.string().nullable(),
   metadata: z.record(z.string(), z.string()).default({}),
   status: z.enum([
@@ -99,7 +100,7 @@ export const StripeInvoice = z.object({
   subscription: z.string().nullable(),
   amount_paid: z.number().int(),
   amount_due: z.number().int(),
-  currency: z.string().length(3),
+  currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
   status: z.enum(['draft', 'open', 'paid', 'uncollectible', 'void']),
   metadata: z.record(z.string(), z.string()).default({}),
 })

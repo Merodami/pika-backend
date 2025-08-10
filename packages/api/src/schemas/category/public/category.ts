@@ -1,4 +1,4 @@
-import { CategorySortBy } from '@pika/types'
+import { CategorySortBy, FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -24,19 +24,29 @@ import { CATEGORY_RELATIONS } from '../common/enums.js'
 const BaseCategoryResponse = openapi(
   withTimestamps({
     id: UUID,
-    nameKey: z.string().max(255).describe('Translation key for category name'),
+    nameKey: z
+      .string()
+      .max(FIELD_LENGTH.SLUG_MAX)
+      .describe('Translation key for category name'),
     descriptionKey: z
       .string()
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Translation key for category description'),
-    icon: z.string().max(255).optional().describe('Category icon identifier'),
+    icon: z
+      .string()
+      .max(FIELD_LENGTH.ICON_MAX)
+      .optional()
+      .describe('Category icon identifier'),
     parentId: UUID.optional().describe(
       'Parent category ID for hierarchical structure',
     ),
     isActive: z.boolean().default(true).describe('Whether category is active'),
     sortOrder: z.number().int().default(0).describe('Sort order for display'),
-    slug: z.string().max(255).describe('URL-friendly category identifier'),
+    slug: z
+      .string()
+      .max(FIELD_LENGTH.SLUG_MAX)
+      .describe('URL-friendly category identifier'),
     level: z
       .number()
       .int()

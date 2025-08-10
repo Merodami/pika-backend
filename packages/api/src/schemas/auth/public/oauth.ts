@@ -1,4 +1,8 @@
-import { OAuthError, UserRole as UserRoleEnum } from '@pika/types'
+import {
+  FIELD_LENGTH,
+  OAuthError,
+  UserRole as UserRoleEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -26,7 +30,10 @@ export const TokenRequest = openapi(
     z.object({
       grantType: z.literal('password'),
       username: Email.describe('User email address'),
-      password: z.string().min(8).describe('User password'),
+      password: z
+        .string()
+        .min(FIELD_LENGTH.PASSWORD_MIN)
+        .describe('User password'),
       scope: z.string().optional().describe('Requested permissions'),
     }),
     // Refresh Token Grant

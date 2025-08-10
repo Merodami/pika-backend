@@ -1,4 +1,8 @@
-import { BusinessSortBy as BusinessSortByEnum } from '@pika/types'
+import {
+  BusinessSortBy as BusinessSortByEnum,
+  FIELD_LENGTH,
+  NUMERIC_CONSTRAINTS,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -28,11 +32,11 @@ export const BusinessResponse = openapi(
     userId: UserId.describe('User who owns this business'),
     businessNameKey: z
       .string()
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .describe('Translation key for business name'),
     businessDescriptionKey: z
       .string()
-      .max(255)
+      .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Translation key for business description'),
     categoryId: UUID.describe('Category this business belongs to'),
@@ -43,8 +47,8 @@ export const BusinessResponse = openapi(
     active: z.boolean().default(true).describe('Whether business is active'),
     avgRating: z
       .number()
-      .min(0)
-      .max(5)
+      .min(NUMERIC_CONSTRAINTS.RATING_MIN)
+      .max(NUMERIC_CONSTRAINTS.RATING_MAX)
       .default(0)
       .describe('Average rating of the business'),
     // Optional relations - industry standard pattern
@@ -136,10 +140,14 @@ export type BusinessesByCategoryResponse = z.infer<
  */
 export const CreateMyBusinessRequest = openapi(
   z.object({
-    businessName: z.string().min(1).max(100).describe('Business name'),
+    businessName: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.NAME_MAX)
+      .describe('Business name'),
     businessDescription: z
       .string()
-      .max(500)
+      .max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX)
       .optional()
       .describe('Business description'),
     categoryId: UUID.describe('Category ID'),
@@ -159,12 +167,12 @@ export const UpdateMyBusinessRequest = openapi(
     businessName: z
       .string()
       .min(1)
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .optional()
       .describe('Business name'),
     businessDescription: z
       .string()
-      .max(500)
+      .max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX)
       .optional()
       .describe('Business description'),
     categoryId: UUID.optional().describe('Category ID'),

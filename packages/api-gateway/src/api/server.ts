@@ -199,15 +199,15 @@ async function startGateway(): Promise<Express> {
   app.get('/openapi.json', (req, res) => {
     res.redirect(301, '/api/v1/docs/openapi/public-api.json')
   })
-  
+
   app.get('/api/v1/openapi.json', (req, res) => {
     res.redirect(301, '/api/v1/docs/openapi/public-api.json')
   })
-  
+
   app.get('/docs/openapi.json', (req, res) => {
     res.redirect(301, '/api/v1/docs/openapi/public-api.json')
   })
-  
+
   app.get('/api/docs/openapi.json', (req, res) => {
     res.redirect(301, '/api/v1/docs/openapi/public-api.json')
   })
@@ -216,7 +216,7 @@ async function startGateway(): Promise<Express> {
   app.get('/api/v1/public/openapi.json', (req, res) => {
     res.redirect(301, '/api/v1/docs/openapi/public-api.json')
   })
-  
+
   app.get('/api/v1/admin/openapi.json', (req, res) => {
     res.redirect(301, '/api/v1/docs/openapi/admin-api.json')
   })

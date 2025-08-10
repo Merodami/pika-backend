@@ -1,3 +1,4 @@
+import { FIELD_LENGTH, MessagePriority } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -26,7 +27,7 @@ import { CommunicationLog } from './communicationLog.js'
  */
 export const EmailRecipient = z.object({
   email: EmailAddress,
-  name: z.string().max(255).optional(),
+  name: z.string().max(FIELD_LENGTH.SLUG_MAX).optional(),
 })
 export type EmailRecipient = z.infer<typeof EmailRecipient>
 
@@ -34,7 +35,10 @@ export type EmailRecipient = z.infer<typeof EmailRecipient>
  * Email attachment
  */
 export const EmailAttachment = z.object({
-  filename: z.string().max(255).describe('Name of the attachment file'),
+  filename: z
+    .string()
+    .max(FIELD_LENGTH.FILENAME_MAX)
+    .describe('Name of the attachment file'),
   content: z.string().describe('Base64 encoded content or URL'),
   contentType: z.string().optional().describe('MIME type of the attachment'),
   size: z.number().int().positive().optional().describe('File size in bytes'),
@@ -54,7 +58,7 @@ export const SendEmailRequest = openapi(
       ),
       cc: z.array(EmailAddress).optional().describe('CC recipients'),
       bcc: z.array(EmailAddress).optional().describe('BCC recipients'),
-      subject: z.string().max(255),
+      subject: z.string().max(FIELD_LENGTH.SLUG_MAX),
 
       // Template-based email
       templateId: z
@@ -88,7 +92,7 @@ export const SendEmailRequest = openapi(
         .describe('Whether the content is HTML (deprecated)'),
       replyTo: EmailAddress.optional(),
       attachments: z.array(EmailAttachment).optional(),
-      priority: EmailPriority.default('normal'),
+      priority: EmailPriority.default(MessagePriority.NORMAL),
 
       // Tracking and metadata
       trackOpens: z.boolean().default(true),
@@ -163,7 +167,7 @@ export const SendBulkEmailRequest = openapi(
     globalVariables: z.record(z.string(), z.any()).optional(),
 
     // Options
-    priority: EmailPriority.default('normal'),
+    priority: EmailPriority.default(MessagePriority.NORMAL),
     trackOpens: z.boolean().default(true),
     trackClicks: z.boolean().default(true),
 
