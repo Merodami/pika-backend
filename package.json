@@ -71,6 +71,7 @@
     "db:migrate": "nx run @pika/database:prisma:migrate:dev",
     "db:migrate:deploy": "npx prisma migrate deploy --schema packages/database/prisma/schema.prisma",
     "db:seed": "nx run @pika/database:prisma:seed",
+    "db:reset:force": "docker stop pika_postgres 2>/dev/null; docker rm pika_postgres 2>/dev/null; rm -rf .local/data/postgres; docker-compose -f docker-compose.local.yml up -d postgres && sleep 5 && cd packages/database && npx dotenv -e ../../.env -- npx prisma migrate reset --force --skip-seed && cd ../..",
     "db:generate-test-dump": "dotenv -e .env -- sh ./packages/tests/src/scripts/generate_test_init_sql.sh",
     "clear": "find . -name \"node_modules\" -type d -prune -exec rm -rf '{}' + && find . -name \"dist\" -type d -prune -exec rm -rf '{}' +",
     "user:create": "nx run @pika/auth:generate-user",

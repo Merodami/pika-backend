@@ -102,6 +102,23 @@ yarn kill                   # Kill all running backend services
 yarn nx run @pika/[service-name]:local
 ```
 
+### Publishing Packages to GitHub Packages
+
+```bash
+# Publish packages with bundled dependencies
+yarn publish:packages [VERSION]
+
+# Example:
+yarn publish:packages 1.1.12
+```
+
+This command:
+1. Builds @pika/types package
+2. Builds @pika/api with bundling (inlines @pika/types code)
+3. Updates version numbers in package.github.json files
+4. Publishes both packages to GitHub Packages registry
+5. The API package is self-contained with types bundled inline
+
 ### Building & Testing
 
 ```bash

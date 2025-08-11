@@ -48,12 +48,14 @@ jobs:
       - name: Build @pika/types
         run: yarn workspace @pika/types build
 
-      - name: Build @pika/api
+      - name: Build @pika/api (bundled)
         run: |
           # First generate OpenAPI spec
           yarn workspace @pika/api generate:openapi
-          # Then build
-          yarn workspace @pika/api build
+          # Then build with bundling (includes @pika/types)
+          cd packages/api
+          node scripts/bundle.js
+          yarn copy:openapi
 
       - name: Copy package.json files for publishing
         run: |

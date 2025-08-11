@@ -32,7 +32,14 @@ echo "📦 Publishing version $VERSION..."
 echo "🔨 Building packages..."
 cd "$REPO_ROOT"
 yarn nx run @pika/types:build
-yarn nx run @pika/api:build
+
+# Build API with bundling (includes @pika/types)
+echo "📦 Building @pika/api with bundling..."
+cd "$REPO_ROOT/packages/api"
+yarn generate:openapi
+node scripts/bundle.js
+yarn copy:openapi
+cd "$REPO_ROOT"
 
 # Update versions
 sed -i '' "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" "$REPO_ROOT/packages/types/package.github.json"

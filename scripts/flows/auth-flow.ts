@@ -318,8 +318,6 @@ async function testUpdateProfile(accessToken: string): Promise<void> {
   logStep(6, 'Update User Profile')
 
   const updateData = {
-    bio: 'Test user bio updated via API',
-    displayName: 'TestUser',
     preferredLanguage: 'en',
   }
 
@@ -331,8 +329,7 @@ async function testUpdateProfile(accessToken: string): Promise<void> {
     })
 
     logSuccess('Profile updated successfully')
-    logInfo(`Updated bio: ${response.data.bio}`)
-    logInfo(`Display name: ${response.data.displayName}`)
+    logInfo(`Preferred language: ${response.data.preferredLanguage}`)
   } catch (error: any) {
     logError(
       `Failed to update profile: ${error.response?.data?.message || error.message}`,

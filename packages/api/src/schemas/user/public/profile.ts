@@ -25,9 +25,7 @@ export const PublicUserProfile = z.object({
   id: UserId,
   firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX),
   lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX),
-  displayName: z.string().max(FIELD_LENGTH.DISPLAY_NAME_MAX).optional(),
   avatarUrl: z.string().url().optional(),
-  bio: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
   // Public fields only - no email, phone, role, status
   createdAt: DateTime,
 })
@@ -56,10 +54,8 @@ export const CurrentUserProfile = z.object({
   email: Email,
   firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX),
   lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX),
-  displayName: z.string().max(FIELD_LENGTH.DISPLAY_NAME_MAX).optional(),
   phoneNumber: PhoneNumber.optional(),
   avatarUrl: z.string().url().optional(),
-  bio: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
   dateOfBirth: DateOnly.optional(),
   preferredLanguage: LanguageCode.optional(),
   role: UserRoleSchema,
@@ -94,9 +90,7 @@ export const UpdateProfileRequest = openapi(
     .object({
       firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX).optional(),
       lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX).optional(),
-      displayName: z.string().max(FIELD_LENGTH.DISPLAY_NAME_MAX).optional(),
       phoneNumber: PhoneNumber.optional(),
-      bio: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
       dateOfBirth: DateOnly.optional(),
       preferredLanguage: LanguageCode.optional(),
     })
