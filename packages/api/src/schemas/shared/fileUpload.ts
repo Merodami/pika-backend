@@ -14,6 +14,15 @@ export const AllowedImageTypes = z.enum([
   'image/webp',
   'image/gif',
 ])
+
+export const AllowedImageTypesSchema = AllowedImageTypes.openapi(
+  'AllowedImageTypes',
+  {
+    description: 'Allowed image MIME types',
+    example: 'image/jpeg',
+  },
+)
+
 export type AllowedImageTypes = z.infer<typeof AllowedImageTypes>
 
 export const AllowedDocumentTypes = z.enum([
@@ -21,6 +30,15 @@ export const AllowedDocumentTypes = z.enum([
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ])
+
+export const AllowedDocumentTypesSchema = AllowedDocumentTypes.openapi(
+  'AllowedDocumentTypes',
+  {
+    description: 'Allowed document MIME types',
+    example: 'application/pdf',
+  },
+)
+
 export type AllowedDocumentTypes = z.infer<typeof AllowedDocumentTypes>
 
 // ============= File Upload =============
@@ -58,7 +76,7 @@ export const AvatarUpload = openapi(
   z.object({
     fieldname: z.literal('avatar'),
     originalname: z.string(),
-    mimetype: AllowedImageTypes,
+    mimetype: AllowedImageTypesSchema,
     size: z
       .number()
       .int()
@@ -79,7 +97,7 @@ export const ReviewImageUpload = openapi(
   z.object({
     fieldname: z.literal('image'),
     originalname: z.string(),
-    mimetype: AllowedImageTypes,
+    mimetype: AllowedImageTypesSchema,
     size: z
       .number()
       .int()
@@ -100,7 +118,7 @@ export const DocumentUpload = openapi(
   z.object({
     fieldname: z.string(),
     originalname: z.string(),
-    mimetype: AllowedDocumentTypes,
+    mimetype: AllowedDocumentTypesSchema,
     size: z
       .number()
       .int()

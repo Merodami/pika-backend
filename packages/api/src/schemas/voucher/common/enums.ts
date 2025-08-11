@@ -22,29 +22,34 @@ import { createZodEnum } from '../../../common/utils/zodEnum.js'
  */
 
 // Voucher state schema
-export const VoucherStateSchema = openapi(createZodEnum(VoucherState), {
-  description: 'Current state of the voucher lifecycle',
-  example: VoucherState.PUBLISHED,
-})
-
-// Voucher discount type schema
-export const VoucherDiscountTypeSchema = openapi(
-  createZodEnum(VoucherDiscountType),
+export const VoucherStateSchema = createZodEnum(VoucherState).openapi(
+  'VoucherState',
   {
-    description: 'Type of discount the voucher provides',
-    example: VoucherDiscountType.PERCENTAGE,
+    description: 'Current state of the voucher lifecycle',
+    example: VoucherState.PUBLISHED,
   },
 )
 
-// Voucher code type schema
-export const VoucherCodeTypeSchema = openapi(createZodEnum(VoucherCodeType), {
-  description: 'Type of voucher code',
-  example: VoucherCodeType.QR,
+// Voucher discount type schema
+export const VoucherDiscountTypeSchema = createZodEnum(
+  VoucherDiscountType,
+).openapi('VoucherDiscountType', {
+  description: 'Type of discount the voucher provides',
+  example: VoucherDiscountType.PERCENTAGE,
 })
 
+// Voucher code type schema
+export const VoucherCodeTypeSchema = createZodEnum(VoucherCodeType).openapi(
+  'VoucherCodeType',
+  {
+    description: 'Type of voucher code',
+    example: VoucherCodeType.QR,
+  },
+)
+
 // Voucher scan source schema
-export const VoucherScanSourceSchema = openapi(
-  createZodEnum(VoucherScanSource),
+export const VoucherScanSourceSchema = createZodEnum(VoucherScanSource).openapi(
+  'VoucherScanSource',
   {
     description: 'Source of the voucher scan',
     example: VoucherScanSource.CAMERA,
@@ -52,23 +57,25 @@ export const VoucherScanSourceSchema = openapi(
 )
 
 // Voucher scan type schema
-export const VoucherScanTypeSchema = openapi(createZodEnum(VoucherScanType), {
-  description: 'Type of voucher scan',
-  example: VoucherScanType.customer,
-})
-
-// Customer voucher status schema
-export const CustomerVoucherStatusSchema = openapi(
-  createZodEnum(CustomerVoucherStatus),
+export const VoucherScanTypeSchema = createZodEnum(VoucherScanType).openapi(
+  'VoucherScanType',
   {
-    description: 'Status of voucher from customer perspective',
-    example: CustomerVoucherStatus.CLAIMED,
+    description: 'Type of voucher scan',
+    example: VoucherScanType.customer,
   },
 )
 
+// Customer voucher status schema
+export const CustomerVoucherStatusSchema = createZodEnum(
+  CustomerVoucherStatus,
+).openapi('CustomerVoucherStatus', {
+  description: 'Status of voucher from customer perspective',
+  example: CustomerVoucherStatus.CLAIMED,
+})
+
 // Voucher book status schema
-export const VoucherBookStatusSchema = openapi(
-  createZodEnum(VoucherBookStatus),
+export const VoucherBookStatusSchema = createZodEnum(VoucherBookStatus).openapi(
+  'VoucherBookStatus',
   {
     description: 'Status of a voucher book in the publishing workflow',
     example: VoucherBookStatus.DRAFT,
@@ -76,27 +83,32 @@ export const VoucherBookStatusSchema = openapi(
 )
 
 // Voucher book type schema
-export const VoucherBookTypeSchema = openapi(createZodEnum(VoucherBookType), {
-  description: 'Type of voucher book',
-  example: VoucherBookType.MONTHLY,
-})
-
-// Voucher sorting schemas
-export const VoucherSortBySchema = openapi(createZodEnum(VoucherSortBy), {
-  description: 'Field to sort vouchers by',
-  example: VoucherSortBy.CREATED_AT,
-})
-
-export const AdminVoucherSortBySchema = openapi(
-  createZodEnum(AdminVoucherSortBy),
+export const VoucherBookTypeSchema = createZodEnum(VoucherBookType).openapi(
+  'VoucherBookType',
   {
-    description: 'Admin voucher sort fields',
-    example: AdminVoucherSortBy.CREATED_AT,
+    description: 'Type of voucher book',
+    example: VoucherBookType.MONTHLY,
   },
 )
 
-export const UserVoucherSortBySchema = openapi(
-  createZodEnum(UserVoucherSortBy),
+// Voucher sorting schemas
+export const VoucherSortBySchema = createZodEnum(VoucherSortBy).openapi(
+  'VoucherSortBy',
+  {
+    description: 'Field to sort vouchers by',
+    example: VoucherSortBy.CREATED_AT,
+  },
+)
+
+export const AdminVoucherSortBySchema = createZodEnum(
+  AdminVoucherSortBy,
+).openapi('AdminVoucherSortBy', {
+  description: 'Admin voucher sort fields',
+  example: AdminVoucherSortBy.CREATED_AT,
+})
+
+export const UserVoucherSortBySchema = createZodEnum(UserVoucherSortBy).openapi(
+  'UserVoucherSortBy',
   {
     description: 'User voucher sort fields',
     example: UserVoucherSortBy.CLAIMED_AT,

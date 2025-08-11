@@ -122,22 +122,28 @@ export function createdResponse<T extends z.ZodTypeAny>(
 // ============= Pagination =============
 
 /**
- * Pagination metadata
+ * Pagination metadata (raw Zod)
+ * For runtime validation
  */
-export const PaginationMetadata = z
-  .object({
-    page: z.number().int().positive().describe('Current page number'),
-    limit: z.number().int().positive().max(100).describe('Items per page'),
-    total: z.number().int().nonnegative().describe('Total number of items'),
-    totalPages: z
-      .number()
-      .int()
-      .nonnegative()
-      .describe('Total number of pages'),
-    hasNext: z.boolean().describe('Whether there is a next page'),
-    hasPrev: z.boolean().describe('Whether there is a previous page'),
-  })
-  .describe('Pagination information')
+const PaginationMetadataBase = z.object({
+  page: z.number().int().positive().describe('Current page number'),
+  limit: z.number().int().positive().max(100).describe('Items per page'),
+  total: z.number().int().nonnegative().describe('Total number of items'),
+  totalPages: z.number().int().nonnegative().describe('Total number of pages'),
+  hasNext: z.boolean().describe('Whether there is a next page'),
+  hasPrev: z.boolean().describe('Whether there is a previous page'),
+})
+
+/**
+ * Pagination metadata (OpenAPI documented)
+ * This will generate $ref when used in OpenAPI schemas
+ */
+export const PaginationMetadata = PaginationMetadataBase.openapi(
+  'PaginationMetadata',
+  {
+    description: 'Pagination information',
+  },
+)
 
 export type PaginationMetadata = z.infer<typeof PaginationMetadata>
 

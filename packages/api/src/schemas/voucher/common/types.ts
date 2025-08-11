@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { GeoJSONPoint } from '../../shared/geo.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import {
   CustomerVoucherStatusSchema,
@@ -12,18 +13,6 @@ import {
  * Common voucher-related types used across all tiers
  * Based on pika-old voucher structure
  */
-
-/**
- * Geographic location (PostGIS Point)
- */
-export const LocationPoint = z
-  .object({
-    type: z.literal('Point'),
-    coordinates: z.tuple([z.number(), z.number()]), // [longitude, latitude]
-  })
-  .describe('Geographic location as GeoJSON Point')
-
-export type LocationPoint = z.infer<typeof LocationPoint>
 
 /**
  * Voucher code information
@@ -62,7 +51,7 @@ export const VoucherScan = z.object({
   userId: UUID.nullable(),
   scanType: VoucherScanTypeSchema,
   scanSource: VoucherScanSourceSchema,
-  location: LocationPoint.nullable(),
+  location: GeoJSONPoint.nullable(),
   deviceInfo: z.record(z.string(), z.any()),
   scannedAt: DateTime,
   createdAt: DateTime,

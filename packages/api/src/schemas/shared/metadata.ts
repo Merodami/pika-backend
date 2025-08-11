@@ -1,4 +1,4 @@
-import { Priority as PriorityEnum,Status } from '@pika/types'
+import { Priority as PriorityEnum, Status } from '@pika/types'
 import { z } from 'zod'
 
 import { createZodEnum } from '../../common/utils/zodEnum.js'

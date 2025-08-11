@@ -1,7 +1,14 @@
-import { FIELD_LENGTH,VoucherSortBy } from '@pika/types'
+import { FIELD_LENGTH, VoucherScanSource, VoucherSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
+import { DeviceInfo, DeviceInfoSchema } from '../../shared/device.js'
+import {
+  Coordinates,
+  CoordinatesSchema,
+  GeoSearchParams,
+} from '../../shared/geo.js'
 import { withTimestampsString } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
@@ -14,10 +21,7 @@ import {
   VoucherSortBySchema,
   VoucherStateSchema,
 } from '../common/enums.js'
-import {
-  GeographicSearchParams,
-  VoucherFilterParams,
-} from '../common/queries.js'
+import { VoucherFilterParams } from '../common/queries.js'
 
 /**
  * Public voucher schemas for customer-facing operations
@@ -112,46 +116,40 @@ export const VoucherQueryParams = SearchParams.extend({
   // Override default sorting with voucher-specific sort fields
   sortBy: VoucherSortBySchema.default(VoucherSortBy.CREATED_AT),
 })
-  .merge(GeographicSearchParams)
+  .merge(GeoSearchParams)
   .merge(VoucherFilterParams)
 
 export type VoucherQueryParams = z.infer<typeof VoucherQueryParams>
 
 // ============= Voucher Scan Operations =============
 
-export const VoucherScanRequest = openapi(
+/**
+ * Voucher scan request (raw Zod)
+ * Matches @pika/types VoucherScanOptions
+ * For runtime validation
+ */
+export const VoucherScanRequest = z.object({
+  scanSource: createZodEnum(VoucherScanSource).optional(),
+  location: Coordinates.optional(),
+  deviceInfo: DeviceInfo.optional(),
+})
+
+export type VoucherScanRequest = z.infer<typeof VoucherScanRequest>
+
+/**
+ * Voucher scan request (OpenAPI documented)
+ * Uses Schema versions to generate $ref
+ */
+export const VoucherScanRequestSchema = openapi(
   z.object({
     scanSource: VoucherScanSourceSchema.optional(),
-    location: z
-      .object({
-        latitude: z.number().min(-90).max(90),
-        longitude: z.number().min(-180).max(180),
-      })
-      .optional(),
-    deviceInfo: z
-      .object({
-        platform: z
-          .string()
-          .min(FIELD_LENGTH.NAME_MIN)
-          .max(FIELD_LENGTH.CODE_MAX),
-        version: z
-          .string()
-          .min(FIELD_LENGTH.NAME_MIN)
-          .max(FIELD_LENGTH.CODE_SHORT_MAX),
-        model: z
-          .string()
-          .min(FIELD_LENGTH.NAME_MIN)
-          .max(FIELD_LENGTH.NAME_MAX)
-          .optional(),
-      })
-      .optional(),
+    location: CoordinatesSchema.optional(),
+    deviceInfo: DeviceInfoSchema.optional(),
   }),
   {
     description: 'Request to track voucher scan',
   },
 )
-
-export type VoucherScanRequest = z.infer<typeof VoucherScanRequest>
 
 export const VoucherScanResponse = openapi(
   z.object({
@@ -165,10 +163,7 @@ export const VoucherScanResponse = openapi(
           name: z.string(),
           address: z.string(),
           distance: z.number(),
-          coordinates: z.object({
-            latitude: z.number(),
-            longitude: z.number(),
-          }),
+          coordinates: CoordinatesSchema,
         }),
       )
       .optional(),
@@ -182,27 +177,27 @@ export type VoucherScanResponse = z.infer<typeof VoucherScanResponse>
 
 // ============= Voucher Claim Operations =============
 
-export const VoucherClaimRequest = openapi(
-  z.object({
-    notificationPreferences: z
-      .object({
-        enableReminders: z.boolean().default(true),
-        reminderDaysBefore: z
-          .number()
-          .int()
-          .min(1)
-          .max(30)
-          .optional()
-          .default(3),
-      })
-      .optional(),
-  }),
-  {
-    description: 'Request to claim voucher to wallet',
-  },
-)
+/**
+ * Voucher claim request (raw Zod)
+ * Matches @pika/types VoucherClaimOptions
+ */
+export const VoucherClaimRequest = z.object({
+  notificationPreferences: z
+    .object({
+      enableReminders: z.boolean().default(true),
+      reminderDaysBefore: z.number().int().min(1).max(30).optional().default(3),
+    })
+    .optional(),
+})
 
 export type VoucherClaimRequest = z.infer<typeof VoucherClaimRequest>
+
+/**
+ * Voucher claim request (OpenAPI documented)
+ */
+export const VoucherClaimRequestSchema = openapi(VoucherClaimRequest, {
+  description: 'Request to claim voucher to wallet',
+})
 
 export const VoucherClaimResponse = openapi(
   z.object({
@@ -221,17 +216,31 @@ export type VoucherClaimResponse = z.infer<typeof VoucherClaimResponse>
 
 // ============= Voucher Redeem Operations =============
 
-export const VoucherRedeemRequest = openapi(
+/**
+ * Voucher redeem request (raw Zod)
+ * Matches @pika/types VoucherRedeemOptions
+ * For runtime validation
+ */
+export const VoucherRedeemRequest = z.object({
+  code: z.string().min(FIELD_LENGTH.CODE_MIN),
+  location: Coordinates.optional(),
+})
+
+export type VoucherRedeemRequest = z.infer<typeof VoucherRedeemRequest>
+
+/**
+ * Voucher redeem request (OpenAPI documented)
+ * Uses Schema versions to generate $ref
+ */
+export const VoucherRedeemRequestSchema = openapi(
   z.object({
-    code: z.string(),
-    location: z.any().optional().describe('GeoJSON location data'),
+    code: z.string().min(FIELD_LENGTH.CODE_MIN),
+    location: CoordinatesSchema.optional(),
   }),
   {
     description: 'Request to redeem voucher',
   },
 )
-
-export type VoucherRedeemRequest = z.infer<typeof VoucherRedeemRequest>
 
 export const VoucherRedeemResponse = openapi(
   z.object({

@@ -19,6 +19,11 @@ export const EmailStatus = z.enum([
   'rejected',
 ])
 
+export const EmailStatusSchema = EmailStatus.openapi('EmailStatus', {
+  description: 'Email delivery status',
+  example: 'sent',
+})
+
 export type EmailStatus = z.infer<typeof EmailStatus>
 
 export const EmailPriority = createZodEnum(MessagePriority)
@@ -54,6 +59,14 @@ export type EmailSortBy = z.infer<typeof EmailSortBy>
 
 export const NotificationType = z.enum(['email', 'inApp', 'sms', 'push'])
 
+export const NotificationTypeSchema = NotificationType.openapi(
+  'NotificationType',
+  {
+    description: 'Type of notification channel',
+    example: 'email',
+  },
+)
+
 export type NotificationType = z.infer<typeof NotificationType>
 
 export const NotificationStatus = z.enum([
@@ -63,6 +76,14 @@ export const NotificationStatus = z.enum([
   'failed',
   'read',
 ])
+
+export const NotificationStatusSchema = NotificationStatus.openapi(
+  'NotificationStatus',
+  {
+    description: 'Notification delivery status',
+    example: 'sent',
+  },
+)
 
 export type NotificationStatus = z.infer<typeof NotificationStatus>
 
@@ -105,6 +126,14 @@ export const CommunicationChannel = z.enum([
   'webhook',
 ])
 
+export const CommunicationChannelSchema = CommunicationChannel.openapi(
+  'CommunicationChannel',
+  {
+    description: 'Communication channel type',
+    example: 'email',
+  },
+)
+
 export type CommunicationChannel = z.infer<typeof CommunicationChannel>
 
 export const CommunicationStatus = z.enum([
@@ -115,6 +144,14 @@ export const CommunicationStatus = z.enum([
   'failed',
   'cancelled',
 ])
+
+export const CommunicationStatusSchema = CommunicationStatus.openapi(
+  'CommunicationStatus',
+  {
+    description: 'Communication delivery status',
+    example: 'sent',
+  },
+)
 
 export type CommunicationStatus = z.infer<typeof CommunicationStatus>
 

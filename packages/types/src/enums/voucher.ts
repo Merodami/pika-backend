@@ -113,6 +113,23 @@ export enum CustomerVoucherStatus {
 export type CustomerVoucherStatusType = `${CustomerVoucherStatus}`
 
 /**
+ * Customer voucher status filter
+ * Extends the base statuses with 'all' option for filtering
+ */
+export enum CustomerVoucherStatusFilter {
+  ALL = 'all',
+  AVAILABLE = 'available',
+  CLAIMED = 'claimed',
+  REDEEMED = 'redeemed',
+  EXPIRED = 'expired',
+}
+
+/**
+ * Type definition for customer voucher status filter
+ */
+export type CustomerVoucherStatusFilterType = `${CustomerVoucherStatusFilter}`
+
+/**
  * Voucher book status - matches database VoucherBookStatus enum exactly
  */
 export enum VoucherBookStatus {

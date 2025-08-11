@@ -8,12 +8,20 @@ import { z } from 'zod'
 // ============= Basic Types =============
 
 /**
- * UUID v4 - Generic UUID without branding
+ * UUID v4 - Generic UUID without branding (raw Zod)
  */
 export const UUID = z
   .string()
   .uuid({ message: 'Must be a valid UUID' })
   .describe('Universally Unique Identifier')
+
+/**
+ * UUID v4 - OpenAPI documented
+ */
+export const UUIDSchema = UUID.openapi('UUID', {
+  description: 'Universally Unique Identifier (v4)',
+  example: '123e4567-e89b-12d3-a456-426614174000',
+})
 
 /**
  * DateTime - ISO 8601 string that can be parsed to Date
@@ -268,7 +276,7 @@ export const HexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/, {
 })
 
 /**
- * Language Code - ISO 639-1
+ * Language Code - ISO 639-1 (raw Zod)
  */
 export const LanguageCode = z
   .string()
@@ -276,7 +284,15 @@ export const LanguageCode = z
   .regex(/^[a-z]{2}$/, 'Must be lowercase ISO 639-1 code')
 
 /**
- * Country Code - ISO 3166-1 alpha-2
+ * Language Code - OpenAPI documented
+ */
+export const LanguageCodeSchema = LanguageCode.openapi('LanguageCode', {
+  description: 'ISO 639-1 language code',
+  example: 'en',
+})
+
+/**
+ * Country Code - ISO 3166-1 alpha-2 (raw Zod)
  */
 export const CountryCode = z
   .string()
@@ -284,12 +300,28 @@ export const CountryCode = z
   .regex(/^[A-Z]{2}$/, 'Must be uppercase ISO 3166-1 alpha-2 code')
 
 /**
- * Currency Code - ISO 4217
+ * Country Code - OpenAPI documented
+ */
+export const CountryCodeSchema = CountryCode.openapi('CountryCode', {
+  description: 'ISO 3166-1 alpha-2 country code',
+  example: 'US',
+})
+
+/**
+ * Currency Code - ISO 4217 (raw Zod)
  */
 export const CurrencyCode = z
   .string()
   .length(3, 'Currency code must be 3 characters')
   .regex(/^[A-Z]{3}$/, 'Must be uppercase ISO 4217 code')
+
+/**
+ * Currency Code - OpenAPI documented
+ */
+export const CurrencyCodeSchema = CurrencyCode.openapi('CurrencyCode', {
+  description: 'ISO 4217 currency code',
+  example: 'USD',
+})
 
 // ============= Complex Types =============
 

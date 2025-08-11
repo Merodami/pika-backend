@@ -10,7 +10,13 @@ import * as adminPaymentSchemas from '@api/schemas/payment/admin/transactions.js
 import * as adminPdfSchemas from '@api/schemas/pdf/admin/voucher-book.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import { UserId } from '@api/schemas/shared/branded.js'
+import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import {
+  CoordinatesSchema,
+  GeoJSONPointSchema,
+  GeoSearchParamsSchema,
+} from '@api/schemas/shared/geo.js'
 import { DateTime, UUID } from '@api/schemas/shared/primitives.js'
 import { PaginationMetadata } from '@api/schemas/shared/responses.js'
 import * as adminStorageSchemas from '@api/schemas/storage/admin/management.js'
@@ -33,6 +39,14 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   // ============= Common Schemas =============
   // Register pagination metadata to ensure hasNext/hasPrev are included
   registry.registerSchema('PaginationMetadata', PaginationMetadata)
+
+  // Register shared geo schemas
+  registry.registerSchema('Coordinates', CoordinatesSchema)
+  registry.registerSchema('GeoJSONPoint', GeoJSONPointSchema)
+  registry.registerSchema('GeoSearchParams', GeoSearchParamsSchema)
+
+  // Register shared device schemas
+  registry.registerSchema('DeviceInfo', DeviceInfoSchema)
 
   // ============= Enum Schemas =============
   // User enums
@@ -63,6 +77,30 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'VoucherDiscountType',
     voucherEnumSchemas.VoucherDiscountTypeSchema,
+  )
+  registry.registerSchema(
+    'VoucherScanSource',
+    voucherEnumSchemas.VoucherScanSourceSchema,
+  )
+  registry.registerSchema(
+    'VoucherCodeType',
+    voucherEnumSchemas.VoucherCodeTypeSchema,
+  )
+  registry.registerSchema(
+    'CustomerVoucherStatus',
+    voucherEnumSchemas.CustomerVoucherStatusSchema,
+  )
+  registry.registerSchema(
+    'VoucherBookStatus',
+    voucherEnumSchemas.VoucherBookStatusSchema,
+  )
+  registry.registerSchema(
+    'VoucherBookType',
+    voucherEnumSchemas.VoucherBookTypeSchema,
+  )
+  registry.registerSchema(
+    'AdminVoucherSortBy',
+    voucherEnumSchemas.AdminVoucherSortBySchema,
   )
 
   // ============= Business Management Schemas =============

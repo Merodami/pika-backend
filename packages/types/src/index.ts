@@ -8,3 +8,11 @@ export * from './errorCodes.js'
 export * from './geolocation/index.js'
 export * from './types.js'
 export * from './utils.js'
+
+// Export common primitives
+export * from './common/device.js'
+export * from './common/notifications.js'
+export * from './common/pagination.js'
+
+// Export domain-specific input types
+export * from './voucher/inputs.js'

@@ -20,6 +20,12 @@ export const AddressType = z.enum([
   'SHIPPING',
   'OTHER',
 ])
+
+export const AddressTypeSchema = AddressType.openapi('AddressType', {
+  description: 'Type of address',
+  example: 'HOME',
+})
+
 export type AddressType = z.infer<typeof AddressType>
 
 // ============= User Address =============
@@ -36,7 +42,7 @@ export const UserAddress = openapi(
     ...AddressBase.shape,
 
     // Address metadata
-    type: AddressType,
+    type: AddressTypeSchema,
     label: z
       .string()
       .max(FIELD_LENGTH.NAME_MAX)
@@ -87,7 +93,7 @@ export const CreateAddressRequest = openapi(
       .length(FIELD_LENGTH.COUNTRY_CODE_LENGTH)
       .describe('ISO 3166-1 alpha-2 country code'),
 
-    type: AddressType,
+    type: AddressTypeSchema,
     label: z.string().max(FIELD_LENGTH.NAME_MAX).optional(),
     isDefault: z.boolean().optional(),
 
@@ -210,7 +216,9 @@ export type UserAddressesResponse = z.infer<typeof UserAddressesResponse>
 export const SetDefaultAddressRequest = openapi(
   z.object({
     addressId: UUID,
-    type: AddressType.optional().describe('Set as default for specific type'),
+    type: AddressTypeSchema.optional().describe(
+      'Set as default for specific type',
+    ),
   }),
   {
     description: 'Set default address',

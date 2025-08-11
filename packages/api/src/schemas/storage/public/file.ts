@@ -1,5 +1,5 @@
 import { FileSortBy } from '@pika/types'
-import { NUMERIC_CONSTRAINTS,SortOrder } from '@pika/types'
+import { NUMERIC_CONSTRAINTS, SortOrder } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'

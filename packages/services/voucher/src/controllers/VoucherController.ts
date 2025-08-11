@@ -186,13 +186,14 @@ export class VoucherController {
           scanSource:
             (scanData.scanSource as VoucherScanSource) ||
             VoucherScanSource.CAMERA,
-          location: scanData.location
+          location: scanData.location || null,
+          deviceInfo: scanData.deviceInfo
             ? {
-                lat: scanData.location.latitude,
-                lng: scanData.location.longitude,
+                platform: scanData.deviceInfo.platform || 'unknown',
+                version: scanData.deviceInfo.appVersion || 'unknown',
+                model: scanData.deviceInfo.deviceId,
               }
             : null,
-          deviceInfo: scanData.deviceInfo || null,
         },
         language,
       )

@@ -13,7 +13,13 @@ import * as paymentHeaderSchemas from '@api/schemas/payment/public/headers.js'
 import * as webhookSchemas from '@api/schemas/payment/public/webhooks.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
+import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import {
+  CoordinatesSchema,
+  GeoJSONPointSchema,
+  GeoSearchParamsSchema,
+} from '@api/schemas/shared/geo.js'
 import {
   MessageResponse,
   PaginationMetadata,
@@ -41,6 +47,14 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   // Register pagination metadata to ensure hasNext/hasPrev are included
   registry.registerSchema('PaginationMetadata', PaginationMetadata)
 
+  // Register shared geo schemas
+  registry.registerSchema('Coordinates', CoordinatesSchema)
+  registry.registerSchema('GeoJSONPoint', GeoJSONPointSchema)
+  registry.registerSchema('GeoSearchParams', GeoSearchParamsSchema)
+
+  // Register shared device schemas
+  registry.registerSchema('DeviceInfo', DeviceInfoSchema)
+
   // ============= Enum Schemas =============
   // User enums
   registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)
@@ -62,6 +76,18 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'VoucherDiscountType',
     voucherEnumSchemas.VoucherDiscountTypeSchema,
+  )
+  registry.registerSchema(
+    'VoucherScanSource',
+    voucherEnumSchemas.VoucherScanSourceSchema,
+  )
+  registry.registerSchema(
+    'VoucherCodeType',
+    voucherEnumSchemas.VoucherCodeTypeSchema,
+  )
+  registry.registerSchema(
+    'CustomerVoucherStatus',
+    voucherEnumSchemas.CustomerVoucherStatusSchema,
   )
 
   // ============= Authentication Schemas =============
@@ -182,7 +208,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'VoucherScanRequest',
-    voucherSchemas.VoucherScanRequest,
+    voucherSchemas.VoucherScanRequestSchema,
   )
   registry.registerSchema(
     'VoucherScanResponse',
@@ -190,7 +216,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'VoucherClaimRequest',
-    voucherSchemas.VoucherClaimRequest,
+    voucherSchemas.VoucherClaimRequestSchema,
   )
   registry.registerSchema(
     'VoucherClaimResponse',
@@ -198,7 +224,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'VoucherRedeemRequest',
-    voucherSchemas.VoucherRedeemRequest,
+    voucherSchemas.VoucherRedeemRequestSchema,
   )
   registry.registerSchema(
     'VoucherRedeemResponse',
@@ -1022,7 +1048,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: voucherSchemas.VoucherScanRequest,
+            schema: voucherSchemas.VoucherScanRequestSchema,
           },
         },
       },
@@ -1060,7 +1086,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: voucherSchemas.VoucherClaimRequest,
+            schema: voucherSchemas.VoucherClaimRequestSchema,
           },
         },
       },
@@ -1106,7 +1132,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: voucherSchemas.VoucherRedeemRequest,
+            schema: voucherSchemas.VoucherRedeemRequestSchema,
           },
         },
       },

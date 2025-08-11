@@ -1,8 +1,4 @@
-import {
-  FIELD_LENGTH,
-  OAuthError,
-  UserRole as UserRoleEnum,
-} from '@pika/types'
+import { FIELD_LENGTH, OAuthError, UserRole as UserRoleEnum } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'

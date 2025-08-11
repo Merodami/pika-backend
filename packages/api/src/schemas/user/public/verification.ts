@@ -1,4 +1,4 @@
-import { FIELD_LENGTH,VerificationType } from '@pika/types'
+import { FIELD_LENGTH, VerificationType } from '@pika/types'
 import { z } from 'zod'
 
 import { createZodEnum } from '../../../common/utils/zodEnum.js'

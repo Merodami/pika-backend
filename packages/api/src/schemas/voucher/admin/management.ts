@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { GeoJSONPoint } from '../../shared/geo.js'
 import { withTimestampsString } from '../../shared/metadata.js'
 import { createBulkOperationResponse } from '../../shared/operations.js'
 import { DateTime, Decimal, UUID } from '../../shared/primitives.js'
@@ -12,7 +13,6 @@ import {
 } from '../common/enums.js'
 import {
   CustomerVoucher,
-  LocationPoint,
   VoucherCode,
   VoucherRedemption,
   VoucherScan,
@@ -53,7 +53,7 @@ export const AdminVoucherDetailResponse = openapi(
     currency: z.string().default('PYG'),
 
     // Geographic targeting
-    location: LocationPoint.nullable(),
+    location: GeoJSONPoint.nullable(),
 
     // Media
     imageUrl: z.string().url().nullable(),
@@ -163,7 +163,7 @@ export const AdminCreateVoucherRequest = openapi(
     currency: z.string().default('PYG'),
 
     // Geographic targeting
-    location: LocationPoint.nullable().optional(),
+    location: GeoJSONPoint.nullable().optional(),
 
     // Media
     imageUrl: z.string().url().nullable().optional(),
@@ -213,7 +213,7 @@ export const AdminUpdateVoucherRequest = openapi(
     currency: z.string().optional(),
 
     // Geographic targeting
-    location: LocationPoint.nullable().optional(),
+    location: GeoJSONPoint.nullable().optional(),
 
     // Media
     imageUrl: z.string().url().nullable().optional(),
