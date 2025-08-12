@@ -1,18 +1,36 @@
-# 🏢 Pika - Enterprise Microservices Platform
+# 🏢 Pika Backend - Enterprise Microservices Platform
 
 <div align="center">
+  
+  <img src="https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
+  <img src="https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/NX-21.1.3-143055?style=for-the-badge&logo=nx&logoColor=white" alt="NX">
+  <img src="https://img.shields.io/badge/PostgreSQL-17.2-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Redis-7.x-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+  <img src="https://img.shields.io/badge/Express-5.1.0-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express">
+  <img src="https://img.shields.io/badge/Prisma-6.9.0-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma">
+  
+  <br />
+  <br />
+  
+  <h3>🚀 A comprehensive enterprise platform built with modern microservices architecture</h3>
+  
+  <p align="center">
+    <strong>Clean Architecture</strong> • <strong>Type-Safe</strong> • <strong>Production Ready</strong> • <strong>Self-Documenting APIs</strong>
+  </p>
 
-![Node.js](https://img.shields.io/badge/Node.js-22.x-green?logo=node.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue?logo=typescript)
-![NX](https://img.shields.io/badge/NX-21.1.3-lightblue?logo=nx)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.2-blue?logo=postgresql)
-![Redis](https://img.shields.io/badge/Redis-7.x-red?logo=redis)
-![Express](https://img.shields.io/badge/Express-5.1.0-black?logo=express)
-![Prisma](https://img.shields.io/badge/Prisma-6.9.0-indigo?logo=prisma)
+  <p align="center">
+    <a href="#-quick-start">Quick Start</a> •
+    <a href="#-key-features">Features</a> •
+    <a href="#-architecture-overview">Architecture</a> •
+    <a href="#-microservices-architecture">Services</a> •
+    <a href="#-api-documentation">Documentation</a> •
+    <a href="#-license">License</a>
+  </p>
 
-_A comprehensive business platform built with modern microservices architecture, Clean Architecture principles, and enterprise-grade patterns._
+  <br />
 
-**🚀 Modern Stack** • **⚡ High Performance** • **🛡️ Production Ready** • **🧪 Testing First** • **📖 Self-Documenting**
+⚠️ **IMPORTANT**: Commercial use requires a license. See <a href="#-license">License section</a> for details.
 
 </div>
 
@@ -73,6 +91,57 @@ yarn tsx tools/api-testing/generate-test-tokens.ts
 - **API Gateway**: http://127.0.0.1:5500
 - **API Documentation**: http://127.0.0.1:5500/docs
 - **Individual Services**: Ports 5501-5510 (see [Service Ports](#service-ports))
+
+---
+
+## ✨ Key Features
+
+<table>
+<tr>
+<td>
+
+### 🏗️ Architecture
+
+- **Clean Architecture** with strict separation of concerns
+- **Microservices** with independent deployment
+- **Event-driven** communication patterns
+- **Domain-driven design** principles
+
+</td>
+<td>
+
+### 🔒 Security
+
+- **JWT Authentication** with RS256 signing
+- **Role-based access control** (RBAC)
+- **API Key** authentication for services
+- **Input validation** with Zod schemas
+
+</td>
+</tr>
+<tr>
+<td>
+
+### ⚡ Performance
+
+- **Redis caching** at multiple layers
+- **Connection pooling** for databases
+- **Optimized builds** with esbuild
+- **Lazy loading** and code splitting
+
+</td>
+<td>
+
+### 🧪 Quality
+
+- **100% TypeScript** with strict mode
+- **Integration-first** testing approach
+- **Automated** code quality checks
+- **Self-documenting** OpenAPI specs
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -227,23 +296,40 @@ yarn vitest packages/services/gym
 
 ## 🔧 Technology Stack
 
-### 🚀 Core Technologies
+<table>
+<tr>
+<td width="50%">
 
-- **Runtime**: Node.js 22.x with ESM modules and modern JavaScript features
-- **Language**: TypeScript 5.8.3 with strict configuration and advanced types
-- **Framework**: Express 5.1.0 with comprehensive middleware stack
-- **Database**: PostgreSQL 17.2 with PostGIS extensions and Prisma 6.9.0 ORM
-- **Caching**: Redis 7.x with ioredis client and advanced caching patterns
-- **Monorepo**: NX 21.1.3 with Yarn 4.9.1 Berry workspaces
+### 🚀 Core Stack
 
-### 🛠️ Development Tools
+| Technology     | Version | Purpose                    |
+| -------------- | ------- | -------------------------- |
+| **Node.js**    | 22.x    | Runtime with ESM modules   |
+| **TypeScript** | 5.8.3   | Type safety & DX           |
+| **Express**    | 5.1.0   | HTTP framework             |
+| **PostgreSQL** | 17.2    | Primary database + PostGIS |
+| **Prisma**     | 6.9.0   | Type-safe ORM              |
+| **Redis**      | 7.x     | Caching & sessions         |
+| **NX**         | 21.1.3  | Monorepo orchestration     |
 
-- **Build System**: esbuild 0.25.5 with tsc-alias path resolution for blazing-fast builds
-- **Testing**: Vitest 3.2.2 with Testcontainers 11.0.1 for real database testing
-- **Code Quality**: ESLint 9.28.0, Prettier 3.5.3, Husky git hooks for consistency
-- **Hot Reload**: tsx 4.19.4 for instant TypeScript execution and development
-- **Process Management**: concurrently, fkill-cli for multi-service orchestration
-- **API Generation**: OpenAPI 3.1 spec generation with Scalar documentation
+</td>
+<td width="50%">
+
+### 🛠️ Dev Tools
+
+| Tool         | Version | Purpose           |
+| ------------ | ------- | ----------------- |
+| **Vitest**   | 3.2.2   | Testing framework |
+| **ESLint**   | 9.28.0  | Code linting      |
+| **Prettier** | 3.5.3   | Code formatting   |
+| **esbuild**  | 0.25.5  | Fast bundling     |
+| **tsx**      | 4.19.4  | TS execution      |
+| **Husky**    | Latest  | Git hooks         |
+| **OpenAPI**  | 3.1     | API specs         |
+
+</td>
+</tr>
+</table>
 
 ### 🎯 Platform Features
 
@@ -762,6 +848,12 @@ Each package includes comprehensive documentation:
 - **Integration testing** with real databases and services
 - **Hot reload** development with instant feedback
 
+## 🖥️ Frontend Applications
+
+The Pika platform includes modern frontend applications built with React and TypeScript:
+
+- **📊 Dashboard**: Admin dashboard for platform management → **[pika-frontend-dashboard](https://github.com/Merodami/pika-frontend-dashboard)**
+
 ## 📚 Additional Resources
 
 - **🏗️ Architecture Guide**: `CLAUDE.md` - Comprehensive development patterns and best practices
@@ -774,18 +866,108 @@ Each package includes comprehensive documentation:
 
 ## 📝 License
 
-Pika Enterprise Platform - Internal development project.
+This project is licensed under the **GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)** with additional restrictions.
+
+### ⚠️ IMPORTANT: Commercial Use Restriction
+
+**Commercial use of this software is NOT permitted without explicit written permission from the copyright holder.**
+
+### What this means:
+
+- ✅ **Free for personal, educational, and non-commercial use**
+- ✅ **Free to study, modify, and distribute for non-commercial purposes**
+- ❌ **Commercial/business use requires a commercial license**
+- ⚠️ **Network use requires source code disclosure** - If you run this software as a web service, you must make your source code available to users
+- ⚠️ **Derivative works must use compatible license**
+- ⚠️ **No sublicensing** - Cannot change license terms
+
+### Commercial Licensing
+
+If you wish to use this software for commercial purposes (including but not limited to):
+
+- Running a business or for-profit service
+- Internal use within a commercial organization
+- Offering this software as a service to customers
+- Any use that generates revenue
+
+You MUST obtain a commercial license. Please contact the copyright holder at [open an issue](https://github.com/Merodami/pika-backend/issues) to discuss commercial licensing options.
+
+**Full license text**: [LICENSE](./LICENSE)
+
+---
+
+## 🎯 Quick Commands Reference
+
+<details>
+<summary><b>📚 Click to expand command reference</b></summary>
+
+### Development
+
+```bash
+yarn local              # Start all services
+yarn kill               # Stop all services
+yarn build              # Build all packages
+yarn test               # Run all tests
+yarn check              # Run all quality checks
+```
+
+### Database
+
+```bash
+yarn db:migrate         # Run migrations
+yarn db:seed            # Seed with test data
+yarn db:generate        # Generate Prisma client
+```
+
+### Code Quality
+
+```bash
+yarn typecheck          # TypeScript checks
+yarn lint               # ESLint + Prettier
+yarn lint:fix           # Auto-fix issues
+yarn format             # Format all files
+```
+
+### API Development
+
+```bash
+yarn generate:api       # Generate OpenAPI specs
+yarn generate:sdk       # Generate TypeScript SDK
+yarn generate:docs      # Generate API docs
+```
+
+### Infrastructure
+
+```bash
+yarn docker:local       # Start PostgreSQL + Redis
+yarn docker:restart     # Restart containers
+```
+
+</details>
 
 ---
 
 <div align="center">
 
-**🚀 Quick Start Command**
+## 🚀 Get Started Now
 
 ```bash
+git clone https://github.com/Merodami/pika-backend.git
+cd pika-backend
 yarn install && yarn docker:local && yarn local:generate && yarn local
 ```
 
+<br />
+
 **Built with ❤️ using Modern TypeScript, Clean Architecture, and Enterprise Patterns**
+
+<br />
+
+<p>
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="https://github.com/Merodami/pika-backend/issues">Report Bug</a> •
+  <a href="https://github.com/Merodami/pika-backend/issues">Request Feature</a> •
+  <a href="#-license">Commercial License</a>
+</p>
 
 </div>

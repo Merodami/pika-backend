@@ -10,7 +10,7 @@ export interface CommentSearchParams {
   page?: number
   limit?: number
   sortBy?: string
-  sortOrder?: 'ASC' | 'DESC'
+  sortOrder?: 'asc' | 'desc'
 }
 
 export interface CreateSupportCommentInput {
@@ -86,7 +86,7 @@ export class SupportCommentRepository implements ISupportCommentRepository {
       page = 1,
       limit = 20,
       sortBy = 'createdAt',
-      sortOrder = 'ASC',
+      sortOrder = 'asc',
     } = params
 
     const skip = (page - 1) * limit

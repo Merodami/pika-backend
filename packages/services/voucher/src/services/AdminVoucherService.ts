@@ -172,7 +172,7 @@ export class AdminVoucherService implements IAdminVoucherService {
 
       // Validate voucher type and required fields
       if (
-        data.discountType === VoucherDiscountType.percentage &&
+        data.discountType === VoucherDiscountType.PERCENTAGE &&
         !data.discountValue
       ) {
         throw ErrorFactory.businessRuleViolation(
@@ -182,7 +182,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       }
 
       if (
-        data.discountType === VoucherDiscountType.fixed &&
+        data.discountType === VoucherDiscountType.FIXED &&
         !data.discountValue
       ) {
         throw ErrorFactory.businessRuleViolation(
@@ -239,18 +239,18 @@ export class AdminVoucherService implements IAdminVoucherService {
         businessId: data.businessId,
         categoryId: data.categoryId,
         type:
-          data.discountType === VoucherDiscountType.percentage
+          data.discountType === VoucherDiscountType.PERCENTAGE
             ? 'percentage'
             : 'fixed',
         titleKey,
         descriptionKey,
         termsAndConditionsKey,
         value:
-          data.discountType === VoucherDiscountType.fixed
+          data.discountType === VoucherDiscountType.FIXED
             ? data.discountValue
             : undefined,
         discount:
-          data.discountType === VoucherDiscountType.percentage
+          data.discountType === VoucherDiscountType.PERCENTAGE
             ? data.discountValue
             : undefined,
         currency: data.currency,
@@ -261,7 +261,7 @@ export class AdminVoucherService implements IAdminVoucherService {
         metadata: data.metadata ?? undefined,
         imageUrl: data.imageUrl ?? undefined,
         qrCode,
-        state: VoucherState.draft,
+        state: VoucherState.DRAFT,
       })
 
       // Invalidate cache
@@ -299,8 +299,8 @@ export class AdminVoucherService implements IAdminVoucherService {
 
       // Validate state allows updates
       if (
-        existing.state === VoucherState.expired ||
-        existing.state === VoucherState.redeemed
+        existing.state === VoucherState.EXPIRED ||
+        existing.state === VoucherState.REDEEMED
       ) {
         throw ErrorFactory.businessRuleViolation(
           'Cannot update expired or redeemed voucher',
@@ -358,14 +358,14 @@ export class AdminVoucherService implements IAdminVoucherService {
       // Update other fields - these don't need translation
       if (data.discountType !== undefined) {
         updateData.type =
-          data.discountType === VoucherDiscountType.percentage
+          data.discountType === VoucherDiscountType.PERCENTAGE
             ? 'percentage'
             : 'fixed'
       }
       if (data.discountValue !== undefined) {
         if (
-          data.discountType === VoucherDiscountType.percentage ||
-          existing.discountType === VoucherDiscountType.percentage
+          data.discountType === VoucherDiscountType.PERCENTAGE ||
+          existing.discountType === VoucherDiscountType.PERCENTAGE
         ) {
           updateData.discount = data.discountValue
         } else {
@@ -415,7 +415,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       }
 
       // Validate state allows deletion
-      if (existing.state === VoucherState.published) {
+      if (existing.state === VoucherState.PUBLISHED) {
         throw ErrorFactory.businessRuleViolation(
           'Cannot delete published voucher',
           'Published vouchers can only be expired',
@@ -492,7 +492,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       // Validate state transition using shared business rules
       VoucherBusinessRules.validateStateTransition(
         voucher.state,
-        VoucherState.published,
+        VoucherState.PUBLISHED,
       )
 
       // Additional business rule validation for publishing (from legacy canBePublished)
@@ -514,7 +514,7 @@ export class AdminVoucherService implements IAdminVoucherService {
 
       const updatedVoucher = await this.repository.updateState(
         id,
-        VoucherState.published,
+        VoucherState.PUBLISHED,
       )
 
       // Invalidate cache
@@ -548,12 +548,12 @@ export class AdminVoucherService implements IAdminVoucherService {
       // Validate state transition using shared business rules
       VoucherBusinessRules.validateStateTransition(
         voucher.state,
-        VoucherState.expired,
+        VoucherState.EXPIRED,
       )
 
       const updatedVoucher = await this.repository.updateState(
         id,
-        VoucherState.expired,
+        VoucherState.EXPIRED,
       )
 
       // Invalidate cache
@@ -891,10 +891,10 @@ export class AdminVoucherService implements IAdminVoucherService {
       const vouchers = result.data
       const totalVouchers = vouchers.length
       const activeVouchers = vouchers.filter(
-        (v) => v.state === VoucherState.published,
+        (v) => v.state === VoucherState.PUBLISHED,
       ).length
       const expiredVouchers = vouchers.filter(
-        (v) => v.state === VoucherState.expired,
+        (v) => v.state === VoucherState.EXPIRED,
       ).length
       const totalRedemptions = vouchers.reduce(
         (sum, v) => sum + (v.currentRedemptions || 0),
@@ -1019,10 +1019,10 @@ export class AdminVoucherService implements IAdminVoucherService {
       const vouchers = result.data
       const totalVouchers = vouchers.length
       const activeVouchers = vouchers.filter(
-        (v) => v.state === VoucherState.published,
+        (v) => v.state === VoucherState.PUBLISHED,
       ).length
       const expiredVouchers = vouchers.filter(
-        (v) => v.state === VoucherState.expired,
+        (v) => v.state === VoucherState.EXPIRED,
       ).length
       const totalRedemptions = vouchers.reduce(
         (sum, v) => sum + (v.currentRedemptions || 0),

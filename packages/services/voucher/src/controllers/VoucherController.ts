@@ -66,7 +66,7 @@ export class VoucherController {
       const params = {
         businessId: query.businessId,
         categoryId: query.categoryId,
-        state: VoucherState.published, // Always filter by published for public routes
+        state: VoucherState.PUBLISHED, // Always filter by published for public routes
         type: query.type,
         minValue: query.minValue,
         maxValue: query.maxValue,
@@ -139,7 +139,7 @@ export class VoucherController {
       )
 
       // Check if voucher is published for public access
-      if (voucher.state !== VoucherState.published) {
+      if (voucher.state !== VoucherState.PUBLISHED) {
         throw ErrorFactory.resourceNotFound('Voucher', voucherId)
       }
 
@@ -185,14 +185,15 @@ export class VoucherController {
           scanType: VoucherScanType.customer,
           scanSource:
             (scanData.scanSource as VoucherScanSource) ||
-            VoucherScanSource.camera,
-          location: scanData.location
+            VoucherScanSource.CAMERA,
+          location: scanData.location || null,
+          deviceInfo: scanData.deviceInfo
             ? {
-                lat: scanData.location.latitude,
-                lng: scanData.location.longitude,
+                platform: scanData.deviceInfo.platform || 'unknown',
+                version: scanData.deviceInfo.appVersion || 'unknown',
+                model: scanData.deviceInfo.deviceId,
               }
             : null,
-          deviceInfo: scanData.deviceInfo || null,
         },
         language,
       )
@@ -385,7 +386,7 @@ export class VoucherController {
 
       const params = {
         businessId,
-        state: VoucherState.published, // Only show published vouchers
+        state: VoucherState.PUBLISHED, // Only show published vouchers
         categoryId: query.categoryId,
         discountType: query.discountType,
         minDiscount: query.minDiscount,

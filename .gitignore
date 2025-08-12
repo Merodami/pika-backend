@@ -60,11 +60,15 @@ tsconfig.tsbuildinfo
 
 localstack_data
 
-# Security - Never commit private keys
+# Security - Never commit private keys or tokens
 keys/
 *.pem
 *.key
 .env.production
+test-tokens.json
+# Package registry tokens (should use env vars)
+packages/**/.npmrc
+scripts/**/*.sh.local
 
 # misc
 npm-debug.log*
@@ -104,7 +108,6 @@ test-tokens.json
 # Generated files
 packages/api/generated/
 packages/database/prisma/schema.prisma
-frontend/dashboard/lib/api/generated/
 
 # Build artifacts
 **/dist/

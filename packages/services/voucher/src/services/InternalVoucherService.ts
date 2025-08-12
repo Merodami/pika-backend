@@ -445,7 +445,7 @@ export class InternalVoucherService implements IInternalVoucherService {
         voucherId,
         userId,
         scanType: VoucherScanType.business,
-        scanSource: VoucherScanSource.share,
+        scanSource: VoucherScanSource.SHARE,
         metadata,
       })
 

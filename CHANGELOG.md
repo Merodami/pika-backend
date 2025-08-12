@@ -229,9 +229,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **📦 SDK Generation Location**
-  - SDK generation now targets `frontend/dashboard/lib/api/generated/` following industry standards
-  - Updated root `package.json` generate:sdk command to use new location
+- **📦 SDK Generation Architecture**
+  - Restructured API schemas from tier-first to service-first organization
   - All TypeScript models and service classes generated from OpenAPI specifications
 
 ### Fixed

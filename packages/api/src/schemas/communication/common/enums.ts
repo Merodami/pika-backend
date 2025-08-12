@@ -1,4 +1,7 @@
+import { MessagePriority } from '@pika/types'
 import { z } from 'zod'
+
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 /**
  * Communication-specific enums
@@ -16,9 +19,14 @@ export const EmailStatus = z.enum([
   'rejected',
 ])
 
+export const EmailStatusSchema = EmailStatus.openapi('EmailStatus', {
+  description: 'Email delivery status',
+  example: 'sent',
+})
+
 export type EmailStatus = z.infer<typeof EmailStatus>
 
-export const EmailPriority = z.enum(['low', 'normal', 'high'])
+export const EmailPriority = createZodEnum(MessagePriority)
 
 export type EmailPriority = z.infer<typeof EmailPriority>
 
@@ -51,6 +59,14 @@ export type EmailSortBy = z.infer<typeof EmailSortBy>
 
 export const NotificationType = z.enum(['email', 'inApp', 'sms', 'push'])
 
+export const NotificationTypeSchema = NotificationType.openapi(
+  'NotificationType',
+  {
+    description: 'Type of notification channel',
+    example: 'email',
+  },
+)
+
 export type NotificationType = z.infer<typeof NotificationType>
 
 export const NotificationStatus = z.enum([
@@ -61,9 +77,17 @@ export const NotificationStatus = z.enum([
   'read',
 ])
 
+export const NotificationStatusSchema = NotificationStatus.openapi(
+  'NotificationStatus',
+  {
+    description: 'Notification delivery status',
+    example: 'sent',
+  },
+)
+
 export type NotificationStatus = z.infer<typeof NotificationStatus>
 
-export const NotificationPriority = z.enum(['low', 'normal', 'high', 'urgent'])
+export const NotificationPriority = createZodEnum(MessagePriority)
 
 export type NotificationPriority = z.infer<typeof NotificationPriority>
 
@@ -102,6 +126,14 @@ export const CommunicationChannel = z.enum([
   'webhook',
 ])
 
+export const CommunicationChannelSchema = CommunicationChannel.openapi(
+  'CommunicationChannel',
+  {
+    description: 'Communication channel type',
+    example: 'email',
+  },
+)
+
 export type CommunicationChannel = z.infer<typeof CommunicationChannel>
 
 export const CommunicationStatus = z.enum([
@@ -112,6 +144,14 @@ export const CommunicationStatus = z.enum([
   'failed',
   'cancelled',
 ])
+
+export const CommunicationStatusSchema = CommunicationStatus.openapi(
+  'CommunicationStatus',
+  {
+    description: 'Communication delivery status',
+    example: 'sent',
+  },
+)
 
 export type CommunicationStatus = z.infer<typeof CommunicationStatus>
 

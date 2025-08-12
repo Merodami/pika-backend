@@ -340,9 +340,9 @@ export class VoucherRepository implements IVoucherRepository {
 
           // Add user-specific state based on customer voucher status
           voucher.state =
-            item.status === CustomerVoucherStatus.claimed
+            item.status === CustomerVoucherStatus.CLAIMED
               ? ('claimed' as VoucherState)
-              : item.status === CustomerVoucherStatus.redeemed
+              : item.status === CustomerVoucherStatus.REDEEMED
                 ? ('redeemed' as VoucherState)
                 : voucher.state
 
@@ -397,9 +397,9 @@ export class VoucherRepository implements IVoucherRepository {
 
       // Add user-specific state based on customer voucher status
       voucher.state =
-        customerVoucher.status === CustomerVoucherStatus.claimed
+        customerVoucher.status === CustomerVoucherStatus.CLAIMED
           ? ('claimed' as VoucherState)
-          : customerVoucher.status === CustomerVoucherStatus.redeemed
+          : customerVoucher.status === CustomerVoucherStatus.REDEEMED
             ? ('redeemed' as VoucherState)
             : voucher.state
 
@@ -479,7 +479,7 @@ export class VoucherRepository implements IVoucherRepository {
               codes: {
                 some: {
                   code: shortCode,
-                  type: VoucherCodeType.short,
+                  type: VoucherCodeType.SHORT,
                   isActive: true,
                 },
               },
@@ -508,7 +508,7 @@ export class VoucherRepository implements IVoucherRepository {
           codes: {
             some: {
               code: staticCode,
-              type: VoucherCodeType.static,
+              type: VoucherCodeType.STATIC,
               isActive: true,
             },
           },
@@ -564,7 +564,7 @@ export class VoucherRepository implements IVoucherRepository {
         data: {
           customerId: userId,
           voucherId,
-          status: CustomerVoucherStatus.claimed,
+          status: CustomerVoucherStatus.CLAIMED,
           claimedAt: new Date(),
         },
         include: {
@@ -595,7 +595,7 @@ export class VoucherRepository implements IVoucherRepository {
           },
         },
         data: {
-          status: CustomerVoucherStatus.redeemed,
+          status: CustomerVoucherStatus.REDEEMED,
           redeemedAt: new Date(),
         },
         include: {

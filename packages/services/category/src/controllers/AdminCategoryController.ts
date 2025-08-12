@@ -116,7 +116,7 @@ export class AdminCategoryController {
    * Create new category
    */
   async createCategory(
-    req: Request<{}, {}, categoryAdmin.CreateCategoryRequest>,
+    req: Request<{}, {}, categoryAdmin.AdminCreateCategoryRequest>,
     res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -155,7 +155,7 @@ export class AdminCategoryController {
     req: Request<
       categoryCommon.CategoryIdParam,
       {},
-      categoryAdmin.UpdateCategoryRequest
+      categoryAdmin.AdminUpdateCategoryRequest
     >,
     res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
@@ -247,7 +247,7 @@ export class AdminCategoryController {
     req: Request<
       categoryCommon.CategoryIdParam,
       {},
-      categoryAdmin.MoveCategoryRequest
+      categoryAdmin.AdminMoveCategoryRequest
     >,
     res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
@@ -285,7 +285,7 @@ export class AdminCategoryController {
     req: Request<
       categoryCommon.CategoryIdParam,
       {},
-      categoryAdmin.UpdateCategorySortOrderRequest
+      categoryAdmin.AdminUpdateCategorySortOrderRequest
     >,
     res: Response<categoryAdmin.AdminCategoryResponse>,
     next: NextFunction,
@@ -320,8 +320,8 @@ export class AdminCategoryController {
    * Bulk delete categories
    */
   async bulkDeleteCategories(
-    req: Request<{}, {}, categoryAdmin.BulkDeleteCategoriesRequest>,
-    res: Response<categoryAdmin.BulkCategoryOperationResponse>,
+    req: Request<{}, {}, categoryAdmin.AdminBulkDeleteCategoriesRequest>,
+    res: Response<categoryAdmin.AdminBulkCategoryOperationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -340,7 +340,7 @@ export class AdminCategoryController {
 
       // Validate response against Zod schema
       const validatedResponse = validateResponse(
-        categoryAdmin.BulkCategoryOperationResponse,
+        categoryAdmin.AdminBulkCategoryOperationResponse,
         response,
         'AdminCategoryController.bulkDeleteCategories',
       )

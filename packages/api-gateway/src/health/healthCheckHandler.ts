@@ -462,10 +462,8 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
 </html>`
 }
 
-async function checkEmbeddedService(
-  serviceName: string,
-): Promise<systemPublic.ServiceHealth> {
-  const startTime = Date.now()
+async function checkEmbeddedService(): Promise<systemPublic.ServiceHealth> {
+  const serviceCheckStartTime = Date.now()
 
   try {
     // Perform a lightweight operation to measure response time
@@ -475,13 +473,13 @@ async function checkEmbeddedService(
     return {
       status: 'healthy',
       url: 'embedded',
-      responseTime: Date.now() - startTime,
+      responseTime: Date.now() - serviceCheckStartTime,
     }
-  } catch (error) {
+  } catch {
     return {
       status: 'unhealthy',
       url: 'embedded',
-      responseTime: Date.now() - startTime,
+      responseTime: Date.now() - serviceCheckStartTime,
     }
   }
 }
@@ -509,7 +507,7 @@ export async function handleHealthCheck(req: Request, res: Response) {
       const serviceChecks = await Promise.all(
         serviceNames.map(async (name) => ({
           name,
-          result: await checkEmbeddedService(name),
+          result: await checkEmbeddedService(),
         })),
       )
 

@@ -10,7 +10,13 @@ import * as adminPaymentSchemas from '@api/schemas/payment/admin/transactions.js
 import * as adminPdfSchemas from '@api/schemas/pdf/admin/voucher-book.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import { UserId } from '@api/schemas/shared/branded.js'
+import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import {
+  CoordinatesSchema,
+  GeoJSONPointSchema,
+  GeoSearchParamsSchema,
+} from '@api/schemas/shared/geo.js'
 import { DateTime, UUID } from '@api/schemas/shared/primitives.js'
 import { PaginationMetadata } from '@api/schemas/shared/responses.js'
 import * as adminStorageSchemas from '@api/schemas/storage/admin/management.js'
@@ -33,7 +39,15 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   // ============= Common Schemas =============
   // Register pagination metadata to ensure hasNext/hasPrev are included
   registry.registerSchema('PaginationMetadata', PaginationMetadata)
-  
+
+  // Register shared geo schemas
+  registry.registerSchema('Coordinates', CoordinatesSchema)
+  registry.registerSchema('GeoJSONPoint', GeoJSONPointSchema)
+  registry.registerSchema('GeoSearchParams', GeoSearchParamsSchema)
+
+  // Register shared device schemas
+  registry.registerSchema('DeviceInfo', DeviceInfoSchema)
+
   // ============= Enum Schemas =============
   // User enums
   registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)
@@ -64,6 +78,30 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'VoucherDiscountType',
     voucherEnumSchemas.VoucherDiscountTypeSchema,
   )
+  registry.registerSchema(
+    'VoucherScanSource',
+    voucherEnumSchemas.VoucherScanSourceSchema,
+  )
+  registry.registerSchema(
+    'VoucherCodeType',
+    voucherEnumSchemas.VoucherCodeTypeSchema,
+  )
+  registry.registerSchema(
+    'CustomerVoucherStatus',
+    voucherEnumSchemas.CustomerVoucherStatusSchema,
+  )
+  registry.registerSchema(
+    'VoucherBookStatus',
+    voucherEnumSchemas.VoucherBookStatusSchema,
+  )
+  registry.registerSchema(
+    'VoucherBookType',
+    voucherEnumSchemas.VoucherBookTypeSchema,
+  )
+  registry.registerSchema(
+    'AdminVoucherSortBy',
+    voucherEnumSchemas.AdminVoucherSortBySchema,
+  )
 
   // ============= Business Management Schemas =============
   registry.registerSchema(
@@ -71,12 +109,12 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminBusinessSchemas.AdminBusinessResponse,
   )
   registry.registerSchema(
-    'CreateBusinessRequest',
-    adminBusinessSchemas.CreateBusinessRequest,
+    'AdminCreateBusinessRequest',
+    adminBusinessSchemas.AdminCreateBusinessRequest,
   )
   registry.registerSchema(
-    'UpdateBusinessRequest',
-    adminBusinessSchemas.UpdateBusinessRequest,
+    'AdminUpdateBusinessRequest',
+    adminBusinessSchemas.AdminUpdateBusinessRequest,
   )
   registry.registerSchema(
     'AdminBusinessQueryParams',
@@ -87,32 +125,32 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminBusinessSchemas.AdminBusinessListResponse,
   )
   registry.registerSchema(
-    'ToggleBusinessVerificationRequest',
-    adminBusinessSchemas.ToggleBusinessVerificationRequest,
+    'AdminToggleBusinessVerificationRequest',
+    adminBusinessSchemas.AdminToggleBusinessVerificationRequest,
   )
   registry.registerSchema(
-    'ToggleBusinessActivationRequest',
-    adminBusinessSchemas.ToggleBusinessActivationRequest,
+    'AdminToggleBusinessActivationRequest',
+    adminBusinessSchemas.AdminToggleBusinessActivationRequest,
   )
   registry.registerSchema(
-    'BulkBusinessUpdateRequest',
-    adminBusinessSchemas.BulkBusinessUpdateRequest,
+    'AdminBulkBusinessUpdateRequest',
+    adminBusinessSchemas.AdminBulkBusinessUpdateRequest,
   )
   registry.registerSchema(
-    'BulkBusinessOperationResponse',
-    adminBusinessSchemas.BulkBusinessOperationResponse,
+    'AdminBulkBusinessOperationResponse',
+    adminBusinessSchemas.AdminBulkBusinessOperationResponse,
   )
   registry.registerSchema(
-    'BulkDeleteBusinessesRequest',
-    adminBusinessSchemas.BulkDeleteBusinessesRequest,
+    'AdminBulkDeleteBusinessesRequest',
+    adminBusinessSchemas.AdminBulkDeleteBusinessesRequest,
   )
   registry.registerSchema(
-    'UpdateBusinessRatingRequest',
-    adminBusinessSchemas.UpdateBusinessRatingRequest,
+    'AdminUpdateBusinessRatingRequest',
+    adminBusinessSchemas.AdminUpdateBusinessRatingRequest,
   )
   registry.registerSchema(
-    'PatchBusinessVerificationRequest',
-    adminBusinessSchemas.PatchBusinessVerificationRequest,
+    'AdminPatchBusinessVerificationRequest',
+    adminBusinessSchemas.AdminPatchBusinessVerificationRequest,
   )
   registry.registerSchema(
     'PatchBusinessVerificationResponse',
@@ -128,12 +166,12 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminCategorySchemas.AdminCategoryResponse,
   )
   registry.registerSchema(
-    'CreateCategoryRequest',
-    adminCategorySchemas.CreateCategoryRequest,
+    'AdminCreateCategoryRequest',
+    adminCategorySchemas.AdminCreateCategoryRequest,
   )
   registry.registerSchema(
-    'UpdateCategoryRequest',
-    adminCategorySchemas.UpdateCategoryRequest,
+    'AdminUpdateCategoryRequest',
+    adminCategorySchemas.AdminUpdateCategoryRequest,
   )
   registry.registerSchema(
     'AdminCategoryQueryParams',
@@ -148,28 +186,28 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminCategorySchemas.AdminCategoryTreeResponse,
   )
   registry.registerSchema(
-    'MoveCategoryRequest',
-    adminCategorySchemas.MoveCategoryRequest,
+    'AdminMoveCategoryRequest',
+    adminCategorySchemas.AdminMoveCategoryRequest,
   )
   registry.registerSchema(
-    'UpdateCategorySortOrderRequest',
-    adminCategorySchemas.UpdateCategorySortOrderRequest,
+    'AdminUpdateCategorySortOrderRequest',
+    adminCategorySchemas.AdminUpdateCategorySortOrderRequest,
   )
   registry.registerSchema(
-    'ToggleCategoryActivationRequest',
-    adminCategorySchemas.ToggleCategoryActivationRequest,
+    'AdminToggleCategoryActivationRequest',
+    adminCategorySchemas.AdminToggleCategoryActivationRequest,
   )
   registry.registerSchema(
-    'BulkCategoryUpdateRequest',
-    adminCategorySchemas.BulkCategoryUpdateRequest,
+    'AdminBulkCategoryUpdateRequest',
+    adminCategorySchemas.AdminBulkCategoryUpdateRequest,
   )
   registry.registerSchema(
-    'BulkCategoryOperationResponse',
-    adminCategorySchemas.BulkCategoryOperationResponse,
+    'AdminBulkCategoryOperationResponse',
+    adminCategorySchemas.AdminBulkCategoryOperationResponse,
   )
   registry.registerSchema(
-    'BulkDeleteCategoriesRequest',
-    adminCategorySchemas.BulkDeleteCategoriesRequest,
+    'AdminBulkDeleteCategoriesRequest',
+    adminCategorySchemas.AdminBulkDeleteCategoriesRequest,
   )
 
   // Category parameter schemas
@@ -226,28 +264,28 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminVoucherSchemas.AdminVoucherListResponse,
   )
   registry.registerSchema(
-    'CreateVoucherRequest',
-    adminVoucherSchemas.CreateVoucherRequest,
+    'AdminCreateVoucherRequest',
+    adminVoucherSchemas.AdminCreateVoucherRequest,
   )
   registry.registerSchema(
-    'UpdateVoucherRequest',
-    adminVoucherSchemas.UpdateVoucherRequest,
+    'AdminUpdateVoucherRequest',
+    adminVoucherSchemas.AdminUpdateVoucherRequest,
   )
   registry.registerSchema(
     'AdminVoucherQueryParams',
     adminVoucherQueries.AdminVoucherQueryParams,
   )
   registry.registerSchema(
-    'BulkVoucherUpdateRequest',
-    adminVoucherSchemas.BulkVoucherUpdateRequest,
+    'AdminBulkVoucherUpdateRequest',
+    adminVoucherSchemas.AdminBulkVoucherUpdateRequest,
   )
   registry.registerSchema(
-    'BulkVoucherOperationResponse',
-    adminVoucherSchemas.BulkVoucherOperationResponse,
+    'AdminBulkVoucherOperationResponse',
+    adminVoucherSchemas.AdminBulkVoucherOperationResponse,
   )
   registry.registerSchema(
-    'VoucherAnalyticsResponse',
-    adminVoucherSchemas.VoucherAnalyticsResponse,
+    'AdminVoucherAnalyticsResponse',
+    adminVoucherSchemas.AdminVoucherAnalyticsResponse,
   )
 
   // Voucher parameter schemas
@@ -270,8 +308,8 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminPaymentSchemas.AdminTransactionQueryParams,
   )
   registry.registerSchema(
-    'RefundTransactionRequest',
-    adminPaymentSchemas.RefundTransactionRequest,
+    'AdminRefundTransactionRequest',
+    adminPaymentSchemas.AdminRefundTransactionRequest,
   )
   registry.registerSchema(
     'PaymentStatsResponse',
@@ -282,10 +320,60 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminPaymentSchemas.PayoutListResponse,
   )
   registry.registerSchema(
-    'CreatePayoutRequest',
-    adminPaymentSchemas.CreatePayoutRequest,
+    'AdminCreatePayoutRequest',
+    adminPaymentSchemas.AdminCreatePayoutRequest,
   )
   registry.registerSchema('PayoutIdParam', adminPaymentSchemas.PayoutIdParam)
+
+  // Add missing financial/promo code schemas
+  registry.registerSchema(
+    'AdminFinancialReportRequest',
+    adminPaymentSchemas.AdminFinancialReportRequest,
+  )
+  registry.registerSchema(
+    'AdminFinancialReportResponse',
+    adminPaymentSchemas.AdminFinancialReportResponse,
+  )
+  registry.registerSchema(
+    'AdminCreatePromoCodeRequest',
+    adminPaymentSchemas.AdminCreatePromoCodeRequest,
+  )
+  registry.registerSchema(
+    'AdminUpdatePromoCodeRequest',
+    adminPaymentSchemas.AdminUpdatePromoCodeRequest,
+  )
+  registry.registerSchema(
+    'AdminPromoCodeDetail',
+    adminPaymentSchemas.AdminPromoCodeDetail,
+  )
+  registry.registerSchema(
+    'PromoCodeSearchParams',
+    adminPaymentSchemas.PromoCodeSearchParams,
+  )
+  registry.registerSchema(
+    'PromoCodeListResponse',
+    adminPaymentSchemas.PromoCodeListResponse,
+  )
+  registry.registerSchema(
+    'AdminCreateSubscriptionPlanRequest',
+    adminPaymentSchemas.AdminCreateSubscriptionPlanRequest,
+  )
+  registry.registerSchema(
+    'AdminUpdateSubscriptionPlanRequest',
+    adminPaymentSchemas.AdminUpdateSubscriptionPlanRequest,
+  )
+  registry.registerSchema(
+    'AdminSubscriptionPlanDetail',
+    adminPaymentSchemas.AdminSubscriptionPlanDetail,
+  )
+  registry.registerSchema(
+    'SubscriptionPlanSearchParams',
+    adminPaymentSchemas.SubscriptionPlanSearchParams,
+  )
+  registry.registerSchema(
+    'SubscriptionPlanListResponse',
+    adminPaymentSchemas.SubscriptionPlanListResponse,
+  )
 
   // ============= Support/Ticket Schemas =============
   registry.registerSchema(
@@ -301,12 +389,12 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminSupportSchemas.AdminTicketQueryParams,
   )
   registry.registerSchema(
-    'AssignTicketRequest',
-    adminSupportSchemas.AssignTicketRequest,
+    'AdminAssignTicketRequest',
+    adminSupportSchemas.AdminAssignTicketRequest,
   )
   registry.registerSchema(
-    'UpdateTicketStatusRequest',
-    adminSupportSchemas.UpdateTicketStatusRequest,
+    'AdminUpdateTicketStatusRequest',
+    adminSupportSchemas.AdminUpdateTicketStatusRequest,
   )
   registry.registerSchema(
     'TicketStatsResponse',
@@ -346,8 +434,14 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'AdminUpdateUserRequest',
     adminUserSchemas.AdminUpdateUserRequest,
   )
-  registry.registerSchema('BanUserRequest', adminUserSchemas.BanUserRequest)
-  registry.registerSchema('UnbanUserRequest', adminUserSchemas.UnbanUserRequest)
+  registry.registerSchema(
+    'AdminBanUserRequest',
+    adminUserSchemas.AdminBanUserRequest,
+  )
+  registry.registerSchema(
+    'AdminUnbanUserRequest',
+    adminUserSchemas.AdminUnbanUserRequest,
+  )
   registry.registerSchema(
     'AdminUploadUserAvatarRequest',
     adminUserSchemas.AdminUploadUserAvatarRequest,
@@ -357,22 +451,28 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminUserSchemas.AdminUploadUserAvatarResponse,
   )
   registry.registerSchema(
-    'UpdateAdminProfileRequest',
-    adminUserSchemas.UpdateAdminProfileRequest,
+    'AdminUpdateProfileRequest',
+    adminUserSchemas.AdminUpdateProfileRequest,
   )
   registry.registerSchema(
-    'UserActivityResponse',
-    adminUserSchemas.UserActivityResponse,
+    'AdminUserActivityResponse',
+    adminUserSchemas.AdminUserActivityResponse,
   )
   registry.registerSchema(
-    'UserStatsResponse',
-    adminUserSchemas.UserStatsResponse,
+    'AdminUserStatsResponse',
+    adminUserSchemas.AdminUserStatsResponse,
   )
   registry.registerSchema(
-    'BulkUserActionRequest',
-    adminUserSchemas.BulkUserActionRequest,
+    'AdminBulkUserActionRequest',
+    adminUserSchemas.AdminBulkUserActionRequest,
   )
   registry.registerSchema('UserIdParam', adminUserSchemas.UserIdParam)
+
+  // Add missing user management schemas
+  registry.registerSchema(
+    'AdminUpdateUserStatusRequest',
+    adminUserSchemas.AdminUpdateUserStatusRequest,
+  )
 
   // ============= PDF/Voucher Book Management Schemas =============
   registry.registerSchema(
@@ -384,36 +484,36 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminPdfSchemas.AdminVoucherBookListResponse,
   )
   registry.registerSchema(
-    'CreateVoucherBookRequest',
-    adminPdfSchemas.CreateVoucherBookRequest,
+    'AdminCreateVoucherBookRequest',
+    adminPdfSchemas.AdminCreateVoucherBookRequest,
   )
   registry.registerSchema(
-    'UpdateVoucherBookRequest',
-    adminPdfSchemas.UpdateVoucherBookRequest,
+    'AdminUpdateVoucherBookRequest',
+    adminPdfSchemas.AdminUpdateVoucherBookRequest,
   )
   registry.registerSchema(
-    'PublishVoucherBookRequest',
-    adminPdfSchemas.PublishVoucherBookRequest,
+    'AdminPublishVoucherBookRequest',
+    adminPdfSchemas.AdminPublishVoucherBookRequest,
   )
   registry.registerSchema(
-    'ArchiveVoucherBookRequest',
-    adminPdfSchemas.ArchiveVoucherBookRequest,
+    'AdminArchiveVoucherBookRequest',
+    adminPdfSchemas.AdminArchiveVoucherBookRequest,
   )
   registry.registerSchema(
-    'GeneratePdfRequest',
-    adminPdfSchemas.GeneratePdfRequest,
+    'AdminGeneratePdfRequest',
+    adminPdfSchemas.AdminGeneratePdfRequest,
   )
   registry.registerSchema(
-    'GeneratePdfResponse',
-    adminPdfSchemas.GeneratePdfResponse,
+    'AdminGeneratePdfResponse',
+    adminPdfSchemas.AdminGeneratePdfResponse,
   )
   registry.registerSchema(
-    'BulkVoucherBookOperationRequest',
-    adminPdfSchemas.BulkVoucherBookOperationRequest,
+    'AdminBulkVoucherBookOperationRequest',
+    adminPdfSchemas.AdminBulkVoucherBookOperationRequest,
   )
   registry.registerSchema(
-    'BulkVoucherBookOperationResponse',
-    adminPdfSchemas.BulkVoucherBookOperationResponse,
+    'AdminBulkVoucherBookOperationResponse',
+    adminPdfSchemas.AdminBulkVoucherBookOperationResponse,
   )
   registry.registerSchema(
     'AdminVoucherBookQueryParams',
@@ -428,28 +528,28 @@ export function registerAdminAPI(registry: ZodRegistry): void {
 
   // User Verification Schemas (Admin)
   registry.registerSchema(
-    'UnifiedVerificationRequest',
-    userVerificationSchemas.UnifiedVerificationRequest,
-  )
-  registry.registerSchema(
-    'UnifiedResendVerificationRequest',
-    userVerificationSchemas.UnifiedResendVerificationRequest,
-  )
-  registry.registerSchema(
     'UnifiedVerificationResponse',
     userVerificationSchemas.UnifiedVerificationResponse,
   )
   registry.registerSchema(
-    'VerifyUserResponse',
-    adminUserSchemas.VerifyUserResponse,
+    'AdminVerifyUserResponse',
+    adminUserSchemas.AdminVerifyUserResponse,
   )
   registry.registerSchema(
-    'ResendVerificationResponse',
-    adminUserSchemas.ResendVerificationResponse,
+    'AdminResendVerificationResponse',
+    adminUserSchemas.AdminResendVerificationResponse,
   )
   registry.registerSchema(
-    'UserVerificationStatusResponse',
-    adminUserSchemas.UserVerificationStatusResponse,
+    'AdminUserVerificationStatusResponse',
+    adminUserSchemas.AdminUserVerificationStatusResponse,
+  )
+  registry.registerSchema(
+    'AdminVerificationRequest',
+    adminUserSchemas.AdminVerificationRequest,
+  )
+  registry.registerSchema(
+    'AdminResendVerificationRequest',
+    adminUserSchemas.AdminResendVerificationRequest,
   )
 
   // ============= Register Routes =============
@@ -548,7 +648,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminCategorySchemas.CreateCategoryRequest,
+            schema: adminCategorySchemas.AdminCreateCategoryRequest,
           },
         },
       },
@@ -586,7 +686,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminCategorySchemas.UpdateCategoryRequest,
+            schema: adminCategorySchemas.AdminUpdateCategoryRequest,
           },
         },
       },
@@ -650,7 +750,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminCategorySchemas.MoveCategoryRequest,
+            schema: adminCategorySchemas.AdminMoveCategoryRequest,
           },
         },
       },
@@ -688,7 +788,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminCategorySchemas.ToggleCategoryActivationRequest,
+            schema: adminCategorySchemas.AdminToggleCategoryActivationRequest,
           },
         },
       },
@@ -725,7 +825,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminCategorySchemas.BulkCategoryUpdateRequest,
+            schema: adminCategorySchemas.AdminBulkCategoryUpdateRequest,
           },
         },
       },
@@ -735,7 +835,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'Categories updated successfully',
         content: {
           'application/json': {
-            schema: adminCategorySchemas.BulkCategoryOperationResponse,
+            schema: adminCategorySchemas.AdminBulkCategoryOperationResponse,
           },
         },
       },
@@ -762,7 +862,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminCategorySchemas.BulkDeleteCategoriesRequest,
+            schema: adminCategorySchemas.AdminBulkDeleteCategoriesRequest,
           },
         },
       },
@@ -772,7 +872,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'Categories deleted successfully',
         content: {
           'application/json': {
-            schema: adminCategorySchemas.BulkCategoryOperationResponse,
+            schema: adminCategorySchemas.AdminBulkCategoryOperationResponse,
           },
         },
       },
@@ -824,7 +924,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.CreateBusinessRequest,
+            schema: adminBusinessSchemas.AdminCreateBusinessRequest,
           },
         },
       },
@@ -877,7 +977,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.UpdateBusinessRequest,
+            schema: adminBusinessSchemas.AdminUpdateBusinessRequest,
           },
         },
       },
@@ -925,7 +1025,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.PatchBusinessVerificationRequest,
+            schema: adminBusinessSchemas.AdminPatchBusinessVerificationRequest,
           },
         },
       },
@@ -986,7 +1086,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.UpdateBusinessRatingRequest,
+            schema: adminBusinessSchemas.AdminUpdateBusinessRatingRequest,
           },
         },
       },
@@ -1015,7 +1115,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.BulkBusinessUpdateRequest,
+            schema: adminBusinessSchemas.AdminBulkBusinessUpdateRequest,
           },
         },
       },
@@ -1025,7 +1125,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'Bulk business update results',
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.BulkBusinessOperationResponse,
+            schema: adminBusinessSchemas.AdminBulkBusinessOperationResponse,
           },
         },
       },
@@ -1044,7 +1144,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.BulkDeleteBusinessesRequest,
+            schema: adminBusinessSchemas.AdminBulkDeleteBusinessesRequest,
           },
         },
       },
@@ -1054,7 +1154,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'Bulk business deletion results',
         content: {
           'application/json': {
-            schema: adminBusinessSchemas.BulkBusinessOperationResponse,
+            schema: adminBusinessSchemas.AdminBulkBusinessOperationResponse,
           },
         },
       },
@@ -1363,7 +1463,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminVoucherSchemas.CreateVoucherRequest,
+            schema: adminVoucherSchemas.AdminCreateVoucherRequest,
           },
         },
       },
@@ -1401,7 +1501,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminVoucherSchemas.UpdateVoucherRequest,
+            schema: adminVoucherSchemas.AdminUpdateVoucherRequest,
           },
         },
       },
@@ -1463,7 +1563,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminVoucherSchemas.BulkVoucherUpdateRequest,
+            schema: adminVoucherSchemas.AdminBulkVoucherUpdateRequest,
           },
         },
       },
@@ -1473,7 +1573,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'Vouchers updated successfully',
         content: {
           'application/json': {
-            schema: adminVoucherSchemas.BulkVoucherOperationResponse,
+            schema: adminVoucherSchemas.AdminBulkVoucherOperationResponse,
           },
         },
       },
@@ -1503,7 +1603,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'Voucher analytics data',
         content: {
           'application/json': {
-            schema: adminVoucherSchemas.VoucherAnalyticsResponse,
+            schema: adminVoucherSchemas.AdminVoucherAnalyticsResponse,
           },
         },
       },
@@ -1571,7 +1671,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminUserSchemas.UpdateUserStatusRequest,
+            schema: adminUserSchemas.AdminUpdateUserStatusRequest,
           },
         },
       },
@@ -1602,7 +1702,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminUserSchemas.BanUserRequest,
+            schema: adminUserSchemas.AdminBanUserRequest,
           },
         },
       },
@@ -1628,7 +1728,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminUserSchemas.UnbanUserRequest,
+            schema: adminUserSchemas.AdminUnbanUserRequest,
           },
         },
       },
@@ -1795,7 +1895,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: userVerificationSchemas.UnifiedVerificationRequest,
+            schema: adminUserSchemas.AdminVerificationRequest,
           },
         },
       },
@@ -1834,7 +1934,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: userVerificationSchemas.UnifiedResendVerificationRequest,
+            schema: adminUserSchemas.AdminResendVerificationRequest,
           },
         },
       },
@@ -1885,7 +1985,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'User verification status retrieved successfully',
         content: {
           'application/json': {
-            schema: adminUserSchemas.UserVerificationStatusResponse,
+            schema: adminUserSchemas.AdminUserVerificationStatusResponse,
           },
         },
       },
@@ -2007,7 +2107,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminUserSchemas.UpdateAdminProfileRequest,
+            schema: adminUserSchemas.AdminUpdateProfileRequest,
           },
         },
       },
@@ -2113,14 +2213,14 @@ function registerAdminRoutes(registry: ZodRegistry): void {
     tags: ['Financial Management'],
     security: [{ bearerAuth: [] }],
     request: {
-      query: adminPaymentSchemas.FinancialReportRequest,
+      query: adminPaymentSchemas.AdminFinancialReportRequest,
     },
     responses: {
       200: {
         description: 'Financial report data',
         content: {
           'application/json': {
-            schema: adminPaymentSchemas.FinancialReportResponse,
+            schema: adminPaymentSchemas.AdminFinancialReportResponse,
           },
         },
       },
@@ -2141,7 +2241,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPaymentSchemas.RefundTransactionRequest,
+            schema: adminPaymentSchemas.AdminRefundTransactionRequest,
           },
         },
       },
@@ -2177,7 +2277,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPaymentSchemas.CreatePromoCodeRequest,
+            schema: adminPaymentSchemas.AdminCreatePromoCodeRequest,
           },
         },
       },
@@ -2215,7 +2315,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPaymentSchemas.UpdatePromoCodeRequest,
+            schema: adminPaymentSchemas.AdminUpdatePromoCodeRequest,
           },
         },
       },
@@ -2317,7 +2417,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPaymentSchemas.CreateSubscriptionPlanRequest,
+            schema: adminPaymentSchemas.AdminCreateSubscriptionPlanRequest,
           },
         },
       },
@@ -2355,7 +2455,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPaymentSchemas.UpdateSubscriptionPlanRequest,
+            schema: adminPaymentSchemas.AdminUpdateSubscriptionPlanRequest,
           },
         },
       },
@@ -2471,7 +2571,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminSupportSchemas.UpdateTicketStatusRequest,
+            schema: adminSupportSchemas.AdminUpdateTicketStatusRequest,
           },
         },
       },
@@ -2502,7 +2602,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminSupportSchemas.AssignTicketRequest,
+            schema: adminSupportSchemas.AdminAssignTicketRequest,
           },
         },
       },
@@ -2862,7 +2962,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPdfSchemas.CreateVoucherBookRequest,
+            schema: adminPdfSchemas.AdminCreateVoucherBookRequest,
           },
         },
       },
@@ -2900,7 +3000,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPdfSchemas.UpdateVoucherBookRequest,
+            schema: adminPdfSchemas.AdminUpdateVoucherBookRequest,
           },
         },
       },
@@ -2964,7 +3064,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPdfSchemas.PublishVoucherBookRequest,
+            schema: adminPdfSchemas.AdminPublishVoucherBookRequest,
           },
         },
       },
@@ -3002,7 +3102,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPdfSchemas.GeneratePdfRequest,
+            schema: adminPdfSchemas.AdminGeneratePdfRequest,
           },
         },
       },
@@ -3012,7 +3112,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'PDF generated successfully',
         content: {
           'application/json': {
-            schema: adminPdfSchemas.GeneratePdfResponse,
+            schema: adminPdfSchemas.AdminGeneratePdfResponse,
           },
         },
       },
@@ -3039,7 +3139,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: adminPdfSchemas.BulkVoucherBookOperationRequest,
+            schema: adminPdfSchemas.AdminBulkVoucherBookOperationRequest,
           },
         },
       },
@@ -3086,7 +3186,7 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         description: 'Voucher book statistics',
         content: {
           'application/json': {
-            schema: adminPdfSchemas.BulkVoucherBookOperationResponse,
+            schema: adminPdfSchemas.AdminBulkVoucherBookOperationResponse,
           },
         },
       },

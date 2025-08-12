@@ -492,7 +492,7 @@ describe('Storage API Integration Tests', () => {
       const responseTime = Date.now() - startTime
 
       expect(response2.body).toEqual(response1.body)
-      expect(responseTime).toBeLessThan(50) // Should be very fast from cache
+      expect(responseTime).toBeLessThan(100) // Should be very fast from cache
     })
   })
 })

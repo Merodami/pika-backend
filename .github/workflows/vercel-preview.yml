@@ -30,6 +30,9 @@ jobs:
           corepack enable
           corepack prepare yarn@4.9.1 --activate
 
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
       - name: Install dependencies
         run: yarn install --immutable
 

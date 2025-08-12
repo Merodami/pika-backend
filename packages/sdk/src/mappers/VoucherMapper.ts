@@ -524,20 +524,20 @@ export class VoucherMapper {
    */
   private static mapStateToDTO(state: VoucherState): VoucherStateType {
     switch (state) {
-      case VoucherState.draft:
-        return VoucherState.draft
-      case VoucherState.published:
-        return VoucherState.published
-      case VoucherState.claimed:
-        return VoucherState.claimed
-      case VoucherState.redeemed:
-        return VoucherState.redeemed
-      case VoucherState.expired:
-        return VoucherState.expired
-      case VoucherState.suspended:
-        return VoucherState.suspended
+      case VoucherState.DRAFT:
+        return VoucherState.DRAFT
+      case VoucherState.PUBLISHED:
+        return VoucherState.PUBLISHED
+      case VoucherState.CLAIMED:
+        return VoucherState.CLAIMED
+      case VoucherState.REDEEMED:
+        return VoucherState.REDEEMED
+      case VoucherState.EXPIRED:
+        return VoucherState.EXPIRED
+      case VoucherState.SUSPENDED:
+        return VoucherState.SUSPENDED
       default:
-        return VoucherState.draft
+        return VoucherState.DRAFT
     }
   }
 
@@ -548,12 +548,12 @@ export class VoucherMapper {
     discountType: VoucherDiscountType,
   ): VoucherDiscountTypeType {
     switch (discountType) {
-      case VoucherDiscountType.percentage:
-        return VoucherDiscountType.percentage
-      case VoucherDiscountType.fixed:
-        return VoucherDiscountType.fixed
+      case VoucherDiscountType.PERCENTAGE:
+        return VoucherDiscountType.PERCENTAGE
+      case VoucherDiscountType.FIXED:
+        return VoucherDiscountType.FIXED
       default:
-        return VoucherDiscountType.fixed
+        return VoucherDiscountType.FIXED
     }
   }
 
@@ -686,12 +686,12 @@ export class VoucherMapper {
 
       // Computed fields
       isActive:
-        domain.state === VoucherState.published &&
+        domain.state === VoucherState.PUBLISHED &&
         (!domain.expiresAt || new Date(domain.expiresAt) > now) &&
         (!domain.maxRedemptions ||
           domain.currentRedemptions < domain.maxRedemptions),
       isExpired:
-        domain.state === VoucherState.expired ||
+        domain.state === VoucherState.EXPIRED ||
         (domain.expiresAt && new Date(domain.expiresAt) <= now),
       redemptionRate:
         domain.maxRedemptions && domain.maxRedemptions > 0

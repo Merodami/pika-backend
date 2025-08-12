@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 
 import axios, { AxiosInstance } from 'axios'
+import { get } from 'lodash-es'
 
 import { createTestUsers, TEST_USERS } from './setup-test-users.js'
 
@@ -298,7 +299,7 @@ async function deleteCategory(
     })
 
     logSuccess('Category deleted successfully')
-  } catch (error: any) {
+  } catch {
     // Ignore errors during cleanup
   }
 }
@@ -423,9 +424,11 @@ async function runBusinessCategoryFlow() {
         categoryId,
       )
 
-      logInfo(
-        `${testCategories[index].nameKey}: ${result.data.length} businesses`,
-      )
+      const category = get(testCategories, index)
+
+      if (category) {
+        logInfo(`${category.nameKey}: ${result.data.length} businesses`)
+      }
     }
 
     // Phase 6: Cleanup

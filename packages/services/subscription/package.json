@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Membership and subscription management for Pika platform",
-  "author": "Pika",
+  "author": "Damian Meroni",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

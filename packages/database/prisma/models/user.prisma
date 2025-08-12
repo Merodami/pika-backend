@@ -19,6 +19,7 @@ model User {
   // Additional fields
   dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
   stripeUserId      String?           @map("stripe_user_id") @db.VarChar(255)
+  preferredLanguage String?           @map("preferred_language") @db.VarChar(2) // ISO 639-1 language code
 
   // Relations
   addresses         Address[]

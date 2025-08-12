@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.5 (Debian 17.5-1.pgdg110+1)
--- Dumped by pg_dump version 17.2 (Debian 17.2-1.pgdg120+1)
+-- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
+-- Dumped by pg_dump version 17.5 (Debian 17.5-1.pgdg120+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -116,7 +116,6 @@ DROP INDEX IF EXISTS payments.subscription_plans_stripe_product_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_stripe_price_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_name_key;
 DROP INDEX IF EXISTS payments.subscription_plans_is_active_idx;
-DROP INDEX IF EXISTS payments.subscription_plans_interval_idx;
 DROP INDEX IF EXISTS marketplace.businesses_verified_active_idx;
 DROP INDEX IF EXISTS marketplace.businesses_user_id_key;
 DROP INDEX IF EXISTS marketplace.businesses_deleted_at_idx;
@@ -345,6 +344,7 @@ DROP SCHEMA IF EXISTS tiger_data;
 DROP SCHEMA IF EXISTS tiger;
 DROP SCHEMA IF EXISTS support;
 DROP SCHEMA IF EXISTS security;
+-- *not* dropping schema, since initdb creates it
 DROP SCHEMA IF EXISTS payments;
 DROP SCHEMA IF EXISTS marketplace;
 DROP SCHEMA IF EXISTS identity;
@@ -415,6 +415,20 @@ CREATE SCHEMA marketplace;
 --
 
 CREATE SCHEMA payments;
+
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA public IS '';
 
 
 --
@@ -1293,7 +1307,6 @@ CREATE TABLE payments.subscription_plans (
     description text,
     price double precision NOT NULL,
     currency text DEFAULT 'usd'::text NOT NULL,
-    "interval" text NOT NULL,
     interval_count integer DEFAULT 1 NOT NULL,
     trial_period_days integer,
     features text[],
@@ -1508,7 +1521,8 @@ CREATE TABLE users.users (
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     deleted_at timestamp(6) with time zone,
     date_of_birth date,
-    stripe_user_id character varying(255)
+    stripe_user_id character varying(255),
+    preferred_language character varying(2)
 );
 
 
@@ -2655,13 +2669,6 @@ CREATE UNIQUE INDEX businesses_user_id_key ON marketplace.businesses USING btree
 --
 
 CREATE INDEX businesses_verified_active_idx ON marketplace.businesses USING btree (verified, active);
-
-
---
--- Name: subscription_plans_interval_idx; Type: INDEX; Schema: payments; Owner: -
---
-
-CREATE INDEX subscription_plans_interval_idx ON payments.subscription_plans USING btree ("interval");
 
 
 --

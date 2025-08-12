@@ -142,6 +142,13 @@ async function startGateway(): Promise<Express> {
         '/api/v1/docs',
         '/api/v1/docs/*', // Documentation routes
         '/api/v1/uploads/*', // Static file uploads (avatars, etc.)
+        // OpenAPI JSON endpoints
+        '/openapi.json',
+        '/api/v1/openapi.json',
+        '/docs/openapi.json',
+        '/api/docs/openapi.json',
+        '/api/v1/public/openapi.json',
+        '/api/v1/admin/openapi.json',
         // Public auth endpoints only
         '/api/v1/auth/token',
         '/api/v1/auth/login',
@@ -187,6 +194,32 @@ async function startGateway(): Promise<Express> {
   const docsRouter = createDocsRouter()
 
   app.use('/api/v1/docs', docsRouter)
+
+  // Set up common OpenAPI JSON endpoints (public APIs only)
+  app.get('/openapi.json', (req, res) => {
+    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
+  })
+
+  app.get('/api/v1/openapi.json', (req, res) => {
+    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
+  })
+
+  app.get('/docs/openapi.json', (req, res) => {
+    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
+  })
+
+  app.get('/api/docs/openapi.json', (req, res) => {
+    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
+  })
+
+  // Specific API documentation endpoints
+  app.get('/api/v1/public/openapi.json', (req, res) => {
+    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
+  })
+
+  app.get('/api/v1/admin/openapi.json', (req, res) => {
+    res.redirect(301, '/api/v1/docs/openapi/admin-api.json')
+  })
 
   if (isLocalDev) {
     logger.info('API documentation available at /api/v1/docs', {

@@ -161,7 +161,7 @@ export class AdminVoucherController {
    * Create new voucher (admin)
    */
   async createVoucher(
-    req: Request<{}, {}, voucherAdmin.CreateVoucherRequest>,
+    req: Request<{}, {}, voucherAdmin.AdminCreateVoucherRequest>,
     res: Response<voucherAdmin.AdminVoucherDetailResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -200,7 +200,7 @@ export class AdminVoucherController {
     req: Request<
       voucherCommon.VoucherIdParam,
       {},
-      voucherAdmin.UpdateVoucherRequest
+      voucherAdmin.AdminUpdateVoucherRequest
     >,
     res: Response<voucherAdmin.AdminVoucherDetailResponse>,
     next: NextFunction,
@@ -272,7 +272,7 @@ export class AdminVoucherController {
     req: Request<
       voucherCommon.VoucherIdParam,
       {},
-      voucherAdmin.UpdateVoucherStateRequest
+      voucherAdmin.AdminUpdateVoucherStateRequest
     >,
     res: Response<voucherAdmin.AdminVoucherDetailResponse>,
     next: NextFunction,
@@ -318,7 +318,7 @@ export class AdminVoucherController {
     req: Request<
       voucherCommon.VoucherIdParam,
       {},
-      voucherAdmin.GenerateVoucherCodesRequest
+      voucherAdmin.AdminGenerateVoucherCodesRequest
     >,
     res: Response<voucherAdmin.AdminVoucherDetailResponse>,
     next: NextFunction,
@@ -356,7 +356,7 @@ export class AdminVoucherController {
    */
   async uploadVoucherImage(
     req: Request<voucherCommon.VoucherIdParam>,
-    res: Response<voucherAdmin.UploadVoucherImageResponse>,
+    res: Response<voucherAdmin.AdminUploadVoucherImageResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -377,7 +377,7 @@ export class AdminVoucherController {
       // Transform and validate upload image response
       const responseData = { imageUrl }
       const validatedResponse = validateResponse(
-        voucherAdmin.UploadVoucherImageResponse,
+        voucherAdmin.AdminUploadVoucherImageResponse,
         responseData,
         'AdminVoucherController.uploadVoucherImage',
       )
@@ -396,9 +396,9 @@ export class AdminVoucherController {
     req: Request<
       voucherCommon.VoucherIdParam,
       {},
-      voucherAdmin.UpdateVoucherTranslationsRequest
+      voucherAdmin.AdminUpdateVoucherTranslationsRequest
     >,
-    res: Response<voucherAdmin.VoucherTranslationsResponse>,
+    res: Response<voucherAdmin.AdminVoucherTranslationsResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -423,7 +423,7 @@ export class AdminVoucherController {
         },
       }
       const validatedResponse = validateResponse(
-        voucherAdmin.VoucherTranslationsResponse,
+        voucherAdmin.AdminVoucherTranslationsResponse,
         responseData,
         'AdminVoucherController.updateVoucherTranslations',
       )
@@ -440,7 +440,7 @@ export class AdminVoucherController {
    */
   async getVoucherTranslations(
     req: Request<voucherCommon.VoucherIdParam>,
-    res: Response<voucherAdmin.VoucherTranslationsResponse>,
+    res: Response<voucherAdmin.AdminVoucherTranslationsResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -458,7 +458,7 @@ export class AdminVoucherController {
         translations: apiTranslations,
       }
       const validatedResponse = validateResponse(
-        voucherAdmin.VoucherTranslationsResponse,
+        voucherAdmin.AdminVoucherTranslationsResponse,
         responseData,
         'AdminVoucherController.getVoucherTranslations',
       )
@@ -474,8 +474,8 @@ export class AdminVoucherController {
    * Bulk update vouchers (admin)
    */
   async bulkUpdateVouchers(
-    req: Request<{}, {}, voucherAdmin.BulkVoucherUpdateRequest>,
-    res: Response<voucherAdmin.BulkVoucherOperationResponse>,
+    req: Request<{}, {}, voucherAdmin.AdminBulkVoucherUpdateRequest>,
+    res: Response<voucherAdmin.AdminBulkVoucherOperationResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -509,7 +509,7 @@ export class AdminVoucherController {
       // Transform and validate bulk update response
       const responseData = VoucherMapper.toBulkUpdateResponseDTO(result)
       const validatedResponse = validateResponse(
-        voucherAdmin.BulkVoucherOperationResponse,
+        voucherAdmin.AdminBulkVoucherOperationResponse,
         responseData,
         'AdminVoucherController.bulkUpdateVouchers',
       )
@@ -526,7 +526,7 @@ export class AdminVoucherController {
    */
   async getVoucherAnalytics(
     req: Request<voucherCommon.VoucherIdParam>,
-    res: Response<voucherAdmin.VoucherAnalyticsResponse>,
+    res: Response<voucherAdmin.AdminVoucherAnalyticsResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -549,7 +549,7 @@ export class AdminVoucherController {
         },
       )
       const validatedResponse = validateResponse(
-        voucherAdmin.VoucherAnalyticsResponse,
+        voucherAdmin.AdminVoucherAnalyticsResponse,
         responseData,
         'AdminVoucherController.getVoucherAnalytics',
       )
@@ -566,7 +566,7 @@ export class AdminVoucherController {
    */
   async getBusinessVoucherStats(
     req: Request<businessCommon.BusinessIdParam>,
-    res: Response<voucherAdmin.BusinessVoucherStatsResponse>,
+    res: Response<voucherAdmin.AdminBusinessVoucherStatsResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -580,7 +580,7 @@ export class AdminVoucherController {
       // Transform and validate business stats response
       const responseData = VoucherMapper.toBusinessVoucherStatsDTO(stats)
       const validatedResponse = validateResponse(
-        voucherAdmin.BusinessVoucherStatsResponse,
+        voucherAdmin.AdminBusinessVoucherStatsResponse,
         responseData,
         'AdminVoucherController.getBusinessVoucherStats',
       )

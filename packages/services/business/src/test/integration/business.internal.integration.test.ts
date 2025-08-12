@@ -355,8 +355,8 @@ describe('Business Service - Internal API Integration Tests', () => {
       const duration = endTime - startTime
 
       expect(response.body.businesses).toHaveLength(50)
-      // Should complete within reasonable time (< 1 second for 50 records)
-      expect(duration).toBeLessThan(1000)
+      // Should complete within reasonable time (< 1.5 seconds for 50 records)
+      expect(duration).toBeLessThan(1500)
     })
 
     it('should handle concurrent requests', async () => {

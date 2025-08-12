@@ -1,12 +1,13 @@
 import { authPublic, userAdmin, userCommon, userPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
+  adaptMulterFile,
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
+  validateAvatarFile,
   validateResponse,
 } from '@pika/http'
-import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
@@ -284,12 +285,11 @@ export class UserController {
       // Get the uploaded file from Multer
       const file = req.file
 
-      if (!file) {
-        throw ErrorFactory.badRequest('No file uploaded')
-      }
+      // Validate the uploaded file (this will throw if file is undefined)
+      validateAvatarFile(file as Express.Multer.File)
 
-      // Adapt the multer file to our FileUpload format
-      const adaptedFile = adaptMulterFile(file)
+      // Adapt the multer file to our FileUpload format (file is validated above)
+      const adaptedFile = adaptMulterFile(file!)
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
@@ -342,7 +342,11 @@ export class UserController {
    * Update user account status
    */
   async updateUserStatus(
-    req: Request<userAdmin.UserIdParam, {}, userAdmin.UpdateUserStatusRequest>,
+    req: Request<
+      userAdmin.UserIdParam,
+      {},
+      userAdmin.AdminUpdateUserStatusRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -369,7 +373,7 @@ export class UserController {
    * Ban user account
    */
   async banUser(
-    req: Request<userAdmin.UserIdParam, {}, userAdmin.BanUserRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminBanUserRequest>,
     res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
@@ -377,6 +381,7 @@ export class UserController {
       const { id: userId } = req.params
 
       const { reason, duration, notifyUser } = req.body
+
       await this.userService.banUser(userId, { reason, duration, notifyUser })
 
       // No content response
@@ -391,7 +396,7 @@ export class UserController {
    * Unban user account
    */
   async unbanUser(
-    req: Request<userAdmin.UserIdParam, {}, userAdmin.UnbanUserRequest>,
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminUnbanUserRequest>,
     res: Response<void>,
     next: NextFunction,
   ): Promise<void> {
@@ -399,6 +404,7 @@ export class UserController {
       const { id: userId } = req.params
 
       const { reason, notifyUser } = req.body
+
       await this.userService.unbanUser(userId, { reason, notifyUser })
 
       // No content response
@@ -476,12 +482,11 @@ export class UserController {
       // Get the uploaded file from Multer
       const file = req.file
 
-      if (!file) {
-        throw ErrorFactory.badRequest('No file uploaded')
-      }
+      // Validate the uploaded file (this will throw if file is undefined)
+      validateAvatarFile(file as Express.Multer.File)
 
-      // Adapt the multer file to our FileUpload format
-      const adaptedFile = adaptMulterFile(file)
+      // Adapt the multer file to our FileUpload format (file is validated above)
+      const adaptedFile = adaptMulterFile(file!)
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 

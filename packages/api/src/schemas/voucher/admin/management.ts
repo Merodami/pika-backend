@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { GeoJSONPoint } from '../../shared/geo.js'
 import { withTimestampsString } from '../../shared/metadata.js'
 import { createBulkOperationResponse } from '../../shared/operations.js'
 import { DateTime, Decimal, UUID } from '../../shared/primitives.js'
@@ -12,7 +13,6 @@ import {
 } from '../common/enums.js'
 import {
   CustomerVoucher,
-  LocationPoint,
   VoucherCode,
   VoucherRedemption,
   VoucherScan,
@@ -53,7 +53,7 @@ export const AdminVoucherDetailResponse = openapi(
     currency: z.string().default('PYG'),
 
     // Geographic targeting
-    location: LocationPoint.nullable(),
+    location: GeoJSONPoint.nullable(),
 
     // Media
     imageUrl: z.string().url().nullable(),
@@ -141,7 +141,7 @@ export type AdminVoucherResponse = z.infer<typeof AdminVoucherResponse>
 /**
  * Create voucher request
  */
-export const CreateVoucherRequest = openapi(
+export const AdminCreateVoucherRequest = openapi(
   z.object({
     businessId: UUID,
     categoryId: UUID,
@@ -163,7 +163,7 @@ export const CreateVoucherRequest = openapi(
     currency: z.string().default('PYG'),
 
     // Geographic targeting
-    location: LocationPoint.nullable().optional(),
+    location: GeoJSONPoint.nullable().optional(),
 
     // Media
     imageUrl: z.string().url().nullable().optional(),
@@ -184,12 +184,14 @@ export const CreateVoucherRequest = openapi(
   },
 )
 
-export type CreateVoucherRequest = z.infer<typeof CreateVoucherRequest>
+export type AdminCreateVoucherRequest = z.infer<
+  typeof AdminCreateVoucherRequest
+>
 
 /**
  * Update voucher request
  */
-export const UpdateVoucherRequest = openapi(
+export const AdminUpdateVoucherRequest = openapi(
   z.object({
     // Content translations (will update translation keys)
     title: z
@@ -211,7 +213,7 @@ export const UpdateVoucherRequest = openapi(
     currency: z.string().optional(),
 
     // Geographic targeting
-    location: LocationPoint.nullable().optional(),
+    location: GeoJSONPoint.nullable().optional(),
 
     // Media
     imageUrl: z.string().url().nullable().optional(),
@@ -232,12 +234,14 @@ export const UpdateVoucherRequest = openapi(
   },
 )
 
-export type UpdateVoucherRequest = z.infer<typeof UpdateVoucherRequest>
+export type AdminUpdateVoucherRequest = z.infer<
+  typeof AdminUpdateVoucherRequest
+>
 
 /**
  * Update voucher state request
  */
-export const UpdateVoucherStateRequest = openapi(
+export const AdminUpdateVoucherStateRequest = openapi(
   z.object({
     state: VoucherStateSchema,
     reason: z.string().max(500).optional(),
@@ -247,14 +251,14 @@ export const UpdateVoucherStateRequest = openapi(
   },
 )
 
-export type UpdateVoucherStateRequest = z.infer<
-  typeof UpdateVoucherStateRequest
+export type AdminUpdateVoucherStateRequest = z.infer<
+  typeof AdminUpdateVoucherStateRequest
 >
 
 /**
  * Generate voucher codes request
  */
-export const GenerateVoucherCodesRequest = openapi(
+export const AdminGenerateVoucherCodesRequest = openapi(
   z.object({
     codeType: VoucherCodeTypeSchema,
     quantity: z.number().int().positive().max(1000).default(1),
@@ -268,14 +272,14 @@ export const GenerateVoucherCodesRequest = openapi(
   },
 )
 
-export type GenerateVoucherCodesRequest = z.infer<
-  typeof GenerateVoucherCodesRequest
+export type AdminGenerateVoucherCodesRequest = z.infer<
+  typeof AdminGenerateVoucherCodesRequest
 >
 
 /**
  * Upload voucher image request
  */
-export const UploadVoucherImageRequest = openapi(
+export const AdminUploadVoucherImageRequest = openapi(
   z.object({
     file: z.any().describe('Image file (multipart/form-data)'),
   }),
@@ -284,14 +288,14 @@ export const UploadVoucherImageRequest = openapi(
   },
 )
 
-export type UploadVoucherImageRequest = z.infer<
-  typeof UploadVoucherImageRequest
+export type AdminUploadVoucherImageRequest = z.infer<
+  typeof AdminUploadVoucherImageRequest
 >
 
 /**
  * Upload voucher image response
  */
-export const UploadVoucherImageResponse = openapi(
+export const AdminUploadVoucherImageResponse = openapi(
   z.object({
     imageUrl: z.string().url().describe('URL of the uploaded image'),
   }),
@@ -300,8 +304,8 @@ export const UploadVoucherImageResponse = openapi(
   },
 )
 
-export type UploadVoucherImageResponse = z.infer<
-  typeof UploadVoucherImageResponse
+export type AdminUploadVoucherImageResponse = z.infer<
+  typeof AdminUploadVoucherImageResponse
 >
 
 // ============= Translation Management =============
@@ -309,7 +313,7 @@ export type UploadVoucherImageResponse = z.infer<
 /**
  * Update voucher translations request
  */
-export const UpdateVoucherTranslationsRequest = openapi(
+export const AdminUpdateVoucherTranslationsRequest = openapi(
   z.object({
     translations: z.object({
       title: z.record(z.string(), z.string()).optional(),
@@ -322,14 +326,14 @@ export const UpdateVoucherTranslationsRequest = openapi(
   },
 )
 
-export type UpdateVoucherTranslationsRequest = z.infer<
-  typeof UpdateVoucherTranslationsRequest
+export type AdminUpdateVoucherTranslationsRequest = z.infer<
+  typeof AdminUpdateVoucherTranslationsRequest
 >
 
 /**
  * Get voucher translations response
  */
-export const VoucherTranslationsResponse = openapi(
+export const AdminVoucherTranslationsResponse = openapi(
   z.object({
     voucherId: UUID,
     translations: z.object({
@@ -343,8 +347,8 @@ export const VoucherTranslationsResponse = openapi(
   },
 )
 
-export type VoucherTranslationsResponse = z.infer<
-  typeof VoucherTranslationsResponse
+export type AdminVoucherTranslationsResponse = z.infer<
+  typeof AdminVoucherTranslationsResponse
 >
 
 // ============= Bulk Operations =============
@@ -352,7 +356,7 @@ export type VoucherTranslationsResponse = z.infer<
 /**
  * Bulk voucher update request
  */
-export const BulkVoucherUpdateRequest = openapi(
+export const AdminBulkVoucherUpdateRequest = openapi(
   z.object({
     voucherIds: z.array(UUID).min(1).max(100),
     updates: z.object({
@@ -368,19 +372,21 @@ export const BulkVoucherUpdateRequest = openapi(
   },
 )
 
-export type BulkVoucherUpdateRequest = z.infer<typeof BulkVoucherUpdateRequest>
+export type AdminBulkVoucherUpdateRequest = z.infer<
+  typeof AdminBulkVoucherUpdateRequest
+>
 
 /**
  * Bulk voucher operation response
  * Uses the shared bulk operation pattern
  */
-export const BulkVoucherOperationResponse = createBulkOperationResponse(
+export const AdminBulkVoucherOperationResponse = createBulkOperationResponse(
   'voucherId',
   UUID,
 )
 
-export type BulkVoucherOperationResponse = z.infer<
-  typeof BulkVoucherOperationResponse
+export type AdminBulkVoucherOperationResponse = z.infer<
+  typeof AdminBulkVoucherOperationResponse
 >
 
 // ============= Analytics =============
@@ -388,7 +394,7 @@ export type BulkVoucherOperationResponse = z.infer<
 /**
  * Voucher analytics response
  */
-export const VoucherAnalyticsResponse = openapi(
+export const AdminVoucherAnalyticsResponse = openapi(
   z.object({
     voucherId: UUID,
     period: z.object({
@@ -416,12 +422,14 @@ export const VoucherAnalyticsResponse = openapi(
   },
 )
 
-export type VoucherAnalyticsResponse = z.infer<typeof VoucherAnalyticsResponse>
+export type AdminVoucherAnalyticsResponse = z.infer<
+  typeof AdminVoucherAnalyticsResponse
+>
 
 /**
  * Business voucher statistics
  */
-export const BusinessVoucherStatsResponse = openapi(
+export const AdminBusinessVoucherStatsResponse = openapi(
   z.object({
     businessId: UUID,
     period: z.object({
@@ -454,6 +462,6 @@ export const BusinessVoucherStatsResponse = openapi(
   },
 )
 
-export type BusinessVoucherStatsResponse = z.infer<
-  typeof BusinessVoucherStatsResponse
+export type AdminBusinessVoucherStatsResponse = z.infer<
+  typeof AdminBusinessVoucherStatsResponse
 >

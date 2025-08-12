@@ -44,7 +44,7 @@ if command -v docker &> /dev/null; then
   
   # Run pg_dump and capture output directly, then write to file
   docker run --rm --network host \
-    postgres:17.2 pg_dump \
+    postgres:17 pg_dump \
     --schema-only \
     --no-owner \
     --no-privileges \

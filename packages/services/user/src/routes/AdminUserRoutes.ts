@@ -1,4 +1,4 @@
-import { userAdmin, userPublic } from '@pika/api'
+import { userAdmin } from '@pika/api'
 import {
   requireAuth,
   requirePermissions,
@@ -55,7 +55,7 @@ export function createAdminUserRouter(
     '/verify',
     requireAuth(),
     requirePermissions('admin:users'),
-    validateBody(userPublic.UnifiedVerificationRequest),
+    validateBody(userAdmin.AdminVerificationRequest),
     controller.verifyUser,
   )
 
@@ -64,7 +64,7 @@ export function createAdminUserRouter(
     '/resend-verification',
     requireAuth(),
     requirePermissions('admin:users'),
-    validateBody(userPublic.UnifiedResendVerificationRequest),
+    validateBody(userAdmin.AdminResendVerificationRequest),
     controller.resendVerification,
   )
 
@@ -92,7 +92,7 @@ export function createAdminUserRouter(
     '/me',
     requireAuth(),
     requirePermissions('admin:users'),
-    validateBody(userAdmin.UpdateAdminProfileRequest),
+    validateBody(userAdmin.AdminUpdateProfileRequest),
     controller.updateMyProfile,
   )
 

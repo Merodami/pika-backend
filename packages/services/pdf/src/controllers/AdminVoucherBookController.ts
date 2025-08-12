@@ -120,13 +120,13 @@ export class AdminVoucherBookController {
    * Create new voucher book
    */
   async createVoucherBook(
-    req: Request<{}, {}, pdfAdmin.CreateVoucherBookRequest>,
+    req: Request<{}, {}, pdfAdmin.AdminCreateVoucherBookRequest>,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const context = RequestContext.getContext(req)
-      const data = getValidatedBody<pdfAdmin.CreateVoucherBookRequest>(req)
+      const data = getValidatedBody<pdfAdmin.AdminCreateVoucherBookRequest>(req)
 
       if (!context.userId) {
         throw ErrorFactory.unauthorized('User context not found')
@@ -158,7 +158,7 @@ export class AdminVoucherBookController {
     req: Request<
       pdfCommon.VoucherBookIdParam,
       {},
-      pdfAdmin.UpdateVoucherBookRequest
+      pdfAdmin.AdminUpdateVoucherBookRequest
     >,
     res: Response,
     next: NextFunction,
@@ -166,7 +166,7 @@ export class AdminVoucherBookController {
     try {
       const context = RequestContext.getContext(req)
       const { id } = req.params
-      const data = getValidatedBody<pdfAdmin.UpdateVoucherBookRequest>(req)
+      const data = getValidatedBody<pdfAdmin.AdminUpdateVoucherBookRequest>(req)
 
       const updateData = VoucherBookMapper.fromUpdateDTO(data, context.userId)
 
@@ -216,7 +216,7 @@ export class AdminVoucherBookController {
     req: Request<
       pdfCommon.VoucherBookIdParam,
       {},
-      pdfAdmin.UpdateVoucherBookStatusRequest
+      pdfAdmin.AdminUpdateVoucherBookStatusRequest
     >,
     res: Response,
     next: NextFunction,
@@ -225,7 +225,7 @@ export class AdminVoucherBookController {
       const context = RequestContext.getContext(req)
       const { id } = req.params
       const { status } =
-        getValidatedBody<pdfAdmin.UpdateVoucherBookStatusRequest>(req)
+        getValidatedBody<pdfAdmin.AdminUpdateVoucherBookStatusRequest>(req)
 
       const voucherBook = await this.voucherBookService.updateVoucherBookStatus(
         id,
@@ -251,7 +251,11 @@ export class AdminVoucherBookController {
    * Generate PDF for voucher book
    */
   async generatePDF(
-    req: Request<pdfCommon.VoucherBookIdParam, {}, pdfAdmin.GeneratePdfRequest>,
+    req: Request<
+      pdfCommon.VoucherBookIdParam,
+      {},
+      pdfAdmin.AdminGeneratePdfRequest
+    >,
     res: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -263,7 +267,7 @@ export class AdminVoucherBookController {
         throw ErrorFactory.unauthorized('User context not found')
       }
 
-      getValidatedBody<pdfAdmin.GeneratePdfRequest>(req)
+      getValidatedBody<pdfAdmin.AdminGeneratePdfRequest>(req)
 
       const result = await this.voucherBookService.generatePDF(
         id,
@@ -273,7 +277,7 @@ export class AdminVoucherBookController {
       // Use mapper for proper response transformation
       const response = VoucherBookMapper.toGeneratePDFResponse(result)
       const validatedResponse = validateResponse(
-        pdfAdmin.GeneratePdfResponse,
+        pdfAdmin.AdminGeneratePdfResponse,
         response,
         'AdminVoucherBookController.generatePDF',
       )
@@ -311,7 +315,7 @@ export class AdminVoucherBookController {
         results: result.results,
       })
       const validatedResponse = validateResponse(
-        pdfAdmin.BulkVoucherBookOperationResponse,
+        pdfAdmin.AdminBulkVoucherBookOperationResponse,
         response,
         'AdminVoucherBookController.bulkArchiveVoucherBooks',
       )

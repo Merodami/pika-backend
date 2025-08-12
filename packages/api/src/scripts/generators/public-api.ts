@@ -13,8 +13,17 @@ import * as paymentHeaderSchemas from '@api/schemas/payment/public/headers.js'
 import * as webhookSchemas from '@api/schemas/payment/public/webhooks.js'
 import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
+import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import { MessageResponse, PaginationMetadata } from '@api/schemas/shared/responses.js'
+import {
+  CoordinatesSchema,
+  GeoJSONPointSchema,
+  GeoSearchParamsSchema,
+} from '@api/schemas/shared/geo.js'
+import {
+  MessageResponse,
+  PaginationMetadata,
+} from '@api/schemas/shared/responses.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import * as storageSchemas from '@api/schemas/storage/public/file.js'
 import * as subscriptionSchemas from '@api/schemas/subscription/public/index.js'
@@ -37,7 +46,17 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   // ============= Common Schemas =============
   // Register pagination metadata to ensure hasNext/hasPrev are included
   registry.registerSchema('PaginationMetadata', PaginationMetadata)
-  
+
+  // Register shared geo schemas
+  registry.registerSchema('Coordinates', CoordinatesSchema)
+  registry.registerSchema('GeoJSONPoint', GeoJSONPointSchema)
+  registry.registerSchema('GeoSearchParams', GeoSearchParamsSchema)
+
+  // Register shared device schemas
+  registry.registerSchema('DeviceInfo', DeviceInfoSchema)
+
+  // Register file upload schemas
+
   // ============= Enum Schemas =============
   // User enums
   registry.registerSchema('UserStatus', userEnumSchemas.UserStatusSchema)
@@ -59,6 +78,18 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'VoucherDiscountType',
     voucherEnumSchemas.VoucherDiscountTypeSchema,
+  )
+  registry.registerSchema(
+    'VoucherScanSource',
+    voucherEnumSchemas.VoucherScanSourceSchema,
+  )
+  registry.registerSchema(
+    'VoucherCodeType',
+    voucherEnumSchemas.VoucherCodeTypeSchema,
+  )
+  registry.registerSchema(
+    'CustomerVoucherStatus',
+    voucherEnumSchemas.CustomerVoucherStatusSchema,
   )
 
   // ============= Authentication Schemas =============
@@ -179,7 +210,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'VoucherScanRequest',
-    voucherSchemas.VoucherScanRequest,
+    voucherSchemas.VoucherScanRequestSchema,
   )
   registry.registerSchema(
     'VoucherScanResponse',
@@ -187,7 +218,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'VoucherClaimRequest',
-    voucherSchemas.VoucherClaimRequest,
+    voucherSchemas.VoucherClaimRequestSchema,
   )
   registry.registerSchema(
     'VoucherClaimResponse',
@@ -195,7 +226,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'VoucherRedeemRequest',
-    voucherSchemas.VoucherRedeemRequest,
+    voucherSchemas.VoucherRedeemRequestSchema,
   )
   registry.registerSchema(
     'VoucherRedeemResponse',
@@ -422,7 +453,11 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'UploadAvatarRequest',
-    userProfileSchemas.UploadAvatarRequest,
+    userProfileSchemas.UploadAvatarRequestSchema,
+  )
+  registry.registerSchema(
+    'UploadAvatarResponse',
+    userProfileSchemas.UploadAvatarResponseSchema,
   )
   registry.registerSchema(
     'DeleteAccountRequest',
@@ -581,7 +616,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     summary: 'Get businesses in a specific category',
     tags: ['Business'],
     request: {
-      params: categoryParameters.CategoryIdParam,
+      params: categoryParameters.CategoryIdNamedParam,
       query: businessSchemas.BusinessQueryParams,
     },
     responses: {
@@ -1019,7 +1054,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: voucherSchemas.VoucherScanRequest,
+            schema: voucherSchemas.VoucherScanRequestSchema,
           },
         },
       },
@@ -1057,7 +1092,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: voucherSchemas.VoucherClaimRequest,
+            schema: voucherSchemas.VoucherClaimRequestSchema,
           },
         },
       },
@@ -1103,7 +1138,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: voucherSchemas.VoucherRedeemRequest,
+            schema: voucherSchemas.VoucherRedeemRequestSchema,
           },
         },
       },
@@ -1525,6 +1560,36 @@ function registerPublicRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: userProfileSchemas.CurrentUserProfile,
+          },
+        },
+      },
+    },
+  })
+
+  // Avatar upload route
+  registry.registerRoute({
+    method: 'post',
+    path: '/users/me/avatar',
+    operationId: 'uploadUserAvatar',
+    summary: 'Upload user avatar',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: userProfileSchemas.UploadAvatarRequestSchema,
+          },
+        },
+        required: true,
+      },
+    },
+    responses: {
+      200: {
+        description: 'Avatar uploaded successfully',
+        content: {
+          'application/json': {
+            schema: userProfileSchemas.UploadAvatarResponseSchema,
           },
         },
       },

@@ -1,4 +1,5 @@
 // packages/tests/src/utils/setupTests.ts
+import { get } from 'lodash-es'
 import { vi } from 'vitest'
 
 // Configure Testcontainers to clean up automatically
@@ -391,7 +392,7 @@ vi.mock('@pika/shared', async () => {
     includesRelation: vi
       .fn()
       .mockImplementation((includes: Record<string, any>, relation: string) => {
-        return includes[relation] === true
+        return Boolean(includes && get(includes, relation))
       }),
     mergeIncludes: vi
       .fn()

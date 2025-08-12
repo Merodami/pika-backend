@@ -1,5 +1,7 @@
+import { Priority as PriorityEnum, Status } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 import { GymId, UserId } from './branded.js'
 import { DateTime, DateTimeString } from './primitives.js'
 
@@ -140,7 +142,7 @@ export const activeStatus = z.object({
  * Publication status
  */
 export const publicationStatus = z.object({
-  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).default('DRAFT'),
+  status: createZodEnum(Status).default(Status.DRAFT),
   publishedAt: DateTime.optional().describe('When the record was published'),
 })
 
@@ -148,7 +150,7 @@ export const publicationStatus = z.object({
  * Approval workflow
  */
 export const approvalStatus = z.object({
-  status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).default('PENDING'),
+  status: createZodEnum(Status).default(Status.PENDING),
   approvedAt: DateTime.optional(),
   approvedBy: UserId.optional(),
   rejectedAt: DateTime.optional(),
@@ -174,7 +176,7 @@ export const sortOrder = z.object({
  * Priority field
  */
 export const priority = z.object({
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).default('MEDIUM'),
+  priority: createZodEnum(PriorityEnum).default(PriorityEnum.MEDIUM),
 })
 
 // ============= Tagging & Categorization =============

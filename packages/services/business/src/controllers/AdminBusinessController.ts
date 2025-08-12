@@ -127,7 +127,7 @@ export class AdminBusinessController {
    * Create new business (admin)
    */
   async createBusiness(
-    req: Request<{}, {}, businessAdmin.CreateBusinessRequest>,
+    req: Request<{}, {}, businessAdmin.AdminCreateBusinessRequest>,
     res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
   ): Promise<void> {
@@ -167,7 +167,7 @@ export class AdminBusinessController {
     req: Request<
       businessPublic.BusinessPathParams,
       {},
-      businessAdmin.UpdateBusinessRequest
+      businessAdmin.AdminUpdateBusinessRequest
     >,
     res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
@@ -226,7 +226,7 @@ export class AdminBusinessController {
     req: Request<
       businessPublic.BusinessPathParams,
       {},
-      businessAdmin.PatchBusinessVerificationRequest
+      businessAdmin.AdminPatchBusinessVerificationRequest
     >,
     res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,
@@ -235,9 +235,12 @@ export class AdminBusinessController {
       const { id: businessId } = req.params
       const { verified } = req.body
 
-      const updatedBusiness = await this.businessService.updateBusiness(businessId, {
-        verified,
-      })
+      const updatedBusiness = await this.businessService.updateBusiness(
+        businessId,
+        {
+          verified,
+        },
+      )
 
       // Return the updated business data
       res.status(200).json(BusinessMapper.toAdminDTO(updatedBusiness))
@@ -298,7 +301,7 @@ export class AdminBusinessController {
     req: Request<
       businessPublic.BusinessPathParams,
       {},
-      businessAdmin.UpdateBusinessRatingRequest
+      businessAdmin.AdminUpdateBusinessRatingRequest
     >,
     res: Response<businessAdmin.AdminBusinessResponse>,
     next: NextFunction,

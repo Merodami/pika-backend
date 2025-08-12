@@ -1,3 +1,4 @@
+import { NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -27,7 +28,10 @@ export const InternalBusinessData = openapi(
     categoryId: UUID,
     verified: z.boolean(),
     active: z.boolean(),
-    avgRating: z.number().min(0).max(5),
+    avgRating: z
+      .number()
+      .min(NUMERIC_CONSTRAINTS.RATING_MIN)
+      .max(NUMERIC_CONSTRAINTS.RATING_MAX),
   }),
   {
     description: 'Internal business data for services',

@@ -46,7 +46,7 @@ export function createAdminSupportRouter(
     requireAuth(),
     requirePermissions('admin:support'),
     validateParams(supportCommon.TicketIdParam),
-    validateBody(supportAdmin.UpdateTicketStatusRequest),
+    validateBody(supportAdmin.AdminUpdateTicketStatusRequest),
     controller.updateTicketStatus,
   )
 
@@ -55,7 +55,7 @@ export function createAdminSupportRouter(
     requireAuth(),
     requirePermissions('admin:support'),
     validateParams(supportCommon.TicketIdParam),
-    validateBody(supportAdmin.AssignTicketRequest),
+    validateBody(supportAdmin.AdminAssignTicketRequest),
     controller.assignTicket,
   )
 

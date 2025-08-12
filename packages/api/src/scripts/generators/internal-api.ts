@@ -6,7 +6,13 @@ import * as categoryParameters from '@api/schemas/category/common/parameters.js'
 import * as internalCategorySchemas from '@api/schemas/category/internal/service.js'
 import * as internalCommunicationSchemas from '@api/schemas/communication/internal/service.js'
 import * as internalDiscoverySchemas from '@api/schemas/discovery/internal/service.js'
+import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import {
+  CoordinatesSchema,
+  GeoJSONPointSchema,
+  GeoSearchParamsSchema,
+} from '@api/schemas/shared/geo.js'
 import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import * as internalStorageSchemas from '@api/schemas/storage/internal/service.js'
@@ -21,6 +27,15 @@ import { z } from 'zod'
  * Register all internal API schemas and routes
  */
 export function registerInternalAPI(registry: ZodRegistry): void {
+  // ============= Common Schemas =============
+  // Register shared geo schemas
+  registry.registerSchema('Coordinates', CoordinatesSchema)
+  registry.registerSchema('GeoJSONPoint', GeoJSONPointSchema)
+  registry.registerSchema('GeoSearchParams', GeoSearchParamsSchema)
+
+  // Register shared device schemas
+  registry.registerSchema('DeviceInfo', DeviceInfoSchema)
+
   // ============= Health & Discovery Schemas =============
   registry.registerSchema('ServiceHealth', healthSchemas.ServiceHealth)
 
@@ -660,7 +675,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
     tags: ['Business Service'],
     security: [{ apiKey: [] }],
     request: {
-      params: categoryParameters.CategoryIdParam,
+      params: categoryParameters.CategoryIdNamedParam,
       query: internalBusinessSchemas.GetBusinessesByCategoryRequest,
     },
     responses: {

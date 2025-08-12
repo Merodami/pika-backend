@@ -125,7 +125,7 @@ export class AdminSupportController {
     req: Request<
       supportCommon.TicketIdParam,
       {},
-      supportAdmin.UpdateTicketStatusRequest
+      supportAdmin.AdminUpdateTicketStatusRequest
     >,
     res: Response,
     next: NextFunction,
@@ -170,7 +170,7 @@ export class AdminSupportController {
     req: Request<
       supportCommon.TicketIdParam,
       {},
-      supportAdmin.AssignTicketRequest
+      supportAdmin.AdminAssignTicketRequest
     >,
     res: Response,
     next: NextFunction,

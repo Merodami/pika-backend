@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -25,8 +26,12 @@ import {
 export const InternalVoucherBookResponse = openapi(
   withTimestamps({
     id: UUID,
-    title: z.string().max(255).describe('Voucher book title'),
-    edition: z.string().max(100).optional().describe('Book edition'),
+    title: z.string().max(FIELD_LENGTH.SLUG_MAX).describe('Voucher book title'),
+    edition: z
+      .string()
+      .max(FIELD_LENGTH.NAME_MAX)
+      .optional()
+      .describe('Book edition'),
     bookType: VoucherBookTypeSchema,
     month: z
       .number()
@@ -41,7 +46,7 @@ export const InternalVoucherBookResponse = openapi(
       .number()
       .int()
       .min(1)
-      .max(100)
+      .max(FIELD_LENGTH.NAME_MAX)
       .describe('Total number of pages'),
     publishedAt: z
       .string()
@@ -214,8 +219,16 @@ export const InternalBookWithRelationsResponse = openapi(
                   .string()
                   .optional()
                   .describe('QR code payload'),
-                shortCode: z.string().max(20).optional().describe('Short code'),
-                title: z.string().max(255).optional().describe('Title'),
+                shortCode: z
+                  .string()
+                  .max(FIELD_LENGTH.CODE_SHORT_MAX)
+                  .optional()
+                  .describe('Short code'),
+                title: z
+                  .string()
+                  .max(FIELD_LENGTH.SLUG_MAX)
+                  .optional()
+                  .describe('Title'),
                 description: z.string().optional().describe('Description'),
                 metadata: z
                   .record(z.string(), z.any())

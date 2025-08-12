@@ -1,3 +1,4 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -60,7 +61,10 @@ export type ServiceEndpoint = z.infer<typeof ServiceEndpoint>
 export const ServiceInstance = openapi(
   withTimestamps({
     id: UUID,
-    serviceName: z.string().min(1).max(100),
+    serviceName: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.NAME_MAX),
     serviceType: ServiceType,
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     instanceId: z.string().min(1),
@@ -113,7 +117,10 @@ export type ServiceInstance = z.infer<typeof ServiceInstance>
  */
 export const RegisterServiceRequest = openapi(
   z.object({
-    serviceName: z.string().min(1).max(100),
+    serviceName: z
+      .string()
+      .min(FIELD_LENGTH.NAME_MIN)
+      .max(FIELD_LENGTH.NAME_MAX),
     serviceType: ServiceType,
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     instanceId: z.string().min(1),

@@ -1,22 +1,37 @@
 {
   "name": "@pika/types",
-  "private": true,
-  "version": "0.0.0",
-  "description": "Shared TypeScript type definitions and enums for Pika platform",
-  "author": "Pika",
+  "version": "1.1.1",
+  "description": "Shared TypeScript types for Pika platform",
+  "author": "Damian Meroni",
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "devDependencies": {
-    "typescript": "^5.8.3"
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pika/pika.git",
-    "directory": "packages/types"
+    "url": "git+https://github.com/Merodami/pika-backend.git"
   },
-  "homepage": "https://github.com/pikaipikae/main/packages/types",
+  "homepage": "https://github.com/Merodami/pika-backend#readme",
   "bugs": {
-    "url": "https://github.com/pikaipikaues"
+    "url": "https://github.com/Merodami/pika-backend/issues"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   }
 }

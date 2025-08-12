@@ -36,6 +36,7 @@ export interface UserDocument {
   // Additional fields
   dateOfBirth?: Date | null
   stripeUserId?: string | null
+  preferredLanguage?: string | null
 }
 
 /**
@@ -125,6 +126,7 @@ export class UserMapper {
           : new Date(doc.dateOfBirth)
         : undefined,
       stripeUserId: doc.stripeUserId,
+      preferredLanguage: doc.preferredLanguage,
     }
   }
 
@@ -151,6 +153,7 @@ export class UserMapper {
       dateOfBirth: formatDateOnlyOrUndefined(domain.dateOfBirth),
       // Admin fields - default values when not available
       stripeUserId: domain.stripeUserId || undefined,
+      preferredLanguage: domain.preferredLanguage || undefined,
     }
   }
 
@@ -199,6 +202,7 @@ export class UserMapper {
       // Additional fields
       dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
       stripeUserId: dto.stripeUserId || null,
+      preferredLanguage: dto.preferredLanguage || null,
     }
   }
 

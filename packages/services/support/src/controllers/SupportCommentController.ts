@@ -48,7 +48,7 @@ export class SupportCommentController {
         page: query.page,
         limit: query.limit,
         sortBy: query.sortBy,
-        sortOrder: query.sortOrder.toUpperCase() as 'ASC' | 'DESC',
+        sortOrder: query.sortOrder.toLowerCase() as 'asc' | 'desc',
       }
 
       const result = await this.commentService.getCommentsByProblemId(params)

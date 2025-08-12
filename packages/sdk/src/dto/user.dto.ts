@@ -57,6 +57,7 @@ export interface UserDTO {
   // Additional fields
   dateOfBirth?: string
   stripeUserId?: string
+  preferredLanguage?: string
 }
 
 // ============= Create/Update DTOs =============
@@ -75,6 +76,7 @@ export interface UpdateUserDTO {
   phoneNumber?: string
   avatarUrl?: string
   dateOfBirth?: string
+  preferredLanguage?: string
 }
 
 export interface CreateAddressDTO {

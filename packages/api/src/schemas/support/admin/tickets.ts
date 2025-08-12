@@ -5,6 +5,7 @@ import {
   TicketStatus,
   TicketType,
 } from '@pika/types'
+import { NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -135,7 +136,7 @@ export type AdminUpdateProblemRequest = z.infer<
 /**
  * Assign ticket request
  */
-export const AssignTicketRequest = openapi(
+export const AdminAssignTicketRequest = openapi(
   z.object({
     assigneeId: UserId,
     note: z.string().max(500).optional(),
@@ -146,12 +147,12 @@ export const AssignTicketRequest = openapi(
   },
 )
 
-export type AssignTicketRequest = z.infer<typeof AssignTicketRequest>
+export type AdminAssignTicketRequest = z.infer<typeof AdminAssignTicketRequest>
 
 /**
  * Update ticket status request
  */
-export const UpdateTicketStatusRequest = openapi(
+export const AdminUpdateTicketStatusRequest = openapi(
   z.object({
     status: TicketStatusSchema,
     note: z.string().max(1000).optional(),
@@ -162,14 +163,14 @@ export const UpdateTicketStatusRequest = openapi(
   },
 )
 
-export type UpdateTicketStatusRequest = z.infer<
-  typeof UpdateTicketStatusRequest
+export type AdminUpdateTicketStatusRequest = z.infer<
+  typeof AdminUpdateTicketStatusRequest
 >
 
 /**
  * Escalate ticket request
  */
-export const EscalateTicketRequest = openapi(
+export const AdminEscalateTicketRequest = openapi(
   z.object({
     reason: z.string().max(1000),
     priority: TicketPrioritySchema.optional(),
@@ -180,7 +181,9 @@ export const EscalateTicketRequest = openapi(
   },
 )
 
-export type EscalateTicketRequest = z.infer<typeof EscalateTicketRequest>
+export type AdminEscalateTicketRequest = z.infer<
+  typeof AdminEscalateTicketRequest
+>
 
 /**
  * Admin comment on ticket
@@ -275,13 +278,21 @@ export const SupportMetrics = openapi(
           ticketsHandled: z.number().int().nonnegative(),
           averageResponseTime: z.number(),
           averageResolutionTime: z.number(),
-          satisfactionScore: z.number().min(0).max(5).optional(),
+          satisfactionScore: z
+            .number()
+            .min(NUMERIC_CONSTRAINTS.RATING_MIN)
+            .max(NUMERIC_CONSTRAINTS.RATING_MAX)
+            .optional(),
         }),
       )
       .optional(),
 
     // Satisfaction
-    averageSatisfaction: z.number().min(0).max(5).optional(),
+    averageSatisfaction: z
+      .number()
+      .min(NUMERIC_CONSTRAINTS.RATING_MIN)
+      .max(NUMERIC_CONSTRAINTS.RATING_MAX)
+      .optional(),
     satisfactionResponseRate: z.number().min(0).max(100).optional(),
   }),
   {
@@ -296,7 +307,7 @@ export type SupportMetrics = z.infer<typeof SupportMetrics>
 /**
  * Bulk ticket update request
  */
-export const BulkTicketUpdateRequest = openapi(
+export const AdminBulkTicketUpdateRequest = openapi(
   z.object({
     ticketIds: z.array(UUID).min(1).max(100),
     updates: z.object({
@@ -312,7 +323,9 @@ export const BulkTicketUpdateRequest = openapi(
   },
 )
 
-export type BulkTicketUpdateRequest = z.infer<typeof BulkTicketUpdateRequest>
+export type AdminBulkTicketUpdateRequest = z.infer<
+  typeof AdminBulkTicketUpdateRequest
+>
 
 // ============= Templates =============
 

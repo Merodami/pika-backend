@@ -1,6 +1,7 @@
 import { AdminVoucherSortBy } from '@pika/types'
 import { z } from 'zod'
 
+import { GeoSearchParams } from '../../shared/geo.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import { AnalyticsGroupBySchema } from '../../shared/query.js'
@@ -9,10 +10,7 @@ import {
   VoucherDiscountTypeSchema,
   VoucherStateSchema,
 } from '../common/enums.js'
-import {
-  GeographicSearchParams,
-  VoucherFilterParams,
-} from '../common/queries.js'
+import { VoucherFilterParams } from '../common/queries.js'
 import { ADMIN_VOUCHER_ALLOWED_RELATIONS } from '../common/relations.js'
 
 /**
@@ -62,7 +60,7 @@ export const AdminVoucherQueryParams = SearchParams.extend({
       `Comma-separated relations: ${ADMIN_VOUCHER_ALLOWED_RELATIONS.join(',')}`,
     ),
 })
-  .merge(GeographicSearchParams)
+  .merge(GeoSearchParams)
   .merge(VoucherFilterParams)
 
 export type AdminVoucherQueryParams = z.infer<typeof AdminVoucherQueryParams>

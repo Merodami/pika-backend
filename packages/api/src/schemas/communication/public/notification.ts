@@ -1,3 +1,4 @@
+import { FIELD_LENGTH, MessagePriority } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -30,8 +31,8 @@ export const Notification = openapi(
     userId: UserId.optional().describe('User ID who receives the notification'),
     type: NotificationType.optional(),
     status: NotificationStatus.default('pending'),
-    priority: NotificationPriority.default('normal'),
-    title: z.string().max(255).optional(),
+    priority: NotificationPriority.default(MessagePriority.NORMAL),
+    title: z.string().max(FIELD_LENGTH.SLUG_MAX).optional(),
     description: z.string().optional(),
     isGlobal: z
       .boolean()
@@ -80,10 +81,10 @@ export const CreateNotificationRequest = openapi(
       .optional()
       .describe('Subscription token for push notifications'),
     type: NotificationType.optional(),
-    title: z.string().max(255).optional(),
+    title: z.string().max(FIELD_LENGTH.SLUG_MAX).optional(),
     description: z.string(),
     isGlobal: z.boolean().default(false),
-    priority: NotificationPriority.default('normal'),
+    priority: NotificationPriority.default(MessagePriority.NORMAL),
     category: z.string().optional(),
     actionUrl: z.string().url().optional(),
     imageUrl: z.string().url().optional(),

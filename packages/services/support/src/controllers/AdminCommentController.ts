@@ -104,7 +104,7 @@ export class AdminCommentController {
         page: query.page || 1,
         limit: query.limit || 20,
         sortBy: query.sortBy || 'createdAt',
-        sortOrder: (query.sortOrder || 'DESC') as 'ASC' | 'DESC',
+        sortOrder: (query.sortOrder || 'desc') as 'asc' | 'desc',
       }
 
       const result = await this.adminCommentService.getCommentsByProblemId(

@@ -1,7 +1,9 @@
+import { FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
+import { BinaryFile } from '../../shared/fileUpload.js'
 import {
   DateOnly,
   DateTime,
@@ -17,19 +19,24 @@ import { UserRoleSchema, UserStatusSchema } from '../common/enums.js'
 // ============= Public User Profile =============
 
 /**
- * Public user profile (excludes sensitive fields)
+ * Public user profile (raw Zod)
+ * For runtime validation
  */
-export const PublicUserProfile = openapi(
-  z.object({
-    id: UserId,
-    firstName: z.string().max(50),
-    lastName: z.string().max(50),
-    displayName: z.string().max(100).optional(),
-    avatarUrl: z.string().url().optional(),
-    bio: z.string().max(500).optional(),
-    // Public fields only - no email, phone, role, status
-    createdAt: DateTime,
-  }),
+export const PublicUserProfile = z.object({
+  id: UserId,
+  firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX),
+  lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX),
+  avatarUrl: z.string().url().optional(),
+  // Public fields only - no email, phone, role, status
+  createdAt: DateTime,
+})
+
+/**
+ * Public user profile (OpenAPI documented)
+ * This will generate $ref when used in OpenAPI schemas
+ */
+export const PublicUserProfileSchema = PublicUserProfile.openapi(
+  'PublicUserProfile',
   {
     description: 'Public user profile information',
   },
@@ -40,28 +47,33 @@ export type PublicUserProfile = z.infer<typeof PublicUserProfile>
 // ============= Current User Profile =============
 
 /**
- * Current user profile (includes private fields for the authenticated user)
+ * Current user profile (raw Zod)
+ * For runtime validation
  */
-export const CurrentUserProfile = openapi(
-  z.object({
-    id: UserId,
-    email: Email,
-    firstName: z.string().max(50),
-    lastName: z.string().max(50),
-    displayName: z.string().max(100).optional(),
-    phoneNumber: PhoneNumber.optional(),
-    avatarUrl: z.string().url().optional(),
-    bio: z.string().max(500).optional(),
-    dateOfBirth: DateOnly.optional(),
-    preferredLanguage: LanguageCode.optional(),
-    role: UserRoleSchema,
-    status: UserStatusSchema,
-    emailVerified: z.boolean(),
-    phoneVerified: z.boolean().optional(),
-    createdAt: DateTime,
-    updatedAt: DateTime,
-    lastLoginAt: DateTime.optional(),
-  }),
+export const CurrentUserProfile = z.object({
+  id: UserId,
+  email: Email,
+  firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX),
+  lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX),
+  phoneNumber: PhoneNumber.optional(),
+  avatarUrl: z.string().url().optional(),
+  dateOfBirth: DateOnly.optional(),
+  preferredLanguage: LanguageCode.optional(),
+  role: UserRoleSchema,
+  status: UserStatusSchema,
+  emailVerified: z.boolean(),
+  phoneVerified: z.boolean().optional(),
+  createdAt: DateTime,
+  updatedAt: DateTime,
+  lastLoginAt: DateTime.optional(),
+})
+
+/**
+ * Current user profile (OpenAPI documented)
+ * This will generate $ref when used in OpenAPI schemas
+ */
+export const CurrentUserProfileSchema = CurrentUserProfile.openapi(
+  'CurrentUserProfile',
   {
     description: "Authenticated user's complete profile",
   },
@@ -77,11 +89,9 @@ export type CurrentUserProfile = z.infer<typeof CurrentUserProfile>
 export const UpdateProfileRequest = openapi(
   z
     .object({
-      firstName: z.string().max(50).optional(),
-      lastName: z.string().max(50).optional(),
-      displayName: z.string().max(100).optional(),
+      firstName: z.string().max(FIELD_LENGTH.FIRST_NAME_MAX).optional(),
+      lastName: z.string().max(FIELD_LENGTH.LAST_NAME_MAX).optional(),
       phoneNumber: PhoneNumber.optional(),
-      bio: z.string().max(500).optional(),
       dateOfBirth: DateOnly.optional(),
       preferredLanguage: LanguageCode.optional(),
     })
@@ -98,35 +108,51 @@ export type UpdateProfileRequest = z.infer<typeof UpdateProfileRequest>
 /**
  * User profile response (alias for current user profile)
  */
-export const UserProfileResponse = CurrentUserProfile
+export const UserProfileResponse = CurrentUserProfileSchema
 
-export type UserProfileResponse = z.infer<typeof UserProfileResponse>
+export type UserProfileResponse = z.infer<typeof CurrentUserProfile>
 
 // ============= Avatar Upload =============
 
 /**
- * Upload avatar request
+ * Upload avatar request (raw Zod)
+ * For multipart/form-data file uploads
  */
-export const UploadAvatarRequest = openapi(
-  z.object({
-    avatar: z.string().describe('Base64 encoded image data or file upload'),
-    format: z.enum(['JPEG', 'PNG', 'WEBP']).optional().describe('Image format'),
-  }),
-  {
-    description: 'Upload user avatar/profile picture',
-  },
-)
+export const UploadAvatarRequest = z.object({
+  avatar: BinaryFile,
+})
+
+/**
+ * Upload avatar request (OpenAPI documented)
+ * This generates proper multipart/form-data schema with binary file
+ */
+export const UploadAvatarRequestSchema = z
+  .object({
+    avatar: BinaryFile.openapi({
+      type: 'string',
+      format: 'binary',
+      description: 'Avatar image file (JPEG, PNG, or WebP)',
+    }),
+  })
+  .openapi('UploadAvatarRequest', {
+    description: 'Upload user avatar via multipart/form-data',
+  })
 
 export type UploadAvatarRequest = z.infer<typeof UploadAvatarRequest>
 
 /**
- * Upload avatar response
+ * Upload avatar response (raw Zod)
  */
-export const UploadAvatarResponse = openapi(
-  z.object({
-    avatarUrl: z.string().url().describe('URL of the uploaded avatar'),
-    message: z.string().default('Avatar uploaded successfully'),
-  }),
+export const UploadAvatarResponse = z.object({
+  avatarUrl: z.string().url().describe('URL of the uploaded avatar'),
+  message: z.string().default('Avatar uploaded successfully'),
+})
+
+/**
+ * Upload avatar response (OpenAPI documented)
+ */
+export const UploadAvatarResponseSchema = UploadAvatarResponse.openapi(
+  'UploadAvatarResponse',
   {
     description: 'Avatar upload result',
   },
@@ -230,7 +256,7 @@ export const DeleteAccountRequest = openapi(
     password: z.string().min(1).describe('Current password for verification'),
     reason: z
       .string()
-      .max(500)
+      .max(FIELD_LENGTH.NOTES_MAX)
       .optional()
       .describe('Optional reason for account deletion'),
     confirmDeletion: z
@@ -273,16 +299,16 @@ export type DeleteAccountResponse = z.infer<typeof DeleteAccountResponse>
 /**
  * User response for public endpoints
  */
-export const UserResponse = CurrentUserProfile
+export const UserResponse = CurrentUserProfileSchema
 
-export type UserResponse = z.infer<typeof UserResponse>
+export type UserResponse = z.infer<typeof CurrentUserProfile>
 
 /**
  * User friends response
  */
 export const UserFriendsResponse = openapi(
   z.object({
-    friends: z.array(PublicUserProfile),
+    friends: z.array(PublicUserProfileSchema),
     totalCount: z.number().int().nonnegative(),
   }),
   {

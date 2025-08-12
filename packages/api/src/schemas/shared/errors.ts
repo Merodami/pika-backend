@@ -10,29 +10,33 @@ import { DateTime, UUID } from './primitives.js'
 // ============= Error Response =============
 
 /**
- * Standard error response
+ * Standard error response (raw Zod)
+ * Base schema that can be extended
  */
-export const ErrorResponse = openapi(
-  z.object({
-    statusCode: z.number().int().min(100).max(599),
-    error: z.string(),
-    message: z.string(),
-    details: z
-      .array(
-        z.object({
-          field: z.string(),
-          message: z.string(),
-          code: z.string().optional(),
-        }),
-      )
-      .optional(),
-    correlationId: UUID.optional().describe('Request correlation ID'),
-    timestamp: DateTime.optional(),
-  }),
-  {
-    description: 'Standard error response',
-  },
-)
+const ErrorResponseBase = z.object({
+  statusCode: z.number().int().min(100).max(599),
+  error: z.string(),
+  message: z.string(),
+  details: z
+    .array(
+      z.object({
+        field: z.string(),
+        message: z.string(),
+        code: z.string().optional(),
+      }),
+    )
+    .optional(),
+  correlationId: UUID.optional().describe('Request correlation ID'),
+  timestamp: DateTime.optional(),
+})
+
+/**
+ * Standard error response (OpenAPI documented)
+ * This will generate $ref when used in OpenAPI schemas
+ */
+export const ErrorResponse = ErrorResponseBase.openapi('ErrorResponse', {
+  description: 'Standard error response',
+})
 
 export type ErrorResponse = z.infer<typeof ErrorResponse>
 
@@ -42,7 +46,7 @@ export type ErrorResponse = z.infer<typeof ErrorResponse>
  * Validation error response (400)
  */
 export const ValidationErrorResponse = openapi(
-  ErrorResponse.extend({
+  ErrorResponseBase.extend({
     statusCode: z.literal(400),
     error: z.literal('Bad Request'),
   }),
@@ -59,7 +63,7 @@ export type ValidationErrorResponse = z.infer<typeof ValidationErrorResponse>
  * Unauthorized error response (401)
  */
 export const UnauthorizedResponse = openapi(
-  ErrorResponse.extend({
+  ErrorResponseBase.extend({
     statusCode: z.literal(401),
     error: z.literal('Unauthorized'),
   }),
@@ -74,7 +78,7 @@ export type UnauthorizedResponse = z.infer<typeof UnauthorizedResponse>
  * Forbidden error response (403)
  */
 export const ForbiddenResponse = openapi(
-  ErrorResponse.extend({
+  ErrorResponseBase.extend({
     statusCode: z.literal(403),
     error: z.literal('Forbidden'),
   }),
@@ -91,7 +95,7 @@ export type ForbiddenResponse = z.infer<typeof ForbiddenResponse>
  * Not found error response (404)
  */
 export const NotFoundResponse = openapi(
-  ErrorResponse.extend({
+  ErrorResponseBase.extend({
     statusCode: z.literal(404),
     error: z.literal('Not Found'),
     resource: z.string().optional(),
@@ -108,7 +112,7 @@ export type NotFoundResponse = z.infer<typeof NotFoundResponse>
  * Conflict error response (409)
  */
 export const ConflictResponse = openapi(
-  ErrorResponse.extend({
+  ErrorResponseBase.extend({
     statusCode: z.literal(409),
     error: z.literal('Conflict'),
     conflictingField: z.string().optional(),
@@ -127,7 +131,7 @@ export type ConflictResponse = z.infer<typeof ConflictResponse>
  * Internal server error response (500)
  */
 export const InternalServerErrorResponse = openapi(
-  ErrorResponse.extend({
+  ErrorResponseBase.extend({
     statusCode: z.literal(500),
     error: z.literal('Internal Server Error'),
   }),
@@ -144,7 +148,7 @@ export type InternalServerErrorResponse = z.infer<
  * Service unavailable error response (503)
  */
 export const ServiceUnavailableResponse = openapi(
-  ErrorResponse.extend({
+  ErrorResponseBase.extend({
     statusCode: z.literal(503),
     error: z.literal('Service Unavailable'),
     retryAfter: z.number().int().positive().optional(),
@@ -157,3 +161,30 @@ export const ServiceUnavailableResponse = openapi(
 export type ServiceUnavailableResponse = z.infer<
   typeof ServiceUnavailableResponse
 >
+
+// ============= ApiError Class (for frontend compatibility) =============
+
+/**
+ * ApiError class for frontend SDK compatibility
+ * This mimics the error structure expected by the generated API client
+ */
+export class ApiError extends Error {
+  public readonly status: number
+  public readonly statusText: string
+  public readonly body: any
+  public readonly headers: Record<string, string>
+
+  constructor(
+    status: number,
+    statusText: string,
+    body: any,
+    headers: Record<string, string> = {},
+  ) {
+    super(`${status} ${statusText}`)
+    this.name = 'ApiError'
+    this.status = status
+    this.statusText = statusText
+    this.body = body
+    this.headers = headers
+  }
+}

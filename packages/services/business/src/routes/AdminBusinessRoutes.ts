@@ -53,7 +53,7 @@ export function createAdminBusinessRoutes(
   router.post(
     '/',
     requirePermissions('admin:businesses'),
-    validateBody(businessAdmin.CreateBusinessRequest),
+    validateBody(businessAdmin.AdminCreateBusinessRequest),
     controller.createBusiness,
   )
 
@@ -62,7 +62,7 @@ export function createAdminBusinessRoutes(
     '/:id',
     requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
-    validateBody(businessAdmin.UpdateBusinessRequest),
+    validateBody(businessAdmin.AdminUpdateBusinessRequest),
     controller.updateBusiness,
   )
 
@@ -79,7 +79,7 @@ export function createAdminBusinessRoutes(
     '/:id/verify',
     requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
-    validateBody(businessAdmin.ToggleBusinessVerificationRequest),
+    validateBody(businessAdmin.AdminToggleBusinessVerificationRequest),
     controller.verifyBusiness,
   )
 
@@ -104,7 +104,7 @@ export function createAdminBusinessRoutes(
     '/:id/rating',
     requirePermissions('admin:businesses'),
     validateParams(businessCommon.BusinessIdParam),
-    validateBody(businessAdmin.UpdateBusinessRatingRequest),
+    validateBody(businessAdmin.AdminUpdateBusinessRatingRequest),
     controller.updateBusinessRating,
   )
 

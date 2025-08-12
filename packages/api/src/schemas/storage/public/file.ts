@@ -1,7 +1,9 @@
 import { FileSortBy } from '@pika/types'
+import { NUMERIC_CONSTRAINTS, SortOrder } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
@@ -135,9 +137,14 @@ export const GetFileHistoryQuery = openapi(
     fromDate: DateTime.optional(),
     toDate: DateTime.optional(),
     page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(20),
+    limit: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX)
+      .default(NUMERIC_CONSTRAINTS.PAGE_SIZE_DEFAULT),
     sortBy: FileSortBySchema.default(FileSortBy.UPLOADED_AT),
-    sortOrder: z.enum(['asc', 'desc']).default('desc'),
+    sortOrder: createZodEnum(SortOrder).default(SortOrder.DESC),
   }),
   {
     description: 'Query parameters for file history',
