@@ -11,6 +11,7 @@ import { z } from 'zod'
 import { openapi } from '../../../common/utils/openapi.js'
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Email, UserId } from '../../shared/branded.js'
+import { BinaryFile } from '../../shared/fileUpload.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateOnly, DateTime, UUID } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
@@ -342,7 +343,11 @@ export type AdminUnbanUserRequest = z.infer<typeof AdminUnbanUserRequest>
 
 export const AdminUploadUserAvatarRequest = openapi(
   z.object({
-    file: z.any().describe('Avatar image file (multipart/form-data)'),
+    avatar: BinaryFile.openapi({
+      type: 'string',
+      format: 'binary',
+      description: 'Avatar image file (JPEG, PNG, or WebP)',
+    }),
   }),
   {
     description: 'Upload avatar for a user (admin only)',

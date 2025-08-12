@@ -24,17 +24,15 @@ export const ALLOWED_FILE_TYPES = {
     AllowedMimeTypes.PNG,
     AllowedMimeTypes.WEBP,
   ] as const,
-  
+
   IMAGE: [
     AllowedMimeTypes.JPEG,
     AllowedMimeTypes.PNG,
     AllowedMimeTypes.WEBP,
     AllowedMimeTypes.GIF,
   ] as const,
-  
-  DOCUMENT: [
-    AllowedMimeTypes.PDF,
-  ] as const,
+
+  DOCUMENT: [AllowedMimeTypes.PDF] as const,
 } as const
 
 /**
@@ -58,10 +56,15 @@ export function getFileExtension(filename: string): string | undefined {
 /**
  * Check if file extension matches MIME type
  */
-export function isValidFileExtension(filename: string, mimeType: string): boolean {
+export function isValidFileExtension(
+  filename: string,
+  mimeType: string,
+): boolean {
   const extension = getFileExtension(filename)
+
   if (!extension) return false
-  
+
   const validExtensions = MIME_TO_EXTENSION[mimeType]
+
   return validExtensions ? validExtensions.includes(extension) : false
 }

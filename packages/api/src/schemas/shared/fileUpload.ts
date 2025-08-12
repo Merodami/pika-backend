@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { openapi } from '../../common/utils/openapi.js'
-
 /**
  * File upload schemas for various features
  */
@@ -107,9 +105,12 @@ export const ReviewImageUpload = z.object({
 /**
  * Session review image upload (OpenAPI documented)
  */
-export const ReviewImageUploadSchema = ReviewImageUpload.openapi('ReviewImageUpload', {
-  description: 'Review image upload validation',
-})
+export const ReviewImageUploadSchema = ReviewImageUpload.openapi(
+  'ReviewImageUpload',
+  {
+    description: 'Review image upload validation',
+  },
+)
 
 export type ReviewImageUpload = z.infer<typeof ReviewImageUpload>
 
@@ -150,9 +151,12 @@ export const FileUploadResponse = z.object({
 /**
  * Multi-file upload response (OpenAPI documented)
  */
-export const FileUploadResponseSchema = FileUploadResponse.openapi('FileUploadResponse', {
-  description: 'Successful file upload response',
-})
+export const FileUploadResponseSchema = FileUploadResponse.openapi(
+  'FileUploadResponse',
+  {
+    description: 'Successful file upload response',
+  },
+)
 
 export type FileUploadResponse = z.infer<typeof FileUploadResponse>
 
@@ -168,9 +172,11 @@ export const BatchFileUploadResponse = z.object({
 /**
  * Batch file upload response (OpenAPI documented)
  */
-export const BatchFileUploadResponseSchema = BatchFileUploadResponse.openapi('BatchFileUploadResponse', {
-  description: 'Multiple files uploaded successfully',
-})
+export const BatchFileUploadResponseSchema = BatchFileUploadResponse.openapi(
+  'BatchFileUploadResponse',
+  {
+    description: 'Multiple files uploaded successfully',
+  },
+)
 
 export type BatchFileUploadResponse = z.infer<typeof BatchFileUploadResponse>
-

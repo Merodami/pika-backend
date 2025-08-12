@@ -15,7 +15,6 @@ import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
 import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
-import { BinaryFileSchema } from '@api/schemas/shared/fileUpload.js'
 import {
   CoordinatesSchema,
   GeoJSONPointSchema,
@@ -57,7 +56,6 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   registry.registerSchema('DeviceInfo', DeviceInfoSchema)
 
   // Register file upload schemas
-  registry.registerSchema('BinaryFile', BinaryFileSchema)
 
   // ============= Enum Schemas =============
   // User enums

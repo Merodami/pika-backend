@@ -253,48 +253,69 @@ export class ErrorFactory {
     if (error?.name === 'MulterError') {
       switch (error.code) {
         case 'LIMIT_FILE_SIZE':
-          return new ValidationError({ file: ['File size exceeds maximum allowed size'] }, {
-            correlationId: context?.correlationId,
-            source: context?.source,
-            ...context,
-          })
+          return new ValidationError(
+            { file: ['File size exceeds maximum allowed size'] },
+            {
+              correlationId: context?.correlationId,
+              source: context?.source,
+              ...context,
+            },
+          )
         case 'LIMIT_FILE_COUNT':
-          return new ValidationError({ files: ['Too many files uploaded'] }, {
-            correlationId: context?.correlationId,
-            source: context?.source,
-            ...context,
-          })
+          return new ValidationError(
+            { files: ['Too many files uploaded'] },
+            {
+              correlationId: context?.correlationId,
+              source: context?.source,
+              ...context,
+            },
+          )
         case 'LIMIT_UNEXPECTED_FILE':
-          return new ValidationError({ [error.field || 'file']: ['Unexpected field name'] }, {
-            correlationId: context?.correlationId,
-            source: context?.source,
-            ...context,
-          })
+          return new ValidationError(
+            { [error.field || 'file']: ['Unexpected field name'] },
+            {
+              correlationId: context?.correlationId,
+              source: context?.source,
+              ...context,
+            },
+          )
         case 'LIMIT_FIELD_KEY':
         case 'LIMIT_FIELD_VALUE':
         case 'LIMIT_FIELD_COUNT':
         case 'LIMIT_PART_COUNT':
-          return new ValidationError({ form: ['Form data exceeds limits'] }, {
-            correlationId: context?.correlationId,
-            source: context?.source,
-            ...context,
-          })
+          return new ValidationError(
+            { form: ['Form data exceeds limits'] },
+            {
+              correlationId: context?.correlationId,
+              source: context?.source,
+              ...context,
+            },
+          )
         default:
-          return new ValidationError({ file: [message] }, {
-            correlationId: context?.correlationId,
-            source: context?.source,
-            ...context,
-          })
+          return new ValidationError(
+            { file: [message] },
+            {
+              correlationId: context?.correlationId,
+              source: context?.source,
+              ...context,
+            },
+          )
       }
     }
 
     // Handle form parsing errors
-    if (message.includes('Unexpected end of form') || message.includes('Missing boundary')) {
-      return new ValidationError({ form: ['Invalid or incomplete form data'] }, {
-        correlationId: context?.correlationId,
-        source: context?.source,
-        ...context,
-      })
+    if (
+      message.includes('Unexpected end of form') ||
+      message.includes('Missing boundary')
+    ) {
+      return new ValidationError(
+        { form: ['Invalid or incomplete form data'] },
+        {
+          correlationId: context?.correlationId,
+          source: context?.source,
+          ...context,
+        },
+      )
     }
 
     if (

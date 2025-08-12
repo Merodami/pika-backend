@@ -113,6 +113,7 @@ yarn publish:packages 1.1.12
 ```
 
 This command:
+
 1. Builds @pika/types package
 2. Builds @pika/api with bundling (inlines @pika/types code)
 3. Updates version numbers in package.github.json files

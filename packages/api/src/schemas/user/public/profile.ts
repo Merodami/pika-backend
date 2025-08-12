@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
-import { BinaryFile, BinaryFileSchema } from '../../shared/fileUpload.js'
+import { BinaryFile } from '../../shared/fileUpload.js'
 import {
   DateOnly,
   DateTime,
@@ -126,11 +126,17 @@ export const UploadAvatarRequest = z.object({
  * Upload avatar request (OpenAPI documented)
  * This generates proper multipart/form-data schema with binary file
  */
-export const UploadAvatarRequestSchema = z.object({
-  avatar: BinaryFileSchema,
-}).openapi('UploadAvatarRequest', {
-  description: 'Upload user avatar via multipart/form-data',
-})
+export const UploadAvatarRequestSchema = z
+  .object({
+    avatar: BinaryFile.openapi({
+      type: 'string',
+      format: 'binary',
+      description: 'Avatar image file (JPEG, PNG, or WebP)',
+    }),
+  })
+  .openapi('UploadAvatarRequest', {
+    description: 'Upload user avatar via multipart/form-data',
+  })
 
 export type UploadAvatarRequest = z.infer<typeof UploadAvatarRequest>
 

@@ -65,10 +65,12 @@ export function logRequest(method: string, url: string, data?: any) {
 
 export function logResponse(status: number, data: any) {
   const statusColor = status >= 200 && status < 300 ? colors.green : colors.red
+
   log(`Response ${status}:`, statusColor)
-  
+
   // Truncate long responses
   const responseStr = JSON.stringify(data, null, 2)
+
   if (responseStr.length > 1000) {
     log(responseStr.substring(0, 1000) + '... (truncated)', colors.dim)
   } else {
@@ -90,19 +92,20 @@ export function createApiClient(baseURL: string = API_BASE_URL): AxiosInstance {
   api.interceptors.request.use(
     (config) => {
       const startTime = performance.now()
+
       config.metadata = { startTime }
 
       logRequest(
         config.method?.toUpperCase() || 'GET',
         config.url || '',
-        config.data
+        config.data,
       )
 
       return config
     },
     (error) => {
       return Promise.reject(error)
-    }
+    },
   )
 
   // Response interceptor
@@ -131,7 +134,7 @@ export function createApiClient(baseURL: string = API_BASE_URL): AxiosInstance {
       }
 
       return Promise.reject(error)
-    }
+    },
   )
 
   return api
@@ -141,10 +144,10 @@ export function createApiClient(baseURL: string = API_BASE_URL): AxiosInstance {
 export async function authenticateUser(
   api: AxiosInstance,
   email: string,
-  password: string
+  password: string,
 ): Promise<{ accessToken: string; refreshToken: string }> {
   logInfo(`Authenticating as ${email}`)
-  
+
   const response = await api.post('/auth/token', {
     grantType: 'password',
     username: email,
@@ -159,15 +162,16 @@ export async function authenticateUser(
 
   // Set authorization header
   api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-  
+
   logSuccess(`Authenticated successfully`)
-  
+
   return { accessToken, refreshToken }
 }
 
 // Test data generators
 export function generateRandomEmail(): string {
   const randomId = Math.random().toString(36).substring(7)
+
   return `test-${randomId}@example.com`
 }
 
@@ -185,28 +189,30 @@ export interface FlowOptions {
 
 export async function executeFlow(
   flowFn: () => Promise<void>,
-  options: FlowOptions
+  options: FlowOptions,
 ): Promise<void> {
   logSection(`🚀 Starting ${options.title}`)
-  
+
   try {
     await flowFn()
-    
+
     if (options.cleanup) {
       logSection('🧹 Running cleanup')
       await options.cleanup()
     }
-    
+
     logSection(`✅ ${options.title} Completed Successfully!`)
-    
   } catch (error) {
     logSection(`❌ ${options.title} Failed!`)
-    
+
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError
+
       if (axiosError.response) {
         logError(`Error Status: ${axiosError.response.status}`)
-        logError(`Error Data: ${JSON.stringify(axiosError.response.data, null, 2)}`)
+        logError(
+          `Error Data: ${JSON.stringify(axiosError.response.data, null, 2)}`,
+        )
       } else if (axiosError.request) {
         logError('No response received from server')
       } else {
@@ -215,14 +221,14 @@ export async function executeFlow(
     } else {
       logError(`Unexpected error: ${error}`)
     }
-    
+
     process.exit(1)
   }
 }
 
 // Delay helper for rate limiting
 export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 // Test data
@@ -254,23 +260,23 @@ export interface TestResult {
 
 export function printTestSummary(results: TestResult[]) {
   logSection('📊 Test Summary')
-  
-  const passed = results.filter(r => r.success).length
-  const failed = results.filter(r => !r.success).length
-  
-  results.forEach(result => {
+
+  const passed = results.filter((r) => r.success).length
+  const failed = results.filter((r) => !r.success).length
+
+  results.forEach((result) => {
     if (result.success) {
       logSuccess(`${result.name}: ${result.message || 'Passed'}`)
     } else {
       logError(`${result.name}: ${result.message || 'Failed'}`)
     }
   })
-  
+
   log('')
   log(`Total: ${results.length} tests`, colors.bright)
   log(`Passed: ${passed}`, colors.green)
   log(`Failed: ${failed}`, failed > 0 ? colors.red : colors.green)
-  
+
   if (failed > 0) {
     process.exit(1)
   }
