@@ -15,6 +15,7 @@ import * as pdfParameters from '@api/schemas/pdf/common/parameters.js'
 import * as pdfVoucherBookSchemas from '@api/schemas/pdf/public/voucher-book.js'
 import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
+import { BinaryFileSchema } from '@api/schemas/shared/fileUpload.js'
 import {
   CoordinatesSchema,
   GeoJSONPointSchema,
@@ -54,6 +55,9 @@ export function registerPublicAPI(registry: ZodRegistry): void {
 
   // Register shared device schemas
   registry.registerSchema('DeviceInfo', DeviceInfoSchema)
+
+  // Register file upload schemas
+  registry.registerSchema('BinaryFile', BinaryFileSchema)
 
   // ============= Enum Schemas =============
   // User enums
@@ -451,7 +455,11 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   )
   registry.registerSchema(
     'UploadAvatarRequest',
-    userProfileSchemas.UploadAvatarRequest,
+    userProfileSchemas.UploadAvatarRequestSchema,
+  )
+  registry.registerSchema(
+    'UploadAvatarResponse',
+    userProfileSchemas.UploadAvatarResponseSchema,
   )
   registry.registerSchema(
     'DeleteAccountRequest',
@@ -1554,6 +1562,36 @@ function registerPublicRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: userProfileSchemas.CurrentUserProfile,
+          },
+        },
+      },
+    },
+  })
+
+  // Avatar upload route
+  registry.registerRoute({
+    method: 'post',
+    path: '/users/me/avatar',
+    operationId: 'uploadUserAvatar',
+    summary: 'Upload user avatar',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: userProfileSchemas.UploadAvatarRequestSchema,
+          },
+        },
+        required: true,
+      },
+    },
+    responses: {
+      200: {
+        description: 'Avatar uploaded successfully',
+        content: {
+          'application/json': {
+            schema: userProfileSchemas.UploadAvatarResponseSchema,
           },
         },
       },

@@ -5,8 +5,9 @@ import {
   paginatedResponse,
   RequestContext,
   validateResponse,
+  adaptMulterFile,
+  validateAvatarFile,
 } from '@pika/http'
-import { adaptMulterFile } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
@@ -284,12 +285,11 @@ export class UserController {
       // Get the uploaded file from Multer
       const file = req.file
 
-      if (!file) {
-        throw ErrorFactory.badRequest('No file uploaded')
-      }
+      // Validate the uploaded file (this will throw if file is undefined)
+      validateAvatarFile(file as Express.Multer.File)
 
-      // Adapt the multer file to our FileUpload format
-      const adaptedFile = adaptMulterFile(file)
+      // Adapt the multer file to our FileUpload format (file is validated above)
+      const adaptedFile = adaptMulterFile(file!)
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 
@@ -482,12 +482,11 @@ export class UserController {
       // Get the uploaded file from Multer
       const file = req.file
 
-      if (!file) {
-        throw ErrorFactory.badRequest('No file uploaded')
-      }
+      // Validate the uploaded file (this will throw if file is undefined)
+      validateAvatarFile(file as Express.Multer.File)
 
-      // Adapt the multer file to our FileUpload format
-      const adaptedFile = adaptMulterFile(file)
+      // Adapt the multer file to our FileUpload format (file is validated above)
+      const adaptedFile = adaptMulterFile(file!)
 
       const url = await this.userService.uploadUserAvatar(userId, adaptedFile)
 

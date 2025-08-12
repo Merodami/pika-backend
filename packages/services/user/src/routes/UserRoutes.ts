@@ -1,6 +1,6 @@
 import { userAdmin, userPublic } from '@pika/api'
 import {
-  createMulterMiddleware,
+  createAvatarUploadMiddleware,
   requireAuth,
   requirePermissions,
   validateBody,
@@ -60,11 +60,7 @@ export async function createUserRouter(
   )
 
   // POST /users/me/avatar - Upload avatar for current user
-  const upload = createMulterMiddleware({
-    limits: {
-      fileSize: 5 * 1024 * 1024, // 5MB limit for avatars
-    },
-  })
+  const upload = createAvatarUploadMiddleware()
 
   router.post(
     '/me/avatar',

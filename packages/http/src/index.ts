@@ -12,6 +12,8 @@ export type { ServerOptions } from './domain/types/server.js'
 export {
   adaptMulterFile,
   createMulterMiddleware,
+  createAvatarUploadMiddleware,
+  validateAvatarFile,
 } from './infrastructure/express/adapters/file-storage/multer-adapter.js'
 export {
   RequestContext,

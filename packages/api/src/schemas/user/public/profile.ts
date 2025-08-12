@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { Email, UserId } from '../../shared/branded.js'
+import { BinaryFile, BinaryFileSchema } from '../../shared/fileUpload.js'
 import {
   DateOnly,
   DateTime,
@@ -114,28 +115,38 @@ export type UserProfileResponse = z.infer<typeof CurrentUserProfile>
 // ============= Avatar Upload =============
 
 /**
- * Upload avatar request
+ * Upload avatar request (raw Zod)
+ * For multipart/form-data file uploads
  */
-export const UploadAvatarRequest = openapi(
-  z.object({
-    avatar: z.string().describe('Base64 encoded image data or file upload'),
-    format: z.enum(['JPEG', 'PNG', 'WEBP']).optional().describe('Image format'),
-  }),
-  {
-    description: 'Upload user avatar/profile picture',
-  },
-)
+export const UploadAvatarRequest = z.object({
+  avatar: BinaryFile,
+})
+
+/**
+ * Upload avatar request (OpenAPI documented)
+ * This generates proper multipart/form-data schema with binary file
+ */
+export const UploadAvatarRequestSchema = z.object({
+  avatar: BinaryFileSchema,
+}).openapi('UploadAvatarRequest', {
+  description: 'Upload user avatar via multipart/form-data',
+})
 
 export type UploadAvatarRequest = z.infer<typeof UploadAvatarRequest>
 
 /**
- * Upload avatar response
+ * Upload avatar response (raw Zod)
  */
-export const UploadAvatarResponse = openapi(
-  z.object({
-    avatarUrl: z.string().url().describe('URL of the uploaded avatar'),
-    message: z.string().default('Avatar uploaded successfully'),
-  }),
+export const UploadAvatarResponse = z.object({
+  avatarUrl: z.string().url().describe('URL of the uploaded avatar'),
+  message: z.string().default('Avatar uploaded successfully'),
+})
+
+/**
+ * Upload avatar response (OpenAPI documented)
+ */
+export const UploadAvatarResponseSchema = UploadAvatarResponse.openapi(
+  'UploadAvatarResponse',
   {
     description: 'Avatar upload result',
   },

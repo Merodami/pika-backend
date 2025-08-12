@@ -9,6 +9,7 @@ import {
   CommunicationServiceClient,
   ErrorFactory,
   FileStoragePort,
+  FileUpload,
   isUuidV4,
   logger,
 } from '@pika/shared'
@@ -64,7 +65,7 @@ export interface IUserService {
     id: string,
     options?: { reason?: string; notifyUser?: boolean },
   ): Promise<UserDomain>
-  uploadUserAvatar(userId: string, file: any): Promise<string>
+  uploadUserAvatar(userId: string, file: FileUpload): Promise<string>
 
   // Unified verification system
   verify(request: VerificationRequest): Promise<UserDomain>
@@ -391,7 +392,7 @@ export class UserService implements IUserService {
     }
   }
 
-  async uploadUserAvatar(userId: string, file: any): Promise<string> {
+  async uploadUserAvatar(userId: string, file: FileUpload): Promise<string> {
     try {
       if (!this.fileStorage) {
         throw ErrorFactory.serviceUnavailable(
