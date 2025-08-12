@@ -45,7 +45,7 @@
     "test:auth-all": "yarn test:auth && yarn test:auth-gateway",
     "test:all": "yarn test",
     "build": "nx run-many --target=build --all --parallel=100 --output-style=stream --skip-nx-cache",
-    "build:vercel": "./scripts/deploy/vercel-build.sh",
+    "build:vercel": "bash ./scripts/deploy/vercel-build.sh",
     "typecheck": "nx run-many --target=typecheck --parallel=100",
     "lint": "nx format:check && eslint '**/*.{js,tsx,jsx,ts}' && prettier --check .",
     "lint:fix": "prettier --write . && eslint '**/*.{js,tsx,jsx,ts}' --fix",

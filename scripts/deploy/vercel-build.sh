@@ -5,26 +5,31 @@
 set -e  # Exit on error
 
 echo "🚀 Starting Vercel build process..."
-echo "Environment: ${VERCEL_ENV:-development}"
-echo "Database URL is ${DATABASE_URL:+set}${DATABASE_URL:-not set}"
+echo "Environment: ${NODE_ENV:-development}"
 
 # 1. Generate Prisma Client
 echo "📦 Step 1: Generating Prisma Client..."
 yarn db:generate
 
-# 2. Run database migrations (only in production)
-if [ "$VERCEL_ENV" = "production" ] || [ "$VERCEL_ENV" = "preview" ]; then
-  echo "🗄️  Step 2: Running database migrations (${VERCEL_ENV})..."
+# 2. Run database migrations
+# Run migrations if DATABASE_URL is set (we're in Vercel if this script is running from build:vercel)
+if [ -n "$DATABASE_URL" ]; then
+  echo "🗄️  Step 2: Running database migrations..."
   cd packages/database
-  npx prisma migrate deploy || {
-    echo "❌ Migration failed! Attempting to continue build..."
-    # You might want to exit here in production
-    # exit 1
-  }
+  npx prisma migrate deploy
+  MIGRATION_EXIT_CODE=$?
   cd ../..
-  echo "✅ Migrations deployed successfully"
+  
+  if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
+    echo "✅ Migrations deployed successfully"
+  else
+    echo "❌ Migration failed with exit code $MIGRATION_EXIT_CODE"
+    echo "Continuing build anyway for now..."
+    # Uncomment to fail the build on migration error:
+    # exit $MIGRATION_EXIT_CODE
+  fi
 else
-  echo "⏭️  Step 2: Skipping migrations (Environment: ${VERCEL_ENV:-development})"
+  echo "⏭️  Step 2: Skipping migrations (DATABASE_URL not set)"
 fi
 
 # 3. Build all packages
