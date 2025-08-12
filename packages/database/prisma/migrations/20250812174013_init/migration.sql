@@ -56,34 +56,34 @@ CREATE TYPE "identity"."UserRole" AS ENUM ('admin', 'customer', 'business');
 CREATE TYPE "identity"."UserStatus" AS ENUM ('active', 'suspended', 'banned', 'unconfirmed');
 
 -- CreateEnum
-CREATE TYPE "audit"."AuditAction" AS ENUM ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'STATUS_CHANGE');
+CREATE TYPE "audit"."AuditAction" AS ENUM ('create', 'update', 'delete', 'login', 'logout', 'status_change');
 
 -- CreateEnum
-CREATE TYPE "support"."ProblemStatus" AS ENUM ('OPEN', 'ASSIGNED', 'IN_PROGRESS', 'WAITING_CUSTOMER', 'WAITING_INTERNAL', 'RESOLVED', 'CLOSED');
+CREATE TYPE "support"."ProblemStatus" AS ENUM ('open', 'assigned', 'in_progress', 'waiting_customer', 'waiting_internal', 'resolved', 'closed');
 
 -- CreateEnum
-CREATE TYPE "support"."ProblemPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH', 'URGENT', 'CRITICAL');
+CREATE TYPE "support"."ProblemPriority" AS ENUM ('low', 'medium', 'high', 'urgent', 'critical');
 
 -- CreateEnum
-CREATE TYPE "support"."ProblemType" AS ENUM ('BILLING', 'TECHNICAL', 'ACCOUNT', 'GENERAL', 'BUG_REPORT', 'FEATURE_REQUEST');
+CREATE TYPE "support"."ProblemType" AS ENUM ('billing', 'technical', 'account', 'general', 'bug_report', 'feature_request');
 
 -- CreateEnum
-CREATE TYPE "support"."NotificationStatus" AS ENUM ('PENDING', 'SENT', 'FAILED', 'READ');
+CREATE TYPE "support"."NotificationStatus" AS ENUM ('pending', 'sent', 'failed', 'read');
 
 -- CreateEnum
-CREATE TYPE "support"."NotificationType" AS ENUM ('EMAIL', 'SMS', 'PUSH', 'IN_APP');
+CREATE TYPE "support"."NotificationType" AS ENUM ('email', 'sms', 'push', 'in_app');
 
 -- CreateEnum
-CREATE TYPE "support"."CommunicationMethod" AS ENUM ('EMAIL', 'SMS', 'PUSH', 'IN_APP');
+CREATE TYPE "support"."CommunicationMethod" AS ENUM ('email', 'sms', 'push', 'in_app');
 
 -- CreateEnum
-CREATE TYPE "payments"."SubscriptionStatus" AS ENUM ('active', 'canceled', 'incomplete', 'incompleteExpired', 'pastDue', 'trialing', 'unpaid');
+CREATE TYPE "payments"."SubscriptionStatus" AS ENUM ('active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'trialing', 'unpaid');
 
 -- CreateEnum
-CREATE TYPE "files"."FileType" AS ENUM ('IMAGE', 'VIDEO', 'DOCUMENT', 'AUDIO', 'OTHER');
+CREATE TYPE "files"."FileType" AS ENUM ('image', 'video', 'document', 'audio', 'other');
 
 -- CreateEnum
-CREATE TYPE "files"."StorageProvider" AS ENUM ('AWS_S3', 'LOCAL', 'MINIO');
+CREATE TYPE "files"."StorageProvider" AS ENUM ('aws_s3', 'local', 'minio');
 
 -- CreateEnum
 CREATE TYPE "files"."VoucherBookStatus" AS ENUM ('draft', 'ready_for_print', 'published', 'archived');
@@ -374,9 +374,9 @@ CREATE TABLE "support"."problems" (
     "user_id" UUID NOT NULL,
     "title" VARCHAR(255) NOT NULL,
     "description" TEXT NOT NULL,
-    "status" "support"."ProblemStatus" NOT NULL DEFAULT 'OPEN',
-    "priority" "support"."ProblemPriority" NOT NULL DEFAULT 'MEDIUM',
-    "type" "support"."ProblemType" NOT NULL DEFAULT 'GENERAL',
+    "status" "support"."ProblemStatus" NOT NULL DEFAULT 'open',
+    "priority" "support"."ProblemPriority" NOT NULL DEFAULT 'medium',
+    "type" "support"."ProblemType" NOT NULL DEFAULT 'general',
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "resolved_at" TIMESTAMPTZ(6),
@@ -394,7 +394,6 @@ CREATE TABLE "payments"."subscription_plans" (
     "description" TEXT,
     "price" DOUBLE PRECISION NOT NULL,
     "currency" TEXT NOT NULL DEFAULT 'usd',
-    "interval" TEXT NOT NULL,
     "interval_count" INTEGER NOT NULL DEFAULT 1,
     "trial_period_days" INTEGER,
     "features" TEXT[],
@@ -426,10 +425,10 @@ CREATE TABLE "i18n"."languages" (
     "code" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "direction" TEXT NOT NULL DEFAULT 'ltr',
-    "isDefault" BOOLEAN NOT NULL DEFAULT false,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "is_default" BOOLEAN NOT NULL DEFAULT false,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "languages_pkey" PRIMARY KEY ("code")
 );
@@ -439,11 +438,11 @@ CREATE TABLE "i18n"."translations" (
     "id" TEXT NOT NULL,
     "key" TEXT NOT NULL,
     "value" TEXT NOT NULL,
-    "languageCode" TEXT NOT NULL,
+    "language_code" TEXT NOT NULL,
     "context" TEXT,
     "service" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "translations_pkey" PRIMARY KEY ("id")
 );
@@ -451,10 +450,10 @@ CREATE TABLE "i18n"."translations" (
 -- CreateTable
 CREATE TABLE "i18n"."user_language_preferences" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "languageCode" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "language_code" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "user_language_preferences_pkey" PRIMARY KEY ("id")
 );
@@ -478,6 +477,7 @@ CREATE TABLE "users"."users" (
     "deleted_at" TIMESTAMPTZ(6),
     "date_of_birth" DATE,
     "stripe_user_id" VARCHAR(255),
+    "preferred_language" VARCHAR(2),
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -921,9 +921,6 @@ CREATE UNIQUE INDEX "subscription_plans_stripe_price_id_key" ON "payments"."subs
 CREATE INDEX "subscription_plans_is_active_idx" ON "payments"."subscription_plans"("is_active");
 
 -- CreateIndex
-CREATE INDEX "subscription_plans_interval_idx" ON "payments"."subscription_plans"("interval");
-
--- CreateIndex
 CREATE INDEX "support_comments_problem_id_idx" ON "support"."support_comments"("problem_id");
 
 -- CreateIndex
@@ -933,19 +930,19 @@ CREATE INDEX "support_comments_user_id_idx" ON "support"."support_comments"("use
 CREATE INDEX "support_comments_created_at_idx" ON "support"."support_comments"("created_at");
 
 -- CreateIndex
-CREATE INDEX "translations_key_languageCode_idx" ON "i18n"."translations"("key", "languageCode");
+CREATE INDEX "translations_key_language_code_idx" ON "i18n"."translations"("key", "language_code");
 
 -- CreateIndex
 CREATE INDEX "translations_service_key_idx" ON "i18n"."translations"("service", "key");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "translations_key_languageCode_key" ON "i18n"."translations"("key", "languageCode");
+CREATE UNIQUE INDEX "translations_key_language_code_key" ON "i18n"."translations"("key", "language_code");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_language_preferences_userId_key" ON "i18n"."user_language_preferences"("userId");
+CREATE UNIQUE INDEX "user_language_preferences_user_id_key" ON "i18n"."user_language_preferences"("user_id");
 
 -- CreateIndex
-CREATE INDEX "user_language_preferences_userId_idx" ON "i18n"."user_language_preferences"("userId");
+CREATE INDEX "user_language_preferences_user_id_idx" ON "i18n"."user_language_preferences"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"."users"("email");
@@ -1299,10 +1296,10 @@ ALTER TABLE "support"."support_comments" ADD CONSTRAINT "support_comments_proble
 ALTER TABLE "support"."support_comments" ADD CONSTRAINT "support_comments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "i18n"."translations" ADD CONSTRAINT "translations_languageCode_fkey" FOREIGN KEY ("languageCode") REFERENCES "i18n"."languages"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "i18n"."translations" ADD CONSTRAINT "translations_language_code_fkey" FOREIGN KEY ("language_code") REFERENCES "i18n"."languages"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "i18n"."user_language_preferences" ADD CONSTRAINT "user_language_preferences_languageCode_fkey" FOREIGN KEY ("languageCode") REFERENCES "i18n"."languages"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "i18n"."user_language_preferences" ADD CONSTRAINT "user_language_preferences_language_code_fkey" FOREIGN KEY ("language_code") REFERENCES "i18n"."languages"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "files"."voucher_books" ADD CONSTRAINT "voucher_books_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

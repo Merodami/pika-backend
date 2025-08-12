@@ -490,6 +490,83 @@ async function testResendVerification(): Promise<void> {
   }
 }
 
+async function testExistingAdminLogin(): Promise<void> {
+  logStep(0, 'Test Pre-created Admin User Login')
+
+  const adminCredentials = {
+    email: 'admin@example.com',
+    password: 'AdminPassword123!',
+  }
+
+  logInfo(`Testing login with existing admin user: ${adminCredentials.email}`)
+
+  try {
+    // Test login
+    const response = await api.post('/auth/token', {
+      grantType: 'password',
+      username: adminCredentials.email,
+      password: adminCredentials.password,
+    })
+
+    logSuccess('Admin login successful!')
+    logInfo(
+      `Access token received: ${response.data.accessToken ? 'Yes' : 'No'}`,
+    )
+    logInfo(`Token type: ${response.data.tokenType}`)
+    logInfo(`Expires in: ${response.data.expiresIn} seconds`)
+
+    if (response.data.user) {
+      logInfo(`User role: ${response.data.user.role}`)
+      logInfo(`User ID: ${response.data.user.id}`)
+      logInfo(`Email verified: ${response.data.user.emailVerified}`)
+    }
+
+    // Test the token by fetching user profile
+    if (response.data.accessToken) {
+      logInfo('Testing token by fetching admin profile...')
+
+      const profileResponse = await api.get('/users/me', {
+        headers: {
+          Authorization: `Bearer ${response.data.accessToken}`,
+        },
+      })
+
+      logSuccess('Token validation successful!')
+      logInfo(
+        `Profile - Name: ${profileResponse.data.firstName} ${profileResponse.data.lastName}`,
+      )
+      logInfo(`Profile - Email: ${profileResponse.data.email}`)
+      logInfo(`Profile - Role: ${profileResponse.data.role}`)
+      logInfo(`Profile - Status: ${profileResponse.data.status}`)
+    }
+
+    // Test admin-specific endpoint
+    if (response.data.accessToken && response.data.user?.role === 'admin') {
+      logInfo('Testing admin permissions by listing users...')
+
+      const usersResponse = await api.get('/users?limit=2', {
+        headers: {
+          Authorization: `Bearer ${response.data.accessToken}`,
+        },
+      })
+
+      logSuccess('Admin permissions verified!')
+      logInfo(`Retrieved ${usersResponse.data.data?.length || 0} users`)
+    }
+  } catch (error: any) {
+    logError(
+      `Admin login failed: ${error.response?.data?.error?.message || error.message}`,
+    )
+    if (error.response?.status === 401) {
+      logInfo(
+        'This might indicate the admin user needs to be created or verified first',
+      )
+      logInfo('Run: npx tsx scripts/flows/setup-test-users.ts')
+    }
+    throw error
+  }
+}
+
 // Main test flow
 async function runTests() {
   log(
@@ -504,6 +581,18 @@ async function runTests() {
   const profile: UserProfile | null = null
 
   try {
+    // 0. Test existing admin user login first
+    try {
+      await testExistingAdminLogin()
+      log(
+        `\n${colors.bright}${colors.green}✅ Pre-created admin user test passed!${colors.reset}\n`,
+      )
+    } catch (error: any) {
+      log(
+        `\n${colors.bright}${colors.yellow}⚠️  Admin user test failed - continuing with new user registration${colors.reset}\n`,
+      )
+    }
+
     // 1. Register new user
     userId = await testRegistration()
 
