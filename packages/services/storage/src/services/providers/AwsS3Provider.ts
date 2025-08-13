@@ -8,7 +8,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { logger } from '@pika/shared'
-import { StorageProvider } from '@pika/types'
+import { StorageProvider as StorageProviderEnum } from '@pika/types'
 
 import type {
   FileDeleteParams,
@@ -51,7 +51,7 @@ export class AwsS3Provider implements StorageProvider {
     },
   ) {
     this.bucketName = config.bucketName || 'pika-uploads'
-    this.providerName = config.providerName || StorageProvider.AWS_S3
+    this.providerName = config.providerName || StorageProviderEnum.AWS_S3
     this.isConfigured = !!(
       config.region &&
       config.accessKeyId &&

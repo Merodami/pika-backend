@@ -3,8 +3,8 @@ import type { SubscriptionDomain, SubscriptionWithPlanDomain } from '@pika/sdk'
 import { SubscriptionMapper, SubscriptionWithPlanMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
+import { SubscriptionStatus } from '@pika/types'
 import type { Prisma, PrismaClient } from '@prisma/client'
-import type { SubscriptionStatus } from '@prisma/client'
 import { Prisma as PrismaErrors } from '@prisma/client'
 
 export interface CreateSubscriptionInput {
@@ -130,9 +130,12 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         },
       })
 
-      return subscription
-        ? SubscriptionWithPlanMapper.fromDocumentWithPlan(subscription)
-        : null
+      if (!subscription) return null
+
+      return SubscriptionWithPlanMapper.fromDocumentWithPlan({
+        ...subscription,
+        plan: subscription.plan,
+      })
     } catch (error) {
       throw ErrorFactory.databaseError(
         'findByIdWithPlan',
@@ -148,7 +151,11 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['active', 'trialing', 'past_due'],
+            in: [
+              SubscriptionStatus.ACTIVE,
+              SubscriptionStatus.TRIALING,
+              SubscriptionStatus.PAST_DUE,
+            ],
           },
         },
       })
@@ -167,7 +174,11 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         where: {
           userId,
           status: {
-            in: ['active', 'trialing', 'past_due'],
+            in: [
+              SubscriptionStatus.ACTIVE,
+              SubscriptionStatus.TRIALING,
+              SubscriptionStatus.PAST_DUE,
+            ],
           },
         },
         include: {
@@ -175,9 +186,12 @@ export class SubscriptionRepository implements ISubscriptionRepository {
         },
       })
 
-      return subscription
-        ? SubscriptionWithPlanMapper.fromDocumentWithPlan(subscription)
-        : null
+      if (!subscription) return null
+
+      return SubscriptionWithPlanMapper.fromDocumentWithPlan({
+        ...subscription,
+        plan: subscription.plan,
+      })
     } catch (error) {
       throw ErrorFactory.databaseError(
         'findByUserIdWithPlan',
