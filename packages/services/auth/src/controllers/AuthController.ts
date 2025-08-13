@@ -15,7 +15,7 @@ import type { IAuthService } from '@auth-service/services/AuthService.js'
 import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
-import { ErrorFactory } from '@pika/shared'
+import { ErrorFactory, logger } from '@pika/shared'
 import { mapRoleToPermissions, UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -57,7 +57,24 @@ export class AuthController {
         dateOfBirth,
         acceptTerms,
         marketingConsent,
+        registrationSource,
       } = request.body
+
+      // Determine role based on registration source
+      const role =
+        registrationSource === 'admin_dashboard'
+          ? UserRole.BUSINESS
+          : UserRole.CUSTOMER
+
+      // Log business owner registration
+      if (role === UserRole.BUSINESS) {
+        logger.info({
+          msg: 'Business owner registration initiated',
+          email,
+          source: registrationSource,
+          timestamp: new Date().toISOString(),
+        })
+      }
 
       const result = await this.authService.register({
         email,
@@ -68,7 +85,7 @@ export class AuthController {
         dateOfBirth,
         acceptTerms,
         marketingConsent,
-        role: UserRole.CUSTOMER, // Default role for new registrations
+        role,
       })
 
       // If email verification is required, return success message without tokens

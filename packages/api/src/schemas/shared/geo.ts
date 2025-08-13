@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { openapi } from '../../common/utils/openapi.js'
-
 /**
  * Geographic schemas for location-based features
  *
@@ -59,7 +57,7 @@ export type GeoJSONPoint = z.infer<typeof GeoJSONPoint>
 /**
  * GeoJSON Point format (OpenAPI documented)
  */
-export const GeoJSONPointSchema = openapi(GeoJSONPoint, {
+export const GeoJSONPointSchema = GeoJSONPoint.openapi('GeoJSONPoint', {
   description: 'Geographic point in GeoJSON format (PostGIS compatible)',
   example: { type: 'Point', coordinates: [-57.5759, -25.2637] }, // [lng, lat]
 })
@@ -95,10 +93,13 @@ export type GeoSearchParams = z.infer<typeof GeoSearchParams>
 /**
  * Geographic search parameters (OpenAPI documented)
  */
-export const GeoSearchParamsSchema = openapi(GeoSearchParams, {
-  description: 'Geographic search parameters for location-based queries',
-  example: { lat: -25.2637, lng: -57.5759, radius: 10 },
-})
+export const GeoSearchParamsSchema = GeoSearchParams.openapi(
+  'GeoSearchParams',
+  {
+    description: 'Geographic search parameters for location-based queries',
+    example: { lat: -25.2637, lng: -57.5759, radius: 10 },
+  },
+)
 
 // ============= Geographic Bounds =============
 
@@ -116,7 +117,7 @@ export type GeoBounds = z.infer<typeof GeoBounds>
 /**
  * Geographic bounding box (OpenAPI documented)
  */
-export const GeoBoundsSchema = openapi(GeoBounds, {
+export const GeoBoundsSchema = GeoBounds.openapi('GeoBounds', {
   description: 'Geographic bounding box for viewport queries',
 })
 
@@ -140,7 +141,7 @@ export type Address = z.infer<typeof Address>
 /**
  * Physical address (OpenAPI documented)
  */
-export const AddressSchema = openapi(Address, {
+export const AddressSchema = Address.openapi('Address', {
   description: 'Physical address with optional coordinates',
 })
 
@@ -159,7 +160,7 @@ export type Distance = z.infer<typeof Distance>
 /**
  * Distance measurement (OpenAPI documented)
  */
-export const DistanceSchema = openapi(Distance, {
+export const DistanceSchema = Distance.openapi('Distance', {
   description: 'Distance measurement with unit',
   example: { value: 5.2, unit: 'km' },
 })

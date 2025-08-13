@@ -24,7 +24,7 @@ export const UUIDSchema = UUID.openapi('UUID', {
 })
 
 /**
- * DateTime - ISO 8601 string that can be parsed to Date
+ * DateTime - ISO 8601 string that can be parsed to Date (raw Zod)
  * Used for request inputs where we want Date objects
  */
 export const DateTime = z
@@ -34,7 +34,15 @@ export const DateTime = z
   .describe('ISO 8601 datetime with timezone')
 
 /**
- * DateTimeString - ISO 8601 string without transformation
+ * DateTime - OpenAPI documented
+ */
+export const DateTimeSchema = DateTime.openapi('DateTime', {
+  description: 'ISO 8601 datetime with timezone',
+  example: '2024-01-01T12:00:00Z',
+})
+
+/**
+ * DateTimeString - ISO 8601 string without transformation (raw Zod)
  * Used for API responses to maintain string format
  */
 export const DateTimeString = z
@@ -43,7 +51,15 @@ export const DateTimeString = z
   .describe('ISO 8601 datetime string with timezone')
 
 /**
- * DateOnly - Date in YYYY-MM-DD format
+ * DateTimeString - OpenAPI documented
+ */
+export const DateTimeStringSchema = DateTimeString.openapi('DateTimeString', {
+  description: 'ISO 8601 datetime string with timezone',
+  example: '2024-01-01T12:00:00Z',
+})
+
+/**
+ * DateOnly - Date in YYYY-MM-DD format (raw Zod)
  */
 export const DateOnly = z
   .string()
@@ -60,7 +76,15 @@ export const DateOnly = z
   .describe('Date in YYYY-MM-DD format')
 
 /**
- * DateOnlyString - Date in YYYY-MM-DD format (no transformation)
+ * DateOnly - OpenAPI documented
+ */
+export const DateOnlySchema = DateOnly.openapi('DateOnly', {
+  description: 'Date in YYYY-MM-DD format',
+  example: '2024-01-01',
+})
+
+/**
+ * DateOnlyString - Date in YYYY-MM-DD format (no transformation) (raw Zod)
  */
 export const DateOnlyString = z
   .string()
@@ -74,6 +98,14 @@ export const DateOnlyString = z
     { message: 'Must be a valid date' },
   )
   .describe('Date string in YYYY-MM-DD format')
+
+/**
+ * DateOnlyString - OpenAPI documented
+ */
+export const DateOnlyStringSchema = DateOnlyString.openapi('DateOnlyString', {
+  description: 'Date string in YYYY-MM-DD format',
+  example: '2024-01-01',
+})
 
 /**
  * TimeOnly - Time in HH:MM or HH:MM:SS format
@@ -96,7 +128,7 @@ export const EmailString = z
   .describe('Email address')
 
 /**
- * Phone Number - E.164 format with optional extension
+ * Phone Number - E.164 format with optional extension (raw Zod)
  */
 export const PhoneNumber = z
   .string()
@@ -104,6 +136,14 @@ export const PhoneNumber = z
     message: 'Must be in E.164 format (e.g., +1234567890)',
   })
   .describe('Phone number in E.164 format')
+
+/**
+ * Phone Number - OpenAPI documented
+ */
+export const PhoneNumberSchema = PhoneNumber.openapi('PhoneNumber', {
+  description: 'Phone number in E.164 format',
+  example: '+1234567890',
+})
 
 /**
  * Password - Basic validation for general users

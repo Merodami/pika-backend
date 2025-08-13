@@ -4,8 +4,6 @@ import {
   NUMERIC_CONSTRAINTS,
 } from '@pika/types'
 import { z } from 'zod'
-
-import { openapi } from '../../../common/utils/openapi.js'
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { CategoryResponse } from '../../category/public/category.js'
 import { UserId } from '../../shared/branded.js'
@@ -24,41 +22,46 @@ import { BUSINESS_RELATIONS, BusinessSortBy } from '../common/enums.js'
 // ============= Business Response =============
 
 /**
- * Public business response
+ * Public business response (raw Zod)
  */
-export const BusinessResponse = openapi(
-  withTimestamps({
-    id: UUID,
-    userId: UserId.describe('User who owns this business'),
-    businessNameKey: z
-      .string()
-      .max(FIELD_LENGTH.SLUG_MAX)
-      .describe('Translation key for business name'),
-    businessDescriptionKey: z
-      .string()
-      .max(FIELD_LENGTH.SLUG_MAX)
-      .optional()
-      .describe('Translation key for business description'),
-    categoryId: UUID.describe('Category this business belongs to'),
-    verified: z
-      .boolean()
-      .default(false)
-      .describe('Whether business is verified'),
-    active: z.boolean().default(true).describe('Whether business is active'),
-    avgRating: z
-      .number()
-      .min(NUMERIC_CONSTRAINTS.RATING_MIN)
-      .max(NUMERIC_CONSTRAINTS.RATING_MAX)
-      .default(0)
-      .describe('Average rating of the business'),
-    // Optional relations - industry standard pattern
-    user: PublicUserProfile.optional().describe(
-      'Business owner profile when ?include=user',
-    ),
-    category: CategoryResponse.optional().describe(
-      'Category information when ?include=category',
-    ),
-  }),
+export const BusinessResponse = withTimestamps({
+  id: UUID,
+  userId: UserId.describe('User who owns this business'),
+  businessNameKey: z
+    .string()
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .describe('Translation key for business name'),
+  businessDescriptionKey: z
+    .string()
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .optional()
+    .describe('Translation key for business description'),
+  categoryId: UUID.describe('Category this business belongs to'),
+  verified: z
+    .boolean()
+    .default(false)
+    .describe('Whether business is verified'),
+  active: z.boolean().default(true).describe('Whether business is active'),
+  avgRating: z
+    .number()
+    .min(NUMERIC_CONSTRAINTS.RATING_MIN)
+    .max(NUMERIC_CONSTRAINTS.RATING_MAX)
+    .default(0)
+    .describe('Average rating of the business'),
+  // Optional relations - industry standard pattern
+  user: PublicUserProfile.optional().describe(
+    'Business owner profile when ?include=user',
+  ),
+  category: CategoryResponse.optional().describe(
+    'Category information when ?include=category',
+  ),
+})
+
+/**
+ * Public business response (OpenAPI documented)
+ */
+export const BusinessResponseSchema = BusinessResponse.openapi(
+  'BusinessResponse',
   {
     description: 'Business information for public view',
   },
@@ -69,7 +72,7 @@ export type BusinessResponse = z.infer<typeof BusinessResponse>
 // ============= Search Businesses =============
 
 /**
- * Business search/filter parameters
+ * Business search/filter parameters (raw Zod)
  */
 export const BusinessQueryParams = SearchParams.extend({
   categoryId: UUID.optional().describe('Filter by category'),
@@ -84,22 +87,52 @@ export const BusinessQueryParams = SearchParams.extend({
   sortBy: BusinessSortBy.default(BusinessSortByEnum.BUSINESS_NAME),
 })
 
+/**
+ * Business search/filter parameters (OpenAPI documented)
+ */
+export const BusinessQueryParamsSchema = BusinessQueryParams.openapi(
+  'BusinessQueryParams',
+  {
+    description: 'Business search and filter parameters',
+  },
+)
+
 export type BusinessQueryParams = z.infer<typeof BusinessQueryParams>
 
 /**
- * Business path parameters
+ * Business path parameters (raw Zod)
  */
 export const BusinessPathParams = z.object({
   id: UUID.describe('Business ID'),
 })
 
+/**
+ * Business path parameters (OpenAPI documented)
+ */
+export const BusinessPathParamsSchema = BusinessPathParams.openapi(
+  'BusinessPathParams',
+  {
+    description: 'Business path parameters',
+  },
+)
+
 export type BusinessPathParams = z.infer<typeof BusinessPathParams>
 
 /**
- * Business detail query parameters (for single business endpoints)
+ * Business detail query parameters (for single business endpoints) (raw Zod)
  */
 export const BusinessDetailQueryParams =
   createByIdQuerySchema(BUSINESS_RELATIONS)
+
+/**
+ * Business detail query parameters (OpenAPI documented)
+ */
+export const BusinessDetailQueryParamsSchema = BusinessDetailQueryParams.openapi(
+  'BusinessDetailQueryParams',
+  {
+    description: 'Business detail query parameters',
+  },
+)
 
 export type BusinessDetailQueryParams = z.infer<
   typeof BusinessDetailQueryParams
@@ -108,22 +141,37 @@ export type BusinessDetailQueryParams = z.infer<
 // ============= Response Types =============
 
 /**
- * Paginated business list response
+ * Paginated business list response (raw Zod)
  */
 export const BusinessListResponse = paginatedResponse(BusinessResponse)
+
+/**
+ * Paginated business list response (OpenAPI documented)
+ */
+export const BusinessListResponseSchema = BusinessListResponse.openapi(
+  'BusinessListResponse',
+  {
+    description: 'Paginated list of businesses',
+  },
+)
 
 export type BusinessListResponse = z.infer<typeof BusinessListResponse>
 
 /**
- * Businesses by category response
+ * Businesses by category response (raw Zod)
  */
-export const BusinessesByCategoryResponse = openapi(
-  z.object({
-    categoryId: UUID,
-    categoryName: z.string(),
-    businesses: z.array(BusinessResponse),
-    totalCount: z.number().int().nonnegative(),
-  }),
+export const BusinessesByCategoryResponse = z.object({
+  categoryId: UUID,
+  categoryName: z.string(),
+  businesses: z.array(BusinessResponse),
+  totalCount: z.number().int().nonnegative(),
+})
+
+/**
+ * Businesses by category response (OpenAPI documented)
+ */
+export const BusinessesByCategoryResponseSchema = BusinessesByCategoryResponse.openapi(
+  'BusinessesByCategoryResponse',
   {
     description: 'Businesses grouped by category',
   },
@@ -136,22 +184,29 @@ export type BusinessesByCategoryResponse = z.infer<
 // ============= Create/Update Requests =============
 
 /**
- * Create my business request (for business owners)
+ * Create my business request (for business owners) (raw Zod)
  */
-export const CreateMyBusinessRequest = openapi(
-  z.object({
-    businessName: z
-      .string()
-      .min(FIELD_LENGTH.NAME_MIN)
-      .max(FIELD_LENGTH.NAME_MAX)
-      .describe('Business name'),
-    businessDescription: z
-      .string()
-      .max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX)
-      .optional()
-      .describe('Business description'),
-    categoryId: UUID.describe('Category ID'),
-  }),
+export const CreateMyBusinessRequest = z.object({
+  businessName: z
+    .string()
+    .min(FIELD_LENGTH.NAME_MIN)
+    .max(FIELD_LENGTH.NAME_MAX)
+    .describe('Business name'),
+  businessDescription: z
+    .string()
+    .max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX)
+    .optional()
+    .describe('Business description'),
+  categoryId: UUID.optional().describe(
+    'Category ID (can be assigned later by admin)',
+  ),
+})
+
+/**
+ * Create my business request (OpenAPI documented)
+ */
+export const CreateMyBusinessRequestSchema = CreateMyBusinessRequest.openapi(
+  'CreateMyBusinessRequest',
   {
     description: 'Create business data for business owners',
   },
@@ -160,23 +215,52 @@ export const CreateMyBusinessRequest = openapi(
 export type CreateMyBusinessRequest = z.infer<typeof CreateMyBusinessRequest>
 
 /**
- * Update my business request (for business owners)
+ * Create my business response (raw Zod)
  */
-export const UpdateMyBusinessRequest = openapi(
-  z.object({
-    businessName: z
-      .string()
-      .min(1)
-      .max(FIELD_LENGTH.NAME_MAX)
-      .optional()
-      .describe('Business name'),
-    businessDescription: z
-      .string()
-      .max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX)
-      .optional()
-      .describe('Business description'),
-    categoryId: UUID.optional().describe('Category ID'),
-  }),
+export const CreateMyBusinessResponse = z.object({
+  id: UUID.describe('Newly created business ID'),
+  businessNameKey: z.string().describe('Translation key for business name'),
+  approved: z.boolean().default(false).describe('Business approval status'),
+  message: z
+    .string()
+    .default('Business created successfully. Awaiting admin approval.'),
+})
+
+/**
+ * Create my business response (OpenAPI documented)
+ */
+export const CreateMyBusinessResponseSchema = CreateMyBusinessResponse.openapi(
+  'CreateMyBusinessResponse',
+  {
+    description: 'Business creation response',
+  },
+)
+
+export type CreateMyBusinessResponse = z.infer<typeof CreateMyBusinessResponse>
+
+/**
+ * Update my business request (for business owners) (raw Zod)
+ */
+export const UpdateMyBusinessRequest = z.object({
+  businessName: z
+    .string()
+    .min(1)
+    .max(FIELD_LENGTH.NAME_MAX)
+    .optional()
+    .describe('Business name'),
+  businessDescription: z
+    .string()
+    .max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX)
+    .optional()
+    .describe('Business description'),
+  categoryId: UUID.optional().describe('Category ID'),
+})
+
+/**
+ * Update my business request (OpenAPI documented)
+ */
+export const UpdateMyBusinessRequestSchema = UpdateMyBusinessRequest.openapi(
+  'UpdateMyBusinessRequest',
   {
     description: 'Update business data for business owners',
   },

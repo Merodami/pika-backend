@@ -104,6 +104,7 @@ The build process (`scripts/deploy/vercel-build.sh`) performs:
 ### GitHub Actions
 
 Pull requests trigger automatic preview deployments via GitHub Actions:
+
 - Validates deployment configuration
 - Builds and deploys to Vercel preview
 - Runs smoke tests
@@ -158,6 +159,7 @@ To rollback a deployment:
 ## Support
 
 For deployment issues:
+
 - Check build logs in Vercel dashboard
 - Review GitHub Actions logs for PR deployments
 - Contact team for infrastructure access

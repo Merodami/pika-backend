@@ -47,7 +47,7 @@ model User {
   assignedProblems  Problem[]         @relation("AssignedProblems")
   
   // Business relations
-  business          Business?
+  businesses        Business[]
   
   // PDF relations
   createdVoucherBooks   VoucherBook[]     @relation("VoucherBookCreatedBy")

@@ -108,5 +108,14 @@ export function createAdminBusinessRoutes(
     controller.updateBusinessRating,
   )
 
+  // POST /admin/businesses/:id/approve - Approve or reject business
+  router.post(
+    '/:id/approve',
+    requirePermissions('admin:businesses'),
+    validateParams(businessCommon.BusinessIdParam),
+    validateBody(businessAdmin.AdminBusinessApprovalRequest),
+    controller.approveBusiness,
+  )
+
   return router
 }

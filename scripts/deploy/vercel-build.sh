@@ -15,16 +15,22 @@ yarn db:generate
 # Use MIGRATION_DATABASE_URL for migrations (direct connection required for schema changes)
 if [ -n "$MIGRATION_DATABASE_URL" ]; then
   echo "🗄️  Step 2: Running database migrations..."
+  echo "  Using direct connection URL for migrations"
   cd packages/database
 
+  # Use timeout to prevent hanging (5 minutes max)
   # Use MIGRATION_DATABASE_URL for migrations (bypasses connection pooler)
-  DATABASE_URL="$MIGRATION_DATABASE_URL" npx prisma migrate deploy
+  timeout 300 bash -c "DATABASE_URL='$MIGRATION_DATABASE_URL' npx prisma migrate deploy"
 
   MIGRATION_EXIT_CODE=$?
   cd ../..
 
   if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
     echo "✅ Migrations deployed successfully"
+  elif [ $MIGRATION_EXIT_CODE -eq 124 ]; then
+    echo "❌ Migration timed out after 5 minutes"
+    echo "This usually means the database connection is blocked or the URL is incorrect"
+    echo "Continuing build anyway..."
   else
     echo "❌ Migration failed with exit code $MIGRATION_EXIT_CODE"
     echo "Continuing build anyway for now..."
@@ -35,12 +41,19 @@ elif [ -n "$DATABASE_URL" ]; then
   echo "⚠️  Step 2: MIGRATION_DATABASE_URL not set, attempting with DATABASE_URL..."
   echo "Note: This may fail if using a connection pooler. Set MIGRATION_DATABASE_URL for reliable migrations."
   cd packages/database
-  npx prisma migrate deploy
+  
+  # Use timeout to prevent hanging (5 minutes max)
+  timeout 300 npx prisma migrate deploy
+  
   MIGRATION_EXIT_CODE=$?
   cd ../..
 
   if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
     echo "✅ Migrations deployed successfully"
+  elif [ $MIGRATION_EXIT_CODE -eq 124 ]; then
+    echo "❌ Migration timed out after 5 minutes"
+    echo "This likely means you need to use MIGRATION_DATABASE_URL with a direct connection"
+    echo "Continuing build anyway..."
   else
     echo "❌ Migration failed - likely needs direct connection (MIGRATION_DATABASE_URL)"
   fi

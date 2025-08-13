@@ -204,6 +204,7 @@ export function combineRegistrationSteps(
     ...passwordData,
     ...step3,
     acceptTerms: true as const, // agreedToTerms is already validated as true
+    registrationSource: 'public' as const, // Default to public for frontend registration
   }
 }
 
