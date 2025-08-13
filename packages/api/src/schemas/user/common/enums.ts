@@ -2,11 +2,13 @@ import {
   AccountFlag as AccountFlagEnum,
   AdminNoteCategory as AdminNoteCategoryEnum,
   AdminUserSortBy as AdminUserSortByEnum,
+  InternalVerificationType as InternalVerificationTypeEnum,
   SortOrder as SortOrderEnum,
   UserActivityCategory as UserActivityCategoryEnum,
   UserRole as UserRoleEnum,
   UserSortBy as UserSortByEnum,
   UserStatus as UserStatusEnum,
+  UserStatusFilter as UserStatusFilterEnum,
   VerificationStatus as VerificationStatusEnum,
   VerificationType as VerificationTypeEnum,
 } from '@pika/types'
@@ -39,16 +41,11 @@ export const UserStatusSchema = openapi(createZodEnum(UserStatusEnum), {
 })
 
 // API-specific status filter (includes composite filters)
-export const UserStatusFilter = z.enum([
-  'active',
-  'inactive',
-  'suspended',
-  'pending_verification',
-])
+export const UserStatusFilter = createZodEnum(UserStatusFilterEnum)
 
 export const UserStatusFilterSchema = openapi(UserStatusFilter, {
   description: 'Filter users by status (includes composite filters)',
-  example: 'active',
+  example: UserStatusFilterEnum.ACTIVE,
 })
 
 // Verification status schema
@@ -115,7 +112,7 @@ import {
   ImageFormat as ImageFormatEnum,
   PermissionAction as PermissionActionEnum,
   ProfileVisibility as ProfileVisibilityEnum,
-  Theme as ThemeEnum,
+  ThemePreference as ThemeEnum,
   VerificationLevel as VerificationLevelEnum,
 } from '@pika/types'
 
@@ -142,14 +139,16 @@ export const ProfileVisibilitySchema = openapi(
 
 // ============= Internal Service Enums =============
 
-// Keep internal verification type as is since it's different from domain VerificationType
-export const InternalVerificationType = z.enum(['email', 'phone', 'identity'])
+// Internal verification type for service-to-service communication
+export const InternalVerificationType = createZodEnum(
+  InternalVerificationTypeEnum,
+)
 
 export const InternalVerificationTypeSchema = openapi(
   InternalVerificationType,
   {
     description: 'Internal verification type for services',
-    example: 'email',
+    example: InternalVerificationTypeEnum.EMAIL,
   },
 )
 

@@ -1,5 +1,7 @@
+import { RegistrationSource } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { DateOnlyString, PhoneNumber } from '../../shared/primitives.js'
 
@@ -53,10 +55,9 @@ export const RegisterRequest = z.object({
     .optional()
     .default(false)
     .describe('User consent for marketing emails'),
-  registrationSource: z
-    .enum(['public', 'admin_dashboard'])
+  registrationSource: createZodEnum(RegistrationSource)
     .optional()
-    .default('public')
+    .default(RegistrationSource.PUBLIC)
     .describe('Source of registration to determine user role'),
 })
 

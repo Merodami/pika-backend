@@ -1,7 +1,18 @@
-import { FIELD_LENGTH } from '@pika/types'
+import {
+  CircuitBreakerState,
+  DeregistrationReason,
+  EnvironmentType,
+  FIELD_LENGTH,
+  HealthCheckStatus,
+  LoadBalancingStrategy,
+  NetworkProtocol as NetworkProtocolEnum,
+  ServiceStatus,
+  ServiceType,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 
@@ -12,33 +23,14 @@ import { DateTime, UUID } from '../../shared/primitives.js'
 
 // ============= Enums =============
 
-export const ServiceStatus = z.enum([
-  'STARTING',
-  'HEALTHY',
-  'DEGRADED',
-  'UNHEALTHY',
-  'STOPPED',
-])
-export type ServiceStatus = z.infer<typeof ServiceStatus>
+export const ServiceStatusSchema = createZodEnum(ServiceStatus)
+export type ServiceStatusType = z.infer<typeof ServiceStatusSchema>
 
-export const ServiceType = z.enum([
-  'API_GATEWAY',
-  'MICROSERVICE',
-  'DATABASE',
-  'CACHE',
-  'QUEUE',
-  'STORAGE',
-  'MONITORING',
-])
-export type ServiceType = z.infer<typeof ServiceType>
+export const ServiceTypeSchema = createZodEnum(ServiceType)
+export type ServiceTypeType = z.infer<typeof ServiceTypeSchema>
 
-export const EnvironmentType = z.enum([
-  'DEVELOPMENT',
-  'STAGING',
-  'PRODUCTION',
-  'TEST',
-])
-export type EnvironmentType = z.infer<typeof EnvironmentType>
+export const EnvironmentTypeSchema = createZodEnum(EnvironmentType)
+export type EnvironmentTypeType = z.infer<typeof EnvironmentTypeSchema>
 
 // ============= Service Instance =============
 
@@ -46,7 +38,7 @@ export type EnvironmentType = z.infer<typeof EnvironmentType>
  * Service endpoint information
  */
 export const ServiceEndpoint = z.object({
-  protocol: z.enum(['http', 'https', 'tcp', 'grpc']),
+  protocol: createZodEnum(NetworkProtocolEnum),
   host: z.string(),
   port: z.number().int().positive(),
   path: z.string().optional(),
@@ -65,7 +57,7 @@ export const ServiceInstance = openapi(
       .string()
       .min(FIELD_LENGTH.NAME_MIN)
       .max(FIELD_LENGTH.NAME_MAX),
-    serviceType: ServiceType,
+    serviceType: ServiceTypeSchema,
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     instanceId: z.string().min(1),
 
@@ -73,12 +65,12 @@ export const ServiceInstance = openapi(
     endpoints: z.array(ServiceEndpoint).min(1),
 
     // Environment
-    environment: EnvironmentType,
+    environment: EnvironmentTypeSchema,
     region: z.string().optional(),
     availabilityZone: z.string().optional(),
 
     // Status
-    status: ServiceStatus,
+    status: ServiceStatusSchema,
     lastHealthCheck: DateTime.optional(),
     healthCheckUrl: z.string().url().optional(),
 
@@ -121,7 +113,7 @@ export const RegisterServiceRequest = openapi(
       .string()
       .min(FIELD_LENGTH.NAME_MIN)
       .max(FIELD_LENGTH.NAME_MAX),
-    serviceType: ServiceType,
+    serviceType: ServiceTypeSchema,
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     instanceId: z.string().min(1),
 
@@ -129,7 +121,7 @@ export const RegisterServiceRequest = openapi(
     endpoints: z.array(ServiceEndpoint).min(1),
 
     // Environment
-    environment: EnvironmentType,
+    environment: EnvironmentTypeSchema,
     region: z.string().optional(),
     availabilityZone: z.string().optional(),
 
@@ -177,9 +169,9 @@ export type RegisterServiceResponse = z.infer<typeof RegisterServiceResponse>
  */
 export const ServiceRegistryQuery = z.object({
   serviceName: z.string().optional(),
-  serviceType: ServiceType.optional(),
-  environment: EnvironmentType.optional(),
-  status: ServiceStatus.optional(),
+  serviceType: ServiceTypeSchema.optional(),
+  environment: EnvironmentTypeSchema.optional(),
+  status: ServiceStatusSchema.optional(),
   region: z.string().optional(),
   tags: z.array(z.string()).optional(),
   healthyOnly: z.boolean().default(true),
@@ -214,14 +206,14 @@ export const ServiceEndpointsResponse = openapi(
       z.object({
         instanceId: z.string(),
         endpoints: z.array(ServiceEndpoint),
-        status: ServiceStatus,
+        status: ServiceStatusSchema,
         lastSeen: DateTime,
         loadBalanceWeight: z.number().min(0).max(100).default(50),
       }),
     ),
-    loadBalancingStrategy: z
-      .enum(['ROUND_ROBIN', 'LEAST_CONNECTIONS', 'WEIGHTED'])
-      .default('ROUND_ROBIN'),
+    loadBalancingStrategy: createZodEnum(LoadBalancingStrategy).default(
+      LoadBalancingStrategy.ROUND_ROBIN,
+    ),
   }),
   {
     description: 'Available endpoints for a service',
@@ -237,7 +229,7 @@ export type ServiceEndpointsResponse = z.infer<typeof ServiceEndpointsResponse>
  */
 export const ServiceHealthCheckRequest = z.object({
   instanceId: UUID,
-  status: ServiceStatus,
+  status: ServiceStatusSchema,
   metrics: z
     .object({
       cpuUsage: z.number().min(0).max(100).optional(),
@@ -252,7 +244,7 @@ export const ServiceHealthCheckRequest = z.object({
     .array(
       z.object({
         name: z.string(),
-        status: z.enum(['PASS', 'FAIL', 'WARN']),
+        status: createZodEnum(HealthCheckStatus),
         message: z.string().optional(),
         duration: z.number().nonnegative().optional(),
       }),
@@ -271,14 +263,14 @@ export const ServiceHealthStatusResponse = openapi(
   z.object({
     serviceName: z.string(),
     instanceId: UUID,
-    status: ServiceStatus,
+    status: ServiceStatusSchema,
     lastHealthCheck: DateTime,
     nextHealthCheck: DateTime,
     healthHistory: z
       .array(
         z.object({
           timestamp: DateTime,
-          status: ServiceStatus,
+          status: ServiceStatusSchema,
           responseTime: z.number().nonnegative().optional(),
         }),
       )
@@ -300,9 +292,7 @@ export type ServiceHealthStatusResponse = z.infer<
  */
 export const DeregisterServiceRequest = openapi(
   z.object({
-    reason: z
-      .enum(['SHUTDOWN', 'MAINTENANCE', 'ERROR', 'SCALE_DOWN'])
-      .optional(),
+    reason: createZodEnum(DeregistrationReason).optional(),
     gracefulShutdown: z.boolean().default(true),
     drainConnections: z.boolean().default(true),
     drainTimeoutSeconds: z.number().int().positive().default(30),
@@ -340,7 +330,7 @@ export type DeregisterServiceResponse = z.infer<
  * Service configuration request
  */
 export const ServiceConfigRequest = z.object({
-  environment: EnvironmentType.optional(),
+  environment: EnvironmentTypeSchema.optional(),
   configKeys: z.array(z.string()).optional(),
 })
 
@@ -352,7 +342,7 @@ export type ServiceConfigRequest = z.infer<typeof ServiceConfigRequest>
 export const ServiceConfigResponse = openapi(
   z.object({
     serviceName: z.string(),
-    environment: EnvironmentType,
+    environment: EnvironmentTypeSchema,
     configuration: z.record(z.string(), z.any()),
     lastUpdated: DateTime,
     version: z.string(),
@@ -406,7 +396,7 @@ export type ServiceDependencyGraphResponse = z.infer<
 export const CircuitBreakerStatus = z.object({
   serviceName: z.string(),
   targetService: z.string(),
-  state: z.enum(['CLOSED', 'OPEN', 'HALF_OPEN']),
+  state: createZodEnum(CircuitBreakerState),
   failureCount: z.number().int().nonnegative(),
   failureThreshold: z.number().int().positive(),
   lastFailure: DateTime.optional(),

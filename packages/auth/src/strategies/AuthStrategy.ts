@@ -56,6 +56,7 @@ export interface AuthResult {
     refreshExpiresAt: Date
   }
   error?: string
+  errorCode?: string
   message?: string
   requiresVerification?: boolean
   requiresMfa?: boolean

@@ -1,5 +1,11 @@
-import { FIELD_LENGTH, MessagePriority } from '@pika/types'
+import {
+  FIELD_LENGTH,
+  MessagePriority,
+  NotificationSortBy as NotificationSortByEnum,
+  NotificationStatus as NotificationStatusEnum,
+} from '@pika/types'
 import { z } from 'zod'
+
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
@@ -27,7 +33,7 @@ export const Notification = withTimestamps({
   id: UUID,
   userId: UserId.optional().describe('User ID who receives the notification'),
   type: NotificationType.optional(),
-  status: NotificationStatus.default('pending'),
+  status: NotificationStatus.default(NotificationStatusEnum.PENDING),
   priority: NotificationPriority.default(MessagePriority.NORMAL),
   title: z.string().max(FIELD_LENGTH.SLUG_MAX).optional(),
   description: z.string().optional(),
@@ -94,12 +100,10 @@ export const CreateNotificationRequest = z.object({
 /**
  * Create notification request (OpenAPI documented)
  */
-export const CreateNotificationRequestSchema = CreateNotificationRequest.openapi(
-  'CreateNotificationRequest',
-  {
+export const CreateNotificationRequestSchema =
+  CreateNotificationRequest.openapi('CreateNotificationRequest', {
     description: 'Create a new notification',
-  },
-)
+  })
 
 export type CreateNotificationRequest = z.infer<
   typeof CreateNotificationRequest
@@ -125,12 +129,10 @@ export const BatchCreateNotificationsRequest = z
 /**
  * Batch create notifications request (OpenAPI documented)
  */
-export const BatchCreateNotificationsRequestSchema = BatchCreateNotificationsRequest.openapi(
-  'BatchCreateNotificationsRequest',
-  {
+export const BatchCreateNotificationsRequestSchema =
+  BatchCreateNotificationsRequest.openapi('BatchCreateNotificationsRequest', {
     description: 'Send notifications to multiple users',
-  },
-)
+  })
 
 export type BatchCreateNotificationsRequest = z.infer<
   typeof BatchCreateNotificationsRequest
@@ -149,12 +151,10 @@ export const UpdateNotificationStatusRequest = z.object({
 /**
  * Update notification status (OpenAPI documented)
  */
-export const UpdateNotificationStatusRequestSchema = UpdateNotificationStatusRequest.openapi(
-  'UpdateNotificationStatusRequest',
-  {
+export const UpdateNotificationStatusRequestSchema =
+  UpdateNotificationStatusRequest.openapi('UpdateNotificationStatusRequest', {
     description: 'Update notification status',
-  },
-)
+  })
 
 export type UpdateNotificationStatusRequest = z.infer<
   typeof UpdateNotificationStatusRequest
@@ -172,12 +172,10 @@ export const MarkNotificationsReadRequest = z.object({
 /**
  * Mark notifications as read request (OpenAPI documented)
  */
-export const MarkNotificationsReadRequestSchema = MarkNotificationsReadRequest.openapi(
-  'MarkNotificationsReadRequest',
-  {
+export const MarkNotificationsReadRequestSchema =
+  MarkNotificationsReadRequest.openapi('MarkNotificationsReadRequest', {
     description: 'Mark notifications as read',
-  },
-)
+  })
 
 export type MarkNotificationsReadRequest = z.infer<
   typeof MarkNotificationsReadRequest
@@ -197,7 +195,7 @@ export const NotificationSearchParams = SearchParams.extend({
   category: z.string().optional(),
   fromDate: DateTime.optional(),
   toDate: DateTime.optional(),
-  sortBy: NotificationSortBy.default('createdAt'),
+  sortBy: NotificationSortBy.default(NotificationSortByEnum.CREATED_AT),
 })
 
 /**
@@ -286,12 +284,10 @@ export const NotificationPreferencesResponse = z.object({
 /**
  * Notification preferences (OpenAPI documented)
  */
-export const NotificationPreferencesResponseSchema = NotificationPreferencesResponse.openapi(
-  'NotificationPreferencesResponse',
-  {
+export const NotificationPreferencesResponseSchema =
+  NotificationPreferencesResponse.openapi('NotificationPreferencesResponse', {
     description: 'User notification preferences',
-  },
-)
+  })
 
 export type NotificationPreferencesResponse = z.infer<
   typeof NotificationPreferencesResponse
@@ -306,12 +302,13 @@ export const UpdateNotificationPreferencesRequest =
 /**
  * Update notification preferences request (OpenAPI documented)
  */
-export const UpdateNotificationPreferencesRequestSchema = UpdateNotificationPreferencesRequest.openapi(
-  'UpdateNotificationPreferencesRequest',
-  {
-    description: 'Update notification preferences',
-  },
-)
+export const UpdateNotificationPreferencesRequestSchema =
+  UpdateNotificationPreferencesRequest.openapi(
+    'UpdateNotificationPreferencesRequest',
+    {
+      description: 'Update notification preferences',
+    },
+  )
 
 export type UpdateNotificationPreferencesRequest = z.infer<
   typeof UpdateNotificationPreferencesRequest
@@ -351,12 +348,10 @@ export const UnregisterPushTokenRequest = z.object({
 /**
  * Unregister push notification token (OpenAPI documented)
  */
-export const UnregisterPushTokenRequestSchema = UnregisterPushTokenRequest.openapi(
-  'UnregisterPushTokenRequest',
-  {
+export const UnregisterPushTokenRequestSchema =
+  UnregisterPushTokenRequest.openapi('UnregisterPushTokenRequest', {
     description: 'Unregister device from push notifications',
-  },
-)
+  })
 
 export type UnregisterPushTokenRequest = z.infer<
   typeof UnregisterPushTokenRequest
@@ -397,12 +392,10 @@ export const DeleteNotificationResponse = z.object({
 /**
  * Delete notification response (OpenAPI documented)
  */
-export const DeleteNotificationResponseSchema = DeleteNotificationResponse.openapi(
-  'DeleteNotificationResponse',
-  {
+export const DeleteNotificationResponseSchema =
+  DeleteNotificationResponse.openapi('DeleteNotificationResponse', {
     description: 'Response when a notification is deleted',
-  },
-)
+  })
 
 export type DeleteNotificationResponse = z.infer<
   typeof DeleteNotificationResponse

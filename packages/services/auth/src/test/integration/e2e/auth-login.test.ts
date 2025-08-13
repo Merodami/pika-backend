@@ -146,6 +146,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
+          code: 'AUTH_INVALID_CREDENTIALS',
+          type: 'authentication_error',
           message: 'Invalid email or password',
         }),
       })
@@ -164,6 +166,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
+          code: 'AUTH_INVALID_CREDENTIALS',
+          type: 'authentication_error',
           message: 'Invalid email or password',
         }),
       })
@@ -182,6 +186,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
+          code: 'AUTH_USER_INACTIVE',
+          type: 'authentication_error',
           message: 'Account is inactive. Please contact support.',
         }),
       })
@@ -200,6 +206,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
+          code: 'AUTH_PASSWORD_REQUIRED',
+          type: 'authentication_error',
           message: 'Password authentication not available for this account',
         }),
       })

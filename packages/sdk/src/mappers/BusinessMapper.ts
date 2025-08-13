@@ -100,9 +100,7 @@ export class BusinessMapper {
       active: domain.active,
       approved: domain.approved,
       approvedBy: domain.approvedBy || null,
-      approvedAt: domain.approvedAt
-        ? formatDateToISO(domain.approvedAt)
-        : null,
+      approvedAt: domain.approvedAt ? formatDateToISO(domain.approvedAt) : null,
       avgRating: domain.avgRating,
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),

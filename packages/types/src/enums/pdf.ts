@@ -8,7 +8,7 @@
 export enum PageLayoutType {
   STANDARD = 'standard',
   MIXED = 'mixed',
-  FULL_PAGE = 'full_page',
+  FULL_PAGE = 'fullPage',
   CUSTOM = 'custom',
 }
 
@@ -85,6 +85,31 @@ export enum PDFGenerationStatus {
 export enum BulkVoucherBookOperation {
   PUBLISH = 'publish',
   ARCHIVE = 'archive',
-  GENERATE_PDF = 'generate_pdf',
+  GENERATE_PDF = 'generatePdf',
   DELETE = 'delete',
+}
+
+/**
+ * PDF page formats (ISO 216 standard sizes)
+ */
+export enum PageFormat {
+  A4 = 'A4',
+  A5 = 'A5',
+}
+
+/**
+ * Bulk page operations for admin management
+ */
+export enum BulkPageOperation {
+  ACTIVATE = 'activate',
+  DEACTIVATE = 'deactivate',
+  DELETE = 'delete',
+  MOVE = 'move',
+}
+
+/**
+ * Public voucher book status (limited to published only)
+ */
+export enum PublicVoucherBookStatus {
+  PUBLISHED = 'published',
 }

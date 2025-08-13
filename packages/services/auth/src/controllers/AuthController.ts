@@ -16,7 +16,7 @@ import { RequestContext, validateResponse } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
-import { mapRoleToPermissions, UserRole } from '@pika/types'
+import { mapRoleToPermissions, RegistrationSource, UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -62,7 +62,7 @@ export class AuthController {
 
       // Determine role based on registration source
       const role =
-        registrationSource === 'admin_dashboard'
+        registrationSource === RegistrationSource.ADMIN_DASHBOARD
           ? UserRole.BUSINESS
           : UserRole.CUSTOMER
 

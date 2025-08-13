@@ -13,7 +13,7 @@ import {
 } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, logger } from '@pika/shared'
-import { EmailTemplateId, UserRole, UserStatus } from '@pika/types'
+import { EmailTemplateKey, ErrorCode, UserRole, UserStatus } from '@pika/types'
 
 import { JwtTokenService } from '../services/JwtTokenService.js'
 import { PasswordSecurityService } from '../services/PasswordSecurityService.js'
@@ -118,6 +118,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         return {
           success: false,
           error: 'Invalid email or password',
+          errorCode: ErrorCode.AUTH_INVALID_CREDENTIALS,
         }
       }
 
@@ -126,6 +127,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         return {
           success: false,
           error: 'Account is inactive. Please contact support.',
+          errorCode: ErrorCode.AUTH_USER_INACTIVE,
         }
       }
 
@@ -134,6 +136,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         return {
           success: false,
           error: 'Password authentication not available for this account',
+          errorCode: ErrorCode.AUTH_PASSWORD_REQUIRED,
         }
       }
 
@@ -146,6 +149,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         return {
           success: false,
           error: 'Invalid email or password',
+          errorCode: ErrorCode.AUTH_INVALID_CREDENTIALS,
         }
       }
 
@@ -269,7 +273,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         if (this.communicationClient && verificationToken) {
           const emailResult = await this.communicationClient.sendEmail({
             to: user.email,
-            templateId: EmailTemplateId.EMAIL_VERIFICATION,
+            templateId: EmailTemplateKey.EMAIL_VERIFICATION,
             templateParams: {
               firstName: user.firstName,
               verificationUrl: `${API_GATEWAY_BASE_URL}${API_PREFIX}/auth/verify-email/${verificationToken}`,
@@ -543,7 +547,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         await this.communicationClient
           .sendEmail({
             to: user.email,
-            templateId: EmailTemplateId.PASSWORD_RESET,
+            templateId: EmailTemplateKey.PASSWORD_RESET,
             templateParams: {
               firstName: user.firstName,
               resetLink: `${FRONTEND_URL}/reset-password?token=${resetToken}`,
@@ -622,7 +626,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         await this.communicationClient
           .sendEmail({
             to: user.email,
-            templateId: EmailTemplateId.PASSWORD_RESET_CONFIRMATION,
+            templateId: EmailTemplateKey.PASSWORD_RESET_CONFIRMATION,
             templateParams: {
               firstName: user.firstName,
             },
@@ -677,7 +681,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         await this.communicationClient
           .sendEmail({
             to: user.email,
-            templateId: EmailTemplateId.WELCOME,
+            templateId: EmailTemplateKey.WELCOME,
             templateParams: {
               firstName: user.firstName,
             },
@@ -736,7 +740,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         await this.communicationClient
           .sendEmail({
             to: user.email,
-            templateId: EmailTemplateId.EMAIL_VERIFICATION,
+            templateId: EmailTemplateKey.EMAIL_VERIFICATION,
             templateParams: {
               firstName: user.firstName,
               verificationUrl: `${API_GATEWAY_BASE_URL}${API_PREFIX}/auth/verify-email/${verificationToken}`,
@@ -811,7 +815,7 @@ export class LocalAuthStrategy implements AuthStrategy {
         await this.communicationClient
           .sendEmail({
             to: user.email,
-            templateId: EmailTemplateId.PASSWORD_RESET_CONFIRMATION,
+            templateId: EmailTemplateKey.PASSWORD_RESET_CONFIRMATION,
             templateParams: {
               firstName: user.firstName,
             },

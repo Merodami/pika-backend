@@ -66,3 +66,11 @@ export enum SessionStatus {
   REVOKED = 'revoked',
   INVALID = 'invalid',
 }
+
+/**
+ * Registration source to determine user role
+ */
+export enum RegistrationSource {
+  PUBLIC = 'public',
+  ADMIN_DASHBOARD = 'adminDashboard',
+}

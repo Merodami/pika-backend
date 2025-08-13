@@ -1,4 +1,11 @@
+import {
+  AllowedDocumentTypes as AllowedDocumentTypesEnum,
+  AllowedImageTypes as AllowedImageTypesEnum,
+  AllowedMimeTypes,
+} from '@pika/types'
 import { z } from 'zod'
+
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 
 /**
  * File upload schemas for various features
@@ -6,34 +13,26 @@ import { z } from 'zod'
 
 // ============= File Types =============
 
-export const AllowedImageTypes = z.enum([
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-])
+// Create subsets of allowed MIME types for specific use cases
+export const AllowedImageTypes = createZodEnum(AllowedImageTypesEnum)
 
 export const AllowedImageTypesSchema = AllowedImageTypes.openapi(
   'AllowedImageTypes',
   {
     description: 'Allowed image MIME types',
-    example: 'image/jpeg',
+    example: AllowedMimeTypes.JPEG,
   },
 )
 
 export type AllowedImageTypes = z.infer<typeof AllowedImageTypes>
 
-export const AllowedDocumentTypes = z.enum([
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-])
+export const AllowedDocumentTypes = createZodEnum(AllowedDocumentTypesEnum)
 
 export const AllowedDocumentTypesSchema = AllowedDocumentTypes.openapi(
   'AllowedDocumentTypes',
   {
     description: 'Allowed document MIME types',
-    example: 'application/pdf',
+    example: AllowedMimeTypes.PDF,
   },
 )
 

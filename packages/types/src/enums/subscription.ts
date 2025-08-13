@@ -148,3 +148,13 @@ export enum BulkAction {
  * Type definition for bulk action - use this for type annotations
  */
 export type BulkActionType = `${BulkAction}`
+
+/**
+ * Membership cancellation reasons
+ */
+export enum MembershipCancellationReason {
+  TOO_EXPENSIVE = 'tooExpensive',
+  NOT_USING = 'notUsing',
+  MISSING_FEATURES = 'missingFeatures',
+  OTHER = 'other',
+}

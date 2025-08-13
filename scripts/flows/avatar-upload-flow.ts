@@ -8,6 +8,7 @@
 
 import axios from 'axios'
 import FormData from 'form-data'
+import { get } from 'lodash-es'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -55,7 +56,7 @@ function createTestImage(format: 'png' | 'jpeg' | 'webp' | 'gif'): Buffer {
     ),
   }
 
-  return images[format]
+  return get(images, format)
 }
 
 // Create a large file for testing size limits

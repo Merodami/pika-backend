@@ -1,7 +1,14 @@
-import { FIELD_LENGTH } from '@pika/types'
+import {
+  FIELD_LENGTH,
+  Language as LanguageEnum,
+  PageFormat,
+  PDFGenerationPriority,
+  PDFGenerationStatus as PDFGenerationStatusEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
@@ -114,14 +121,14 @@ export const InternalGeneratePdfJobRequest = openapi(
           .boolean()
           .default(true)
           .describe('Include back cover'),
-        quality: z
-          .enum(['low', 'medium', 'high'])
-          .default('medium')
+        quality: createZodEnum(PDFGenerationPriority)
+          .default(PDFGenerationPriority.NORMAL)
           .describe('PDF quality'),
-        format: z.enum(['A5', 'A4']).default('A5').describe('PDF format'),
-        language: z
-          .enum(['es', 'en'])
-          .default('es')
+        format: createZodEnum(PageFormat)
+          .default(PageFormat.A5)
+          .describe('PDF format'),
+        language: createZodEnum(LanguageEnum)
+          .default(LanguageEnum.ES)
           .describe('Content language'),
       })
       .optional()
@@ -143,9 +150,7 @@ export const InternalGeneratePdfJobResponse = openapi(
   z.object({
     jobId: z.string().describe('Unique job identifier'),
     bookId: UUID.describe('Voucher book ID'),
-    status: z
-      .enum(['queued', 'processing', 'completed', 'failed'])
-      .describe('Job status'),
+    status: createZodEnum(PDFGenerationStatusEnum).describe('Job status'),
     progress: z.number().min(0).max(100).describe('Job progress percentage'),
     message: z.string().describe('Current status message'),
     pdfUrl: z.string().url().optional().describe('Generated PDF URL'),

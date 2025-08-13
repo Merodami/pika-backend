@@ -1,6 +1,7 @@
-import { FIELD_LENGTH } from '@pika/types'
+import { AddressType as AddressTypeEnum, FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { Address as AddressBase, GeoPoint } from '../../shared/geo.js'
 import { withTimestamps } from '../../shared/metadata.js'
@@ -12,17 +13,11 @@ import { UUID } from '../../shared/primitives.js'
 
 // ============= Address Types =============
 
-export const AddressType = z.enum([
-  'HOME',
-  'WORK',
-  'BILLING',
-  'SHIPPING',
-  'OTHER',
-])
+export const AddressType = createZodEnum(AddressTypeEnum)
 
 export const AddressTypeSchema = AddressType.openapi('AddressType', {
   description: 'Type of address',
-  example: 'HOME',
+  example: AddressTypeEnum.HOME,
 })
 
 export type AddressType = z.infer<typeof AddressType>

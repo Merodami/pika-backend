@@ -39,7 +39,7 @@ export type FileStatusType = `${FileStatus}`
  * Supported storage providers
  */
 export enum StorageProvider {
-  AWS_S3 = 'aws_s3',
+  AWS_S3 = 'awsS3',
   LOCAL = 'local',
   MINIO = 'minio',
 }
@@ -73,6 +73,25 @@ export enum HealthStatus {
 }
 
 /**
+ * File migration status
+ */
+export enum MigrationStatus {
+  SUCCESS = 'success',
+  FAILED = 'failed',
+  PARTIAL = 'partial',
+}
+
+/**
+ * File bulk action types
+ */
+export enum FileBulkAction {
+  DELETE = 'delete',
+  MAKE_PUBLIC = 'makePublic',
+  MAKE_PRIVATE = 'makePrivate',
+  CHANGE_STATUS = 'changeStatus',
+}
+
+/**
  * Allowed MIME types for file uploads
  */
 export enum AllowedMimeTypes {
@@ -97,4 +116,23 @@ export enum AllowedMimeTypes {
   MP3 = 'audio/mpeg',
   WAV = 'audio/wav',
   OGG = 'audio/ogg',
+}
+
+/**
+ * Allowed image MIME types (subset for image uploads)
+ */
+export enum AllowedImageTypes {
+  JPEG = 'image/jpeg',
+  PNG = 'image/png',
+  WEBP = 'image/webp',
+  GIF = 'image/gif',
+}
+
+/**
+ * Allowed document MIME types (subset for document uploads)
+ */
+export enum AllowedDocumentTypes {
+  PDF = 'application/pdf',
+  DOC = 'application/msword',
+  DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 }

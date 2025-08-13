@@ -1,77 +1,99 @@
 /**
+ * Error type categories for API consumers
+ */
+export enum ErrorType {
+  AUTHENTICATION_ERROR = 'authenticationError',
+  AUTHORIZATION_ERROR = 'authorizationError',
+  VALIDATION_ERROR = 'validationError',
+  NOT_FOUND_ERROR = 'notFoundError',
+  CONFLICT_ERROR = 'conflictError',
+  INTERNAL_ERROR = 'internalError',
+  EXTERNAL_ERROR = 'externalError',
+  RATE_LIMIT_ERROR = 'rateLimitError',
+}
+
+/**
  * Standardized error codes used across the application
  */
 export enum ErrorCode {
   // Health check-related errors
-  HEALTH_CHECK_INVALID_DEPENDENCIES = 'HEALTH_CHECK_INVALID_DEPENDENCIES',
-  HEALTH_CHECK_INVALID_DEPENDENCY = 'HEALTH_CHECK_INVALID_DEPENDENCY',
-  HEALTH_CHECK_INVALID_SERVICES = 'HEALTH_CHECK_INVALID_SERVICES',
-  HEALTH_CHECK_INVALID_STARTTIME = 'HEALTH_CHECK_INVALID_STARTTIME',
-  HEALTH_CHECK_INVALID_VERSION = 'HEALTH_CHECK_INVALID_VERSION',
-  HEALTH_CHECK_EXECUTION_FAILED = 'HEALTH_CHECK_EXECUTION_FAILED',
-  HEALTH_CHECK_DEPENDENCIES_MISSING = 'HEALTH_CHECK_DEPENDENCIES_MISSING',
+  HEALTH_CHECK_INVALID_DEPENDENCIES = 'healthCheckInvalidDependencies',
+  HEALTH_CHECK_INVALID_DEPENDENCY = 'healthCheckInvalidDependency',
+  HEALTH_CHECK_INVALID_SERVICES = 'healthCheckInvalidServices',
+  HEALTH_CHECK_INVALID_STARTTIME = 'healthCheckInvalidStarttime',
+  HEALTH_CHECK_INVALID_VERSION = 'healthCheckInvalidVersion',
+  HEALTH_CHECK_EXECUTION_FAILED = 'healthCheckExecutionFailed',
+  HEALTH_CHECK_DEPENDENCIES_MISSING = 'healthCheckDependenciesMissing',
 
   // General errors
-  ALREADY_DELETED = 'ALREADY_DELETED',
-  NOT_FOUND = 'NOT_FOUND',
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
-  INVALID_AGGREGATE_ID = 'INVALID_AGGREGATE_ID',
-  UNAUTHORIZED = 'UNAUTHORIZED',
-  FORBIDDEN = 'FORBIDDEN',
-  INTERNAL_ERROR = 'INTERNAL_ERROR',
-  UNEXPECTED_ERROR = 'UNEXPECTED_ERROR',
-  CONCURRENCY_CONFLICT = 'CONCURRENCY_CONFLICT',
-  DATABASE_ERROR = 'DATABASE_ERROR',
-  DUPLICATE_ENTITY = 'DUPLICATE_ENTITY',
-  DUPLICATE_EVENT = 'DUPLICATE_EVENT',
-  EVENT_SAVE_FAILED = 'EVENT_SAVE_FAILED',
-  EVENT_LOOKUP_FAILED = 'EVENT_LOOKUP_FAILED',
-  FOREIGN_KEY_VIOLATION = 'FOREIGN_KEY_VIOLATION',
-  INVALID_QUERY = 'INVALID_QUERY',
-  COMPLEXITY_LIMIT_EXCEEDED = 'COMPLEXITY_LIMIT_EXCEEDED',
-  RETRY_LIMIT_EXCEEDED = 'RETRY_LIMIT_EXCEEDED',
-  CONCURRENCY_ERROR = 'CONCURRENCY_ERROR',
-  CONCURRENCY_ERROR_RETRY_LIMIT_EXCEEDED = 'CONCURRENCY_ERROR_RETRY_LIMIT_EXCEEDED',
-  INVALID_INPUT = 'INVALID_INPUT',
-  CONFLICT = 'CONFLICT',
+  ALREADY_DELETED = 'alreadyDeleted',
+  NOT_FOUND = 'notFound',
+  VALIDATION_ERROR = 'validationError',
+  INVALID_AGGREGATE_ID = 'invalidAggregateId',
+  UNAUTHORIZED = 'unauthorized',
+  FORBIDDEN = 'forbidden',
+  INTERNAL_ERROR = 'internalError',
+  UNEXPECTED_ERROR = 'unexpectedError',
+  CONCURRENCY_CONFLICT = 'concurrencyConflict',
+  DATABASE_ERROR = 'databaseError',
+  DUPLICATE_ENTITY = 'duplicateEntity',
+  DUPLICATE_EVENT = 'duplicateEvent',
+  EVENT_SAVE_FAILED = 'eventSaveFailed',
+  EVENT_LOOKUP_FAILED = 'eventLookupFailed',
+  FOREIGN_KEY_VIOLATION = 'foreignKeyViolation',
+  INVALID_QUERY = 'invalidQuery',
+  COMPLEXITY_LIMIT_EXCEEDED = 'complexityLimitExceeded',
+  RETRY_LIMIT_EXCEEDED = 'retryLimitExceeded',
+  CONCURRENCY_ERROR = 'concurrencyError',
+  CONCURRENCY_ERROR_RETRY_LIMIT_EXCEEDED = 'concurrencyErrorRetryLimitExceeded',
+  INVALID_INPUT = 'invalidInput',
+  CONFLICT = 'conflict',
 
   // Authentication errors
-  NOT_AUTHENTICATED = 'NOT_AUTHENTICATED',
-  NOT_AUTHORIZED = 'NOT_AUTHORIZED',
+  NOT_AUTHENTICATED = 'notAuthenticated',
+  NOT_AUTHORIZED = 'notAuthorized',
+
+  // Granular authentication error codes
+  AUTH_USER_INACTIVE = 'authUserInactive',
+  AUTH_INVALID_CREDENTIALS = 'authInvalidCredentials',
+  AUTH_ACCOUNT_LOCKED = 'authAccountLocked',
+  AUTH_PASSWORD_REQUIRED = 'authPasswordRequired',
+  AUTH_TOKEN_EXPIRED = 'authTokenExpired',
+  AUTH_TOKEN_INVALID = 'authTokenInvalid',
 
   // Configuration errors
-  CONFIGURATION_ERROR = 'CONFIGURATION_ERROR',
+  CONFIGURATION_ERROR = 'configurationError',
 
   // External service errors
-  EXTERNAL_SERVICE_ERROR = 'EXTERNAL_SERVICE_ERROR',
+  EXTERNAL_SERVICE_ERROR = 'externalServiceError',
 
   // Cache errors
-  CACHE_ERROR = 'CACHE_ERROR',
+  CACHE_ERROR = 'cacheError',
 
   // Business rule errors
-  BUSINESS_RULE_VIOLATION = 'BUSINESS_RULE_VIOLATION',
-  INVALID_OPERATION = 'INVALID_OPERATION',
+  BUSINESS_RULE_VIOLATION = 'businessRuleViolation',
+  INVALID_OPERATION = 'invalidOperation',
 
   // Rate limit errors
-  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
+  RATE_LIMIT_EXCEEDED = 'rateLimitExceeded',
 
   // Service availability errors
-  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
-  NOT_IMPLEMENTED = 'NOT_IMPLEMENTED',
+  SERVICE_UNAVAILABLE = 'serviceUnavailable',
+  NOT_IMPLEMENTED = 'notImplemented',
 
   // Resource conflict errors
-  RESOURCE_CONFLICT = 'RESOURCE_CONFLICT',
+  RESOURCE_CONFLICT = 'resourceConflict',
 
   // Not found errors
-  URL_NOT_FOUND = 'URL_NOT_FOUND',
+  URL_NOT_FOUND = 'urlNotFound',
 
   // No changes errors
-  NO_CHANGES = 'NO_CHANGES',
+  NO_CHANGES = 'noChanges',
 
   // Item errors
-  ITEM_LOOKUP_FAILED = 'ITEM_LOOKUP_FAILED',
-  ITEM_NOT_FOUND = 'ITEM_NOT_FOUND',
-  ITEM_ALREADY_EXISTS = 'ITEM_ALREADY_EXISTS',
+  ITEM_LOOKUP_FAILED = 'itemLookupFailed',
+  ITEM_NOT_FOUND = 'itemNotFound',
+  ITEM_ALREADY_EXISTS = 'itemAlreadyExists',
 }
 
 /**
@@ -90,6 +112,12 @@ export function getStatusCodeForError(code: ErrorCode): number {
     // 401 Unauthorized
     case ErrorCode.UNAUTHORIZED:
     case ErrorCode.NOT_AUTHENTICATED:
+    case ErrorCode.AUTH_USER_INACTIVE:
+    case ErrorCode.AUTH_INVALID_CREDENTIALS:
+    case ErrorCode.AUTH_ACCOUNT_LOCKED:
+    case ErrorCode.AUTH_PASSWORD_REQUIRED:
+    case ErrorCode.AUTH_TOKEN_EXPIRED:
+    case ErrorCode.AUTH_TOKEN_INVALID:
       return 401
 
     // 403 Forbidden
@@ -150,6 +178,67 @@ export function getStatusCodeForError(code: ErrorCode): number {
     // Default to 500 for unhandled error codes
     default:
       return 500
+  }
+}
+
+/**
+ * Get error type for an error code
+ */
+export function getErrorType(code: ErrorCode): ErrorType {
+  switch (code) {
+    // Authentication errors
+    case ErrorCode.NOT_AUTHENTICATED:
+    case ErrorCode.AUTH_USER_INACTIVE:
+    case ErrorCode.AUTH_INVALID_CREDENTIALS:
+    case ErrorCode.AUTH_ACCOUNT_LOCKED:
+    case ErrorCode.AUTH_PASSWORD_REQUIRED:
+    case ErrorCode.AUTH_TOKEN_EXPIRED:
+    case ErrorCode.AUTH_TOKEN_INVALID:
+      return ErrorType.AUTHENTICATION_ERROR
+
+    // Authorization errors
+    case ErrorCode.UNAUTHORIZED:
+    case ErrorCode.NOT_AUTHORIZED:
+    case ErrorCode.FORBIDDEN:
+      return ErrorType.AUTHORIZATION_ERROR
+
+    // Validation errors
+    case ErrorCode.VALIDATION_ERROR:
+    case ErrorCode.INVALID_INPUT:
+    case ErrorCode.BUSINESS_RULE_VIOLATION:
+    case ErrorCode.INVALID_OPERATION:
+      return ErrorType.VALIDATION_ERROR
+
+    // Not found errors
+    case ErrorCode.NOT_FOUND:
+    case ErrorCode.URL_NOT_FOUND:
+    case ErrorCode.ITEM_NOT_FOUND:
+      return ErrorType.NOT_FOUND_ERROR
+
+    // Conflict errors
+    case ErrorCode.DUPLICATE_ENTITY:
+    case ErrorCode.DUPLICATE_EVENT:
+    case ErrorCode.ITEM_ALREADY_EXISTS:
+    case ErrorCode.RESOURCE_CONFLICT:
+    case ErrorCode.CONCURRENCY_CONFLICT:
+    case ErrorCode.CONCURRENCY_ERROR:
+    case ErrorCode.CONFLICT:
+      return ErrorType.CONFLICT_ERROR
+
+    // Rate limit errors
+    case ErrorCode.RATE_LIMIT_EXCEEDED:
+    case ErrorCode.RETRY_LIMIT_EXCEEDED:
+    case ErrorCode.COMPLEXITY_LIMIT_EXCEEDED:
+      return ErrorType.RATE_LIMIT_ERROR
+
+    // External service errors
+    case ErrorCode.EXTERNAL_SERVICE_ERROR:
+    case ErrorCode.SERVICE_UNAVAILABLE:
+      return ErrorType.EXTERNAL_ERROR
+
+    // Internal errors (default for everything else)
+    default:
+      return ErrorType.INTERNAL_ERROR
   }
 }
 

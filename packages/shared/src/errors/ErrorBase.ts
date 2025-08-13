@@ -1,3 +1,5 @@
+import { getErrorType } from '@pika/types'
+
 /**
  * Error severity levels for classification and monitoring
  */
@@ -51,6 +53,7 @@ export interface ErrorContext {
 interface ErrorResponse {
   error: {
     code: string
+    type: string
     message: string
     domain: ErrorDomain
     timestamp: string
@@ -107,6 +110,7 @@ export class BaseError extends Error {
     const response: ErrorResponse = {
       error: {
         code: this.context.code,
+        type: getErrorType(this.context.code as any),
         message: this.message,
         domain: this.context.domain,
         timestamp: this.context.timestamp,

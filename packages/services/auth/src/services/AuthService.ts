@@ -129,9 +129,19 @@ export class AuthService implements IAuthService {
     const result = await this.authStrategy.authenticate({ email, password })
 
     if (!result.success || !result.user || !result.tokens) {
-      throw ErrorFactory.unauthorized(
-        result.error || 'Invalid email or password',
-      )
+      // Use specific error factory methods based on error code
+      switch (result.errorCode) {
+        case 'AUTH_USER_INACTIVE':
+          throw ErrorFactory.userInactive(result.error)
+        case 'AUTH_INVALID_CREDENTIALS':
+          throw ErrorFactory.invalidCredentials(result.error)
+        case 'AUTH_PASSWORD_REQUIRED':
+          throw ErrorFactory.passwordRequired(result.error)
+        default:
+          throw ErrorFactory.unauthorized(
+            result.error || 'Invalid email or password',
+          )
+      }
     }
 
     // Get full user object from user service

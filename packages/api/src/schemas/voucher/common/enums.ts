@@ -1,7 +1,9 @@
 import {
   AdminVoucherSortBy,
+  BatchOperationType as BatchOperationTypeEnum,
   CustomerVoucherStatus,
   UserVoucherSortBy,
+  UserVoucherStatusFilter as UserVoucherStatusFilterEnum,
   VoucherBookStatus,
   VoucherBookType,
   VoucherCodeType,
@@ -11,7 +13,6 @@ import {
   VoucherSortBy,
   VoucherState,
 } from '@pika/types'
-import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
@@ -115,28 +116,19 @@ export const UserVoucherSortBySchema = createZodEnum(UserVoucherSortBy).openapi(
   },
 )
 
-// Additional schema-specific enums that don't belong in @pika/types
-export const UserVoucherStatusFilter = z.enum([
-  'claimed',
-  'redeemed',
-  'expired',
-  'all',
-])
+// Additional schema-specific enums
+export const UserVoucherStatusFilter = createZodEnum(
+  UserVoucherStatusFilterEnum,
+)
 
 export const UserVoucherStatusFilterSchema = openapi(UserVoucherStatusFilter, {
-  description: 'User voucher status filter including all option',
-  example: 'all',
+  description: 'User voucher status filter',
+  example: UserVoucherStatusFilterEnum.CLAIMED,
 })
 
-export const BatchOperationType = z.enum([
-  'publish',
-  'expire',
-  'validate',
-  'refresh',
-  'activate',
-])
+export const BatchOperationType = createZodEnum(BatchOperationTypeEnum)
 
 export const BatchOperationTypeSchema = openapi(BatchOperationType, {
   description: 'Type of batch operation to perform',
-  example: 'publish',
+  example: BatchOperationTypeEnum.PUBLISH,
 })

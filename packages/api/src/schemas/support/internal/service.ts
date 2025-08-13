@@ -1,7 +1,16 @@
-import { TicketPriority, TicketStatus, TicketType } from '@pika/types'
+import {
+  AnalyticsGroupBy as AnalyticsGroupByEnum,
+  HealthStatus as HealthStatusEnum,
+  TicketEscalationType as TicketEscalationTypeEnum,
+  TicketPriority,
+  TicketStatus,
+  TicketType,
+  TicketUpdateType as TicketUpdateTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { UUID } from '../../shared/primitives.js'
 import {
@@ -19,7 +28,7 @@ import {
 export const SupportServiceHealthCheck = openapi(
   z.object({
     service: z.literal('support'),
-    status: z.enum(['healthy', 'degraded', 'unhealthy']),
+    status: createZodEnum(HealthStatusEnum),
     timestamp: z.string().datetime(),
     activeTickets: z.number().int().nonnegative(),
     pendingEscalations: z.number().int().nonnegative(),
@@ -38,12 +47,7 @@ export const NotifyTicketUpdate = openapi(
   z.object({
     ticketId: UUID,
     userId: UserId,
-    updateType: z.enum([
-      'status_change',
-      'new_comment',
-      'assigned',
-      'escalated',
-    ]),
+    updateType: createZodEnum(TicketUpdateTypeEnum),
     oldStatus: TicketStatusSchema.optional(),
     newStatus: TicketStatusSchema.optional(),
     assignedToId: UserId.optional(),
@@ -141,12 +145,7 @@ export type BulkCreateTicketsResponse = z.infer<
 export const EscalateTicketInternalRequest = openapi(
   z.object({
     ticketId: UUID,
-    escalationType: z.enum([
-      'priority',
-      'sla_breach',
-      'customer_request',
-      'system',
-    ]),
+    escalationType: createZodEnum(TicketEscalationTypeEnum),
     reason: z.string(),
     targetPriority: TicketPrioritySchema,
     notifyManagement: z.boolean().default(true),
@@ -165,7 +164,7 @@ export const GetTicketAnalyticsRequest = openapi(
   z.object({
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
-    groupBy: z.enum(['day', 'week', 'month']).optional(),
+    groupBy: createZodEnum(AnalyticsGroupByEnum).optional(),
   }),
   {
     description: 'Request ticket analytics data',

@@ -17,7 +17,7 @@ import {
  * Extends SearchParams with user voucher specific filters
  */
 export const UserVouchersQueryParams = SearchParams.extend({
-  status: UserVoucherStatusFilterSchema.default('all'),
+  status: UserVoucherStatusFilterSchema.optional(),
   sortBy: UserVoucherSortBySchema.default(UserVoucherSortBy.CLAIMED_AT),
 })
 

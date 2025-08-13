@@ -1,7 +1,13 @@
-import { FileStatus, FileType, StorageProvider } from '@pika/types'
+import {
+  FileStatus,
+  FileType,
+  MigrationStatus as MigrationStatusEnum,
+  StorageProvider,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 import {
@@ -242,7 +248,7 @@ export const MigrateFileResponse = openapi(
     newProvider: StorageProviderSchema,
     oldFileKey: z.string(),
     newFileKey: z.string(),
-    migrationStatus: z.enum(['success', 'failed', 'partial']),
+    migrationStatus: createZodEnum(MigrationStatusEnum),
     error: z.string().optional(),
     migratedAt: DateTime,
   }),

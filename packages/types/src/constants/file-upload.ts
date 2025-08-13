@@ -3,6 +3,8 @@
  * Simple, focused configuration for current needs
  */
 
+import { get } from 'lodash-es'
+
 import { AllowedMimeTypes } from '../enums/storage.js'
 
 /**
@@ -64,7 +66,7 @@ export function isValidFileExtension(
 
   if (!extension) return false
 
-  const validExtensions = MIME_TO_EXTENSION[mimeType]
+  const validExtensions = get(MIME_TO_EXTENSION, mimeType)
 
   return validExtensions ? validExtensions.includes(extension) : false
 }

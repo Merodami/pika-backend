@@ -1,6 +1,13 @@
+import {
+  CreditOperation as CreditOperationEnum,
+  PermissionAction as PermissionActionEnum,
+  VerificationLevel as VerificationLevelEnum,
+  VerificationType as VerificationTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { DateOnlyString, DateTime } from '../../shared/primitives.js'
 import { UserRoleSchema, UserStatusSchema } from '../common/enums.js'
@@ -58,7 +65,7 @@ export type InternalUserData = z.infer<typeof InternalUserData>
 export const VerifyUserRequest = openapi(
   z.object({
     userId: UserId,
-    verificationType: z.enum(['EMAIL', 'PHONE', 'IDENTITY']),
+    verificationType: createZodEnum(VerificationTypeEnum),
   }),
   {
     description: 'Verify user for internal services',
@@ -76,7 +83,7 @@ export const VerifyUserResponse = openapi(
     exists: z.boolean(),
     isActive: z.boolean(),
     isVerified: z.boolean(),
-    verificationLevel: z.enum(['NONE', 'EMAIL', 'PHONE', 'FULL']),
+    verificationLevel: createZodEnum(VerificationLevelEnum),
   }),
   {
     description: 'User verification response',
@@ -129,7 +136,7 @@ export const UpdateUserCreditsRequest = openapi(
   z.object({
     userId: UserId,
     amount: z.number().int(),
-    operation: z.enum(['ADD', 'SUBTRACT', 'SET']),
+    operation: createZodEnum(CreditOperationEnum),
     reason: z.string(),
     metadata: z.record(z.string(), z.any()).optional(),
   }),
@@ -169,7 +176,7 @@ export const CheckUserPermissionRequest = openapi(
   z.object({
     userId: UserId,
     resource: z.string(),
-    action: z.enum(['READ', 'CREATE', 'UPDATE', 'DELETE']),
+    action: createZodEnum(PermissionActionEnum),
     resourceId: z.string().optional(),
   }),
   {

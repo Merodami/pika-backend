@@ -134,7 +134,7 @@ export type CustomerVoucherStatusFilterType = `${CustomerVoucherStatusFilter}`
  */
 export enum VoucherBookStatus {
   DRAFT = 'draft',
-  READY_FOR_PRINT = 'ready_for_print',
+  READY_FOR_PRINT = 'readyForPrint',
   PUBLISHED = 'published',
   ARCHIVED = 'archived',
 }
@@ -149,7 +149,7 @@ export type VoucherBookStatusType = `${VoucherBookStatus}`
  */
 export enum VoucherBookType {
   MONTHLY = 'monthly',
-  SPECIAL_EDITION = 'special_edition',
+  SPECIAL_EDITION = 'specialEdition',
   REGIONAL = 'regional',
   SEASONAL = 'seasonal',
   PROMOTIONAL = 'promotional',
@@ -208,3 +208,34 @@ export enum UserVoucherSortBy {
  * Type definition for user voucher sort by - use this for type annotations
  */
 export type UserVoucherSortByType = `${UserVoucherSortBy}`
+
+/**
+ * User voucher status filter for API schemas
+ * These are status filters that can be applied in voucher queries
+ */
+export enum UserVoucherStatusFilter {
+  CLAIMED = 'claimed',
+  REDEEMED = 'redeemed',
+  EXPIRED = 'expired',
+  AVAILABLE = 'available',
+}
+
+/**
+ * Type definition for user voucher status filter
+ */
+export type UserVoucherStatusFilterType = `${UserVoucherStatusFilter}`
+
+/**
+ * Batch operation types for voucher management
+ */
+export enum BatchOperationType {
+  PUBLISH = 'publish',
+  EXPIRE = 'expire',
+  SUSPEND = 'suspend',
+  ACTIVATE = 'activate',
+}
+
+/**
+ * Type definition for batch operation type
+ */
+export type BatchOperationTypeType = `${BatchOperationType}`

@@ -1,13 +1,19 @@
 import {
+  AccountFlag as AccountFlagEnum,
+  AdminNoteCategory as AdminNoteCategoryEnum,
   AdminUserSortBy as AdminUserSortByEnum,
   FIELD_LENGTH,
   NUMERIC_CONSTRAINTS,
+  SortOrder as SortOrderEnum,
+  UserActivityCategory as UserActivityCategoryEnum,
   UserRole as UserRoleEnum,
   UserStatus as UserStatusEnum,
   VerificationType,
+  VerificationType as VerificationTypeEnum,
 } from '@pika/types'
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { BinaryFile } from '../../shared/fileUpload.js'
@@ -24,14 +30,11 @@ import { AdminUserSortBySchema } from '../common/enums.js'
 // ============= Enums =============
 // Note: UserRole and UserStatus are now imported from common/schemas/enums.ts
 
-export const AccountFlag = z.enum([
-  'VERIFIED',
-  'PREMIUM',
-  'SUSPICIOUS',
-  'REPORTED',
-  'VIP',
-])
-export type AccountFlag = z.infer<typeof AccountFlag>
+export const AccountFlagSchema = openapi(createZodEnum(AccountFlagEnum), {
+  description: 'Account flags for special account states',
+  example: AccountFlagEnum.VERIFIED,
+})
+export type AccountFlag = z.infer<typeof AccountFlagSchema>
 
 // ============= Admin User View =============
 
@@ -60,9 +63,12 @@ export const AdminUserDetailResponse = withTimestamps({
 /**
  * Detailed user information for admin (OpenAPI documented)
  */
-export const AdminUserDetailResponseSchema = AdminUserDetailResponse.openapi('AdminUserDetailResponse', {
-  description: 'Detailed user information for admin',
-})
+export const AdminUserDetailResponseSchema = AdminUserDetailResponse.openapi(
+  'AdminUserDetailResponse',
+  {
+    description: 'Detailed user information for admin',
+  },
+)
 
 export type AdminUserDetailResponse = z.infer<typeof AdminUserDetailResponse>
 
@@ -93,15 +99,18 @@ export const AdminUserQueryParams = z.object({
     .max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX)
     .default(NUMERIC_CONSTRAINTS.PAGE_SIZE_DEFAULT),
   sortBy: AdminUserSortBySchema.default(AdminUserSortByEnum.CREATED_AT),
-  sortOrder: z.enum(['ASC', 'DESC']).default('DESC'),
+  sortOrder: createZodEnum(SortOrderEnum).default(SortOrderEnum.DESC),
 })
 
 /**
  * Admin user search parameters (OpenAPI documented)
  */
-export const AdminUserQueryParamsSchema = AdminUserQueryParams.openapi('AdminUserQueryParams', {
-  description: 'Admin user search and filter parameters',
-})
+export const AdminUserQueryParamsSchema = AdminUserQueryParams.openapi(
+  'AdminUserQueryParams',
+  {
+    description: 'Admin user search and filter parameters',
+  },
+)
 
 export type AdminUserQueryParams = z.infer<typeof AdminUserQueryParams>
 
@@ -113,9 +122,12 @@ export const AdminUserListResponse = paginatedResponse(AdminUserDetailResponse)
 /**
  * Admin user list response (OpenAPI documented)
  */
-export const AdminUserListResponseSchema = AdminUserListResponse.openapi('AdminUserListResponse', {
-  description: 'Paginated list of users for admin management',
-})
+export const AdminUserListResponseSchema = AdminUserListResponse.openapi(
+  'AdminUserListResponse',
+  {
+    description: 'Paginated list of users for admin management',
+  },
+)
 
 export type AdminUserListResponse = z.infer<typeof AdminUserListResponse>
 
@@ -139,9 +151,10 @@ export const AdminUpdateUserStatusRequest = z.object({
 /**
  * Update user status request (OpenAPI documented)
  */
-export const AdminUpdateUserStatusRequestSchema = AdminUpdateUserStatusRequest.openapi('AdminUpdateUserStatusRequest', {
-  description: 'Update user account status',
-})
+export const AdminUpdateUserStatusRequestSchema =
+  AdminUpdateUserStatusRequest.openapi('AdminUpdateUserStatusRequest', {
+    description: 'Update user account status',
+  })
 
 export type AdminUpdateUserStatusRequest = z.infer<
   typeof AdminUpdateUserStatusRequest
@@ -158,9 +171,10 @@ export const AdminUpdateUserRoleRequest = z.object({
 /**
  * Update user role request (OpenAPI documented)
  */
-export const AdminUpdateUserRoleRequestSchema = AdminUpdateUserRoleRequest.openapi('AdminUpdateUserRoleRequest', {
-  description: 'Update user role',
-})
+export const AdminUpdateUserRoleRequestSchema =
+  AdminUpdateUserRoleRequest.openapi('AdminUpdateUserRoleRequest', {
+    description: 'Update user role',
+  })
 
 export type AdminUpdateUserRoleRequest = z.infer<
   typeof AdminUpdateUserRoleRequest
@@ -170,16 +184,19 @@ export type AdminUpdateUserRoleRequest = z.infer<
  * Add user flag request (raw Zod)
  */
 export const AdminAddUserFlagRequest = z.object({
-  flag: AccountFlag,
+  flag: createZodEnum(AccountFlagEnum),
   reason: z.string().max(FIELD_LENGTH.DESCRIPTION_MEDIUM_MAX).optional(),
 })
 
 /**
  * Add user flag request (OpenAPI documented)
  */
-export const AdminAddUserFlagRequestSchema = AdminAddUserFlagRequest.openapi('AdminAddUserFlagRequest', {
-  description: 'Add flag to user account',
-})
+export const AdminAddUserFlagRequestSchema = AdminAddUserFlagRequest.openapi(
+  'AdminAddUserFlagRequest',
+  {
+    description: 'Add flag to user account',
+  },
+)
 
 export type AdminAddUserFlagRequest = z.infer<typeof AdminAddUserFlagRequest>
 
@@ -188,15 +205,18 @@ export type AdminAddUserFlagRequest = z.infer<typeof AdminAddUserFlagRequest>
  */
 export const AdminAddNoteRequest = z.object({
   note: z.string().max(2000),
-  category: z.enum(['GENERAL', 'SECURITY', 'SUPPORT', 'BILLING']).optional(),
+  category: createZodEnum(AdminNoteCategoryEnum).optional(),
 })
 
 /**
  * Admin note request (OpenAPI documented)
  */
-export const AdminAddNoteRequestSchema = AdminAddNoteRequest.openapi('AdminAddNoteRequest', {
-  description: 'Add admin note to user',
-})
+export const AdminAddNoteRequestSchema = AdminAddNoteRequest.openapi(
+  'AdminAddNoteRequest',
+  {
+    description: 'Add admin note to user',
+  },
+)
 
 export type AdminAddNoteRequest = z.infer<typeof AdminAddNoteRequest>
 
@@ -209,7 +229,7 @@ export const UserActivityLog = z.object({
   id: UUID,
   userId: UserId,
   action: z.string(),
-  category: z.enum(['AUTH', 'PROFILE', 'PAYMENT', 'OTHER']),
+  category: createZodEnum(UserActivityCategoryEnum),
   details: z.record(z.string(), z.any()).optional(),
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
@@ -219,9 +239,12 @@ export const UserActivityLog = z.object({
 /**
  * User activity log (OpenAPI documented)
  */
-export const UserActivityLogSchema = UserActivityLog.openapi('UserActivityLog', {
-  description: 'User activity log entry',
-})
+export const UserActivityLogSchema = UserActivityLog.openapi(
+  'UserActivityLog',
+  {
+    description: 'User activity log entry',
+  },
+)
 
 export type UserActivityLog = z.infer<typeof UserActivityLog>
 
@@ -233,9 +256,10 @@ export const AdminUserActivityResponse = paginatedResponse(UserActivityLog)
 /**
  * User activity response (OpenAPI documented)
  */
-export const AdminUserActivityResponseSchema = AdminUserActivityResponse.openapi('AdminUserActivityResponse', {
-  description: 'Paginated list of user activity logs',
-})
+export const AdminUserActivityResponseSchema =
+  AdminUserActivityResponse.openapi('AdminUserActivityResponse', {
+    description: 'Paginated list of user activity logs',
+  })
 
 export type AdminUserActivityResponse = z.infer<
   typeof AdminUserActivityResponse
@@ -258,9 +282,10 @@ export const AdminBulkUserUpdateRequest = z.object({
 /**
  * Bulk user update request (OpenAPI documented)
  */
-export const AdminBulkUserUpdateRequestSchema = AdminBulkUserUpdateRequest.openapi('AdminBulkUserUpdateRequest', {
-  description: 'Update multiple users at once',
-})
+export const AdminBulkUserUpdateRequestSchema =
+  AdminBulkUserUpdateRequest.openapi('AdminBulkUserUpdateRequest', {
+    description: 'Update multiple users at once',
+  })
 
 export type AdminBulkUserUpdateRequest = z.infer<
   typeof AdminBulkUserUpdateRequest
@@ -285,9 +310,10 @@ export const AdminBulkOperationResponse = z.object({
 /**
  * Bulk operation response (OpenAPI documented)
  */
-export const AdminBulkOperationResponseSchema = AdminBulkOperationResponse.openapi('AdminBulkOperationResponse', {
-  description: 'Bulk user operation result',
-})
+export const AdminBulkOperationResponseSchema =
+  AdminBulkOperationResponse.openapi('AdminBulkOperationResponse', {
+    description: 'Bulk user operation result',
+  })
 
 export type AdminBulkOperationResponse = z.infer<
   typeof AdminBulkOperationResponse
@@ -312,9 +338,12 @@ export const AdminCreateUserRequest = z.object({
 /**
  * Admin create user request (OpenAPI documented)
  */
-export const AdminCreateUserRequestSchema = AdminCreateUserRequest.openapi('AdminCreateUserRequest', {
-  description: 'Create a new user (admin only)',
-})
+export const AdminCreateUserRequestSchema = AdminCreateUserRequest.openapi(
+  'AdminCreateUserRequest',
+  {
+    description: 'Create a new user (admin only)',
+  },
+)
 
 export type AdminCreateUserRequest = z.infer<typeof AdminCreateUserRequest>
 
@@ -347,9 +376,12 @@ export const AdminUpdateUserRequest = z.object({
 /**
  * Admin update user request (OpenAPI documented)
  */
-export const AdminUpdateUserRequestSchema = AdminUpdateUserRequest.openapi('AdminUpdateUserRequest', {
-  description: 'Update user information (admin)',
-})
+export const AdminUpdateUserRequestSchema = AdminUpdateUserRequest.openapi(
+  'AdminUpdateUserRequest',
+  {
+    description: 'Update user information (admin)',
+  },
+)
 
 export type AdminUpdateUserRequest = z.infer<typeof AdminUpdateUserRequest>
 
@@ -377,9 +409,12 @@ export const AdminBanUserRequest = z
 /**
  * Admin ban user request (OpenAPI documented)
  */
-export const AdminBanUserRequestSchema = AdminBanUserRequest.openapi('AdminBanUserRequest', {
-  description: 'Ban a user',
-})
+export const AdminBanUserRequestSchema = AdminBanUserRequest.openapi(
+  'AdminBanUserRequest',
+  {
+    description: 'Ban a user',
+  },
+)
 
 export type AdminBanUserRequest = z.infer<typeof AdminBanUserRequest>
 
@@ -401,9 +436,12 @@ export const AdminUnbanUserRequest = z
 /**
  * Admin unban user request (OpenAPI documented)
  */
-export const AdminUnbanUserRequestSchema = AdminUnbanUserRequest.openapi('AdminUnbanUserRequest', {
-  description: 'Unban a user',
-})
+export const AdminUnbanUserRequestSchema = AdminUnbanUserRequest.openapi(
+  'AdminUnbanUserRequest',
+  {
+    description: 'Unban a user',
+  },
+)
 
 export type AdminUnbanUserRequest = z.infer<typeof AdminUnbanUserRequest>
 
@@ -421,9 +459,10 @@ export const AdminUploadUserAvatarRequest = z.object({
 /**
  * Admin upload user avatar request (OpenAPI documented)
  */
-export const AdminUploadUserAvatarRequestSchema = AdminUploadUserAvatarRequest.openapi('AdminUploadUserAvatarRequest', {
-  description: 'Upload avatar for a user (admin only)',
-})
+export const AdminUploadUserAvatarRequestSchema =
+  AdminUploadUserAvatarRequest.openapi('AdminUploadUserAvatarRequest', {
+    description: 'Upload avatar for a user (admin only)',
+  })
 
 export type AdminUploadUserAvatarRequest = z.infer<
   typeof AdminUploadUserAvatarRequest
@@ -439,9 +478,10 @@ export const AdminUploadUserAvatarResponse = z.object({
 /**
  * Admin upload user avatar response (OpenAPI documented)
  */
-export const AdminUploadUserAvatarResponseSchema = AdminUploadUserAvatarResponse.openapi('AdminUploadUserAvatarResponse', {
-  description: 'Avatar upload response',
-})
+export const AdminUploadUserAvatarResponseSchema =
+  AdminUploadUserAvatarResponse.openapi('AdminUploadUserAvatarResponse', {
+    description: 'Avatar upload response',
+  })
 
 export type AdminUploadUserAvatarResponse = z.infer<
   typeof AdminUploadUserAvatarResponse
@@ -470,9 +510,10 @@ export const AdminUpdateProfileRequest = z.object({
 /**
  * Update current admin user profile request (OpenAPI documented)
  */
-export const AdminUpdateProfileRequestSchema = AdminUpdateProfileRequest.openapi('AdminUpdateProfileRequest', {
-  description: 'Update current admin user profile',
-})
+export const AdminUpdateProfileRequestSchema =
+  AdminUpdateProfileRequest.openapi('AdminUpdateProfileRequest', {
+    description: 'Update current admin user profile',
+  })
 
 export type AdminUpdateProfileRequest = z.infer<
   typeof AdminUpdateProfileRequest
@@ -502,9 +543,12 @@ export const AdminUserStatsResponse = z.object({
 /**
  * Admin user stats response (OpenAPI documented)
  */
-export const AdminUserStatsResponseSchema = AdminUserStatsResponse.openapi('AdminUserStatsResponse', {
-  description: 'User statistics for admin view',
-})
+export const AdminUserStatsResponseSchema = AdminUserStatsResponse.openapi(
+  'AdminUserStatsResponse',
+  {
+    description: 'User statistics for admin view',
+  },
+)
 
 export type AdminUserStatsResponse = z.infer<typeof AdminUserStatsResponse>
 
@@ -528,9 +572,13 @@ export const AdminUserVerificationStatusResponse = z.object({
 /**
  * User verification status response (OpenAPI documented)
  */
-export const AdminUserVerificationStatusResponseSchema = AdminUserVerificationStatusResponse.openapi('AdminUserVerificationStatusResponse', {
-  description: 'User verification status information',
-})
+export const AdminUserVerificationStatusResponseSchema =
+  AdminUserVerificationStatusResponse.openapi(
+    'AdminUserVerificationStatusResponse',
+    {
+      description: 'User verification status information',
+    },
+  )
 
 export type AdminUserVerificationStatusResponse = z.infer<
   typeof AdminUserVerificationStatusResponse
@@ -554,9 +602,12 @@ export const AdminVerificationRequest = z.object({
 /**
  * Admin verification request (OpenAPI documented)
  */
-export const AdminVerificationRequestSchema = AdminVerificationRequest.openapi('AdminVerificationRequest', {
-  description: 'Admin request to verify a user account',
-})
+export const AdminVerificationRequestSchema = AdminVerificationRequest.openapi(
+  'AdminVerificationRequest',
+  {
+    description: 'Admin request to verify a user account',
+  },
+)
 
 export type AdminVerificationRequest = z.infer<typeof AdminVerificationRequest>
 
@@ -565,7 +616,11 @@ export type AdminVerificationRequest = z.infer<typeof AdminVerificationRequest>
  * Allows admin to resend verification for any user
  */
 export const AdminResendVerificationRequest = z.object({
-  type: z.enum([VerificationType.EMAIL, VerificationType.PHONE]),
+  type: createZodEnum(VerificationTypeEnum).refine(
+    (val) =>
+      val === VerificationTypeEnum.EMAIL || val === VerificationTypeEnum.PHONE,
+    { message: 'Only EMAIL and PHONE verification types are allowed' },
+  ),
   userId: z.string().uuid().optional(),
   email: z.string().email().optional(),
   phoneNumber: z.string().optional(),
@@ -574,9 +629,10 @@ export const AdminResendVerificationRequest = z.object({
 /**
  * Admin resend verification request (OpenAPI documented)
  */
-export const AdminResendVerificationRequestSchema = AdminResendVerificationRequest.openapi('AdminResendVerificationRequest', {
-  description: 'Admin request to resend verification for a user',
-})
+export const AdminResendVerificationRequestSchema =
+  AdminResendVerificationRequest.openapi('AdminResendVerificationRequest', {
+    description: 'Admin request to resend verification for a user',
+  })
 
 export type AdminResendVerificationRequest = z.infer<
   typeof AdminResendVerificationRequest
@@ -594,9 +650,12 @@ export const AdminVerifyUserResponse = z.object({
 /**
  * Verify user response for admin operations (OpenAPI documented)
  */
-export const AdminVerifyUserResponseSchema = AdminVerifyUserResponse.openapi('AdminVerifyUserResponse', {
-  description: 'User verification response',
-})
+export const AdminVerifyUserResponseSchema = AdminVerifyUserResponse.openapi(
+  'AdminVerifyUserResponse',
+  {
+    description: 'User verification response',
+  },
+)
 
 export type AdminVerifyUserResponse = z.infer<typeof AdminVerifyUserResponse>
 
@@ -611,9 +670,10 @@ export const AdminResendVerificationResponse = z.object({
 /**
  * Resend verification response (OpenAPI documented)
  */
-export const AdminResendVerificationResponseSchema = AdminResendVerificationResponse.openapi('AdminResendVerificationResponse', {
-  description: 'Resend verification response',
-})
+export const AdminResendVerificationResponseSchema =
+  AdminResendVerificationResponse.openapi('AdminResendVerificationResponse', {
+    description: 'Resend verification response',
+  })
 
 export type AdminResendVerificationResponse = z.infer<
   typeof AdminResendVerificationResponse

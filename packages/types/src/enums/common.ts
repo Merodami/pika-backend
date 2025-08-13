@@ -125,14 +125,33 @@ export type LocationTypeType = `${LocationType}`
  * Address types
  */
 export enum AddressType {
-  HOME = 'HOME',
-  WORK = 'WORK',
-  BILLING = 'BILLING',
-  SHIPPING = 'SHIPPING',
-  OTHER = 'OTHER',
+  HOME = 'home',
+  WORK = 'work',
+  BILLING = 'billing',
+  SHIPPING = 'shipping',
+  OTHER = 'other',
 }
 
 /**
  * Type definition for address type
  */
 export type AddressTypeType = `${AddressType}`
+
+/**
+ * Log levels for system logging
+ */
+export enum LogLevel {
+  DEBUG = 'debug',
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
+  FATAL = 'fatal',
+}
+
+/**
+ * Supported languages for content
+ */
+export enum Language {
+  ES = 'es',
+  EN = 'en',
+}

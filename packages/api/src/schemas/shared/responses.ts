@@ -1,5 +1,7 @@
+import { AsyncOperationStatus as AsyncOperationStatusEnum } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 import { CorrelationId } from './branded.js'
 import { ErrorResponse, ValidationErrorResponse } from './errors.js'
 import { HealthStatus } from './health.js'
@@ -315,13 +317,7 @@ export type HealthCheckResponse = z.infer<typeof HealthCheckResponse>
 /**
  * Async operation status (raw Zod)
  */
-export const AsyncOperationStatus = z.enum([
-  'PENDING',
-  'PROCESSING',
-  'COMPLETED',
-  'FAILED',
-  'CANCELLED',
-])
+export const AsyncOperationStatus = createZodEnum(AsyncOperationStatusEnum)
 
 /**
  * Async operation status (OpenAPI documented)
@@ -330,7 +326,7 @@ export const AsyncOperationStatusSchema = AsyncOperationStatus.openapi(
   'AsyncOperationStatus',
   {
     description: 'Status of an asynchronous operation',
-    example: 'PROCESSING',
+    example: AsyncOperationStatusEnum.IN_PROGRESS,
   },
 )
 

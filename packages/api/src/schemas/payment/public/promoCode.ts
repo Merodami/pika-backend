@@ -1,7 +1,8 @@
-import { FIELD_LENGTH } from '@pika/types'
+import { FIELD_LENGTH, PromoCodeSortField, SortOrder } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Percentage, UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
@@ -206,10 +207,8 @@ export const SearchPromoCodesParams = z.object({
   createdBy: UserId.optional(),
   page: z.number().int().positive().default(1),
   limit: z.number().int().positive().max(50).default(20),
-  sort: z
-    .enum(['CODE', 'DISCOUNT', 'EXPIRATION_DATE', 'CREATED_AT'])
-    .optional(),
-  order: z.enum(['ASC', 'DESC']).default('DESC'),
+  sort: createZodEnum(PromoCodeSortField).optional(),
+  order: createZodEnum(SortOrder).default(SortOrder.DESC),
 })
 
 export type SearchPromoCodesParams = z.infer<typeof SearchPromoCodesParams>

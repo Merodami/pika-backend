@@ -4,8 +4,11 @@ import {
   RouteConfig,
   ZodRequestBody,
 } from '@asteasolutions/zod-to-openapi'
+import { SortOrder } from '@pika/types'
 import type { HeadersObject, ParameterObject } from 'openapi3-ts/oas31'
 import { z } from 'zod'
+
+import { createZodEnum } from './zodEnum.js'
 
 /**
  * OpenAPI utilities for Zod schemas
@@ -181,10 +184,14 @@ export const paginationParams = [
     description: 'Sort field',
     example: 'createdAt',
   }),
-  queryParam('order', z.enum(['ASC', 'DESC']).optional().default('DESC'), {
-    description: 'Sort order',
-    example: 'desc',
-  }),
+  queryParam(
+    'order',
+    createZodEnum(SortOrder).optional().default(SortOrder.DESC),
+    {
+      description: 'Sort order',
+      example: SortOrder.DESC,
+    },
+  ),
 ]
 
 /**

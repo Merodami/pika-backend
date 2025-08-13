@@ -1,4 +1,9 @@
-import { FIELD_LENGTH, NUMERIC_CONSTRAINTS } from '@pika/types'
+import {
+  Currency as CurrencyEnum,
+  FIELD_LENGTH,
+  NUMERIC_CONSTRAINTS,
+  ReportFormat as ReportFormatEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { Money, UserId } from '../../shared/branded.js'
@@ -82,9 +87,10 @@ export const AdminTransactionDetailResponse = withTimestamps({
   userAgent: z.string().optional(),
 })
 
-export const AdminTransactionDetailResponseSchema = AdminTransactionDetailResponse.openapi('AdminTransactionDetailResponse', {
-  description: 'Detailed transaction information for admin',
-})
+export const AdminTransactionDetailResponseSchema =
+  AdminTransactionDetailResponse.openapi('AdminTransactionDetailResponse', {
+    description: 'Detailed transaction information for admin',
+  })
 
 export type AdminTransactionDetailResponse = z.infer<
   typeof AdminTransactionDetailResponse
@@ -199,9 +205,12 @@ export const FinancialSummary = z.object({
     .optional(),
 })
 
-export const FinancialSummarySchema = FinancialSummary.openapi('FinancialSummary', {
-  description: 'Financial summary for a period',
-})
+export const FinancialSummarySchema = FinancialSummary.openapi(
+  'FinancialSummary',
+  {
+    description: 'Financial summary for a period',
+  },
+)
 
 export type FinancialSummary = z.infer<typeof FinancialSummary>
 
@@ -217,9 +226,10 @@ export const AdminRefundTransactionRequest = z.object({
   notifyUser: z.boolean().default(true),
 })
 
-export const AdminRefundTransactionRequestSchema = AdminRefundTransactionRequest.openapi('AdminRefundTransactionRequest', {
-  description: 'Refund a transaction',
-})
+export const AdminRefundTransactionRequestSchema =
+  AdminRefundTransactionRequest.openapi('AdminRefundTransactionRequest', {
+    description: 'Refund a transaction',
+  })
 
 export type AdminRefundTransactionRequest = z.infer<
   typeof AdminRefundTransactionRequest
@@ -237,9 +247,10 @@ export const AdminManualAdjustmentRequest = z.object({
   notifyUser: z.boolean().default(true),
 })
 
-export const AdminManualAdjustmentRequestSchema = AdminManualAdjustmentRequest.openapi('AdminManualAdjustmentRequest', {
-  description: 'Create manual adjustment',
-})
+export const AdminManualAdjustmentRequestSchema =
+  AdminManualAdjustmentRequest.openapi('AdminManualAdjustmentRequest', {
+    description: 'Create manual adjustment',
+  })
 
 export type AdminManualAdjustmentRequest = z.infer<
   typeof AdminManualAdjustmentRequest
@@ -284,9 +295,10 @@ export const AdminProcessPayoutRequest = z.object({
   delayUntil: DateTime.optional(),
 })
 
-export const AdminProcessPayoutRequestSchema = AdminProcessPayoutRequest.openapi('AdminProcessPayoutRequest', {
-  description: 'Process pending payouts',
-})
+export const AdminProcessPayoutRequestSchema =
+  AdminProcessPayoutRequest.openapi('AdminProcessPayoutRequest', {
+    description: 'Process pending payouts',
+  })
 
 export type AdminProcessPayoutRequest = z.infer<
   typeof AdminProcessPayoutRequest
@@ -311,9 +323,10 @@ export const AdminUpdateDisputeRequest = z.object({
   notes: z.string().max(2000).optional(),
 })
 
-export const AdminUpdateDisputeRequestSchema = AdminUpdateDisputeRequest.openapi('AdminUpdateDisputeRequest', {
-  description: 'Update dispute status',
-})
+export const AdminUpdateDisputeRequestSchema =
+  AdminUpdateDisputeRequest.openapi('AdminUpdateDisputeRequest', {
+    description: 'Update dispute status',
+  })
 
 export type AdminUpdateDisputeRequest = z.infer<
   typeof AdminUpdateDisputeRequest
@@ -357,9 +370,12 @@ export const AdminPromoCodeDetail = withTimestamps({
   adminNotes: z.string().optional(),
 })
 
-export const AdminPromoCodeDetailSchema = AdminPromoCodeDetail.openapi('AdminPromoCodeDetail', {
-  description: 'Detailed promo code information for admin',
-})
+export const AdminPromoCodeDetailSchema = AdminPromoCodeDetail.openapi(
+  'AdminPromoCodeDetail',
+  {
+    description: 'Detailed promo code information for admin',
+  },
+)
 
 export type AdminPromoCodeDetail = z.infer<typeof AdminPromoCodeDetail>
 
@@ -394,9 +410,10 @@ export const AdminCreatePromoCodeRequest = z.object({
   adminNotes: z.string().optional(),
 })
 
-export const AdminCreatePromoCodeRequestSchema = AdminCreatePromoCodeRequest.openapi('AdminCreatePromoCodeRequest', {
-  description: 'Create a new promo code',
-})
+export const AdminCreatePromoCodeRequestSchema =
+  AdminCreatePromoCodeRequest.openapi('AdminCreatePromoCodeRequest', {
+    description: 'Create a new promo code',
+  })
 
 export type AdminCreatePromoCodeRequest = z.infer<
   typeof AdminCreatePromoCodeRequest
@@ -429,9 +446,10 @@ export const AdminUpdatePromoCodeRequest = z.object({
   adminNotes: z.string().optional(),
 })
 
-export const AdminUpdatePromoCodeRequestSchema = AdminUpdatePromoCodeRequest.openapi('AdminUpdatePromoCodeRequest', {
-  description: 'Update promo code',
-})
+export const AdminUpdatePromoCodeRequestSchema =
+  AdminUpdatePromoCodeRequest.openapi('AdminUpdatePromoCodeRequest', {
+    description: 'Update promo code',
+  })
 
 export type AdminUpdatePromoCodeRequest = z.infer<
   typeof AdminUpdatePromoCodeRequest
@@ -472,7 +490,7 @@ export const AdminSubscriptionPlanDetail = withTimestamps({
 
   // Pricing
   price: Money,
-  currency: Currency.default('usd'),
+  currency: Currency.default(CurrencyEnum.USD),
   billingInterval: PriceInterval,
   trialPeriodDays: z.number().int().nonnegative().default(0),
 
@@ -497,9 +515,10 @@ export const AdminSubscriptionPlanDetail = withTimestamps({
   adminNotes: z.string().optional(),
 })
 
-export const AdminSubscriptionPlanDetailSchema = AdminSubscriptionPlanDetail.openapi('AdminSubscriptionPlanDetail', {
-  description: 'Detailed subscription plan for admin',
-})
+export const AdminSubscriptionPlanDetailSchema =
+  AdminSubscriptionPlanDetail.openapi('AdminSubscriptionPlanDetail', {
+    description: 'Detailed subscription plan for admin',
+  })
 
 export type AdminSubscriptionPlanDetail = z.infer<
   typeof AdminSubscriptionPlanDetail
@@ -514,7 +533,7 @@ export const AdminCreateSubscriptionPlanRequest = z.object({
 
   // Pricing
   price: Money,
-  currency: Currency.default('usd'),
+  currency: Currency.default(CurrencyEnum.USD),
   billingInterval: PriceInterval,
   trialPeriodDays: z.number().int().nonnegative().default(0),
 
@@ -529,9 +548,13 @@ export const AdminCreateSubscriptionPlanRequest = z.object({
   adminNotes: z.string().optional(),
 })
 
-export const AdminCreateSubscriptionPlanRequestSchema = AdminCreateSubscriptionPlanRequest.openapi('AdminCreateSubscriptionPlanRequest', {
-  description: 'Create a new subscription plan',
-})
+export const AdminCreateSubscriptionPlanRequestSchema =
+  AdminCreateSubscriptionPlanRequest.openapi(
+    'AdminCreateSubscriptionPlanRequest',
+    {
+      description: 'Create a new subscription plan',
+    },
+  )
 
 export type AdminCreateSubscriptionPlanRequest = z.infer<
   typeof AdminCreateSubscriptionPlanRequest
@@ -559,9 +582,13 @@ export const AdminUpdateSubscriptionPlanRequest = z.object({
   adminNotes: z.string().optional(),
 })
 
-export const AdminUpdateSubscriptionPlanRequestSchema = AdminUpdateSubscriptionPlanRequest.openapi('AdminUpdateSubscriptionPlanRequest', {
-  description: 'Update subscription plan',
-})
+export const AdminUpdateSubscriptionPlanRequestSchema =
+  AdminUpdateSubscriptionPlanRequest.openapi(
+    'AdminUpdateSubscriptionPlanRequest',
+    {
+      description: 'Update subscription plan',
+    },
+  )
 
 export type AdminUpdateSubscriptionPlanRequest = z.infer<
   typeof AdminUpdateSubscriptionPlanRequest
@@ -608,7 +635,7 @@ export const AdminFinancialReportRequest = z.object({
   endDate: DateTime.optional(),
   groupBy: ReportGroupBy.optional(),
   includeDetails: z.boolean().default(false),
-  format: ReportFormat.default('json'),
+  format: ReportFormat.default(ReportFormatEnum.JSON),
 })
 
 export type AdminFinancialReportRequest = z.infer<
@@ -646,9 +673,10 @@ export const AdminFinancialReportResponse = z.object({
   downloadUrl: z.string().url().optional(),
 })
 
-export const AdminFinancialReportResponseSchema = AdminFinancialReportResponse.openapi('AdminFinancialReportResponse', {
-  description: 'Financial report data',
-})
+export const AdminFinancialReportResponseSchema =
+  AdminFinancialReportResponse.openapi('AdminFinancialReportResponse', {
+    description: 'Financial report data',
+  })
 
 export type AdminFinancialReportResponse = z.infer<
   typeof AdminFinancialReportResponse

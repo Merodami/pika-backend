@@ -434,6 +434,7 @@ export class BusinessService implements IBusinessService {
 
       // Check if business exists
       const existingBusiness = await this.businessRepository.findById(id)
+
       if (!existingBusiness) {
         throw ErrorFactory.resourceNotFound(
           'Business',

@@ -102,9 +102,10 @@ export const AdminCreateCategoryRequest = z.object({
 /**
  * Create category request (OpenAPI documented)
  */
-export const AdminCreateCategoryRequestSchema = AdminCreateCategoryRequest.openapi('AdminCreateCategoryRequest', {
-  description: 'Create a new category',
-})
+export const AdminCreateCategoryRequestSchema =
+  AdminCreateCategoryRequest.openapi('AdminCreateCategoryRequest', {
+    description: 'Create a new category',
+  })
 
 export type AdminCreateCategoryRequest = z.infer<
   typeof AdminCreateCategoryRequest
@@ -140,9 +141,10 @@ export const AdminUpdateCategoryRequest = z.object({
 /**
  * Update category request (OpenAPI documented)
  */
-export const AdminUpdateCategoryRequestSchema = AdminUpdateCategoryRequest.openapi('AdminUpdateCategoryRequest', {
-  description: 'Update category information',
-})
+export const AdminUpdateCategoryRequestSchema =
+  AdminUpdateCategoryRequest.openapi('AdminUpdateCategoryRequest', {
+    description: 'Update category information',
+  })
 
 export type AdminUpdateCategoryRequest = z.infer<
   typeof AdminUpdateCategoryRequest
@@ -163,9 +165,12 @@ export const AdminCategoryQueryParams = SearchParams.extend({
 /**
  * Admin category search/filter parameters (OpenAPI documented)
  */
-export const AdminCategoryQueryParamsSchema = AdminCategoryQueryParams.openapi('AdminCategoryQueryParams', {
-  description: 'Admin category search and filter parameters',
-})
+export const AdminCategoryQueryParamsSchema = AdminCategoryQueryParams.openapi(
+  'AdminCategoryQueryParams',
+  {
+    description: 'Admin category search and filter parameters',
+  },
+)
 
 export type AdminCategoryQueryParams = z.infer<typeof AdminCategoryQueryParams>
 
@@ -181,9 +186,10 @@ export const AdminCategoryListResponse = paginatedResponse(
 /**
  * Admin paginated category list response (OpenAPI documented)
  */
-export const AdminCategoryListResponseSchema = AdminCategoryListResponse.openapi('AdminCategoryListResponse', {
-  description: 'Paginated list of categories for admin management',
-})
+export const AdminCategoryListResponseSchema =
+  AdminCategoryListResponse.openapi('AdminCategoryListResponse', {
+    description: 'Paginated list of categories for admin management',
+  })
 
 export type AdminCategoryListResponse = z.infer<
   typeof AdminCategoryListResponse
@@ -200,9 +206,10 @@ export const AdminCategoryTreeResponse = z.object({
 /**
  * Admin category tree response (OpenAPI documented)
  */
-export const AdminCategoryTreeResponseSchema = AdminCategoryTreeResponse.openapi('AdminCategoryTreeResponse', {
-  description: 'Hierarchical category tree structure for admin',
-})
+export const AdminCategoryTreeResponseSchema =
+  AdminCategoryTreeResponse.openapi('AdminCategoryTreeResponse', {
+    description: 'Hierarchical category tree structure for admin',
+  })
 
 export type AdminCategoryTreeResponse = z.infer<
   typeof AdminCategoryTreeResponse
@@ -227,9 +234,12 @@ export const AdminMoveCategoryRequest = z.object({
 /**
  * Move category request (OpenAPI documented)
  */
-export const AdminMoveCategoryRequestSchema = AdminMoveCategoryRequest.openapi('AdminMoveCategoryRequest', {
-  description: 'Move category to different parent or change sort order',
-})
+export const AdminMoveCategoryRequestSchema = AdminMoveCategoryRequest.openapi(
+  'AdminMoveCategoryRequest',
+  {
+    description: 'Move category to different parent or change sort order',
+  },
+)
 
 export type AdminMoveCategoryRequest = z.infer<typeof AdminMoveCategoryRequest>
 
@@ -243,9 +253,13 @@ export const AdminUpdateCategorySortOrderRequest = z.object({
 /**
  * Update category sort order request (OpenAPI documented)
  */
-export const AdminUpdateCategorySortOrderRequestSchema = AdminUpdateCategorySortOrderRequest.openapi('AdminUpdateCategorySortOrderRequest', {
-  description: 'Update category sort order',
-})
+export const AdminUpdateCategorySortOrderRequestSchema =
+  AdminUpdateCategorySortOrderRequest.openapi(
+    'AdminUpdateCategorySortOrderRequest',
+    {
+      description: 'Update category sort order',
+    },
+  )
 
 export type AdminUpdateCategorySortOrderRequest = z.infer<
   typeof AdminUpdateCategorySortOrderRequest
@@ -261,9 +275,13 @@ export const AdminToggleCategoryActivationRequest = z.object({
 /**
  * Toggle category activation request (OpenAPI documented)
  */
-export const AdminToggleCategoryActivationRequestSchema = AdminToggleCategoryActivationRequest.openapi('AdminToggleCategoryActivationRequest', {
-  description: 'Toggle category activation status',
-})
+export const AdminToggleCategoryActivationRequestSchema =
+  AdminToggleCategoryActivationRequest.openapi(
+    'AdminToggleCategoryActivationRequest',
+    {
+      description: 'Toggle category activation status',
+    },
+  )
 
 export type AdminToggleCategoryActivationRequest = z.infer<
   typeof AdminToggleCategoryActivationRequest
@@ -283,9 +301,10 @@ export const AdminBulkCategoryUpdateRequest = z.object({
 /**
  * Bulk category update request (OpenAPI documented)
  */
-export const AdminBulkCategoryUpdateRequestSchema = AdminBulkCategoryUpdateRequest.openapi('AdminBulkCategoryUpdateRequest', {
-  description: 'Update multiple categories at once',
-})
+export const AdminBulkCategoryUpdateRequestSchema =
+  AdminBulkCategoryUpdateRequest.openapi('AdminBulkCategoryUpdateRequest', {
+    description: 'Update multiple categories at once',
+  })
 
 export type AdminBulkCategoryUpdateRequest = z.infer<
   typeof AdminBulkCategoryUpdateRequest
@@ -310,9 +329,13 @@ export const AdminBulkCategoryOperationResponse = z.object({
 /**
  * Bulk operation response (OpenAPI documented)
  */
-export const AdminBulkCategoryOperationResponseSchema = AdminBulkCategoryOperationResponse.openapi('AdminBulkCategoryOperationResponse', {
-  description: 'Bulk category operation result',
-})
+export const AdminBulkCategoryOperationResponseSchema =
+  AdminBulkCategoryOperationResponse.openapi(
+    'AdminBulkCategoryOperationResponse',
+    {
+      description: 'Bulk category operation result',
+    },
+  )
 
 export type AdminBulkCategoryOperationResponse = z.infer<
   typeof AdminBulkCategoryOperationResponse
@@ -330,9 +353,10 @@ export const AdminBulkDeleteCategoriesRequest = z.object({
 /**
  * Bulk delete categories request (OpenAPI documented)
  */
-export const AdminBulkDeleteCategoriesRequestSchema = AdminBulkDeleteCategoriesRequest.openapi('AdminBulkDeleteCategoriesRequest', {
-  description: 'Delete multiple categories',
-})
+export const AdminBulkDeleteCategoriesRequestSchema =
+  AdminBulkDeleteCategoriesRequest.openapi('AdminBulkDeleteCategoriesRequest', {
+    description: 'Delete multiple categories',
+  })
 
 export type AdminBulkDeleteCategoriesRequest = z.infer<
   typeof AdminBulkDeleteCategoriesRequest

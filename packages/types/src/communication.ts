@@ -4,48 +4,32 @@
  */
 
 /**
- * Template categories for organization
+ * Email template keys - type-safe template identifiers
+ * These correspond to file-based email templates in the communication service
  */
-export enum TemplateCategory {
-  AUTH = 'auth',
-  BOOKING = 'booking',
-  PAYMENT = 'payment',
-  SYSTEM = 'system',
-}
-
-/**
- * Email template identifiers - type-safe template keys
- * These correspond to file-based templates in the communication service
- */
-export enum EmailTemplateId {
+export enum EmailTemplateKey {
   // Authentication templates
-  EMAIL_VERIFICATION = 'email-verification',
-  PASSWORD_RESET = 'password-reset',
-  PASSWORD_RESET_CONFIRMATION = 'password-reset-confirmation',
+  EMAIL_VERIFICATION = 'emailVerification',
+  PASSWORD_RESET = 'passwordReset',
+  PASSWORD_RESET_CONFIRMATION = 'passwordResetConfirmation',
   WELCOME = 'welcome',
 
   // Booking templates
-  BOOKING_CONFIRMATION = 'booking-confirmation',
-  BOOKING_REMINDER = 'booking-reminder',
-  BOOKING_CANCELLED = 'booking-cancelled',
+  BOOKING_CONFIRMATION = 'bookingConfirmation',
+  BOOKING_REMINDER = 'bookingReminder',
+  BOOKING_CANCELLED = 'bookingCancelled',
 
   // Payment templates
-  PAYMENT_SUCCESS = 'payment-success',
-  PAYMENT_FAILED = 'payment-failed',
-  SUBSCRIPTION_ACTIVATED = 'subscription-activated',
-  SUBSCRIPTION_EXPIRING = 'subscription-expiring',
-  SUBSCRIPTION_EXPIRED = 'subscription-expired',
+  PAYMENT_SUCCESS = 'paymentSuccess',
+  PAYMENT_FAILED = 'paymentFailed',
+  SUBSCRIPTION_ACTIVATED = 'subscriptionActivated',
+  SUBSCRIPTION_EXPIRING = 'subscriptionExpiring',
+  SUBSCRIPTION_EXPIRED = 'subscriptionExpired',
 
   // Account status templates
-  ACCOUNT_BANNED = 'account-banned',
-  ACCOUNT_UNBANNED = 'account-unbanned',
+  ACCOUNT_BANNED = 'accountBanned',
+  ACCOUNT_UNBANNED = 'accountUnbanned',
 }
-
-/**
- * Type alias for backward compatibility
- * @deprecated Use EmailTemplateId instead
- */
-export type TemplateKey = EmailTemplateId
 
 /**
  * Email template variables interface

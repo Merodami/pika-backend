@@ -127,6 +127,39 @@ export class ErrorFactory {
   }
 
   /**
+   * Create specific authentication errors with granular codes
+   */
+  static userInactive(
+    reason: string = 'Account is inactive. Please contact support.',
+    context: Partial<ErrorContext> = {},
+  ): NotAuthenticatedError {
+    return new NotAuthenticatedError(reason, {
+      ...context,
+      code: ErrorCode.AUTH_USER_INACTIVE,
+    })
+  }
+
+  static invalidCredentials(
+    reason: string = 'Invalid email or password',
+    context: Partial<ErrorContext> = {},
+  ): NotAuthenticatedError {
+    return new NotAuthenticatedError(reason, {
+      ...context,
+      code: ErrorCode.AUTH_INVALID_CREDENTIALS,
+    })
+  }
+
+  static passwordRequired(
+    reason: string = 'Password authentication not available for this account',
+    context: Partial<ErrorContext> = {},
+  ): NotAuthenticatedError {
+    return new NotAuthenticatedError(reason, {
+      ...context,
+      code: ErrorCode.AUTH_PASSWORD_REQUIRED,
+    })
+  }
+
+  /**
    * Create an external service error
    */
   static externalServiceError(

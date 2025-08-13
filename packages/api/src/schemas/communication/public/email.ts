@@ -1,5 +1,10 @@
-import { FIELD_LENGTH, MessagePriority } from '@pika/types'
+import {
+  EmailSortBy as EmailSortByEnum,
+  FIELD_LENGTH,
+  MessagePriority,
+} from '@pika/types'
 import { z } from 'zod'
+
 import { Email as EmailAddress } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateRangeParams, SearchParams } from '../../shared/pagination.js'
@@ -53,9 +58,12 @@ export const EmailAttachment = z.object({
 /**
  * Email attachment (OpenAPI documented)
  */
-export const EmailAttachmentSchema = EmailAttachment.openapi('EmailAttachment', {
-  description: 'Email attachment details',
-})
+export const EmailAttachmentSchema = EmailAttachment.openapi(
+  'EmailAttachment',
+  {
+    description: 'Email attachment details',
+  },
+)
 
 export type EmailAttachment = z.infer<typeof EmailAttachment>
 
@@ -307,7 +315,7 @@ export const EmailSearchParams = SearchParams.merge(DateRangeParams).extend({
   templateId: z.string().optional(),
   hasOpened: z.boolean().optional(),
   hasClicked: z.boolean().optional(),
-  sortBy: EmailSortBy.default('createdAt'),
+  sortBy: EmailSortBy.default(EmailSortByEnum.CREATED_AT),
 })
 
 /**

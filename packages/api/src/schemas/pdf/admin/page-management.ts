@@ -1,7 +1,11 @@
-import { FIELD_LENGTH } from '@pika/types'
+import {
+  BulkPageOperation as BulkPageOperationEnum,
+  FIELD_LENGTH,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
@@ -312,9 +316,9 @@ export const BulkPlacementOperationRequest = openapi(
       .min(1)
       .max(FIELD_LENGTH.CODE_MAX)
       .describe('Placement IDs to operate on'),
-    operation: z
-      .enum(['activate', 'deactivate', 'delete', 'move'])
-      .describe('Operation to perform'),
+    operation: createZodEnum(BulkPageOperationEnum).describe(
+      'Operation to perform',
+    ),
     options: z
       .record(z.string(), z.any())
       .optional()

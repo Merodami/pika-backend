@@ -113,12 +113,13 @@ export class NotAuthorizedError extends BaseError {
 export class NotAuthenticatedError extends BaseError {
   constructor(
     reason: string = 'Authentication required',
-    context: Partial<Omit<ErrorContext, 'domain' | 'code' | 'httpStatus'>> = {},
+    context: Partial<Omit<ErrorContext, 'domain' | 'httpStatus'>> = {},
   ) {
-    const code = ErrorCode.NOT_AUTHENTICATED
+    const code = context.code || ErrorCode.NOT_AUTHENTICATED
+    const { code: _, ...restContext } = context
 
     super(reason, {
-      ...context,
+      ...restContext,
       code,
       domain: ErrorDomain.SECURITY,
       httpStatus: 401,

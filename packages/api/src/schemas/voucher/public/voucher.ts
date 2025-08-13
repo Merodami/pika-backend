@@ -1,12 +1,9 @@
 import { FIELD_LENGTH, VoucherScanSource, VoucherSortBy } from '@pika/types'
 import { z } from 'zod'
+
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
-import { DeviceInfo, DeviceInfoSchema } from '../../shared/device.js'
-import {
-  Coordinates,
-  CoordinatesSchema,
-  GeoSearchParams,
-} from '../../shared/geo.js'
+import { DeviceInfo } from '../../shared/device.js'
+import { Coordinates, GeoSearchParams } from '../../shared/geo.js'
 import { withTimestampsString } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
@@ -15,7 +12,6 @@ import {
   CustomerVoucherStatusSchema,
   VoucherCodeTypeSchema,
   VoucherDiscountTypeSchema,
-  VoucherScanSourceSchema,
   VoucherSortBySchema,
   VoucherStateSchema,
 } from '../common/enums.js'

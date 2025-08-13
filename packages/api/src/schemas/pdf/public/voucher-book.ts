@@ -1,6 +1,10 @@
-import { VoucherBookSortBy } from '@pika/types'
+import {
+  PublicVoucherBookStatus as PublicVoucherBookStatusEnum,
+  VoucherBookSortBy,
+} from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { UUID } from '../../shared/primitives.js'
@@ -37,9 +41,9 @@ export const VoucherBookResponse = withTimestamps({
     .optional()
     .describe('Month for monthly books (1-12)'),
   year: z.number().int().min(2020).max(2100).describe('Year of publication'),
-  status: z
-    .enum(['published'])
-    .describe('Only published books visible to public'),
+  status: createZodEnum(PublicVoucherBookStatusEnum).describe(
+    'Only published books visible to public',
+  ),
   totalPages: z
     .number()
     .int()
@@ -76,9 +80,12 @@ export const VoucherBookResponse = withTimestamps({
 /**
  * Public voucher book response (OpenAPI documented)
  */
-export const VoucherBookResponseSchema = VoucherBookResponse.openapi('VoucherBookResponse', {
-  description: 'Public voucher book information (read-only)',
-})
+export const VoucherBookResponseSchema = VoucherBookResponse.openapi(
+  'VoucherBookResponse',
+  {
+    description: 'Public voucher book information (read-only)',
+  },
+)
 
 export type VoucherBookResponse = z.infer<typeof VoucherBookResponse>
 
@@ -111,9 +118,12 @@ export const VoucherBookQueryParams = SearchParams.extend({
 /**
  * Voucher book search/filter parameters (OpenAPI documented)
  */
-export const VoucherBookQueryParamsSchema = VoucherBookQueryParams.openapi('VoucherBookQueryParams', {
-  description: 'Voucher book search and filter parameters',
-})
+export const VoucherBookQueryParamsSchema = VoucherBookQueryParams.openapi(
+  'VoucherBookQueryParams',
+  {
+    description: 'Voucher book search and filter parameters',
+  },
+)
 
 export type VoucherBookQueryParams = z.infer<typeof VoucherBookQueryParams>
 
@@ -127,9 +137,12 @@ export const VoucherBookPathParams = z.object({
 /**
  * Voucher book path parameters (OpenAPI documented)
  */
-export const VoucherBookPathParamsSchema = VoucherBookPathParams.openapi('VoucherBookPathParams', {
-  description: 'Voucher book path parameters',
-})
+export const VoucherBookPathParamsSchema = VoucherBookPathParams.openapi(
+  'VoucherBookPathParams',
+  {
+    description: 'Voucher book path parameters',
+  },
+)
 
 export type VoucherBookPathParams = z.infer<typeof VoucherBookPathParams>
 
@@ -143,9 +156,12 @@ export const VoucherBookListResponse = paginatedResponse(VoucherBookResponse)
 /**
  * Paginated voucher book list response (OpenAPI documented)
  */
-export const VoucherBookListResponseSchema = VoucherBookListResponse.openapi('VoucherBookListResponse', {
-  description: 'Paginated list of voucher books',
-})
+export const VoucherBookListResponseSchema = VoucherBookListResponse.openapi(
+  'VoucherBookListResponse',
+  {
+    description: 'Paginated list of voucher books',
+  },
+)
 
 export type VoucherBookListResponse = z.infer<typeof VoucherBookListResponse>
 
@@ -159,9 +175,10 @@ export const VoucherBookDetailResponse = z.object({
 /**
  * Single voucher book response (OpenAPI documented)
  */
-export const VoucherBookDetailResponseSchema = VoucherBookDetailResponse.openapi('VoucherBookDetailResponse', {
-  description: 'Single voucher book details',
-})
+export const VoucherBookDetailResponseSchema =
+  VoucherBookDetailResponse.openapi('VoucherBookDetailResponse', {
+    description: 'Single voucher book details',
+  })
 
 export type VoucherBookDetailResponse = z.infer<
   typeof VoucherBookDetailResponse
@@ -179,9 +196,12 @@ export const PdfDownloadParams = z.object({
 /**
  * PDF download parameters (OpenAPI documented)
  */
-export const PdfDownloadParamsSchema = PdfDownloadParams.openapi('PdfDownloadParams', {
-  description: 'PDF download parameters',
-})
+export const PdfDownloadParamsSchema = PdfDownloadParams.openapi(
+  'PdfDownloadParams',
+  {
+    description: 'PDF download parameters',
+  },
+)
 
 export type PdfDownloadParams = z.infer<typeof PdfDownloadParams>
 
@@ -199,8 +219,11 @@ export const PdfDownloadResponse = z.object({
 /**
  * PDF download response (OpenAPI documented)
  */
-export const PdfDownloadResponseSchema = PdfDownloadResponse.openapi('PdfDownloadResponse', {
-  description: 'PDF download information',
-})
+export const PdfDownloadResponseSchema = PdfDownloadResponse.openapi(
+  'PdfDownloadResponse',
+  {
+    description: 'PDF download information',
+  },
+)
 
 export type PdfDownloadResponse = z.infer<typeof PdfDownloadResponse>

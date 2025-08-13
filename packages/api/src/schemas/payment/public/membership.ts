@@ -1,6 +1,12 @@
+import {
+  MembershipCancellationReason,
+  MembershipStatus as MembershipStatusEnum,
+  PlanType as PlanTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
@@ -94,8 +100,10 @@ export const CreateMembershipRequest = openapi(
     stripeCustomerId: z.string().optional(),
     stripeSubscriptionId: z.string().optional(),
     active: z.boolean().optional().default(false),
-    subscriptionStatus: MembershipStatus.optional().default('incomplete'),
-    planType: PlanType.optional().default('basic'),
+    subscriptionStatus: MembershipStatus.optional().default(
+      MembershipStatusEnum.INCOMPLETE,
+    ),
+    planType: PlanType.optional().default(PlanTypeEnum.BASIC),
   }),
   {
     description: 'Create a new membership record',
@@ -175,9 +183,7 @@ export const CancelMembershipRequest = openapi(
       .default(false)
       .describe('Cancel immediately vs at period end'),
     reason: z.string().max(500).optional(),
-    feedback: z
-      .enum(['TOO_EXPENSIVE', 'NOT_USING', 'MISSING_FEATURES', 'OTHER'])
-      .optional(),
+    feedback: createZodEnum(MembershipCancellationReason).optional(),
   }),
   {
     description: 'Cancel membership subscription',

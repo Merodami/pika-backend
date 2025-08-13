@@ -1,7 +1,8 @@
-import { FIELD_LENGTH } from '@pika/types'
+import { FIELD_LENGTH, ProfileVisibility, ThemePreference } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { BinaryFile } from '../../shared/fileUpload.js'
 import {
@@ -181,14 +182,14 @@ export const UserPreferencesResponse = openapi(
       }),
     }),
     privacy: z.object({
-      profileVisibility: z
-        .enum(['PUBLIC', 'FRIENDS', 'PRIVATE'])
-        .default('FRIENDS'),
+      profileVisibility: createZodEnum(ProfileVisibility).default(
+        ProfileVisibility.FRIENDS,
+      ),
       showEmail: z.boolean().default(false),
       showPhone: z.boolean().default(false),
     }),
     display: z.object({
-      theme: z.enum(['LIGHT', 'DARK', 'SYSTEM']).default('SYSTEM'),
+      theme: createZodEnum(ThemePreference).default(ThemePreference.SYSTEM),
       language: LanguageCode.optional(),
       timezone: z.string().optional(),
     }),
@@ -226,14 +227,14 @@ export const UpdatePreferencesRequest = openapi(
       .optional(),
     privacy: z
       .object({
-        profileVisibility: z.enum(['PUBLIC', 'FRIENDS', 'PRIVATE']).optional(),
+        profileVisibility: createZodEnum(ProfileVisibility).optional(),
         showEmail: z.boolean().optional(),
         showPhone: z.boolean().optional(),
       })
       .optional(),
     display: z
       .object({
-        theme: z.enum(['LIGHT', 'DARK', 'SYSTEM']).optional(),
+        theme: createZodEnum(ThemePreference).optional(),
         language: LanguageCode.optional(),
         timezone: z.string().optional(),
       })

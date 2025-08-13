@@ -24,9 +24,10 @@ export const AdminCreateCommentRequest = z.object({
 /**
  * Admin create comment request (OpenAPI documented)
  */
-export const AdminCreateCommentRequestSchema = AdminCreateCommentRequest.openapi('AdminCreateCommentRequest', {
-  description: 'Admin create support comment',
-})
+export const AdminCreateCommentRequestSchema =
+  AdminCreateCommentRequest.openapi('AdminCreateCommentRequest', {
+    description: 'Admin create support comment',
+  })
 
 export type AdminCreateCommentRequest = z.infer<
   typeof AdminCreateCommentRequest
@@ -43,9 +44,10 @@ export const AdminUpdateCommentRequest = z.object({
 /**
  * Admin update comment request (OpenAPI documented)
  */
-export const AdminUpdateCommentRequestSchema = AdminUpdateCommentRequest.openapi('AdminUpdateCommentRequest', {
-  description: 'Admin update support comment',
-})
+export const AdminUpdateCommentRequestSchema =
+  AdminUpdateCommentRequest.openapi('AdminUpdateCommentRequest', {
+    description: 'Admin update support comment',
+  })
 
 export type AdminUpdateCommentRequest = z.infer<
   typeof AdminUpdateCommentRequest
@@ -67,9 +69,12 @@ export const AdminCommentResponse = withTimestamps({
 /**
  * Admin comment response (OpenAPI documented)
  */
-export const AdminCommentResponseSchema = AdminCommentResponse.openapi('AdminCommentResponse', {
-  description: 'Admin support comment',
-})
+export const AdminCommentResponseSchema = AdminCommentResponse.openapi(
+  'AdminCommentResponse',
+  {
+    description: 'Admin support comment',
+  },
+)
 
 export type AdminCommentResponse = z.infer<typeof AdminCommentResponse>
 
@@ -81,9 +86,12 @@ export const AdminCommentListResponse = paginatedResponse(AdminCommentResponse)
 /**
  * Admin comment list response (OpenAPI documented)
  */
-export const AdminCommentListResponseSchema = AdminCommentListResponse.openapi('AdminCommentListResponse', {
-  description: 'Paginated list of admin support comments',
-})
+export const AdminCommentListResponseSchema = AdminCommentListResponse.openapi(
+  'AdminCommentListResponse',
+  {
+    description: 'Paginated list of admin support comments',
+  },
+)
 
 export type AdminCommentListResponse = z.infer<typeof AdminCommentListResponse>
 
@@ -109,8 +117,11 @@ export const AdminCommentSearchParams = createSearchSchema({
 /**
  * Admin comment search parameters (OpenAPI documented)
  */
-export const AdminCommentSearchParamsSchema = AdminCommentSearchParams.openapi('AdminCommentSearchParams', {
-  description: 'Admin comment search and filter parameters',
-})
+export const AdminCommentSearchParamsSchema = AdminCommentSearchParams.openapi(
+  'AdminCommentSearchParams',
+  {
+    description: 'Admin comment search and filter parameters',
+  },
+)
 
 export type AdminCommentSearchParams = z.infer<typeof AdminCommentSearchParams>

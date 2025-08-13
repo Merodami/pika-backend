@@ -13,7 +13,6 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
 import { authPublic } from '@pika/api'
-import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
@@ -139,6 +138,7 @@ describe('Business Owner Registration Flow', () => {
 
       // The schema should default to 'public'
       const registrationSource = registrationData.registrationSource ?? 'public'
+
       expect(registrationSource).toBe('public')
 
       const expectedRole =

@@ -1,5 +1,7 @@
+import { HealthStatus as HealthStatusEnum } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 import { DateTime } from './primitives.js'
 
 /**
@@ -11,14 +13,14 @@ import { DateTime } from './primitives.js'
 /**
  * Health status enum (raw Zod)
  */
-export const HealthStatus = z.enum(['healthy', 'degraded', 'unhealthy'])
+export const HealthStatus = createZodEnum(HealthStatusEnum)
 
 /**
  * Health status enum (OpenAPI documented)
  */
 export const HealthStatusSchema = HealthStatus.openapi('HealthStatus', {
   description: 'Service health status',
-  example: 'healthy',
+  example: HealthStatusEnum.HEALTHY,
 })
 
 export type HealthStatus = z.infer<typeof HealthStatus>

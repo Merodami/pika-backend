@@ -1,6 +1,8 @@
+import { HealthStatus as HealthStatusEnum } from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { DateTime } from '../../shared/primitives.js'
 
 /**
@@ -14,7 +16,7 @@ import { DateTime } from '../../shared/primitives.js'
 export const InternalHealthCheckResponse = openapi(
   z.object({
     service: z.string(),
-    status: z.enum(['healthy', 'degraded', 'unhealthy']),
+    status: createZodEnum(HealthStatusEnum),
     timestamp: DateTime,
     uptime: z.number().describe('Service uptime in seconds'),
     version: z.string().optional(),
@@ -32,12 +34,12 @@ export type InternalHealthCheckResponse = z.infer<
 export const ResourceStatusResponse = openapi(
   z.object({
     database: z.object({
-      status: z.enum(['healthy', 'degraded', 'unhealthy']),
+      status: createZodEnum(HealthStatusEnum),
       responseTime: z.number().describe('Response time in milliseconds'),
       activeConnections: z.number().int().nonnegative(),
     }),
     cache: z.object({
-      status: z.enum(['healthy', 'degraded', 'unhealthy']),
+      status: createZodEnum(HealthStatusEnum),
       responseTime: z.number().describe('Response time in milliseconds'),
       memoryUsage: z.number().describe('Memory usage percentage'),
     }),

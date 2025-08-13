@@ -1,7 +1,13 @@
-import { VoucherBookSortBy } from '@pika/types'
-import { FIELD_LENGTH } from '@pika/types'
+import {
+  BulkVoucherBookOperation as BulkVoucherBookOperationEnum,
+  FIELD_LENGTH,
+  PDFGenerationPriority as PDFGenerationPriorityEnum,
+  PDFGenerationStatus as PDFGenerationStatusEnum,
+  VoucherBookSortBy,
+} from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
@@ -51,11 +57,7 @@ export const AdminVoucherBookResponse = withTimestamps({
     .datetime()
     .optional()
     .describe('When the book was published'),
-  coverImageUrl: z
-    .string()
-    .url()
-    .optional()
-    .describe('URL of the cover image'),
+  coverImageUrl: z.string().url().optional().describe('URL of the cover image'),
   backImageUrl: z
     .string()
     .url()
@@ -94,9 +96,12 @@ export const AdminVoucherBookResponse = withTimestamps({
 /**
  * Admin voucher book response (OpenAPI documented)
  */
-export const AdminVoucherBookResponseSchema = AdminVoucherBookResponse.openapi('AdminVoucherBookResponse', {
-  description: 'Admin voucher book information with full management details',
-})
+export const AdminVoucherBookResponseSchema = AdminVoucherBookResponse.openapi(
+  'AdminVoucherBookResponse',
+  {
+    description: 'Admin voucher book information with full management details',
+  },
+)
 
 export type AdminVoucherBookResponse = z.infer<typeof AdminVoucherBookResponse>
 
@@ -132,11 +137,7 @@ export const AdminCreateVoucherBookRequest = z.object({
     .max(FIELD_LENGTH.NAME_MAX)
     .default(24)
     .describe('Total number of pages'),
-  coverImageUrl: z
-    .string()
-    .url()
-    .optional()
-    .describe('URL of the cover image'),
+  coverImageUrl: z.string().url().optional().describe('URL of the cover image'),
   backImageUrl: z
     .string()
     .url()
@@ -151,9 +152,10 @@ export const AdminCreateVoucherBookRequest = z.object({
 /**
  * Create voucher book request (OpenAPI documented)
  */
-export const AdminCreateVoucherBookRequestSchema = AdminCreateVoucherBookRequest.openapi('AdminCreateVoucherBookRequest', {
-  description: 'Create a new voucher book',
-})
+export const AdminCreateVoucherBookRequestSchema =
+  AdminCreateVoucherBookRequest.openapi('AdminCreateVoucherBookRequest', {
+    description: 'Create a new voucher book',
+  })
 
 export type AdminCreateVoucherBookRequest = z.infer<
   typeof AdminCreateVoucherBookRequest
@@ -191,11 +193,7 @@ export const AdminUpdateVoucherBookRequest = z.object({
     .max(FIELD_LENGTH.NAME_MAX)
     .optional()
     .describe('Total number of pages'),
-  coverImageUrl: z
-    .string()
-    .url()
-    .optional()
-    .describe('URL of the cover image'),
+  coverImageUrl: z.string().url().optional().describe('URL of the cover image'),
   backImageUrl: z
     .string()
     .url()
@@ -210,9 +208,10 @@ export const AdminUpdateVoucherBookRequest = z.object({
 /**
  * Update voucher book request (OpenAPI documented)
  */
-export const AdminUpdateVoucherBookRequestSchema = AdminUpdateVoucherBookRequest.openapi('AdminUpdateVoucherBookRequest', {
-  description: 'Update voucher book information',
-})
+export const AdminUpdateVoucherBookRequestSchema =
+  AdminUpdateVoucherBookRequest.openapi('AdminUpdateVoucherBookRequest', {
+    description: 'Update voucher book information',
+  })
 
 export type AdminUpdateVoucherBookRequest = z.infer<
   typeof AdminUpdateVoucherBookRequest
@@ -250,9 +249,10 @@ export const AdminVoucherBookQueryParams = SearchParams.extend({
 /**
  * Admin voucher book search parameters (OpenAPI documented)
  */
-export const AdminVoucherBookQueryParamsSchema = AdminVoucherBookQueryParams.openapi('AdminVoucherBookQueryParams', {
-  description: 'Admin voucher book search and filter parameters',
-})
+export const AdminVoucherBookQueryParamsSchema =
+  AdminVoucherBookQueryParams.openapi('AdminVoucherBookQueryParams', {
+    description: 'Admin voucher book search and filter parameters',
+  })
 
 export type AdminVoucherBookQueryParams = z.infer<
   typeof AdminVoucherBookQueryParams
@@ -270,9 +270,10 @@ export const AdminVoucherBookListResponse = paginatedResponse(
 /**
  * Admin paginated voucher book list response (OpenAPI documented)
  */
-export const AdminVoucherBookListResponseSchema = AdminVoucherBookListResponse.openapi('AdminVoucherBookListResponse', {
-  description: 'Paginated list of voucher books for admin management',
-})
+export const AdminVoucherBookListResponseSchema =
+  AdminVoucherBookListResponse.openapi('AdminVoucherBookListResponse', {
+    description: 'Paginated list of voucher books for admin management',
+  })
 
 export type AdminVoucherBookListResponse = z.infer<
   typeof AdminVoucherBookListResponse
@@ -288,9 +289,10 @@ export const AdminVoucherBookDetailResponse = z.object({
 /**
  * Admin single voucher book response (OpenAPI documented)
  */
-export const AdminVoucherBookDetailResponseSchema = AdminVoucherBookDetailResponse.openapi('AdminVoucherBookDetailResponse', {
-  description: 'Single voucher book details with full admin information',
-})
+export const AdminVoucherBookDetailResponseSchema =
+  AdminVoucherBookDetailResponse.openapi('AdminVoucherBookDetailResponse', {
+    description: 'Single voucher book details with full admin information',
+  })
 
 export type AdminVoucherBookDetailResponse = z.infer<
   typeof AdminVoucherBookDetailResponse
@@ -316,9 +318,10 @@ export const AdminPublishVoucherBookRequest = z.object({
 /**
  * Publish voucher book request (OpenAPI documented)
  */
-export const AdminPublishVoucherBookRequestSchema = AdminPublishVoucherBookRequest.openapi('AdminPublishVoucherBookRequest', {
-  description: 'Publish a voucher book',
-})
+export const AdminPublishVoucherBookRequestSchema =
+  AdminPublishVoucherBookRequest.openapi('AdminPublishVoucherBookRequest', {
+    description: 'Publish a voucher book',
+  })
 
 export type AdminPublishVoucherBookRequest = z.infer<
   typeof AdminPublishVoucherBookRequest
@@ -338,9 +341,10 @@ export const AdminArchiveVoucherBookRequest = z.object({
 /**
  * Archive voucher book request (OpenAPI documented)
  */
-export const AdminArchiveVoucherBookRequestSchema = AdminArchiveVoucherBookRequest.openapi('AdminArchiveVoucherBookRequest', {
-  description: 'Archive a voucher book',
-})
+export const AdminArchiveVoucherBookRequestSchema =
+  AdminArchiveVoucherBookRequest.openapi('AdminArchiveVoucherBookRequest', {
+    description: 'Archive a voucher book',
+  })
 
 export type AdminArchiveVoucherBookRequest = z.infer<
   typeof AdminArchiveVoucherBookRequest
@@ -354,18 +358,20 @@ export const AdminGeneratePdfRequest = z.object({
     .boolean()
     .default(false)
     .describe('Force regeneration even if PDF already exists'),
-  priority: z
-    .enum(['low', 'normal', 'high'])
-    .default('normal')
+  priority: createZodEnum(PDFGenerationPriorityEnum)
+    .default(PDFGenerationPriorityEnum.NORMAL)
     .describe('Generation priority'),
 })
 
 /**
  * Generate PDF request (OpenAPI documented)
  */
-export const AdminGeneratePdfRequestSchema = AdminGeneratePdfRequest.openapi('AdminGeneratePdfRequest', {
-  description: 'Generate PDF for voucher book',
-})
+export const AdminGeneratePdfRequestSchema = AdminGeneratePdfRequest.openapi(
+  'AdminGeneratePdfRequest',
+  {
+    description: 'Generate PDF for voucher book',
+  },
+)
 
 export type AdminGeneratePdfRequest = z.infer<typeof AdminGeneratePdfRequest>
 
@@ -374,28 +380,25 @@ export type AdminGeneratePdfRequest = z.infer<typeof AdminGeneratePdfRequest>
  */
 export const AdminGeneratePdfResponse = z.object({
   jobId: z.string().describe('PDF generation job ID'),
-  status: z
-    .enum(['queued', 'processing', 'completed', 'failed'])
-    .describe('Generation status'),
+  status: createZodEnum(PDFGenerationStatusEnum).describe('Generation status'),
   message: z.string().describe('Status message'),
   estimatedCompletion: z
     .string()
     .datetime()
     .optional()
     .describe('Estimated completion time'),
-  pdfUrl: z
-    .string()
-    .url()
-    .optional()
-    .describe('PDF URL if already completed'),
+  pdfUrl: z.string().url().optional().describe('PDF URL if already completed'),
 })
 
 /**
  * Generate PDF response (OpenAPI documented)
  */
-export const AdminGeneratePdfResponseSchema = AdminGeneratePdfResponse.openapi('AdminGeneratePdfResponse', {
-  description: 'PDF generation job status',
-})
+export const AdminGeneratePdfResponseSchema = AdminGeneratePdfResponse.openapi(
+  'AdminGeneratePdfResponse',
+  {
+    description: 'PDF generation job status',
+  },
+)
 
 export type AdminGeneratePdfResponse = z.infer<typeof AdminGeneratePdfResponse>
 
@@ -410,9 +413,9 @@ export const AdminBulkVoucherBookOperationRequest = z.object({
     .min(1)
     .max(FIELD_LENGTH.NAME_MAX)
     .describe('Voucher book IDs to operate on'),
-  operation: z
-    .enum(['publish', 'archive', 'generate_pdf', 'delete'])
-    .describe('Operation to perform'),
+  operation: createZodEnum(BulkVoucherBookOperationEnum).describe(
+    'Operation to perform',
+  ),
   options: z
     .record(z.string(), z.any())
     .optional()
@@ -422,9 +425,13 @@ export const AdminBulkVoucherBookOperationRequest = z.object({
 /**
  * Bulk voucher book operation request (OpenAPI documented)
  */
-export const AdminBulkVoucherBookOperationRequestSchema = AdminBulkVoucherBookOperationRequest.openapi('AdminBulkVoucherBookOperationRequest', {
-  description: 'Bulk operation on multiple voucher books',
-})
+export const AdminBulkVoucherBookOperationRequestSchema =
+  AdminBulkVoucherBookOperationRequest.openapi(
+    'AdminBulkVoucherBookOperationRequest',
+    {
+      description: 'Bulk operation on multiple voucher books',
+    },
+  )
 
 export type AdminBulkVoucherBookOperationRequest = z.infer<
   typeof AdminBulkVoucherBookOperationRequest
@@ -458,9 +465,13 @@ export const AdminBulkVoucherBookOperationResponse = z.object({
 /**
  * Bulk operation response (OpenAPI documented)
  */
-export const AdminBulkVoucherBookOperationResponseSchema = AdminBulkVoucherBookOperationResponse.openapi('AdminBulkVoucherBookOperationResponse', {
-  description: 'Bulk operation results',
-})
+export const AdminBulkVoucherBookOperationResponseSchema =
+  AdminBulkVoucherBookOperationResponse.openapi(
+    'AdminBulkVoucherBookOperationResponse',
+    {
+      description: 'Bulk operation results',
+    },
+  )
 
 export type AdminBulkVoucherBookOperationResponse = z.infer<
   typeof AdminBulkVoucherBookOperationResponse
@@ -478,9 +489,13 @@ export const AdminUpdateVoucherBookStatusRequest = z.object({
 /**
  * Update voucher book status request (OpenAPI documented)
  */
-export const AdminUpdateVoucherBookStatusRequestSchema = AdminUpdateVoucherBookStatusRequest.openapi('AdminUpdateVoucherBookStatusRequest', {
-  description: 'Update voucher book status',
-})
+export const AdminUpdateVoucherBookStatusRequestSchema =
+  AdminUpdateVoucherBookStatusRequest.openapi(
+    'AdminUpdateVoucherBookStatusRequest',
+    {
+      description: 'Update voucher book status',
+    },
+  )
 
 export type AdminUpdateVoucherBookStatusRequest = z.infer<
   typeof AdminUpdateVoucherBookStatusRequest
@@ -500,9 +515,10 @@ export const BulkArchiveVoucherBooksRequest = z.object({
 /**
  * Bulk archive voucher books request (OpenAPI documented)
  */
-export const BulkArchiveVoucherBooksRequestSchema = BulkArchiveVoucherBooksRequest.openapi('BulkArchiveVoucherBooksRequest', {
-  description: 'Bulk archive multiple voucher books',
-})
+export const BulkArchiveVoucherBooksRequestSchema =
+  BulkArchiveVoucherBooksRequest.openapi('BulkArchiveVoucherBooksRequest', {
+    description: 'Bulk archive multiple voucher books',
+  })
 
 export type BulkArchiveVoucherBooksRequest = z.infer<
   typeof BulkArchiveVoucherBooksRequest
@@ -533,9 +549,10 @@ export const VoucherBookStatsQueryParams = z.object({
 /**
  * Voucher book statistics query parameters (OpenAPI documented)
  */
-export const VoucherBookStatsQueryParamsSchema = VoucherBookStatsQueryParams.openapi('VoucherBookStatsQueryParams', {
-  description: 'Query parameters for voucher book statistics',
-})
+export const VoucherBookStatsQueryParamsSchema =
+  VoucherBookStatsQueryParams.openapi('VoucherBookStatsQueryParams', {
+    description: 'Query parameters for voucher book statistics',
+  })
 
 export type VoucherBookStatsQueryParams = z.infer<
   typeof VoucherBookStatsQueryParams
@@ -583,8 +600,11 @@ export const VoucherBookStatsResponse = z.object({
 /**
  * Voucher book statistics response (OpenAPI documented)
  */
-export const VoucherBookStatsResponseSchema = VoucherBookStatsResponse.openapi('VoucherBookStatsResponse', {
-  description: 'Voucher book statistics',
-})
+export const VoucherBookStatsResponseSchema = VoucherBookStatsResponse.openapi(
+  'VoucherBookStatsResponse',
+  {
+    description: 'Voucher book statistics',
+  },
+)
 
 export type VoucherBookStatsResponse = z.infer<typeof VoucherBookStatsResponse>

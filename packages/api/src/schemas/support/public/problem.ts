@@ -1,5 +1,7 @@
-import { TicketPriority, TicketType } from '@pika/types'
+import { TicketPriority, TicketSortField, TicketType } from '@pika/types'
 import { z } from 'zod'
+
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { SearchParams } from '../../shared/pagination.js'
@@ -31,12 +33,10 @@ export const CreateSupportProblemRequest = z.object({
 /**
  * Create support problem request (OpenAPI documented)
  */
-export const CreateSupportProblemRequestSchema = CreateSupportProblemRequest.openapi(
-  'CreateSupportProblemRequest',
-  {
+export const CreateSupportProblemRequestSchema =
+  CreateSupportProblemRequest.openapi('CreateSupportProblemRequest', {
     description: 'Create new support problem',
-  },
-)
+  })
 
 export type CreateSupportProblemRequest = z.infer<
   typeof CreateSupportProblemRequest
@@ -56,12 +56,10 @@ export const UpdateSupportProblemRequest = z.object({
 /**
  * Update support problem request (OpenAPI documented)
  */
-export const UpdateSupportProblemRequestSchema = UpdateSupportProblemRequest.openapi(
-  'UpdateSupportProblemRequest',
-  {
+export const UpdateSupportProblemRequestSchema =
+  UpdateSupportProblemRequest.openapi('UpdateSupportProblemRequest', {
     description: 'Update support problem',
-  },
-)
+  })
 
 export type UpdateSupportProblemRequest = z.infer<
   typeof UpdateSupportProblemRequest
@@ -108,12 +106,10 @@ export const SupportProblemListResponse = paginatedResponse(
 /**
  * Support problem list response (OpenAPI documented)
  */
-export const SupportProblemListResponseSchema = SupportProblemListResponse.openapi(
-  'SupportProblemListResponse',
-  {
+export const SupportProblemListResponseSchema =
+  SupportProblemListResponse.openapi('SupportProblemListResponse', {
     description: 'Paginated list of support problems',
-  },
-)
+  })
 
 export type SupportProblemListResponse = z.infer<
   typeof SupportProblemListResponse
@@ -130,20 +126,16 @@ export const SupportProblemSearchParams = SearchParams.extend({
   status: TicketStatusSchema.optional(),
   priority: TicketPrioritySchema.optional(),
   type: TicketTypeSchema.optional(),
-  sortBy: z
-    .enum(['createdAt', 'updatedAt', 'priority', 'status'])
-    .default('createdAt'),
+  sortBy: createZodEnum(TicketSortField).default(TicketSortField.CREATED_AT),
 })
 
 /**
  * Support problem search parameters (OpenAPI documented)
  */
-export const SupportProblemSearchParamsSchema = SupportProblemSearchParams.openapi(
-  'SupportProblemSearchParams',
-  {
+export const SupportProblemSearchParamsSchema =
+  SupportProblemSearchParams.openapi('SupportProblemSearchParams', {
     description: 'Search and filter parameters for support problems',
-  },
-)
+  })
 
 export type SupportProblemSearchParams = z.infer<
   typeof SupportProblemSearchParams

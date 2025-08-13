@@ -1,4 +1,4 @@
-import { PlanSortBy } from '@pika/types'
+import { Currency, PlanSortBy } from '@pika/types'
 import { z } from 'zod'
 
 import { activeStatus, withTimestamps } from '../../shared/metadata.js'
@@ -31,7 +31,7 @@ export const SubscriptionPlan = withTimestamps({
   currency: z
     .string()
     .length(3)
-    .default('usd')
+    .default(Currency.USD)
     .describe('Currency code (e.g., usd, gbp)'),
   interval: BillingIntervalSchema,
   intervalCount: z
@@ -58,9 +58,12 @@ export const SubscriptionPlan = withTimestamps({
 /**
  * Subscription plan (OpenAPI documented)
  */
-export const SubscriptionPlanSchema = SubscriptionPlan.openapi('SubscriptionPlan', {
-  description: 'Subscription plan details',
-})
+export const SubscriptionPlanSchema = SubscriptionPlan.openapi(
+  'SubscriptionPlan',
+  {
+    description: 'Subscription plan details',
+  },
+)
 
 export type SubscriptionPlan = z.infer<typeof SubscriptionPlan>
 
@@ -73,7 +76,7 @@ export const CreateSubscriptionPlanRequest = z.object({
   name: z.string(),
   description: z.string().optional(),
   price: z.number().nonnegative(),
-  currency: z.string().length(3).default('usd'),
+  currency: z.string().length(3).default(Currency.USD),
   interval: BillingIntervalSchema,
   intervalCount: z.number().int().positive().default(1),
   trialPeriodDays: z.number().int().nonnegative().optional(),
@@ -86,9 +89,10 @@ export const CreateSubscriptionPlanRequest = z.object({
 /**
  * Create subscription plan request (OpenAPI documented)
  */
-export const CreateSubscriptionPlanRequestSchema = CreateSubscriptionPlanRequest.openapi('CreateSubscriptionPlanRequest', {
-  description: 'Create a new subscription plan',
-})
+export const CreateSubscriptionPlanRequestSchema =
+  CreateSubscriptionPlanRequest.openapi('CreateSubscriptionPlanRequest', {
+    description: 'Create a new subscription plan',
+  })
 
 export type CreateSubscriptionPlanRequest = z.infer<
   typeof CreateSubscriptionPlanRequest
@@ -113,9 +117,10 @@ export const UpdateSubscriptionPlanRequest = z.object({
 /**
  * Update subscription plan request (OpenAPI documented)
  */
-export const UpdateSubscriptionPlanRequestSchema = UpdateSubscriptionPlanRequest.openapi('UpdateSubscriptionPlanRequest', {
-  description: 'Update a subscription plan',
-})
+export const UpdateSubscriptionPlanRequestSchema =
+  UpdateSubscriptionPlanRequest.openapi('UpdateSubscriptionPlanRequest', {
+    description: 'Update a subscription plan',
+  })
 
 export type UpdateSubscriptionPlanRequest = z.infer<
   typeof UpdateSubscriptionPlanRequest
@@ -131,9 +136,12 @@ export const PlanSyncResponse = z.object({
 /**
  * Plan sync success response (OpenAPI documented)
  */
-export const PlanSyncResponseSchema = PlanSyncResponse.openapi('PlanSyncResponse', {
-  description: 'Plan sync success response',
-})
+export const PlanSyncResponseSchema = PlanSyncResponse.openapi(
+  'PlanSyncResponse',
+  {
+    description: 'Plan sync success response',
+  },
+)
 
 export type PlanSyncResponse = z.infer<typeof PlanSyncResponse>
 
@@ -152,9 +160,10 @@ export const SubscriptionPlanQueryParams = SearchParams.extend({
 /**
  * Subscription plan query parameters (OpenAPI documented)
  */
-export const SubscriptionPlanQueryParamsSchema = SubscriptionPlanQueryParams.openapi('SubscriptionPlanQueryParams', {
-  description: 'Subscription plan search and filter parameters',
-})
+export const SubscriptionPlanQueryParamsSchema =
+  SubscriptionPlanQueryParams.openapi('SubscriptionPlanQueryParams', {
+    description: 'Subscription plan search and filter parameters',
+  })
 
 export type SubscriptionPlanQueryParams = z.infer<
   typeof SubscriptionPlanQueryParams
@@ -168,9 +177,10 @@ export const SubscriptionPlanListResponse = paginatedResponse(SubscriptionPlan)
 /**
  * Subscription plan list response (OpenAPI documented)
  */
-export const SubscriptionPlanListResponseSchema = SubscriptionPlanListResponse.openapi('SubscriptionPlanListResponse', {
-  description: 'Paginated list of subscription plans',
-})
+export const SubscriptionPlanListResponseSchema =
+  SubscriptionPlanListResponse.openapi('SubscriptionPlanListResponse', {
+    description: 'Paginated list of subscription plans',
+  })
 
 export type SubscriptionPlanListResponse = z.infer<
   typeof SubscriptionPlanListResponse
@@ -184,9 +194,10 @@ export const SubscriptionPlanDetailResponse = SubscriptionPlan
 /**
  * Single subscription plan response (OpenAPI documented)
  */
-export const SubscriptionPlanDetailResponseSchema = SubscriptionPlanDetailResponse.openapi('SubscriptionPlanDetailResponse', {
-  description: 'Single subscription plan details',
-})
+export const SubscriptionPlanDetailResponseSchema =
+  SubscriptionPlanDetailResponse.openapi('SubscriptionPlanDetailResponse', {
+    description: 'Single subscription plan details',
+  })
 
 export type SubscriptionPlanDetailResponse = z.infer<
   typeof SubscriptionPlanDetailResponse

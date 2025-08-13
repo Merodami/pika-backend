@@ -1,5 +1,6 @@
 import { CategorySortBy, FIELD_LENGTH } from '@pika/types'
 import { z } from 'zod'
+
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
@@ -176,12 +177,10 @@ export const CategoryHierarchyResponse = z.object({
 /**
  * Category hierarchy response (OpenAPI documented)
  */
-export const CategoryHierarchyResponseSchema = CategoryHierarchyResponse.openapi(
-  'CategoryHierarchyResponse',
-  {
+export const CategoryHierarchyResponseSchema =
+  CategoryHierarchyResponse.openapi('CategoryHierarchyResponse', {
     description: 'Hierarchical category tree structure',
-  },
-)
+  })
 
 export type CategoryHierarchyResponse = z.infer<
   typeof CategoryHierarchyResponse

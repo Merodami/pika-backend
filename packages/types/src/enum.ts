@@ -34,29 +34,13 @@ export enum UserStatus {
 export type UserStatusType = `${UserStatus}`
 
 /**
- * Communication channels for notifications and messages
- * Used for multi-channel communication delivery
- */
-export enum CommunicationChannel {
-  IN_APP = 'IN_APP',
-  EMAIL = 'EMAIL',
-  PUSH = 'PUSH',
-  SMS = 'SMS',
-}
-
-/**
- * Type definition for communication channels - use this for type annotations
- */
-export type CommunicationChannelType = `${CommunicationChannel}`
-
-/**
  * User verification types for unified verification system
  * Used for email, phone, and account confirmation verification
  */
 export enum VerificationType {
-  EMAIL = 'EMAIL',
-  PHONE = 'PHONE',
-  ACCOUNT_CONFIRMATION = 'ACCOUNT_CONFIRMATION',
+  EMAIL = 'email',
+  PHONE = 'phone',
+  ACCOUNT_CONFIRMATION = 'accountConfirmation',
 }
 
 /**
@@ -69,11 +53,11 @@ export type VerificationTypeType = `${VerificationType}`
  * Used to track the status of verification processes
  */
 export enum VerificationStatus {
-  PENDING = 'PENDING',
-  SENT = 'SENT',
-  VERIFIED = 'VERIFIED',
-  FAILED = 'FAILED',
-  EXPIRED = 'EXPIRED',
+  PENDING = 'pending',
+  SENT = 'sent',
+  VERIFIED = 'verified',
+  FAILED = 'failed',
+  EXPIRED = 'expired',
 }
 
 /**
@@ -216,35 +200,6 @@ export enum ImageFormat {
 export type ImageFormatType = `${ImageFormat}`
 
 /**
- * UI theme options
- * Used for user interface theme preferences
- */
-export enum Theme {
-  LIGHT = 'light',
-  DARK = 'dark',
-  SYSTEM = 'system',
-}
-
-/**
- * Type definition for theme - use this for type annotations
- */
-export type ThemeType = `${Theme}`
-
-/**
- * Profile visibility options
- * Used for user profile privacy settings
- */
-export enum ProfileVisibility {
-  PUBLIC = 'public',
-  PRIVATE = 'private',
-}
-
-/**
- * Type definition for profile visibility - use this for type annotations
- */
-export type ProfileVisibilityType = `${ProfileVisibility}`
-
-/**
  * Verification levels for user accounts
  * Used to track the level of account verification
  */
@@ -290,6 +245,94 @@ export enum PermissionAction {
  * Type definition for permission action - use this for type annotations
  */
 export type PermissionActionType = `${PermissionAction}`
+
+/**
+ * User status filter options for API queries
+ * Includes composite filters for common use cases
+ */
+export enum UserStatusFilter {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+  PENDING_VERIFICATION = 'pendingVerification',
+}
+
+/**
+ * Card brands for payment methods
+ */
+export enum CardBrand {
+  VISA = 'visa',
+  MASTERCARD = 'mastercard',
+  AMEX = 'amex',
+  DISCOVER = 'discover',
+  DINERS = 'diners',
+  JCB = 'jcb',
+  UNIONPAY = 'unionpay',
+  UNKNOWN = 'unknown',
+}
+
+/**
+ * Card funding types
+ */
+export enum CardFunding {
+  CREDIT = 'credit',
+  DEBIT = 'debit',
+  PREPAID = 'prepaid',
+  UNKNOWN = 'unknown',
+}
+
+/**
+ * Account holder types for bank accounts
+ */
+export enum AccountHolderType {
+  INDIVIDUAL = 'individual',
+  COMPANY = 'company',
+}
+
+/**
+ * Digital wallet types
+ */
+export enum WalletType {
+  APPLE_PAY = 'applePay',
+  GOOGLE_PAY = 'googlePay',
+  SAMSUNG_PAY = 'samsungPay',
+}
+
+/**
+ * Payment verification status
+ */
+export enum PaymentVerificationStatus {
+  SUCCEEDED = 'succeeded',
+  REQUIRES_ACTION = 'requiresAction',
+  FAILED = 'failed',
+}
+
+/**
+ * Setup intent usage types
+ */
+export enum SetupIntentUsage {
+  ON_SESSION = 'onSession',
+  OFF_SESSION = 'offSession',
+}
+
+/**
+ * Async operation statuses
+ */
+export enum AsyncOperationStatus {
+  PENDING = 'pending',
+  IN_PROGRESS = 'inProgress',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  CANCELLED = 'cancelled',
+}
+
+/**
+ * Distance units for geospatial queries
+ */
+export enum DistanceUnit {
+  KM = 'km',
+  MI = 'mi',
+}
 
 /**
  * Account flags for user accounts

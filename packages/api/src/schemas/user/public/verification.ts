@@ -31,7 +31,10 @@ export type UnifiedVerificationRequest = z.infer<
  * Unified resend verification request schema (raw Zod)
  */
 export const UnifiedResendVerificationRequest = z.object({
-  type: z.enum([VerificationType.EMAIL, VerificationType.PHONE]),
+  type: createZodEnum(VerificationType).refine(
+    (val) => val === VerificationType.EMAIL || val === VerificationType.PHONE,
+    { message: 'Type must be EMAIL or PHONE' },
+  ),
   userId: z.string().uuid().optional(),
   email: z.string().email().optional(),
   phoneNumber: z.string().optional(),

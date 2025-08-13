@@ -1,7 +1,14 @@
 import { SortOrder } from '@pika/types'
-import { FileSortBy, FileStatus, FileType, StorageProvider } from '@pika/types'
+import {
+  FileBulkAction,
+  FileSortBy,
+  FileStatus,
+  FileType,
+  StorageProvider,
+} from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { SortOrderSchema } from '../../common/enums.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
@@ -54,9 +61,12 @@ export const AdminFileDetailResponse = withTimestamps({
 /**
  * Admin file detail response (OpenAPI documented)
  */
-export const AdminFileDetailResponseSchema = AdminFileDetailResponse.openapi('AdminFileDetailResponse', {
-  description: 'Admin file details with user information',
-})
+export const AdminFileDetailResponseSchema = AdminFileDetailResponse.openapi(
+  'AdminFileDetailResponse',
+  {
+    description: 'Admin file details with user information',
+  },
+)
 
 export type AdminFileDetailResponse = z.infer<typeof AdminFileDetailResponse>
 
@@ -87,9 +97,12 @@ export const AdminFileQueryParams = z.object({
 /**
  * Admin file query parameters (OpenAPI documented)
  */
-export const AdminFileQueryParamsSchema = AdminFileQueryParams.openapi('AdminFileQueryParams', {
-  description: 'Admin file search parameters',
-})
+export const AdminFileQueryParamsSchema = AdminFileQueryParams.openapi(
+  'AdminFileQueryParams',
+  {
+    description: 'Admin file search parameters',
+  },
+)
 
 export type AdminFileQueryParams = z.infer<typeof AdminFileQueryParams>
 
@@ -101,9 +114,12 @@ export const AdminFileListResponse = paginatedResponse(AdminFileDetailResponse)
 /**
  * Admin file list response (OpenAPI documented)
  */
-export const AdminFileListResponseSchema = AdminFileListResponse.openapi('AdminFileListResponse', {
-  description: 'Paginated list of files for admin management',
-})
+export const AdminFileListResponseSchema = AdminFileListResponse.openapi(
+  'AdminFileListResponse',
+  {
+    description: 'Paginated list of files for admin management',
+  },
+)
 
 export type AdminFileListResponse = z.infer<typeof AdminFileListResponse>
 
@@ -122,9 +138,12 @@ export const AdminUpdateFileRequest = z.object({
 /**
  * Admin update file request (OpenAPI documented)
  */
-export const AdminUpdateFileRequestSchema = AdminUpdateFileRequest.openapi('AdminUpdateFileRequest', {
-  description: 'Admin update file details',
-})
+export const AdminUpdateFileRequestSchema = AdminUpdateFileRequest.openapi(
+  'AdminUpdateFileRequest',
+  {
+    description: 'Admin update file details',
+  },
+)
 
 export type AdminUpdateFileRequest = z.infer<typeof AdminUpdateFileRequest>
 
@@ -133,16 +152,17 @@ export type AdminUpdateFileRequest = z.infer<typeof AdminUpdateFileRequest>
  */
 export const AdminBulkFileActionRequest = z.object({
   fileIds: z.array(UUID).min(1).max(100),
-  action: z.enum(['delete', 'make_public', 'make_private', 'change_status']),
+  action: createZodEnum(FileBulkAction),
   newStatus: FileStatusSchema.optional(),
 })
 
 /**
  * Admin bulk file action request (OpenAPI documented)
  */
-export const AdminBulkFileActionRequestSchema = AdminBulkFileActionRequest.openapi('AdminBulkFileActionRequest', {
-  description: 'Bulk action on multiple files',
-})
+export const AdminBulkFileActionRequestSchema =
+  AdminBulkFileActionRequest.openapi('AdminBulkFileActionRequest', {
+    description: 'Bulk action on multiple files',
+  })
 
 export type AdminBulkFileActionRequest = z.infer<
   typeof AdminBulkFileActionRequest
@@ -167,9 +187,10 @@ export const AdminBulkFileActionResponse = z.object({
 /**
  * Admin bulk file action response (OpenAPI documented)
  */
-export const AdminBulkFileActionResponseSchema = AdminBulkFileActionResponse.openapi('AdminBulkFileActionResponse', {
-  description: 'Bulk file action results',
-})
+export const AdminBulkFileActionResponseSchema =
+  AdminBulkFileActionResponse.openapi('AdminBulkFileActionResponse', {
+    description: 'Bulk file action results',
+  })
 
 export type AdminBulkFileActionResponse = z.infer<
   typeof AdminBulkFileActionResponse
@@ -230,9 +251,12 @@ export const StorageAnalyticsResponse = z.object({
 /**
  * Storage analytics response (OpenAPI documented)
  */
-export const StorageAnalyticsResponseSchema = StorageAnalyticsResponse.openapi('StorageAnalyticsResponse', {
-  description: 'Storage usage analytics',
-})
+export const StorageAnalyticsResponseSchema = StorageAnalyticsResponse.openapi(
+  'StorageAnalyticsResponse',
+  {
+    description: 'Storage usage analytics',
+  },
+)
 
 export type StorageAnalyticsResponse = z.infer<typeof StorageAnalyticsResponse>
 
@@ -268,9 +292,10 @@ export const StorageConfigurationResponse = z.object({
 /**
  * Storage configuration response (OpenAPI documented)
  */
-export const StorageConfigurationResponseSchema = StorageConfigurationResponse.openapi('StorageConfigurationResponse', {
-  description: 'Storage service configuration',
-})
+export const StorageConfigurationResponseSchema =
+  StorageConfigurationResponse.openapi('StorageConfigurationResponse', {
+    description: 'Storage service configuration',
+  })
 
 export type StorageConfigurationResponse = z.infer<
   typeof StorageConfigurationResponse
@@ -304,9 +329,13 @@ export const UpdateStorageConfigurationRequest = z.object({
 /**
  * Update storage configuration request (OpenAPI documented)
  */
-export const UpdateStorageConfigurationRequestSchema = UpdateStorageConfigurationRequest.openapi('UpdateStorageConfigurationRequest', {
-  description: 'Update storage configuration',
-})
+export const UpdateStorageConfigurationRequestSchema =
+  UpdateStorageConfigurationRequest.openapi(
+    'UpdateStorageConfigurationRequest',
+    {
+      description: 'Update storage configuration',
+    },
+  )
 
 export type UpdateStorageConfigurationRequest = z.infer<
   typeof UpdateStorageConfigurationRequest

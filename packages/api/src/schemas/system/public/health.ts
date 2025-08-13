@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import {
   HealthStatus,
   ServiceHealth,
@@ -91,9 +92,12 @@ export const PostgreSQLHealth = z.object({
 /**
  * PostgreSQL health (OpenAPI documented)
  */
-export const PostgreSQLHealthSchema = PostgreSQLHealth.openapi('PostgreSQLHealth', {
-  description: 'PostgreSQL database health status',
-})
+export const PostgreSQLHealthSchema = PostgreSQLHealth.openapi(
+  'PostgreSQLHealth',
+  {
+    description: 'PostgreSQL database health status',
+  },
+)
 
 export type PostgreSQLHealth = z.infer<typeof PostgreSQLHealth>
 
@@ -128,9 +132,12 @@ export const DatabasesHealth = z.object({
 /**
  * All databases health (OpenAPI documented)
  */
-export const DatabasesHealthSchema = DatabasesHealth.openapi('DatabasesHealth', {
-  description: 'Health status of all databases',
-})
+export const DatabasesHealthSchema = DatabasesHealth.openapi(
+  'DatabasesHealth',
+  {
+    description: 'Health status of all databases',
+  },
+)
 
 export type DatabasesHealth = z.infer<typeof DatabasesHealth>
 
@@ -182,9 +189,12 @@ export const MessageQueueHealth = z.object({
 /**
  * Message queue health (OpenAPI documented)
  */
-export const MessageQueueHealthSchema = MessageQueueHealth.openapi('MessageQueueHealth', {
-  description: 'Message queue system health',
-})
+export const MessageQueueHealthSchema = MessageQueueHealth.openapi(
+  'MessageQueueHealth',
+  {
+    description: 'Message queue system health',
+  },
+)
 
 export type MessageQueueHealth = z.infer<typeof MessageQueueHealth>
 

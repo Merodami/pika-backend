@@ -256,7 +256,7 @@ export type GetVouchersByCategoryResponse = z.infer<
 export const GetUserVouchersRequest = openapi(
   z.object({
     userId: UUID,
-    status: UserVoucherStatusFilter.default('all'),
+    status: UserVoucherStatusFilter.optional(),
     page: z.number().int().positive().default(1),
     limit: z.number().int().positive().max(100).default(20),
   }),

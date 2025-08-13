@@ -176,24 +176,25 @@ async function testRegistration(): Promise<string> {
   }
 }
 
-async function testEmailVerification(token: string): Promise<void> {
-  logStep(2, 'Email Verification')
-
-  try {
-    const response = await api.get(`/auth/verify-email/${token}`)
-
-    logSuccess('Email verified successfully')
-    logInfo(response.data.message)
-    if (response.data.userId) {
-      logInfo(`User ID: ${response.data.userId}`)
-    }
-  } catch (error: any) {
-    logError(
-      `Email verification failed: ${error.response?.data?.message || error.message}`,
-    )
-    throw error
-  }
-}
+// Commented out - not used in current flow but kept for future reference
+// async function testEmailVerification(token: string): Promise<void> {
+//   logStep(2, 'Email Verification')
+//
+//   try {
+//     const response = await api.get(`/auth/verify-email/${token}`)
+//
+//     logSuccess('Email verified successfully')
+//     logInfo(response.data.message)
+//     if (response.data.userId) {
+//       logInfo(`User ID: ${response.data.userId}`)
+//     }
+//   } catch (error: any) {
+//     logError(
+//       `Email verification failed: ${error.response?.data?.message || error.message}`,
+//     )
+//     throw error
+//   }
+// }
 
 async function testLogin(): Promise<AuthTokens> {
   logStep(3, 'User Login (OAuth2 Token Endpoint)')
@@ -372,7 +373,7 @@ async function testChangePassword(accessToken: string): Promise<void> {
   const newPassword = 'NewSecurePassword456!'
 
   try {
-    const response = await api.post(
+    await api.post(
       '/auth/change-password',
       {
         currentPassword: testUser.password,
@@ -578,8 +579,6 @@ async function runTests() {
   let userId: string | null = null
   let tokens: AuthTokens | null = null
 
-  const profile: UserProfile | null = null
-
   try {
     // 0. Test existing admin user login first
     try {
@@ -587,7 +586,7 @@ async function runTests() {
       log(
         `\n${colors.bright}${colors.green}✅ Pre-created admin user test passed!${colors.reset}\n`,
       )
-    } catch (error: any) {
+    } catch {
       log(
         `\n${colors.bright}${colors.yellow}⚠️  Admin user test failed - continuing with new user registration${colors.reset}\n`,
       )

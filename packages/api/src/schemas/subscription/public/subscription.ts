@@ -54,9 +54,7 @@ export const Subscription = withTimestamps({
   stripePriceId: z.string().optional().describe('Stripe price ID'),
   startDate: DateTime.optional().describe('Subscription start date'),
   endDate: DateTime.optional().describe('Subscription end date'),
-  lastProcessedAt: DateTime.optional().describe(
-    'Last credit processing date',
-  ),
+  lastProcessedAt: DateTime.optional().describe('Last credit processing date'),
   cancelledAt: DateTime.optional().describe('Cancellation date'),
 })
 
@@ -79,9 +77,12 @@ export const SubscriptionWithPlan = Subscription.extend({
 /**
  * Subscription with plan details (OpenAPI documented)
  */
-export const SubscriptionWithPlanSchema = SubscriptionWithPlan.openapi('SubscriptionWithPlan', {
-  description: 'Subscription with plan details',
-})
+export const SubscriptionWithPlanSchema = SubscriptionWithPlan.openapi(
+  'SubscriptionWithPlan',
+  {
+    description: 'Subscription with plan details',
+  },
+)
 
 export type SubscriptionWithPlan = z.infer<typeof SubscriptionWithPlan>
 
@@ -100,9 +101,10 @@ export const CreateSubscriptionRequest = z.object({
 /**
  * Create subscription request (OpenAPI documented)
  */
-export const CreateSubscriptionRequestSchema = CreateSubscriptionRequest.openapi('CreateSubscriptionRequest', {
-  description: 'Create a new subscription',
-})
+export const CreateSubscriptionRequestSchema =
+  CreateSubscriptionRequest.openapi('CreateSubscriptionRequest', {
+    description: 'Create a new subscription',
+  })
 
 export type CreateSubscriptionRequest = z.infer<
   typeof CreateSubscriptionRequest
@@ -127,9 +129,10 @@ export const UpdateSubscriptionRequest = z.object({
 /**
  * Update subscription request (OpenAPI documented)
  */
-export const UpdateSubscriptionRequestSchema = UpdateSubscriptionRequest.openapi('UpdateSubscriptionRequest', {
-  description: 'Update a subscription',
-})
+export const UpdateSubscriptionRequestSchema =
+  UpdateSubscriptionRequest.openapi('UpdateSubscriptionRequest', {
+    description: 'Update a subscription',
+  })
 
 export type UpdateSubscriptionRequest = z.infer<
   typeof UpdateSubscriptionRequest
@@ -151,9 +154,12 @@ export const SubscriptionQueryParams = SearchParams.extend({
 /**
  * Subscription query parameters (OpenAPI documented)
  */
-export const SubscriptionQueryParamsSchema = SubscriptionQueryParams.openapi('SubscriptionQueryParams', {
-  description: 'Subscription search and filter parameters',
-})
+export const SubscriptionQueryParamsSchema = SubscriptionQueryParams.openapi(
+  'SubscriptionQueryParams',
+  {
+    description: 'Subscription search and filter parameters',
+  },
+)
 
 export type SubscriptionQueryParams = z.infer<typeof SubscriptionQueryParams>
 
@@ -165,9 +171,12 @@ export const SubscriptionListResponse = paginatedResponse(SubscriptionWithPlan)
 /**
  * Subscription list response (OpenAPI documented)
  */
-export const SubscriptionListResponseSchema = SubscriptionListResponse.openapi('SubscriptionListResponse', {
-  description: 'Paginated list of subscriptions',
-})
+export const SubscriptionListResponseSchema = SubscriptionListResponse.openapi(
+  'SubscriptionListResponse',
+  {
+    description: 'Paginated list of subscriptions',
+  },
+)
 
 export type SubscriptionListResponse = z.infer<typeof SubscriptionListResponse>
 
@@ -179,9 +188,12 @@ export const SubscriptionResponse = SubscriptionWithPlan
 /**
  * Single subscription response (OpenAPI documented)
  */
-export const SubscriptionResponseSchema = SubscriptionResponse.openapi('SubscriptionResponse', {
-  description: 'Single subscription with plan details',
-})
+export const SubscriptionResponseSchema = SubscriptionResponse.openapi(
+  'SubscriptionResponse',
+  {
+    description: 'Single subscription with plan details',
+  },
+)
 
 export type SubscriptionResponse = z.infer<typeof SubscriptionResponse>
 
@@ -200,9 +212,10 @@ export const ResumeSubscriptionRequest = z.object({
 /**
  * Resume subscription request (OpenAPI documented)
  */
-export const ResumeSubscriptionRequestSchema = ResumeSubscriptionRequest.openapi('ResumeSubscriptionRequest', {
-  description: 'Resume a cancelled subscription',
-})
+export const ResumeSubscriptionRequestSchema =
+  ResumeSubscriptionRequest.openapi('ResumeSubscriptionRequest', {
+    description: 'Resume a cancelled subscription',
+  })
 
 export type ResumeSubscriptionRequest = z.infer<
   typeof ResumeSubscriptionRequest
@@ -213,10 +226,7 @@ export type ResumeSubscriptionRequest = z.infer<
  */
 export const ChangeSubscriptionPlanRequest = z.object({
   newPlanId: UUID,
-  prorate: z
-    .boolean()
-    .default(true)
-    .describe('Whether to prorate the change'),
+  prorate: z.boolean().default(true).describe('Whether to prorate the change'),
   changeImmediately: z
     .boolean()
     .default(true)
@@ -226,9 +236,10 @@ export const ChangeSubscriptionPlanRequest = z.object({
 /**
  * Change subscription plan request (OpenAPI documented)
  */
-export const ChangeSubscriptionPlanRequestSchema = ChangeSubscriptionPlanRequest.openapi('ChangeSubscriptionPlanRequest', {
-  description: 'Change subscription plan',
-})
+export const ChangeSubscriptionPlanRequestSchema =
+  ChangeSubscriptionPlanRequest.openapi('ChangeSubscriptionPlanRequest', {
+    description: 'Change subscription plan',
+  })
 
 export type ChangeSubscriptionPlanRequest = z.infer<
   typeof ChangeSubscriptionPlanRequest
@@ -251,9 +262,12 @@ export const SubscriptionUsage = z.object({
 /**
  * Subscription usage (OpenAPI documented)
  */
-export const SubscriptionUsageSchema = SubscriptionUsage.openapi('SubscriptionUsage', {
-  description: 'Subscription usage information',
-})
+export const SubscriptionUsageSchema = SubscriptionUsage.openapi(
+  'SubscriptionUsage',
+  {
+    description: 'Subscription usage information',
+  },
+)
 
 export type SubscriptionUsage = z.infer<typeof SubscriptionUsage>
 
@@ -276,8 +290,11 @@ export const UpcomingInvoice = z.object({
 /**
  * Upcoming invoice (OpenAPI documented)
  */
-export const UpcomingInvoiceSchema = UpcomingInvoice.openapi('UpcomingInvoice', {
-  description: 'Upcoming invoice details',
-})
+export const UpcomingInvoiceSchema = UpcomingInvoice.openapi(
+  'UpcomingInvoice',
+  {
+    description: 'Upcoming invoice details',
+  },
+)
 
 export type UpcomingInvoice = z.infer<typeof UpcomingInvoice>

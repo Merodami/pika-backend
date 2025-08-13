@@ -69,9 +69,10 @@ export const AdminTicketDetailResponse = withTimestamps({
 /**
  * Simplified ticket for admin (OpenAPI documented)
  */
-export const AdminTicketDetailResponseSchema = AdminTicketDetailResponse.openapi('AdminTicketDetailResponse', {
-  description: 'Support ticket for admin',
-})
+export const AdminTicketDetailResponseSchema =
+  AdminTicketDetailResponse.openapi('AdminTicketDetailResponse', {
+    description: 'Support ticket for admin',
+  })
 
 export type AdminTicketDetailResponse = z.infer<
   typeof AdminTicketDetailResponse
@@ -100,9 +101,12 @@ export const AdminTicketQueryParams = z.object({
 /**
  * Admin ticket search parameters (OpenAPI documented)
  */
-export const AdminTicketQueryParamsSchema = AdminTicketQueryParams.openapi('AdminTicketQueryParams', {
-  description: 'Admin ticket search and filter parameters',
-})
+export const AdminTicketQueryParamsSchema = AdminTicketQueryParams.openapi(
+  'AdminTicketQueryParams',
+  {
+    description: 'Admin ticket search and filter parameters',
+  },
+)
 
 export type AdminTicketQueryParams = z.infer<typeof AdminTicketQueryParams>
 
@@ -116,9 +120,12 @@ export const AdminTicketListResponse = paginatedResponse(
 /**
  * Admin ticket list response (OpenAPI documented)
  */
-export const AdminTicketListResponseSchema = AdminTicketListResponse.openapi('AdminTicketListResponse', {
-  description: 'Paginated list of support tickets for admin management',
-})
+export const AdminTicketListResponseSchema = AdminTicketListResponse.openapi(
+  'AdminTicketListResponse',
+  {
+    description: 'Paginated list of support tickets for admin management',
+  },
+)
 
 export type AdminTicketListResponse = z.infer<typeof AdminTicketListResponse>
 
@@ -141,9 +148,10 @@ export const AdminUpdateProblemRequest = z.object({
 /**
  * Admin update problem request (OpenAPI documented)
  */
-export const AdminUpdateProblemRequestSchema = AdminUpdateProblemRequest.openapi('AdminUpdateProblemRequest', {
-  description: 'Admin update support problem',
-})
+export const AdminUpdateProblemRequestSchema =
+  AdminUpdateProblemRequest.openapi('AdminUpdateProblemRequest', {
+    description: 'Admin update support problem',
+  })
 
 export type AdminUpdateProblemRequest = z.infer<
   typeof AdminUpdateProblemRequest
@@ -163,9 +171,12 @@ export const AdminAssignTicketRequest = z.object({
 /**
  * Assign ticket request (OpenAPI documented)
  */
-export const AdminAssignTicketRequestSchema = AdminAssignTicketRequest.openapi('AdminAssignTicketRequest', {
-  description: 'Assign ticket to agent',
-})
+export const AdminAssignTicketRequestSchema = AdminAssignTicketRequest.openapi(
+  'AdminAssignTicketRequest',
+  {
+    description: 'Assign ticket to agent',
+  },
+)
 
 export type AdminAssignTicketRequest = z.infer<typeof AdminAssignTicketRequest>
 
@@ -181,9 +192,10 @@ export const AdminUpdateTicketStatusRequest = z.object({
 /**
  * Update ticket status request (OpenAPI documented)
  */
-export const AdminUpdateTicketStatusRequestSchema = AdminUpdateTicketStatusRequest.openapi('AdminUpdateTicketStatusRequest', {
-  description: 'Update ticket status',
-})
+export const AdminUpdateTicketStatusRequestSchema =
+  AdminUpdateTicketStatusRequest.openapi('AdminUpdateTicketStatusRequest', {
+    description: 'Update ticket status',
+  })
 
 export type AdminUpdateTicketStatusRequest = z.infer<
   typeof AdminUpdateTicketStatusRequest
@@ -201,9 +213,10 @@ export const AdminEscalateTicketRequest = z.object({
 /**
  * Escalate ticket request (OpenAPI documented)
  */
-export const AdminEscalateTicketRequestSchema = AdminEscalateTicketRequest.openapi('AdminEscalateTicketRequest', {
-  description: 'Escalate ticket',
-})
+export const AdminEscalateTicketRequestSchema =
+  AdminEscalateTicketRequest.openapi('AdminEscalateTicketRequest', {
+    description: 'Escalate ticket',
+  })
 
 export type AdminEscalateTicketRequest = z.infer<
   typeof AdminEscalateTicketRequest
@@ -230,9 +243,12 @@ export const AdminTicketComment = z.object({
 /**
  * Admin comment on ticket (OpenAPI documented)
  */
-export const AdminTicketCommentSchema = AdminTicketComment.openapi('AdminTicketComment', {
-  description: 'Add admin comment to ticket',
-})
+export const AdminTicketCommentSchema = AdminTicketComment.openapi(
+  'AdminTicketComment',
+  {
+    description: 'Add admin comment to ticket',
+  },
+)
 
 export type AdminTicketComment = z.infer<typeof AdminTicketComment>
 
@@ -265,16 +281,8 @@ export const SupportMetrics = z.object({
     [TicketStatus.OPEN]: z.number().int().nonnegative().optional(),
     [TicketStatus.ASSIGNED]: z.number().int().nonnegative().optional(),
     [TicketStatus.IN_PROGRESS]: z.number().int().nonnegative().optional(),
-    [TicketStatus.WAITING_CUSTOMER]: z
-      .number()
-      .int()
-      .nonnegative()
-      .optional(),
-    [TicketStatus.WAITING_INTERNAL]: z
-      .number()
-      .int()
-      .nonnegative()
-      .optional(),
+    [TicketStatus.WAITING_CUSTOMER]: z.number().int().nonnegative().optional(),
+    [TicketStatus.WAITING_INTERNAL]: z.number().int().nonnegative().optional(),
     [TicketStatus.RESOLVED]: z.number().int().nonnegative().optional(),
     [TicketStatus.CLOSED]: z.number().int().nonnegative().optional(),
   }),
@@ -349,9 +357,10 @@ export const AdminBulkTicketUpdateRequest = z.object({
 /**
  * Bulk ticket update request (OpenAPI documented)
  */
-export const AdminBulkTicketUpdateRequestSchema = AdminBulkTicketUpdateRequest.openapi('AdminBulkTicketUpdateRequest', {
-  description: 'Update multiple tickets',
-})
+export const AdminBulkTicketUpdateRequestSchema =
+  AdminBulkTicketUpdateRequest.openapi('AdminBulkTicketUpdateRequest', {
+    description: 'Update multiple tickets',
+  })
 
 export type AdminBulkTicketUpdateRequest = z.infer<
   typeof AdminBulkTicketUpdateRequest
@@ -376,9 +385,12 @@ export const ResponseTemplate = z.object({
 /**
  * Response template (OpenAPI documented)
  */
-export const ResponseTemplateSchema = ResponseTemplate.openapi('ResponseTemplate', {
-  description: 'Response template for support tickets',
-})
+export const ResponseTemplateSchema = ResponseTemplate.openapi(
+  'ResponseTemplate',
+  {
+    description: 'Response template for support tickets',
+  },
+)
 
 export type ResponseTemplate = z.infer<typeof ResponseTemplate>
 
@@ -390,9 +402,12 @@ export const TemplateListResponse = paginatedResponse(ResponseTemplate)
 /**
  * Template list response (OpenAPI documented)
  */
-export const TemplateListResponseSchema = TemplateListResponse.openapi('TemplateListResponse', {
-  description: 'Paginated list of response templates',
-})
+export const TemplateListResponseSchema = TemplateListResponse.openapi(
+  'TemplateListResponse',
+  {
+    description: 'Paginated list of response templates',
+  },
+)
 
 export type TemplateListResponse = z.infer<typeof TemplateListResponse>
 
@@ -421,9 +436,10 @@ const AgentPerformanceResponseBase = z.object({
 /**
  * Agent performance response (OpenAPI documented)
  */
-export const AgentPerformanceResponseSchema = AgentPerformanceResponseBase.openapi('AgentPerformanceResponse', {
-  description: 'Individual agent performance metrics',
-})
+export const AgentPerformanceResponseSchema =
+  AgentPerformanceResponseBase.openapi('AgentPerformanceResponse', {
+    description: 'Individual agent performance metrics',
+  })
 
 export const AgentPerformanceResponse = AgentPerformanceResponseBase
 
@@ -450,9 +466,12 @@ export const AdminGetAllCommentsQuery = z.object({
 /**
  * Admin get all comments query parameters (OpenAPI documented)
  */
-export const AdminGetAllCommentsQuerySchema = AdminGetAllCommentsQuery.openapi('AdminGetAllCommentsQuery', {
-  description: 'Query parameters for admin comment listing',
-})
+export const AdminGetAllCommentsQuerySchema = AdminGetAllCommentsQuery.openapi(
+  'AdminGetAllCommentsQuery',
+  {
+    description: 'Query parameters for admin comment listing',
+  },
+)
 
 export type AdminGetAllCommentsQuery = z.infer<typeof AdminGetAllCommentsQuery>
 
@@ -466,9 +485,11 @@ export const AdminCommentsByProblemQuery = SearchParams.extend({
 /**
  * Admin get comments by problem query parameters (OpenAPI documented)
  */
-export const AdminCommentsByProblemQuerySchema = AdminCommentsByProblemQuery.openapi('AdminCommentsByProblemQuery', {
-  description: 'Query parameters for getting comments by problem ID with pagination',
-})
+export const AdminCommentsByProblemQuerySchema =
+  AdminCommentsByProblemQuery.openapi('AdminCommentsByProblemQuery', {
+    description:
+      'Query parameters for getting comments by problem ID with pagination',
+  })
 
 export type AdminCommentsByProblemQuery = z.infer<
   typeof AdminCommentsByProblemQuery
@@ -484,8 +505,11 @@ export const AdminTicketByIdQuery = z.object({
 /**
  * Admin get ticket by ID query parameters (OpenAPI documented)
  */
-export const AdminTicketByIdQuerySchema = AdminTicketByIdQuery.openapi('AdminTicketByIdQuery', {
-  description: 'Query parameters for getting a single ticket',
-})
+export const AdminTicketByIdQuerySchema = AdminTicketByIdQuery.openapi(
+  'AdminTicketByIdQuery',
+  {
+    description: 'Query parameters for getting a single ticket',
+  },
+)
 
 export type AdminTicketByIdQuery = z.infer<typeof AdminTicketByIdQuery>

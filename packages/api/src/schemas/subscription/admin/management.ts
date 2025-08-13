@@ -1,6 +1,7 @@
-import { SubscriptionSortBy } from '@pika/types'
+import { Currency, PlanSortBy, SubscriptionSortBy } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
@@ -30,9 +31,10 @@ export const AdminGetSubscriptionsQuery = SearchParams.extend({
   sortBy: SubscriptionSortBySchema.default(SubscriptionSortBy.CREATED_AT),
 })
 
-export const AdminGetSubscriptionsQuerySchema = AdminGetSubscriptionsQuery.openapi('AdminGetSubscriptionsQuery', {
-  description: 'Query parameters for admin subscription listing',
-})
+export const AdminGetSubscriptionsQuerySchema =
+  AdminGetSubscriptionsQuery.openapi('AdminGetSubscriptionsQuery', {
+    description: 'Query parameters for admin subscription listing',
+  })
 
 export type AdminGetSubscriptionsQuery = z.infer<
   typeof AdminGetSubscriptionsQuery
@@ -51,9 +53,10 @@ export const AdminCreateSubscriptionRequest = z.object({
   metadata: z.record(z.string(), z.any()).optional(),
 })
 
-export const AdminCreateSubscriptionRequestSchema = AdminCreateSubscriptionRequest.openapi('AdminCreateSubscriptionRequest', {
-  description: 'Admin create subscription for any user',
-})
+export const AdminCreateSubscriptionRequestSchema =
+  AdminCreateSubscriptionRequest.openapi('AdminCreateSubscriptionRequest', {
+    description: 'Admin create subscription for any user',
+  })
 
 export type AdminCreateSubscriptionRequest = z.infer<
   typeof AdminCreateSubscriptionRequest
@@ -75,9 +78,10 @@ export const AdminUpdateSubscriptionRequest = z.object({
   stripeCustomerId: z.string().optional(),
 })
 
-export const AdminUpdateSubscriptionRequestSchema = AdminUpdateSubscriptionRequest.openapi('AdminUpdateSubscriptionRequest', {
-  description: 'Admin update subscription with extended options',
-})
+export const AdminUpdateSubscriptionRequestSchema =
+  AdminUpdateSubscriptionRequest.openapi('AdminUpdateSubscriptionRequest', {
+    description: 'Admin update subscription with extended options',
+  })
 
 export type AdminUpdateSubscriptionRequest = z.infer<
   typeof AdminUpdateSubscriptionRequest
@@ -98,9 +102,10 @@ export const AdminSubscriptionResponse = SubscriptionWithPlan.extend({
   createdBy: UserId.optional(),
 })
 
-export const AdminSubscriptionResponseSchema = AdminSubscriptionResponse.openapi('AdminSubscriptionResponse', {
-  description: 'Admin subscription with extended metadata',
-})
+export const AdminSubscriptionResponseSchema =
+  AdminSubscriptionResponse.openapi('AdminSubscriptionResponse', {
+    description: 'Admin subscription with extended metadata',
+  })
 
 export type AdminSubscriptionResponse = z.infer<
   typeof AdminSubscriptionResponse
@@ -130,12 +135,15 @@ export const AdminGetPlansQuery = SearchParams.extend({
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
   search: z.string().optional(),
-  sortBy: z.enum(['name', 'price', 'createdAt', 'updatedAt']).default('name'),
+  sortBy: createZodEnum(PlanSortBy).default(PlanSortBy.NAME),
 })
 
-export const AdminGetPlansQuerySchema = AdminGetPlansQuery.openapi('AdminGetPlansQuery', {
-  description: 'Query parameters for admin plan listing',
-})
+export const AdminGetPlansQuerySchema = AdminGetPlansQuery.openapi(
+  'AdminGetPlansQuery',
+  {
+    description: 'Query parameters for admin plan listing',
+  },
+)
 
 export type AdminGetPlansQuery = z.infer<typeof AdminGetPlansQuery>
 
@@ -146,7 +154,7 @@ export const AdminCreatePlanRequest = z.object({
   name: z.string(),
   description: z.string().optional(),
   price: z.number().nonnegative(),
-  currency: z.string().length(3).default('usd'),
+  currency: z.string().length(3).default(Currency.USD),
   interval: BillingIntervalSchema,
   intervalCount: z.number().int().positive().default(1),
   trialPeriodDays: z.number().int().nonnegative().optional(),
@@ -157,9 +165,12 @@ export const AdminCreatePlanRequest = z.object({
   isActive: z.boolean().default(true),
 })
 
-export const AdminCreatePlanRequestSchema = AdminCreatePlanRequest.openapi('AdminCreatePlanRequest', {
-  description: 'Admin create subscription plan',
-})
+export const AdminCreatePlanRequestSchema = AdminCreatePlanRequest.openapi(
+  'AdminCreatePlanRequest',
+  {
+    description: 'Admin create subscription plan',
+  },
+)
 
 export type AdminCreatePlanRequest = z.infer<typeof AdminCreatePlanRequest>
 
@@ -175,9 +186,12 @@ export const AdminUpdatePlanRequest = z.object({
   trialPeriodDays: z.number().int().nonnegative().optional(),
 })
 
-export const AdminUpdatePlanRequestSchema = AdminUpdatePlanRequest.openapi('AdminUpdatePlanRequest', {
-  description: 'Admin update subscription plan',
-})
+export const AdminUpdatePlanRequestSchema = AdminUpdatePlanRequest.openapi(
+  'AdminUpdatePlanRequest',
+  {
+    description: 'Admin update subscription plan',
+  },
+)
 
 export type AdminUpdatePlanRequest = z.infer<typeof AdminUpdatePlanRequest>
 
@@ -191,9 +205,12 @@ export const AdminPlanResponse = SubscriptionPlan.extend({
   activeSubscriptionCount: z.number().int().nonnegative().optional(),
 })
 
-export const AdminPlanResponseSchema = AdminPlanResponse.openapi('AdminPlanResponse', {
-  description: 'Admin plan with extended metadata',
-})
+export const AdminPlanResponseSchema = AdminPlanResponse.openapi(
+  'AdminPlanResponse',
+  {
+    description: 'Admin plan with extended metadata',
+  },
+)
 
 export type AdminPlanResponse = z.infer<typeof AdminPlanResponse>
 

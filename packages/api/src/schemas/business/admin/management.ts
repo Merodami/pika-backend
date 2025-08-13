@@ -39,10 +39,7 @@ export const AdminBusinessResponse = withTimestamps({
     .optional()
     .describe('Translation key for business description'),
   categoryId: UUID.nullable().describe('Category this business belongs to'),
-  verified: z
-    .boolean()
-    .default(false)
-    .describe('Whether business is verified'),
+  verified: z.boolean().default(false).describe('Whether business is verified'),
   active: z.boolean().default(true).describe('Whether business is active'),
   approved: z
     .boolean()
@@ -80,9 +77,12 @@ export const AdminBusinessResponse = withTimestamps({
 /**
  * Admin business response (OpenAPI documented)
  */
-export const AdminBusinessResponseSchema = AdminBusinessResponse.openapi('AdminBusinessResponse', {
-  description: 'Business information for admin management',
-})
+export const AdminBusinessResponseSchema = AdminBusinessResponse.openapi(
+  'AdminBusinessResponse',
+  {
+    description: 'Business information for admin management',
+  },
+)
 
 export type AdminBusinessResponse = z.infer<typeof AdminBusinessResponse>
 
@@ -104,19 +104,17 @@ export const AdminCreateBusinessRequest = z.object({
     .optional()
     .describe('Business description'),
   categoryId: UUID.describe('Category this business belongs to'),
-  verified: z
-    .boolean()
-    .default(false)
-    .describe('Whether business is verified'),
+  verified: z.boolean().default(false).describe('Whether business is verified'),
   active: z.boolean().default(true).describe('Whether business is active'),
 })
 
 /**
  * Create business request (OpenAPI documented)
  */
-export const AdminCreateBusinessRequestSchema = AdminCreateBusinessRequest.openapi('AdminCreateBusinessRequest', {
-  description: 'Create a new business',
-})
+export const AdminCreateBusinessRequestSchema =
+  AdminCreateBusinessRequest.openapi('AdminCreateBusinessRequest', {
+    description: 'Create a new business',
+  })
 
 export type AdminCreateBusinessRequest = z.infer<
   typeof AdminCreateBusinessRequest
@@ -147,9 +145,10 @@ export const AdminUpdateBusinessRequest = z.object({
 /**
  * Update business request (OpenAPI documented)
  */
-export const AdminUpdateBusinessRequestSchema = AdminUpdateBusinessRequest.openapi('AdminUpdateBusinessRequest', {
-  description: 'Update business information',
-})
+export const AdminUpdateBusinessRequestSchema =
+  AdminUpdateBusinessRequest.openapi('AdminUpdateBusinessRequest', {
+    description: 'Update business information',
+  })
 
 export type AdminUpdateBusinessRequest = z.infer<
   typeof AdminUpdateBusinessRequest
@@ -189,9 +188,12 @@ export const AdminBusinessQueryParams = SearchParams.extend({
 /**
  * Admin business search/filter parameters (OpenAPI documented)
  */
-export const AdminBusinessQueryParamsSchema = AdminBusinessQueryParams.openapi('AdminBusinessQueryParams', {
-  description: 'Admin business search and filter parameters',
-})
+export const AdminBusinessQueryParamsSchema = AdminBusinessQueryParams.openapi(
+  'AdminBusinessQueryParams',
+  {
+    description: 'Admin business search and filter parameters',
+  },
+)
 
 export type AdminBusinessQueryParams = z.infer<typeof AdminBusinessQueryParams>
 
@@ -207,9 +209,10 @@ export const AdminBusinessListResponse = paginatedResponse(
 /**
  * Admin paginated business list response (OpenAPI documented)
  */
-export const AdminBusinessListResponseSchema = AdminBusinessListResponse.openapi('AdminBusinessListResponse', {
-  description: 'Paginated list of businesses for admin management',
-})
+export const AdminBusinessListResponseSchema =
+  AdminBusinessListResponse.openapi('AdminBusinessListResponse', {
+    description: 'Paginated list of businesses for admin management',
+  })
 
 export type AdminBusinessListResponse = z.infer<
   typeof AdminBusinessListResponse
@@ -227,9 +230,13 @@ export const AdminToggleBusinessVerificationRequest = z.object({
 /**
  * Toggle business verification request (OpenAPI documented)
  */
-export const AdminToggleBusinessVerificationRequestSchema = AdminToggleBusinessVerificationRequest.openapi('AdminToggleBusinessVerificationRequest', {
-  description: 'Toggle business verification status',
-})
+export const AdminToggleBusinessVerificationRequestSchema =
+  AdminToggleBusinessVerificationRequest.openapi(
+    'AdminToggleBusinessVerificationRequest',
+    {
+      description: 'Toggle business verification status',
+    },
+  )
 
 export type AdminToggleBusinessVerificationRequest = z.infer<
   typeof AdminToggleBusinessVerificationRequest
@@ -245,9 +252,13 @@ export const AdminToggleBusinessActivationRequest = z.object({
 /**
  * Toggle business activation request (OpenAPI documented)
  */
-export const AdminToggleBusinessActivationRequestSchema = AdminToggleBusinessActivationRequest.openapi('AdminToggleBusinessActivationRequest', {
-  description: 'Toggle business activation status',
-})
+export const AdminToggleBusinessActivationRequestSchema =
+  AdminToggleBusinessActivationRequest.openapi(
+    'AdminToggleBusinessActivationRequest',
+    {
+      description: 'Toggle business activation status',
+    },
+  )
 
 export type AdminToggleBusinessActivationRequest = z.infer<
   typeof AdminToggleBusinessActivationRequest
@@ -268,9 +279,10 @@ export const AdminBulkBusinessUpdateRequest = z.object({
 /**
  * Bulk business update request (OpenAPI documented)
  */
-export const AdminBulkBusinessUpdateRequestSchema = AdminBulkBusinessUpdateRequest.openapi('AdminBulkBusinessUpdateRequest', {
-  description: 'Update multiple businesses at once',
-})
+export const AdminBulkBusinessUpdateRequestSchema =
+  AdminBulkBusinessUpdateRequest.openapi('AdminBulkBusinessUpdateRequest', {
+    description: 'Update multiple businesses at once',
+  })
 
 export type AdminBulkBusinessUpdateRequest = z.infer<
   typeof AdminBulkBusinessUpdateRequest
@@ -295,9 +307,13 @@ export const AdminBulkBusinessOperationResponse = z.object({
 /**
  * Bulk operation response (OpenAPI documented)
  */
-export const AdminBulkBusinessOperationResponseSchema = AdminBulkBusinessOperationResponse.openapi('AdminBulkBusinessOperationResponse', {
-  description: 'Bulk business operation result',
-})
+export const AdminBulkBusinessOperationResponseSchema =
+  AdminBulkBusinessOperationResponse.openapi(
+    'AdminBulkBusinessOperationResponse',
+    {
+      description: 'Bulk business operation result',
+    },
+  )
 
 export type AdminBulkBusinessOperationResponse = z.infer<
   typeof AdminBulkBusinessOperationResponse
@@ -315,9 +331,10 @@ export const AdminBulkDeleteBusinessesRequest = z.object({
 /**
  * Bulk delete businesses request (OpenAPI documented)
  */
-export const AdminBulkDeleteBusinessesRequestSchema = AdminBulkDeleteBusinessesRequest.openapi('AdminBulkDeleteBusinessesRequest', {
-  description: 'Delete multiple businesses',
-})
+export const AdminBulkDeleteBusinessesRequestSchema =
+  AdminBulkDeleteBusinessesRequest.openapi('AdminBulkDeleteBusinessesRequest', {
+    description: 'Delete multiple businesses',
+  })
 
 export type AdminBulkDeleteBusinessesRequest = z.infer<
   typeof AdminBulkDeleteBusinessesRequest
@@ -337,9 +354,10 @@ export const AdminUpdateBusinessRatingRequest = z.object({
 /**
  * Update business rating request (OpenAPI documented)
  */
-export const AdminUpdateBusinessRatingRequestSchema = AdminUpdateBusinessRatingRequest.openapi('AdminUpdateBusinessRatingRequest', {
-  description: 'Update business rating data',
-})
+export const AdminUpdateBusinessRatingRequestSchema =
+  AdminUpdateBusinessRatingRequest.openapi('AdminUpdateBusinessRatingRequest', {
+    description: 'Update business rating data',
+  })
 
 export type AdminUpdateBusinessRatingRequest = z.infer<
   typeof AdminUpdateBusinessRatingRequest
@@ -357,9 +375,13 @@ export const AdminPatchBusinessVerificationRequest = z.object({
 /**
  * Business verification update request for PATCH endpoint (OpenAPI documented)
  */
-export const AdminPatchBusinessVerificationRequestSchema = AdminPatchBusinessVerificationRequest.openapi('AdminPatchBusinessVerificationRequest', {
-  description: 'Update business verification status via PATCH',
-})
+export const AdminPatchBusinessVerificationRequestSchema =
+  AdminPatchBusinessVerificationRequest.openapi(
+    'AdminPatchBusinessVerificationRequest',
+    {
+      description: 'Update business verification status via PATCH',
+    },
+  )
 
 export type AdminPatchBusinessVerificationRequest = z.infer<
   typeof AdminPatchBusinessVerificationRequest
@@ -373,9 +395,13 @@ export const PatchBusinessVerificationResponse = AdminBusinessResponse
 /**
  * Business verification update response (OpenAPI documented)
  */
-export const PatchBusinessVerificationResponseSchema = PatchBusinessVerificationResponse.openapi('PatchBusinessVerificationResponse', {
-  description: 'Business verification update result',
-})
+export const PatchBusinessVerificationResponseSchema =
+  PatchBusinessVerificationResponse.openapi(
+    'PatchBusinessVerificationResponse',
+    {
+      description: 'Business verification update result',
+    },
+  )
 
 export type PatchBusinessVerificationResponse = z.infer<
   typeof PatchBusinessVerificationResponse
@@ -398,9 +424,10 @@ const BusinessApprovalRequest = z.object({
 /**
  * Business approval request (OpenAPI documented)
  */
-export const AdminBusinessApprovalRequestSchema = BusinessApprovalRequest.openapi('AdminBusinessApprovalRequest', {
-  description: 'Approve or reject a business',
-})
+export const AdminBusinessApprovalRequestSchema =
+  BusinessApprovalRequest.openapi('AdminBusinessApprovalRequest', {
+    description: 'Approve or reject a business',
+  })
 
 export const AdminBusinessApprovalRequest = BusinessApprovalRequest
 
@@ -416,9 +443,10 @@ const BusinessApprovalResponse = AdminBusinessResponse
 /**
  * Business approval response (OpenAPI documented)
  */
-export const AdminBusinessApprovalResponseSchema = BusinessApprovalResponse.openapi('AdminBusinessApprovalResponse', {
-  description: 'Business approval result',
-})
+export const AdminBusinessApprovalResponseSchema =
+  BusinessApprovalResponse.openapi('AdminBusinessApprovalResponse', {
+    description: 'Business approval result',
+  })
 
 export const AdminBusinessApprovalResponse = BusinessApprovalResponse
 

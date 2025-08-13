@@ -1,4 +1,7 @@
+import { DistanceUnit as DistanceUnitEnum } from '@pika/types'
 import { z } from 'zod'
+
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 
 /**
  * Geographic schemas for location-based features
@@ -152,7 +155,9 @@ export const AddressSchema = Address.openapi('Address', {
  */
 export const Distance = z.object({
   value: z.number().nonnegative().describe('Distance value'),
-  unit: z.enum(['km', 'mi']).default('km').describe('Distance unit'),
+  unit: createZodEnum(DistanceUnitEnum)
+    .default(DistanceUnitEnum.KM)
+    .describe('Distance unit'),
 })
 
 export type Distance = z.infer<typeof Distance>
@@ -219,7 +224,10 @@ export const GeoSearch = z.object({
   lat: z.number().min(-90).max(90).describe('Search center latitude'),
   lng: z.number().min(-180).max(180).describe('Search center longitude'),
   radius: z.number().positive().default(10).describe('Search radius'),
-  unit: z.enum(['KM', 'MI']).default('KM').optional().describe('Distance unit'),
+  unit: createZodEnum(DistanceUnitEnum)
+    .default(DistanceUnitEnum.KM)
+    .optional()
+    .describe('Distance unit'),
 })
 
 /**
@@ -231,7 +239,10 @@ export const GeoRadius = z.object({
     .positive()
     .default(10)
     .describe('Search radius in kilometers'),
-  unit: z.enum(['KM', 'MI']).default('KM').optional().describe('Distance unit'),
+  unit: createZodEnum(DistanceUnitEnum)
+    .default(DistanceUnitEnum.KM)
+    .optional()
+    .describe('Distance unit'),
 })
 
 // Export OpenAPI versions for backward compatibility

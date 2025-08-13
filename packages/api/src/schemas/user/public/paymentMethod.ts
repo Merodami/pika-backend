@@ -1,5 +1,16 @@
+import {
+  AccountHolderType as AccountHolderTypeEnum,
+  CardBrand as CardBrandEnum,
+  CardFunding as CardFundingEnum,
+  PaymentUsage as PaymentUsageEnum,
+  PaymentVerificationStatus as PaymentVerificationStatusEnum,
+  UIPaymentMethodType as UIPaymentMethodTypeEnum,
+  WalletType as WalletTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
 import { UUID } from '../../shared/primitives.js'
@@ -10,39 +21,22 @@ import { UUID } from '../../shared/primitives.js'
 
 // ============= Payment Method Types =============
 
-export const PaymentMethodType = z.enum([
-  'CARD',
-  'BANK_ACCOUNT',
-  'PAYPAL',
-  'APPLE_PAY',
-  'GOOGLE_PAY',
-  'WALLET',
-])
-
-export const PaymentMethodTypeSchema = PaymentMethodType.openapi(
-  'PaymentMethodType',
+// Use UI-specific payment method type enum
+export const PaymentMethodTypeSchema = openapi(
+  createZodEnum(UIPaymentMethodTypeEnum),
   {
     description: 'Type of payment method',
-    example: 'CARD',
+    example: UIPaymentMethodTypeEnum.CARD,
   },
 )
 
-export type PaymentMethodType = z.infer<typeof PaymentMethodType>
+export type PaymentMethodType = z.infer<typeof PaymentMethodTypeSchema>
 
-export const CardBrand = z.enum([
-  'VISA',
-  'MASTERCARD',
-  'AMEX',
-  'DISCOVER',
-  'DINERS',
-  'JCB',
-  'UNIONPAY',
-  'UNKNOWN',
-])
+export const CardBrand = createZodEnum(CardBrandEnum)
 
 export const CardBrandSchema = CardBrand.openapi('CardBrand', {
   description: 'Card brand',
-  example: 'VISA',
+  example: CardBrandEnum.VISA,
 })
 
 export type CardBrand = z.infer<typeof CardBrand>
@@ -72,7 +66,7 @@ export const PaymentMethod = withTimestamps({
       expYear: z.number().int().min(new Date().getFullYear()),
       holderName: z.string().optional(),
       country: z.string().length(2).optional(),
-      funding: z.enum(['CREDIT', 'DEBIT', 'PREPAID', 'UNKNOWN']).optional(),
+      funding: createZodEnum(CardFundingEnum).optional(),
     })
     .optional(),
 
@@ -82,7 +76,7 @@ export const PaymentMethod = withTimestamps({
       bankName: z.string().optional(),
       last4: z.string().length(4),
       accountHolderName: z.string(),
-      accountHolderType: z.enum(['INDIVIDUAL', 'COMPANY']),
+      accountHolderType: createZodEnum(AccountHolderTypeEnum),
       country: z.string().length(2),
       currency: z.string().length(3),
     })
@@ -91,7 +85,7 @@ export const PaymentMethod = withTimestamps({
   // Digital wallet details
   wallet: z
     .object({
-      type: z.enum(['APPLE_PAY', 'GOOGLE_PAY', 'SAMSUNG_PAY']),
+      type: createZodEnum(WalletTypeEnum),
       dynamicLast4: z.string().length(4).optional(),
     })
     .optional(),
@@ -248,7 +242,7 @@ export type VerifyPaymentMethodRequest = z.infer<
  * Payment method verification response (raw Zod)
  */
 export const PaymentMethodVerificationResponse = z.object({
-  status: z.enum(['SUCCEEDED', 'REQUIRES_ACTION', 'FAILED']),
+  status: createZodEnum(PaymentVerificationStatusEnum),
   clientSecret: z
     .string()
     .optional()
@@ -288,10 +282,9 @@ export type PaymentMethodVerificationResponse = z.infer<
  */
 export const CreateSetupIntentRequest = z.object({
   paymentMethodTypes: z.array(z.string()).optional().default(['card']),
-  usage: z
-    .enum(['ON_SESSION', 'OFF_SESSION'])
+  usage: createZodEnum(PaymentUsageEnum)
     .optional()
-    .default('OFF_SESSION'),
+    .default(PaymentUsageEnum.OFF_SESSION),
 })
 
 /**

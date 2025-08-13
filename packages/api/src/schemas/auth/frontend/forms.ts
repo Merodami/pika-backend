@@ -1,4 +1,5 @@
 import {
+  RegistrationSource,
   UserRole as UserRoleEnum,
   UserStatus as UserStatusEnum,
 } from '@pika/types'
@@ -204,7 +205,7 @@ export function combineRegistrationSteps(
     ...passwordData,
     ...step3,
     acceptTerms: true as const, // agreedToTerms is already validated as true
-    registrationSource: 'public' as const, // Default to public for frontend registration
+    registrationSource: RegistrationSource.PUBLIC,
   }
 }
 

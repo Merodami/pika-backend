@@ -1,4 +1,8 @@
-import { FIELD_LENGTH, NUMERIC_CONSTRAINTS } from '@pika/types'
+import {
+  Currency as CurrencyEnum,
+  FIELD_LENGTH,
+  NUMERIC_CONSTRAINTS,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -114,7 +118,7 @@ export const CreatePriceRequest = openapi(
   z.object({
     productId: z.string(),
     amount: Money,
-    currency: Currency.default('usd'),
+    currency: Currency.default(CurrencyEnum.USD),
     interval: PriceInterval.optional(),
     intervalCount: z.number().int().positive().optional(),
   }),

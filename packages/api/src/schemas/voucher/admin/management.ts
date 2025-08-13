@@ -38,9 +38,7 @@ export const AdminVoucherDetailResponse = withTimestampsString({
 
   // Resolved content only - no translation keys exposed
   title: z.string().describe('Voucher title in requested language'),
-  description: z
-    .string()
-    .describe('Voucher description in requested language'),
+  description: z.string().describe('Voucher description in requested language'),
   terms: z
     .string()
     .describe('Voucher terms and conditions in requested language'),
@@ -109,10 +107,11 @@ export const AdminVoucherDetailResponse = withTimestampsString({
   daysUntilExpiry: z.number().int().nullable(),
 })
 
-export const AdminVoucherDetailResponseSchema = AdminVoucherDetailResponse.openapi('AdminVoucherDetailResponse', {
-  description:
-    'Detailed voucher information for admin with industry-standard include relations',
-})
+export const AdminVoucherDetailResponseSchema =
+  AdminVoucherDetailResponse.openapi('AdminVoucherDetailResponse', {
+    description:
+      'Detailed voucher information for admin with industry-standard include relations',
+  })
 
 export type AdminVoucherDetailResponse = z.infer<
   typeof AdminVoucherDetailResponse
@@ -181,9 +180,10 @@ export const AdminCreateVoucherRequest = z.object({
   metadata: z.record(z.string(), z.any()).nullable().optional(),
 })
 
-export const AdminCreateVoucherRequestSchema = AdminCreateVoucherRequest.openapi('AdminCreateVoucherRequest', {
-  description: 'Create new voucher with translations',
-})
+export const AdminCreateVoucherRequestSchema =
+  AdminCreateVoucherRequest.openapi('AdminCreateVoucherRequest', {
+    description: 'Create new voucher with translations',
+  })
 
 export type AdminCreateVoucherRequest = z.infer<
   typeof AdminCreateVoucherRequest
@@ -230,9 +230,10 @@ export const AdminUpdateVoucherRequest = z.object({
   metadata: z.record(z.string(), z.any()).nullable().optional(),
 })
 
-export const AdminUpdateVoucherRequestSchema = AdminUpdateVoucherRequest.openapi('AdminUpdateVoucherRequest', {
-  description: 'Update voucher information and translations',
-})
+export const AdminUpdateVoucherRequestSchema =
+  AdminUpdateVoucherRequest.openapi('AdminUpdateVoucherRequest', {
+    description: 'Update voucher information and translations',
+  })
 
 export type AdminUpdateVoucherRequest = z.infer<
   typeof AdminUpdateVoucherRequest
@@ -246,9 +247,10 @@ export const AdminUpdateVoucherStateRequest = z.object({
   reason: z.string().max(500).optional(),
 })
 
-export const AdminUpdateVoucherStateRequestSchema = AdminUpdateVoucherStateRequest.openapi('AdminUpdateVoucherStateRequest', {
-  description: 'Update voucher state',
-})
+export const AdminUpdateVoucherStateRequestSchema =
+  AdminUpdateVoucherStateRequest.openapi('AdminUpdateVoucherStateRequest', {
+    description: 'Update voucher state',
+  })
 
 export type AdminUpdateVoucherStateRequest = z.infer<
   typeof AdminUpdateVoucherStateRequest
@@ -266,9 +268,10 @@ export const AdminGenerateVoucherCodesRequest = z.object({
     .describe('Custom codes (for STATIC type)'),
 })
 
-export const AdminGenerateVoucherCodesRequestSchema = AdminGenerateVoucherCodesRequest.openapi('AdminGenerateVoucherCodesRequest', {
-  description: 'Generate voucher codes',
-})
+export const AdminGenerateVoucherCodesRequestSchema =
+  AdminGenerateVoucherCodesRequest.openapi('AdminGenerateVoucherCodesRequest', {
+    description: 'Generate voucher codes',
+  })
 
 export type AdminGenerateVoucherCodesRequest = z.infer<
   typeof AdminGenerateVoucherCodesRequest
@@ -281,9 +284,10 @@ export const AdminUploadVoucherImageRequest = z.object({
   file: z.any().describe('Image file (multipart/form-data)'),
 })
 
-export const AdminUploadVoucherImageRequestSchema = AdminUploadVoucherImageRequest.openapi('AdminUploadVoucherImageRequest', {
-  description: 'Upload voucher image',
-})
+export const AdminUploadVoucherImageRequestSchema =
+  AdminUploadVoucherImageRequest.openapi('AdminUploadVoucherImageRequest', {
+    description: 'Upload voucher image',
+  })
 
 export type AdminUploadVoucherImageRequest = z.infer<
   typeof AdminUploadVoucherImageRequest
@@ -296,9 +300,10 @@ export const AdminUploadVoucherImageResponse = z.object({
   imageUrl: z.string().url().describe('URL of the uploaded image'),
 })
 
-export const AdminUploadVoucherImageResponseSchema = AdminUploadVoucherImageResponse.openapi('AdminUploadVoucherImageResponse', {
-  description: 'Voucher image upload response',
-})
+export const AdminUploadVoucherImageResponseSchema =
+  AdminUploadVoucherImageResponse.openapi('AdminUploadVoucherImageResponse', {
+    description: 'Voucher image upload response',
+  })
 
 export type AdminUploadVoucherImageResponse = z.infer<
   typeof AdminUploadVoucherImageResponse
@@ -317,9 +322,13 @@ export const AdminUpdateVoucherTranslationsRequest = z.object({
   }),
 })
 
-export const AdminUpdateVoucherTranslationsRequestSchema = AdminUpdateVoucherTranslationsRequest.openapi('AdminUpdateVoucherTranslationsRequest', {
-  description: 'Update voucher translations for multiple languages',
-})
+export const AdminUpdateVoucherTranslationsRequestSchema =
+  AdminUpdateVoucherTranslationsRequest.openapi(
+    'AdminUpdateVoucherTranslationsRequest',
+    {
+      description: 'Update voucher translations for multiple languages',
+    },
+  )
 
 export type AdminUpdateVoucherTranslationsRequest = z.infer<
   typeof AdminUpdateVoucherTranslationsRequest
@@ -337,9 +346,10 @@ export const AdminVoucherTranslationsResponse = z.object({
   }),
 })
 
-export const AdminVoucherTranslationsResponseSchema = AdminVoucherTranslationsResponse.openapi('AdminVoucherTranslationsResponse', {
-  description: 'Voucher translations for all languages',
-})
+export const AdminVoucherTranslationsResponseSchema =
+  AdminVoucherTranslationsResponse.openapi('AdminVoucherTranslationsResponse', {
+    description: 'Voucher translations for all languages',
+  })
 
 export type AdminVoucherTranslationsResponse = z.infer<
   typeof AdminVoucherTranslationsResponse
@@ -361,9 +371,10 @@ export const AdminBulkVoucherUpdateRequest = z.object({
   reason: z.string().max(500),
 })
 
-export const AdminBulkVoucherUpdateRequestSchema = AdminBulkVoucherUpdateRequest.openapi('AdminBulkVoucherUpdateRequest', {
-  description: 'Update multiple vouchers at once',
-})
+export const AdminBulkVoucherUpdateRequestSchema =
+  AdminBulkVoucherUpdateRequest.openapi('AdminBulkVoucherUpdateRequest', {
+    description: 'Update multiple vouchers at once',
+  })
 
 export type AdminBulkVoucherUpdateRequest = z.infer<
   typeof AdminBulkVoucherUpdateRequest
@@ -378,7 +389,8 @@ export const AdminBulkVoucherOperationResponse = createBulkOperationResponse(
   UUID,
 )
 
-export const AdminBulkVoucherOperationResponseSchema = AdminBulkVoucherOperationResponse
+export const AdminBulkVoucherOperationResponseSchema =
+  AdminBulkVoucherOperationResponse
 
 export type AdminBulkVoucherOperationResponse = z.infer<
   typeof AdminBulkVoucherOperationResponse
@@ -412,9 +424,10 @@ export const AdminVoucherAnalyticsResponse = z.object({
   ),
 })
 
-export const AdminVoucherAnalyticsResponseSchema = AdminVoucherAnalyticsResponse.openapi('AdminVoucherAnalyticsResponse', {
-  description: 'Voucher analytics data',
-})
+export const AdminVoucherAnalyticsResponseSchema =
+  AdminVoucherAnalyticsResponse.openapi('AdminVoucherAnalyticsResponse', {
+    description: 'Voucher analytics data',
+  })
 
 export type AdminVoucherAnalyticsResponse = z.infer<
   typeof AdminVoucherAnalyticsResponse
@@ -451,9 +464,13 @@ export const AdminBusinessVoucherStatsResponse = z.object({
     .max(10),
 })
 
-export const AdminBusinessVoucherStatsResponseSchema = AdminBusinessVoucherStatsResponse.openapi('AdminBusinessVoucherStatsResponse', {
-  description: 'Business voucher statistics',
-})
+export const AdminBusinessVoucherStatsResponseSchema =
+  AdminBusinessVoucherStatsResponse.openapi(
+    'AdminBusinessVoucherStatsResponse',
+    {
+      description: 'Business voucher statistics',
+    },
+  )
 
 export type AdminBusinessVoucherStatsResponse = z.infer<
   typeof AdminBusinessVoucherStatsResponse

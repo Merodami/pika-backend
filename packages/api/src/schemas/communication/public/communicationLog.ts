@@ -1,3 +1,9 @@
+import {
+  CommunicationDirection as CommunicationDirectionEnum,
+  CommunicationGroupBy as CommunicationGroupByEnum,
+  CommunicationLogSortBy as CommunicationLogSortByEnum,
+  CommunicationStatus as CommunicationStatusEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -95,8 +101,10 @@ export type CommunicationLogResponse = z.infer<typeof CommunicationLogResponse>
 export const CreateCommunicationLogRequest = openapi(
   z.object({
     channel: CommunicationChannel,
-    direction: CommunicationDirection.default('outbound'),
-    status: CommunicationStatus.default('pending'),
+    direction: CommunicationDirection.default(
+      CommunicationDirectionEnum.OUTBOUND,
+    ),
+    status: CommunicationStatus.default(CommunicationStatusEnum.PENDING),
     userId: UserId.optional(),
     recipient: z.string().optional(),
     sender: z.string().optional(),
@@ -199,7 +207,7 @@ export const CommunicationLogSearchParams = SearchParams.merge(
   hasOpened: z.boolean().optional(),
   hasClicked: z.boolean().optional(),
   hasFailed: z.boolean().optional(),
-  sortBy: CommunicationLogSortBy.default('createdAt'),
+  sortBy: CommunicationLogSortBy.default(CommunicationLogSortByEnum.CREATED_AT),
 })
 
 export type CommunicationLogSearchParams = z.infer<
@@ -224,7 +232,7 @@ export const CommunicationAnalyticsRequest = z.object({
   channel: CommunicationChannel.optional(),
   fromDate: DateTime,
   toDate: DateTime,
-  groupBy: CommunicationGroupBy.default('day'),
+  groupBy: CommunicationGroupBy.default(CommunicationGroupByEnum.DAY),
   userId: UserId.optional(),
   templateId: UUID.optional(),
   provider: z.string().optional(),

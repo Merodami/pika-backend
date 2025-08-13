@@ -4,6 +4,7 @@ import {
   NUMERIC_CONSTRAINTS,
 } from '@pika/types'
 import { z } from 'zod'
+
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { CategoryResponse } from '../../category/public/category.js'
 import { UserId } from '../../shared/branded.js'
@@ -37,10 +38,7 @@ export const BusinessResponse = withTimestamps({
     .optional()
     .describe('Translation key for business description'),
   categoryId: UUID.describe('Category this business belongs to'),
-  verified: z
-    .boolean()
-    .default(false)
-    .describe('Whether business is verified'),
+  verified: z.boolean().default(false).describe('Whether business is verified'),
   active: z.boolean().default(true).describe('Whether business is active'),
   avgRating: z
     .number()
@@ -127,12 +125,10 @@ export const BusinessDetailQueryParams =
 /**
  * Business detail query parameters (OpenAPI documented)
  */
-export const BusinessDetailQueryParamsSchema = BusinessDetailQueryParams.openapi(
-  'BusinessDetailQueryParams',
-  {
+export const BusinessDetailQueryParamsSchema =
+  BusinessDetailQueryParams.openapi('BusinessDetailQueryParams', {
     description: 'Business detail query parameters',
-  },
-)
+  })
 
 export type BusinessDetailQueryParams = z.infer<
   typeof BusinessDetailQueryParams
@@ -170,12 +166,10 @@ export const BusinessesByCategoryResponse = z.object({
 /**
  * Businesses by category response (OpenAPI documented)
  */
-export const BusinessesByCategoryResponseSchema = BusinessesByCategoryResponse.openapi(
-  'BusinessesByCategoryResponse',
-  {
+export const BusinessesByCategoryResponseSchema =
+  BusinessesByCategoryResponse.openapi('BusinessesByCategoryResponse', {
     description: 'Businesses grouped by category',
-  },
-)
+  })
 
 export type BusinessesByCategoryResponse = z.infer<
   typeof BusinessesByCategoryResponse

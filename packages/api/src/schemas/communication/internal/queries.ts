@@ -1,3 +1,7 @@
+import {
+  CommunicationLogSortBy as CommunicationLogSortByEnum,
+  NotificationSortBy as NotificationSortByEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -26,7 +30,9 @@ export const InternalEmailHistoryParams = openapi(
     status: EmailStatus.optional(),
     startDate: DateTime.optional(),
     endDate: DateTime.optional(),
-    sortBy: CommunicationLogSortBy.default('createdAt'),
+    sortBy: CommunicationLogSortBy.default(
+      CommunicationLogSortByEnum.CREATED_AT,
+    ),
   }),
   {
     description: 'Query parameters for internal email history',
@@ -47,7 +53,7 @@ export const InternalNotificationsParams = openapi(
   SearchParams.extend({
     userId: UserId,
     isRead: z.boolean().optional(),
-    sortBy: NotificationSortBy.default('createdAt'),
+    sortBy: NotificationSortBy.default(NotificationSortByEnum.CREATED_AT),
   }),
   {
     description: 'Query parameters for internal notifications',

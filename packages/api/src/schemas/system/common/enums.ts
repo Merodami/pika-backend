@@ -1,52 +1,64 @@
+import {
+  AlertSeverity as AlertSeverityEnum,
+  LogLevel as LogLevelEnum,
+  MaintenanceStatus as MaintenanceStatusEnum,
+  MaintenanceType as MaintenanceTypeEnum,
+  SystemComponentType as SystemComponentTypeEnum,
+  SystemMetricType as SystemMetricTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
+import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
+
 /**
- * System service enums
+ * System service enum schemas
  */
 
-export const SystemComponentType = z.enum([
-  'API_GATEWAY',
-  'DATABASE',
-  'CACHE',
-  'MESSAGE_QUEUE',
-  'STORAGE',
-  'EMAIL',
-  'SMS',
-  'MONITORING',
-])
-export type SystemComponentType = z.infer<typeof SystemComponentType>
+export const SystemComponentTypeSchema = openapi(
+  createZodEnum(SystemComponentTypeEnum),
+  {
+    description: 'System component type for monitoring',
+    example: SystemComponentTypeEnum.DATABASE,
+  },
+)
+export type SystemComponentType = z.infer<typeof SystemComponentTypeSchema>
 
-export const MaintenanceType = z.enum([
-  'SCHEDULED',
-  'EMERGENCY',
-  'UPGRADE',
-  'PATCH',
-  'ROLLBACK',
-])
-export type MaintenanceType = z.infer<typeof MaintenanceType>
+export const MaintenanceTypeSchema = openapi(
+  createZodEnum(MaintenanceTypeEnum),
+  {
+    description: 'Type of maintenance operation',
+    example: MaintenanceTypeEnum.SCHEDULED,
+  },
+)
+export type MaintenanceType = z.infer<typeof MaintenanceTypeSchema>
 
-export const MaintenanceStatus = z.enum([
-  'SCHEDULED',
-  'IN_PROGRESS',
-  'COMPLETED',
-  'CANCELLED',
-  'FAILED',
-])
-export type MaintenanceStatus = z.infer<typeof MaintenanceStatus>
+export const MaintenanceStatusSchema = openapi(
+  createZodEnum(MaintenanceStatusEnum),
+  {
+    description: 'Status of maintenance operation',
+    example: MaintenanceStatusEnum.SCHEDULED,
+  },
+)
+export type MaintenanceStatus = z.infer<typeof MaintenanceStatusSchema>
 
-export const LogLevel = z.enum(['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL'])
-export type LogLevel = z.infer<typeof LogLevel>
+export const LogLevelSchema = openapi(createZodEnum(LogLevelEnum), {
+  description: 'Log level for system logging',
+  example: LogLevelEnum.INFO,
+})
+export type LogLevel = z.infer<typeof LogLevelSchema>
 
-export const AlertSeverity = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'])
-export type AlertSeverity = z.infer<typeof AlertSeverity>
+export const AlertSeveritySchema = openapi(createZodEnum(AlertSeverityEnum), {
+  description: 'Severity level of system alerts',
+  example: AlertSeverityEnum.MEDIUM,
+})
+export type AlertSeverity = z.infer<typeof AlertSeveritySchema>
 
-export const SystemMetricType = z.enum([
-  'CPU_USAGE',
-  'MEMORY_USAGE',
-  'DISK_USAGE',
-  'NETWORK_IO',
-  'REQUEST_COUNT',
-  'RESPONSE_TIME',
-  'ERROR_RATE',
-])
-export type SystemMetricType = z.infer<typeof SystemMetricType>
+export const SystemMetricTypeSchema = openapi(
+  createZodEnum(SystemMetricTypeEnum),
+  {
+    description: 'Type of system metric for monitoring',
+    example: SystemMetricTypeEnum.CPU_USAGE,
+  },
+)
+export type SystemMetricType = z.infer<typeof SystemMetricTypeSchema>

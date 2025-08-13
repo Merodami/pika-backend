@@ -1,6 +1,7 @@
 import { FileSortBy } from '@pika/types'
 import { NUMERIC_CONSTRAINTS, SortOrder } from '@pika/types'
 import { z } from 'zod'
+
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
@@ -68,10 +69,7 @@ export const FileUploadResponse = z.object({
   provider: StorageProviderSchema,
   url: z.string().url().optional().describe('Presigned URL if applicable'),
   uploadedAt: DateTime,
-  metadata: z
-    .record(z.string(), z.any())
-    .optional()
-    .describe('File metadata'),
+  metadata: z.record(z.string(), z.any()).optional().describe('File metadata'),
 })
 
 /**

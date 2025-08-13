@@ -1,7 +1,17 @@
-import { FIELD_LENGTH } from '@pika/types'
+import {
+  FIELD_LENGTH,
+  StripeCheckoutPaymentStatus as StripeCheckoutPaymentStatusEnum,
+  StripeEventType as StripeEventTypeEnum,
+  StripeInvoiceStatus as StripeInvoiceStatusEnum,
+  StripePaymentIntentStatus as StripePaymentIntentStatusEnum,
+  StripeSubscriptionStatus as StripeSubscriptionStatusEnum,
+  WebhookErrorCode as WebhookErrorCodeEnum,
+  WebhookPaymentPurpose,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Money, UserId } from '../../shared/branded.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
 
@@ -12,19 +22,7 @@ import { DateTime, UUID } from '../../shared/primitives.js'
 
 // ============= Stripe Event Types =============
 
-export const StripeEventType = z.enum([
-  'payment_intent.succeeded',
-  'payment_intent.payment_failed',
-  'payment_intent.canceled',
-  'payment_method.attached',
-  'customer.subscription.created',
-  'customer.subscription.updated',
-  'customer.subscription.deleted',
-  'invoice.payment_succeeded',
-  'invoice.payment_failed',
-  'checkout.session.completed',
-  'checkout.session.expired',
-])
+export const StripeEventType = createZodEnum(StripeEventTypeEnum)
 export type StripeEventType = z.infer<typeof StripeEventType>
 
 // ============= Stripe Objects =============
@@ -39,15 +37,7 @@ export const StripePaymentIntent = z.object({
   currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
   customer: z.string().nullable(),
   metadata: z.record(z.string(), z.string()).default({}),
-  status: z.enum([
-    'requires_payment_method',
-    'requires_confirmation',
-    'requires_action',
-    'processing',
-    'requires_capture',
-    'canceled',
-    'succeeded',
-  ]),
+  status: createZodEnum(StripePaymentIntentStatusEnum),
   created: z.number().int(),
 })
 export type StripePaymentIntent = z.infer<typeof StripePaymentIntent>
@@ -59,15 +49,7 @@ export const StripeSubscription = z.object({
   id: z.string(),
   objectType: z.literal('subscription'),
   customer: z.string(),
-  status: z.enum([
-    'active',
-    'past_due',
-    'unpaid',
-    'canceled',
-    'incomplete',
-    'incomplete_expired',
-    'trialing',
-  ]),
+  status: createZodEnum(StripeSubscriptionStatusEnum),
   current_period_start: z.number().int(),
   current_period_end: z.number().int(),
   metadata: z.record(z.string(), z.string()).default({}),
@@ -86,7 +68,7 @@ export const StripeCheckoutSession = z.object({
   amount_total: z.number().int().nullable(),
   currency: z.string().length(3).nullable(),
   metadata: z.record(z.string(), z.string()).default({}),
-  payment_status: z.enum(['paid', 'unpaid', 'no_payment_required']),
+  payment_status: createZodEnum(StripeCheckoutPaymentStatusEnum),
 })
 export type StripeCheckoutSession = z.infer<typeof StripeCheckoutSession>
 
@@ -101,7 +83,7 @@ export const StripeInvoice = z.object({
   amount_paid: z.number().int(),
   amount_due: z.number().int(),
   currency: z.string().length(FIELD_LENGTH.CURRENCY_LENGTH),
-  status: z.enum(['draft', 'open', 'paid', 'uncollectible', 'void']),
+  status: createZodEnum(StripeInvoiceStatusEnum),
   metadata: z.record(z.string(), z.string()).default({}),
 })
 export type StripeInvoice = z.infer<typeof StripeInvoice>
@@ -355,11 +337,7 @@ export type WebhookResponse = z.infer<typeof WebhookResponse>
 export const WebhookErrorResponse = openapi(
   z.object({
     error: z.object({
-      code: z.enum([
-        'INVALID_SIGNATURE',
-        'PROCESSING_ERROR',
-        'UNKNOWN_EVENT_TYPE',
-      ]),
+      code: createZodEnum(WebhookErrorCodeEnum),
       message: z.string(),
       eventId: z.string().optional(),
       timestamp: DateTime,
@@ -383,7 +361,7 @@ export const WebhookMetadata = z.object({
   sessionId: UUID.optional(),
   creditPackId: UUID.optional(),
   amount: Money.optional(),
-  purpose: z.enum(['CREDITS', 'SUBSCRIPTION', 'SESSION_PAYMENT']).optional(),
+  purpose: createZodEnum(WebhookPaymentPurpose).optional(),
 })
 
 export type WebhookMetadata = z.infer<typeof WebhookMetadata>

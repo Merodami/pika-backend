@@ -1,4 +1,38 @@
+import {
+  AdjustmentReason as AdjustmentReasonEnum,
+  AdjustmentType as AdjustmentTypeEnum,
+  AdminRefundReason as AdminRefundReasonEnum,
+  Currency as CurrencyEnum,
+  DisputeAction as DisputeActionEnum,
+  DisputeStatus as DisputeStatusEnum,
+  EntityType as EntityTypeEnum,
+  InternalTransactionType as InternalTransactionTypeEnum,
+  MembershipAction as MembershipActionEnum,
+  MembershipStatus as MembershipStatusEnum,
+  PaymentMethod as PaymentMethodEnum,
+  PaymentMethodType as PaymentMethodTypeEnum,
+  PayoutAction as PayoutActionEnum,
+  PayoutStatus as PayoutStatusEnum,
+  PlanType as PlanTypeEnum,
+  PriceInterval as PriceIntervalEnum,
+  ProductType as ProductTypeEnum,
+  PromoCodeSortBy as PromoCodeSortByEnum,
+  PromoCodeStatus as PromoCodeStatusEnum,
+  PromoCodeType as PromoCodeTypeEnum,
+  RefundInitiator as RefundInitiatorEnum,
+  RefundReason as RefundReasonEnum,
+  ReportFormat as ReportFormatEnum,
+  ReportGroupBy as ReportGroupByEnum,
+  ReportPeriod as ReportPeriodEnum,
+  ReportType as ReportTypeEnum,
+  SubscriptionPlanSortBy as SubscriptionPlanSortByEnum,
+  TransactionSortBy as TransactionSortByEnum,
+  TransactionStatus as TransactionStatusEnum,
+  TransactionType as TransactionTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
+
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 /**
  * Payment-specific enums
@@ -6,223 +40,140 @@ import { z } from 'zod'
 
 // ============= Membership Enums =============
 
-export const MembershipStatus = z.enum([
-  'active',
-  'pastDue',
-  'canceled',
-  'incomplete',
-  'incompleteExpired',
-  'trialing',
-  'unpaid',
-])
+export const MembershipStatus = createZodEnum(MembershipStatusEnum)
 
 export type MembershipStatus = z.infer<typeof MembershipStatus>
 
-export const PlanType = z.enum(['basic', 'premium', 'elite', 'custom'])
+export const PlanType = createZodEnum(PlanTypeEnum)
 
 export type PlanType = z.infer<typeof PlanType>
 
-export const MembershipAction = z.enum([
-  'created',
-  'upgraded',
-  'downgraded',
-  'cancelled',
-  'reactivated',
-  'expired',
-  'paymentFailed',
-  'renewed',
-])
+export const MembershipAction = createZodEnum(MembershipActionEnum)
 
 export type MembershipAction = z.infer<typeof MembershipAction>
 
 // ============= Product Enums =============
 
-export const ProductType = z.enum([
-  'membership',
-  'merchandise',
-  'service',
-  'other',
-])
+export const ProductType = createZodEnum(ProductTypeEnum)
 
 export type ProductType = z.infer<typeof ProductType>
 
-export const PriceInterval = z.enum(['day', 'week', 'month', 'year'])
+export const PriceInterval = createZodEnum(PriceIntervalEnum)
 
 export type PriceInterval = z.infer<typeof PriceInterval>
 
-export const Currency = z.enum(['usd', 'eur', 'gbp'])
+export const Currency = createZodEnum(CurrencyEnum)
 
 export type Currency = z.infer<typeof Currency>
 
 // ============= Transaction Enums =============
 
-export const TransactionType = z.enum([
-  'payment',
-  'refund',
-  'transfer',
-  'payout',
-  'adjustment',
-])
+export const TransactionType = createZodEnum(TransactionTypeEnum)
 
 export type TransactionType = z.infer<typeof TransactionType>
 
-export const TransactionStatus = z.enum([
-  'pending',
-  'processing',
-  'completed',
-  'failed',
-  'cancelled',
-])
+export const TransactionStatus = createZodEnum(TransactionStatusEnum)
 
 export type TransactionStatus = z.infer<typeof TransactionStatus>
 
-export const PaymentMethod = z.enum(['card', 'bankTransfer', 'wallet', 'cash'])
+export const PaymentMethod = createZodEnum(PaymentMethodEnum)
 
 export type PaymentMethod = z.infer<typeof PaymentMethod>
 
-export const TransactionSortBy = z.enum(['createdAt', 'amount', 'processedAt'])
+export const TransactionSortBy = createZodEnum(TransactionSortByEnum)
 
 export type TransactionSortBy = z.infer<typeof TransactionSortBy>
 
 // ============= Internal Service Enums =============
 
-export const InternalTransactionType = z.enum([
-  'subscription',
-  'refund',
-  'transfer',
-])
+export const InternalTransactionType = createZodEnum(
+  InternalTransactionTypeEnum,
+)
 
 export type InternalTransactionType = z.infer<typeof InternalTransactionType>
 
-export const RefundReason = z.enum([
-  'cancellation',
-  'serviceIssue',
-  'duplicate',
-  'other',
-])
+export const RefundReason = createZodEnum(RefundReasonEnum)
 
 export type RefundReason = z.infer<typeof RefundReason>
 
-export const RefundInitiator = z.enum(['user', 'system', 'admin'])
+export const RefundInitiator = createZodEnum(RefundInitiatorEnum)
 
 export type RefundInitiator = z.infer<typeof RefundInitiator>
 
-export const PaymentMethodType = z.enum(['card', 'bank', 'wallet'])
+export const PaymentMethodType = createZodEnum(PaymentMethodTypeEnum)
 
 export type PaymentMethodType = z.infer<typeof PaymentMethodType>
 
-export const PayoutStatus = z.enum([
-  'scheduled',
-  'processing',
-  'completed',
-  'failed',
-])
+export const PayoutStatus = createZodEnum(PayoutStatusEnum)
 
 export type PayoutStatus = z.infer<typeof PayoutStatus>
 
-export const EntityType = z.enum(['user', 'business'])
+export const EntityType = createZodEnum(EntityTypeEnum)
 
 export type EntityType = z.infer<typeof EntityType>
 
 // ============= Admin Enums =============
 
-export const AdminRefundReason = z.enum([
-  'duplicate',
-  'fraudulent',
-  'customerRequest',
-  'other',
-])
+export const AdminRefundReason = createZodEnum(AdminRefundReasonEnum)
 
 export type AdminRefundReason = z.infer<typeof AdminRefundReason>
 
-export const AdjustmentType = z.enum(['credit', 'debit'])
+export const AdjustmentType = createZodEnum(AdjustmentTypeEnum)
 
 export type AdjustmentType = z.infer<typeof AdjustmentType>
 
-export const AdjustmentReason = z.enum([
-  'compensation',
-  'correction',
-  'promotional',
-  'other',
-])
+export const AdjustmentReason = createZodEnum(AdjustmentReasonEnum)
 
 export type AdjustmentReason = z.infer<typeof AdjustmentReason>
 
-export const PayoutAction = z.enum(['approve', 'reject', 'delay'])
+export const PayoutAction = createZodEnum(PayoutActionEnum)
 
 export type PayoutAction = z.infer<typeof PayoutAction>
 
 // ============= Promo Code Enums =============
 
-export const PromoCodeType = z.enum(['percentage', 'fixedAmount'])
+export const PromoCodeType = createZodEnum(PromoCodeTypeEnum)
 
 export type PromoCodeType = z.infer<typeof PromoCodeType>
 
-export const PromoCodeStatus = z.enum([
-  'active',
-  'expired',
-  'depleted',
-  'disabled',
-])
+export const PromoCodeStatus = createZodEnum(PromoCodeStatusEnum)
 
 export type PromoCodeStatus = z.infer<typeof PromoCodeStatus>
 
 // ============= Report Enums =============
 
-export const ReportType = z.enum([
-  'revenue',
-  'transactions',
-  'payouts',
-  'disputes',
-  'summary',
-])
+export const ReportType = createZodEnum(ReportTypeEnum)
 
 export type ReportType = z.infer<typeof ReportType>
 
-export const ReportPeriod = z.enum(['7d', '30d', '90d', '1y', 'custom'])
+export const ReportPeriod = createZodEnum(ReportPeriodEnum)
 
 export type ReportPeriod = z.infer<typeof ReportPeriod>
 
-export const ReportGroupBy = z.enum(['day', 'week', 'month'])
+export const ReportGroupBy = createZodEnum(ReportGroupByEnum)
 
 export type ReportGroupBy = z.infer<typeof ReportGroupBy>
 
-export const ReportFormat = z.enum(['json', 'csv', 'pdf'])
+export const ReportFormat = createZodEnum(ReportFormatEnum)
 
 export type ReportFormat = z.infer<typeof ReportFormat>
 
 // ============= Dispute Enums =============
 
-export const DisputeStatus = z.enum([
-  'warning',
-  'needsResponse',
-  'underReview',
-  'won',
-  'lost',
-])
+export const DisputeStatus = createZodEnum(DisputeStatusEnum)
 
 export type DisputeStatus = z.infer<typeof DisputeStatus>
 
-export const DisputeAction = z.enum(['accept', 'challenge'])
+export const DisputeAction = createZodEnum(DisputeActionEnum)
 
 export type DisputeAction = z.infer<typeof DisputeAction>
 
 // ============= Sort Enums =============
 
-export const PromoCodeSortBy = z.enum([
-  'code',
-  'createdAt',
-  'usedCount',
-  'validUntil',
-])
+export const PromoCodeSortBy = createZodEnum(PromoCodeSortByEnum)
 
 export type PromoCodeSortBy = z.infer<typeof PromoCodeSortBy>
 
-export const SubscriptionPlanSortBy = z.enum([
-  'name',
-  'price',
-  'createdAt',
-  'activeSubscriptions',
-])
+export const SubscriptionPlanSortBy = createZodEnum(SubscriptionPlanSortByEnum)
 
 export type SubscriptionPlanSortBy = z.infer<typeof SubscriptionPlanSortBy>

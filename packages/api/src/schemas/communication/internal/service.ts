@@ -1,7 +1,16 @@
-import { MessagePriority } from '@pika/types'
+import {
+  CommunicationLogSortBy as CommunicationLogSortByEnum,
+  CommunicationStatus as CommunicationStatusEnum,
+  EmailEvent as EmailEventEnum,
+  InAppNotificationType as InAppNotificationTypeEnum,
+  MessagePriority,
+  NotificationSortBy as NotificationSortByEnum,
+  NotificationType as NotificationTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Email as EmailAddress, UserId } from '../../shared/branded.js'
 import { SearchParams } from '../../shared/pagination.js'
 import { DateTime, UUID } from '../../shared/primitives.js'
@@ -16,7 +25,7 @@ import {
   NotificationPriority,
   NotificationSortBy,
   NotificationType,
-  TemplateKey,
+  EmailTemplateKey,
 } from '../common/enums.js'
 
 /**
@@ -82,7 +91,9 @@ export const InternalEmailHistoryParams = openapi(
     status: EmailStatus.optional(),
     startDate: DateTime.optional(),
     endDate: DateTime.optional(),
-    sortBy: CommunicationLogSortBy.default('createdAt'),
+    sortBy: CommunicationLogSortBy.default(
+      CommunicationLogSortByEnum.CREATED_AT,
+    ),
   }),
   {
     description: 'Query parameters for internal email history',
@@ -101,7 +112,7 @@ export const InternalNotificationsParams = openapi(
   SearchParams.extend({
     userId: UserId,
     isRead: z.boolean().optional(),
-    sortBy: NotificationSortBy.default('createdAt'),
+    sortBy: NotificationSortBy.default(NotificationSortByEnum.CREATED_AT),
   }),
   {
     description: 'Query parameters for internal notifications',
@@ -145,7 +156,7 @@ export const SendSystemNotificationRequest = openapi(
     priority: NotificationPriority.default(MessagePriority.NORMAL),
 
     // Channels
-    channels: z.array(NotificationType).default(['inApp']),
+    channels: z.array(NotificationType).default([NotificationTypeEnum.IN_APP]),
 
     // Template
     templateId: z.string().optional(),
@@ -198,7 +209,7 @@ export type SendSystemNotificationResponse = z.infer<
 export const SendTransactionalEmailRequest = openapi(
   z.object({
     userId: UserId,
-    templateKey: TemplateKey,
+    templateKey: EmailTemplateKey,
     variables: z.record(z.string(), z.any()),
 
     // Override options
@@ -273,7 +284,7 @@ export type SendSMSRequest = z.infer<typeof SendSMSRequest>
 export const SendSMSResponse = openapi(
   z.object({
     messageId: z.string(),
-    status: z.enum(['SENT', 'FAILED', 'QUEUED']),
+    status: createZodEnum(CommunicationStatusEnum),
     errorMessage: z.string().optional(),
   }),
   {
@@ -560,13 +571,7 @@ export const BatchUpdateNotificationStatusRequest = openapi(
       .array(
         z.object({
           messageId: z.string(),
-          status: z.enum([
-            'DELIVERED',
-            'OPENED',
-            'CLICKED',
-            'BOUNCED',
-            'FAILED',
-          ]),
+          status: createZodEnum(EmailEventEnum),
           timestamp: DateTime,
           metadata: z.record(z.string(), z.any()).optional(),
         }),
@@ -637,7 +642,7 @@ export const BatchCreateNotificationsRequest = openapi(
           userId: UserId,
           title: z.string(),
           description: z.string(),
-          type: InAppNotificationType.default('info'),
+          type: InAppNotificationType.default(InAppNotificationTypeEnum.INFO),
           metadata: z.record(z.string(), z.any()).nullish(),
         }),
       )

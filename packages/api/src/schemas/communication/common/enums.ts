@@ -1,4 +1,27 @@
-import { MessagePriority } from '@pika/types'
+import {
+  BounceType as BounceTypeEnum,
+  CommunicationChannel as CommunicationChannelEnum,
+  CommunicationDirection as CommunicationDirectionEnum,
+  CommunicationGroupBy as CommunicationGroupByEnum,
+  CommunicationLogSortBy as CommunicationLogSortByEnum,
+  CommunicationStatus as CommunicationStatusEnum,
+  DevicePlatform as DevicePlatformEnum,
+  EmailEvent as EmailEventEnum,
+  EmailSortBy as EmailSortByEnum,
+  EmailStatus as EmailStatusEnum,
+  EmailTemplateKey as EmailTemplateKeyEnum,
+  InAppNotificationType as InAppNotificationTypeEnum,
+  MessagePriority,
+  MessageType as MessageTypeEnum,
+  NotificationCategory as NotificationCategoryEnum,
+  NotificationSortBy as NotificationSortByEnum,
+  NotificationStatus as NotificationStatusEnum,
+  NotificationType as NotificationTypeEnum,
+  TemplateCategory as TemplateCategoryEnum,
+  TemplateSortBy as TemplateSortByEnum,
+  TemplateType as TemplateTypeEnum,
+  TemplateVariableType as TemplateVariableTypeEnum,
+} from '@pika/types'
 import { z } from 'zod'
 
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
@@ -9,15 +32,7 @@ import { createZodEnum } from '../../../common/utils/zodEnum.js'
 
 // ============= Email Enums =============
 
-export const EmailStatus = z.enum([
-  'queued',
-  'sent',
-  'delivered',
-  'failed',
-  'bounced',
-  'complained',
-  'rejected',
-])
+export const EmailStatus = createZodEnum(EmailStatusEnum)
 
 export const EmailStatusSchema = EmailStatus.openapi('EmailStatus', {
   description: 'Email delivery status',
@@ -30,34 +45,21 @@ export const EmailPriority = createZodEnum(MessagePriority)
 
 export type EmailPriority = z.infer<typeof EmailPriority>
 
-export const BounceType = z.enum(['soft', 'hard'])
+export const BounceType = createZodEnum(BounceTypeEnum)
 
 export type BounceType = z.infer<typeof BounceType>
 
-export const EmailEvent = z.enum([
-  'sent',
-  'delivered',
-  'opened',
-  'clicked',
-  'bounced',
-  'complained',
-  'unsubscribed',
-])
+export const EmailEvent = createZodEnum(EmailEventEnum)
 
 export type EmailEvent = z.infer<typeof EmailEvent>
 
-export const EmailSortBy = z.enum([
-  'createdAt',
-  'sentAt',
-  'deliveredAt',
-  'subject',
-])
+export const EmailSortBy = createZodEnum(EmailSortByEnum)
 
 export type EmailSortBy = z.infer<typeof EmailSortBy>
 
 // ============= Notification Enums =============
 
-export const NotificationType = z.enum(['email', 'inApp', 'sms', 'push'])
+export const NotificationType = createZodEnum(NotificationTypeEnum)
 
 export const NotificationTypeSchema = NotificationType.openapi(
   'NotificationType',
@@ -69,13 +71,7 @@ export const NotificationTypeSchema = NotificationType.openapi(
 
 export type NotificationType = z.infer<typeof NotificationType>
 
-export const NotificationStatus = z.enum([
-  'pending',
-  'sent',
-  'delivered',
-  'failed',
-  'read',
-])
+export const NotificationStatus = createZodEnum(NotificationStatusEnum)
 
 export const NotificationStatusSchema = NotificationStatus.openapi(
   'NotificationStatus',
@@ -91,40 +87,25 @@ export const NotificationPriority = createZodEnum(MessagePriority)
 
 export type NotificationPriority = z.infer<typeof NotificationPriority>
 
-export const NotificationSortBy = z.enum(['createdAt', 'priority', 'expiresAt'])
+export const NotificationSortBy = createZodEnum(NotificationSortByEnum)
 
 export type NotificationSortBy = z.infer<typeof NotificationSortBy>
 
-export const CommunicationLogSortBy = z.enum([
-  'createdAt',
-  'sentAt',
-  'deliveredAt',
-])
+export const CommunicationLogSortBy = createZodEnum(CommunicationLogSortByEnum)
 
 export type CommunicationLogSortBy = z.infer<typeof CommunicationLogSortBy>
 
-export const TemplateSortBy = z.enum([
-  'name',
-  'createdAt',
-  'updatedAt',
-  'category',
-])
+export const TemplateSortBy = createZodEnum(TemplateSortByEnum)
 
 export type TemplateSortBy = z.infer<typeof TemplateSortBy>
 
-export const DevicePlatform = z.enum(['ios', 'android', 'web'])
+export const DevicePlatform = createZodEnum(DevicePlatformEnum)
 
 export type DevicePlatform = z.infer<typeof DevicePlatform>
 
 // ============= Communication Log Enums =============
 
-export const CommunicationChannel = z.enum([
-  'email',
-  'sms',
-  'push',
-  'inApp',
-  'webhook',
-])
+export const CommunicationChannel = createZodEnum(CommunicationChannelEnum)
 
 export const CommunicationChannelSchema = CommunicationChannel.openapi(
   'CommunicationChannel',
@@ -136,14 +117,7 @@ export const CommunicationChannelSchema = CommunicationChannel.openapi(
 
 export type CommunicationChannel = z.infer<typeof CommunicationChannel>
 
-export const CommunicationStatus = z.enum([
-  'pending',
-  'queued',
-  'sent',
-  'delivered',
-  'failed',
-  'cancelled',
-])
+export const CommunicationStatus = createZodEnum(CommunicationStatusEnum)
 
 export const CommunicationStatusSchema = CommunicationStatus.openapi(
   'CommunicationStatus',
@@ -155,77 +129,42 @@ export const CommunicationStatusSchema = CommunicationStatus.openapi(
 
 export type CommunicationStatus = z.infer<typeof CommunicationStatus>
 
-export const CommunicationDirection = z.enum(['inbound', 'outbound'])
+export const CommunicationDirection = createZodEnum(CommunicationDirectionEnum)
 
 export type CommunicationDirection = z.infer<typeof CommunicationDirection>
 
-export const CommunicationGroupBy = z.enum(['day', 'week', 'month'])
+export const CommunicationGroupBy = createZodEnum(CommunicationGroupByEnum)
 
 export type CommunicationGroupBy = z.infer<typeof CommunicationGroupBy>
 
 // ============= Template Enums =============
 
-export const TemplateType = z.enum(['email', 'sms', 'push', 'inApp'])
+export const TemplateType = createZodEnum(TemplateTypeEnum)
 
 export type TemplateType = z.infer<typeof TemplateType>
 
-export const TemplateCategory = z.enum([
-  'transactional',
-  'marketing',
-  'system',
-  'notification',
-])
+export const TemplateCategory = createZodEnum(TemplateCategoryEnum)
 
 export type TemplateCategory = z.infer<typeof TemplateCategory>
 
-export const TemplateVariableType = z.enum([
-  'string',
-  'number',
-  'boolean',
-  'date',
-  'array',
-  'object',
-])
+export const TemplateVariableType = createZodEnum(TemplateVariableTypeEnum)
 
 export type TemplateVariableType = z.infer<typeof TemplateVariableType>
 
 // ============= Internal Service Enums =============
 
-export const NotificationCategory = z.enum([
-  'system',
-  'security',
-  'billing',
-  'marketing',
-])
+export const NotificationCategory = createZodEnum(NotificationCategoryEnum)
 
 export type NotificationCategory = z.infer<typeof NotificationCategory>
 
-export const TemplateKey = z.enum([
-  'welcome',
-  'passwordReset',
-  'emailVerification',
-  'paymentSuccess',
-  'paymentFailed',
-  'subscriptionActivated',
-  'subscriptionCancelled',
-])
+export const EmailTemplateKey = createZodEnum(EmailTemplateKeyEnum)
 
-export type TemplateKey = z.infer<typeof TemplateKey>
+export type EmailTemplateKey = z.infer<typeof EmailTemplateKey>
 
-export const MessageType = z.enum([
-  'verification',
-  'alert',
-  'reminder',
-  'marketing',
-])
+export const MessageType = createZodEnum(MessageTypeEnum)
 
 export type MessageType = z.infer<typeof MessageType>
 
-export const InAppNotificationType = z.enum([
-  'info',
-  'warning',
-  'error',
-  'success',
-])
+export const InAppNotificationType = createZodEnum(InAppNotificationTypeEnum)
 
 export type InAppNotificationType = z.infer<typeof InAppNotificationType>
