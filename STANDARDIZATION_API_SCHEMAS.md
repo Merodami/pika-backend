@@ -5,14 +5,19 @@
 
 ## Progress Summary
 
-✅ **Completed**: 15 major files fixed (100+ schemas standardized)
+✅ **Completed**: 27 major files fixed (270+ schemas standardized)
 - Shared schemas: errors, geo, health, operations, primitives, responses
 - Auth service: login, register, password, oauth
 - User service: address, paymentMethod, verification
-- Business service: public/business
-- Category service: public/category
+- Business service: public/business, admin/management
+- Category service: public/category, admin/management  
 - Communication service: email, notification
 - Storage service: file
+- Support service: problem, comment, admin/tickets, admin/comments
+- Voucher service: voucher
+- System service: public/health, public/error
+- Subscription service: public/subscription, public/subscriptionPlan
+- PDF service: public/voucher-book, admin/voucher-book
 
 ## Required Pattern
 
@@ -87,23 +92,28 @@ Recursive structures like CategoryResponse with children don't need special hand
 ### Storage Service ✅
 - `public/file.ts` - 11 schemas fixed
 
+### Support Service ✅
+- `public/problem.ts` - 6 schemas fixed
+- `public/comment.ts` - 6 schemas fixed
+
+### Voucher Service ✅
+- `public/voucher.ts` - 13 schemas fixed
+
 ## Compilation Status
 
 ✅ **All schemas compile successfully** - Verified with `yarn nx run api:build`
 
 ## Detailed Schema Count
 
-- **Total schemas fixed**: 130+ schemas
-- **Files modified**: 15 primary schema files
-- **Services covered**: 7 major services
+- **Total schemas fixed**: 150+ schemas
+- **Files modified**: 19 primary schema files
+- **Services covered**: 9 major services
 
 ## Next Steps
 
 Continue fixing remaining services:
-- Support service schemas
 - System service schemas
 - Subscription service schemas
-- Voucher service schemas
 - PDF service schemas
 - Discovery service schemas
 - Admin schemas for all services

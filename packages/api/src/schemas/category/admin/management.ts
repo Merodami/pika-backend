@@ -1,7 +1,6 @@
 import { CategorySortBy, FIELD_LENGTH, NUMERIC_CONSTRAINTS } from '@pika/types'
 import { z } from 'zod'
 
-import { openapi } from '../../../common/utils/openapi.js'
 import { optionalBoolean } from '../../../common/utils/validators.js'
 import { UserId } from '../../shared/branded.js'
 import { withTimestamps } from '../../shared/metadata.js'
@@ -77,33 +76,35 @@ export type AdminCategoryResponse = z.infer<typeof AdminCategoryResponse>
 // ============= Create Category =============
 
 /**
- * Create category request
+ * Create category request (raw Zod)
  */
-export const AdminCreateCategoryRequest = openapi(
-  z.object({
-    nameKey: z
-      .string()
-      .min(1)
-      .max(FIELD_LENGTH.SLUG_MAX)
-      .describe('Translation key for category name'),
-    descriptionKey: z
-      .string()
-      .max(FIELD_LENGTH.SLUG_MAX)
-      .optional()
-      .describe('Translation key for category description'),
-    icon: z
-      .string()
-      .max(FIELD_LENGTH.ICON_MAX)
-      .optional()
-      .describe('Category icon identifier'),
-    parentId: UUID.optional().describe('Parent category ID'),
-    isActive: z.boolean().default(true).describe('Whether category is active'),
-    sortOrder: z.number().int().default(0).describe('Sort order for display'),
-  }),
-  {
-    description: 'Create a new category',
-  },
-)
+export const AdminCreateCategoryRequest = z.object({
+  nameKey: z
+    .string()
+    .min(1)
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .describe('Translation key for category name'),
+  descriptionKey: z
+    .string()
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .optional()
+    .describe('Translation key for category description'),
+  icon: z
+    .string()
+    .max(FIELD_LENGTH.ICON_MAX)
+    .optional()
+    .describe('Category icon identifier'),
+  parentId: UUID.optional().describe('Parent category ID'),
+  isActive: z.boolean().default(true).describe('Whether category is active'),
+  sortOrder: z.number().int().default(0).describe('Sort order for display'),
+})
+
+/**
+ * Create category request (OpenAPI documented)
+ */
+export const AdminCreateCategoryRequestSchema = AdminCreateCategoryRequest.openapi('AdminCreateCategoryRequest', {
+  description: 'Create a new category',
+})
 
 export type AdminCreateCategoryRequest = z.infer<
   typeof AdminCreateCategoryRequest
@@ -112,34 +113,36 @@ export type AdminCreateCategoryRequest = z.infer<
 // ============= Update Category =============
 
 /**
- * Update category request
+ * Update category request (raw Zod)
  */
-export const AdminUpdateCategoryRequest = openapi(
-  z.object({
-    nameKey: z
-      .string()
-      .min(1)
-      .max(FIELD_LENGTH.SLUG_MAX)
-      .optional()
-      .describe('Translation key for category name'),
-    descriptionKey: z
-      .string()
-      .max(FIELD_LENGTH.SLUG_MAX)
-      .optional()
-      .describe('Translation key for category description'),
-    icon: z
-      .string()
-      .max(FIELD_LENGTH.ICON_MAX)
-      .optional()
-      .describe('Category icon identifier'),
-    parentId: UUID.optional().describe('Parent category ID'),
-    isActive: z.boolean().optional().describe('Whether category is active'),
-    sortOrder: z.number().int().optional().describe('Sort order for display'),
-  }),
-  {
-    description: 'Update category information',
-  },
-)
+export const AdminUpdateCategoryRequest = z.object({
+  nameKey: z
+    .string()
+    .min(1)
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .optional()
+    .describe('Translation key for category name'),
+  descriptionKey: z
+    .string()
+    .max(FIELD_LENGTH.SLUG_MAX)
+    .optional()
+    .describe('Translation key for category description'),
+  icon: z
+    .string()
+    .max(FIELD_LENGTH.ICON_MAX)
+    .optional()
+    .describe('Category icon identifier'),
+  parentId: UUID.optional().describe('Parent category ID'),
+  isActive: z.boolean().optional().describe('Whether category is active'),
+  sortOrder: z.number().int().optional().describe('Sort order for display'),
+})
+
+/**
+ * Update category request (OpenAPI documented)
+ */
+export const AdminUpdateCategoryRequestSchema = AdminUpdateCategoryRequest.openapi('AdminUpdateCategoryRequest', {
+  description: 'Update category information',
+})
 
 export type AdminUpdateCategoryRequest = z.infer<
   typeof AdminUpdateCategoryRequest
@@ -148,7 +151,7 @@ export type AdminUpdateCategoryRequest = z.infer<
 // ============= Admin Search Categories =============
 
 /**
- * Admin category search/filter parameters
+ * Admin category search/filter parameters (raw Zod)
  */
 export const AdminCategoryQueryParams = SearchParams.extend({
   parentId: UUID.optional().describe('Filter by parent category'),
@@ -157,33 +160,49 @@ export const AdminCategoryQueryParams = SearchParams.extend({
   sortBy: CategorySortBySchema.default(CategorySortBy.SORT_ORDER),
 }).merge(createIncludeParam(CATEGORY_RELATIONS))
 
+/**
+ * Admin category search/filter parameters (OpenAPI documented)
+ */
+export const AdminCategoryQueryParamsSchema = AdminCategoryQueryParams.openapi('AdminCategoryQueryParams', {
+  description: 'Admin category search and filter parameters',
+})
+
 export type AdminCategoryQueryParams = z.infer<typeof AdminCategoryQueryParams>
 
 // ============= Response Types =============
 
 /**
- * Admin paginated category list response
+ * Admin paginated category list response (raw Zod)
  */
 export const AdminCategoryListResponse = paginatedResponse(
   AdminCategoryResponse,
 )
+
+/**
+ * Admin paginated category list response (OpenAPI documented)
+ */
+export const AdminCategoryListResponseSchema = AdminCategoryListResponse.openapi('AdminCategoryListResponse', {
+  description: 'Paginated list of categories for admin management',
+})
 
 export type AdminCategoryListResponse = z.infer<
   typeof AdminCategoryListResponse
 >
 
 /**
- * Admin category tree response (hierarchical structure)
+ * Admin category tree response (hierarchical structure) (raw Zod)
  */
-export const AdminCategoryTreeResponse = openapi(
-  z.object({
-    categories: z.array(AdminCategoryResponse),
-    totalCount: z.number().int().nonnegative(),
-  }),
-  {
-    description: 'Hierarchical category tree structure for admin',
-  },
-)
+export const AdminCategoryTreeResponse = z.object({
+  categories: z.array(AdminCategoryResponse),
+  totalCount: z.number().int().nonnegative(),
+})
+
+/**
+ * Admin category tree response (OpenAPI documented)
+ */
+export const AdminCategoryTreeResponseSchema = AdminCategoryTreeResponse.openapi('AdminCategoryTreeResponse', {
+  description: 'Hierarchical category tree structure for admin',
+})
 
 export type AdminCategoryTreeResponse = z.infer<
   typeof AdminCategoryTreeResponse
@@ -192,98 +211,108 @@ export type AdminCategoryTreeResponse = z.infer<
 // ============= Category Management Actions =============
 
 /**
- * Move category request (change parent)
+ * Move category request (change parent) (raw Zod)
  */
-export const AdminMoveCategoryRequest = openapi(
-  z.object({
-    parentId: UUID.optional().describe(
-      'New parent category ID (null for root level)',
-    ),
-    sortOrder: z
-      .number()
-      .int()
-      .optional()
-      .describe('New sort order within parent'),
-  }),
-  {
-    description: 'Move category to different parent or change sort order',
-  },
-)
+export const AdminMoveCategoryRequest = z.object({
+  parentId: UUID.optional().describe(
+    'New parent category ID (null for root level)',
+  ),
+  sortOrder: z
+    .number()
+    .int()
+    .optional()
+    .describe('New sort order within parent'),
+})
+
+/**
+ * Move category request (OpenAPI documented)
+ */
+export const AdminMoveCategoryRequestSchema = AdminMoveCategoryRequest.openapi('AdminMoveCategoryRequest', {
+  description: 'Move category to different parent or change sort order',
+})
 
 export type AdminMoveCategoryRequest = z.infer<typeof AdminMoveCategoryRequest>
 
 /**
- * Update category sort order request
+ * Update category sort order request (raw Zod)
  */
-export const AdminUpdateCategorySortOrderRequest = openapi(
-  z.object({
-    sortOrder: z.number().int().describe('New sort order value'),
-  }),
-  {
-    description: 'Update category sort order',
-  },
-)
+export const AdminUpdateCategorySortOrderRequest = z.object({
+  sortOrder: z.number().int().describe('New sort order value'),
+})
+
+/**
+ * Update category sort order request (OpenAPI documented)
+ */
+export const AdminUpdateCategorySortOrderRequestSchema = AdminUpdateCategorySortOrderRequest.openapi('AdminUpdateCategorySortOrderRequest', {
+  description: 'Update category sort order',
+})
 
 export type AdminUpdateCategorySortOrderRequest = z.infer<
   typeof AdminUpdateCategorySortOrderRequest
 >
 
 /**
- * Toggle category activation request
+ * Toggle category activation request (raw Zod)
  */
-export const AdminToggleCategoryActivationRequest = openapi(
-  z.object({
-    isActive: z.boolean().describe('New activation status'),
-  }),
-  {
-    description: 'Toggle category activation status',
-  },
-)
+export const AdminToggleCategoryActivationRequest = z.object({
+  isActive: z.boolean().describe('New activation status'),
+})
+
+/**
+ * Toggle category activation request (OpenAPI documented)
+ */
+export const AdminToggleCategoryActivationRequestSchema = AdminToggleCategoryActivationRequest.openapi('AdminToggleCategoryActivationRequest', {
+  description: 'Toggle category activation status',
+})
 
 export type AdminToggleCategoryActivationRequest = z.infer<
   typeof AdminToggleCategoryActivationRequest
 >
 
 /**
- * Bulk category update request
+ * Bulk category update request (raw Zod)
  */
-export const AdminBulkCategoryUpdateRequest = openapi(
-  z.object({
-    categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
-    updates: z.object({
-      isActive: z.boolean().optional(),
-      parentId: UUID.optional(),
-    }),
+export const AdminBulkCategoryUpdateRequest = z.object({
+  categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
+  updates: z.object({
+    isActive: z.boolean().optional(),
+    parentId: UUID.optional(),
   }),
-  {
-    description: 'Update multiple categories at once',
-  },
-)
+})
+
+/**
+ * Bulk category update request (OpenAPI documented)
+ */
+export const AdminBulkCategoryUpdateRequestSchema = AdminBulkCategoryUpdateRequest.openapi('AdminBulkCategoryUpdateRequest', {
+  description: 'Update multiple categories at once',
+})
 
 export type AdminBulkCategoryUpdateRequest = z.infer<
   typeof AdminBulkCategoryUpdateRequest
 >
 
 /**
- * Bulk operation response
+ * Bulk operation response (raw Zod)
  */
-export const AdminBulkCategoryOperationResponse = openapi(
-  z.object({
-    successful: z.number().int().nonnegative(),
-    failed: z.number().int().nonnegative(),
-    errors: z
-      .array(
-        z.object({
-          categoryId: UUID,
-          error: z.string(),
-        }),
-      )
-      .optional(),
-  }),
-  {
-    description: 'Bulk category operation result',
-  },
-)
+export const AdminBulkCategoryOperationResponse = z.object({
+  successful: z.number().int().nonnegative(),
+  failed: z.number().int().nonnegative(),
+  errors: z
+    .array(
+      z.object({
+        categoryId: UUID,
+        error: z.string(),
+      }),
+    )
+    .optional(),
+})
+
+/**
+ * Bulk operation response (OpenAPI documented)
+ */
+export const AdminBulkCategoryOperationResponseSchema = AdminBulkCategoryOperationResponse.openapi('AdminBulkCategoryOperationResponse', {
+  description: 'Bulk category operation result',
+})
 
 export type AdminBulkCategoryOperationResponse = z.infer<
   typeof AdminBulkCategoryOperationResponse
@@ -292,16 +321,18 @@ export type AdminBulkCategoryOperationResponse = z.infer<
 // ============= Bulk Delete Categories =============
 
 /**
- * Bulk delete categories request
+ * Bulk delete categories request (raw Zod)
  */
-export const AdminBulkDeleteCategoriesRequest = openapi(
-  z.object({
-    categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
-  }),
-  {
-    description: 'Delete multiple categories',
-  },
-)
+export const AdminBulkDeleteCategoriesRequest = z.object({
+  categoryIds: z.array(UUID).min(1).max(NUMERIC_CONSTRAINTS.PAGE_SIZE_MAX),
+})
+
+/**
+ * Bulk delete categories request (OpenAPI documented)
+ */
+export const AdminBulkDeleteCategoriesRequestSchema = AdminBulkDeleteCategoriesRequest.openapi('AdminBulkDeleteCategoriesRequest', {
+  description: 'Delete multiple categories',
+})
 
 export type AdminBulkDeleteCategoriesRequest = z.infer<
   typeof AdminBulkDeleteCategoriesRequest

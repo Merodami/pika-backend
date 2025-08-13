@@ -1,7 +1,5 @@
 import { FIELD_LENGTH, VoucherScanSource, VoucherSortBy } from '@pika/types'
 import { z } from 'zod'
-
-import { openapi } from '../../../common/utils/openapi.js'
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { DeviceInfo, DeviceInfoSchema } from '../../shared/device.js'
 import {
@@ -30,14 +28,22 @@ import { VoucherFilterParams } from '../common/queries.js'
 
 // ============= Voucher Code Response =============
 
-export const VoucherCodeResponse = openapi(
-  z.object({
-    id: UUID,
-    code: z.string(),
-    type: VoucherCodeTypeSchema,
-    isActive: z.boolean(),
-    metadata: z.record(z.string(), z.any()).optional(),
-  }),
+/**
+ * Voucher code response (raw Zod)
+ */
+export const VoucherCodeResponse = z.object({
+  id: UUID,
+  code: z.string(),
+  type: VoucherCodeTypeSchema,
+  isActive: z.boolean(),
+  metadata: z.record(z.string(), z.any()).optional(),
+})
+
+/**
+ * Voucher code response (OpenAPI documented)
+ */
+export const VoucherCodeResponseSchema = VoucherCodeResponse.openapi(
+  'VoucherCodeResponse',
   {
     description: 'Voucher code information',
   },
@@ -47,28 +53,36 @@ export type VoucherCodeResponse = z.infer<typeof VoucherCodeResponse>
 
 // ============= Voucher Response =============
 
-export const VoucherResponse = openapi(
-  withTimestampsString({
-    id: UUID,
-    businessId: UUID,
-    categoryId: UUID,
-    state: VoucherStateSchema,
-    title: z.any().describe('Multilingual voucher title'),
-    description: z.any().describe('Multilingual voucher description'),
-    terms: z.any().describe('Multilingual voucher terms'),
-    discountType: VoucherDiscountTypeSchema,
-    discountValue: z.number().min(0),
-    currency: z.string().default('PYG'),
-    location: z.any().nullable().describe('GeoJSON Point or Polygon'),
-    imageUrl: z.string().url().optional().nullable(),
-    validFrom: z.string().datetime(),
-    expiresAt: z.string().datetime(),
-    maxRedemptions: z.number().int().min(1).optional().nullable(),
-    maxRedemptionsPerUser: z.number().int().min(1).default(1),
-    currentRedemptions: z.number().int().min(0).default(0),
-    metadata: z.record(z.string(), z.any()).optional().nullable(),
-    codes: z.array(VoucherCodeResponse).optional(),
-  }),
+/**
+ * Voucher response (raw Zod)
+ */
+export const VoucherResponse = withTimestampsString({
+  id: UUID,
+  businessId: UUID,
+  categoryId: UUID,
+  state: VoucherStateSchema,
+  title: z.any().describe('Multilingual voucher title'),
+  description: z.any().describe('Multilingual voucher description'),
+  terms: z.any().describe('Multilingual voucher terms'),
+  discountType: VoucherDiscountTypeSchema,
+  discountValue: z.number().min(0),
+  currency: z.string().default('PYG'),
+  location: z.any().nullable().describe('GeoJSON Point or Polygon'),
+  imageUrl: z.string().url().optional().nullable(),
+  validFrom: z.string().datetime(),
+  expiresAt: z.string().datetime(),
+  maxRedemptions: z.number().int().min(1).optional().nullable(),
+  maxRedemptionsPerUser: z.number().int().min(1).default(1),
+  currentRedemptions: z.number().int().min(0).default(0),
+  metadata: z.record(z.string(), z.any()).optional().nullable(),
+  codes: z.array(VoucherCodeResponse).optional(),
+})
+
+/**
+ * Voucher response (OpenAPI documented)
+ */
+export const VoucherResponseSchema = VoucherResponse.openapi(
+  'VoucherResponse',
   {
     description: 'Public voucher information',
   },
@@ -78,6 +92,9 @@ export type VoucherResponse = z.infer<typeof VoucherResponse>
 
 // ============= Search Vouchers =============
 
+/**
+ * Voucher query parameters (raw Zod)
+ */
 export const VoucherQueryParams = SearchParams.extend({
   // Filter parameters (from pika-old VoucherSearchQuerySchema)
   businessId: UUID.optional().describe('Filter by business ID'),
@@ -119,6 +136,16 @@ export const VoucherQueryParams = SearchParams.extend({
   .merge(GeoSearchParams)
   .merge(VoucherFilterParams)
 
+/**
+ * Voucher query parameters (OpenAPI documented)
+ */
+export const VoucherQueryParamsSchema = VoucherQueryParams.openapi(
+  'VoucherQueryParams',
+  {
+    description: 'Voucher search and filter parameters',
+  },
+)
+
 export type VoucherQueryParams = z.infer<typeof VoucherQueryParams>
 
 // ============= Voucher Scan Operations =============
@@ -140,34 +167,38 @@ export type VoucherScanRequest = z.infer<typeof VoucherScanRequest>
  * Voucher scan request (OpenAPI documented)
  * Uses Schema versions to generate $ref
  */
-export const VoucherScanRequestSchema = openapi(
-  z.object({
-    scanSource: VoucherScanSourceSchema.optional(),
-    location: CoordinatesSchema.optional(),
-    deviceInfo: DeviceInfoSchema.optional(),
-  }),
+export const VoucherScanRequestSchema = VoucherScanRequest.openapi(
+  'VoucherScanRequest',
   {
     description: 'Request to track voucher scan',
   },
 )
 
-export const VoucherScanResponse = openapi(
-  z.object({
-    voucher: VoucherResponse,
-    scanId: UUID,
-    canClaim: z.boolean(),
-    alreadyClaimed: z.boolean(),
-    nearbyLocations: z
-      .array(
-        z.object({
-          name: z.string(),
-          address: z.string(),
-          distance: z.number(),
-          coordinates: CoordinatesSchema,
-        }),
-      )
-      .optional(),
-  }),
+/**
+ * Voucher scan response (raw Zod)
+ */
+export const VoucherScanResponse = z.object({
+  voucher: VoucherResponse,
+  scanId: UUID,
+  canClaim: z.boolean(),
+  alreadyClaimed: z.boolean(),
+  nearbyLocations: z
+    .array(
+      z.object({
+        name: z.string(),
+        address: z.string(),
+        distance: z.number(),
+        coordinates: Coordinates,
+      }),
+    )
+    .optional(),
+})
+
+/**
+ * Voucher scan response (OpenAPI documented)
+ */
+export const VoucherScanResponseSchema = VoucherScanResponse.openapi(
+  'VoucherScanResponse',
   {
     description: 'Voucher scan tracking result',
   },
@@ -195,18 +226,29 @@ export type VoucherClaimRequest = z.infer<typeof VoucherClaimRequest>
 /**
  * Voucher claim request (OpenAPI documented)
  */
-export const VoucherClaimRequestSchema = openapi(VoucherClaimRequest, {
-  description: 'Request to claim voucher to wallet',
+export const VoucherClaimRequestSchema = VoucherClaimRequest.openapi(
+  'VoucherClaimRequest',
+  {
+    description: 'Request to claim voucher to wallet',
+  },
+)
+
+/**
+ * Voucher claim response (raw Zod)
+ */
+export const VoucherClaimResponse = z.object({
+  claimId: UUID,
+  voucher: VoucherResponse,
+  claimedAt: z.string().datetime(),
+  expiresAt: z.string().datetime().nullable(),
+  walletPosition: z.number().int().min(0),
 })
 
-export const VoucherClaimResponse = openapi(
-  z.object({
-    claimId: UUID,
-    voucher: VoucherResponse,
-    claimedAt: z.string().datetime(),
-    expiresAt: z.string().datetime().nullable(),
-    walletPosition: z.number().int().min(0),
-  }),
+/**
+ * Voucher claim response (OpenAPI documented)
+ */
+export const VoucherClaimResponseSchema = VoucherClaimResponse.openapi(
+  'VoucherClaimResponse',
   {
     description: 'Voucher claim result',
   },
@@ -232,24 +274,29 @@ export type VoucherRedeemRequest = z.infer<typeof VoucherRedeemRequest>
  * Voucher redeem request (OpenAPI documented)
  * Uses Schema versions to generate $ref
  */
-export const VoucherRedeemRequestSchema = openapi(
-  z.object({
-    code: z.string().min(FIELD_LENGTH.CODE_MIN),
-    location: CoordinatesSchema.optional(),
-  }),
+export const VoucherRedeemRequestSchema = VoucherRedeemRequest.openapi(
+  'VoucherRedeemRequest',
   {
     description: 'Request to redeem voucher',
   },
 )
 
-export const VoucherRedeemResponse = openapi(
-  z.object({
-    message: z.string(),
-    voucherId: UUID,
-    redeemedAt: z.string().datetime(),
-    discountApplied: z.number().min(0),
-    voucher: VoucherResponse,
-  }),
+/**
+ * Voucher redeem response (raw Zod)
+ */
+export const VoucherRedeemResponse = z.object({
+  message: z.string(),
+  voucherId: UUID,
+  redeemedAt: z.string().datetime(),
+  discountApplied: z.number().min(0),
+  voucher: VoucherResponse,
+})
+
+/**
+ * Voucher redeem response (OpenAPI documented)
+ */
+export const VoucherRedeemResponseSchema = VoucherRedeemResponse.openapi(
+  'VoucherRedeemResponse',
   {
     description: 'Voucher redemption result',
   },
@@ -259,18 +306,38 @@ export type VoucherRedeemResponse = z.infer<typeof VoucherRedeemResponse>
 
 // ============= Response Types =============
 
+/**
+ * Voucher list response (raw Zod)
+ */
 export const VoucherListResponse = paginatedResponse(VoucherResponse)
+
+/**
+ * Voucher list response (OpenAPI documented)
+ */
+export const VoucherListResponseSchema = VoucherListResponse.openapi(
+  'VoucherListResponse',
+  {
+    description: 'Paginated list of vouchers',
+  },
+)
 
 export type VoucherListResponse = z.infer<typeof VoucherListResponse>
 
-// User Vouchers Response (for GET /vouchers/user/:userId)
-export const UserVoucherResponse = openapi(
-  z.object({
-    voucher: VoucherResponse,
-    claimedAt: z.string().datetime(),
-    status: CustomerVoucherStatusSchema,
-    redeemedAt: z.string().datetime().nullable().optional(),
-  }),
+/**
+ * User voucher response (raw Zod)
+ */
+export const UserVoucherResponse = z.object({
+  voucher: VoucherResponse,
+  claimedAt: z.string().datetime(),
+  status: CustomerVoucherStatusSchema,
+  redeemedAt: z.string().datetime().nullable().optional(),
+})
+
+/**
+ * User voucher response (OpenAPI documented)
+ */
+export const UserVoucherResponseSchema = UserVoucherResponse.openapi(
+  'UserVoucherResponse',
   {
     description: 'User voucher with status information',
   },
@@ -278,6 +345,19 @@ export const UserVoucherResponse = openapi(
 
 export type UserVoucherResponse = z.infer<typeof UserVoucherResponse>
 
+/**
+ * User vouchers list response (raw Zod)
+ */
 export const UserVouchersListResponse = paginatedResponse(UserVoucherResponse)
+
+/**
+ * User vouchers list response (OpenAPI documented)
+ */
+export const UserVouchersListResponseSchema = UserVouchersListResponse.openapi(
+  'UserVouchersListResponse',
+  {
+    description: 'Paginated list of user vouchers',
+  },
+)
 
 export type UserVouchersListResponse = z.infer<typeof UserVouchersListResponse>
