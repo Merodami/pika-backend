@@ -1299,7 +1299,7 @@ function registerInternalRoutes(registry: ZodRegistry): void {
         serviceName: z.string(),
       }),
       query: z.object({
-        environment: internalDiscoverySchemas.EnvironmentType.optional(),
+        environment: internalDiscoverySchemas.EnvironmentTypeSchema.optional(),
         healthyOnly: z.boolean().default(true),
       }),
     },

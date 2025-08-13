@@ -11,7 +11,7 @@
  * - Handles mock email/SMS provider setup
  */
 
-import { EmailTemplateId, UserRole, UserStatus } from '@pika/types'
+import { EmailTemplateKey, UserRole, UserStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 
@@ -80,7 +80,7 @@ export async function seedTestCommunicationLogs(
         provider: 'mock',
         metadata: {
           body: `Content ${i + 1}`,
-          templateId: i === 0 ? EmailTemplateId.WELCOME : undefined,
+          templateId: i === 0 ? EmailTemplateKey.WELCOME : undefined,
           ...(status === 'failed' ? { error: 'Failed to send' } : {}),
         },
         ...(status === 'failed' ? { errorMessage: 'Failed to send' } : {}),

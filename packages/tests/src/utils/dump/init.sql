@@ -582,7 +582,7 @@ CREATE TYPE audit."AuditAction" AS ENUM (
     'delete',
     'login',
     'logout',
-    'status_change'
+    'statusChange'
 );
 
 
@@ -676,7 +676,7 @@ CREATE TYPE files."FileType" AS ENUM (
 CREATE TYPE files."PageLayoutType" AS ENUM (
     'standard',
     'mixed',
-    'full_page',
+    'fullPage',
     'custom'
 );
 
@@ -686,7 +686,7 @@ CREATE TYPE files."PageLayoutType" AS ENUM (
 --
 
 CREATE TYPE files."StorageProvider" AS ENUM (
-    'aws_s3',
+    'awsS3',
     'local',
     'minio'
 );
@@ -698,7 +698,7 @@ CREATE TYPE files."StorageProvider" AS ENUM (
 
 CREATE TYPE files."VoucherBookStatus" AS ENUM (
     'draft',
-    'ready_for_print',
+    'readyForPrint',
     'published',
     'archived'
 );
@@ -710,7 +710,7 @@ CREATE TYPE files."VoucherBookStatus" AS ENUM (
 
 CREATE TYPE files."VoucherBookType" AS ENUM (
     'monthly',
-    'special_edition',
+    'specialEdition',
     'regional',
     'seasonal',
     'promotional'
@@ -772,8 +772,8 @@ CREATE TYPE payments."SubscriptionStatus" AS ENUM (
     'active',
     'canceled',
     'incomplete',
-    'incomplete_expired',
-    'past_due',
+    'incompleteExpired',
+    'pastDue',
     'trialing',
     'unpaid'
 );
@@ -788,7 +788,7 @@ CREATE TYPE security."FraudCaseStatus" AS ENUM (
     'reviewing',
     'approved',
     'rejected',
-    'false_positive'
+    'falsePositive'
 );
 
 
@@ -800,7 +800,7 @@ CREATE TYPE support."CommunicationMethod" AS ENUM (
     'email',
     'sms',
     'push',
-    'in_app'
+    'inApp'
 );
 
 
@@ -824,7 +824,7 @@ CREATE TYPE support."NotificationType" AS ENUM (
     'email',
     'sms',
     'push',
-    'in_app'
+    'inApp'
 );
 
 
@@ -848,9 +848,9 @@ CREATE TYPE support."ProblemPriority" AS ENUM (
 CREATE TYPE support."ProblemStatus" AS ENUM (
     'open',
     'assigned',
-    'in_progress',
-    'waiting_customer',
-    'waiting_internal',
+    'inProgress',
+    'waitingCustomer',
+    'waitingInternal',
     'resolved',
     'closed'
 );
@@ -865,8 +865,8 @@ CREATE TYPE support."ProblemType" AS ENUM (
     'technical',
     'account',
     'general',
-    'bug_report',
-    'feature_request'
+    'bugReport',
+    'featureRequest'
 );
 
 

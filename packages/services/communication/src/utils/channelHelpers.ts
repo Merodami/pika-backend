@@ -1,7 +1,4 @@
-import {
-  CommunicationChannel,
-  type CommunicationChannelType,
-} from '@pika/types'
+import { CommunicationChannel } from '@pika/types'
 
 /**
  * Channel delivery status interface
@@ -16,8 +13,8 @@ export interface ChannelStatus {
  * @param channels - Array of channel names (case insensitive)
  * @returns Array of normalized channel types
  */
-function normalizeChannels(channels: string[]): CommunicationChannelType[] {
-  const normalized: CommunicationChannelType[] = []
+function normalizeChannels(channels: string[]): CommunicationChannel[] {
+  const normalized: CommunicationChannel[] = []
 
   for (const channel of channels) {
     const lowerChannel = channel.toLowerCase()
@@ -43,12 +40,10 @@ function normalizeChannels(channels: string[]): CommunicationChannelType[] {
  * @returns Safe channel results object
  */
 export function createChannelResults(
-  channels: (CommunicationChannelType | string)[] = [
-    CommunicationChannel.IN_APP,
-  ],
+  channels: (CommunicationChannel | string)[] = [CommunicationChannel.IN_APP],
   recipientCount: number = 0,
-): Record<CommunicationChannelType, ChannelStatus> {
-  const results = {} as Record<CommunicationChannelType, ChannelStatus>
+): Record<CommunicationChannel, ChannelStatus> {
+  const results = {} as Record<CommunicationChannel, ChannelStatus>
 
   // Normalize channels to standard format
   const normalizedChannels = normalizeChannels(channels as string[])

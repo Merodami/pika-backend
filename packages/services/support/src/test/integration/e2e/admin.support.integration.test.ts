@@ -98,7 +98,7 @@ async function seedTestData(
         userId: testUser.id,
         title: 'Billing Question',
         description: 'Charged twice for the same session',
-        status: ProblemStatus.in_progress,
+        status: ProblemStatus.inProgress,
         priority: ProblemPriority.medium,
         type: ProblemType.billing,
         ticketNumber: 'TKT-002',
@@ -372,19 +372,19 @@ describe('Admin Support API Integration Tests', () => {
       const response = await adminClient
         .put(`/admin/support/tickets/${ticket.id}/status`)
         .send({
-          status: ProblemStatus.in_progress,
+          status: ProblemStatus.inProgress,
           note: 'Starting work on this issue',
         })
         .expect(200)
 
-      expect(response.body.status).toBe(ProblemStatus.in_progress)
+      expect(response.body.status).toBe(ProblemStatus.inProgress)
 
       // Verify in database
       const updated = await testDb.prisma.problem.findUnique({
         where: { id: ticket.id },
       })
 
-      expect(updated?.status).toBe(ProblemStatus.in_progress)
+      expect(updated?.status).toBe(ProblemStatus.inProgress)
     })
 
     it('should set resolvedAt when status is RESOLVED', async () => {
@@ -427,7 +427,7 @@ describe('Admin Support API Integration Tests', () => {
 
       await userClient
         .put(`/admin/support/tickets/${ticket.id}/status`)
-        .send({ status: ProblemStatus.in_progress })
+        .send({ status: ProblemStatus.inProgress })
         .expect(403)
     })
 

@@ -41,7 +41,7 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { UserRole, UserStatus } from '@pika/types'
+import { EmailTemplateKey, UserRole, UserStatus, VerificationType } from '@pika/types'
 import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,
@@ -259,7 +259,7 @@ describe('User Service - Admin API Integration Tests', () => {
       await seedTestUsers(testDb.prisma, { count: 5 })
 
       const response = await adminClient
-        .get('/users?sortBy=email&sortOrder=ASC')
+        .get('/users?sortBy=email&sortOrder=asc')
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -940,7 +940,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const response = await adminClient
           .post('/admin/users/verify')
           .send({
-            type: 'EMAIL',
+            type: VerificationType.EMAIL,
             userId: user.id,
           })
           .expect(204)
@@ -958,7 +958,7 @@ describe('User Service - Admin API Integration Tests', () => {
         await adminClient
           .post('/admin/users/verify')
           .send({
-            type: 'EMAIL',
+            type: VerificationType.EMAIL,
             userId: '00000000-0000-0000-0000-000000000000',
           })
           .expect(404)
@@ -979,7 +979,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const response = await adminClient
           .post('/admin/users/resend-verification')
           .send({
-            type: 'EMAIL',
+            type: VerificationType.EMAIL,
             userId: user.id,
           })
           .expect(200)
@@ -1019,7 +1019,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const response = await adminClient
           .post('/admin/users/verify')
           .send({
-            type: 'PHONE',
+            type: VerificationType.PHONE,
             userId: user.id,
             code: '123456',
           })
@@ -1056,7 +1056,7 @@ describe('User Service - Admin API Integration Tests', () => {
         await adminClient
           .post('/admin/users/verify')
           .send({
-            type: 'PHONE',
+            type: VerificationType.PHONE,
             userId: user.id,
             code: '999999', // Wrong code
           })
@@ -1078,7 +1078,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const response = await adminClient
           .post('/admin/users/resend-verification')
           .send({
-            type: 'PHONE',
+            type: VerificationType.PHONE,
             userId: user.id,
           })
           .expect(200)
@@ -1109,7 +1109,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const response = await adminClient
           .post('/admin/users/verify')
           .send({
-            type: 'ACCOUNT_CONFIRMATION',
+            type: VerificationType.ACCOUNT_CONFIRMATION,
             userId: user.id,
           })
           .expect(204)
@@ -1126,7 +1126,7 @@ describe('User Service - Admin API Integration Tests', () => {
         await adminClient
           .post('/admin/users/verify')
           .send({
-            type: 'ACCOUNT_CONFIRMATION',
+            type: VerificationType.ACCOUNT_CONFIRMATION,
           })
           .expect(400)
       })
@@ -1147,7 +1147,7 @@ describe('User Service - Admin API Integration Tests', () => {
         await adminClient
           .post('/admin/users/resend-verification')
           .send({
-            type: 'EMAIL',
+            type: VerificationType.EMAIL,
             // Missing both userId and email
           })
           .expect(400)
@@ -1157,7 +1157,7 @@ describe('User Service - Admin API Integration Tests', () => {
         await adminClient
           .post('/admin/users/resend-verification')
           .send({
-            type: 'EMAIL',
+            type: VerificationType.EMAIL,
             userId: '00000000-0000-0000-0000-000000000000',
           })
           .expect(404)
@@ -1167,7 +1167,7 @@ describe('User Service - Admin API Integration Tests', () => {
         await customerClient
           .post('/admin/users/verify')
           .send({
-            type: 'EMAIL',
+            type: VerificationType.EMAIL,
             userId: '00000000-0000-0000-0000-000000000000',
           })
           .expect(403)
@@ -1204,7 +1204,7 @@ describe('User Service - Admin API Integration Tests', () => {
           expect.objectContaining({
             to: targetUser.email,
             subject: 'Account Suspended',
-            templateId: 'account-banned',
+            templateId: EmailTemplateKey.ACCOUNT_BANNED,
             templateParams: expect.objectContaining({
               reason: 'Violation of Terms of Service',
               duration: 30,
@@ -1311,7 +1311,7 @@ describe('User Service - Admin API Integration Tests', () => {
           expect.objectContaining({
             to: targetUser.email,
             subject: 'Account Reinstated',
-            templateId: 'account-unbanned',
+            templateId: EmailTemplateKey.ACCOUNT_UNBANNED,
             templateParams: expect.objectContaining({
               reason: 'Ban appeal approved',
             }),

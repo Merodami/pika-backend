@@ -1,7 +1,7 @@
 import type { VoucherBookDomain } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
-import type { VoucherBookStatus } from '@prisma/client'
+import { VoucherBookStatus } from '@pika/types'
 
 import type {
   AdminVoucherBookSearchParams,
@@ -70,14 +70,14 @@ export class AdminVoucherBookService
       let updatedBook: VoucherBookDomain
 
       switch (status) {
-        case 'published':
+        case VoucherBookStatus.PUBLISHED:
           updatedBook = await this.publishVoucherBook(id, userId)
           break
-        case 'archived':
+        case VoucherBookStatus.ARCHIVED:
           updatedBook = await this.archiveVoucherBook(id, userId)
           break
-        case 'ready_for_print':
-        case 'draft':
+        case VoucherBookStatus.READY_FOR_PRINT:
+        case VoucherBookStatus.DRAFT:
           // For other status changes, use repository's updateStatus method
           updatedBook = await this.voucherBookRepository.updateStatus(
             id,
@@ -126,7 +126,11 @@ export class AdminVoucherBookService
       // Process each book individually for proper error handling
       for (const id of ids) {
         try {
-          await this.updateVoucherBookStatus(id, 'archived', userId)
+          await this.updateVoucherBookStatus(
+            id,
+            VoucherBookStatus.ARCHIVED,
+            userId,
+          )
           results.push({ id, success: true })
         } catch (error) {
           logger.warn('Failed to archive voucher book', { id, error })
@@ -186,7 +190,7 @@ export class AdminVoucherBookService
     newStatus: VoucherBookStatus,
   ): void {
     // Allow admin to archive any book
-    if (newStatus === 'archived') {
+    if (newStatus === VoucherBookStatus.ARCHIVED) {
       return
     }
 
@@ -196,10 +200,17 @@ export class AdminVoucherBookService
     }
 
     const allowedTransitions: Record<VoucherBookStatus, VoucherBookStatus[]> = {
-      draft: ['ready_for_print', 'archived'],
-      ready_for_print: ['published', 'draft', 'archived'],
-      published: ['archived'],
-      archived: [], // Archived books cannot be changed
+      [VoucherBookStatus.DRAFT]: [
+        VoucherBookStatus.READY_FOR_PRINT,
+        VoucherBookStatus.ARCHIVED,
+      ],
+      [VoucherBookStatus.READY_FOR_PRINT]: [
+        VoucherBookStatus.PUBLISHED,
+        VoucherBookStatus.DRAFT,
+        VoucherBookStatus.ARCHIVED,
+      ],
+      [VoucherBookStatus.PUBLISHED]: [VoucherBookStatus.ARCHIVED],
+      [VoucherBookStatus.ARCHIVED]: [], // Archived books cannot be changed
     }
 
     const allowed =

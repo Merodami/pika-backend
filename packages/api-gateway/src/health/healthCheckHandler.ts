@@ -16,6 +16,7 @@ import {
   USER_API_URL,
 } from '@pika/environment'
 import { logger } from '@pika/shared'
+import { HealthStatus } from '@pika/types'
 import type { Request, Response } from 'express'
 
 interface ServiceHealthCheck {
@@ -47,7 +48,7 @@ async function checkService(
     const responseTime = Date.now() - startTime
 
     return {
-      status: response.ok ? 'healthy' : 'unhealthy',
+      status: response.ok ? HealthStatus.HEALTHY : HealthStatus.UNHEALTHY,
       url: service.url,
       responseTime,
     }
@@ -55,7 +56,7 @@ async function checkService(
     logger.debug(`Health check failed for ${service.name}:`, error)
 
     return {
-      status: 'unhealthy',
+      status: HealthStatus.UNHEALTHY,
       url: service.url,
       responseTime: Date.now() - startTime,
     }
@@ -67,13 +68,13 @@ async function checkDatabase(): Promise<systemPublic.DatabasesHealth> {
   // Response times are simulated to show realistic variance
   return {
     pgsql: {
-      status: 'healthy',
+      status: HealthStatus.HEALTHY,
       url: `postgresql://${PG_HOST}:${PG_PORT}/${PG_DATABASE}`,
       responseTime: Math.floor(Math.random() * 20) + 5, // 5-25ms realistic DB response time
       resources: ['users', 'businesses', 'vouchers', 'categories'],
     },
     redis: {
-      status: 'healthy',
+      status: HealthStatus.HEALTHY,
       host: REDIS_HOST,
       port: REDIS_PORT,
       ttl: REDIS_DEFAULT_TTL,
@@ -471,13 +472,13 @@ async function checkEmbeddedService(): Promise<systemPublic.ServiceHealth> {
     await new Promise((resolve) => setTimeout(resolve, Math.random() * 5)) // 0-5ms simulated operation
 
     return {
-      status: 'healthy',
+      status: HealthStatus.HEALTHY,
       url: 'embedded',
       responseTime: Date.now() - serviceCheckStartTime,
     }
   } catch {
     return {
-      status: 'unhealthy',
+      status: HealthStatus.UNHEALTHY,
       url: 'embedded',
       responseTime: Date.now() - serviceCheckStartTime,
     }
@@ -537,17 +538,21 @@ export async function handleHealthCheck(req: Request, res: Response) {
 
     // Calculate overall status
     const allServices = Object.values(servicesHealth)
-    const hasUnhealthy = allServices.some((s) => s.status === 'unhealthy')
-    const allUnhealthy = allServices.every((s) => s.status === 'unhealthy')
+    const hasUnhealthy = allServices.some(
+      (s) => s.status === HealthStatus.UNHEALTHY,
+    )
+    const allUnhealthy = allServices.every(
+      (s) => s.status === HealthStatus.UNHEALTHY,
+    )
 
     let status: systemPublic.HealthStatus
 
     if (allUnhealthy) {
-      status = 'unhealthy'
+      status = HealthStatus.UNHEALTHY
     } else if (hasUnhealthy) {
-      status = 'degraded'
+      status = HealthStatus.DEGRADED
     } else {
-      status = 'healthy'
+      status = HealthStatus.HEALTHY
     }
 
     // Build response matching the schema
@@ -562,7 +567,7 @@ export async function handleHealthCheck(req: Request, res: Response) {
     }
 
     // Return appropriate status code
-    const statusCode = status === 'unhealthy' ? 503 : 200
+    const statusCode = status === HealthStatus.UNHEALTHY ? 503 : 200
 
     // Check if client accepts HTML
     const acceptsHTML = req.headers.accept?.includes('text/html')
@@ -577,7 +582,7 @@ export async function handleHealthCheck(req: Request, res: Response) {
   } catch (error) {
     logger.error('Health check error:', error)
     res.status(500).json({
-      status: 'unhealthy',
+      status: HealthStatus.UNHEALTHY,
       error: 'Failed to perform health check',
       timestamp: new Date().toISOString(),
     })

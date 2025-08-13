@@ -7,6 +7,7 @@ import {
   ErrorSeverity,
   ValidationError,
 } from './index.js'
+import { ErrorCode } from '@pika/types'
 
 describe('New Error System', () => {
   describe('ApplicationError', () => {
@@ -67,7 +68,7 @@ describe('New Error System', () => {
       const error = ErrorFactory.fromError(originalError)
 
       expect(error.message).toBe('Something went wrong')
-      expect(error.context.code).toBe('UNEXPECTED_ERROR')
+      expect(error.context.code).toBe(ErrorCode.UNEXPECTED_ERROR)
       expect(error.context.httpStatus).toBe(500)
     })
   })

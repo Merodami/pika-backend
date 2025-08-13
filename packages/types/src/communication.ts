@@ -23,6 +23,7 @@ export enum EmailTemplateKey {
   PAYMENT_SUCCESS = 'paymentSuccess',
   PAYMENT_FAILED = 'paymentFailed',
   SUBSCRIPTION_ACTIVATED = 'subscriptionActivated',
+  SUBSCRIPTION_CANCELLED = 'subscriptionCancelled',
   SUBSCRIPTION_EXPIRING = 'subscriptionExpiring',
   SUBSCRIPTION_EXPIRED = 'subscriptionExpired',
 

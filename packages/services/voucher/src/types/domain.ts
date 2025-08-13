@@ -196,12 +196,6 @@ export interface BatchTokenGenerationRequest {
 
 // ============= Voucher Book Types =============
 
-export type VoucherBookStatus =
-  | 'draft'
-  | 'ready_for_print'
-  | 'published'
-  | 'archived'
-
 export interface VoucherBookStateTransition {
   allowed: boolean
   reason?: string

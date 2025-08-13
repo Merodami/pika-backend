@@ -4,6 +4,7 @@ import {
   STORAGE_PROVIDER_PRIMARY,
 } from '@pika/environment'
 import { logger } from '@pika/shared'
+import { StorageProvider as StorageProviderEnum } from '@pika/types'
 
 import { AwsS3Provider } from './AwsS3Provider.js'
 import { ConsoleStorageProvider } from './ConsoleStorageProvider.js'
@@ -50,7 +51,7 @@ export class ProviderFactory {
 
       // Add providerName for dev/test environments
       if (this.config.environment !== 'production') {
-        Object.assign(s3Config, { providerName: 'aws_s3' })
+        Object.assign(s3Config, { providerName: StorageProviderEnum.AWS_S3 })
       }
 
       this.storageProviders.set('aws-s3', new AwsS3Provider(s3Config))

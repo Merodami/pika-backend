@@ -21,7 +21,7 @@ enum AuditAction {
   delete
   login
   logout
-  status_change
+  statusChange
 
   @@schema("audit")
 }
@@ -29,9 +29,9 @@ enum AuditAction {
 enum ProblemStatus {
   open
   assigned
-  in_progress
-  waiting_customer
-  waiting_internal
+  inProgress
+  waitingCustomer
+  waitingInternal
   resolved
   closed
 
@@ -53,8 +53,8 @@ enum ProblemType {
   technical
   account
   general
-  bug_report
-  feature_request
+  bugReport
+  featureRequest
 
   @@schema("support")
 }
@@ -72,7 +72,7 @@ enum NotificationType {
   email
   sms
   push
-  in_app
+  inApp
 
   @@schema("support")
 }
@@ -81,7 +81,7 @@ enum CommunicationMethod {
   email
   sms
   push
-  in_app
+  inApp
 
   @@schema("support")
 }
@@ -90,8 +90,8 @@ enum SubscriptionStatus {
   active
   canceled
   incomplete
-  incomplete_expired
-  past_due
+  incompleteExpired
+  pastDue
   trialing
   unpaid
 
@@ -109,7 +109,7 @@ enum FileType {
 }
 
 enum StorageProvider {
-  aws_s3
+  awsS3
   local
   minio
 
@@ -118,7 +118,7 @@ enum StorageProvider {
 
 enum VoucherBookStatus {
   draft
-  ready_for_print
+  readyForPrint
   published
   archived
 
@@ -127,7 +127,7 @@ enum VoucherBookStatus {
 
 enum VoucherBookType {
   monthly
-  special_edition
+  specialEdition
   regional
   seasonal
   promotional
@@ -138,7 +138,7 @@ enum VoucherBookType {
 enum PageLayoutType {
   standard      // 8 spaces (2x4 grid)
   mixed         // Mixed ad sizes
-  full_page     // Single full-page ad
+  fullPage     // Single full-page ad
   custom        // Custom layout
 
   @@schema("files")
@@ -219,7 +219,7 @@ enum FraudCaseStatus {
   reviewing       // Under investigation
   approved        // Marked as legitimate
   rejected        // Confirmed fraud
-  false_positive  // Incorrectly flagged
+  falsePositive  // Incorrectly flagged
 
   @@schema("security")
 }

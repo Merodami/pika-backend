@@ -19,13 +19,13 @@ import {
   CommunicationLogSortBy,
   DevicePlatform,
   EmailStatus,
+  EmailTemplateKey,
   InAppNotificationType,
   MessageType,
   NotificationCategory,
   NotificationPriority,
   NotificationSortBy,
   NotificationType,
-  EmailTemplateKey,
 } from '../common/enums.js'
 
 /**

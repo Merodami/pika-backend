@@ -1,6 +1,6 @@
 import { FRONTEND_URL } from '@pika/environment'
 import { logger } from '@pika/shared'
-import { EmailTemplateId, TemplateCategory } from '@pika/types'
+import { EmailTemplateKey, TemplateCategory } from '@pika/types'
 import fs from 'fs/promises'
 import Handlebars from 'handlebars'
 import { get, has } from 'lodash-es'
@@ -12,15 +12,15 @@ const __dirname = path.dirname(__filename)
 
 /**
  * Type alias for backward compatibility
- * @deprecated Use EmailTemplateId from @pikaypes instead
+ * @deprecated Use EmailTemplateKey from @pika/types instead
  */
-export type TemplateKey = EmailTemplateId
+export type TemplateKey = EmailTemplateKey
 
 /**
  * Template metadata
  */
 export interface TemplateMetadata {
-  key: EmailTemplateId
+  key: EmailTemplateKey
   category: TemplateCategory
   filePath: string
   subject: string
@@ -41,9 +41,9 @@ export interface CompiledTemplate {
 /**
  * Template registry mapping template keys to file paths and metadata
  */
-export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
-  [EmailTemplateId.EMAIL_VERIFICATION]: {
-    key: EmailTemplateId.EMAIL_VERIFICATION,
+export const TEMPLATE_REGISTRY: Record<EmailTemplateKey, TemplateMetadata> = {
+  [EmailTemplateKey.EMAIL_VERIFICATION]: {
+    key: EmailTemplateKey.EMAIL_VERIFICATION,
     category: TemplateCategory.AUTH,
     filePath: 'auth/email-verification.hbs',
     subject: 'Verify your email address - Pika',
@@ -52,8 +52,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     optionalVariables: ['frontendUrl'],
   },
 
-  [EmailTemplateId.PASSWORD_RESET]: {
-    key: EmailTemplateId.PASSWORD_RESET,
+  [EmailTemplateKey.PASSWORD_RESET]: {
+    key: EmailTemplateKey.PASSWORD_RESET,
     category: TemplateCategory.AUTH,
     filePath: 'auth/password-reset.hbs',
     subject: 'Reset your password - Pika',
@@ -61,8 +61,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     requiredVariables: ['firstName', 'resetLink', 'expirationHours'],
   },
 
-  [EmailTemplateId.PASSWORD_RESET_CONFIRMATION]: {
-    key: EmailTemplateId.PASSWORD_RESET_CONFIRMATION,
+  [EmailTemplateKey.PASSWORD_RESET_CONFIRMATION]: {
+    key: EmailTemplateKey.PASSWORD_RESET_CONFIRMATION,
     category: TemplateCategory.AUTH,
     filePath: 'auth/password-reset-confirmation.hbs',
     subject: 'Password reset confirmed - Pika',
@@ -70,8 +70,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     requiredVariables: ['firstName'],
   },
 
-  [EmailTemplateId.WELCOME]: {
-    key: EmailTemplateId.WELCOME,
+  [EmailTemplateKey.WELCOME]: {
+    key: EmailTemplateKey.WELCOME,
     category: TemplateCategory.AUTH,
     filePath: 'auth/welcome.hbs',
     subject: 'Welcome to Pika! Your account is ready',
@@ -80,9 +80,9 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     optionalVariables: ['frontendUrl'],
   },
 
-  [EmailTemplateId.BOOKING_CONFIRMATION]: {
-    key: EmailTemplateId.BOOKING_CONFIRMATION,
-    category: TemplateCategory.BOOKING,
+  [EmailTemplateKey.BOOKING_CONFIRMATION]: {
+    key: EmailTemplateKey.BOOKING_CONFIRMATION,
+    category: TemplateCategory.TRANSACTIONAL,
     filePath: 'booking/confirmation.hbs',
     subject: 'Booking Confirmed - {{sessionType}} with {{trainerName}}',
     description: 'Booking confirmation notification',
@@ -95,9 +95,9 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     ],
   },
 
-  [EmailTemplateId.BOOKING_REMINDER]: {
-    key: EmailTemplateId.BOOKING_REMINDER,
-    category: TemplateCategory.BOOKING,
+  [EmailTemplateKey.BOOKING_REMINDER]: {
+    key: EmailTemplateKey.BOOKING_REMINDER,
+    category: TemplateCategory.TRANSACTIONAL,
     filePath: 'booking/reminder.hbs',
     subject: 'Reminder: {{sessionType}} session tomorrow',
     description: 'Session reminder notification',
@@ -110,9 +110,9 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     ],
   },
 
-  [EmailTemplateId.BOOKING_CANCELLED]: {
-    key: EmailTemplateId.BOOKING_CANCELLED,
-    category: TemplateCategory.BOOKING,
+  [EmailTemplateKey.BOOKING_CANCELLED]: {
+    key: EmailTemplateKey.BOOKING_CANCELLED,
+    category: TemplateCategory.TRANSACTIONAL,
     filePath: 'booking/cancelled.hbs',
     subject: 'Session Cancelled - {{sessionType}} with {{trainerName}}',
     description: 'Session cancellation notification',
@@ -125,8 +125,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     ],
   },
 
-  [EmailTemplateId.PAYMENT_SUCCESS]: {
-    key: EmailTemplateId.PAYMENT_SUCCESS,
+  [EmailTemplateKey.PAYMENT_SUCCESS]: {
+    key: EmailTemplateKey.PAYMENT_SUCCESS,
     category: TemplateCategory.PAYMENT,
     filePath: 'payment/success.hbs',
     subject: 'Payment Confirmed - Pika',
@@ -134,8 +134,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     requiredVariables: ['firstName', 'amount', 'transactionId'],
   },
 
-  [EmailTemplateId.PAYMENT_FAILED]: {
-    key: EmailTemplateId.PAYMENT_FAILED,
+  [EmailTemplateKey.PAYMENT_FAILED]: {
+    key: EmailTemplateKey.PAYMENT_FAILED,
     category: TemplateCategory.PAYMENT,
     filePath: 'payment/failed.hbs',
     subject: 'Payment Failed - Pika',
@@ -143,8 +143,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     requiredVariables: ['firstName', 'amount', 'failureReason'],
   },
 
-  [EmailTemplateId.SUBSCRIPTION_ACTIVATED]: {
-    key: EmailTemplateId.SUBSCRIPTION_ACTIVATED,
+  [EmailTemplateKey.SUBSCRIPTION_ACTIVATED]: {
+    key: EmailTemplateKey.SUBSCRIPTION_ACTIVATED,
     category: TemplateCategory.PAYMENT,
     filePath: 'payment/subscription-activated.hbs',
     subject: 'Subscription Activated - Welcome to Pika Pro!',
@@ -152,8 +152,17 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     requiredVariables: ['firstName', 'planName', 'nextBillingDate'],
   },
 
-  [EmailTemplateId.SUBSCRIPTION_EXPIRING]: {
-    key: EmailTemplateId.SUBSCRIPTION_EXPIRING,
+  [EmailTemplateKey.SUBSCRIPTION_CANCELLED]: {
+    key: EmailTemplateKey.SUBSCRIPTION_CANCELLED,
+    category: TemplateCategory.PAYMENT,
+    filePath: 'payment/subscription-cancelled.hbs',
+    subject: 'Your Pika subscription has been cancelled',
+    description: 'Subscription cancellation confirmation',
+    requiredVariables: ['firstName', 'planName', 'cancellationDate'],
+  },
+
+  [EmailTemplateKey.SUBSCRIPTION_EXPIRING]: {
+    key: EmailTemplateKey.SUBSCRIPTION_EXPIRING,
     category: TemplateCategory.PAYMENT,
     filePath: 'payment/subscription-expiring.hbs',
     subject: 'Your Pika subscription expires soon',
@@ -161,8 +170,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     requiredVariables: ['firstName', 'planName', 'expirationDate'],
   },
 
-  [EmailTemplateId.SUBSCRIPTION_EXPIRED]: {
-    key: EmailTemplateId.SUBSCRIPTION_EXPIRED,
+  [EmailTemplateKey.SUBSCRIPTION_EXPIRED]: {
+    key: EmailTemplateKey.SUBSCRIPTION_EXPIRED,
     category: TemplateCategory.PAYMENT,
     filePath: 'payment/subscription-expired.hbs',
     subject: 'Your Pika subscription has expired',
@@ -170,8 +179,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     requiredVariables: ['firstName', 'planName', 'renewalUrl'],
   },
 
-  [EmailTemplateId.ACCOUNT_BANNED]: {
-    key: EmailTemplateId.ACCOUNT_BANNED,
+  [EmailTemplateKey.ACCOUNT_BANNED]: {
+    key: EmailTemplateKey.ACCOUNT_BANNED,
     category: TemplateCategory.SYSTEM,
     filePath: 'system/account-banned.hbs',
     subject: 'Account Suspended',
@@ -180,8 +189,8 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
     optionalVariables: ['duration'],
   },
 
-  [EmailTemplateId.ACCOUNT_UNBANNED]: {
-    key: EmailTemplateId.ACCOUNT_UNBANNED,
+  [EmailTemplateKey.ACCOUNT_UNBANNED]: {
+    key: EmailTemplateKey.ACCOUNT_UNBANNED,
     category: TemplateCategory.SYSTEM,
     filePath: 'system/account-unbanned.hbs',
     subject: 'Account Reinstated',
@@ -196,7 +205,7 @@ export const TEMPLATE_REGISTRY: Record<EmailTemplateId, TemplateMetadata> = {
  */
 export class TemplateService {
   private readonly templatesPath: string
-  private readonly templateCache = new Map<EmailTemplateId, CompiledTemplate>()
+  private readonly templateCache = new Map<EmailTemplateKey, CompiledTemplate>()
   private layoutTemplate: HandlebarsTemplateDelegate | null = null
 
   constructor() {
@@ -248,7 +257,7 @@ export class TemplateService {
   /**
    * Load and compile a template by key
    */
-  async getTemplate(templateKey: EmailTemplateId): Promise<CompiledTemplate> {
+  async getTemplate(templateKey: EmailTemplateKey): Promise<CompiledTemplate> {
     // Check cache first
     if (this.templateCache.has(templateKey)) {
       return this.templateCache.get(templateKey)!
@@ -339,7 +348,7 @@ export class TemplateService {
    * Render a template with variables
    */
   async renderTemplate(
-    templateKey: EmailTemplateId,
+    templateKey: EmailTemplateKey,
     variables: Record<string, any>,
   ): Promise<{ subject: string; body: string }> {
     const template = await this.getTemplate(templateKey)
@@ -403,7 +412,7 @@ export class TemplateService {
    * Validate template variables without rendering
    */
   validateTemplateVariables(
-    templateKey: EmailTemplateId,
+    templateKey: EmailTemplateKey,
     variables: Record<string, unknown>,
   ): { valid: boolean; missingVariables: string[] } {
     const metadata = has(TEMPLATE_REGISTRY, templateKey)

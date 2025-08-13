@@ -18,6 +18,7 @@ import {
   createSharedAuthTestData,
   type SharedAuthTestData,
 } from '@auth-service/test/helpers/authTestHelpers.js'
+import { ErrorCode, ErrorType } from '@pika/types'
 import { CommunicationServiceClientMock } from '@auth-service/test/mocks/CommunicationServiceClientMock.js'
 import { UserServiceClientMock } from '@auth-service/test/mocks/UserServiceClientMock.js'
 import { MemoryCacheService } from '@pika/redis'
@@ -242,7 +243,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'VALIDATION_ERROR',
+          code: ErrorCode.VALIDATION_ERROR,
         }),
       })
     })
@@ -469,7 +470,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'NOT_AUTHENTICATED',
+          code: ErrorCode.NOT_AUTHENTICATED,
         }),
       })
     })
@@ -482,7 +483,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'NOT_AUTHENTICATED',
+          code: ErrorCode.NOT_AUTHENTICATED,
         }),
       })
     })

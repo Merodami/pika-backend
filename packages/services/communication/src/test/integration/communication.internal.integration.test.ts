@@ -47,7 +47,7 @@ import {
   InternalAPITestHelper,
   TestDatabaseResult,
 } from '@pika/tests'
-import { EmailTemplateId } from '@pika/types'
+import { EmailTemplateKey } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -131,7 +131,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
             userId: testUserId,
             to: 'recipient@example.com',
             subject: 'Welcome!',
-            templateId: EmailTemplateId.WELCOME,
+            templateId: EmailTemplateKey.WELCOME,
             templateParams: {
               firstName: 'John',
               appName: 'Pika',
@@ -153,7 +153,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
 
         expect(log).toBeDefined()
         expect(log?.metadata).toMatchObject({
-          templateId: EmailTemplateId.WELCOME,
+          templateId: EmailTemplateKey.WELCOME,
           templateParams: {
             firstName: 'John',
             appName: 'Pika',
@@ -294,7 +294,7 @@ describe('Communication Service - Internal API Integration Tests', () => {
         const response = await internalClient
           .post('/internal/emails/send-bulk')
           .send({
-            templateId: EmailTemplateId.PAYMENT_SUCCESS,
+            templateId: EmailTemplateKey.PAYMENT_SUCCESS,
             recipients: [
               {
                 to: 'user1@example.com',

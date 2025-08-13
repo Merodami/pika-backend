@@ -12,7 +12,6 @@ import {
   VerificationStatus as VerificationStatusEnum,
   VerificationType as VerificationTypeEnum,
 } from '@pika/types'
-import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { createZodEnum } from '../../../common/utils/zodEnum.js'

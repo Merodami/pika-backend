@@ -14,7 +14,7 @@ import {
   logger,
 } from '@pika/shared'
 import {
-  EmailTemplateId,
+  EmailTemplateKey,
   mapUserRole,
   mapUserStatus,
   type PaginatedResult,
@@ -339,7 +339,7 @@ export class UserService implements IUserService {
           .sendEmail({
             to: user.email,
             subject: 'Account Suspended',
-            templateId: EmailTemplateId.ACCOUNT_BANNED,
+            templateId: EmailTemplateKey.ACCOUNT_BANNED,
             templateParams: {
               reason: options.reason || 'Terms of Service violation',
               duration: options.duration,
@@ -374,7 +374,7 @@ export class UserService implements IUserService {
           .sendEmail({
             to: user.email,
             subject: 'Account Reinstated',
-            templateId: EmailTemplateId.ACCOUNT_UNBANNED,
+            templateId: EmailTemplateKey.ACCOUNT_UNBANNED,
             templateParams: {
               reason: options.reason || 'Your account has been reinstated',
             },
@@ -675,7 +675,7 @@ export class UserService implements IUserService {
     // Send verification email using communication service
     await this.communicationClient.sendEmail({
       to: user.email,
-      templateId: EmailTemplateId.EMAIL_VERIFICATION,
+      templateId: EmailTemplateKey.EMAIL_VERIFICATION,
       templateParams: {
         firstName: user.firstName,
         verificationUrl,

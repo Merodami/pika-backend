@@ -4,7 +4,11 @@ import { ICacheService } from '@pika/redis'
 import type { UserVoucherData, VoucherDomain, VoucherScanData } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes, VoucherState } from '@pika/types'
-import { VoucherScanSource, VoucherScanType } from '@pika/types'
+import {
+  VoucherBookStatus,
+  VoucherScanSource,
+  VoucherScanType,
+} from '@pika/types'
 import { get } from 'lodash-es'
 
 import type { IInternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
@@ -19,7 +23,6 @@ import type {
   RedemptionTrackingResult,
   UserVoucherSearchParams,
   VoucherBookStateTransition,
-  VoucherBookStatus,
   VoucherBookValidation,
   VoucherExistsOptions,
   VoucherExistsResult,
@@ -139,10 +142,17 @@ export class InternalVoucherService implements IInternalVoucherService {
     VoucherBookStatus,
     VoucherBookStatus[]
   > = {
-    draft: ['ready_for_print', 'archived'],
-    ready_for_print: ['published', 'draft', 'archived'],
-    published: ['archived'],
-    archived: [],
+    [VoucherBookStatus.DRAFT]: [
+      VoucherBookStatus.READY_FOR_PRINT,
+      VoucherBookStatus.ARCHIVED,
+    ],
+    [VoucherBookStatus.READY_FOR_PRINT]: [
+      VoucherBookStatus.PUBLISHED,
+      VoucherBookStatus.DRAFT,
+      VoucherBookStatus.ARCHIVED,
+    ],
+    [VoucherBookStatus.PUBLISHED]: [VoucherBookStatus.ARCHIVED],
+    [VoucherBookStatus.ARCHIVED]: [],
   }
 
   constructor(

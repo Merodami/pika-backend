@@ -25,6 +25,7 @@ import {
   TestDatabaseResult,
 } from '@pika/tests'
 import type { Express } from 'express'
+import { VoucherBookStatus } from '@prisma/client'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -443,7 +444,7 @@ describe('PDF Service - Admin API Integration Tests', () => {
     it('should update voucher book status', async () => {
       const testBook = await createTestVoucherBook(
         testDb.prisma,
-        'ready_for_print',
+        VoucherBookStatus.readyForPrint,
         undefined,
         undefined,
         true, // withPlacements = true

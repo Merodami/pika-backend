@@ -1,4 +1,4 @@
-import { FileType } from '@pika/types'
+import { FileType, StorageProvider } from '@pika/types'
 
 import type {
   FileStorageLogDomain,
@@ -124,7 +124,7 @@ export class FileStorageLogMapper {
       mimeType: domain.contentType,
       fileType: FileStorageLogMapper.determineFileType(domain.contentType),
       status: domain.status,
-      provider: domain.provider || 'local',
+      provider: domain.provider || StorageProvider.LOCAL,
       url: domain.url,
       uploadedAt: (domain.uploadedAt || domain.createdAt).toISOString(),
       metadata: parsedMetadata,
@@ -178,7 +178,7 @@ export class FileStorageLogMapper {
       mimeType: domain.contentType,
       fileType: FileStorageLogMapper.determineFileType(domain.contentType),
       status: domain.status,
-      provider: domain.provider || 'local',
+      provider: domain.provider || StorageProvider.LOCAL,
       bucketName: undefined,
       region: undefined,
       uploadedAt: domain.uploadedAt?.toISOString(),

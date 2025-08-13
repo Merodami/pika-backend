@@ -259,7 +259,7 @@ model FraudCase {
 model FraudCaseHistory {
   id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   caseId      String          @map("case_id") @db.Uuid
-  action      String          @db.VarChar(100) // 'created', 'status_changed', 'reviewed', 'action_taken'
+  action      String          @db.VarChar(100) // 'created', 'statusChanged', 'reviewed', 'action_taken'
   oldValue    String?         @map("old_value") @db.Text // Previous value (for status changes)
   newValue    String?         @map("new_value") @db.Text // New value
   notes       String?         @db.Text // Action notes or comments

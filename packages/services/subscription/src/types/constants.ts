@@ -67,15 +67,17 @@ export const CREDIT_PROCESSING = {
   MAX_CONCURRENT_JOBS: 5,
 } as const
 
+import { EmailTemplateKey } from '@pika/types'
+
 // Template keys used by subscription service
 export const TEMPLATE_KEYS = {
-  SUBSCRIPTION_ACTIVATED: 'subscriptionActivated',
-  SUBSCRIPTION_CANCELLED: 'subscriptionCancelled',
-  PAYMENT_FAILED: 'paymentFailed',
+  SUBSCRIPTION_ACTIVATED: EmailTemplateKey.SUBSCRIPTION_ACTIVATED,
+  SUBSCRIPTION_CANCELLED: EmailTemplateKey.SUBSCRIPTION_CANCELLED,
+  PAYMENT_FAILED: EmailTemplateKey.PAYMENT_FAILED,
   // Fallback template keys for notifications that don't have specific templates yet
-  CREDITS_ALLOCATED: 'subscriptionActivated', // Using closest available template
-  RENEWAL_REMINDER: 'subscriptionActivated', // Using closest available template
-  TRIAL_ENDING: 'subscriptionActivated', // Using closest available template
+  CREDITS_ALLOCATED: EmailTemplateKey.SUBSCRIPTION_ACTIVATED, // Using closest available template
+  RENEWAL_REMINDER: EmailTemplateKey.SUBSCRIPTION_ACTIVATED, // Using closest available template
+  TRIAL_ENDING: EmailTemplateKey.SUBSCRIPTION_ACTIVATED, // Using closest available template
 } as const
 
 export type TemplateKeysType =

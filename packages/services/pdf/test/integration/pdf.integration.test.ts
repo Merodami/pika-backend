@@ -24,6 +24,7 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
+import { VoucherBookStatus, VoucherBookType } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -143,7 +144,7 @@ describe('PDF Service - Public API Integration Tests', () => {
       // Should only show published books (2 published, 1 draft created)
       expect(response.body.data).toHaveLength(2)
       expect(
-        response.body.data.every((book: any) => book.status === 'published'),
+        response.body.data.every((book: any) => book.status === VoucherBookStatus.PUBLISHED),
       ).toBe(true)
     })
 
@@ -185,9 +186,9 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Current Month Book',
           year: currentYear,
           month: currentMonth,
-          bookType: 'monthly',
+          bookType: VoucherBookType.MONTHLY,
           totalPages: 24,
-          status: 'published',
+          status: VoucherBookStatus.PUBLISHED,
           createdBy: testUser.id,
           updatedBy: testUser.id,
         },
@@ -199,9 +200,9 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Different Month Book',
           year: currentYear,
           month: currentMonth === 12 ? 1 : currentMonth + 1,
-          bookType: 'monthly',
+          bookType: VoucherBookType.MONTHLY,
           totalPages: 24,
-          status: 'published',
+          status: VoucherBookStatus.PUBLISHED,
           createdBy: testUser.id,
           updatedBy: testUser.id,
         },
@@ -233,9 +234,9 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Monthly Book',
           year: new Date().getFullYear(),
           month: new Date().getMonth() + 1,
-          bookType: 'monthly',
+          bookType: VoucherBookType.MONTHLY,
           totalPages: 24,
-          status: 'published',
+          status: VoucherBookStatus.PUBLISHED,
           createdBy: testUser.id,
           updatedBy: testUser.id,
         },
@@ -247,9 +248,9 @@ describe('PDF Service - Public API Integration Tests', () => {
           title: 'Special Book',
           year: new Date().getFullYear(),
           month: new Date().getMonth() + 1,
-          bookType: 'special_edition',
+          bookType: VoucherBookType.SPECIAL_EDITION,
           totalPages: 32,
-          status: 'published',
+          status: VoucherBookStatus.PUBLISHED,
           createdBy: testUser.id,
           updatedBy: testUser.id,
         },
@@ -257,12 +258,12 @@ describe('PDF Service - Public API Integration Tests', () => {
 
       const response = await customerClient
         .get('/voucher-books')
-        .query({ bookType: 'monthly' })
+        .query({ bookType: VoucherBookType.MONTHLY })
         .set('Accept', 'application/json')
         .expect(200)
 
       expect(response.body.data).toHaveLength(1)
-      expect(response.body.data[0].bookType).toBe('monthly')
+      expect(response.body.data[0].bookType).toBe(VoucherBookType.MONTHLY)
     })
   })
 

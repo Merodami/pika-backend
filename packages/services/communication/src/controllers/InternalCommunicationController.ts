@@ -16,7 +16,7 @@ import {
   NotificationMapper,
 } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
-import { EmailTemplateId } from '@pika/types'
+import { EmailStatus, EmailTemplateKey } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -69,7 +69,7 @@ export class InternalCommunicationController {
       const emailInput: SendEmailInput = {
         to: data.to,
         subject: data.subject,
-        templateId: data.templateId as EmailTemplateId | undefined,
+        templateId: data.templateId as EmailTemplateKey | undefined,
         templateParams: data.templateParams,
         body: data.body,
         isHtml: data.isHtml,
@@ -146,7 +146,7 @@ export class InternalCommunicationController {
         try {
           const result = await this.emailService.sendEmail({
             to: recipient.to,
-            templateId: templateId as EmailTemplateId,
+            templateId: templateId as EmailTemplateKey,
             templateParams: recipient.variables || {},
             subject: recipient.variables?.subject || 'Notification',
             userId: recipient.variables?.userId,
@@ -266,7 +266,7 @@ export class InternalCommunicationController {
       // In a full implementation, this would use user service to get email
       const result = await this.emailService.sendEmail({
         to: variables.email || 'placeholder@example.com', // This should come from user service
-        templateId: templateKey as EmailTemplateId,
+        templateId: templateKey as EmailTemplateKey,
         templateParams: variables,
         subject: variables.subject || 'Notification',
         userId,
@@ -275,7 +275,8 @@ export class InternalCommunicationController {
       const responseData: communicationInternal.SendTransactionalEmailResponse =
         {
           messageId: result.id,
-          status: result.status === 'sent' ? 'queued' : 'failed',
+          status:
+            result.status === 'sent' ? EmailStatus.QUEUED : EmailStatus.FAILED,
           scheduledAt: result.sentAt,
         }
       const validatedResponse = validateResponse(

@@ -520,7 +520,7 @@ export class VoucherBookService implements IVoucherBookService {
       // Update book status if it was draft
       if (voucherBook.status === 'draft') {
         await this.voucherBookRepository.update(id, {
-          status: 'ready_for_print',
+          status: 'readyForPrint',
           updatedBy: userId || 'system',
         })
       }

@@ -18,6 +18,7 @@ import {
   createSharedAuthTestData,
   type SharedAuthTestData,
 } from '@auth-service/test/helpers/authTestHelpers.js'
+import { ErrorCode, ErrorType } from '@pika/types'
 import { CommunicationServiceClientMock } from '@auth-service/test/mocks/CommunicationServiceClientMock.js'
 import { UserServiceClientMock } from '@auth-service/test/mocks/UserServiceClientMock.js'
 import { MemoryCacheService } from '@pika/redis'
@@ -146,8 +147,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'AUTH_INVALID_CREDENTIALS',
-          type: 'authentication_error',
+          code: ErrorCode.NOT_AUTHENTICATED,
+          type: ErrorType.AUTHENTICATION_ERROR,
           message: 'Invalid email or password',
         }),
       })
@@ -166,8 +167,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'AUTH_INVALID_CREDENTIALS',
-          type: 'authentication_error',
+          code: ErrorCode.NOT_AUTHENTICATED,
+          type: ErrorType.AUTHENTICATION_ERROR,
           message: 'Invalid email or password',
         }),
       })
@@ -186,8 +187,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'AUTH_USER_INACTIVE',
-          type: 'authentication_error',
+          code: ErrorCode.NOT_AUTHENTICATED,
+          type: ErrorType.AUTHENTICATION_ERROR,
           message: 'Account is inactive. Please contact support.',
         }),
       })
@@ -206,8 +207,8 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'AUTH_PASSWORD_REQUIRED',
-          type: 'authentication_error',
+          code: ErrorCode.NOT_AUTHENTICATED,
+          type: ErrorType.AUTHENTICATION_ERROR,
           message: 'Password authentication not available for this account',
         }),
       })
@@ -277,7 +278,7 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'VALIDATION_ERROR',
+          code: ErrorCode.VALIDATION_ERROR,
         }),
       })
     })
@@ -294,7 +295,7 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'VALIDATION_ERROR',
+          code: ErrorCode.VALIDATION_ERROR,
         }),
       })
     })
@@ -312,7 +313,7 @@ describe('Auth Login Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         error: expect.objectContaining({
-          code: 'VALIDATION_ERROR',
+          code: ErrorCode.VALIDATION_ERROR,
         }),
       })
     })

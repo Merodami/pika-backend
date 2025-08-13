@@ -40,7 +40,7 @@ import {
   createTestDatabase,
   InternalAPITestHelper,
 } from '@pika/tests'
-import { UserRole, UserStatus } from '@pika/types'
+import { UserRole, UserStatus, ErrorCode } from '@pika/types'
 import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,
@@ -296,7 +296,7 @@ describe('User Service - Internal API Integration Tests', () => {
       expect(response.body).toMatchObject({
         status_code: 400,
         error: {
-          code: 'VALIDATION_ERROR',
+          code: ErrorCode.VALIDATION_ERROR,
           message: expect.stringContaining('Invalid email'),
           validationErrors: expect.objectContaining({
             email: expect.arrayContaining([

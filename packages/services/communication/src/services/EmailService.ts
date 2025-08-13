@@ -12,7 +12,7 @@ import type {
   SendEmailDTO,
 } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
-import type { EmailTemplateId, PaginatedResult } from '@pika/types'
+import type { EmailTemplateKey, PaginatedResult } from '@pika/types'
 import Handlebars from 'handlebars'
 import { nth } from 'lodash-es'
 
@@ -108,7 +108,7 @@ export class EmailService implements IEmailService {
 
       if (templateId) {
         // File-based template system
-        const templateKey = templateId as EmailTemplateId
+        const templateKey = templateId as EmailTemplateKey
         const rendered = await this.templateService.renderTemplate(
           templateKey,
           {
@@ -251,7 +251,7 @@ export class EmailService implements IEmailService {
 
       if (templateId) {
         // File-based template system for bulk email
-        const templateKey = templateId as EmailTemplateId
+        const templateKey = templateId as EmailTemplateKey
         const rendered = await this.templateService.renderTemplate(
           templateKey,
           // For bulk email, use first recipient's variables for base template

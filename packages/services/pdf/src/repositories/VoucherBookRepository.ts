@@ -580,7 +580,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
     try {
       const voucherBooks = await this.prisma.voucherBook.findMany({
         where: {
-          status: 'ready_for_print',
+          status: 'readyForPrint',
           pdfUrl: null,
         },
         orderBy: { createdAt: 'asc' },

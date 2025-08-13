@@ -1,4 +1,5 @@
 import { logger } from '@pika/shared'
+import { StorageProvider as StorageProviderEnum } from '@pika/types'
 
 import type {
   FileDeleteParams,
@@ -16,7 +17,7 @@ import type {
  */
 export class ConsoleStorageProvider implements StorageProvider {
   getProviderName(): string {
-    return 'local'
+    return StorageProviderEnum.LOCAL
   }
 
   async isAvailable(): Promise<boolean> {

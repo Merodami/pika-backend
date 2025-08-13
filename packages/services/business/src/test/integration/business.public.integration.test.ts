@@ -34,6 +34,7 @@ import {
   TestDatabaseResult,
 } from '@pika/tests'
 import { UserRole, UserStatus } from '@prisma/client'
+import { ErrorCode } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -300,7 +301,7 @@ describe('Business Service - Public API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(404)
 
-      expect(response.body.error.code).toBe('NOT_FOUND')
+      expect(response.body.error.code).toBe(ErrorCode.NOT_FOUND)
     })
 
     it('should not show inactive businesses to public', async () => {
@@ -445,7 +446,7 @@ describe('Business Service - Public API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(400)
 
-      expect(response.body.error.code).toBe('VALIDATION_ERROR')
+      expect(response.body.error.code).toBe(ErrorCode.VALIDATION_ERROR)
       expect(response.body.error.validationErrors).toBeDefined()
     })
 
@@ -560,7 +561,7 @@ describe('Business Service - Public API Integration Tests', () => {
         .expect(400)
 
       expect(response.body.error).toBeDefined()
-      expect(response.body.error.code).toBe('VALIDATION_ERROR')
+      expect(response.body.error.code).toBe(ErrorCode.VALIDATION_ERROR)
     })
 
     it('should handle invalid UUIDs in path parameters', async () => {
