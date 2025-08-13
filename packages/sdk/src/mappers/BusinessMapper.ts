@@ -21,9 +21,12 @@ export interface BusinessDocument {
   userId: string
   businessNameKey: string
   businessDescriptionKey: string | null
-  categoryId: string
+  categoryId: string | null
   verified: boolean
   active: boolean
+  approved: boolean
+  approvedBy: string | null
+  approvedAt: Date | null
   avgRating: number | string // Prisma Decimal comes as number or string
   createdAt: Date | null
   updatedAt: Date | null
@@ -49,6 +52,13 @@ export class BusinessMapper {
       categoryId: doc.categoryId,
       verified: doc.verified,
       active: doc.active,
+      approved: doc.approved,
+      approvedBy: doc.approvedBy,
+      approvedAt: doc.approvedAt
+        ? doc.approvedAt instanceof Date
+          ? doc.approvedAt
+          : new Date(doc.approvedAt)
+        : null,
       avgRating: Number(doc.avgRating), // Convert Decimal to number
       createdAt:
         doc.createdAt instanceof Date
@@ -77,7 +87,7 @@ export class BusinessMapper {
 
   /**
    * Maps a domain entity to an Admin API DTO
-   * Admin responses include branded types and Date objects
+   * Admin responses include branded types and formatted date strings
    */
   static toAdminDTO(domain: BusinessDomain): any {
     return {
@@ -88,10 +98,15 @@ export class BusinessMapper {
       categoryId: domain.categoryId,
       verified: domain.verified,
       active: domain.active,
+      approved: domain.approved,
+      approvedBy: domain.approvedBy || null,
+      approvedAt: domain.approvedAt
+        ? formatDateToISO(domain.approvedAt)
+        : null,
       avgRating: domain.avgRating,
-      createdAt: domain.createdAt,
-      updatedAt: domain.updatedAt,
-      deletedAt: domain.deletedAt || undefined,
+      createdAt: formatDateToISO(domain.createdAt),
+      updatedAt: formatDateToISO(domain.updatedAt),
+      deletedAt: domain.deletedAt ? formatDateToISO(domain.deletedAt) : null,
       // Relations using existing mappers
       user: domain.user ? UserMapper.toAdminDTO(domain.user) : undefined,
       category: domain.category
@@ -109,7 +124,7 @@ export class BusinessMapper {
       userId: domain.userId,
       businessNameKey: domain.businessNameKey,
       businessDescriptionKey: domain.businessDescriptionKey || undefined,
-      categoryId: domain.categoryId,
+      categoryId: domain.categoryId || '', // Handle null categoryId
       verified: domain.verified,
       active: domain.active,
       avgRating: domain.avgRating,
@@ -133,9 +148,12 @@ export class BusinessMapper {
       userId: dto.userId,
       businessNameKey: dto.businessNameKey,
       businessDescriptionKey: dto.businessDescriptionKey || null,
-      categoryId: dto.categoryId,
+      categoryId: dto.categoryId || null, // Handle empty string as null
       verified: dto.verified,
       active: dto.active,
+      approved: false, // Default to false if not in DTO
+      approvedBy: null, // Default to null if not in DTO
+      approvedAt: null, // Default to null if not in DTO
       avgRating: dto.avgRating,
       createdAt: new Date(dto.createdAt),
       updatedAt: new Date(dto.updatedAt),

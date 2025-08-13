@@ -317,7 +317,6 @@ function generateOpenAPIFiles() {
 
     console.log('\n📁 OpenAPI specifications generated in:', OUTPUT_DIR)
     console.log('\nNext steps:')
-    console.log('1. Run "yarn generate:sdk" to generate TypeScript SDK')
     console.log('2. Use the generated specs with your API documentation tools')
     console.log('3. Import the specs into Postman or Insomnia for testing')
   } catch (error) {

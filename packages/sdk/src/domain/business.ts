@@ -13,9 +13,12 @@ export interface BusinessDomain {
   userId: string
   businessNameKey: string
   businessDescriptionKey: string | null
-  categoryId: string
+  categoryId: string | null
   verified: boolean
   active: boolean
+  approved: boolean
+  approvedBy: string | null
+  approvedAt: Date | null
   avgRating: number
   createdAt: Date
   updatedAt: Date
@@ -31,15 +34,19 @@ export interface CreateBusinessData {
   userId: string
   businessNameKey: string
   businessDescriptionKey?: string | null
-  categoryId: string
+  categoryId?: string | null
   verified?: boolean
   active?: boolean
+  approved?: boolean
 }
 
 export interface UpdateBusinessData {
   businessNameKey?: string
   businessDescriptionKey?: string | null
-  categoryId?: string
+  categoryId?: string | null
   verified?: boolean
   active?: boolean
+  approved?: boolean
+  approvedBy?: string | null
+  approvedAt?: Date | null
 }

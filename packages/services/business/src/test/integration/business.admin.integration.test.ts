@@ -23,6 +23,7 @@ import {
 } from '@business/test/helpers/businessTestHelpers.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { UserRole, UserStatus } from '@pika/types'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -53,6 +54,9 @@ describe('Business Service - Admin API Integration Tests', () => {
 
   // Shared test data created once
   let sharedTestData: SharedBusinessTestData
+
+  // Test user for approval tests
+  let testBusinessOwner: any
 
   beforeAll(async () => {
     logger.debug('Setting up Business Service Admin API integration tests...')
@@ -99,6 +103,19 @@ describe('Business Service - Admin API Integration Tests', () => {
     logger.debug(
       `Created ${sharedTestData.allBusinesses.length} test businesses`,
     )
+
+    // Create a dedicated test user for approval tests
+    testBusinessOwner = await testDb.prisma.user.create({
+      data: {
+        email: `business.approval.test@test.com`,
+        firstName: 'Approval',
+        lastName: 'Test',
+        role: UserRole.BUSINESS,
+        status: UserStatus.ACTIVE,
+        emailVerified: true,
+      },
+    })
+    logger.debug('Created test business owner for approval tests')
 
     // Verify shared data was created
     const businessCount = await testDb.prisma.business.count()
@@ -594,6 +611,177 @@ describe('Business Service - Admin API Integration Tests', () => {
       expect(response.body).toHaveLength(3) // 3 categories
       expect(response.body[0]).toHaveProperty('categoryId')
       expect(response.body[0]).toHaveProperty('count')
+    })
+  })
+
+  // Business Approval Tests
+  describe('POST /admin/businesses/:id/approve', () => {
+    it('should approve a business as admin', async () => {
+      // Create a new unapproved business using the shared test user
+      const business = await testDb.prisma.business.create({
+        data: {
+          userId: testBusinessOwner.id,
+          businessNameKey: `business.name.test.${uuid()}`,
+          businessDescriptionKey: `business.description.test.${uuid()}`,
+          categoryId: null, // No category required
+          verified: false,
+          active: true,
+          approved: false,
+          avgRating: 0,
+        },
+      })
+
+      const response = await adminClient
+        .post(`/admin/businesses/${business.id}/approve`)
+        .send({ approved: true })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.id).toBe(business.id)
+      expect(response.body.approved).toBe(true)
+      expect(response.body.approvedBy).toBeTruthy()
+      expect(response.body.approvedAt).toBeTruthy()
+
+      // Verify in database
+      const updatedBusiness = await testDb.prisma.business.findUnique({
+        where: { id: business.id },
+      })
+
+      expect(updatedBusiness?.approved).toBe(true)
+      expect(updatedBusiness?.approvedBy).toBeTruthy()
+      expect(updatedBusiness?.approvedAt).toBeTruthy()
+    })
+
+    it('should reject a business with reason as admin', async () => {
+      // Create a new unapproved business using the shared test user
+      const business = await testDb.prisma.business.create({
+        data: {
+          userId: testBusinessOwner.id,
+          businessNameKey: `business.name.test.${uuid()}`,
+          businessDescriptionKey: `business.description.test.${uuid()}`,
+          categoryId: null,
+          verified: false,
+          active: true,
+          approved: false,
+          avgRating: 0,
+        },
+      })
+
+      const reason = 'Business does not meet quality standards'
+      const response = await adminClient
+        .post(`/admin/businesses/${business.id}/approve`)
+        .send({ approved: false, reason })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.id).toBe(business.id)
+      expect(response.body.approved).toBe(false)
+      expect(response.body.approvedBy).toBeNull()
+      expect(response.body.approvedAt).toBeNull()
+
+      // Verify in database
+      const updatedBusiness = await testDb.prisma.business.findUnique({
+        where: { id: business.id },
+      })
+
+      expect(updatedBusiness?.approved).toBe(false)
+      expect(updatedBusiness?.approvedBy).toBeNull()
+      expect(updatedBusiness?.approvedAt).toBeNull()
+    })
+
+    it('should return 404 for non-existent business', async () => {
+      const nonExistentId = uuid()
+
+      await adminClient
+        .post(`/admin/businesses/${nonExistentId}/approve`)
+        .send({ approved: true })
+        .set('Accept', 'application/json')
+        .expect(404)
+    })
+
+    it('should require admin role for approval', async () => {
+      // Use one of the existing businesses from shared test data
+      const business = sharedTestData.activeBusinesses[0]
+
+      // Customer should get 403
+      await customerClient
+        .post(`/admin/businesses/${business.id}/approve`)
+        .send({ approved: true })
+        .set('Accept', 'application/json')
+        .expect(403)
+
+      // Business user should get 403
+      await businessClient
+        .post(`/admin/businesses/${business.id}/approve`)
+        .send({ approved: true })
+        .set('Accept', 'application/json')
+        .expect(403)
+    })
+
+    it('should handle re-approval of already approved business', async () => {
+      // Create an already approved business using the shared test user
+      const business = await testDb.prisma.business.create({
+        data: {
+          userId: testBusinessOwner.id,
+          businessNameKey: `business.name.test.${uuid()}`,
+          businessDescriptionKey: `business.description.test.${uuid()}`,
+          categoryId: null,
+          verified: true,
+          active: true,
+          approved: true,
+          approvedBy: uuid(),
+          approvedAt: new Date(),
+          avgRating: 0,
+        },
+      })
+
+      // Try to approve again
+      const response = await adminClient
+        .post(`/admin/businesses/${business.id}/approve`)
+        .send({ approved: true })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.approved).toBe(true)
+    })
+
+    it('should allow changing approval status from approved to rejected', async () => {
+      // Create an approved business using the shared test user
+      const business = await testDb.prisma.business.create({
+        data: {
+          userId: testBusinessOwner.id,
+          businessNameKey: `business.name.test.${uuid()}`,
+          businessDescriptionKey: `business.description.test.${uuid()}`,
+          categoryId: null,
+          verified: true,
+          active: true,
+          approved: true,
+          approvedBy: uuid(),
+          approvedAt: new Date(),
+          avgRating: 0,
+        },
+      })
+
+      // Reject the previously approved business
+      const reason = 'Violation of terms of service'
+      const response = await adminClient
+        .post(`/admin/businesses/${business.id}/approve`)
+        .send({ approved: false, reason })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.approved).toBe(false)
+      expect(response.body.approvedBy).toBeNull()
+      expect(response.body.approvedAt).toBeNull()
+
+      // Verify in database
+      const updatedBusiness = await testDb.prisma.business.findUnique({
+        where: { id: business.id },
+      })
+
+      expect(updatedBusiness?.approved).toBe(false)
+      expect(updatedBusiness?.approvedBy).toBeNull()
+      expect(updatedBusiness?.approvedAt).toBeNull()
     })
   })
 

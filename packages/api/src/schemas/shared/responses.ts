@@ -13,7 +13,7 @@ import { DateTime } from './primitives.js'
 // ============= Error Responses =============
 
 /**
- * Base error structure
+ * Base error structure (raw Zod)
  */
 export const ErrorDetails = z.object({
   code: z.string().describe('Machine-readable error code'),
@@ -23,10 +23,19 @@ export const ErrorDetails = z.object({
   timestamp: DateTime.describe('When the error occurred'),
 })
 
+/**
+ * Base error structure (OpenAPI documented)
+ */
+export const ErrorDetailsSchema = ErrorDetails.openapi('ErrorDetails', {
+  description: 'Detailed error information',
+})
+
+export type ErrorDetails = z.infer<typeof ErrorDetails>
+
 // ErrorResponse imported from ./errors.js to avoid duplicates
 
 /**
- * Validation error field
+ * Validation error field (raw Zod)
  */
 export const ValidationErrorField = z.object({
   path: z
@@ -36,43 +45,70 @@ export const ValidationErrorField = z.object({
   code: z.string().optional().describe('Validation rule that failed'),
 })
 
+/**
+ * Validation error field (OpenAPI documented)
+ */
+export const ValidationErrorFieldSchema = ValidationErrorField.openapi(
+  'ValidationErrorField',
+  {
+    description: 'Field-level validation error',
+  },
+)
+
+export type ValidationErrorField = z.infer<typeof ValidationErrorField>
+
 // ValidationErrorResponse imported from ./errors.js to avoid duplicates
 
 /**
- * Rate limit error response
+ * Rate limit error response (raw Zod)
  */
-export const RateLimitResponse = z
-  .object({
-    error: z.object({
-      code: z.literal('RATE_LIMIT_EXCEEDED'),
-      message: z.string().default('Too many requests'),
-      retryAfter: z
-        .number()
-        .int()
-        .positive()
-        .describe('Seconds until rate limit resets'),
-      limit: z.number().int().positive().describe('Request limit'),
-      remaining: z.number().int().nonnegative().describe('Remaining requests'),
-      reset: DateTime.describe('When the rate limit resets'),
-      correlationId: CorrelationId,
-      timestamp: DateTime,
-    }),
-  })
-  .describe('Rate limit exceeded response')
+export const RateLimitResponse = z.object({
+  error: z.object({
+    code: z.literal('RATE_LIMIT_EXCEEDED'),
+    message: z.string().default('Too many requests'),
+    retryAfter: z
+      .number()
+      .int()
+      .positive()
+      .describe('Seconds until rate limit resets'),
+    limit: z.number().int().positive().describe('Request limit'),
+    remaining: z.number().int().nonnegative().describe('Remaining requests'),
+    reset: DateTime.describe('When the rate limit resets'),
+    correlationId: CorrelationId,
+    timestamp: DateTime,
+  }),
+})
+
+/**
+ * Rate limit error response (OpenAPI documented)
+ */
+export const RateLimitResponseSchema = RateLimitResponse.openapi(
+  'RateLimitResponse',
+  {
+    description: 'Rate limit exceeded response',
+  },
+)
 
 export type RateLimitResponse = z.infer<typeof RateLimitResponse>
 
 // ============= Success Responses =============
 
 /**
- * Simple message response
+ * Simple message response (raw Zod)
  */
-export const MessageResponse = z
-  .object({
-    message: z.string().describe('Success message'),
-  })
-  .describe('Simple message response')
-  .openapi('MessageResponse')
+export const MessageResponse = z.object({
+  message: z.string().describe('Success message'),
+})
+
+/**
+ * Simple message response (OpenAPI documented)
+ */
+export const MessageResponseSchema = MessageResponse.openapi(
+  'MessageResponse',
+  {
+    description: 'Simple message response',
+  },
+)
 
 export type MessageResponse = z.infer<typeof MessageResponse>
 
@@ -167,7 +203,7 @@ export function paginatedResponse<T extends z.ZodTypeAny>(
 // ============= Batch Operations =============
 
 /**
- * Batch operation error
+ * Batch operation error (raw Zod)
  */
 export const BatchOperationError = z.object({
   index: z.number().int().nonnegative().describe('Index of the failed item'),
@@ -178,31 +214,47 @@ export const BatchOperationError = z.object({
 })
 
 /**
- * Batch operation response
+ * Batch operation error (OpenAPI documented)
  */
-export const BatchOperationResponse = z
-  .object({
-    successful: z
-      .number()
-      .int()
-      .nonnegative()
-      .describe('Number of successful operations'),
-    failed: z
-      .number()
-      .int()
-      .nonnegative()
-      .describe('Number of failed operations'),
-    total: z
-      .number()
-      .int()
-      .nonnegative()
-      .describe('Total number of operations'),
-    errors: z
-      .array(BatchOperationError)
-      .optional()
-      .describe('Details of failed operations'),
-  })
-  .describe('Response for batch operations')
+export const BatchOperationErrorSchema = BatchOperationError.openapi(
+  'BatchOperationError',
+  {
+    description: 'Error details for failed batch operation item',
+  },
+)
+
+export type BatchOperationError = z.infer<typeof BatchOperationError>
+
+/**
+ * Batch operation response (raw Zod)
+ */
+export const BatchOperationResponse = z.object({
+  successful: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe('Number of successful operations'),
+  failed: z
+    .number()
+    .int()
+    .nonnegative()
+    .describe('Number of failed operations'),
+  total: z.number().int().nonnegative().describe('Total number of operations'),
+  errors: z
+    .array(BatchOperationError)
+    .optional()
+    .describe('Details of failed operations'),
+})
+
+/**
+ * Batch operation response (OpenAPI documented)
+ */
+export const BatchOperationResponseSchema = BatchOperationResponse.openapi(
+  'BatchOperationResponse',
+  {
+    description: 'Response for batch operations',
+  },
+)
 
 export type BatchOperationResponse = z.infer<typeof BatchOperationResponse>
 
@@ -211,7 +263,7 @@ export type BatchOperationResponse = z.infer<typeof BatchOperationResponse>
 // HealthStatus imported from ./health.js to avoid duplicates
 
 /**
- * Service health check
+ * Service health check (raw Zod)
  */
 export const ServiceHealthCheck = z.object({
   status: HealthStatus,
@@ -220,28 +272,48 @@ export const ServiceHealthCheck = z.object({
 })
 
 /**
- * Health check response
+ * Service health check (OpenAPI documented)
  */
-export const HealthCheckResponse = z
-  .object({
-    status: HealthStatus,
-    timestamp: DateTime,
-    service: z.string().describe('Service name'),
-    version: z.string().describe('Service version'),
-    uptime: z.number().int().nonnegative().describe('Uptime in seconds'),
-    checks: z
-      .record(z.string(), ServiceHealthCheck)
-      .optional()
-      .describe('Individual health checks'),
-  })
-  .describe('Service health check response')
+export const ServiceHealthCheckSchema = ServiceHealthCheck.openapi(
+  'ServiceHealthCheck',
+  {
+    description: 'Individual service health check result',
+  },
+)
+
+export type ServiceHealthCheck = z.infer<typeof ServiceHealthCheck>
+
+/**
+ * Health check response (raw Zod)
+ */
+export const HealthCheckResponse = z.object({
+  status: HealthStatus,
+  timestamp: DateTime,
+  service: z.string().describe('Service name'),
+  version: z.string().describe('Service version'),
+  uptime: z.number().int().nonnegative().describe('Uptime in seconds'),
+  checks: z
+    .record(z.string(), ServiceHealthCheck)
+    .optional()
+    .describe('Individual health checks'),
+})
+
+/**
+ * Health check response (OpenAPI documented)
+ */
+export const HealthCheckResponseSchema = HealthCheckResponse.openapi(
+  'HealthCheckResponse',
+  {
+    description: 'Service health check response',
+  },
+)
 
 export type HealthCheckResponse = z.infer<typeof HealthCheckResponse>
 
 // ============= Async Operations =============
 
 /**
- * Async operation status
+ * Async operation status (raw Zod)
  */
 export const AsyncOperationStatus = z.enum([
   'PENDING',
@@ -252,25 +324,46 @@ export const AsyncOperationStatus = z.enum([
 ])
 
 /**
- * Async operation response
+ * Async operation status (OpenAPI documented)
  */
-export const AsyncOperationResponse = z
-  .object({
-    operationId: z.string().uuid().describe('Operation ID for tracking'),
-    status: AsyncOperationStatus,
-    progress: z
-      .number()
-      .min(0)
-      .max(100)
-      .optional()
-      .describe('Progress percentage'),
-    result: z.any().optional().describe('Operation result (when completed)'),
-    error: ErrorDetails.optional().describe('Error details (when failed)'),
-    createdAt: DateTime,
-    updatedAt: DateTime,
-    completedAt: DateTime.optional(),
-  })
-  .describe('Asynchronous operation status')
+export const AsyncOperationStatusSchema = AsyncOperationStatus.openapi(
+  'AsyncOperationStatus',
+  {
+    description: 'Status of an asynchronous operation',
+    example: 'PROCESSING',
+  },
+)
+
+export type AsyncOperationStatus = z.infer<typeof AsyncOperationStatus>
+
+/**
+ * Async operation response (raw Zod)
+ */
+export const AsyncOperationResponse = z.object({
+  operationId: z.string().uuid().describe('Operation ID for tracking'),
+  status: AsyncOperationStatus,
+  progress: z
+    .number()
+    .min(0)
+    .max(100)
+    .optional()
+    .describe('Progress percentage'),
+  result: z.any().optional().describe('Operation result (when completed)'),
+  error: ErrorDetails.optional().describe('Error details (when failed)'),
+  createdAt: DateTime,
+  updatedAt: DateTime,
+  completedAt: DateTime.optional(),
+})
+
+/**
+ * Async operation response (OpenAPI documented)
+ */
+export const AsyncOperationResponseSchema = AsyncOperationResponse.openapi(
+  'AsyncOperationResponse',
+  {
+    description: 'Asynchronous operation status',
+  },
+)
 
 export type AsyncOperationResponse = z.infer<typeof AsyncOperationResponse>
 

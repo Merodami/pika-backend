@@ -33,13 +33,19 @@ export interface IBusinessService {
   verifyBusiness(id: string): Promise<BusinessDomain>
   deactivateBusiness(id: string): Promise<BusinessDomain>
   updateBusinessRating(id: string, rating: number): Promise<BusinessDomain>
+  approveBusiness(
+    id: string,
+    approved: boolean,
+    approvedBy: string,
+    reason?: string,
+  ): Promise<BusinessDomain>
 }
 
 export interface CreateBusinessRequest {
   userId: string
   businessName: string
   businessDescription?: string
-  categoryId: string
+  categoryId?: string | null
   verified?: boolean
   active?: boolean
 }
@@ -410,6 +416,60 @@ export class BusinessService implements IBusinessService {
       logger.error(`Error updating business rating ${id}:`, error)
       throw ErrorFactory.fromError(error, 'Error updating business rating', {
         source: 'BusinessService.updateBusinessRating',
+      })
+    }
+  }
+
+  /**
+   * Approve or reject a business
+   */
+  async approveBusiness(
+    id: string,
+    approved: boolean,
+    approvedBy: string,
+    reason?: string,
+  ): Promise<BusinessDomain> {
+    try {
+      logger.debug(`${approved ? 'Approving' : 'Rejecting'} business: ${id}`)
+
+      // Check if business exists
+      const existingBusiness = await this.businessRepository.findById(id)
+      if (!existingBusiness) {
+        throw ErrorFactory.resourceNotFound(
+          'Business',
+          `Business with id ${id} not found`,
+        )
+      }
+
+      // Update business approval status
+      const business = await this.businessRepository.update(id, {
+        approved,
+        approvedBy: approved ? approvedBy : null,
+        approvedAt: approved ? new Date() : null,
+      })
+
+      // Log the approval action with additional context
+      logger.info({
+        msg: `Business ${approved ? 'approved' : 'rejected'}`,
+        businessId: id,
+        approved,
+        approvedBy,
+        reason,
+        businessOwnerId: business.userId,
+        timestamp: new Date().toISOString(),
+      })
+
+      // Clear cache for this business
+      if (this.cacheService) {
+        await this.cacheService.del(`business:${id}`)
+        await this.cacheService.del(`admin:business:${id}`)
+      }
+
+      return business
+    } catch (error) {
+      logger.error(`Error approving business ${id}:`, error)
+      throw ErrorFactory.fromError(error, 'Error approving business', {
+        source: 'BusinessService.approveBusiness',
       })
     }
   }

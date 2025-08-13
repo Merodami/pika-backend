@@ -41,8 +41,8 @@ ALTER TABLE IF EXISTS ONLY identity.user_devices DROP CONSTRAINT IF EXISTS user_
 ALTER TABLE IF EXISTS ONLY identity.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_device_id_fkey;
-ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS "user_language_preferences_languageCode_fkey";
-ALTER TABLE IF EXISTS ONLY i18n.translations DROP CONSTRAINT IF EXISTS "translations_languageCode_fkey";
+ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS user_language_preferences_language_code_fkey;
+ALTER TABLE IF EXISTS ONLY i18n.translations DROP CONSTRAINT IF EXISTS translations_language_code_fkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_updated_by_fkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_created_by_fkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_book_pages DROP CONSTRAINT IF EXISTS voucher_book_pages_book_id_fkey;
@@ -117,7 +117,7 @@ DROP INDEX IF EXISTS payments.subscription_plans_stripe_price_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_name_key;
 DROP INDEX IF EXISTS payments.subscription_plans_is_active_idx;
 DROP INDEX IF EXISTS marketplace.businesses_verified_active_idx;
-DROP INDEX IF EXISTS marketplace.businesses_user_id_key;
+DROP INDEX IF EXISTS marketplace.businesses_user_id_idx;
 DROP INDEX IF EXISTS marketplace.businesses_deleted_at_idx;
 DROP INDEX IF EXISTS marketplace.businesses_category_id_idx;
 DROP INDEX IF EXISTS marketplace.businesses_avg_rating_idx;
@@ -143,11 +143,11 @@ DROP INDEX IF EXISTS identity.security_events_user_id_idx;
 DROP INDEX IF EXISTS identity.security_events_risk_score_created_at_idx;
 DROP INDEX IF EXISTS identity.security_events_event_type_idx;
 DROP INDEX IF EXISTS identity.security_events_created_at_idx;
-DROP INDEX IF EXISTS i18n."user_language_preferences_userId_key";
-DROP INDEX IF EXISTS i18n."user_language_preferences_userId_idx";
+DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_key;
+DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_idx;
 DROP INDEX IF EXISTS i18n.translations_service_key_idx;
-DROP INDEX IF EXISTS i18n."translations_key_languageCode_key";
-DROP INDEX IF EXISTS i18n."translations_key_languageCode_idx";
+DROP INDEX IF EXISTS i18n.translations_key_language_code_key;
+DROP INDEX IF EXISTS i18n.translations_key_language_code_idx;
 DROP INDEX IF EXISTS files.voucher_books_year_month_idx;
 DROP INDEX IF EXISTS files.voucher_books_updated_by_idx;
 DROP INDEX IF EXISTS files.voucher_books_status_year_month_idx;
@@ -1145,10 +1145,10 @@ CREATE TABLE i18n.languages (
     code text NOT NULL,
     name text NOT NULL,
     direction text DEFAULT 'ltr'::text NOT NULL,
-    "isDefault" boolean DEFAULT false NOT NULL,
-    "isActive" boolean DEFAULT true NOT NULL,
-    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updatedAt" timestamp(3) without time zone NOT NULL
+    is_default boolean DEFAULT false NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(3) without time zone NOT NULL
 );
 
 
@@ -1160,11 +1160,11 @@ CREATE TABLE i18n.translations (
     id text NOT NULL,
     key text NOT NULL,
     value text NOT NULL,
-    "languageCode" text NOT NULL,
+    language_code text NOT NULL,
     context text,
     service text,
-    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updatedAt" timestamp(3) without time zone NOT NULL
+    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(3) without time zone NOT NULL
 );
 
 
@@ -1174,10 +1174,10 @@ CREATE TABLE i18n.translations (
 
 CREATE TABLE i18n.user_language_preferences (
     id text NOT NULL,
-    "userId" text NOT NULL,
-    "languageCode" text NOT NULL,
-    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updatedAt" timestamp(3) without time zone NOT NULL
+    user_id text NOT NULL,
+    language_code text NOT NULL,
+    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(3) without time zone NOT NULL
 );
 
 
@@ -1287,13 +1287,16 @@ CREATE TABLE marketplace.businesses (
     user_id uuid NOT NULL,
     business_name_key character varying(255) NOT NULL,
     business_description_key character varying(255),
-    category_id uuid NOT NULL,
+    category_id uuid,
     verified boolean DEFAULT false NOT NULL,
     active boolean DEFAULT true NOT NULL,
     avg_rating numeric(3,2) DEFAULT 0 NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at timestamp(6) with time zone
+    deleted_at timestamp(6) with time zone,
+    approved boolean DEFAULT false NOT NULL,
+    approved_at timestamp(6) with time zone,
+    approved_by uuid
 );
 
 
@@ -2448,17 +2451,17 @@ CREATE INDEX voucher_books_year_month_idx ON files.voucher_books USING btree (ye
 
 
 --
--- Name: translations_key_languageCode_idx; Type: INDEX; Schema: i18n; Owner: -
+-- Name: translations_key_language_code_idx; Type: INDEX; Schema: i18n; Owner: -
 --
 
-CREATE INDEX "translations_key_languageCode_idx" ON i18n.translations USING btree (key, "languageCode");
+CREATE INDEX translations_key_language_code_idx ON i18n.translations USING btree (key, language_code);
 
 
 --
--- Name: translations_key_languageCode_key; Type: INDEX; Schema: i18n; Owner: -
+-- Name: translations_key_language_code_key; Type: INDEX; Schema: i18n; Owner: -
 --
 
-CREATE UNIQUE INDEX "translations_key_languageCode_key" ON i18n.translations USING btree (key, "languageCode");
+CREATE UNIQUE INDEX translations_key_language_code_key ON i18n.translations USING btree (key, language_code);
 
 
 --
@@ -2469,17 +2472,17 @@ CREATE INDEX translations_service_key_idx ON i18n.translations USING btree (serv
 
 
 --
--- Name: user_language_preferences_userId_idx; Type: INDEX; Schema: i18n; Owner: -
+-- Name: user_language_preferences_user_id_idx; Type: INDEX; Schema: i18n; Owner: -
 --
 
-CREATE INDEX "user_language_preferences_userId_idx" ON i18n.user_language_preferences USING btree ("userId");
+CREATE INDEX user_language_preferences_user_id_idx ON i18n.user_language_preferences USING btree (user_id);
 
 
 --
--- Name: user_language_preferences_userId_key; Type: INDEX; Schema: i18n; Owner: -
+-- Name: user_language_preferences_user_id_key; Type: INDEX; Schema: i18n; Owner: -
 --
 
-CREATE UNIQUE INDEX "user_language_preferences_userId_key" ON i18n.user_language_preferences USING btree ("userId");
+CREATE UNIQUE INDEX user_language_preferences_user_id_key ON i18n.user_language_preferences USING btree (user_id);
 
 
 --
@@ -2658,10 +2661,10 @@ CREATE INDEX businesses_deleted_at_idx ON marketplace.businesses USING btree (de
 
 
 --
--- Name: businesses_user_id_key; Type: INDEX; Schema: marketplace; Owner: -
+-- Name: businesses_user_id_idx; Type: INDEX; Schema: marketplace; Owner: -
 --
 
-CREATE UNIQUE INDEX businesses_user_id_key ON marketplace.businesses USING btree (user_id);
+CREATE INDEX businesses_user_id_idx ON marketplace.businesses USING btree (user_id);
 
 
 --
@@ -3204,19 +3207,19 @@ ALTER TABLE ONLY files.voucher_books
 
 
 --
--- Name: translations translations_languageCode_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
+-- Name: translations translations_language_code_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
 --
 
 ALTER TABLE ONLY i18n.translations
-    ADD CONSTRAINT "translations_languageCode_fkey" FOREIGN KEY ("languageCode") REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT translations_language_code_fkey FOREIGN KEY (language_code) REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
--- Name: user_language_preferences user_language_preferences_languageCode_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
+-- Name: user_language_preferences user_language_preferences_language_code_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
 --
 
 ALTER TABLE ONLY i18n.user_language_preferences
-    ADD CONSTRAINT "user_language_preferences_languageCode_fkey" FOREIGN KEY ("languageCode") REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT user_language_preferences_language_code_fkey FOREIGN KEY (language_code) REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3272,7 +3275,7 @@ ALTER TABLE ONLY identity.user_mfa_settings
 --
 
 ALTER TABLE ONLY marketplace.businesses
-    ADD CONSTRAINT businesses_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT businesses_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --

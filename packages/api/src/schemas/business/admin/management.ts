@@ -40,12 +40,25 @@ export const AdminBusinessResponse = openapi(
       .max(FIELD_LENGTH.SLUG_MAX)
       .optional()
       .describe('Translation key for business description'),
-    categoryId: UUID.describe('Category this business belongs to'),
+    categoryId: UUID.nullable().describe('Category this business belongs to'),
     verified: z
       .boolean()
       .default(false)
       .describe('Whether business is verified'),
     active: z.boolean().default(true).describe('Whether business is active'),
+    approved: z
+      .boolean()
+      .default(false)
+      .describe('Whether business is approved by admin'),
+    approvedBy: UserId.nullable()
+      .optional()
+      .describe('Admin who approved the business'),
+    approvedAt: z
+      .string()
+      .datetime()
+      .nullable()
+      .optional()
+      .describe('When the business was approved'),
     avgRating: z
       .number()
       .min(0)
@@ -326,4 +339,45 @@ export const PatchBusinessVerificationResponse = AdminBusinessResponse
 
 export type PatchBusinessVerificationResponse = z.infer<
   typeof PatchBusinessVerificationResponse
+>
+
+// ============= Business Approval Management =============
+
+/**
+ * Business approval request (raw Zod)
+ */
+const BusinessApprovalRequest = z.object({
+  approved: z.boolean().describe('Approval status'),
+  reason: z
+    .string()
+    .max(500)
+    .optional()
+    .describe('Reason for approval/rejection'),
+})
+
+/**
+ * Business approval request (OpenAPI documented)
+ */
+export const AdminBusinessApprovalRequest = openapi(BusinessApprovalRequest, {
+  description: 'Approve or reject a business',
+})
+
+export type AdminBusinessApprovalRequest = z.infer<
+  typeof AdminBusinessApprovalRequest
+>
+
+/**
+ * Business approval response (raw Zod)
+ */
+const BusinessApprovalResponse = AdminBusinessResponse
+
+/**
+ * Business approval response (OpenAPI documented)
+ */
+export const AdminBusinessApprovalResponse = openapi(BusinessApprovalResponse, {
+  description: 'Business approval result',
+})
+
+export type AdminBusinessApprovalResponse = z.infer<
+  typeof AdminBusinessApprovalResponse
 >

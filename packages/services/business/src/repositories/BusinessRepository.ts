@@ -27,19 +27,23 @@ export interface CreateBusinessData {
   userId: string
   businessNameKey: string
   businessDescriptionKey?: string
-  categoryId: string
+  categoryId?: string | null
   verified?: boolean
   active?: boolean
   avgRating?: number
+  approved?: boolean
 }
 
 export interface UpdateBusinessData {
   businessNameKey?: string
   businessDescriptionKey?: string | null
-  categoryId?: string
+  categoryId?: string | null
   verified?: boolean
   active?: boolean
   avgRating?: number
+  approved?: boolean
+  approvedBy?: string | null
+  approvedAt?: Date | null
 }
 
 /**

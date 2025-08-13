@@ -5,7 +5,7 @@ import { z } from 'zod'
  */
 
 /**
- * Generic bulk operation response
+ * Generic bulk operation response (raw Zod)
  * Used for bulk update/delete operations across different services
  *
  * Services should extend this with specific entity ID fields in the errors array
@@ -23,6 +23,18 @@ export const BulkOperationResponseBase = z.object({
     .nonnegative()
     .describe('Number of failed operations'),
 })
+
+/**
+ * Generic bulk operation response (OpenAPI documented)
+ */
+export const BulkOperationResponseBaseSchema =
+  BulkOperationResponseBase.openapi('BulkOperationResponseBase', {
+    description: 'Base response for bulk operations',
+    example: {
+      successful: 8,
+      failed: 2,
+    },
+  })
 
 export type BulkOperationResponseBase = z.infer<
   typeof BulkOperationResponseBase

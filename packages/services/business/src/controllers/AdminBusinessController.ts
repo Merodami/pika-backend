@@ -8,7 +8,8 @@ import {
 } from '@pika/http'
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
-import { parseIncludeParam } from '@pika/shared'
+import { logger, parseIncludeParam } from '@pika/shared'
+import { RequestContext } from '@pika/http'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -26,6 +27,7 @@ export class AdminBusinessController {
     this.deactivateBusiness = this.deactivateBusiness.bind(this)
     this.activateBusiness = this.activateBusiness.bind(this)
     this.updateBusinessRating = this.updateBusinessRating.bind(this)
+    this.approveBusiness = this.approveBusiness.bind(this)
   }
 
   /**
@@ -323,6 +325,61 @@ export class AdminBusinessController {
         businessAdmin.AdminBusinessResponse,
         response,
         'AdminBusinessController.updateBusinessRating',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/businesses/:business_id/approve
+   * Approve or reject a business (admin only)
+   */
+  async approveBusiness(
+    req: Request<
+      businessPublic.BusinessPathParams,
+      {},
+      businessAdmin.AdminBusinessApprovalRequest
+    >,
+    res: Response<businessAdmin.AdminBusinessApprovalResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: businessId } = req.params
+      const { approved, reason } = req.body
+
+      // Get admin user ID from request context
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
+
+      // Log the approval action
+      logger.info({
+        msg: 'Business approval action',
+        businessId,
+        approved,
+        adminUserId,
+        reason,
+        timestamp: new Date().toISOString(),
+      })
+
+      // Update business approval status
+      const business = await this.businessService.approveBusiness(
+        businessId,
+        approved,
+        adminUserId,
+        reason,
+      )
+
+      // Transform to admin DTO using mapper
+      const response = BusinessMapper.toAdminDTO(business)
+
+      // Validate response
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminBusinessApprovalResponse,
+        response,
+        'AdminBusinessController.approveBusiness',
       )
 
       res.json(validatedResponse)
