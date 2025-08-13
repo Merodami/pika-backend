@@ -19,8 +19,17 @@ if [ -n "$MIGRATION_DATABASE_URL" ]; then
   cd packages/database
 
   # Use timeout to prevent hanging (5 minutes max)
-  # Use MIGRATION_DATABASE_URL for migrations (bypasses connection pooler)
-  timeout 300 bash -c "DATABASE_URL='$MIGRATION_DATABASE_URL' npx prisma migrate deploy"
+  # Export MIGRATION_DATABASE_URL as DATABASE_URL for migrations (bypasses connection pooler)
+  export DATABASE_URL="$MIGRATION_DATABASE_URL"
+  
+  # Add connection parameters to avoid prepared statement issues with poolers
+  # This ensures we're using a direct connection
+  if [[ "$DATABASE_URL" == *":6543"* ]]; then
+    echo "  Warning: URL contains pooler port 6543, adding parameters to avoid prepared statement issues"
+    export DATABASE_URL="${DATABASE_URL}?pgbouncer=true&statement_timeout=300s"
+  fi
+  
+  timeout 300 npx prisma migrate deploy
 
   MIGRATION_EXIT_CODE=$?
   cd ../..
