@@ -8,22 +8,21 @@
  */
 
 import { AxiosInstance } from 'axios'
+
 import {
-  createApiClient,
   authenticateUser,
+  createApiClient,
   executeFlow,
-  logStep,
-  logSuccess,
+  generateRandomEmail,
+  generateRandomPhone,
   logError,
   logInfo,
   logSection,
-  colors,
-  log,
-  generateRandomEmail,
-  generateRandomPhone,
+  logStep,
+  logSuccess,
+  printTestSummary,
   TEST_USERS,
   TestResult,
-  printTestSummary,
 } from './flow-utils.js'
 
 // Test data
@@ -60,7 +59,7 @@ const testUsers = [
   },
 ]
 
-let createdUserIds: string[] = []
+const createdUserIds: string[] = []
 const testResults: TestResult[] = []
 
 // Admin user management test functions
@@ -163,6 +162,7 @@ async function testGetUserDetails(api: AxiosInstance): Promise<void> {
 
   if (createdUserIds.length === 0) {
     logError('No users created to test')
+
     return
   }
 
@@ -201,6 +201,7 @@ async function testUpdateUser(api: AxiosInstance): Promise<void> {
 
   if (createdUserIds.length === 0) {
     logError('No users created to test')
+
     return
   }
 
@@ -244,6 +245,7 @@ async function testChangeUserRole(api: AxiosInstance): Promise<void> {
 
   if (createdUserIds.length < 2) {
     logError('Not enough users created to test role change')
+
     return
   }
 
@@ -259,6 +261,7 @@ async function testChangeUserRole(api: AxiosInstance): Promise<void> {
 
     // Verify role change
     const verifyResponse = await api.get(`/users/${userId}`)
+
     if (verifyResponse.data.role === 'business') {
       logSuccess('Role change verified successfully')
     }
@@ -286,6 +289,7 @@ async function testUpdateUserStatus(api: AxiosInstance): Promise<void> {
 
   if (createdUserIds.length < 3) {
     logError('Not enough users created to test status update')
+
     return
   }
 
@@ -333,6 +337,7 @@ async function testBulkOperations(api: AxiosInstance): Promise<void> {
 
   if (createdUserIds.length < 2) {
     logError('Not enough users for bulk operations')
+
     return
   }
 
@@ -388,11 +393,9 @@ async function testUserStatistics(api: AxiosInstance): Promise<void> {
     logInfo(`Active users: ${statsResponse.data.activeUsers}`)
     logInfo(`Verified emails: ${statsResponse.data.verifiedEmails}`)
     logInfo(`Users by role:`)
-    Object.entries(statsResponse.data.byRole || {}).forEach(
-      ([role, count]) => {
-        logInfo(`  - ${role}: ${count}`)
-      },
-    )
+    Object.entries(statsResponse.data.byRole || {}).forEach(([role, count]) => {
+      logInfo(`  - ${role}: ${count}`)
+    })
     logInfo(`Users by status:`)
     Object.entries(statsResponse.data.byStatus || {}).forEach(
       ([status, count]) => {
@@ -478,6 +481,7 @@ async function testDeleteUser(api: AxiosInstance): Promise<void> {
 
   if (createdUserIds.length === 0) {
     logError('No users created to test deletion')
+
     return
   }
 
@@ -494,6 +498,7 @@ async function testDeleteUser(api: AxiosInstance): Promise<void> {
     // Verify user is soft deleted (status should be 'deleted' or not accessible)
     try {
       const verifyResponse = await api.get(`/users/${userToDelete}`)
+
       if (verifyResponse.data.status === 'deleted') {
         logSuccess('User soft deleted (marked as deleted)')
       }
@@ -532,9 +537,7 @@ async function testSearchAndFilter(api: AxiosInstance): Promise<void> {
       },
     })
 
-    logSuccess(
-      `Name search found ${nameSearchResponse.data.data.length} users`,
-    )
+    logSuccess(`Name search found ${nameSearchResponse.data.data.length} users`)
 
     // Filter by date range (users created today)
     const today = new Date()
@@ -590,6 +593,7 @@ async function testImpersonation(api: AxiosInstance): Promise<void> {
 
   if (createdUserIds.length === 0) {
     logError('No users created to test impersonation')
+
     return
   }
 
@@ -603,19 +607,17 @@ async function testImpersonation(api: AxiosInstance): Promise<void> {
 
     if (impersonateResponse.data.impersonationToken) {
       logSuccess(`Generated impersonation token for user ${userToImpersonate}`)
-      logInfo(
-        `Token expires in: ${impersonateResponse.data.expiresIn} seconds`,
-      )
+      logInfo(`Token expires in: ${impersonateResponse.data.expiresIn} seconds`)
 
       // Test using impersonation token
       const impersonatedApi = createApiClient()
+
       impersonatedApi.defaults.headers.common['Authorization'] =
         `Bearer ${impersonateResponse.data.impersonationToken}`
 
       const meResponse = await impersonatedApi.get('/users/me')
-      logSuccess(
-        `Successfully impersonating user: ${meResponse.data.email}`,
-      )
+
+      logSuccess(`Successfully impersonating user: ${meResponse.data.email}`)
 
       testResults.push({
         name: 'User Impersonation',
@@ -667,7 +669,11 @@ async function runAdminUserManagementFlow(): Promise<void> {
 
   try {
     // Authenticate as admin
-    await authenticateUser(api, TEST_USERS.admin.email, TEST_USERS.admin.password)
+    await authenticateUser(
+      api,
+      TEST_USERS.admin.email,
+      TEST_USERS.admin.password,
+    )
 
     // Run all tests
     await testListUsers(api)

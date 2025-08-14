@@ -11,7 +11,7 @@ Copy and paste this SQL query in your Vercel Postgres dashboard:
 -- Create Damian admin user
 INSERT INTO "users"."users" (
   "id",
-  "email", 
+  "email",
   "password",
   "first_name",
   "last_name",
@@ -24,7 +24,7 @@ INSERT INTO "users"."users" (
   "created_at",
   "updated_at"
 )
-SELECT 
+SELECT
   gen_random_uuid(),
   'damian@pika.com',
   '$2b$10$WHaM.AH4fqzcg0/5NcGpg./flpX0c4.5.d1aMABVWCJEgFNTfC0Fi',
@@ -46,7 +46,7 @@ WHERE NOT EXISTS (
 INSERT INTO "users"."users" (
   "id",
   "email",
-  "password", 
+  "password",
   "first_name",
   "last_name",
   "phone_number",
@@ -81,10 +81,10 @@ WHERE NOT EXISTS (
 
 **IMPORTANT: Save these passwords securely! They are randomly generated and unique.**
 
-| User | Email | Password |
-|------|-------|----------|
+| User   | Email             | Password                |
+| ------ | ----------------- | ----------------------- |
 | Damian | `damian@pika.com` | `ib69A1Va0L0M3jc@Pk24!` |
-| Roman | `roman@pika.com` | `eJXADFJyrcN7D3m@Pk24!` |
+| Roman  | `roman@pika.com`  | `eJXADFJyrcN7D3m@Pk24!` |
 
 ## How to Execute
 
@@ -102,8 +102,8 @@ WHERE NOT EXISTS (
 Run this query to verify:
 
 ```sql
-SELECT email, role, status, email_verified 
-FROM "users"."users" 
+SELECT email, role, status, email_verified
+FROM "users"."users"
 WHERE email IN ('damian@pika.com', 'roman@pika.com');
 ```
 
@@ -114,7 +114,7 @@ If you need to change passwords later:
 ```sql
 -- First generate a new bcrypt hash for your new password
 -- Then update:
-UPDATE "users"."users" 
+UPDATE "users"."users"
 SET password = '$2b$10$[your-new-hash-here]'
 WHERE email = 'damian@pika.com';
 ```

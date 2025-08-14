@@ -17,7 +17,7 @@ export function getStripeConfig(): StripeConfig {
   if (isTest && process.env.STRIPE_MOCK_HOST) {
     return {
       apiKey: 'sk_test_123', // stripe-mock expects this format
-      apiVersion: '2025-06-30.basil',
+      apiVersion: '2025-07-30.basil',
       host: STRIPE_MOCK_HOST,
       port: STRIPE_MOCK_PORT,
       protocol: 'http',
@@ -31,7 +31,7 @@ export function getStripeConfig(): StripeConfig {
 
   return {
     apiKey: process.env.STRIPE_SECRET_KEY,
-    apiVersion: '2025-06-30.basil',
+    apiVersion: '2025-07-30.basil',
   }
 }
 

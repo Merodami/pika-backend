@@ -12,8 +12,8 @@
  */
 
 import { createVoucherServiceClientMock } from '@pika/tests'
-import type { PrismaClient } from '@prisma/client'
 import { VoucherBookStatus, VoucherBookType } from '@pika/types'
+import type { PrismaClient } from '@prisma/client'
 import { v4 as uuid } from 'uuid'
 
 export interface VoucherBookTestData {
@@ -89,7 +89,8 @@ export async function seedTestVoucherBooks(
     let status = VoucherBookStatus.PUBLISHED
 
     if (generateDrafts && generatePublished) {
-      status = i % 2 === 0 ? VoucherBookStatus.PUBLISHED : VoucherBookStatus.DRAFT
+      status =
+        i % 2 === 0 ? VoucherBookStatus.PUBLISHED : VoucherBookStatus.DRAFT
     } else if (generateDrafts) {
       status = VoucherBookStatus.DRAFT
     }
@@ -100,7 +101,10 @@ export async function seedTestVoucherBooks(
         title: `Test Voucher Book ${i + 1}`,
         year: new Date().getFullYear(),
         month: ((new Date().getMonth() + i) % 12) + 1,
-        bookType: i % 2 === 0 ? VoucherBookType.MONTHLY : VoucherBookType.SPECIAL_EDITION,
+        bookType:
+          i % 2 === 0
+            ? VoucherBookType.MONTHLY
+            : VoucherBookType.SPECIAL_EDITION,
         totalPages: 24 + i * 8, // 24, 32, 40, etc.
         status,
         createdBy: userId,

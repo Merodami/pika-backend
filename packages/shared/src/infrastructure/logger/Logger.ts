@@ -1,5 +1,5 @@
 import { LOG_LEVEL, NODE_ENV } from '@pika/environment'
-import { pino } from 'pino'
+import { type LoggerOptions,pino } from 'pino'
 
 // Define a Context type for optional request data.
 export type Context = {
@@ -17,7 +17,7 @@ const isTest = NODE_ENV === 'test'
 // Configure pino options.
 // In development, use pino-pretty for colorized, human-friendly logs.
 // In test, silence logs completely.
-const pinoOptions: pino.LoggerOptions = {
+const pinoOptions: LoggerOptions = {
   // Use silent level for tests or respect the LOG_LEVEL env var
   level: isTest ? 'silent' : LOG_LEVEL,
 

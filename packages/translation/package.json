@@ -12,13 +12,13 @@
     "@pika/environment": "workspace:^",
     "@pika/redis": "workspace:^",
     "@pika/types": "workspace:^",
-    "@prisma/client": "^6.12.0",
-    "ioredis": "^5.6.1",
+    "@prisma/client": "^6.14.0",
+    "ioredis": "^5.7.0",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "repository": {
     "type": "git",

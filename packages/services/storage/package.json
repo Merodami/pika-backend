@@ -7,8 +7,8 @@
   "type": "module",
   "main": "dist/index.js",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.850.0",
-    "@aws-sdk/s3-request-presigner": "^3.850.0",
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@aws-sdk/s3-request-presigner": "^3.864.0",
     "@pika/api": "workspace:^",
     "@pika/auth": "workspace:^",
     "@pika/database": "workspace:^",
@@ -18,8 +18,8 @@
     "@pika/sdk": "workspace:^",
     "@pika/shared": "workspace:^",
     "@pika/types": "workspace:^",
-    "@prisma/client": "^6.12.0",
-    "bullmq": "^5.56.7",
+    "@prisma/client": "^6.14.0",
+    "bullmq": "^5.57.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "lodash-es": "^4.17.21",
@@ -31,13 +31,13 @@
   "devDependencies": {
     "@types/mime-types": "^3.0.1",
     "@types/multer": "^2.0.0",
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.2.1",
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
     "he": "^1.2.0",
     "io-ts-types": "^0.5.19",
     "supertest": "^7.1.4",
-    "typescript": "^5.8.3",
+    "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "depcheck": {

@@ -8,7 +8,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "@pika/database": "workspace:^",
@@ -17,9 +17,9 @@
     "@types/supertest": "^6.0.3",
     "lodash-es": "^4.17.21",
     "node-fetch": "^3.3.2",
-    "stripe": "^18.3.0",
+    "stripe": "^18.4.0",
     "supertest": "^7.1.4",
-    "testcontainers": "^11.4.0",
+    "testcontainers": "^11.5.1",
     "vitest": "^3.2.4"
   },
   "repository": {

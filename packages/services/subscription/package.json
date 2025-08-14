@@ -19,8 +19,8 @@
     "@pika/types": "workspace:^",
     "express": "^5.1.0",
     "jose": "^6.0.12",
-    "pino": "^9.7.0",
-    "zod": "^4.0.10"
+    "pino": "^9.9.0",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@pika/tests": "workspace:^"
