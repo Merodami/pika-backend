@@ -70,8 +70,13 @@ else
   echo "⏭️  Step 2: Skipping migrations (no database connection available)"
 fi
 
-# 3. Build all packages
-echo "🔨 Step 3: Building all packages..."
+# 3. Generate API documentation
+echo "📚 Step 3: Generating API documentation..."
+yarn generate:openapi
+yarn generate:docs
+
+# 4. Build all packages
+echo "🔨 Step 4: Building all packages..."
 npx nx run-many \
   --target=build \
   --projects=@pika/types,@pika/environment,@pika/api,@pika/sdk,@pika/shared,@pika/database,@pika/redis,@pika/http,@pika/deployment,@pika/api-gateway,@pika/auth,@pika/user,@pika/payment,@pika/subscription,@pika/communication,@pika/support,@pika/storage,@pika/business,@pika/category,@pika/voucher-service,@pika/pdf \

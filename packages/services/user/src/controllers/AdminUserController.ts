@@ -9,7 +9,7 @@ import {
 import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
-import { UserStatus, VerificationType } from '@pika/types'
+import { VerificationType } from '@pika/types'
 import type {
   IUserService,
   ResendRequest,

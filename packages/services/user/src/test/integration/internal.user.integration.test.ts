@@ -40,7 +40,7 @@ import {
   createTestDatabase,
   InternalAPITestHelper,
 } from '@pika/tests'
-import { UserRole, UserStatus, ErrorCode } from '@pika/types'
+import { ErrorCode,UserRole, UserStatus } from '@pika/types'
 import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,

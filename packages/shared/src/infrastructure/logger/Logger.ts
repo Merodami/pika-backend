@@ -1,5 +1,5 @@
 import { LOG_LEVEL, NODE_ENV } from '@pika/environment'
-import { type LoggerOptions,pino } from 'pino'
+import { type LoggerOptions, pino } from 'pino'
 
 // Define a Context type for optional request data.
 export type Context = {

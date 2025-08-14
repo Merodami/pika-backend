@@ -1,3 +1,4 @@
+import { NODE_ENV } from '@pika/environment'
 import { type Request, type Response, Router } from 'express'
 import { existsSync } from 'fs'
 import { readFile } from 'fs/promises'
@@ -6,6 +7,9 @@ import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+
+// Check if running in development environment
+const isDevelopment = NODE_ENV === 'development'
 
 /**
  * Create documentation routes
@@ -61,15 +65,45 @@ export function createDocsRouter(): Router {
     await serveDocFile('public-api-docs.html', res)
   })
 
+  // Admin documentation - only available in development
   router.get('/admin', async (_req: Request, res: Response) => {
+    if (!isDevelopment) {
+      res.status(404).json({
+        error: 'Not Found',
+        message:
+          'This documentation is not available in production environments',
+      })
+
+      return
+    }
     await serveDocFile('admin-api-docs.html', res)
   })
 
+  // Internal documentation - only available in development
   router.get('/internal', async (_req: Request, res: Response) => {
+    if (!isDevelopment) {
+      res.status(404).json({
+        error: 'Not Found',
+        message:
+          'This documentation is not available in production environments',
+      })
+
+      return
+    }
     await serveDocFile('internal-api-docs.html', res)
   })
 
+  // All APIs documentation - only available in development
   router.get('/all', async (_req: Request, res: Response) => {
+    if (!isDevelopment) {
+      res.status(404).json({
+        error: 'Not Found',
+        message:
+          'This documentation is not available in production environments',
+      })
+
+      return
+    }
     await serveDocFile('all-apis-docs.html', res)
   })
 
