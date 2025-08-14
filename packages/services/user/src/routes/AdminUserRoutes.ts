@@ -4,6 +4,7 @@ import {
   requirePermissions,
   validateBody,
   validateParams,
+  validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { CommunicationServiceClient, FileStoragePort } from '@pika/shared'
@@ -49,7 +50,94 @@ export function createAdminUserRouter(
     },
   })
 
-  // Admin verification routes
+  // ============= User Management Routes =============
+
+  // GET /admin/users - List all users with filters
+  router.get(
+    '/',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateQuery(userAdmin.AdminUserQueryParams),
+    controller.getAllUsers,
+  )
+
+  // ============= Admin Profile Routes (must be before :id routes) =============
+  // GET /admin/users/me - Get current admin user profile
+  router.get(
+    '/me',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    controller.getMyProfile,
+  )
+
+  // PATCH /admin/users/me - Update current admin user profile
+  router.patch(
+    '/me',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateBody(userAdmin.AdminUpdateProfileRequest),
+    controller.updateMyProfile,
+  )
+
+  // GET /admin/users/email/:email - Get user by email
+  router.get(
+    '/email/:email',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.EmailParam),
+    controller.getUserByEmail,
+  )
+
+  // POST /admin/users - Create new user
+  router.post(
+    '/',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateBody(userAdmin.AdminCreateUserRequest),
+    controller.createUser,
+  )
+
+  // PATCH /admin/users/:id - Update user
+  router.patch(
+    '/:id',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.AdminUpdateUserRequest),
+    controller.updateUser,
+  )
+
+  // PUT /admin/users/:id/status - Update user status
+  router.put(
+    '/:id/status',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.AdminUpdateUserStatusRequest),
+    controller.updateUserStatus,
+  )
+
+  // PUT /admin/users/:id/ban - Ban user
+  router.put(
+    '/:id/ban',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.AdminBanUserRequest),
+    controller.banUser,
+  )
+
+  // PUT /admin/users/:id/unban - Unban user
+  router.put(
+    '/:id/unban',
+    requireAuth(),
+    requirePermissions('admin:users'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(userAdmin.AdminUnbanUserRequest),
+    controller.unbanUser,
+  )
+
+  // ============= Verification Routes =============
   // POST /admin/users/verify - Admin verifies any user
   router.post(
     '/verify',
@@ -76,24 +164,6 @@ export function createAdminUserRouter(
     validateParams(userAdmin.UserIdParam),
     upload.single('file'),
     controller.uploadUserAvatar,
-  )
-
-  // Admin profile routes
-  // GET /admin/users/me - Get current admin user profile
-  router.get(
-    '/me',
-    requireAuth(),
-    requirePermissions('admin:users'),
-    controller.getMyProfile,
-  )
-
-  // PATCH /admin/users/me - Update current admin user profile
-  router.patch(
-    '/me',
-    requireAuth(),
-    requirePermissions('admin:users'),
-    validateBody(userAdmin.AdminUpdateProfileRequest),
-    controller.updateMyProfile,
   )
 
   // GET /admin/users/:id - Get user by ID with admin details

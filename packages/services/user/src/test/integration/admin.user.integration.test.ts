@@ -41,7 +41,12 @@ import {
   createTestDatabase,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { EmailTemplateKey, UserRole, UserStatus, VerificationType } from '@pika/types'
+import {
+  EmailTemplateKey,
+  UserRole,
+  UserStatus,
+  VerificationType,
+} from '@pika/types'
 import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,
@@ -183,7 +188,7 @@ describe('User Service - Admin API Integration Tests', () => {
       await seedTestUsers(testDb.prisma, { count: 5 })
 
       const response = await adminClient
-        .get('/users')
+        .get('/admin/users')
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -198,7 +203,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const targetUser = testUsers.users[0]
 
       const response = await adminClient
-        .get('/users')
+        .get('/admin/users')
         .query({ email: targetUser.email })
         .set('Accept', 'application/json')
         .expect(200)
@@ -212,7 +217,7 @@ describe('User Service - Admin API Integration Tests', () => {
       await seedTestUsers(testDb.prisma, { count: 3, role: UserRole.CUSTOMER })
 
       const response = await adminClient
-        .get('/users')
+        .get('/admin/users')
         .query({ role: UserRole.CUSTOMER })
         .set('Accept', 'application/json')
         .expect(200)
@@ -242,7 +247,7 @@ describe('User Service - Admin API Integration Tests', () => {
       })
 
       const response = await adminClient
-        .get('/users')
+        .get('/admin/users')
         .query({ status: UserStatus.ACTIVE })
         .set('Accept', 'application/json')
         .expect(200)
@@ -259,7 +264,7 @@ describe('User Service - Admin API Integration Tests', () => {
       await seedTestUsers(testDb.prisma, { count: 5 })
 
       const response = await adminClient
-        .get('/users?sortBy=email&sortOrder=asc')
+        .get('/admin/users?sortBy=email&sortOrder=asc')
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -275,7 +280,7 @@ describe('User Service - Admin API Integration Tests', () => {
       await seedTestUsers(testDb.prisma, { count: 10 })
 
       const response = await adminClient
-        .get('/users?page=1&limit=5')
+        .get('/admin/users?page=1&limit=5')
         .set('Accept', 'application/json')
 
       if (response.status !== 200) {
@@ -294,7 +299,7 @@ describe('User Service - Admin API Integration Tests', () => {
 
       // Test first page
       const firstPageResponse = await adminClient
-        .get('/users?page=1&limit=5')
+        .get('/admin/users?page=1&limit=5')
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -305,7 +310,7 @@ describe('User Service - Admin API Integration Tests', () => {
 
       // Test second page
       const secondPageResponse = await adminClient
-        .get('/users?page=2&limit=5')
+        .get('/admin/users?page=2&limit=5')
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -315,7 +320,7 @@ describe('User Service - Admin API Integration Tests', () => {
 
     it('should return 403 for non-admin users', async () => {
       await customerClient
-        .get('/users')
+        .get('/admin/users')
         .set('Accept', 'application/json')
         .expect(403)
     })
@@ -372,7 +377,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const targetUser = testUsers.users[0]
 
       const response = await adminClient
-        .get(`/users/email/${targetUser.email}`)
+        .get(`/admin/users/email/${targetUser.email}`)
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -382,14 +387,14 @@ describe('User Service - Admin API Integration Tests', () => {
 
     it('should return 404 for non-existent email', async () => {
       await adminClient
-        .get('/users/email/nonexistent@example.com')
+        .get('/admin/users/email/nonexistent@example.com')
         .set('Accept', 'application/json')
         .expect(404)
     })
 
     it('should return 403 for non-admin users', async () => {
       await customerClient
-        .get('/users/email/test@example.com')
+        .get('/admin/users/email/test@example.com')
         .set('Accept', 'application/json')
         .expect(403)
     })
@@ -409,7 +414,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
 
@@ -446,14 +451,14 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(201)
 
       expect(response.body.email).toBe(userData.email)
       expect(response.body.role).toBe('customer') // Default value
-      expect(response.body.status).toBe(UserStatus.UNCONFIRMED) // Default value
+      expect(response.body.status).toBe(UserStatus.ACTIVE) // Default value for admin creation
     })
 
     it('should create business user', async () => {
@@ -467,7 +472,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(201)
@@ -487,7 +492,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(201)
@@ -502,7 +507,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(incompleteData)
         .set('Accept', 'application/json')
         .expect(400)
@@ -520,7 +525,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(400)
@@ -540,7 +545,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(422)
@@ -557,7 +562,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(400)
@@ -575,7 +580,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       await customerClient
-        .post('/users')
+        .post('/admin/users')
         .send(userData)
         .set('Accept', 'application/json')
         .expect(403)
@@ -594,7 +599,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .patch(`/users/${targetUser.id}`)
+        .patch(`/admin/users/${targetUser.id}`)
         .send(updateData)
         .set('Accept', 'application/json')
         .expect(200)
@@ -622,7 +627,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .patch(`/users/${targetUser.id}`)
+        .patch(`/admin/users/${targetUser.id}`)
         .send(updateData)
         .set('Accept', 'application/json')
         .expect(200)
@@ -646,7 +651,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .patch(`/users/${targetUser.id}`)
+        .patch(`/admin/users/${targetUser.id}`)
         .send(updateData)
         .set('Accept', 'application/json')
         .expect(200)
@@ -659,7 +664,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const updateData = { firstName: 'Updated' }
 
       await adminClient
-        .patch(`/users/${nonExistentId}`)
+        .patch(`/admin/users/${nonExistentId}`)
         .send(updateData)
         .set('Accept', 'application/json')
         .expect(404)
@@ -670,7 +675,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const updateData = { firstName: 'Unauthorized' }
 
       await customerClient
-        .patch(`/users/${testUsers.users[0].id}`)
+        .patch(`/admin/users/${testUsers.users[0].id}`)
         .send(updateData)
         .set('Accept', 'application/json')
         .expect(403)
@@ -684,7 +689,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const userToDelete = testUsers.users[0]
 
       await adminClient
-        .delete(`/users/${userToDelete.id}`)
+        .delete(`/admin/users/${userToDelete.id}`)
         .set('Accept', 'application/json')
         .expect(204)
 
@@ -700,7 +705,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const nonExistentId = uuid()
 
       await adminClient
-        .delete(`/users/${nonExistentId}`)
+        .delete(`/admin/users/${nonExistentId}`)
         .set('Accept', 'application/json')
         .expect(404)
     })
@@ -709,7 +714,7 @@ describe('User Service - Admin API Integration Tests', () => {
       const testUsers = await seedTestUsers(testDb.prisma, { count: 1 })
 
       await customerClient
-        .delete(`/users/${testUsers.users[0].id}`)
+        .delete(`/admin/users/${testUsers.users[0].id}`)
         .set('Accept', 'application/json')
         .expect(403)
     })
@@ -805,7 +810,12 @@ describe('User Service - Admin API Integration Tests', () => {
         .patch('/admin/users/me')
         .send(updateData)
         .set('Accept', 'application/json')
-        .expect(200)
+
+      if (response.status !== 200) {
+        console.error('Update profile failed:', response.body)
+      }
+
+      expect(response.status).toBe(200)
 
       expect(response.body.firstName).toBe(updateData.firstName)
       expect(response.body.lastName).toBe(updateData.lastName)
@@ -1184,7 +1194,7 @@ describe('User Service - Admin API Integration Tests', () => {
         )!
 
         const response = await adminClient
-          .put(`/users/${targetUser.id}/ban`)
+          .put(`/admin/users/${targetUser.id}/ban`)
           .send({
             reason: 'Violation of Terms of Service',
             duration: 30,
@@ -1219,7 +1229,7 @@ describe('User Service - Admin API Integration Tests', () => {
         )!
 
         await adminClient
-          .put(`/users/${targetUser.id}/ban`)
+          .put(`/admin/users/${targetUser.id}/ban`)
           .send({
             reason: 'Suspicious activity',
             notifyUser: false,
@@ -1248,7 +1258,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const targetUser = sharedTestData.allUsers[2]
 
         await adminClient
-          .put(`/users/${targetUser.id}/ban`)
+          .put(`/admin/users/${targetUser.id}/ban`)
           .send({})
           .expect(204)
 
@@ -1264,14 +1274,14 @@ describe('User Service - Admin API Integration Tests', () => {
         const targetUser = sharedTestData.allUsers[0]
 
         await customerClient
-          .put(`/users/${targetUser.id}/ban`)
+          .put(`/admin/users/${targetUser.id}/ban`)
           .send({ reason: 'Test' })
           .expect(403)
       })
 
       it('should return 404 for non-existent user', async () => {
         await adminClient
-          .put('/users/00000000-0000-0000-0000-000000000000/ban')
+          .put('/admin/users/00000000-0000-0000-0000-000000000000/ban')
           .send({ reason: 'Test' })
           .expect(404)
       })
@@ -1283,7 +1293,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const targetUser = sharedTestData.allUsers[3]
 
         await adminClient
-          .put(`/users/${targetUser.id}/ban`)
+          .put(`/admin/users/${targetUser.id}/ban`)
           .send({ reason: 'Test ban' })
           .expect(204)
 
@@ -1292,7 +1302,7 @@ describe('User Service - Admin API Integration Tests', () => {
 
         // Now unban with notification
         await adminClient
-          .put(`/users/${targetUser.id}/unban`)
+          .put(`/admin/users/${targetUser.id}/unban`)
           .send({
             reason: 'Ban appeal approved',
             notifyUser: true,
@@ -1324,13 +1334,13 @@ describe('User Service - Admin API Integration Tests', () => {
         const targetUser = sharedTestData.allUsers[4]
 
         await adminClient
-          .put(`/users/${targetUser.id}/ban`)
+          .put(`/admin/users/${targetUser.id}/ban`)
           .send({ reason: 'Test ban' })
           .expect(204)
 
         // Now unban without notification
         await adminClient
-          .put(`/users/${targetUser.id}/unban`)
+          .put(`/admin/users/${targetUser.id}/unban`)
           .send({
             notifyUser: false,
           })
@@ -1348,7 +1358,7 @@ describe('User Service - Admin API Integration Tests', () => {
         const targetUser = sharedTestData.allUsers[0]
 
         await customerClient
-          .put(`/users/${targetUser.id}/unban`)
+          .put(`/admin/users/${targetUser.id}/unban`)
           .send({ reason: 'Test' })
           .expect(403)
       })
@@ -1365,7 +1375,7 @@ describe('User Service - Admin API Integration Tests', () => {
       }
 
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send(invalidData)
         .set('Accept', 'application/json')
         .expect(400) // Validation error
@@ -1375,14 +1385,14 @@ describe('User Service - Admin API Integration Tests', () => {
 
     it('should handle invalid UUID parameters', async () => {
       await adminClient
-        .get('/users/not-a-uuid')
+        .get('/admin/users/not-a-uuid')
         .set('Accept', 'application/json')
         .expect(400)
     })
 
     it('should provide detailed error information for admins', async () => {
       const response = await adminClient
-        .post('/users')
+        .post('/admin/users')
         .send({}) // Empty data
         .set('Accept', 'application/json')
         .expect(400)
@@ -1403,7 +1413,7 @@ describe('User Service - Admin API Integration Tests', () => {
 
       const startTime = Date.now()
       const response = await adminClient
-        .get('/users?limit=50')
+        .get('/admin/users?limit=50')
         .set('Accept', 'application/json')
         .expect(200)
 

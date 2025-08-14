@@ -18,7 +18,7 @@ import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { Email, UserId } from '../../shared/branded.js'
 import { BinaryFile } from '../../shared/fileUpload.js'
 import { withTimestamps } from '../../shared/metadata.js'
-import { DateOnly, DateTime, UUID } from '../../shared/primitives.js'
+import { DateOnly, DateTime, UUID, Password, PhoneNumber, LanguageCode } from '../../shared/primitives.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { UserRoleSchema, UserStatusSchema } from '../common/enums.js'
 import { AdminUserSortBySchema } from '../common/enums.js'
@@ -322,17 +322,26 @@ export type AdminBulkOperationResponse = z.infer<
 // Missing schemas for admin-api.ts
 /**
  * Admin create user request (raw Zod)
+ * Used for POST /users endpoint when called by admin
+ * Allows admins to create users with specific roles and verification status
  */
 export const AdminCreateUserRequest = z.object({
+  // Required fields
   email: Email,
-  firstName: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.CODE_MAX),
-  lastName: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.CODE_MAX),
-  phoneNumber: z.string().min(1),
+  firstName: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.FIRST_NAME_MAX),
+  lastName: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.LAST_NAME_MAX),
+  
+  // Optional fields
+  phoneNumber: PhoneNumber.optional(),
   dateOfBirth: DateOnly.optional(),
+  password: Password.optional().describe('Optional password - if not provided, user will set it on first login'),
+  
+  // Admin-settable fields
   role: UserRoleSchema.default(UserRoleEnum.CUSTOMER),
-  status: UserStatusSchema.default(UserStatusEnum.UNCONFIRMED),
-  appVersion: z.string().optional(),
-  alias: z.string().optional(),
+  status: UserStatusSchema.default(UserStatusEnum.ACTIVE),
+  emailVerified: z.boolean().default(false).describe('Admin can create pre-verified users'),
+  phoneVerified: z.boolean().default(false),
+  preferredLanguage: LanguageCode.optional(),
 })
 
 /**
@@ -349,28 +358,26 @@ export type AdminCreateUserRequest = z.infer<typeof AdminCreateUserRequest>
 
 /**
  * Admin update user request (raw Zod)
+ * Used for PATCH /users/{id} endpoint when called by admin
+ * All fields are optional - only provided fields will be updated
  */
 export const AdminUpdateUserRequest = z.object({
-  firstName: z
-    .string()
-    .min(FIELD_LENGTH.NAME_MIN)
-    .max(FIELD_LENGTH.CODE_MAX)
-    .optional(),
-  lastName: z
-    .string()
-    .min(FIELD_LENGTH.NAME_MIN)
-    .max(FIELD_LENGTH.CODE_MAX)
-    .optional(),
-  phoneNumber: z.string().optional(),
+  // Basic user info
+  firstName: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.FIRST_NAME_MAX).optional(),
+  lastName: z.string().min(FIELD_LENGTH.NAME_MIN).max(FIELD_LENGTH.LAST_NAME_MAX).optional(),
+  phoneNumber: PhoneNumber.optional(),
   dateOfBirth: DateOnly.optional(),
-  role: UserRoleSchema.optional(),
-  status: UserStatusSchema.optional(),
-  appVersion: z.string().optional(),
-  alias: z.string().optional(),
-  activeMembership: z.boolean().optional(),
-  // For PROFESSIONAL role
-  description: z.string().optional(),
-  specialties: z.array(z.string()).optional(),
+  preferredLanguage: LanguageCode.optional(),
+  
+  // Admin-only fields for user management
+  email: Email.optional().describe('Admin can change user email'),
+  role: UserRoleSchema.optional().describe('Change user role'),
+  status: UserStatusSchema.optional().describe('Change user status (active, suspended, etc.)'),
+  emailVerified: z.boolean().optional().describe('Manually verify/unverify email'),
+  phoneVerified: z.boolean().optional().describe('Manually verify/unverify phone'),
+  
+  // Password reset
+  password: Password.optional().describe('Admin can reset user password'),
 })
 
 /**

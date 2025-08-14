@@ -3,6 +3,7 @@
 ## Comprehensive Documentation Architecture
 
 ### Root Level Documentation
+
 Essential project-wide documentation that developers need immediate access to.
 
 ```
@@ -277,12 +278,15 @@ reference/
 ## Documentation Standards
 
 ### File Naming Conventions
+
 - Use lowercase with hyphens: `api-gateway.md`
 - Be descriptive but concise
 - Group related docs in folders
 
 ### Document Structure
+
 Each document should include:
+
 1. **Title** - Clear, descriptive title
 2. **Purpose** - Why this document exists
 3. **Table of Contents** - For documents > 3 sections
@@ -292,6 +296,7 @@ Each document should include:
 7. **Last Updated** - Date of last update
 
 ### Markdown Standards
+
 - Use ATX headers (`#`, `##`, `###`)
 - Code blocks with language specification
 - Tables for structured data
@@ -301,21 +306,25 @@ Each document should include:
 ## Migration from Current Structure
 
 ### Phase 1: Create New Structure
+
 1. Create all new directories
 2. Create README.md files for each section
 3. Set up navigation and cross-references
 
 ### Phase 2: Move and Reorganize
+
 1. Move docs from `docs/new-architecture/` to appropriate locations
 2. Split large files into focused documents
 3. Consolidate duplicate content
 
 ### Phase 3: Update and Enhance
+
 1. Update outdated documentation
 2. Fill gaps in documentation
 3. Add examples and diagrams
 
 ### Phase 4: Clean Up
+
 1. Archive old AI-generated docs
 2. Remove redundant files
 3. Update all internal links
