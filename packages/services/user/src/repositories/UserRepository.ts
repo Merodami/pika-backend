@@ -68,7 +68,6 @@ export class UserRepository implements IUserRepository {
           { email: { contains: search, mode: 'insensitive' } },
           { firstName: { contains: search, mode: 'insensitive' } },
           { lastName: { contains: search, mode: 'insensitive' } },
-          { alias: { contains: search, mode: 'insensitive' } },
         ]
       }
 
