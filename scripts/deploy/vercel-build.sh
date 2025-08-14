@@ -70,16 +70,24 @@ else
   echo "⏭️  Step 2: Skipping migrations (no database connection available)"
 fi
 
-# 3. Generate API documentation
-echo "📚 Step 3: Generating API documentation..."
+# 3. Build core packages first (required for documentation generation)
+echo "🔨 Step 3: Building core packages..."
+npx nx run-many \
+  --target=build \
+  --projects=@pika/types,@pika/environment \
+  --parallel=2 \
+  --output-style=stream
+
+# 4. Generate API documentation
+echo "📚 Step 4: Generating API documentation..."
 yarn generate:openapi
 yarn generate:docs
 
-# 4. Build all packages
-echo "🔨 Step 4: Building all packages..."
+# 5. Build remaining packages
+echo "🔨 Step 5: Building all remaining packages..."
 npx nx run-many \
   --target=build \
-  --projects=@pika/types,@pika/environment,@pika/api,@pika/sdk,@pika/shared,@pika/database,@pika/redis,@pika/http,@pika/deployment,@pika/api-gateway,@pika/auth,@pika/user,@pika/payment,@pika/subscription,@pika/communication,@pika/support,@pika/storage,@pika/business,@pika/category,@pika/voucher-service,@pika/pdf \
+  --projects=@pika/api,@pika/sdk,@pika/shared,@pika/database,@pika/redis,@pika/http,@pika/deployment,@pika/api-gateway,@pika/auth,@pika/user,@pika/payment,@pika/subscription,@pika/communication,@pika/support,@pika/storage,@pika/business,@pika/category,@pika/voucher-service,@pika/pdf \
   --parallel=100 \
   --output-style=stream
 
