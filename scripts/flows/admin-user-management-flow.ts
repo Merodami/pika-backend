@@ -129,7 +129,7 @@ async function testCreateUsers(api: AxiosInstance): Promise<void> {
     try {
       logInfo(`Creating user: ${userData.email}`)
 
-      const response = await api.post('/users/admin/create', {
+      const response = await api.post('/admin/users', {
         ...userData,
         emailVerified: true, // Admin can create pre-verified users
         status: 'active',
@@ -343,7 +343,7 @@ async function testBulkOperations(api: AxiosInstance): Promise<void> {
 
   try {
     // Bulk status update
-    const bulkStatusResponse = await api.post('/users/admin/bulk/status', {
+    const bulkStatusResponse = await api.post('/admin/users/bulk/status', {
       userIds: createdUserIds.slice(0, 2),
       status: 'inactive',
       reason: 'Bulk test deactivation',
@@ -354,7 +354,7 @@ async function testBulkOperations(api: AxiosInstance): Promise<void> {
     )
 
     // Bulk reactivate
-    const bulkReactivateResponse = await api.post('/users/admin/bulk/status', {
+    const bulkReactivateResponse = await api.post('/admin/users/bulk/status', {
       userIds: createdUserIds.slice(0, 2),
       status: 'active',
       reason: 'Bulk test reactivation',
@@ -386,7 +386,7 @@ async function testUserStatistics(api: AxiosInstance): Promise<void> {
 
   try {
     // Get user statistics
-    const statsResponse = await api.get('/users/admin/statistics')
+    const statsResponse = await api.get('/admin/users/statistics')
 
     logSuccess('Retrieved user statistics')
     logInfo(`Total users: ${statsResponse.data.totalUsers}`)
@@ -435,7 +435,7 @@ async function testExportUsers(api: AxiosInstance): Promise<void> {
 
   try {
     // Export users as CSV
-    const exportResponse = await api.get('/users/admin/export', {
+    const exportResponse = await api.get('/admin/users/export', {
       params: {
         format: 'csv',
         includeInactive: true,
