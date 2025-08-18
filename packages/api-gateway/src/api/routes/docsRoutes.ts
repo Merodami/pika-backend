@@ -8,8 +8,8 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-// Check if running in development environment
-const isDevelopment = NODE_ENV === 'development'
+// Check if running in production environment
+const isProduction = NODE_ENV === 'production'
 
 /**
  * Create documentation routes
@@ -67,7 +67,7 @@ export function createDocsRouter(): Router {
 
   // Admin documentation - only available in development
   router.get('/admin', async (_req: Request, res: Response) => {
-    if (!isDevelopment) {
+    if (isProduction) {
       res.status(404).json({
         error: 'Not Found',
         message:
@@ -81,7 +81,7 @@ export function createDocsRouter(): Router {
 
   // Internal documentation - only available in development
   router.get('/internal', async (_req: Request, res: Response) => {
-    if (!isDevelopment) {
+    if (isProduction) {
       res.status(404).json({
         error: 'Not Found',
         message:
@@ -95,7 +95,7 @@ export function createDocsRouter(): Router {
 
   // All APIs documentation - only available in development
   router.get('/all', async (_req: Request, res: Response) => {
-    if (!isDevelopment) {
+    if (isProduction) {
       res.status(404).json({
         error: 'Not Found',
         message:

@@ -57,7 +57,7 @@ const BaseCategoryResponse = withTimestamps({
 /**
  * Base category response (OpenAPI documented)
  */
-const BaseCategoryResponseSchema = BaseCategoryResponse.openapi(
+export const BaseCategoryResponseSchema = BaseCategoryResponse.openapi(
   'BaseCategoryResponse',
   {
     description: 'Category information',

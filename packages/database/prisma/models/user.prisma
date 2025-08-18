@@ -22,7 +22,6 @@ model User {
   preferredLanguage String?           @map("preferred_language") @db.VarChar(2) // ISO 639-1 language code
 
   // Relations
-  addresses         Address[]
   problems          Problem[]
   
   // Enhanced authentication relations
