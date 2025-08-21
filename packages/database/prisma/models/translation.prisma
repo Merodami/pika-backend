@@ -1,0 +1,55 @@
+// Translation system models
+// Supports Spanish (default), English, and Guaraní languages
+// Based on the original i18n schema from migration 20250812174013_init
+
+model Language {
+  code      String  @id
+  name      String
+  direction String  @default("ltr")
+  isDefault Boolean @default(false) @map("is_default")
+  isActive  Boolean @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  // Relations
+  translations            Translation[]
+  userLanguagePreferences UserLanguagePreference[]
+
+  @@map("languages")
+  @@schema("i18n")
+}
+
+model Translation {
+  id           String   @id @default(cuid())
+  key          String
+  value        String
+  languageCode String   @map("language_code")
+  context      String?
+  service      String?
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  // Relations
+  language Language @relation(fields: [languageCode], references: [code], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([key, languageCode])
+  @@map("translations")
+  @@schema("i18n")
+}
+
+model UserLanguagePreference {
+  id           String   @id @default(cuid())
+  userId       String   @unique @map("user_id") // Note: This should match User.id type (UUID as String)
+  languageCode String   @map("language_code")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  // Relations
+  // Note: User.id is UUID but stored as String in user_language_preferences
+  user     User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  language Language @relation(fields: [languageCode], references: [code], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([userId])
+  @@map("user_language_preferences")
+  @@schema("i18n")
+}

@@ -1,5 +1,6 @@
 -- Docker PostgreSQL initialization
--- Creates only schemas and extensions needed by Prisma
+-- Creates schemas that Prisma needs
+-- Extensions will be created by Prisma migrations
 -- Tables will be created by Prisma migrations
 
 -- Create schemas that Prisma expects
@@ -15,10 +16,7 @@ CREATE SCHEMA IF NOT EXISTS payments;
 CREATE SCHEMA IF NOT EXISTS security;
 CREATE SCHEMA IF NOT EXISTS support;
 CREATE SCHEMA IF NOT EXISTS users;
+CREATE SCHEMA IF NOT EXISTS voucher;
 
 -- Note: public schema already exists by default
-
--- Extensions are created automatically by PostGIS Docker image
--- But we can ensure they exist
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+-- Note: Extensions will be created by Prisma migrations using CREATE EXTENSION IF NOT EXISTS

@@ -14,13 +14,7 @@ CREATE SCHEMA IF NOT EXISTS "catalog";
 CREATE SCHEMA IF NOT EXISTS "files";
 
 -- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "i18n";
-
--- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "identity";
-
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "marketplace";
 
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "payments";
@@ -33,6 +27,9 @@ CREATE SCHEMA IF NOT EXISTS "support";
 
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "users";
+
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "voucher";
 
 -- CreateExtension
 CREATE EXTENSION IF NOT EXISTS "fuzzystrmatch";
@@ -56,43 +53,43 @@ CREATE TYPE "identity"."UserRole" AS ENUM ('admin', 'customer', 'business');
 CREATE TYPE "identity"."UserStatus" AS ENUM ('active', 'suspended', 'banned', 'unconfirmed');
 
 -- CreateEnum
-CREATE TYPE "audit"."AuditAction" AS ENUM ('create', 'update', 'delete', 'login', 'logout', 'status_change');
+CREATE TYPE "audit"."AuditAction" AS ENUM ('create', 'update', 'delete', 'login', 'logout', 'statusChange');
 
 -- CreateEnum
-CREATE TYPE "support"."ProblemStatus" AS ENUM ('open', 'assigned', 'in_progress', 'waiting_customer', 'waiting_internal', 'resolved', 'closed');
+CREATE TYPE "support"."ProblemStatus" AS ENUM ('open', 'assigned', 'inProgress', 'waitingCustomer', 'waitingInternal', 'resolved', 'closed');
 
 -- CreateEnum
 CREATE TYPE "support"."ProblemPriority" AS ENUM ('low', 'medium', 'high', 'urgent', 'critical');
 
 -- CreateEnum
-CREATE TYPE "support"."ProblemType" AS ENUM ('billing', 'technical', 'account', 'general', 'bug_report', 'feature_request');
+CREATE TYPE "support"."ProblemType" AS ENUM ('billing', 'technical', 'account', 'general', 'bugReport', 'featureRequest');
 
 -- CreateEnum
 CREATE TYPE "support"."NotificationStatus" AS ENUM ('pending', 'sent', 'failed', 'read');
 
 -- CreateEnum
-CREATE TYPE "support"."NotificationType" AS ENUM ('email', 'sms', 'push', 'in_app');
+CREATE TYPE "support"."NotificationType" AS ENUM ('email', 'sms', 'push', 'inApp');
 
 -- CreateEnum
-CREATE TYPE "support"."CommunicationMethod" AS ENUM ('email', 'sms', 'push', 'in_app');
+CREATE TYPE "support"."CommunicationMethod" AS ENUM ('email', 'sms', 'push', 'inApp');
 
 -- CreateEnum
-CREATE TYPE "payments"."SubscriptionStatus" AS ENUM ('active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'trialing', 'unpaid');
+CREATE TYPE "payments"."SubscriptionStatus" AS ENUM ('active', 'canceled', 'incomplete', 'incompleteExpired', 'pastDue', 'trialing', 'unpaid');
 
 -- CreateEnum
 CREATE TYPE "files"."FileType" AS ENUM ('image', 'video', 'document', 'audio', 'other');
 
 -- CreateEnum
-CREATE TYPE "files"."StorageProvider" AS ENUM ('aws_s3', 'local', 'minio');
+CREATE TYPE "files"."StorageProvider" AS ENUM ('awsS3', 'local', 'minio');
 
 -- CreateEnum
-CREATE TYPE "files"."VoucherBookStatus" AS ENUM ('draft', 'ready_for_print', 'published', 'archived');
+CREATE TYPE "files"."VoucherBookStatus" AS ENUM ('draft', 'readyForPrint', 'published', 'archived');
 
 -- CreateEnum
-CREATE TYPE "files"."VoucherBookType" AS ENUM ('monthly', 'special_edition', 'regional', 'seasonal', 'promotional');
+CREATE TYPE "files"."VoucherBookType" AS ENUM ('monthly', 'specialEdition', 'regional', 'seasonal', 'promotional');
 
 -- CreateEnum
-CREATE TYPE "files"."PageLayoutType" AS ENUM ('standard', 'mixed', 'full_page', 'custom');
+CREATE TYPE "files"."PageLayoutType" AS ENUM ('standard', 'mixed', 'fullPage', 'custom');
 
 -- CreateEnum
 CREATE TYPE "files"."AdSize" AS ENUM ('single', 'quarter', 'half', 'full');
@@ -101,13 +98,13 @@ CREATE TYPE "files"."AdSize" AS ENUM ('single', 'quarter', 'half', 'full');
 CREATE TYPE "files"."ContentType" AS ENUM ('voucher', 'image', 'ad', 'sponsored');
 
 -- CreateEnum
-CREATE TYPE "business"."VoucherState" AS ENUM ('draft', 'published', 'claimed', 'redeemed', 'expired', 'suspended');
+CREATE TYPE "voucher"."VoucherState" AS ENUM ('draft', 'published', 'claimed', 'redeemed', 'expired', 'suspended');
 
 -- CreateEnum
-CREATE TYPE "business"."VoucherType" AS ENUM ('percentage', 'fixed');
+CREATE TYPE "voucher"."VoucherType" AS ENUM ('percentage', 'fixed');
 
 -- CreateEnum
-CREATE TYPE "business"."VoucherCodeType" AS ENUM ('qr', 'short', 'static');
+CREATE TYPE "voucher"."VoucherCodeType" AS ENUM ('qr', 'short', 'static');
 
 -- CreateEnum
 CREATE TYPE "analytics"."VoucherScanType" AS ENUM ('customer', 'business');
@@ -116,10 +113,10 @@ CREATE TYPE "analytics"."VoucherScanType" AS ENUM ('customer', 'business');
 CREATE TYPE "analytics"."VoucherScanSource" AS ENUM ('camera', 'gallery', 'link', 'share');
 
 -- CreateEnum
-CREATE TYPE "business"."CustomerVoucherStatus" AS ENUM ('claimed', 'redeemed', 'expired');
+CREATE TYPE "voucher"."CustomerVoucherStatus" AS ENUM ('claimed', 'redeemed', 'expired');
 
 -- CreateEnum
-CREATE TYPE "security"."FraudCaseStatus" AS ENUM ('pending', 'reviewing', 'approved', 'rejected', 'false_positive');
+CREATE TYPE "security"."FraudCaseStatus" AS ENUM ('pending', 'reviewing', 'approved', 'rejected', 'falsePositive');
 
 -- CreateEnum
 CREATE TYPE "identity"."DeviceType" AS ENUM ('ios', 'android', 'web', 'desktop');
@@ -127,36 +124,8 @@ CREATE TYPE "identity"."DeviceType" AS ENUM ('ios', 'android', 'web', 'desktop')
 -- CreateEnum
 CREATE TYPE "identity"."MfaMethod" AS ENUM ('sms', 'totp', 'email', 'backup_codes');
 
--- CreateTable
-CREATE TABLE "users"."addresses" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "user_id" UUID NOT NULL,
-    "address_line1" VARCHAR(255) NOT NULL,
-    "address_line2" VARCHAR(255),
-    "city" VARCHAR(100) NOT NULL,
-    "state" VARCHAR(100) NOT NULL,
-    "postal_code" VARCHAR(20) NOT NULL,
-    "country" VARCHAR(100) NOT NULL DEFAULT 'United States',
-    "is_default" BOOLEAN NOT NULL DEFAULT false,
-    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" TIMESTAMPTZ(6),
-
-    CONSTRAINT "addresses_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "audit"."audit_logs" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "entity_type" VARCHAR(50) NOT NULL,
-    "entity_id" UUID NOT NULL,
-    "action" "audit"."AuditAction" NOT NULL,
-    "user_id" UUID,
-    "data" JSONB,
-    "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
-);
+-- CreateEnum
+CREATE TYPE "business"."business_registration_status" AS ENUM ('IN_PROGRESS', 'SUBMITTED', 'APPROVED', 'REJECTED');
 
 -- CreateTable
 CREATE TABLE "identity"."user_identities" (
@@ -246,20 +215,43 @@ CREATE TABLE "identity"."security_events" (
 );
 
 -- CreateTable
-CREATE TABLE "marketplace"."businesses" (
+CREATE TABLE "business"."businesses" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "user_id" UUID NOT NULL,
     "business_name_key" VARCHAR(255) NOT NULL,
     "business_description_key" VARCHAR(255),
-    "category_id" UUID NOT NULL,
+    "category_id" UUID,
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "approved" BOOLEAN NOT NULL DEFAULT false,
+    "approved_by" UUID,
+    "approved_at" TIMESTAMPTZ(6),
     "avg_rating" DECIMAL(3,2) NOT NULL DEFAULT 0,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMPTZ(6),
 
     CONSTRAINT "businesses_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "business"."business_registration" (
+    "id" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+    "businessId" UUID,
+    "currentStep" INTEGER NOT NULL DEFAULT 1,
+    "step1Data" JSONB,
+    "step2Data" JSONB,
+    "step3Data" JSONB,
+    "registrationStatus" "business"."business_registration_status" NOT NULL DEFAULT 'IN_PROGRESS',
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "completedAt" TIMESTAMP(3),
+    "submittedAt" TIMESTAMP(3),
+    "rejectionReason" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "business_registration_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -421,44 +413,6 @@ CREATE TABLE "support"."support_comments" (
 );
 
 -- CreateTable
-CREATE TABLE "i18n"."languages" (
-    "code" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "direction" TEXT NOT NULL DEFAULT 'ltr',
-    "is_default" BOOLEAN NOT NULL DEFAULT false,
-    "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "languages_pkey" PRIMARY KEY ("code")
-);
-
--- CreateTable
-CREATE TABLE "i18n"."translations" (
-    "id" TEXT NOT NULL,
-    "key" TEXT NOT NULL,
-    "value" TEXT NOT NULL,
-    "language_code" TEXT NOT NULL,
-    "context" TEXT,
-    "service" TEXT,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "translations_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "i18n"."user_language_preferences" (
-    "id" TEXT NOT NULL,
-    "user_id" TEXT NOT NULL,
-    "language_code" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "user_language_preferences_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "users"."users" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "email" TEXT NOT NULL,
@@ -572,15 +526,15 @@ CREATE TABLE "files"."book_distributions" (
 );
 
 -- CreateTable
-CREATE TABLE "business"."vouchers" (
+CREATE TABLE "voucher"."vouchers" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "business_id" UUID NOT NULL,
     "category_id" UUID,
-    "state" "business"."VoucherState" NOT NULL DEFAULT 'draft',
+    "state" "voucher"."VoucherState" NOT NULL DEFAULT 'draft',
     "title_key" VARCHAR(255) NOT NULL,
     "description_key" VARCHAR(255) NOT NULL,
     "terms_and_conditions_key" VARCHAR(255) NOT NULL,
-    "type" "business"."VoucherType" NOT NULL,
+    "type" "voucher"."VoucherType" NOT NULL,
     "value" DECIMAL(10,2),
     "discount" DECIMAL(5,2),
     "currency" VARCHAR(3) NOT NULL DEFAULT 'PYG',
@@ -603,11 +557,11 @@ CREATE TABLE "business"."vouchers" (
 );
 
 -- CreateTable
-CREATE TABLE "business"."voucher_codes" (
+CREATE TABLE "voucher"."voucher_codes" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "voucher_id" UUID NOT NULL,
     "code" VARCHAR(500) NOT NULL,
-    "type" "business"."VoucherCodeType" NOT NULL,
+    "type" "voucher"."VoucherCodeType" NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "metadata" JSONB,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -617,7 +571,7 @@ CREATE TABLE "business"."voucher_codes" (
 );
 
 -- CreateTable
-CREATE TABLE "business"."voucher_redemptions" (
+CREATE TABLE "voucher"."voucher_redemptions" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "voucher_id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
@@ -631,12 +585,12 @@ CREATE TABLE "business"."voucher_redemptions" (
 );
 
 -- CreateTable
-CREATE TABLE "business"."customer_vouchers" (
+CREATE TABLE "voucher"."customer_vouchers" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "customer_id" UUID NOT NULL,
     "voucher_id" UUID NOT NULL,
     "claimed_at" TIMESTAMPTZ(6) NOT NULL,
-    "status" "business"."CustomerVoucherStatus" NOT NULL DEFAULT 'claimed',
+    "status" "voucher"."CustomerVoucherStatus" NOT NULL DEFAULT 'claimed',
     "notification_preferences" JSONB,
     "redeemed_at" TIMESTAMPTZ(6),
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -700,18 +654,6 @@ CREATE TABLE "security"."fraud_case_history" (
 
     CONSTRAINT "fraud_case_history_pkey" PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE INDEX "addresses_user_id_idx" ON "users"."addresses"("user_id");
-
--- CreateIndex
-CREATE INDEX "audit_logs_entity_type_entity_id_idx" ON "audit"."audit_logs"("entity_type", "entity_id");
-
--- CreateIndex
-CREATE INDEX "audit_logs_user_id_idx" ON "audit"."audit_logs"("user_id");
-
--- CreateIndex
-CREATE INDEX "audit_logs_created_at_idx" ON "audit"."audit_logs"("created_at");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_identities_user_id_key" ON "identity"."user_identities"("user_id");
@@ -780,19 +722,34 @@ CREATE INDEX "security_events_created_at_idx" ON "identity"."security_events"("c
 CREATE INDEX "security_events_risk_score_created_at_idx" ON "identity"."security_events"("risk_score", "created_at");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "businesses_user_id_key" ON "marketplace"."businesses"("user_id");
+CREATE INDEX "businesses_user_id_idx" ON "business"."businesses"("user_id");
 
 -- CreateIndex
-CREATE INDEX "businesses_category_id_idx" ON "marketplace"."businesses"("category_id");
+CREATE INDEX "businesses_category_id_idx" ON "business"."businesses"("category_id");
 
 -- CreateIndex
-CREATE INDEX "businesses_verified_active_idx" ON "marketplace"."businesses"("verified", "active");
+CREATE INDEX "businesses_verified_active_idx" ON "business"."businesses"("verified", "active");
 
 -- CreateIndex
-CREATE INDEX "businesses_avg_rating_idx" ON "marketplace"."businesses"("avg_rating");
+CREATE INDEX "businesses_avg_rating_idx" ON "business"."businesses"("avg_rating");
 
 -- CreateIndex
-CREATE INDEX "businesses_deleted_at_idx" ON "marketplace"."businesses"("deleted_at");
+CREATE INDEX "businesses_deleted_at_idx" ON "business"."businesses"("deleted_at");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "business_registration_userId_key" ON "business"."business_registration"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "business_registration_businessId_key" ON "business"."business_registration"("businessId");
+
+-- CreateIndex
+CREATE INDEX "business_registration_userId_idx" ON "business"."business_registration"("userId");
+
+-- CreateIndex
+CREATE INDEX "business_registration_registrationStatus_idx" ON "business"."business_registration"("registrationStatus");
+
+-- CreateIndex
+CREATE INDEX "business_registration_businessId_idx" ON "business"."business_registration"("businessId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "categories_slug_key" ON "catalog"."categories"("slug");
@@ -930,21 +887,6 @@ CREATE INDEX "support_comments_user_id_idx" ON "support"."support_comments"("use
 CREATE INDEX "support_comments_created_at_idx" ON "support"."support_comments"("created_at");
 
 -- CreateIndex
-CREATE INDEX "translations_key_language_code_idx" ON "i18n"."translations"("key", "language_code");
-
--- CreateIndex
-CREATE INDEX "translations_service_key_idx" ON "i18n"."translations"("service", "key");
-
--- CreateIndex
-CREATE UNIQUE INDEX "translations_key_language_code_key" ON "i18n"."translations"("key", "language_code");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_language_preferences_user_id_key" ON "i18n"."user_language_preferences"("user_id");
-
--- CreateIndex
-CREATE INDEX "user_language_preferences_user_id_idx" ON "i18n"."user_language_preferences"("user_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"."users"("email");
 
 -- CreateIndex
@@ -1035,118 +977,118 @@ CREATE INDEX "book_distributions_delivered_at_idx" ON "files"."book_distribution
 CREATE INDEX "book_distributions_created_at_idx" ON "files"."book_distributions"("created_at");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "vouchers_qr_code_key" ON "business"."vouchers"("qr_code");
+CREATE UNIQUE INDEX "vouchers_qr_code_key" ON "voucher"."vouchers"("qr_code");
 
 -- CreateIndex
-CREATE INDEX "vouchers_business_id_idx" ON "business"."vouchers"("business_id");
+CREATE INDEX "vouchers_business_id_idx" ON "voucher"."vouchers"("business_id");
 
 -- CreateIndex
-CREATE INDEX "vouchers_category_id_idx" ON "business"."vouchers"("category_id");
+CREATE INDEX "vouchers_category_id_idx" ON "voucher"."vouchers"("category_id");
 
 -- CreateIndex
-CREATE INDEX "vouchers_state_idx" ON "business"."vouchers"("state");
+CREATE INDEX "vouchers_state_idx" ON "voucher"."vouchers"("state");
 
 -- CreateIndex
-CREATE INDEX "vouchers_type_idx" ON "business"."vouchers"("type");
+CREATE INDEX "vouchers_type_idx" ON "voucher"."vouchers"("type");
 
 -- CreateIndex
-CREATE INDEX "vouchers_valid_from_idx" ON "business"."vouchers"("valid_from");
+CREATE INDEX "vouchers_valid_from_idx" ON "voucher"."vouchers"("valid_from");
 
 -- CreateIndex
-CREATE INDEX "vouchers_valid_until_idx" ON "business"."vouchers"("valid_until");
+CREATE INDEX "vouchers_valid_until_idx" ON "voucher"."vouchers"("valid_until");
 
 -- CreateIndex
-CREATE INDEX "vouchers_created_at_idx" ON "business"."vouchers"("created_at");
+CREATE INDEX "vouchers_created_at_idx" ON "voucher"."vouchers"("created_at");
 
 -- CreateIndex
-CREATE INDEX "vouchers_updated_at_idx" ON "business"."vouchers"("updated_at");
+CREATE INDEX "vouchers_updated_at_idx" ON "voucher"."vouchers"("updated_at");
 
 -- CreateIndex
-CREATE INDEX "vouchers_deleted_at_idx" ON "business"."vouchers"("deleted_at");
+CREATE INDEX "vouchers_deleted_at_idx" ON "voucher"."vouchers"("deleted_at");
 
 -- CreateIndex
-CREATE INDEX "vouchers_qr_code_idx" ON "business"."vouchers"("qr_code");
+CREATE INDEX "vouchers_qr_code_idx" ON "voucher"."vouchers"("qr_code");
 
 -- CreateIndex
-CREATE INDEX "vouchers_state_business_id_idx" ON "business"."vouchers"("state", "business_id");
+CREATE INDEX "vouchers_state_business_id_idx" ON "voucher"."vouchers"("state", "business_id");
 
 -- CreateIndex
-CREATE INDEX "vouchers_state_valid_until_idx" ON "business"."vouchers"("state", "valid_until");
+CREATE INDEX "vouchers_state_valid_until_idx" ON "voucher"."vouchers"("state", "valid_until");
 
 -- CreateIndex
-CREATE INDEX "vouchers_business_id_created_at_idx" ON "business"."vouchers"("business_id", "created_at");
+CREATE INDEX "vouchers_business_id_created_at_idx" ON "voucher"."vouchers"("business_id", "created_at");
 
 -- CreateIndex
-CREATE INDEX "vouchers_category_id_state_idx" ON "business"."vouchers"("category_id", "state");
+CREATE INDEX "vouchers_category_id_state_idx" ON "voucher"."vouchers"("category_id", "state");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "voucher_codes_code_key" ON "business"."voucher_codes"("code");
+CREATE UNIQUE INDEX "voucher_codes_code_key" ON "voucher"."voucher_codes"("code");
 
 -- CreateIndex
-CREATE INDEX "voucher_codes_voucher_id_idx" ON "business"."voucher_codes"("voucher_id");
+CREATE INDEX "voucher_codes_voucher_id_idx" ON "voucher"."voucher_codes"("voucher_id");
 
 -- CreateIndex
-CREATE INDEX "voucher_codes_type_idx" ON "business"."voucher_codes"("type");
+CREATE INDEX "voucher_codes_type_idx" ON "voucher"."voucher_codes"("type");
 
 -- CreateIndex
-CREATE INDEX "voucher_codes_is_active_idx" ON "business"."voucher_codes"("is_active");
+CREATE INDEX "voucher_codes_is_active_idx" ON "voucher"."voucher_codes"("is_active");
 
 -- CreateIndex
-CREATE INDEX "voucher_codes_code_idx" ON "business"."voucher_codes"("code");
+CREATE INDEX "voucher_codes_code_idx" ON "voucher"."voucher_codes"("code");
 
 -- CreateIndex
-CREATE INDEX "voucher_codes_voucher_id_type_idx" ON "business"."voucher_codes"("voucher_id", "type");
+CREATE INDEX "voucher_codes_voucher_id_type_idx" ON "voucher"."voucher_codes"("voucher_id", "type");
 
 -- CreateIndex
-CREATE INDEX "voucher_codes_voucher_id_is_active_idx" ON "business"."voucher_codes"("voucher_id", "is_active");
+CREATE INDEX "voucher_codes_voucher_id_is_active_idx" ON "voucher"."voucher_codes"("voucher_id", "is_active");
 
 -- CreateIndex
-CREATE INDEX "voucher_redemptions_voucher_id_idx" ON "business"."voucher_redemptions"("voucher_id");
+CREATE INDEX "voucher_redemptions_voucher_id_idx" ON "voucher"."voucher_redemptions"("voucher_id");
 
 -- CreateIndex
-CREATE INDEX "voucher_redemptions_user_id_idx" ON "business"."voucher_redemptions"("user_id");
+CREATE INDEX "voucher_redemptions_user_id_idx" ON "voucher"."voucher_redemptions"("user_id");
 
 -- CreateIndex
-CREATE INDEX "voucher_redemptions_redeemed_at_idx" ON "business"."voucher_redemptions"("redeemed_at");
+CREATE INDEX "voucher_redemptions_redeemed_at_idx" ON "voucher"."voucher_redemptions"("redeemed_at");
 
 -- CreateIndex
-CREATE INDEX "voucher_redemptions_code_used_idx" ON "business"."voucher_redemptions"("code_used");
+CREATE INDEX "voucher_redemptions_code_used_idx" ON "voucher"."voucher_redemptions"("code_used");
 
 -- CreateIndex
-CREATE INDEX "voucher_redemptions_voucher_id_redeemed_at_idx" ON "business"."voucher_redemptions"("voucher_id", "redeemed_at");
+CREATE INDEX "voucher_redemptions_voucher_id_redeemed_at_idx" ON "voucher"."voucher_redemptions"("voucher_id", "redeemed_at");
 
 -- CreateIndex
-CREATE INDEX "voucher_redemptions_user_id_redeemed_at_idx" ON "business"."voucher_redemptions"("user_id", "redeemed_at");
+CREATE INDEX "voucher_redemptions_user_id_redeemed_at_idx" ON "voucher"."voucher_redemptions"("user_id", "redeemed_at");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "voucher_redemptions_voucher_id_user_id_key" ON "business"."voucher_redemptions"("voucher_id", "user_id");
+CREATE UNIQUE INDEX "voucher_redemptions_voucher_id_user_id_key" ON "voucher"."voucher_redemptions"("voucher_id", "user_id");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_customer_id_idx" ON "business"."customer_vouchers"("customer_id");
+CREATE INDEX "customer_vouchers_customer_id_idx" ON "voucher"."customer_vouchers"("customer_id");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_voucher_id_idx" ON "business"."customer_vouchers"("voucher_id");
+CREATE INDEX "customer_vouchers_voucher_id_idx" ON "voucher"."customer_vouchers"("voucher_id");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_status_idx" ON "business"."customer_vouchers"("status");
+CREATE INDEX "customer_vouchers_status_idx" ON "voucher"."customer_vouchers"("status");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_claimed_at_idx" ON "business"."customer_vouchers"("claimed_at");
+CREATE INDEX "customer_vouchers_claimed_at_idx" ON "voucher"."customer_vouchers"("claimed_at");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_redeemed_at_idx" ON "business"."customer_vouchers"("redeemed_at");
+CREATE INDEX "customer_vouchers_redeemed_at_idx" ON "voucher"."customer_vouchers"("redeemed_at");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_customer_id_status_idx" ON "business"."customer_vouchers"("customer_id", "status");
+CREATE INDEX "customer_vouchers_customer_id_status_idx" ON "voucher"."customer_vouchers"("customer_id", "status");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_voucher_id_status_idx" ON "business"."customer_vouchers"("voucher_id", "status");
+CREATE INDEX "customer_vouchers_voucher_id_status_idx" ON "voucher"."customer_vouchers"("voucher_id", "status");
 
 -- CreateIndex
-CREATE INDEX "customer_vouchers_customer_id_claimed_at_idx" ON "business"."customer_vouchers"("customer_id", "claimed_at");
+CREATE INDEX "customer_vouchers_customer_id_claimed_at_idx" ON "voucher"."customer_vouchers"("customer_id", "claimed_at");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "customer_vouchers_customer_id_voucher_id_key" ON "business"."customer_vouchers"("customer_id", "voucher_id");
+CREATE UNIQUE INDEX "customer_vouchers_customer_id_voucher_id_key" ON "voucher"."customer_vouchers"("customer_id", "voucher_id");
 
 -- CreateIndex
 CREATE INDEX "voucher_scans_voucher_id_idx" ON "analytics"."voucher_scans"("voucher_id");
@@ -1239,9 +1181,6 @@ CREATE INDEX "fraud_case_history_action_idx" ON "security"."fraud_case_history"(
 CREATE INDEX "fraud_case_history_case_id_performed_at_idx" ON "security"."fraud_case_history"("case_id", "performed_at");
 
 -- AddForeignKey
-ALTER TABLE "users"."addresses" ADD CONSTRAINT "addresses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "identity"."user_identities" ADD CONSTRAINT "user_identities_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -1260,10 +1199,16 @@ ALTER TABLE "identity"."security_events" ADD CONSTRAINT "security_events_user_id
 ALTER TABLE "identity"."security_events" ADD CONSTRAINT "security_events_device_id_fkey" FOREIGN KEY ("device_id") REFERENCES "identity"."user_devices"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "marketplace"."businesses" ADD CONSTRAINT "businesses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "business"."businesses" ADD CONSTRAINT "businesses_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "marketplace"."businesses" ADD CONSTRAINT "businesses_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "catalog"."categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "business"."businesses" ADD CONSTRAINT "businesses_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "catalog"."categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "business"."business_registration" ADD CONSTRAINT "business_registration_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "business"."business_registration" ADD CONSTRAINT "business_registration_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "business"."businesses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "catalog"."categories" ADD CONSTRAINT "categories_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "catalog"."categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1296,12 +1241,6 @@ ALTER TABLE "support"."support_comments" ADD CONSTRAINT "support_comments_proble
 ALTER TABLE "support"."support_comments" ADD CONSTRAINT "support_comments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "i18n"."translations" ADD CONSTRAINT "translations_language_code_fkey" FOREIGN KEY ("language_code") REFERENCES "i18n"."languages"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "i18n"."user_language_preferences" ADD CONSTRAINT "user_language_preferences_language_code_fkey" FOREIGN KEY ("language_code") REFERENCES "i18n"."languages"("code") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "files"."voucher_books" ADD CONSTRAINT "voucher_books_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -1329,46 +1268,46 @@ ALTER TABLE "files"."book_distributions" ADD CONSTRAINT "book_distributions_crea
 ALTER TABLE "files"."book_distributions" ADD CONSTRAINT "book_distributions_updated_by_fkey" FOREIGN KEY ("updated_by") REFERENCES "users"."users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "business"."vouchers" ADD CONSTRAINT "vouchers_business_id_fkey" FOREIGN KEY ("business_id") REFERENCES "marketplace"."businesses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "voucher"."vouchers" ADD CONSTRAINT "vouchers_business_id_fkey" FOREIGN KEY ("business_id") REFERENCES "business"."businesses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "business"."vouchers" ADD CONSTRAINT "vouchers_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "catalog"."categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "voucher"."vouchers" ADD CONSTRAINT "vouchers_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "catalog"."categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "business"."voucher_codes" ADD CONSTRAINT "voucher_codes_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "business"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "voucher"."voucher_codes" ADD CONSTRAINT "voucher_codes_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "voucher"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "business"."voucher_redemptions" ADD CONSTRAINT "voucher_redemptions_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "business"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "voucher"."voucher_redemptions" ADD CONSTRAINT "voucher_redemptions_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "voucher"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "business"."voucher_redemptions" ADD CONSTRAINT "voucher_redemptions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "voucher"."voucher_redemptions" ADD CONSTRAINT "voucher_redemptions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "business"."customer_vouchers" ADD CONSTRAINT "customer_vouchers_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "voucher"."customer_vouchers" ADD CONSTRAINT "customer_vouchers_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "business"."customer_vouchers" ADD CONSTRAINT "customer_vouchers_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "business"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "voucher"."customer_vouchers" ADD CONSTRAINT "customer_vouchers_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "voucher"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "analytics"."voucher_scans" ADD CONSTRAINT "voucher_scans_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "business"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "analytics"."voucher_scans" ADD CONSTRAINT "voucher_scans_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "voucher"."vouchers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "analytics"."voucher_scans" ADD CONSTRAINT "voucher_scans_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"."users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "analytics"."voucher_scans" ADD CONSTRAINT "voucher_scans_business_id_fkey" FOREIGN KEY ("business_id") REFERENCES "marketplace"."businesses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "analytics"."voucher_scans" ADD CONSTRAINT "voucher_scans_business_id_fkey" FOREIGN KEY ("business_id") REFERENCES "business"."businesses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_redemption_id_fkey" FOREIGN KEY ("redemption_id") REFERENCES "business"."voucher_redemptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_redemption_id_fkey" FOREIGN KEY ("redemption_id") REFERENCES "voucher"."voucher_redemptions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_business_id_fkey" FOREIGN KEY ("business_id") REFERENCES "marketplace"."businesses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_business_id_fkey" FOREIGN KEY ("business_id") REFERENCES "business"."businesses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "business"."vouchers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_voucher_id_fkey" FOREIGN KEY ("voucher_id") REFERENCES "voucher"."vouchers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "security"."fraud_cases" ADD CONSTRAINT "fraud_cases_reviewed_by_fkey" FOREIGN KEY ("reviewed_by") REFERENCES "users"."users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1378,3 +1317,4 @@ ALTER TABLE "security"."fraud_case_history" ADD CONSTRAINT "fraud_case_history_c
 
 -- AddForeignKey
 ALTER TABLE "security"."fraud_case_history" ADD CONSTRAINT "fraud_case_history_performed_by_fkey" FOREIGN KEY ("performed_by") REFERENCES "users"."users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+

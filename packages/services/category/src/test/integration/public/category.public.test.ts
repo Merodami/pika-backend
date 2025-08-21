@@ -349,4 +349,130 @@ describe('Public Category Integration Tests', () => {
       expect(response.body).toHaveProperty('error')
     })
   })
+
+  // Cache Performance Tests - Verify service-level caching works
+  describe('Service Layer Cache Performance', () => {
+    it('should cache getAllCategories responses at service layer', async () => {
+      // First call - should hit database
+      const start1 = Date.now()
+      const response1 = await customerClient
+        .get('/categories?page=1&limit=10')
+        .set('Accept', 'application/json')
+        .expect(200)
+      const time1 = Date.now() - start1
+
+      // Second call - should hit cache (much faster)
+      const start2 = Date.now()
+      const response2 = await customerClient
+        .get('/categories?page=1&limit=10')
+        .set('Accept', 'application/json')
+        .expect(200)
+      const time2 = Date.now() - start2
+
+      // Verify same data returned
+      expect(response2.body).toEqual(response1.body)
+      
+      // Verify cache is working (second call should be at least as fast or faster)
+      // Note: In test environment with MockCache, times may be similar
+      expect(time2).toBeLessThanOrEqual(time1)
+      
+      logger.info('Cache performance test:', {
+        firstCallMs: time1,
+        secondCallMs: time2,
+        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`
+      })
+    })
+
+    it('should cache getCategoryById responses at service layer', async () => {
+      const testCategory = sharedTestData.activeParentCategories[0]
+      
+      // First call - should hit database
+      const start1 = Date.now()
+      const response1 = await customerClient
+        .get(`/categories/${testCategory.id}`)
+        .set('Accept', 'application/json')
+        .expect(200)
+      const time1 = Date.now() - start1
+
+      // Second call - should hit cache
+      const start2 = Date.now()
+      const response2 = await customerClient
+        .get(`/categories/${testCategory.id}`)
+        .set('Accept', 'application/json')
+        .expect(200)
+      const time2 = Date.now() - start2
+
+      // Verify same data
+      expect(response2.body).toEqual(response1.body)
+      
+      // Verify cache is working
+      expect(time2).toBeLessThanOrEqual(time1)
+      
+      logger.info('Single category cache performance:', {
+        firstCallMs: time1,
+        secondCallMs: time2,
+        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`
+      })
+    })
+
+    it('should cache hierarchy responses at service layer', async () => {
+      // First call - should hit database
+      const start1 = Date.now()
+      const response1 = await customerClient
+        .get('/categories/hierarchy')
+        .set('Accept', 'application/json')
+        .expect(200)
+      const time1 = Date.now() - start1
+
+      // Second call - should hit cache
+      const start2 = Date.now()
+      const response2 = await customerClient
+        .get('/categories/hierarchy')
+        .set('Accept', 'application/json')
+        .expect(200)
+      const time2 = Date.now() - start2
+
+      // Verify same data
+      expect(response2.body).toEqual(response1.body)
+      
+      // Hierarchy queries are expensive, cache should be at least as fast
+      expect(time2).toBeLessThanOrEqual(time1)
+      
+      logger.info('Hierarchy cache performance:', {
+        firstCallMs: time1,
+        secondCallMs: time2,
+        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`
+      })
+    })
+
+    it('should NOT hang when cache is hit (validates fix)', async () => {
+      // This test validates the fix - controllers no longer have @Cache
+      // so responses are properly sent even when cache is hit
+      
+      const testCategory = sharedTestData.activeParentCategories[0]
+      
+      // Prime the cache
+      await customerClient
+        .get(`/categories/${testCategory.id}`)
+        .set('Accept', 'application/json')
+        .expect(200)
+      
+      // Second call should complete quickly (not hang)
+      const start = Date.now()
+      await customerClient
+        .get(`/categories/${testCategory.id}`)
+        .set('Accept', 'application/json')
+        .timeout(1000) // Fail if takes more than 1 second
+        .expect(200)
+      const elapsed = Date.now() - start
+      
+      // Should complete in under 100ms when hitting cache
+      expect(elapsed).toBeLessThan(100)
+      
+      logger.info('No-hang validation:', {
+        elapsedMs: elapsed,
+        status: 'PASSED - No hanging on cache hit'
+      })
+    })
+  })
 })

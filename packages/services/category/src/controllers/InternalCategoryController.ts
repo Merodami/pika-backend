@@ -1,13 +1,11 @@
 import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
 import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryCommon, categoryInternal } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -28,11 +26,6 @@ export class InternalCategoryController {
    * GET /internal/categories/:id
    * Get category by ID (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:category',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryById(
     req: Request<categoryCommon.CategoryIdParam>,
     res: Response<categoryInternal.InternalCategoryData>,
@@ -63,11 +56,6 @@ export class InternalCategoryController {
    * POST /internal/categories/bulk
    * Get multiple categories by IDs (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories:bulk',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoriesByIds(
     req: Request<{}, {}, categoryInternal.BulkCategoryRequest>,
     res: Response<categoryInternal.BulkCategoryResponse>,
@@ -157,11 +145,6 @@ export class InternalCategoryController {
    * GET /internal/categories/active
    * Get all active categories (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories:active',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getActiveCategoriesOnly(
     req: Request,
     res: Response<categoryInternal.InternalCategoryListResponse>,
@@ -196,11 +179,6 @@ export class InternalCategoryController {
    * GET /internal/categories
    * Get all categories (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getAllCategories(
     req: Request,
     res: Response<categoryInternal.InternalCategoryListResponse>,
@@ -238,11 +216,6 @@ export class InternalCategoryController {
    * GET /internal/categories/hierarchy
    * Get category hierarchy (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories:hierarchy',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryHierarchy(
     req: Request,
     res: Response<categoryInternal.InternalCategoryHierarchyResponse>,

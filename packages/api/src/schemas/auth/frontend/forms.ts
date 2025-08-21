@@ -1,5 +1,4 @@
 import {
-  RegistrationSource,
   UserRole as UserRoleEnum,
   UserStatus as UserStatusEnum,
 } from '@pika/types'
@@ -144,69 +143,6 @@ export function transformResetPasswordToAPI(
   const { confirmPassword: _confirmPassword, ...apiData } = formData
 
   return apiData
-}
-
-// ============= Multi-Step Registration =============
-
-/**
- * Example: Multi-step registration form
- * Step 1: Basic info (subset of full registration)
- */
-export const RegistrationStep1Schema = RegisterRequest.pick({
-  email: true,
-  firstName: true,
-  lastName: true,
-}).extend({
-  agreedToTerms: z
-    .literal(true)
-    .describe('You must accept the terms and conditions'),
-})
-
-/**
- * Step 2: Security (password + confirmation)
- */
-export const RegistrationStep2Schema = RegisterRequest.pick({
-  password: true,
-})
-  .extend({
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
-
-/**
- * Step 3: Optional info
- */
-export const RegistrationStep3Schema = RegisterRequest.pick({
-  phoneNumber: true,
-  dateOfBirth: true,
-  marketingConsent: true,
-})
-
-export type RegistrationStep1Data = z.infer<typeof RegistrationStep1Schema>
-export type RegistrationStep2Data = z.infer<typeof RegistrationStep2Schema>
-export type RegistrationStep3Data = z.infer<typeof RegistrationStep3Schema>
-
-/**
- * Combine multi-step data into final registration request
- */
-export function combineRegistrationSteps(
-  step1: RegistrationStep1Data,
-  step2: RegistrationStep2Data,
-  step3: RegistrationStep3Data,
-): z.infer<typeof RegisterRequest> {
-  const { confirmPassword: _confirmPassword, ...passwordData } = step2
-  const { agreedToTerms: _agreedToTerms, ...basicData } = step1
-
-  return {
-    ...basicData,
-    ...passwordData,
-    ...step3,
-    acceptTerms: true as const, // agreedToTerms is already validated as true
-    registrationSource: RegistrationSource.PUBLIC,
-  }
 }
 
 // ============= Admin/Business Specific Forms =============

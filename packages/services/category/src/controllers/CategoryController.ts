@@ -1,13 +1,12 @@
 import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
 import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryPublic } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -26,12 +25,6 @@ export class CategoryController {
    * GET /categories
    * Get all categories with filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'categories',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllCategories(
     req: Request,
     res: Response<categoryPublic.CategoryListResponse>,
@@ -71,11 +64,6 @@ export class CategoryController {
    * GET /categories/:id
    * Get category by ID
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'category',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryById(
     req: Request<categoryPublic.CategoryPathParams>,
     res: Response<categoryPublic.CategoryResponse>,
@@ -106,11 +94,6 @@ export class CategoryController {
    * GET /categories/hierarchy
    * Get category hierarchy (tree structure)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'category:hierarchy',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryHierarchy(
     req: Request,
     res: Response<categoryPublic.CategoryHierarchyResponse>,
@@ -146,11 +129,6 @@ export class CategoryController {
    * GET /categories/:id/path
    * Get category path (breadcrumb trail)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'category:path',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryPath(
     req: Request<categoryPublic.CategoryPathParams>,
     res: Response<categoryPublic.CategoryPathResponse>,

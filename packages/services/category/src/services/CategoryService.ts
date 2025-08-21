@@ -286,7 +286,10 @@ export class CategoryService implements ICategoryService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:category:hierarchy',
-    keyGenerator: (rootId) => rootId || 'all',
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const rootId = args[0]
+      return `${prefix}:${rootId || 'all'}`
+    },
   })
   async getCategoryHierarchy(rootId?: string): Promise<Category[]> {
     try {
@@ -302,7 +305,9 @@ export class CategoryService implements ICategoryService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: 'service:category:path',
-    keyGenerator: (id) => id,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getCategoryPath(id: string): Promise<Category[]> {
     try {

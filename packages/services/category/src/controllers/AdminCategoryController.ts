@@ -1,14 +1,13 @@
 import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
 import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryAdmin, categoryCommon } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -33,12 +32,6 @@ export class AdminCategoryController {
    * GET /admin/categories
    * Get all categories with admin filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:categories',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllCategories(
     req: Request,
     res: Response<categoryAdmin.AdminCategoryListResponse>,
@@ -80,11 +73,6 @@ export class AdminCategoryController {
    * GET /admin/categories/:id
    * Get category by ID for admin
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:category',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryById(
     req: Request<categoryCommon.CategoryIdParam>,
     res: Response<categoryAdmin.AdminCategoryResponse>,
@@ -355,11 +343,6 @@ export class AdminCategoryController {
    * GET /admin/categories/hierarchy
    * Get category hierarchy for admin management
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:category:hierarchy',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryHierarchy(
     req: Request,
     res: Response<categoryAdmin.AdminCategoryTreeResponse>,

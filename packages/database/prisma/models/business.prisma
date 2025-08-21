@@ -24,11 +24,12 @@ model Business {
   // Add business logo
 
   // Relations
-  user        User          @relation(fields: [userId], references: [id])
-  category    Category?     @relation(fields: [categoryId], references: [id])
-  vouchers    Voucher[]     // Vouchers created by this business
-  scans       VoucherScan[] // Scans that happened at this business location
-  fraudCases  FraudCase[]   // Fraud cases involving this business
+  user                 User                  @relation(fields: [userId], references: [id])
+  category             Category?             @relation(fields: [categoryId], references: [id])
+  vouchers             Voucher[]             // Vouchers created by this business
+  scans                VoucherScan[]         // Scans that happened at this business location
+  fraudCases           FraudCase[]           // Fraud cases involving this business
+  businessRegistration BusinessRegistration? // Registration data (one-time use)
 
   @@index([userId])
   @@index([categoryId])
@@ -36,5 +37,5 @@ model Business {
   @@index([avgRating])
   @@index([deletedAt])
   @@map("businesses")
-  @@schema("marketplace")
+  @@schema("business")
 }

@@ -19,11 +19,12 @@
     "@pika/types": "workspace:^",
     "@prisma/client": "^6.14.0",
     "dotenv": "^17.2.1",
+    "fast-json-stable-stringify": "^2.1.0",
     "ioredis": "^5.7.0",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@types/node": "^24.2.1",
+    "@types/node": "^24.3.0",
     "@types/supertest": "^6.0.3",
     "he": "^1.2.0",
     "supertest": "^7.1.4",

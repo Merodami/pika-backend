@@ -3,12 +3,13 @@ import '@pika/environment'
 
 import { BUSINESS_SERVICE_NAME, BUSINESS_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import { ICacheService } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { ICacheService, setCacheService } from '@pika/redis'
+import { logger, UserServiceClient } from '@pika/shared'
 import { TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminBusinessRoutes } from './routes/AdminBusinessRoutes.js'
+import { createBusinessRegistrationRoutes } from './routes/BusinessRegistrationRoutes.js'
 import { createBusinessRoutes } from './routes/BusinessRoutes.js'
 import { createInternalBusinessRoutes } from './routes/InternalBusinessRoutes.js'
 
@@ -20,11 +21,15 @@ export async function createBusinessServer({
   prisma,
   cacheService,
   translationClient,
+  userServiceClient,
 }: {
   prisma: PrismaClient
   cacheService: ICacheService
   translationClient: TranslationClient
+  userServiceClient?: UserServiceClient
 }) {
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
   logger.info(`Configuring Business service for port: ${BUSINESS_SERVICE_PORT}`)
 
   // Create Express server
@@ -97,6 +102,18 @@ export async function createBusinessServer({
   )
 
   app.use('/businesses', businessRouter)
+
+  // Register business registration routes (only if userServiceClient is provided)
+  if (userServiceClient) {
+    const registrationRouter = createBusinessRegistrationRoutes(
+      prisma,
+      cacheService,
+      translationClient,
+      userServiceClient,
+    )
+
+    app.use('/businesses/registration', registrationRouter)
+  }
 
   // Register admin routes
   const adminRouter = createAdminBusinessRoutes(

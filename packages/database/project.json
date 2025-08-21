@@ -51,7 +51,7 @@
     "prisma:migrate:deploy": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "prisma migrate deploy --schema=prisma/schema.prisma",
+        "command": "tsx prisma/merge.ts && prisma migrate deploy --schema=prisma/schema.prisma",
         "cwd": "{projectRoot}"
       }
     },

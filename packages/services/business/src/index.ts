@@ -10,4 +10,10 @@ export * from './types/search.js'
 // Export controllers for testing
 export * from './controllers/AdminBusinessController.js'
 export * from './controllers/BusinessController.js'
+export * from './controllers/BusinessRegistrationController.js'
 export * from './controllers/InternalBusinessController.js'
+
+// Export business registration components
+export * from './mappers/BusinessRegistrationMapper.js'
+export * from './repositories/BusinessRegistrationRepository.js'
+export * from './services/BusinessRegistrationService.js'

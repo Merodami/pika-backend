@@ -1,0 +1,41 @@
+// Business Registration Model
+// Stores registration progress and data for business owners
+// Keeps user and business tables lean by separating one-time registration data
+
+model BusinessRegistration {
+  id                 String                      @id @default(uuid()) @db.Uuid
+  userId             String                      @unique @db.Uuid
+  businessId         String?                     @unique @db.Uuid
+  currentStep        Int                         @default(1)
+  step1Data          Json?                       // Basic info: name, type, category, language
+  step2Data          Json?                       // Details: description, address, phone, email, website, social
+  step3Data          Json?                       // Future: verification documents and bank info
+  registrationStatus BusinessRegistrationStatus  @default(IN_PROGRESS)
+  startedAt          DateTime                    @default(now())
+  completedAt        DateTime?
+  submittedAt        DateTime?
+  rejectionReason    String?
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([registrationStatus])
+  @@index([businessId])
+  @@map("business_registration")
+  @@schema("business")
+}
+
+// Enum for registration status
+enum BusinessRegistrationStatus {
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+
+  @@map("business_registration_status")
+  @@schema("business")
+}

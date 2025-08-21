@@ -2,7 +2,7 @@
 import { BUSINESS_SERVICE_PORT, REDIS_PASSWORD } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { initializeCache, RedisConfigService } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { logger, UserServiceClient } from '@pika/shared'
 import { createTranslationService, TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 import { Redis } from 'ioredis'
@@ -48,6 +48,9 @@ export async function startBusinessService() {
   const translationService = createTranslationService(prisma, translationRedis)
   const translationClient = new TranslationClient(translationService)
 
+  // Initialize service clients for inter-service communication
+  const userServiceClient = new UserServiceClient()
+
   logger.info(`Business service starting on port: ${BUSINESS_SERVICE_PORT}`)
 
   // Create Express server using the extracted function
@@ -55,6 +58,7 @@ export async function startBusinessService() {
     prisma,
     cacheService,
     translationClient,
+    userServiceClient,
   })
 
   // Start the server

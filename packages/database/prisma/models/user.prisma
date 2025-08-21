@@ -46,7 +46,8 @@ model User {
   assignedProblems  Problem[]         @relation("AssignedProblems")
   
   // Business relations
-  businesses        Business[]
+  businesses            Business[]
+  businessRegistration  BusinessRegistration?
   
   // PDF relations
   createdVoucherBooks   VoucherBook[]     @relation("VoucherBookCreatedBy")
@@ -63,6 +64,9 @@ model User {
   customerFraudCases    FraudCase[]         @relation("FraudCaseCustomer") // Fraud cases involving this user as customer
   reviewedFraudCases    FraudCase[]         @relation("FraudCaseReviewer") // Fraud cases reviewed by this user
   fraudCaseHistory      FraudCaseHistory[]  // Fraud case actions performed by this user
+
+  // Translation system relations
+  languagePreference    UserLanguagePreference? // User's preferred language
 
   @@index([email])
   @@index([phoneNumber])

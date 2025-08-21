@@ -83,7 +83,7 @@ export class AuthController {
       return
     }
 
-    // Format response to match Flutter expectations (snake_case)
+    // Format response with consistent structure
     if (!result.user || !result.tokens) {
       reply.status(500).send({
         error: 'INTERNAL_ERROR',
@@ -172,7 +172,7 @@ export class AuthController {
       return
     }
 
-    // Format response to match Flutter expectations (snake_case)
+    // Format response with consistent structure
     if (!result.user || !result.tokens) {
       reply.status(500).send({
         error: 'INTERNAL_ERROR',
@@ -236,7 +236,7 @@ export class AuthController {
       return
     }
 
-    // Format response to match Flutter expectations (snake_case)
+    // Format response with consistent structure
     if (!result.tokens) {
       reply.status(500).send({
         error: 'INTERNAL_ERROR',

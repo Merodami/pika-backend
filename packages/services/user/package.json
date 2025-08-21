@@ -22,13 +22,13 @@
     "bcrypt": "^6.0.0",
     "close-with-grace": "^2.2.0",
     "dotenv": "^17.2.1",
-    "fp-ts": "^2.16.10",
+    "fp-ts": "^2.16.11",
     "io-ts": "^2.2.22",
     "lodash-es": "^4.17.21",
     "multer": "^2.0.2"
   },
   "devDependencies": {
-    "@types/node": "^24.2.1",
+    "@types/node": "^24.3.0",
     "@types/supertest": "^6.0.3",
     "he": "^1.2.0",
     "io-ts-types": "^0.5.19",
