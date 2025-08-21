@@ -1,0 +1,9 @@
+{
+  "$ref": "#/definitions/CurrentUserProfileSchema",
+  "definitions": {
+    "CurrentUserProfileSchema": {
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

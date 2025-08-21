@@ -1,5 +1,5 @@
 import { businessCommon, shared, voucherCommon, voucherPublic } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getRequestLanguage,
   getValidatedParams,
@@ -8,7 +8,6 @@ import {
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { VoucherDomain, VoucherMapper } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
 import {
@@ -42,12 +41,6 @@ export class VoucherController {
    * GET /vouchers
    * Get all vouchers with filters and pagination (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'vouchers',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllVouchers(
     req: Request,
     res: Response<voucherPublic.VoucherListResponse>,
@@ -107,11 +100,6 @@ export class VoucherController {
    * GET /vouchers/:id
    * Get voucher by ID (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'voucher',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getVoucherById(
     req: Request<
       voucherCommon.VoucherIdParam,
@@ -306,11 +294,6 @@ export class VoucherController {
    * GET /vouchers/user/:userId
    * Get user's vouchers (claimed/redeemed)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'vouchers:user',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserVouchers(
     req: Request<shared.UserIdParam>,
     res: Response<voucherPublic.UserVouchersListResponse>,
@@ -363,11 +346,6 @@ export class VoucherController {
    * GET /vouchers/business/:businessId
    * Get business's vouchers (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'vouchers:business',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getBusinessVouchers(
     req: Request<businessCommon.BusinessIdParam>,
     res: Response<voucherPublic.VoucherListResponse>,
@@ -425,11 +403,6 @@ export class VoucherController {
    * GET /vouchers/by-code/:code
    * Get voucher by any code type (QR, short, static)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'voucher:code',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getVoucherByCode(
     req: Request<voucherCommon.VoucherCodeParam>,
     res: Response<voucherPublic.VoucherResponse>,

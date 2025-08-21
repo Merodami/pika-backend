@@ -84,6 +84,8 @@
     "generate:api": "yarn generate:openapi",
     "generate:openapi": "cd packages/api && yarn generate:openapi && cd ../.. && nx run @pika/api:build",
     "generate:docs": "cd packages/api && yarn generate:docs",
+    "generate:dart": "tsx scripts/generate-dart-types.ts",
+    "generate:flutter-types": "tsx scripts/generate-flutter-types.ts",
     "publish:packages": "dotenv -e .env -- ./scripts/simple-publish.sh",
     "git-hooks-prepare": "husky install",
     "open:docs": "nx run @pika/api:open:docs",
@@ -135,6 +137,7 @@
     "nx": "^21.4.0",
     "openapi-typescript": "^7.9.1",
     "prettier": "^3.6.2",
+    "quicktype": "^23.2.6",
     "sass": "^1.90.0",
     "size-limit": "^11.2.0",
     "supertest": "^7.1.4",
@@ -146,7 +149,8 @@
     "typescript": "^5.9.2",
     "typescript-coverage-report": "^1.1.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod-to-json-schema": "^3.24.6"
   },
   "workspaces": [
     "packages/**",

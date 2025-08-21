@@ -1,5 +1,7 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { AdPlacementDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { ContentType } from '@prisma/client'
@@ -176,8 +178,11 @@ export class AdPlacementService implements IAdPlacementService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:ad-placement',
-    keyGenerator: (id) => id,
+    prefix: CACHE_KEYS.AD_PLACEMENT.BY_TYPE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const id = args[0]
+      return `${prefix}:${id}`
+    },
   })
   async getAdPlacementById(id: string): Promise<AdPlacementDomain> {
     try {
@@ -200,8 +205,11 @@ export class AdPlacementService implements IAdPlacementService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:ad-placements-book',
-    keyGenerator: (voucherBookId) => voucherBookId,
+    prefix: CACHE_KEYS.AD_PLACEMENT.BY_BOOK,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const voucherBookId = args[0]
+      return `${prefix}:${voucherBookId}`
+    },
   })
   async getAdPlacementsByVoucherBookId(
     voucherBookId: string,

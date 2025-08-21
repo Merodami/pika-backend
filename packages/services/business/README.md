@@ -33,6 +33,7 @@ yarn nx run @pika/business:build
 The Business Service is a comprehensive business management system that:
 
 - **Manages Business Entities**: Registration, profiles, verification
+- **Multi-Step Registration**: Complete business registration flow with validation
 - **Handles Relationships**: User ownership, category associations
 - **Supports i18n**: Translation keys for business names/descriptions
 - **Provides Search**: Advanced filtering and geospatial queries
@@ -44,6 +45,7 @@ The Business Service is a comprehensive business management system that:
 ### Key Features
 
 - 🏢 **Business Management**: CRUD operations with soft delete
+- 📋 **Registration Flow**: Multi-step registration with draft saving
 - 🌐 **Multi-Language Support**: Translation key system
 - 🔍 **Advanced Search**: Category, status, and location filters
 - ✅ **Verification System**: Business verification workflow
@@ -51,6 +53,7 @@ The Business Service is a comprehensive business management system that:
 - 🔐 **Access Control**: Public, admin, and internal APIs
 - 🚀 **Performance**: Redis caching, optimized queries
 - 📊 **Analytics Ready**: Business metrics and reporting
+- 📄 **Extended Data**: Contact info, address, operating hours storage
 
 ## 🏗️ Architecture
 

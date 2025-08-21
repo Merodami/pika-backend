@@ -6,6 +6,7 @@ import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
 import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as businessSchemas from '@api/schemas/business/public/business.js'
+import * as businessRegistrationSchemas from '@api/schemas/business/public/registration.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
 import * as categorySchemas from '@api/schemas/category/public/category.js'
 import * as communicationNotificationSchemas from '@api/schemas/communication/public/notification.js'
@@ -130,6 +131,40 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     businessSchemas.UpdateMyBusinessRequest,
   )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
+
+  // ============= Business Registration Schemas =============
+  registry.registerSchema(
+    'StartRegistrationResponse',
+    businessRegistrationSchemas.StartRegistrationResponse,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStatusResponse',
+    businessRegistrationSchemas.BusinessRegistrationStatusResponse,
+  )
+  registry.registerSchema(
+    'RegistrationProgressResponse',
+    businessRegistrationSchemas.RegistrationProgressResponse,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStep1Request',
+    businessRegistrationSchemas.BusinessRegistrationStep1Request,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStep2Request',
+    businessRegistrationSchemas.BusinessRegistrationStep2Request,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStep3Request',
+    businessRegistrationSchemas.BusinessRegistrationStep3Request,
+  )
+  registry.registerSchema(
+    'CompleteBusinessRegistrationRequest',
+    businessRegistrationSchemas.CompleteBusinessRegistrationRequest,
+  )
+  registry.registerSchema(
+    'CompleteBusinessRegistrationResponse',
+    businessRegistrationSchemas.CompleteBusinessRegistrationResponse,
+  )
 
   // ============= Category Schemas =============
   registry.registerSchema('CategoryResponse', categorySchemas.CategoryResponse)
@@ -720,6 +755,184 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     responses: {
       204: {
         description: 'Business deleted successfully',
+      },
+    },
+  })
+
+  // ============= Business Registration Routes =============
+
+  // Start business registration
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/start',
+    operationId: 'startBusinessRegistration',
+    summary: 'Start business registration process',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Registration started',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.StartRegistrationResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get registration status
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses/registration/status',
+    operationId: 'getBusinessRegistrationStatus',
+    summary: 'Get current business registration status',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Registration status',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.BusinessRegistrationStatusResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get registration progress
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses/registration/progress',
+    operationId: 'getBusinessRegistrationProgress',
+    summary: 'Get detailed registration progress with all step data',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Registration progress details',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Submit step 1
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/step1',
+    operationId: 'submitBusinessRegistrationStep1',
+    summary: 'Submit business registration step 1 (basic info)',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.BusinessRegistrationStep1Request,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Step 1 submitted successfully',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Submit step 2
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/step2',
+    operationId: 'submitBusinessRegistrationStep2',
+    summary: 'Submit business registration step 2 (details)',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.BusinessRegistrationStep2Request,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Step 2 submitted successfully',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Submit step 3
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/step3',
+    operationId: 'submitBusinessRegistrationStep3',
+    summary: 'Submit business registration step 3 (additional info)',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.BusinessRegistrationStep3Request,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Step 3 submitted successfully',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Complete registration
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/complete',
+    operationId: 'completeBusinessRegistration',
+    summary: 'Complete business registration with user consent',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.CompleteBusinessRegistrationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Registration completed successfully',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.CompleteBusinessRegistrationResponse,
+          },
+        },
       },
     },
   })

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "password": {
+      "description": "Current password for verification",
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "description": "Optional reason for account deletion",
+      "type": "string",
+      "maxLength": 500
+    },
+    "confirmDeletion": {
+      "description": "Must be true to confirm deletion",
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "password",
+    "confirmDeletion"
+  ],
+  "additionalProperties": false
+}

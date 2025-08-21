@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "notifications": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "object",
+          "properties": {
+            "marketing": {
+              "default": false,
+              "type": "boolean"
+            },
+            "bookingReminders": {
+              "default": true,
+              "type": "boolean"
+            },
+            "sessionUpdates": {
+              "default": true,
+              "type": "boolean"
+            },
+            "friendRequests": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "marketing",
+            "bookingReminders",
+            "sessionUpdates",
+            "friendRequests"
+          ],
+          "additionalProperties": false
+        },
+        "push": {
+          "type": "object",
+          "properties": {
+            "bookingReminders": {
+              "default": true,
+              "type": "boolean"
+            },
+            "sessionUpdates": {
+              "default": true,
+              "type": "boolean"
+            },
+            "friendRequests": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "bookingReminders",
+            "sessionUpdates",
+            "friendRequests"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "email",
+        "push"
+      ],
+      "additionalProperties": false
+    },
+    "privacy": {
+      "type": "object",
+      "properties": {
+        "profileVisibility": {
+          "default": "friends",
+          "type": "string",
+          "enum": [
+            "public",
+            "friends",
+            "private"
+          ]
+        },
+        "showEmail": {
+          "default": false,
+          "type": "boolean"
+        },
+        "showPhone": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "profileVisibility",
+        "showEmail",
+        "showPhone"
+      ],
+      "additionalProperties": false
+    },
+    "display": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "default": "system",
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "pattern": "^[a-z]{2}$"
+        },
+        "timezone": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "theme"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "notifications",
+    "privacy",
+    "display"
+  ],
+  "additionalProperties": false
+}

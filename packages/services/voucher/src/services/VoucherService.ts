@@ -27,6 +27,7 @@ import {
 } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { IVoucherRepository } from '../repositories/VoucherRepository.js'
 import type {
   UserVoucherSearchParams,
@@ -262,6 +263,15 @@ export class VoucherService implements IVoucherService {
     }
   }
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.VOUCHER.USER_VOUCHERS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      const language = args[1] || 'en'
+      return `${prefix}:${params.userId}:${language}:${JSON.stringify({ page: params.page, limit: params.limit, status: params.status })}`
+    },
+  })
   async getUserVouchers(
     params: UserVoucherSearchParams,
     language?: LanguageCode,

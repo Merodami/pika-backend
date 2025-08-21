@@ -1,12 +1,10 @@
 import { userAdmin, userPublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   adaptMulterFile,
   getValidatedQuery,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import { VerificationType } from '@pika/types'
@@ -44,12 +42,6 @@ export class AdminUserController {
    * GET /admin/users
    * List all users with filters
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:users',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllUsers(
     req: Request,
     res: Response<userAdmin.AdminUserListResponse>,
@@ -83,11 +75,6 @@ export class AdminUserController {
    * GET /admin/users/email/:email
    * Get user by email address
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:user:email',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserByEmail(
     req: Request<userAdmin.EmailParam>,
     res: Response<userAdmin.AdminUserDetailResponse>,

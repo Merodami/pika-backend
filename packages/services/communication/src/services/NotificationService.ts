@@ -4,6 +4,8 @@ import type {
 } from '@communication/repositories/NotificationRepository.js'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   CreateNotificationDTO,
   NotificationDomain,
@@ -110,7 +112,7 @@ export class NotificationService implements INotificationService {
 
   @Cache({
     ttl: 60, // 1 minute cache for notifications (short TTL as notifications change frequently)
-    prefix: 'service:user-notifications',
+    prefix: CACHE_KEYS.NOTIFICATION.LIST,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const userId = args[0]
       const params = args[1]

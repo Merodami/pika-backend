@@ -10,6 +10,7 @@ import { ProblemMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { ParsedIncludes } from '@pika/types'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   CreateProblemInput,
   IProblemRepository,
@@ -52,8 +53,10 @@ export class ProblemService implements IProblemService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'problems-list',
-    keyGenerator: httpRequestKeyGenerator,
+    prefix: CACHE_KEYS.PROBLEM.LIST,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${JSON.stringify(args[0])}`
+    },
   })
   async getAllProblems(params: ProblemSearchParams) {
     logger.info('Fetching all problems', { params })
@@ -63,8 +66,10 @@ export class ProblemService implements IProblemService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'problems-search',
-    keyGenerator: httpRequestKeyGenerator,
+    prefix: CACHE_KEYS.PROBLEM.LIST,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:search:${JSON.stringify(args[0])}`
+    },
   })
   async searchProblems(params: ProblemSearchParams) {
     logger.info('Searching problems', { params })
@@ -72,6 +77,15 @@ export class ProblemService implements IProblemService {
     return this.repository.findAll(params)
   }
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.PROBLEM.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const id = args[0]
+      const parsedIncludes = args[1]
+      return `${prefix}:${id}:${JSON.stringify(parsedIncludes || {})}`
+    },
+  })
   async getProblemById(id: string, parsedIncludes?: ParsedIncludes) {
     logger.info('Fetching problem by id', { id })
 
@@ -86,8 +100,11 @@ export class ProblemService implements IProblemService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user-problems-paginated',
-    keyGenerator: httpRequestKeyGenerator,
+    prefix: CACHE_KEYS.PROBLEM.BY_USER,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      return `${prefix}:${params.userId}:${JSON.stringify({ page: params.page, limit: params.limit })}`
+    },
   })
   async getUserProblems(params: ProblemSearchParams) {
     logger.info('Fetching user problems with pagination', { params })
@@ -97,8 +114,10 @@ export class ProblemService implements IProblemService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'problems-by-user',
-    keyGenerator: httpRequestKeyGenerator,
+    prefix: CACHE_KEYS.PROBLEM.BY_USER,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getProblemsByUserId(userId: string) {
     logger.info('Fetching problems by user id', { userId })

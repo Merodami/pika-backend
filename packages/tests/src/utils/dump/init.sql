@@ -45,6 +45,9 @@ ALTER TABLE IF EXISTS ONLY identity.user_devices DROP CONSTRAINT IF EXISTS user_
 ALTER TABLE IF EXISTS ONLY identity.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_device_id_fkey;
+ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS user_language_preferences_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS user_language_preferences_language_code_fkey;
+ALTER TABLE IF EXISTS ONLY i18n.translations DROP CONSTRAINT IF EXISTS translations_language_code_fkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_updated_by_fkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_created_by_fkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_book_pages DROP CONSTRAINT IF EXISTS voucher_book_pages_book_id_fkey;
@@ -60,6 +63,7 @@ ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS busines
 ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_category_id_fkey;
 ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS "business_registration_userId_fkey";
 ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS "business_registration_businessId_fkey";
+ALTER TABLE IF EXISTS ONLY business.business_details DROP CONSTRAINT IF EXISTS "business_details_businessId_fkey";
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_business_id_fkey;
@@ -174,6 +178,9 @@ DROP INDEX IF EXISTS identity.security_events_user_id_idx;
 DROP INDEX IF EXISTS identity.security_events_risk_score_created_at_idx;
 DROP INDEX IF EXISTS identity.security_events_event_type_idx;
 DROP INDEX IF EXISTS identity.security_events_created_at_idx;
+DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_key;
+DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_idx;
+DROP INDEX IF EXISTS i18n.translations_key_language_code_key;
 DROP INDEX IF EXISTS files.voucher_books_year_month_idx;
 DROP INDEX IF EXISTS files.voucher_books_updated_by_idx;
 DROP INDEX IF EXISTS files.voucher_books_status_year_month_idx;
@@ -227,6 +234,8 @@ DROP INDEX IF EXISTS business."business_registration_userId_idx";
 DROP INDEX IF EXISTS business."business_registration_registrationStatus_idx";
 DROP INDEX IF EXISTS business."business_registration_businessId_key";
 DROP INDEX IF EXISTS business."business_registration_businessId_idx";
+DROP INDEX IF EXISTS business."business_details_businessId_key";
+DROP INDEX IF EXISTS business."business_details_businessId_idx";
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scan_type_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_idx;
@@ -257,6 +266,9 @@ ALTER TABLE IF EXISTS ONLY identity.user_identities DROP CONSTRAINT IF EXISTS us
 ALTER TABLE IF EXISTS ONLY identity.user_devices DROP CONSTRAINT IF EXISTS user_devices_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_pkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_pkey;
+ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS user_language_preferences_pkey;
+ALTER TABLE IF EXISTS ONLY i18n.translations DROP CONSTRAINT IF EXISTS translations_pkey;
+ALTER TABLE IF EXISTS ONLY i18n.languages DROP CONSTRAINT IF EXISTS languages_pkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_pkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_book_pages DROP CONSTRAINT IF EXISTS voucher_book_pages_pkey;
 ALTER TABLE IF EXISTS ONLY files.file_storage_logs DROP CONSTRAINT IF EXISTS file_storage_logs_pkey;
@@ -265,6 +277,7 @@ ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_plac
 ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_pkey;
 ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_pkey;
 ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS business_registration_pkey;
+ALTER TABLE IF EXISTS ONLY business.business_details DROP CONSTRAINT IF EXISTS business_details_pkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_pkey;
 DROP TABLE IF EXISTS voucher.vouchers;
 DROP TABLE IF EXISTS voucher.voucher_redemptions;
@@ -285,6 +298,9 @@ DROP TABLE IF EXISTS identity.user_identities;
 DROP TABLE IF EXISTS identity.user_devices;
 DROP TABLE IF EXISTS identity.user_auth_methods;
 DROP TABLE IF EXISTS identity.security_events;
+DROP TABLE IF EXISTS i18n.user_language_preferences;
+DROP TABLE IF EXISTS i18n.translations;
+DROP TABLE IF EXISTS i18n.languages;
 DROP TABLE IF EXISTS files.voucher_books;
 DROP TABLE IF EXISTS files.voucher_book_pages;
 DROP TABLE IF EXISTS files.file_storage_logs;
@@ -293,6 +309,7 @@ DROP TABLE IF EXISTS files.ad_placements;
 DROP TABLE IF EXISTS catalog.categories;
 DROP TABLE IF EXISTS business.businesses;
 DROP TABLE IF EXISTS business.business_registration;
+DROP TABLE IF EXISTS business.business_details;
 DROP TABLE IF EXISTS analytics.voucher_scans;
 DROP TYPE IF EXISTS voucher."VoucherType";
 DROP TYPE IF EXISTS voucher."VoucherState";
@@ -333,6 +350,7 @@ DROP SCHEMA IF EXISTS tiger_data;
 DROP SCHEMA IF EXISTS tiger;
 DROP SCHEMA IF EXISTS support;
 DROP SCHEMA IF EXISTS security;
+-- *not* dropping schema, since initdb creates it
 DROP SCHEMA IF EXISTS payments;
 DROP SCHEMA IF EXISTS marketplace;
 DROP SCHEMA IF EXISTS identity;
@@ -403,6 +421,20 @@ CREATE SCHEMA marketplace;
 --
 
 CREATE SCHEMA payments;
+
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+-- *not* creating schema, since initdb creates it
+
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA public IS '';
 
 
 --
@@ -887,6 +919,29 @@ CREATE TABLE analytics.voucher_scans (
 
 
 --
+-- Name: business_details; Type: TABLE; Schema: business; Owner: -
+--
+
+CREATE TABLE business.business_details (
+    id uuid NOT NULL,
+    "businessId" uuid NOT NULL,
+    phone character varying(20),
+    email character varying(255),
+    website character varying(255),
+    street character varying(255),
+    city character varying(100),
+    state character varying(100),
+    postal_code character varying(20),
+    country character varying(2),
+    operating_hours jsonb,
+    social_media jsonb,
+    additional_info jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: business_registration; Type: TABLE; Schema: business; Owner: -
 --
 
@@ -1074,6 +1129,50 @@ CREATE TABLE files.voucher_books (
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(6) with time zone
+);
+
+
+--
+-- Name: languages; Type: TABLE; Schema: i18n; Owner: -
+--
+
+CREATE TABLE i18n.languages (
+    code text NOT NULL,
+    name text NOT NULL,
+    direction text DEFAULT 'ltr'::text NOT NULL,
+    is_default boolean DEFAULT false NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(3) without time zone NOT NULL
+);
+
+
+--
+-- Name: translations; Type: TABLE; Schema: i18n; Owner: -
+--
+
+CREATE TABLE i18n.translations (
+    id text NOT NULL,
+    key text NOT NULL,
+    value text NOT NULL,
+    language_code text NOT NULL,
+    context text,
+    service text,
+    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(3) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_language_preferences; Type: TABLE; Schema: i18n; Owner: -
+--
+
+CREATE TABLE i18n.user_language_preferences (
+    id text NOT NULL,
+    user_id uuid NOT NULL,
+    language_code text NOT NULL,
+    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(3) without time zone NOT NULL
 );
 
 
@@ -1474,6 +1573,14 @@ ALTER TABLE ONLY analytics.voucher_scans
 
 
 --
+-- Name: business_details business_details_pkey; Type: CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.business_details
+    ADD CONSTRAINT business_details_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: business_registration business_registration_pkey; Type: CONSTRAINT; Schema: business; Owner: -
 --
 
@@ -1535,6 +1642,30 @@ ALTER TABLE ONLY files.voucher_book_pages
 
 ALTER TABLE ONLY files.voucher_books
     ADD CONSTRAINT voucher_books_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: languages languages_pkey; Type: CONSTRAINT; Schema: i18n; Owner: -
+--
+
+ALTER TABLE ONLY i18n.languages
+    ADD CONSTRAINT languages_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: translations translations_pkey; Type: CONSTRAINT; Schema: i18n; Owner: -
+--
+
+ALTER TABLE ONLY i18n.translations
+    ADD CONSTRAINT translations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_language_preferences user_language_preferences_pkey; Type: CONSTRAINT; Schema: i18n; Owner: -
+--
+
+ALTER TABLE ONLY i18n.user_language_preferences
+    ADD CONSTRAINT user_language_preferences_pkey PRIMARY KEY (id);
 
 
 --
@@ -1764,6 +1895,20 @@ CREATE INDEX voucher_scans_voucher_id_scan_type_idx ON analytics.voucher_scans U
 --
 
 CREATE INDEX voucher_scans_voucher_id_scanned_at_idx ON analytics.voucher_scans USING btree (voucher_id, scanned_at);
+
+
+--
+-- Name: business_details_businessId_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX "business_details_businessId_idx" ON business.business_details USING btree ("businessId");
+
+
+--
+-- Name: business_details_businessId_key; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE UNIQUE INDEX "business_details_businessId_key" ON business.business_details USING btree ("businessId");
 
 
 --
@@ -2135,6 +2280,27 @@ CREATE INDEX voucher_books_updated_by_idx ON files.voucher_books USING btree (up
 --
 
 CREATE INDEX voucher_books_year_month_idx ON files.voucher_books USING btree (year, month);
+
+
+--
+-- Name: translations_key_language_code_key; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE UNIQUE INDEX translations_key_language_code_key ON i18n.translations USING btree (key, language_code);
+
+
+--
+-- Name: user_language_preferences_user_id_idx; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE INDEX user_language_preferences_user_id_idx ON i18n.user_language_preferences USING btree (user_id);
+
+
+--
+-- Name: user_language_preferences_user_id_key; Type: INDEX; Schema: i18n; Owner: -
+--
+
+CREATE UNIQUE INDEX user_language_preferences_user_id_key ON i18n.user_language_preferences USING btree (user_id);
 
 
 --
@@ -2939,6 +3105,14 @@ ALTER TABLE ONLY analytics.voucher_scans
 
 
 --
+-- Name: business_details business_details_businessId_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.business_details
+    ADD CONSTRAINT "business_details_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: business_registration business_registration_businessId_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
 --
 
@@ -3056,6 +3230,30 @@ ALTER TABLE ONLY files.voucher_books
 
 ALTER TABLE ONLY files.voucher_books
     ADD CONSTRAINT voucher_books_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: translations translations_language_code_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
+--
+
+ALTER TABLE ONLY i18n.translations
+    ADD CONSTRAINT translations_language_code_fkey FOREIGN KEY (language_code) REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: user_language_preferences user_language_preferences_language_code_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
+--
+
+ALTER TABLE ONLY i18n.user_language_preferences
+    ADD CONSTRAINT user_language_preferences_language_code_fkey FOREIGN KEY (language_code) REFERENCES i18n.languages(code) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: user_language_preferences user_language_preferences_user_id_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
+--
+
+ALTER TABLE ONLY i18n.user_language_preferences
+    ADD CONSTRAINT user_language_preferences_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --

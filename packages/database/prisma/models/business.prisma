@@ -30,6 +30,7 @@ model Business {
   scans                VoucherScan[]         // Scans that happened at this business location
   fraudCases           FraudCase[]           // Fraud cases involving this business
   businessRegistration BusinessRegistration? // Registration data (one-time use)
+  businessDetails      BusinessDetails?      // Additional business information
 
   @@index([userId])
   @@index([categoryId])

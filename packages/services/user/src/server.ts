@@ -3,7 +3,7 @@ import '@pika/environment'
 
 import { USER_SERVICE_NAME, USER_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import { ICacheService } from '@pika/redis'
+import { ICacheService, setCacheService } from '@pika/redis'
 import { FileStoragePort, logger } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 
@@ -26,6 +26,9 @@ export async function createUserServer({
   fileStorage: FileStoragePort
   communicationClient?: any
 }) {
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
+
   logger.info(`Configuring User service for port: ${USER_SERVICE_PORT}`)
 
   // Create Express server

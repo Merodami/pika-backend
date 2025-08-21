@@ -39,13 +39,13 @@ model Translation {
 
 model UserLanguagePreference {
   id           String   @id @default(cuid())
-  userId       String   @unique @map("user_id") // Note: This should match User.id type (UUID as String)
+  userId       String   @unique @map("user_id") @db.Uuid // Fixed: Must match User.id type (UUID)
   languageCode String   @map("language_code")
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
 
   // Relations
-  // Note: User.id is UUID but stored as String in user_language_preferences
+  // Relations with proper UUID type matching
   user     User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   language Language @relation(fields: [languageCode], references: [code], onDelete: Restrict, onUpdate: Cascade)
 

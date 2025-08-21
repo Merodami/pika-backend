@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "code": {
+      "description": "OAuth authorization code",
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "description": "OAuth state parameter",
+      "type": "string",
+      "minLength": 1
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "local",
+        "google",
+        "facebook",
+        "apple",
+        "github",
+        "microsoft"
+      ]
+    }
+  },
+  "required": [
+    "code",
+    "state",
+    "provider"
+  ],
+  "additionalProperties": false
+}

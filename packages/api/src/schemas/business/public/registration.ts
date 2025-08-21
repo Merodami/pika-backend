@@ -23,6 +23,28 @@ import {
   REGISTRATION_STEP_NUMBERS,
 } from '../common/enums.js'
 
+// ============= Start Registration =============
+
+/**
+ * Start registration response (raw Zod)
+ */
+export const StartRegistrationResponse = z.object({
+  started: z.boolean().describe('Whether registration was started or already existed'),
+  currentStep: z.number().int().min(1).max(3).describe('Current step number'),
+})
+
+/**
+ * Start registration response (OpenAPI documented)
+ */
+export const StartRegistrationResponseSchema = openapi(
+  StartRegistrationResponse,
+  {
+    description: 'Registration start result',
+  },
+)
+
+export type StartRegistrationResponse = z.infer<typeof StartRegistrationResponse>
+
 // ============= Registration Status =============
 
 /**

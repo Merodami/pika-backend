@@ -22,6 +22,8 @@ import {
   UserStatus,
   VerificationType,
 } from '@pika/types'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   IUserRepository,
   UserSearchParams,
@@ -83,8 +85,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:users',
-    keyGenerator: (params) => JSON.stringify(params),
+    prefix: CACHE_KEYS.USER.LIST,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${JSON.stringify(args[0])}`
+    },
   })
   async getAllUsers(
     params: UserSearchParams,
@@ -101,8 +105,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:user',
-    keyGenerator: (id) => id,
+    prefix: CACHE_KEYS.USER.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getUserById(id: string): Promise<UserDomain> {
     try {
@@ -126,8 +132,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:user:email',
-    keyGenerator: (email) => email,
+    prefix: CACHE_KEYS.USER.BY_EMAIL,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getUserByEmail(email: string): Promise<UserDomain> {
     try {
@@ -284,8 +292,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:user:subtoken',
-    keyGenerator: (subToken) => subToken,
+    prefix: CACHE_KEYS.INTERNAL.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:subtoken:${args[0]}`
+    },
   })
   async getUserBySubToken(subToken: string): Promise<UserDomain> {
     try {

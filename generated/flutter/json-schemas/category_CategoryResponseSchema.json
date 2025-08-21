@@ -1,0 +1,9 @@
+{
+  "$ref": "#/definitions/CategoryResponseSchema",
+  "definitions": {
+    "CategoryResponseSchema": {
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

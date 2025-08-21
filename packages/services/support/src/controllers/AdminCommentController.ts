@@ -1,12 +1,10 @@
 import { supportAdmin, supportCommon, supportPublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
 import type { IAdminSupportCommentService } from '@support/services/AdminSupportCommentService.js'
@@ -31,11 +29,6 @@ export class AdminCommentController {
    * GET /admin/comments
    * Get all comments with filtering (admin only)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin-comments',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getAllComments(
     request: Request,
     response: Response,
@@ -75,11 +68,6 @@ export class AdminCommentController {
    * GET /admin/comments/problem/:problemId
    * Get all comments for a problem (including internal notes)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin-problem-comments',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCommentsByProblemId(
     request: Request<supportCommon.ProblemIdForCommentsParam>,
     response: Response,

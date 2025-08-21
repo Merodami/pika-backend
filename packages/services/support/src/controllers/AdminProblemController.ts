@@ -23,11 +23,6 @@ export class AdminProblemController {
    * GET /admin/problems
    * Get all support tickets with filtering
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin-problems',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getAllProblems(
     request: Request,
     response: Response,
@@ -77,11 +72,6 @@ export class AdminProblemController {
    * GET /admin/problems/:id
    * Get support ticket by ID
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin-problem',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getProblemById(
     request: Request<supportCommon.ProblemIdParam>,
     response: Response,

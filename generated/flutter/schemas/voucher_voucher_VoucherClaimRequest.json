@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "notificationPreferences": {
+      "type": "object",
+      "properties": {
+        "enableReminders": {
+          "default": true,
+          "type": "boolean"
+        },
+        "reminderDaysBefore": {
+          "default": 3,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        }
+      },
+      "required": [
+        "enableReminders",
+        "reminderDaysBefore"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

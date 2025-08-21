@@ -1,6 +1,8 @@
 import { NODE_ENV, REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   BatchUploadDTO,
   FileStorageLogDomain,
@@ -409,7 +411,7 @@ export class StorageService implements IStorageService {
 
   @Cache({ 
     ttl: REDIS_DEFAULT_TTL, 
-    prefix: 'service:file-history',
+    prefix: CACHE_KEYS.FILE.HISTORY,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const userId = args[0]
       const params = args[1]
@@ -430,7 +432,7 @@ export class StorageService implements IStorageService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:file',
+    prefix: CACHE_KEYS.FILE.SINGLE,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const id = args[0]
       const userId = args[1]

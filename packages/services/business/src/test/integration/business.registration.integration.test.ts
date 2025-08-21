@@ -464,9 +464,9 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       expect(response.body.currentStep).toBe(3)
       expect(response.body.step3Data).toMatchObject(step3Data)
       expect(response.body.registrationStatus).toBe(
-        BusinessRegistrationStatus.SUBMITTED,
+        BusinessRegistrationStatus.IN_PROGRESS,
       )
-      expect(response.body.businessId).toBeDefined()
+      expect(response.body.businessId).toBeUndefined() // No business created until completion
     })
 
 
@@ -477,16 +477,30 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         },
       }
 
-      const response = await businessOwnerClient
+      const step3Response = await businessOwnerClient
         .post('/businesses/registration/step3')
         .send(step3Data)
         .set('Accept', 'application/json')
 
-      expect(response.status).toBe(200)
+      expect(step3Response.status).toBe(200)
+
+      // Complete the registration to create the business
+      const completeData: businessPublic.CompleteBusinessRegistrationRequest = {
+        confirmAllDataAccurate: true,
+        agreedToTerms: true,
+      }
+
+      const completeResponse = await businessOwnerClient
+        .post('/businesses/registration/complete')
+        .send(completeData)
+        .set('Accept', 'application/json')
+
+      expect(completeResponse.status).toBe(200)
+      expect(completeResponse.body.businessId).toBeDefined()
 
       // Verify business was created
       const business = await testDb.prisma.business.findUnique({
-        where: { id: response.body.businessId },
+        where: { id: completeResponse.body.businessId },
       })
 
       expect(business).toBeDefined()
@@ -595,16 +609,33 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         },
       }
 
-      const finalResponse = await businessOwnerClient
+      const step3Response = await businessOwnerClient
         .post('/businesses/registration/step3')
         .send(step3Data)
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(finalResponse.body.registrationStatus).toBe(
-        BusinessRegistrationStatus.SUBMITTED,
+      // Step 3 should save data but NOT auto-complete registration
+      expect(step3Response.body.registrationStatus).toBe(
+        BusinessRegistrationStatus.IN_PROGRESS,
       )
-      expect(finalResponse.body.businessId).toBeDefined()
+      expect(step3Response.body.businessId).toBeUndefined()
+
+      // Now explicitly complete the registration
+      const completeData: businessPublic.CompleteBusinessRegistrationRequest = {
+        confirmAllDataAccurate: true,
+        agreedToTerms: true,
+      }
+
+      const completeResponse = await businessOwnerClient
+        .post('/businesses/registration/complete')
+        .send(completeData)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(completeResponse.body.businessId).toBeDefined()
+      expect(completeResponse.body.registrationStatus).toBe('submitted')
+      expect(completeResponse.body.message).toContain('submitted successfully')
 
       // Check final status
       const statusResponse4 = await businessOwnerClient
@@ -617,6 +648,51 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       )
       expect(statusResponse4.body.needsRegistration).toBe(true) // Still true until approved
       expect(statusResponse4.body.businessId).toBeDefined()
+    })
+  })
+
+  describe('New Endpoints', () => {
+    it('should start registration with POST /start', async () => {
+      // Ensure no registration exists
+      await testDb.prisma.businessRegistration.deleteMany({
+        where: { userId: testUserId },
+      })
+
+      const response = await businessOwnerClient
+        .post('/businesses/registration/start')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.started).toBe(true)
+      expect(response.body.currentStep).toBe(1)
+    })
+
+    it('should return progress with GET /progress', async () => {
+      // Complete step 1 first
+      const step1Data: businessPublic.BusinessRegistrationStep1Request = {
+        businessName: 'Progress Test Business',
+        businessType: BusinessType.SERVICE,
+        categoryId: testCategoryId,
+        primaryLanguage: 'en',
+      }
+
+      await businessOwnerClient
+        .post('/businesses/registration/step1')
+        .send(step1Data)
+        .expect(200)
+
+      // Check progress
+      const progressResponse = await businessOwnerClient
+        .get('/businesses/registration/progress')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(progressResponse.body.currentStep).toBe(2)
+      expect(progressResponse.body.stepsCompleted).toContain(1)
+      expect(progressResponse.body.step1Data).toEqual(step1Data)
+      expect(progressResponse.body.registrationStatus).toBe(
+        BusinessRegistrationStatus.IN_PROGRESS,
+      )
     })
   })
 

@@ -13,8 +13,11 @@ import {
   JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
   JWT_SECRET,
+  REDIS_DEFAULT_TTL,
 } from '@pika/environment'
-import type { ICacheService } from '@pika/redis'
+import { Cache, type ICacheService } from '@pika/redis'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import {
   CommunicationServiceClient,
   ErrorFactory,
@@ -345,6 +348,14 @@ export class AuthService implements IAuthService {
   /**
    * Get user information by ID
    */
+  @Cache({
+    ttl: 300, // 5 minutes for user info
+    prefix: CACHE_KEYS.USER_INFO.BY_ID,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const userId = args[0]
+      return `${prefix}:${userId}`
+    },
+  })
   async getUserInfo(userId: string): Promise<any> {
     try {
       const user = await this.userServiceClient.getUser(userId)

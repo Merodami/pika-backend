@@ -1,6 +1,5 @@
 import { subscriptionPublic } from '@pika/api'
 import { RequestContext, validateResponse } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { ISubscriptionService } from '@subscription/services/SubscriptionService.js'
@@ -56,11 +55,6 @@ export class PublicSubscriptionController {
    * GET /subscriptions/me
    * Get current user's active subscription
    */
-  @Cache({
-    ttl: 300,
-    prefix: 'user-active-subscription',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserSubscription(
     request: Request,
     response: Response<subscriptionPublic.SubscriptionResponse | null>,

@@ -1,5 +1,5 @@
 import { businessCommon, voucherAdmin, voucherCommon } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getRequestLanguage,
   getValidatedQuery,
@@ -7,7 +7,6 @@ import {
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { VoucherMapper } from '@pika/sdk'
 import { ErrorFactory, logger, parseIncludeParam } from '@pika/shared'
 import { VoucherState } from '@pika/types'
@@ -43,12 +42,6 @@ export class AdminVoucherController {
    * GET /admin/vouchers
    * Get all vouchers with admin filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:vouchers',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllVouchers(
     req: Request,
     res: Response<voucherAdmin.AdminVoucherListResponse>,
@@ -116,11 +109,6 @@ export class AdminVoucherController {
    * GET /admin/vouchers/:id
    * Get voucher by ID with full details for admin
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:voucher',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getVoucherById(
     req: Request<voucherCommon.VoucherIdParam>,
     res: Response<voucherAdmin.AdminVoucherDetailResponse>,

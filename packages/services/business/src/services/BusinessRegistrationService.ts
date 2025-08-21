@@ -15,6 +15,7 @@ import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { BusinessRegistrationMapper } from '../mappers/BusinessRegistrationMapper.js'
 import type { IBusinessRegistrationRepository } from '../repositories/BusinessRegistrationRepository.js'
 import type { IBusinessRepository } from '../repositories/BusinessRepository.js'
+import type { IBusinessDetailsRepository } from '../repositories/BusinessDetailsRepository.js'
 import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IBusinessRegistrationService {
@@ -45,6 +46,7 @@ export class BusinessRegistrationService
   constructor(
     private readonly registrationRepository: IBusinessRegistrationRepository,
     private readonly businessRepository: IBusinessRepository,
+    private readonly businessDetailsRepository: IBusinessDetailsRepository,
     private readonly userServiceClient: UserServiceClient,
   ) {}
 
@@ -106,6 +108,16 @@ export class BusinessRegistrationService
     userId: string,
   ): Promise<{ started: boolean; currentStep: number }> {
     try {
+      // Check if user already has a business
+      const existingBusiness = await this.businessRepository.findByUserId(userId)
+      if (existingBusiness) {
+        throw ErrorFactory.businessRuleViolation(
+          'BUSINESS_ALREADY_EXISTS',
+          'User already has a registered business',
+          { metadata: { businessId: existingBusiness.id } },
+        )
+      }
+
       // Check if registration already exists
       const existing = await this.registrationRepository.findByUserId(userId)
 
@@ -139,11 +151,7 @@ export class BusinessRegistrationService
       }
     } catch (error) {
       logger.error('Error starting registration', { userId, error })
-      throw ErrorFactory.databaseError(
-        'START_REGISTRATION_FAILED',
-        'Failed to start business registration',
-        error,
-      )
+      throw ErrorFactory.fromError(error)
     }
   }
 
@@ -323,16 +331,46 @@ export class BusinessRegistrationService
       // Extract business data from steps
       const step1Data = domain.step1Data as any
       const step2Data = domain.step2Data as any
+      const step3Data = domain.step3Data as any
 
-      // Create the business
+      // Create the business with basic info
       const business = await this.businessRepository.create({
         userId,
         businessNameKey: step1Data.businessName,
-        businessDescriptionKey: step2Data.businessDescription,
+        businessDescriptionKey: step2Data.description, // Fixed: was businessDescription
         categoryId: step1Data.categoryId,
         verified: false,
         active: false, // Inactive until approved
         approved: false, // Needs admin approval
+      })
+      
+      // Store additional business details
+      await this.businessDetailsRepository.create({
+        businessId: business.id,
+        // Contact Information
+        phone: step2Data.phone,
+        email: step2Data.email,
+        website: step2Data.website,
+        // Address Information
+        street: step2Data.address?.street,
+        city: step2Data.address?.city,
+        state: step2Data.address?.state,
+        postalCode: step2Data.address?.postalCode,
+        country: step2Data.address?.country,
+        // Operating Information (from step 3)
+        operatingHours: step3Data?.operatingHours,
+        socialMedia: step3Data?.socialMedia,
+        additionalInfo: step3Data?.additionalInfo,
+      })
+      
+      logger.info('Business and details created successfully', {
+        businessId: business.id,
+        hasAddress: !!step2Data.address,
+        hasPhone: !!step2Data.phone,
+        hasEmail: !!step2Data.email,
+        hasWebsite: !!step2Data.website,
+        hasOperatingHours: !!step3Data?.operatingHours,
+        hasSocialMedia: !!step3Data?.socialMedia,
       })
 
       // Update registration to link business and mark as submitted

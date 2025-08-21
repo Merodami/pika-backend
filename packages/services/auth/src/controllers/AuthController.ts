@@ -13,7 +13,6 @@ type VerifyEmailRequest = z.infer<typeof authPublic.VerifyEmailRequest>
 import { AuthMapper } from '@auth-service/mappers/AuthMapper.js'
 import type { IAuthService } from '@auth-service/services/AuthService.js'
 import { RequestContext, validateResponse } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import { mapRoleToPermissions, RegistrationSource, UserRole } from '@pika/types'
@@ -489,11 +488,6 @@ export class AuthController {
    * GET /auth/userinfo
    * Get user information from access token
    */
-  @Cache({
-    ttl: 300, // 5 minutes for user info
-    prefix: 'userinfo',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async userinfo(
     request: Request,
     response: Response,

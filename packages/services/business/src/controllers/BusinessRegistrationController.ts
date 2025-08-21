@@ -12,9 +12,67 @@ export class BusinessRegistrationController {
   constructor(private readonly service: IBusinessRegistrationService) {
     // Bind methods to preserve 'this' context
     this.getRegistrationStatus = this.getRegistrationStatus.bind(this)
+    this.startRegistration = this.startRegistration.bind(this)
+    this.getProgress = this.getProgress.bind(this)
     this.submitStep1 = this.submitStep1.bind(this)
     this.submitStep2 = this.submitStep2.bind(this)
     this.submitStep3 = this.submitStep3.bind(this)
+    this.completeRegistration = this.completeRegistration.bind(this)
+  }
+
+  /**
+   * POST /businesses/registration/start
+   * Start the registration process for a business user
+   */
+  async startRegistration(
+    req: Request,
+    res: Response<businessPublic.StartRegistrationResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const result = await this.service.startRegistration(userId)
+
+      const validatedResponse = validateResponse(
+        businessPublic.StartRegistrationResponse,
+        result,
+        'BusinessRegistrationController.startRegistration',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /businesses/registration/progress
+   * Get detailed registration progress with all step data
+   */
+  async getProgress(
+    req: Request,
+    res: Response<businessPublic.RegistrationProgressResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const progress = await this.service.getProgress(userId)
+      const response = BusinessRegistrationMapper.toDTO(progress)
+
+      const validatedResponse = validateResponse(
+        businessPublic.RegistrationProgressResponse,
+        response,
+        'BusinessRegistrationController.getProgress',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
   }
 
   /**
@@ -126,7 +184,7 @@ export class BusinessRegistrationController {
 
   /**
    * POST /businesses/registration/step3
-   * Submit step 3 data and complete registration
+   * Submit step 3 data (does NOT complete registration)
    */
   async submitStep3(
     req: Request<{}, {}, businessPublic.BusinessRegistrationStep3Request>,
@@ -145,13 +203,7 @@ export class BusinessRegistrationController {
         saveAsDraft: false,
       })
 
-      // Complete the registration
-      const completion = await this.service.completeRegistration(userId, {
-        confirmAllDataAccurate: true,
-        agreedToTerms: true,
-      })
-
-      // Get the final registration for response
+      // Get the updated registration progress
       const progress = await this.service.getProgress(userId)
       const response = BusinessRegistrationMapper.toDTO(progress)
 
@@ -159,6 +211,35 @@ export class BusinessRegistrationController {
         businessPublic.RegistrationProgressResponse,
         response,
         'BusinessRegistrationController.submitStep3',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /businesses/registration/complete
+   * Complete the registration process with user consent
+   */
+  async completeRegistration(
+    req: Request<{}, {}, businessPublic.CompleteBusinessRegistrationRequest>,
+    res: Response<businessPublic.CompleteBusinessRegistrationResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+      const data = req.body
+
+      // Complete registration with explicit user consent
+      const completion = await this.service.completeRegistration(userId, data)
+
+      const validatedResponse = validateResponse(
+        businessPublic.CompleteBusinessRegistrationResponse,
+        completion,
+        'BusinessRegistrationController.completeRegistration',
       )
 
       res.json(validatedResponse)

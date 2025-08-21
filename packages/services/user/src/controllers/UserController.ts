@@ -1,5 +1,5 @@
 import { authPublic, userAdmin, userCommon, userPublic } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   adaptMulterFile,
   getValidatedQuery,
@@ -8,7 +8,6 @@ import {
   validateAvatarFile,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import { UserRole } from '@pika/types'
@@ -42,12 +41,6 @@ export class UserController {
    * GET /users
    * Get all users with filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'users',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllUsers(
     req: Request,
     res: Response,
@@ -101,11 +94,6 @@ export class UserController {
    * GET /users/:user_id
    * Get user by ID
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserById(
     req: Request<userAdmin.UserIdParam>,
     res: Response,
@@ -133,11 +121,6 @@ export class UserController {
    * GET /users/email/:email
    * Get user by email address
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user:email',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserByEmail(
     req: Request<userAdmin.EmailParam>,
     res: Response,
@@ -310,11 +293,6 @@ export class UserController {
    * GET /users/sub/:sub_token
    * Get user by subscription token
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user:subtoken',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserBySubToken(
     req: Request<userAdmin.SubTokenParam>,
     res: Response,

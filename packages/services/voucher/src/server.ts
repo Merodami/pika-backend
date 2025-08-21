@@ -3,7 +3,7 @@ import '@pika/environment'
 
 import { VOUCHER_SERVICE_NAME, VOUCHER_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import { ICacheService } from '@pika/redis'
+import { ICacheService, setCacheService } from '@pika/redis'
 import { BusinessServiceClient, FileStoragePort, logger } from '@pika/shared'
 import { TranslationClient, TranslationResolver } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
@@ -33,6 +33,9 @@ export async function createVoucherServer({
 }) {
   // Initialize service clients
   const businessServiceClient = new BusinessServiceClient()
+
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
 
   logger.info(`Configuring Voucher service for port: ${VOUCHER_SERVICE_PORT}`)
 

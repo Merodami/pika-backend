@@ -1,0 +1,9 @@
+{
+  "$ref": "#/definitions/CategoryHierarchyResponseSchema",
+  "definitions": {
+    "CategoryHierarchyResponseSchema": {
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -1,5 +1,5 @@
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import type { ICacheService } from '@pika/redis'
+import { type ICacheService, setCacheService } from '@pika/redis'
 import {
   CommunicationServiceClient,
   logger,
@@ -16,6 +16,9 @@ export interface ServerConfig {
 }
 
 export async function createAuthServer(config: ServerConfig) {
+  // Set up global cache service for decorators
+  setCacheService(config.cacheService)
+
   const app = await createExpressServer({
     serviceName: 'auth-service',
     port: config.port,

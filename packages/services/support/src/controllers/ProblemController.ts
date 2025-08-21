@@ -25,11 +25,6 @@ export class ProblemController {
    * GET /problems
    * Get authenticated user's support tickets with pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user-problems',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserProblems(
     request: Request,
     response: Response,

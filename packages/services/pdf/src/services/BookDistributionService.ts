@@ -1,5 +1,7 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { BookDistributionDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
@@ -155,8 +157,11 @@ export class BookDistributionService implements IBookDistributionService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:book-distribution',
-    keyGenerator: (id) => id,
+    prefix: CACHE_KEYS.DISTRIBUTION.BY_BOOK,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const id = args[0]
+      return `${prefix}:${id}`
+    },
   })
   async getDistributionById(id: string): Promise<BookDistributionDomain> {
     try {
@@ -179,8 +184,11 @@ export class BookDistributionService implements IBookDistributionService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL / 2,
-    prefix: 'service:book-distributions',
-    keyGenerator: (params) => JSON.stringify(params),
+    prefix: CACHE_KEYS.DISTRIBUTION.BY_STATUS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      return `${prefix}:${JSON.stringify(params)}`
+    },
   })
   async getAllDistributions(
     params: BookDistributionSearchParams,
@@ -197,8 +205,11 @@ export class BookDistributionService implements IBookDistributionService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:book-distributions-by-book',
-    keyGenerator: (bookId) => bookId,
+    prefix: CACHE_KEYS.DISTRIBUTION.BY_BOOK,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const bookId = args[0]
+      return `${prefix}:${bookId}`
+    },
   })
   async getDistributionsByVoucherBookId(
     bookId: string,
@@ -387,9 +398,11 @@ export class BookDistributionService implements IBookDistributionService {
   }
 
   @Cache({
-    ttl: REDIS_DEFAULT_TTL * 2, // Longer cache for analytics
-    prefix: 'service:business-stats',
-    keyGenerator: () => 'all',
+    ttl: REDIS_DEFAULT_TTL * 2,
+    prefix: CACHE_KEYS.DISTRIBUTION.STATS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:all`
+    },
   })
   async getBusinessStats(): Promise<BusinessDistributionStats[]> {
     try {

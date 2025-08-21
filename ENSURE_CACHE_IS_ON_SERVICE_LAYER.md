@@ -215,41 +215,151 @@ export async function createServer(options: ServerOptions) {
 2. Add tests for service-level caching
 3. Ensure integration tests work with proper cache configuration
 
-## Services to Fix
+## Implementation Status Checklist
 
-### Priority 1 (Currently Broken)
-- [ ] **business-service**
-  - Remove `@Cache` from `BusinessRegistrationController`
-  - Add `@Cache` to `BusinessRegistrationService.checkRegistrationStatus()`
-  - Fix integration tests
+### ✅ COMPLETED Services
 
-### Priority 2 (Potentially Broken)
-- [ ] **category-service**
-  - Remove `@Cache` from all controllers
-  - Verify service methods have appropriate caching
-  - Ensure `setCacheService()` is called
-  
-- [ ] **storage-service**
-  - Remove `@Cache` from `FileController`
-  - Add `@Cache` to `StorageService` methods
-  - Add `setCacheService()` call to server setup
+#### 1. **category-service** ✅ 
+- [x] Created cache-keys.ts file
+- [x] Removed @Cache from CategoryController
+- [x] Removed @Cache from AdminCategoryController  
+- [x] Removed @Cache from InternalCategoryController
+- [x] Updated CategoryService to use CACHE_KEYS constants
+- [x] Added proper cache key generators
+- [x] Added setCacheService to server.ts
+- [x] Validated no hardcoded cache strings
+- [x] Build successful
+- [x] Added cache performance tests
 
-- [ ] **communication-service**
-  - Remove `@Cache` from controllers
-  - Add to service layer
-  - Verify setup
+#### 2. **subscription-service** ✅
+- [x] Created cache-keys.ts file
+- [x] Removed @Cache from PlanController.getPlans() (FIXED)
+- [x] Removed @Cache from PublicSubscriptionController.getUserSubscription() (FIXED)
+- [x] ✅ VERIFIED: PlanService.getAllPlans() HAS @Cache with CACHE_KEYS.PLAN.LIST
+- [x] ✅ VERIFIED: SubscriptionService.getUserActiveSubscription() HAS @Cache with CACHE_KEYS.SUBSCRIPTION.USER
+- [x] Updated all services to use CACHE_KEYS constants
+- [x] Added setCacheService to server.ts
+- [x] Validated no hardcoded cache strings
+- [x] Build successful
 
-- [ ] **subscription-service**
-  - Remove `@Cache` from `PublicSubscriptionController`
-  - Add to service layer
-  - Verify setup
+### ✅ COMPLETED Services (ALL DONE!)
 
-### Priority 3 (Audit Needed)
-- [ ] **voucher-service**
-- [ ] **payment-service**
-- [ ] **user-service**
-- [ ] **support-service**
-- [ ] **pdf-service**
+#### 5. **payment-service** ✅ (No changes needed)
+- [x] ✅ VERIFIED: No @Cache decorators found in controllers or services
+- [x] Service already follows Clean Architecture principles  
+- [x] No cache architecture violations detected
+- [x] Uses cache service only for infrastructure (health checks, webhooks)
+- [x] Build successful
+
+#### 6. **user-service** ✅
+- [x] Created cache-keys.ts file
+- [x] ✅ VERIFIED: UserService.getUserById() HAS @Cache with CACHE_KEYS.USER.SINGLE
+- [x] ✅ VERIFIED: AdminUserService methods HAS @Cache with CACHE_KEYS.ADMIN constants
+- [x] No controllers had @Cache decorators (already clean)
+- [x] Updated all services to use CACHE_KEYS constants
+- [x] Added setCacheService to server.ts
+- [x] Validated no hardcoded cache strings
+- [x] Build successful
+
+#### 7. **support-service** ✅
+- [x] Created cache-keys.ts file
+- [x] ✅ VERIFIED: ProblemService.getProblemById() HAS @Cache with CACHE_KEYS.PROBLEM.SINGLE
+- [x] ✅ VERIFIED: SupportCommentService.getCommentsByProblemId() HAS @Cache with CACHE_KEYS.COMMENT.BY_PROBLEM
+- [x] ✅ VERIFIED: AdminSupportCommentService.getAllComments() and getCommentsByProblemId() HAS @Cache
+- [x] Removed @Cache from ProblemController.getUserProblems()
+- [x] Removed @Cache from AdminProblemController.getAllProblems() and getProblemById()
+- [x] Removed @Cache from SupportCommentController.getCommentsByProblemId()
+- [x] Removed @Cache from AdminCommentController.getAllComments() and getCommentsByProblemId()
+- [x] Updated all services to use CACHE_KEYS constants
+- [x] Added setCacheService to server.ts
+- [x] Validated no hardcoded cache strings
+- [x] Build successful
+
+#### 8. **pdf-service** ✅
+- [x] Created cache-keys.ts file
+- [x] ✅ VERIFIED: VoucherBookService.getVoucherBookById() and getAllVoucherBooks() HAS @Cache with CACHE_KEYS
+- [x] ✅ VERIFIED: BookDistributionService methods HAS @Cache with CACHE_KEYS
+- [x] ✅ VERIFIED: AdPlacementService methods HAS @Cache with CACHE_KEYS  
+- [x] Removed @Cache from VoucherBookController.getAllVoucherBooks() and getVoucherBookById()
+- [x] Removed @Cache from AdminVoucherBookController.getAllVoucherBooks(), getVoucherBookById(), and getVoucherBookStatistics()
+- [x] Updated all services to use CACHE_KEYS constants
+- [x] Added setCacheService to server.ts
+- [x] Validated no hardcoded cache strings
+- [x] Build successful
+
+#### 9. **auth-service** ✅
+- [x] Created cache-keys.ts file
+- [x] ✅ VERIFIED: AuthService.getUserInfo() HAS @Cache with CACHE_KEYS.USER_INFO.BY_ID (5 min TTL)
+- [x] Removed @Cache from AuthController.userinfo()
+- [x] Updated service to use CACHE_KEYS constants
+- [x] Added setCacheService to server.ts
+- [x] Validated no hardcoded cache strings
+- [x] Build successful
+
+#### 10. **storage-service** ✅
+- [x] Created cache-keys.ts file (already existed)
+- [x] ✅ VERIFIED: StorageService methods HAS @Cache with CACHE_KEYS.FILE constants
+- [x] Removed @Cache from FileController (already done)
+- [x] Enhanced StorageService with caching
+- [x] Added setCacheService to server.ts
+- [x] Updated to use CACHE_KEYS pattern
+- [x] Build successful
+
+#### 11. **communication-service** ✅
+- [x] Created cache-keys.ts file (already existed)
+- [x] ✅ VERIFIED: EmailService methods HAS @Cache with CACHE_KEYS.EMAIL constants
+- [x] ✅ VERIFIED: NotificationService methods HAS @Cache with CACHE_KEYS.NOTIFICATION constants
+- [x] Removed @Cache from EmailController (already done)
+- [x] Removed @Cache from NotificationController (already done)
+- [x] Enhanced services with caching
+- [x] Added setCacheService to server.ts
+- [x] Updated to use CACHE_KEYS pattern
+- [x] Build successful
+
+### Validation Checklist for Each Service
+
+For each service, validate ALL of the following:
+
+#### Public API Layer
+- [ ] Check all public controllers for @Cache decorators (should be NONE)
+- [ ] Verify public services have appropriate @Cache decorators
+- [ ] Ensure cache keys follow the pattern
+
+#### Admin API Layer  
+- [ ] Check all admin controllers for @Cache decorators (should be NONE)
+- [ ] Verify admin services have appropriate @Cache decorators
+- [ ] Ensure cache keys follow the pattern
+
+#### Internal API Layer
+- [ ] Check all internal controllers for @Cache decorators (should be NONE)
+- [ ] Verify internal services have appropriate @Cache decorators
+- [ ] Ensure cache keys follow the pattern
+
+#### Repository Layer
+- [ ] Verify NO @Cache decorators in repositories
+- [ ] Check repositories don't have hardcoded cache logic
+
+#### Cache Configuration
+- [ ] Verify setCacheService is called in server.ts
+- [ ] Check cache-keys.ts exists and follows pattern
+- [ ] Validate no hardcoded cache strings anywhere
+- [ ] Ensure cache invalidation on CREATE/UPDATE/DELETE
+
+#### Service Layer Completeness Verification 
+- [ ] **CRITICAL: Verify service methods have @Cache decorators**
+  - Don't just remove @Cache from controllers without ensuring services are cached
+  - Check that ALL methods called by controllers have appropriate @Cache
+  - Verify cache keys, TTL, and key generators are properly configured
+- [ ] **Verify cache invalidation is implemented**
+  - Check CREATE/UPDATE/DELETE operations clear relevant caches
+  - Ensure cache invalidation uses the same CACHE_KEYS constants
+
+#### Testing
+- [ ] Run build command successfully
+- [ ] Run service-specific tests
+- [ ] Verify no hanging requests
+- [ ] Check cache performance tests exist (if applicable)
+- [ ] **Test that caching actually works end-to-end**
 
 ## Success Criteria
 
@@ -291,13 +401,100 @@ it('should cache service responses', async () => {
 })
 ```
 
+## ⚠️ CRITICAL VERIFICATION STEP: Don't Just Remove - VERIFY SERVICE CACHING
+
+### The Biggest Pitfall: Removing Controller Caching Without Verifying Service Caching
+
+**WARNING**: Simply removing `@Cache` decorators from controllers is NOT enough! You must verify that the service layer actually implements the caching.
+
+#### What to Check When "Fixing" a Service:
+
+1. **Identify what was cached in controllers**
+   ```bash
+   # Find what controller methods had @Cache
+   grep -n "@Cache" packages/services/[service]/src/controllers/*Controller.ts
+   ```
+
+2. **Map controller methods to service methods**
+   ```typescript
+   // Controller method (had @Cache - now removed)
+   async getUserSubscription(req, res) {
+     const result = await this.subscriptionService.getUserActiveSubscription(userId)
+     res.json(result)
+   }
+   
+   // CHECK: Does SubscriptionService.getUserActiveSubscription() have @Cache?
+   ```
+
+3. **Verify service method has equivalent caching**
+   ```typescript
+   // Service method MUST have @Cache decorator
+   @Cache({
+     ttl: REDIS_DEFAULT_TTL,
+     prefix: CACHE_KEYS.SUBSCRIPTION.USER,
+     keyGenerator: (prefix, method, args) => `${prefix}:${args[0]}`
+   })
+   async getUserActiveSubscription(userId: string) {
+     // Implementation
+   }
+   ```
+
+#### Examples of Proper Verification:
+
+**✅ GOOD Example - Category Service:**
+- Removed `@Cache` from `CategoryController.getAllCategories()`
+- ✅ Verified `CategoryService.getAllCategories()` HAS `@Cache` with `CACHE_KEYS.CATEGORY.LIST`
+- ✅ Verified proper cache invalidation in create/update/delete methods
+
+**✅ GOOD Example - Subscription Service:**
+- Removed `@Cache` from `PublicSubscriptionController.getUserSubscription()`
+- ✅ Verified `SubscriptionService.getUserActiveSubscription()` HAS `@Cache` with `CACHE_KEYS.SUBSCRIPTION.USER`
+
+**❌ BAD Example - What NOT to do:**
+- Remove `@Cache` from `VoucherController.getVouchers()`
+- ❌ Assume `VoucherService.getAllVouchers()` has caching
+- ❌ Don't check if the service method actually has `@Cache`
+- Result: No caching at all - performance regression!
+
+### Service Layer Completeness Checklist:
+
+For each service being "fixed":
+
+1. **Map all controller methods that had @Cache**
+2. **Find the corresponding service methods they call**
+3. **Verify EACH service method has appropriate @Cache decorator**
+4. **Check cache keys use CACHE_KEYS constants (not hardcoded strings)**
+5. **Verify cache invalidation exists for write operations**
+6. **Test that caching actually works end-to-end**
+
+### How to Test Service Layer Caching:
+
+```typescript
+// Integration test to verify caching works
+it('should cache service responses', async () => {
+  // First call - hits database
+  const start1 = Date.now()
+  const result1 = await service.getAllEntities({ page: 1 })
+  const time1 = Date.now() - start1
+  
+  // Second call - should hit cache (much faster)
+  const start2 = Date.now()
+  const result2 = await service.getAllEntities({ page: 1 })
+  const time2 = Date.now() - start2
+  
+  expect(result2).toEqual(result1)  // Same data
+  expect(time2).toBeLessThan(time1 / 2)  // Much faster (cache hit)
+})
+```
+
 ## Common Pitfalls to Avoid
 
-1. **Don't cache methods with side effects** - Only cache pure data retrieval
-2. **Don't cache user-specific data without user ID in key** - Security risk
-3. **Don't cache sensitive data** - Consider security implications
-4. **Don't cache frequently changing data** - Wastes cache space
-5. **Don't forget cache invalidation** - Update cache when data changes
+1. **Don't just remove controller @Cache without verifying service has it** - ⚠️ CRITICAL
+2. **Don't cache methods with side effects** - Only cache pure data retrieval
+3. **Don't cache user-specific data without user ID in key** - Security risk
+4. **Don't cache sensitive data** - Consider security implications
+5. **Don't cache frequently changing data** - Wastes cache space
+6. **Don't forget cache invalidation** - Update cache when data changes
 
 ## Cache Invalidation Strategy
 

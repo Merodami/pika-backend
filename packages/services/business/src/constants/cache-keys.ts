@@ -18,6 +18,7 @@ export const CACHE_KEYS = {
     LIST: 'businesses',
     SINGLE: 'business',
     USER: 'business:user',
+    DETAILS: 'business:details',
   },
   
   // Admin cache keys
@@ -35,4 +36,5 @@ export const generateCacheKey = {
   registrationUser: (userId: string) => `${CACHE_KEYS.REGISTRATION.USER}:${userId}`,
   businessByUser: (userId: string) => `${CACHE_KEYS.BUSINESS.USER}:${userId}`,
   businessById: (businessId: string) => `${CACHE_KEYS.BUSINESS.SINGLE}:${businessId}`,
+  businessDetails: (businessId: string) => `${CACHE_KEYS.BUSINESS.DETAILS}:${businessId}`,
 }
