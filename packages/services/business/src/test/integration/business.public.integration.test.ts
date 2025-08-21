@@ -372,7 +372,7 @@ describe('Business Service - Public API Integration Tests', () => {
 
   // Authenticated User Endpoints (Business Role Required)
   describe('GET /businesses/me', () => {
-    it('should return current user business', async () => {
+    it('should return current user businesses as paginated list', async () => {
       // Create a business for the test business user
       const businessUser = await authHelper.testUsers.BUSINESS
       const businessUserFromDb = await testDb.prisma.user.findUnique({
@@ -395,8 +395,14 @@ describe('Business Service - Public API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.id).toBe(myBusiness.id)
-      expect(response.body.businessNameKey).toBe('business.name.mytest')
+      // Response is now paginated
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data.length).toBeGreaterThan(0)
+      expect(response.body.data[0].id).toBe(myBusiness.id)
+      expect(response.body.data[0].businessNameKey).toBe('business.name.mytest')
+      expect(response.body.pagination).toBeDefined()
+      expect(response.body.pagination.total).toBeGreaterThan(0)
     })
 
     it('should require BUSINESS role for /me endpoint', async () => {
@@ -407,11 +413,72 @@ describe('Business Service - Public API Integration Tests', () => {
         .expect(403)
     })
 
-    it('should return 404 for business user without business', async () => {
-      await clientWithoutBusiness
+    it('should return empty list for business user without business', async () => {
+      const response = await clientWithoutBusiness
         .get(`/businesses/me`)
         .set('Accept', 'application/json')
-        .expect(404)
+        .expect(200)
+      
+      // Should return empty paginated list
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data.length).toBe(0)
+      expect(response.body.pagination.total).toBe(0)
+    })
+
+    it('should return multiple businesses for user with multiple businesses', async () => {
+      // Create multiple businesses for the same user
+      const businessUser = await authHelper.testUsers.BUSINESS
+      const businessUserFromDb = await testDb.prisma.user.findUnique({
+        where: { email: businessUser.email },
+      })
+
+      // Create 3 businesses
+      const businesses = await Promise.all([
+        testDb.prisma.business.create({
+          data: {
+            userId: businessUserFromDb!.id,
+            businessNameKey: 'business.name.test1',
+            categoryId: sharedTestData.activeCategory.id,
+            active: true,
+          },
+        }),
+        testDb.prisma.business.create({
+          data: {
+            userId: businessUserFromDb!.id,
+            businessNameKey: 'business.name.test2',
+            categoryId: sharedTestData.activeCategory.id,
+            active: false, // One inactive
+          },
+        }),
+        testDb.prisma.business.create({
+          data: {
+            userId: businessUserFromDb!.id,
+            businessNameKey: 'business.name.test3',
+            categoryId: sharedTestData.activeCategory.id,
+            active: true,
+          },
+        }),
+      ])
+
+      // Get all businesses (should include active and inactive)
+      const response = await businessClient
+        .get('/businesses/me')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data.length).toBeGreaterThanOrEqual(3)
+      expect(response.body.pagination.total).toBeGreaterThanOrEqual(3)
+      
+      // Test filtering by active status
+      const activeResponse = await businessClient
+        .get('/businesses/me?active=true')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      const activeCount = response.body.data.filter((b: any) => b.active).length
+      expect(activeResponse.body.data.length).toBeGreaterThanOrEqual(2)
+      expect(activeResponse.body.data.every((b: any) => b.active)).toBe(true)
     })
   })
 

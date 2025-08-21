@@ -39,13 +39,13 @@ export function createBusinessRoutes(
   )
 
   // Business owner routes (require auth and business permissions)
-  // GET /businesses/me - Get current user's business (must come before /:id)
+  // GET /businesses/me - Get all current user's businesses (must come before /:id)
   router.get(
     '/me',
     requireAuth(),
     requirePermissions('businesses:read:own'),
-    validateQuery(businessPublic.BusinessDetailQueryParams),
-    controller.getMyBusiness,
+    validateQuery(businessPublic.BusinessQueryParams),
+    controller.getMyBusinesses,
   )
 
   // POST /businesses/me - Create business for current user

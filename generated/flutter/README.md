@@ -7,7 +7,7 @@ This directory contains automatically generated Dart types from your Zod schemas
 - **7** Dart files
 - **0** classes
 - **0** enums  
-- **118** serialization methods
+- **113** serialization methods
 
 ## 📁 Structure
 

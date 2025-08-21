@@ -21,7 +21,7 @@ export class BusinessController {
     this.getAllBusinesses = this.getAllBusinesses.bind(this)
     this.getBusinessById = this.getBusinessById.bind(this)
     this.getBusinessByUserId = this.getBusinessByUserId.bind(this)
-    this.getMyBusiness = this.getMyBusiness.bind(this)
+    this.getMyBusinesses = this.getMyBusinesses.bind(this)
     this.createMyBusiness = this.createMyBusiness.bind(this)
     this.updateMyBusiness = this.updateMyBusiness.bind(this)
   }
@@ -153,34 +153,43 @@ export class BusinessController {
 
   /**
    * GET /businesses/me
-   * Get current authenticated user's business (business owner)
+   * Get all businesses for current authenticated user (business owner)
+   * Returns paginated list of user's businesses
    */
-  async getMyBusiness(
+  async getMyBusinesses(
     req: Request,
-    res: Response<businessPublic.BusinessResponse>,
+    res: Response<businessPublic.BusinessListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
-      const query =
-        getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
+      const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
 
-      // Parse include parameter
-      const includeRelations = query.include?.split(',') || []
-      const business = await this.businessService.getBusinessByUserId(userId, {
-        user: includeRelations.includes('user'),
-        category: includeRelations.includes('category'),
-      })
+      // Build search params with userId filter
+      // For business owners, show all their businesses (active and inactive)
+      // unless they specifically filter by active status
+      const params = {
+        userId, // Filter by current user
+        categoryId: query.categoryId,
+        verified: query.verified,
+        active: query.active, // undefined = show all, true/false = filter
+        minRating: query.minRating,
+        search: query.search,
+        page: query.page || 1,
+        limit: query.limit || PAGINATION_DEFAULT_LIMIT,
+        sortBy: query.sortBy || 'createdAt',
+        sortOrder: mapSortOrder(query.sortOrder),
+      }
 
-      // Transform to DTO
-      const response = BusinessMapper.toDTO(business)
+      const result = await this.businessService.getAllBusinesses(params)
 
-      // Validate response against Zod schema
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, BusinessMapper.toDTO)
       const validatedResponse = validateResponse(
-        businessPublic.BusinessResponse,
+        businessPublic.BusinessListResponse,
         response,
-        'BusinessController.getMyBusiness',
+        'BusinessController.getMyBusinesses',
       )
 
       res.json(validatedResponse)

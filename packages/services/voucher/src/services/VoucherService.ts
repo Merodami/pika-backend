@@ -113,7 +113,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:vouchers',
+    prefix: CACHE_KEYS.VOUCHER.LIST,
     keyGenerator: (params) => JSON.stringify(params),
   })
   async getAllVouchers(
@@ -142,7 +142,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:voucher',
+    prefix: CACHE_KEYS.VOUCHER.SINGLE,
     keyGenerator: (id, parsedIncludes) =>
       `${id}:${JSON.stringify(parsedIncludes || {})}`,
   })
@@ -177,7 +177,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:vouchers:business',
+    prefix: CACHE_KEYS.VOUCHER.BY_BUSINESS,
     keyGenerator: (params) => {
       const searchParams = params as unknown as VoucherSearchParams
 
@@ -226,7 +226,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:vouchers:user',
+    prefix: CACHE_KEYS.VOUCHER.USER_VOUCHERS,
     keyGenerator: (userId, params) => `${userId}:${JSON.stringify(params)}`,
   })
   async getVouchersByUserId(
@@ -721,7 +721,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:voucher:code',
+    prefix: CACHE_KEYS.VOUCHER.BY_CODE,
     keyGenerator: (code) => code,
   })
   async getVoucherByAnyCode(

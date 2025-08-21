@@ -354,4 +354,13 @@ export class UserServiceClientMock extends UserServiceClient {
     this.emailVerificationTokens.clear()
     this.initializeMockData()
   }
+
+  // Method to update a mock user (for testing cache invalidation)
+  updateUserMock(updatedUser: Partial<MockUser> & { id: string }): void {
+    const existingUser = this.users.get(updatedUser.id)
+    if (existingUser) {
+      const merged = { ...existingUser, ...updatedUser, updatedAt: new Date() }
+      this.users.set(updatedUser.id, merged)
+    }
+  }
 }

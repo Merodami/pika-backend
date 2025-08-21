@@ -287,11 +287,14 @@ function generateDartTypes(schemas: Record<string, any>) {
       
       try {
         const individualDartContent: string[] = []
+        const seenEnums = new Set<string>()
+        const seenClasses = new Set<string>()
+        const seenVariables = new Set<string>()
         
         // Add Dart imports
         individualDartContent.push('// To parse this JSON data, do')
         individualDartContent.push('//')
-        individualDartContent.push('//     final data = ${moduleKey}FromJson(jsonString);')
+        individualDartContent.push(`//     final data = SomeClass.fromJson(jsonData);`)
         individualDartContent.push('')
         individualDartContent.push('import "dart:convert";')
         individualDartContent.push('')
@@ -319,19 +322,78 @@ function generateDartTypes(schemas: Record<string, any>) {
             
             if (fs.existsSync(tempDartPath)) {
               const content = fs.readFileSync(tempDartPath, 'utf8')
-              // Extract class definitions (skip imports and comments)
-              const classLines = content.split('\n').filter(line => 
-                !line.startsWith('//') && 
-                !line.startsWith('import') &&
-                line.trim() !== ''
-              ).slice(1) // Skip first empty line
+              const lines = content.split('\n')
               
-              individualDartContent.push(...classLines)
-              individualDartContent.push('')
+              // Filter out duplicate definitions with improved logic
+              const filteredLines: string[] = []
+              let skipBlock = false
+              let blockDepth = 0
+              
+              for (const line of lines) {
+                const trimmedLine = line.trim()
+                
+                // Skip imports and initial comments
+                if (line.startsWith('//') || line.startsWith('import') || trimmedLine === '') {
+                  continue
+                }
+                
+                // Track opening braces for block depth
+                if (trimmedLine.includes('{')) {
+                  blockDepth += (trimmedLine.match(/{/g) || []).length
+                }
+                
+                // Check for duplicate definitions
+                if (!skipBlock) {
+                  if (line.startsWith('enum ')) {
+                    const enumName = line.split(' ')[1].replace('{', '')
+                    if (seenEnums.has(enumName)) {
+                      skipBlock = true
+                      continue
+                    }
+                    seenEnums.add(enumName)
+                  } else if (line.startsWith('class ')) {
+                    const className = line.split(' ')[1].replace('{', '')
+                    if (seenClasses.has(className)) {
+                      skipBlock = true
+                      continue
+                    }
+                    seenClasses.add(className)
+                  } else if (line.startsWith('final ')) {
+                    const varName = line.split(' ')[1]
+                    if (seenVariables.has(varName)) {
+                      skipBlock = true
+                      continue
+                    }
+                    seenVariables.add(varName)
+                  }
+                }
+                
+                // Track closing braces for block end detection
+                if (trimmedLine.includes('}')) {
+                  const closingBraces = (trimmedLine.match(/}/g) || []).length
+                  blockDepth -= closingBraces
+                  
+                  // End of block detection
+                  if (skipBlock && blockDepth <= 0) {
+                    skipBlock = false
+                    blockDepth = 0
+                    continue
+                  }
+                }
+                
+                if (!skipBlock) {
+                  filteredLines.push(line)
+                }
+              }
+              
+              if (filteredLines.length > 0) {
+                individualDartContent.push(...filteredLines)
+                individualDartContent.push('')
+                individualSuccessCount++
+                console.log(`        ✅ ${schemaData.schemaName}`)
+              }
               
               fs.unlinkSync(tempDartPath) // Clean up temp file
-              individualSuccessCount++
-              console.log(`        ✅ ${schemaData.schemaName}`)
             }
           } catch (individualError) {
             console.log(`        ❌ ${schemaData.schemaName}: ${individualError.message}`)

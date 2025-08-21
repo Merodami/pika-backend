@@ -1,7 +1,3 @@
-import {
-  UserRole as UserRoleEnum,
-  UserStatus as UserStatusEnum,
-} from '@pika/types'
 import { z } from 'zod'
 
 import { AdminCreateBusinessRequest } from '../../business/admin/management.js'
@@ -53,19 +49,6 @@ export type AdminBusinessLoginFormData = z.infer<
   typeof AdminBusinessLoginFormSchema
 >
 
-/**
- * Transform login form data to backend TokenRequest format
- */
-export function transformLoginToTokenRequest(
-  loginData: LoginFormData,
-): Extract<z.infer<typeof TokenRequest>, { grantType: 'password' }> {
-  return {
-    grantType: 'password' as const,
-    username: loginData.email as any, // Cast to any to bypass brand type checking
-    password: loginData.password,
-    // Note: rememberMe would be handled by token expiration logic
-  }
-}
 
 // ============= Registration Form =============
 
@@ -83,24 +66,6 @@ export const RegisterFormSchema = RegisterRequest.extend({
 
 export type RegisterFormData = z.infer<typeof RegisterFormSchema>
 
-/**
- * Transform registration form data to backend RegisterRequest format
- */
-export function transformRegisterToAPI(
-  formData: RegisterFormData,
-): z.infer<typeof RegisterRequest> {
-  const {
-    confirmPassword: _confirmPassword,
-    agreedToMarketing,
-    ...apiData
-  } = formData
-
-  // Map UI field to API field
-  return {
-    ...apiData,
-    marketingConsent: agreedToMarketing,
-  }
-}
 
 // ============= Password Reset Forms =============
 
@@ -134,16 +99,6 @@ export const ResetPasswordFormSchema = z
 
 export type ResetPasswordFormData = z.infer<typeof ResetPasswordFormSchema>
 
-/**
- * Transform reset password form to backend format
- */
-export function transformResetPasswordToAPI(
-  formData: ResetPasswordFormData,
-): z.infer<typeof ResetPasswordRequest> {
-  const { confirmPassword: _confirmPassword, ...apiData } = formData
-
-  return apiData
-}
 
 // ============= Admin/Business Specific Forms =============
 
@@ -172,46 +127,6 @@ export type AdminCreateBusinessUserData = z.infer<
   typeof AdminCreateBusinessUserSchema
 >
 
-/**
- * Frontend options returned with the user creation
- */
-export interface AdminCreateUserOptions {
-  temporaryPassword: string
-  sendWelcomeEmail: boolean
-  requirePasswordChange: boolean
-}
-
-/**
- * Transform to backend AdminCreateUserRequest with type-safe enums
- * Returns both the user request and frontend options
- */
-export function transformToAdminCreateUser(
-  formData: AdminCreateBusinessUserData,
-): {
-  createUser: z.infer<typeof AdminCreateUserRequest>
-  options: AdminCreateUserOptions
-} {
-  const {
-    temporaryPassword,
-    sendWelcomeEmail,
-    requirePasswordChange,
-    ...userData
-  } = formData
-
-  // Note: confirmPassword is validated by the schema but not needed for the API
-  return {
-    createUser: {
-      ...userData,
-      role: UserRoleEnum.BUSINESS, // Type-safe enum value
-      status: UserStatusEnum.UNCONFIRMED, // Type-safe enum value
-    },
-    options: {
-      temporaryPassword,
-      sendWelcomeEmail,
-      requirePasswordChange,
-    },
-  }
-}
 
 /**
  * Admin creates business form
@@ -241,18 +156,6 @@ export type AdminBusinessChangePasswordData = z.infer<
   typeof AdminBusinessChangePasswordSchema
 >
 
-/**
- * Transform to backend ChangePasswordRequest
- */
-export function transformToChangePassword(
-  formData: AdminBusinessChangePasswordData,
-): z.infer<typeof ChangePasswordRequest> {
-  // Note: confirmPassword is validated by the schema but not needed for the API
-  return {
-    currentPassword: formData.currentPassword,
-    newPassword: formData.newPassword,
-  }
-}
 
 // ============= Export All =============
 

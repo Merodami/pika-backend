@@ -202,20 +202,53 @@ export class UserService implements IUserService {
         )
       }
 
-      // Admin creation - map schema fields to database fields
+      // Admin creation - map ALL schema fields to database fields
       const userData = {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
         phoneNumber: data.phoneNumber,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
+        password: data.password, // Handle optional password from schema
         role: data.role ? mapUserRole(data.role) : UserRole.CUSTOMER,
         status: data.status
           ? mapUserStatus(data.status)
           : UserStatus.UNCONFIRMED,
+        emailVerified: data.emailVerified || false,
+        phoneVerified: data.phoneVerified || false,
+        preferredLanguage: data.preferredLanguage,
       }
 
       const user = await this.repository.create(userData)
+
+      // Handle different authentication scenarios:
+      // 1. Password provided: User can login immediately with password
+      // 2. No password + SSO expected: User will authenticate via SSO provider
+      // 3. No password + no SSO: User needs to set password on first login
+      if (!data.password) {
+        if (data.authProvider && data.authProvider !== 'local') {
+          // SSO user - they'll authenticate through external provider
+          logger.info('SSO user created without password', {
+            userId: user.id,
+            email: data.email,
+            authProvider: data.authProvider,
+            message: 'User will authenticate via SSO provider',
+          })
+        } else if (data.status === UserStatus.ACTIVE) {
+          // Active user without password - needs password setup
+          logger.warn('Active user created without password - requires setup', {
+            userId: user.id,
+            email: data.email,
+            message: 'User will need to set password on first login or use SSO',
+          })
+        }
+      } else {
+        logger.info('User created with password', {
+          userId: user.id,
+          email: data.email,
+          canLoginImmediately: data.status === UserStatus.ACTIVE,
+        })
+      }
 
       // Invalidate cache
       await this.invalidateCache()
@@ -224,6 +257,9 @@ export class UserService implements IUserService {
         email: data.email,
         role: data.role,
         status: data.status,
+        emailVerified: data.emailVerified,
+        phoneVerified: data.phoneVerified,
+        hasPassword: !!data.password,
       })
 
       return user
