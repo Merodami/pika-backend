@@ -109,8 +109,13 @@ export class NotificationService implements INotificationService {
   }
 
   @Cache({
-    ttl: 60, // 1 minute cache for notifications
-    prefix: 'user-notifications',
+    ttl: 60, // 1 minute cache for notifications (short TTL as notifications change frequently)
+    prefix: 'service:user-notifications',
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const userId = args[0]
+      const params = args[1]
+      return `${prefix}:${userId}:${JSON.stringify(params)}`
+    }
   })
   async getUserNotifications(
     userId: string,
@@ -271,9 +276,13 @@ export class NotificationService implements INotificationService {
   private async clearUserNotificationCache(userId: string): Promise<void> {
     try {
       // Clear all cached entries for this user's notifications
-      const pattern = `user-notifications:${userId}:*`
+      const pattern = `service:user-notifications:${userId}:*`
 
-      await this.cache.delPattern(pattern)
+      if (this.cache.delPattern) {
+        await this.cache.delPattern(pattern)
+      } else {
+        logger.warn('Cache delPattern not available, cache may be stale')
+      }
     } catch (error) {
       logger.error('Failed to clear notification cache', error)
     }

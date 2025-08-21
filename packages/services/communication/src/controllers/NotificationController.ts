@@ -4,14 +4,12 @@ import {
   communicationCommon,
   communicationPublic,
 } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { NotificationMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -130,11 +128,6 @@ export class NotificationController implements INotificationController {
    * GET /notifications
    * Get user's notifications
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'notifications',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getNotifications(
     request: Request, // Standard pattern - don't use Query params on Request
     response: Response<communicationPublic.NotificationListResponse>,

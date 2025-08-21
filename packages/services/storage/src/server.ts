@@ -1,5 +1,5 @@
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import type { ICacheService } from '@pika/redis'
+import { type ICacheService, setCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
@@ -14,6 +14,9 @@ export interface ServerConfig {
 }
 
 export async function createStorageServer(config: ServerConfig) {
+  // Set up global cache service for decorators
+  setCacheService(config.cacheService)
+  
   const app = await createExpressServer({
     serviceName: 'storage-service',
     port: config.port,

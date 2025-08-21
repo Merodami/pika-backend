@@ -10,6 +10,7 @@ import type {
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export class CategoryService implements ICategoryService {
   constructor(
@@ -19,7 +20,7 @@ export class CategoryService implements ICategoryService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:categories',
+    prefix: CACHE_KEYS.CATEGORY.LIST,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       return `${prefix}:${JSON.stringify(args[0])}`
     },
@@ -39,7 +40,7 @@ export class CategoryService implements ICategoryService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:category',
+    prefix: CACHE_KEYS.CATEGORY.SINGLE,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       return `${prefix}:${args[0]}`
     },
@@ -66,7 +67,7 @@ export class CategoryService implements ICategoryService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:categories:bulk',
+    prefix: CACHE_KEYS.CATEGORY.BY_IDS,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const ids = args[0] as string[]
 
@@ -285,7 +286,7 @@ export class CategoryService implements ICategoryService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:category:hierarchy',
+    prefix: CACHE_KEYS.CATEGORY.HIERARCHY,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const rootId = args[0]
       return `${prefix}:${rootId || 'all'}`
@@ -304,7 +305,7 @@ export class CategoryService implements ICategoryService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:category:path',
+    prefix: CACHE_KEYS.CATEGORY.PATH,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       return `${prefix}:${args[0]}`
     },
@@ -343,15 +344,14 @@ export class CategoryService implements ICategoryService {
     try {
       // Invalidate specific category cache if ID provided
       if (categoryId) {
-        await this.cache.del(`service:category:${categoryId}`)
-        await this.cache.del(`service:category:path:${categoryId}`)
+        await this.cache.del(`${CACHE_KEYS.CATEGORY.SINGLE}:${categoryId}`)
+        await this.cache.del(`${CACHE_KEYS.CATEGORY.PATH}:${categoryId}`)
       }
 
-      // Invalidate list caches
-      await this.cache.delPattern?.('service:categories:*')
-      await this.cache.delPattern?.('service:category:hierarchy:*')
-      await this.cache.delPattern?.('categories:*')
-      await this.cache.delPattern?.('category:*')
+      // Invalidate list caches using patterns
+      await this.cache.delPattern?.(`${CACHE_KEYS.CATEGORY.LIST}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.CATEGORY.HIERARCHY}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.CATEGORY.BY_IDS}:*`)
     } catch (error) {
       logger.warn('Failed to invalidate cache', { error })
     }

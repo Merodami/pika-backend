@@ -4,6 +4,7 @@ import { Cache } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import { SubscriptionStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
 import type { UserMembershipStatus } from '@subscription/types/interfaces.js'
 
@@ -22,7 +23,10 @@ export class UserMembershipService implements IUserMembershipService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL * CACHE_TTL_MULTIPLIERS.USER_SUBSCRIPTION,
-    prefix: 'user-membership',
+    prefix: CACHE_KEYS.MEMBERSHIP.USER,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getUserMembershipStatus(userId: string): Promise<UserMembershipStatus> {
     logger.info('Getting user membership status', { userId })
@@ -120,7 +124,9 @@ export class UserMembershipService implements IUserMembershipService {
 
   private async clearUserMembershipCache(userId: string): Promise<void> {
     try {
-      await this.cache.del(`user-membership:${userId}`)
+      await this.cache.del(`${CACHE_KEYS.MEMBERSHIP.USER}:${userId}`)
+      await this.cache.del(`${CACHE_KEYS.MEMBERSHIP.STATUS}:${userId}`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.MEMBERSHIP.BENEFITS}:*`)
     } catch (error) {
       logger.error('Failed to clear user membership cache', { userId, error })
     }

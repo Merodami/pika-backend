@@ -166,6 +166,11 @@ export class StorageService implements IStorageService {
         processingTime: Date.now() - startTime,
       })
 
+      // Invalidate file history cache for this user
+      if (input.userId) {
+        await this.invalidateUserFileCache(input.userId)
+      }
+
       return fileStorageLog
     } catch (error) {
       logger.error('Failed to upload file', error)
@@ -348,6 +353,9 @@ export class StorageService implements IStorageService {
         fileId,
         provider: storageProvider.getProviderName(),
       })
+
+      // Invalidate caches
+      await this.invalidateFileCache(fileId, fileRecord.userId)
     } catch (error) {
       logger.error('Failed to delete file', error)
       throw ErrorFactory.fromError(error)
@@ -399,7 +407,15 @@ export class StorageService implements IStorageService {
     }
   }
 
-  @Cache({ ttl: REDIS_DEFAULT_TTL, prefix: 'file-history' })
+  @Cache({ 
+    ttl: REDIS_DEFAULT_TTL, 
+    prefix: 'service:file-history',
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const userId = args[0]
+      const params = args[1]
+      return `${prefix}:${userId}:${JSON.stringify(params)}`
+    }
+  })
   async getFileHistory(
     userId: string,
     params: FileStorageLogSearchParams,
@@ -412,6 +428,15 @@ export class StorageService implements IStorageService {
     return this.fileStorageLogRepository.findAll(searchParams)
   }
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'service:file',
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const id = args[0]
+      const userId = args[1]
+      return `${prefix}:${id}:${userId || 'public'}`
+    }
+  })
   async getFileById(
     id: string,
     userId?: string,
@@ -465,6 +490,42 @@ export class StorageService implements IStorageService {
     } catch (error) {
       logger.error('Failed to serve file', { error, filePath })
       throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Invalidate cache for a specific file
+   */
+  private async invalidateFileCache(fileId: string, userId?: string): Promise<void> {
+    try {
+      // Invalidate specific file cache entries
+      await this.cache.del(`service:file:${fileId}:${userId || 'public'}`)
+      
+      // Invalidate user's file history cache if userId provided
+      if (userId) {
+        await this.invalidateUserFileCache(userId)
+      }
+    } catch (error) {
+      logger.warn('Failed to invalidate file cache', { error, fileId, userId })
+    }
+  }
+
+  /**
+   * Invalidate file history cache for a user
+   */
+  private async invalidateUserFileCache(userId: string): Promise<void> {
+    try {
+      // Delete all file history cache entries for this user
+      // Using pattern to clear all paginated results
+      const pattern = `service:file-history:${userId}:*`
+      if (this.cache.delPattern) {
+        await this.cache.delPattern(pattern)
+      } else {
+        // Fallback if delPattern is not available
+        logger.warn('Cache delPattern not available, cache may be stale')
+      }
+    } catch (error) {
+      logger.warn('Failed to invalidate user file cache', { error, userId })
     }
   }
 }

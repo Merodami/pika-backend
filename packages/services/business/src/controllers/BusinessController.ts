@@ -1,13 +1,12 @@
 import type { IBusinessService } from '@business/services/BusinessService.js'
 import { businessPublic, mapSortOrder, shared } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -31,12 +30,6 @@ export class BusinessController {
    * GET /businesses
    * Get all businesses with filters and pagination (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'businesses',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllBusinesses(
     req: Request,
     res: Response<businessPublic.BusinessListResponse>,
@@ -78,11 +71,6 @@ export class BusinessController {
    * GET /businesses/:business_id
    * Get business by ID (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'business',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getBusinessById(
     req: Request<businessPublic.BusinessPathParams>,
     res: Response<businessPublic.BusinessResponse>,
@@ -125,11 +113,6 @@ export class BusinessController {
    * GET /businesses/user/:user_id
    * Get business by user ID (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'business:user',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getBusinessByUserId(
     req: Request<shared.UserIdParam>,
     res: Response<businessPublic.BusinessResponse>,

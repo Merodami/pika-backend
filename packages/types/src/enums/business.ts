@@ -54,7 +54,7 @@ export enum BusinessRegistrationStatus {
 export enum BusinessRegistrationStep {
   BASIC_INFO = 'basic_info',
   DETAILS = 'details',
-  VERIFICATION = 'verification', // Future implementation
+  ADDITIONAL_INFO = 'additional_info', // Operating hours, social media, etc.
   COMPLETED = 'completed',
 }
 
@@ -64,7 +64,7 @@ export enum BusinessRegistrationStep {
 export const BUSINESS_REGISTRATION_STEPS = {
   BASIC_INFO: 1,
   DETAILS: 2,
-  // VERIFICATION: 3, // Future implementation
+  ADDITIONAL_INFO: 3, // Step 3 for additional business information
 } as const
 
 export type BusinessRegistrationStepNumber =

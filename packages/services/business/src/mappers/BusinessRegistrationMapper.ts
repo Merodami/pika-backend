@@ -1,8 +1,8 @@
-import type {
-  BusinessRegistrationStatusResponse,
-  CompleteBusinessRegistrationResponse,
-  RegistrationProgressResponse,
-} from '@pika/api'
+import { businessPublic } from '@pika/api'
+
+type BusinessRegistrationStatusResponse = businessPublic.BusinessRegistrationStatusResponse
+type CompleteBusinessRegistrationResponse = businessPublic.CompleteBusinessRegistrationResponse
+type RegistrationProgressResponse = businessPublic.RegistrationProgressResponse
 import {
   BUSINESS_REGISTRATION_STEPS,
   BusinessRegistrationStatus,
@@ -74,7 +74,6 @@ export class BusinessRegistrationMapper {
       return {
         needsRegistration: true,
         currentStep: 0,
-        stepsCompleted: [],
         registrationStatus: BusinessRegistrationStatus.IN_PROGRESS,
         canAccessDashboard: false,
         registrationId: undefined,
@@ -140,7 +139,7 @@ export class BusinessRegistrationMapper {
       step1Data: domain.step1Data || {},
       step2Data: domain.step2Data || {},
       step3Data: domain.step3Data || {},
-      registrationStatus: domain.registrationStatus as string,
+      registrationStatus: domain.registrationStatus,
       businessId: domain.businessId || undefined,
       createdAt: domain.createdAt.toISOString(),
       updatedAt: domain.updatedAt.toISOString(),

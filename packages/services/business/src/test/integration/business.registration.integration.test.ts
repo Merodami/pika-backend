@@ -537,7 +537,6 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       expect(statusResponse1.body.currentStep).toBe(0)
-      expect(statusResponse1.body.stepsCompleted).toEqual([])
 
       // Submit step 1
       const step1Data: businessPublic.BusinessRegistrationStep1Request = {
@@ -559,7 +558,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       expect(statusResponse2.body.currentStep).toBe(2)
-      expect(statusResponse2.body.stepsCompleted).toContain(1)
+      expect(statusResponse2.body.needsRegistration).toBe(true)
 
       // Submit step 2
       const step2Data: businessPublic.BusinessRegistrationStep2Request = {
@@ -586,8 +585,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       expect(statusResponse3.body.currentStep).toBe(3)
-      expect(statusResponse3.body.stepsCompleted).toContain(1)
-      expect(statusResponse3.body.stepsCompleted).toContain(2)
+      expect(statusResponse3.body.needsRegistration).toBe(true)
 
       // Submit step 3
       const step3Data: businessPublic.BusinessRegistrationStep3Request = {
@@ -614,12 +612,10 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       expect(statusResponse4.body.currentStep).toBe(3)
-      expect(statusResponse4.body.stepsCompleted).toContain(1)
-      expect(statusResponse4.body.stepsCompleted).toContain(2)
-      expect(statusResponse4.body.stepsCompleted).toContain(3)
       expect(statusResponse4.body.registrationStatus).toBe(
         BusinessRegistrationStatus.SUBMITTED,
       )
+      expect(statusResponse4.body.needsRegistration).toBe(true) // Still true until approved
       expect(statusResponse4.body.businessId).toBeDefined()
     })
   })

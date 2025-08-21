@@ -1,13 +1,12 @@
 import type { IBusinessService } from '@business/services/BusinessService.js'
 import { businessAdmin, businessPublic, mapSortOrder } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
 import { RequestContext } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { logger, parseIncludeParam } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -34,12 +33,6 @@ export class AdminBusinessController {
    * GET /admin/businesses
    * Get all businesses with admin filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:businesses',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllBusinesses(
     req: Request,
     res: Response<businessAdmin.AdminBusinessListResponse>,
@@ -86,11 +79,6 @@ export class AdminBusinessController {
    * GET /admin/businesses/:business_id
    * Get business by ID with full details for admin
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:business',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getBusinessById(
     req: Request<businessPublic.BusinessPathParams>,
     res: Response<businessAdmin.AdminBusinessResponse>,

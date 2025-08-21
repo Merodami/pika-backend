@@ -4,13 +4,15 @@ import type {
   UpdateBusinessData,
 } from '@business/repositories/BusinessRepository.js'
 import type { BusinessSearchParams } from '@business/types/search.js'
-import { DEFAULT_LANGUAGE } from '@pika/environment'
-import type { ICacheService } from '@pika/redis'
+import { DEFAULT_LANGUAGE, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { Cache, type ICacheService } from '@pika/redis'
 import type { BusinessDomain } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { TranslationClient } from '@pika/translation'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import { v4 as uuid } from 'uuid'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IBusinessService {
   getAllBusinesses(
@@ -70,8 +72,47 @@ export class BusinessService implements IBusinessService {
   ) {}
 
   /**
+   * Helper method to invalidate all cache entries related to a business
+   */
+  private async invalidateBusinessCache(
+    businessId: string,
+    userId?: string,
+  ): Promise<void> {
+    if (!this.cacheService) return
+
+    const keysToInvalidate = [
+      // Invalidate specific business cache
+      `${CACHE_KEYS.BUSINESS.SINGLE}:${businessId}`,
+    ]
+
+    if (userId) {
+      // Invalidate user-specific caches
+      keysToInvalidate.push(
+        `${CACHE_KEYS.BUSINESS.USER}:${userId}`,
+      )
+    }
+
+    // Delete all keys
+    // Note: We can't invalidate pattern-based keys with basic ICacheService
+    // This means list caches won't be invalidated automatically
+    // Consider implementing a more sophisticated cache invalidation strategy
+    await Promise.all(
+      keysToInvalidate.map(key => this.cacheService!.del(key))
+    )
+  }
+
+  /**
    * Retrieve all businesses with filters and pagination
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.BUSINESS.LIST,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      return `${prefix}:${JSON.stringify(params)}`
+    },
+    condition: (result) => result && result.data && Array.isArray(result.data),
+  })
   async getAllBusinesses(
     params: BusinessSearchParams,
   ): Promise<PaginatedResult<BusinessDomain>> {
@@ -94,6 +135,15 @@ export class BusinessService implements IBusinessService {
   /**
    * Retrieve a business by ID
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.BUSINESS.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const [id, includes] = args
+      const key = includes ? `${id}:${JSON.stringify(includes)}` : id
+      return `${prefix}:${key}`
+    },
+  })
   async getBusinessById(
     id: string,
     includes?: ParsedIncludes,
@@ -121,6 +171,15 @@ export class BusinessService implements IBusinessService {
   /**
    * Retrieve a business by user ID
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.BUSINESS.USER,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const [userId, includes] = args
+      const key = includes ? `${userId}:${JSON.stringify(includes)}` : userId
+      return `${prefix}:${key}`
+    },
+  })
   async getBusinessByUserId(
     userId: string,
     includes?: ParsedIncludes,
@@ -204,6 +263,9 @@ export class BusinessService implements IBusinessService {
       }
 
       const business = await this.businessRepository.create(createData)
+
+      // Invalidate cache after creation
+      await this.invalidateBusinessCache(business.id, business.userId)
 
       logger.debug(`Business created successfully: ${business.id}`)
 
@@ -294,10 +356,7 @@ export class BusinessService implements IBusinessService {
       const business = await this.businessRepository.update(id, updateData)
 
       // Invalidate related cache entries
-      if (this.cacheService) {
-        await this.cacheService.del(`business:${id}`)
-        await this.cacheService.del(`business:user:${business.userId}`)
-      }
+      await this.invalidateBusinessCache(id, business.userId)
 
       logger.debug(`Business updated successfully: ${id}`)
 
@@ -329,10 +388,7 @@ export class BusinessService implements IBusinessService {
       await this.businessRepository.delete(id)
 
       // Invalidate cache
-      if (this.cacheService) {
-        await this.cacheService.del(`business:${id}`)
-        await this.cacheService.del(`business:user:${business.userId}`)
-      }
+      await this.invalidateBusinessCache(id, business.userId)
 
       logger.debug(`Business deleted successfully: ${id}`)
     } catch (error) {
@@ -461,10 +517,7 @@ export class BusinessService implements IBusinessService {
       })
 
       // Clear cache for this business
-      if (this.cacheService) {
-        await this.cacheService.del(`business:${id}`)
-        await this.cacheService.del(`admin:business:${id}`)
-      }
+      await this.invalidateBusinessCache(id, business.userId)
 
       return business
     } catch (error) {

@@ -140,22 +140,53 @@ async getAllCategories(req: Request, res: Response): Promise<void> {
 ### Phase 3: Add Cache to Services
 
 For each service method that needs caching:
-1. Add `@Cache` decorator with appropriate configuration
-2. Use proper key generation strategy
-3. Set appropriate TTL values
+1. Create a `constants/cache-keys.ts` file with cache key constants
+2. Add `@Cache` decorator with appropriate configuration
+3. Use the cache key constants for prefixes
+4. Use proper key generation strategy
+5. Set appropriate TTL values
 
-Example:
+#### Cache Keys Pattern (RECOMMENDED)
+
+Create a centralized cache keys file:
 ```typescript
+// constants/cache-keys.ts
+/**
+ * Cache key constants for [service-name] service
+ * Pattern: service:entity[-modifier]:identifier
+ */
+export const CACHE_KEYS = {
+  ENTITY: {
+    LIST: 'service:entities',
+    SINGLE: 'service:entity',
+    BY_USER: 'service:entity:user',
+  },
+  ADMIN: {
+    LIST: 'service:admin:entities',
+    SINGLE: 'service:admin:entity',
+  },
+} as const
+
+export const generateCacheKey = {
+  entityById: (id: string) => `${CACHE_KEYS.ENTITY.SINGLE}:${id}`,
+  entitiesByUser: (userId: string) => `${CACHE_KEYS.ENTITY.BY_USER}:${userId}`,
+}
+```
+
+Usage in service:
+```typescript
+import { CACHE_KEYS } from '../constants/cache-keys.js'
+
 // Service method with caching
 @Cache({
   ttl: REDIS_DEFAULT_TTL,
-  prefix: 'service:categories',
+  prefix: CACHE_KEYS.ENTITY.LIST,
   keyGenerator: (prefix: string, methodName: string, args: any[]) => {
     const params = args[0]
     return `${prefix}:${JSON.stringify(params)}`
   }
 })
-async getAllCategories(params: CategorySearchParams): Promise<PaginatedResult<Category>> {
+async getAllEntities(params: SearchParams): Promise<PaginatedResult<Entity>> {
   return this.repository.findAll(params)
 }
 ```

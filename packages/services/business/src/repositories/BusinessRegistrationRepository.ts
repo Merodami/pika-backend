@@ -8,6 +8,8 @@ import {
   type PrismaClient,
 } from '@prisma/client'
 
+import { generateCacheKey } from '../constants/cache-keys.js'
+
 /**
  * Convert domain enum to Prisma enum
  */
@@ -57,6 +59,12 @@ export interface UpdateStepData {
 /**
  * Business registration repository implementation using Prisma
  * Manages the business_registration table for tracking registration progress
+ * 
+ * Cache Key Pattern (using constants from cache-keys.ts):
+ * - business:registration:user:{userId} - Repository cache for user's registration data
+ * - business:registration:status:{userId} - Service cache for registration status (used by @Cache decorator)
+ * 
+ * Cache invalidation happens on all write operations to ensure consistency
  */
 export class BusinessRegistrationRepository
   implements IBusinessRegistrationRepository
@@ -72,7 +80,7 @@ export class BusinessRegistrationRepository
   async findByUserId(userId: string): Promise<BusinessRegistration | null> {
     try {
       // Check cache first
-      const cacheKey = `business_registration:user:${userId}`
+      const cacheKey = generateCacheKey.registrationUser(userId)
 
       if (this.cacheService) {
         const cached =
@@ -140,9 +148,10 @@ export class BusinessRegistrationRepository
         },
       })
 
-      // Invalidate user cache - must match the key used in service's @Cache decorator
+      // Invalidate both cache keys - service decorator and repository cache
       if (this.cacheService) {
-        await this.cacheService.del(`business:registration:status:${data.userId}`)
+        await this.cacheService.del(generateCacheKey.registrationStatus(data.userId))
+        await this.cacheService.del(generateCacheKey.registrationUser(data.userId))
       }
 
       logger.info('Business registration created', {
@@ -205,7 +214,10 @@ export class BusinessRegistrationRepository
           updateData.step3Data = stepData
           break
         default:
-          throw ErrorFactory.validationError('Invalid step number', { step })
+          throw ErrorFactory.validationError(
+            { step: [`Invalid step number: ${step}`] },
+            { metadata: { step } },
+          )
       }
 
       const registration = await this.prisma.businessRegistration.update({
@@ -213,10 +225,13 @@ export class BusinessRegistrationRepository
         data: updateData,
       })
 
-      // Invalidate cache - must match the key used in service's @Cache decorator
+      // Invalidate both cache keys - service decorator and repository cache
       if (this.cacheService && registration) {
         await this.cacheService.del(
-          `business:registration:status:${registration.userId}`,
+          generateCacheKey.registrationStatus(registration.userId),
+        )
+        await this.cacheService.del(
+          generateCacheKey.registrationUser(registration.userId),
         )
       }
 
@@ -266,10 +281,13 @@ export class BusinessRegistrationRepository
         data: updateData,
       })
 
-      // Invalidate cache - must match the key used in service's @Cache decorator
+      // Invalidate both cache keys - service decorator and repository cache
       if (this.cacheService && registration) {
         await this.cacheService.del(
-          `business:registration:status:${registration.userId}`,
+          generateCacheKey.registrationStatus(registration.userId),
+        )
+        await this.cacheService.del(
+          generateCacheKey.registrationUser(registration.userId),
         )
       }
 
@@ -312,10 +330,13 @@ export class BusinessRegistrationRepository
         },
       })
 
-      // Invalidate cache - must match the key used in service's @Cache decorator
+      // Invalidate both cache keys - service decorator and repository cache
       if (this.cacheService && registration) {
         await this.cacheService.del(
-          `business:registration:status:${registration.userId}`,
+          generateCacheKey.registrationStatus(registration.userId),
+        )
+        await this.cacheService.del(
+          generateCacheKey.registrationUser(registration.userId),
         )
       }
 

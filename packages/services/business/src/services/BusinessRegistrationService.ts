@@ -1,11 +1,11 @@
-import type {
-  BusinessRegistrationStatusResponse,
-  CompleteBusinessRegistrationRequest,
-  CompleteBusinessRegistrationResponse,
-  RegistrationProgressResponse,
-  SubmitRegistrationStepRequest,
-  SubmitRegistrationStepResponse,
-} from '@pika/api'
+import { businessPublic } from '@pika/api'
+
+type BusinessRegistrationStatusResponse = businessPublic.BusinessRegistrationStatusResponse
+type CompleteBusinessRegistrationRequest = businessPublic.CompleteBusinessRegistrationRequest
+type CompleteBusinessRegistrationResponse = businessPublic.CompleteBusinessRegistrationResponse
+type RegistrationProgressResponse = businessPublic.RegistrationProgressResponse
+type SubmitRegistrationStepRequest = businessPublic.SubmitRegistrationStepRequest
+type SubmitRegistrationStepResponse = businessPublic.SubmitRegistrationStepResponse
 import type { UserServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
 import { BusinessRegistrationStatus, UserRole } from '@pika/types'
@@ -15,6 +15,7 @@ import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { BusinessRegistrationMapper } from '../mappers/BusinessRegistrationMapper.js'
 import type { IBusinessRegistrationRepository } from '../repositories/BusinessRegistrationRepository.js'
 import type { IBusinessRepository } from '../repositories/BusinessRepository.js'
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IBusinessRegistrationService {
   checkRegistrationStatus(
@@ -50,10 +51,11 @@ export class BusinessRegistrationService
   /**
    * Check if user needs to complete business registration
    * Cached per user to improve performance
+   * Cache key: business:registration:status:{userId}
    */
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'business:registration:status',
+    prefix: CACHE_KEYS.REGISTRATION.STATUS,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       // Use userId as the cache key
       const userId = args[0]
@@ -68,7 +70,7 @@ export class BusinessRegistrationService
       const user = await this.userServiceClient.getUser(userId)
 
       if (!user) {
-        throw ErrorFactory.notFoundError('User not found')
+        throw ErrorFactory.resourceNotFound('User', userId)
       }
 
       // Only business users need registration
@@ -159,8 +161,8 @@ export class BusinessRegistrationService
 
       if (!registration) {
         throw ErrorFactory.validationError(
-          'Registration not found. Please start registration first.',
-          { userId, step: request.stepNumber },
+          { registration: ['Registration not found. Please start registration first.'] },
+          { metadata: { userId, step: request.stepNumber } },
         )
       }
 
@@ -179,8 +181,10 @@ export class BusinessRegistrationService
             'BusinessRegistrationStep',
             `Step ${request.stepNumber} has already been completed. Use step ${domain.currentStep} to continue.`,
             {
-              completedStep: request.stepNumber,
-              currentStep: domain.currentStep,
+              metadata: {
+                completedStep: request.stepNumber,
+                currentStep: domain.currentStep,
+              }
             },
           )
         }
@@ -192,10 +196,12 @@ export class BusinessRegistrationService
           )
         ) {
           throw ErrorFactory.validationError(
-            'Cannot skip steps. Please complete previous steps first.',
+            { step: ['Cannot skip steps. Please complete previous steps first.'] },
             {
-              currentStep: domain.currentStep,
-              requestedStep: request.stepNumber,
+              metadata: {
+                currentStep: domain.currentStep,
+                requestedStep: request.stepNumber,
+              }
             },
           )
         }
@@ -208,8 +214,8 @@ export class BusinessRegistrationService
           )
         ) {
           throw ErrorFactory.validationError(
-            'Invalid step data. Please check all required fields.',
-            { step: request.stepNumber },
+            { stepData: ['Invalid step data. Please check all required fields.'] },
+            { metadata: { step: request.stepNumber } },
           )
         }
       }
@@ -253,7 +259,7 @@ export class BusinessRegistrationService
         await this.registrationRepository.findByUserId(userId)
 
       if (!registration) {
-        throw ErrorFactory.notFoundError('Registration not found')
+        throw ErrorFactory.resourceNotFound('Registration', userId)
       }
 
       const domain = BusinessRegistrationMapper.fromDocument(registration)
@@ -280,8 +286,8 @@ export class BusinessRegistrationService
       // Validate request
       if (!request.confirmAllDataAccurate || !request.agreedToTerms) {
         throw ErrorFactory.validationError(
-          'You must confirm data accuracy and agree to terms',
-          { request },
+          { confirmation: ['You must confirm data accuracy and agree to terms'] },
+          { metadata: { request } },
         )
       }
 
@@ -290,7 +296,7 @@ export class BusinessRegistrationService
         await this.registrationRepository.findByUserId(userId)
 
       if (!registration) {
-        throw ErrorFactory.notFoundError('Registration not found')
+        throw ErrorFactory.resourceNotFound('Registration', userId)
       }
 
       const domain = BusinessRegistrationMapper.fromDocument(registration)
@@ -298,8 +304,8 @@ export class BusinessRegistrationService
       // Check if ready for submission
       if (!BusinessRegistrationMapper.isReadyForSubmission(domain)) {
         throw ErrorFactory.validationError(
-          'Registration is not complete. Please complete all required steps.',
-          { currentStep: domain.currentStep },
+          { registration: ['Registration is not complete. Please complete all required steps.'] },
+          { metadata: { currentStep: domain.currentStep } },
         )
       }
 

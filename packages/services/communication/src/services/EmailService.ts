@@ -187,6 +187,11 @@ export class EmailService implements IEmailService {
         processingTime: Date.now() - startTime,
       })
 
+      // Invalidate email history cache for this user
+      if (input.userId) {
+        await this.invalidateUserEmailCache(input.userId)
+      }
+
       return communicationLog
     } catch (error) {
       logger.error('Failed to send email', error)
@@ -354,7 +359,15 @@ export class EmailService implements IEmailService {
     }
   }
 
-  @Cache({ ttl: REDIS_DEFAULT_TTL, prefix: 'email-history' })
+  @Cache({ 
+    ttl: REDIS_DEFAULT_TTL, 
+    prefix: 'service:email-history',
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const userId = args[0]
+      const params = args[1]
+      return `${prefix}:${userId}:${JSON.stringify(params)}`
+    }
+  })
   async getEmailHistory(
     userId: string,
     params: CommunicationLogSearchParams,
@@ -368,6 +381,15 @@ export class EmailService implements IEmailService {
     return this.communicationLogRepository.findAll(searchParams)
   }
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: 'service:email',
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const id = args[0]
+      const userId = args[1]
+      return `${prefix}:${id}:${userId || 'public'}`
+    }
+  })
   async getEmailById(
     id: string,
     userId?: string,
@@ -384,5 +406,23 @@ export class EmailService implements IEmailService {
     }
 
     return email
+  }
+
+  /**
+   * Invalidate email history cache for a user
+   */
+  private async invalidateUserEmailCache(userId: string): Promise<void> {
+    try {
+      // Clear all email history cache entries for this user
+      const pattern = `service:email-history:${userId}:*`
+      
+      if (this.cache.delPattern) {
+        await this.cache.delPattern(pattern)
+      } else {
+        logger.warn('Cache delPattern not available, cache may be stale')
+      }
+    } catch (error) {
+      logger.warn('Failed to invalidate user email cache', { error, userId })
+    }
   }
 }

@@ -9,7 +9,7 @@ import { z } from 'zod'
 
 import { openapi } from '../../../common/utils/openapi.js'
 import { createZodEnum } from '../../../common/utils/zodEnum.js'
-import { withTimestamps } from '../../shared/metadata.js'
+import { withTimestampsString } from '../../shared/metadata.js'
 import {
   EmailString,
   LanguageCode,
@@ -28,7 +28,7 @@ import {
 /**
  * Business registration status response (raw Zod)
  */
-export const BusinessRegistrationStatusResponse = withTimestamps({
+export const BusinessRegistrationStatusResponse = withTimestampsString({
   needsRegistration: z
     .boolean()
     .describe('Whether user needs to complete registration'),
@@ -252,7 +252,7 @@ export type SubmitRegistrationStepResponse = z.infer<
 /**
  * Registration progress response (raw Zod)
  */
-export const RegistrationProgressResponse = withTimestamps({
+export const RegistrationProgressResponse = withTimestampsString({
   id: UUID.describe('Registration ID'),
   userId: UUID.describe('User ID'),
   currentStep: z.number().int().describe('Current step number'),
