@@ -20,3 +20,17 @@ export const BusinessIdParam = openapi(
 )
 
 export type BusinessIdParam = z.infer<typeof BusinessIdParam>
+
+/**
+ * Business Registration ID path parameter
+ */
+export const BusinessRegistrationIdParam = openapi(
+  z.object({
+    registration_id: UUID,
+  }),
+  {
+    description: 'Business Registration ID path parameter',
+  },
+)
+
+export type BusinessRegistrationIdParam = z.infer<typeof BusinessRegistrationIdParam>

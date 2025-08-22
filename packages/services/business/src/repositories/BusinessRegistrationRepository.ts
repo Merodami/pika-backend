@@ -41,6 +41,7 @@ export interface IBusinessRegistrationRepository {
   ): Promise<BusinessRegistration>
   updateStatus(id: string, status: DomainStatus): Promise<BusinessRegistration>
   complete(id: string, businessId: string): Promise<BusinessRegistration>
+  reset(id: string): Promise<BusinessRegistration>
 }
 
 export interface CreateRegistrationData {
@@ -360,6 +361,65 @@ export class BusinessRegistrationRepository
       throw ErrorFactory.databaseError(
         'complete',
         'Failed to complete business registration',
+        error,
+      )
+    }
+  }
+
+  /**
+   * Reset registration to initial state
+   * Allows user to restart the registration process
+   */
+  async reset(id: string): Promise<BusinessRegistration> {
+    try {
+      const registration = await this.prisma.businessRegistration.update({
+        where: { id },
+        data: {
+          currentStep: 1,
+          step1Data: Prisma.JsonNull,
+          step2Data: Prisma.JsonNull,
+          step3Data: Prisma.JsonNull,
+          registrationStatus: PrismaStatus.IN_PROGRESS,
+          businessId: null,
+          submittedAt: null,
+          completedAt: null,
+          updatedAt: new Date(),
+        },
+      })
+
+      // Invalidate both cache keys - service decorator and repository cache
+      if (this.cacheService && registration) {
+        await this.cacheService.del(
+          generateCacheKey.registrationStatus(registration.userId),
+        )
+        await this.cacheService.del(
+          generateCacheKey.registrationUser(registration.userId),
+        )
+      }
+
+      logger.info('Business registration reset', {
+        registrationId: id,
+        userId: registration.userId,
+      })
+
+      return registration
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw ErrorFactory.resourceNotFound('Business registration', id, {
+          source: 'BusinessRegistrationRepository.reset',
+        })
+      }
+
+      logger.error('Error resetting business registration', {
+        id,
+        error,
+      })
+      throw ErrorFactory.databaseError(
+        'reset',
+        'Failed to reset business registration',
         error,
       )
     }

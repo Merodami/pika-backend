@@ -1,5 +1,6 @@
+import type { IBusinessRegistrationService } from '@business/services/BusinessRegistrationService.js'
 import type { IBusinessService } from '@business/services/BusinessService.js'
-import { businessAdmin, businessPublic, mapSortOrder } from '@pika/api'
+import { businessAdmin, businessCommon, businessPublic, mapSortOrder, userAdmin } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedQuery,
@@ -15,7 +16,10 @@ import type { NextFunction, Request, Response } from 'express'
  * Handles admin business management operations
  */
 export class AdminBusinessController {
-  constructor(private readonly businessService: IBusinessService) {
+  constructor(
+    private readonly businessService: IBusinessService,
+    private readonly registrationService?: IBusinessRegistrationService,
+  ) {
     // Bind methods to preserve 'this' context
     this.getAllBusinesses = this.getAllBusinesses.bind(this)
     this.getBusinessById = this.getBusinessById.bind(this)
@@ -27,6 +31,7 @@ export class AdminBusinessController {
     this.activateBusiness = this.activateBusiness.bind(this)
     this.updateBusinessRating = this.updateBusinessRating.bind(this)
     this.approveBusiness = this.approveBusiness.bind(this)
+    this.resetBusinessRegistration = this.resetBusinessRegistration.bind(this)
   }
 
   /**
@@ -56,7 +61,7 @@ export class AdminBusinessController {
         sortBy: query.sortBy || 'createdAt',
         sortOrder: mapSortOrder(query.sortOrder),
         includeDeleted: query.includeDeleted,
-        parsedIncludes: parseIncludeParam(query.include, ['user', 'category']),
+        parsedIncludes: parseIncludeParam(query.include, ['user', 'category', 'businessRegistration']),
       }
 
       const result = await this.businessService.getAllBusinesses(params)
@@ -368,6 +373,76 @@ export class AdminBusinessController {
         businessAdmin.AdminBusinessApprovalResponse,
         response,
         'AdminBusinessController.approveBusiness',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/businesses/registrations/:registration_id/reset
+   * Reset a business registration to allow user to restart
+   */
+  async resetBusinessRegistration(
+    req: Request<
+      userAdmin.UserIdParam,
+      {},
+      businessAdmin.AdminResetBusinessRegistrationRequest
+    >,
+    res: Response<businessAdmin.AdminResetBusinessRegistrationResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!this.registrationService) {
+        throw new Error('Registration service not configured')
+      }
+
+      const { id: userId } = req.params
+      const { reason, notifyUser } = req.body
+
+      // Get admin user ID from request context
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
+
+      // Log the reset action
+      logger.info({
+        msg: 'Business registration reset action',
+        userId,
+        reason,
+        notifyUser,
+        adminUserId,
+      })
+
+      // Reset the registration
+      const result = await this.registrationService.resetRegistration(
+        userId,
+        reason,
+      )
+
+      // TODO: If notifyUser is true, send notification to user
+      if (notifyUser) {
+        logger.info({
+          msg: 'Would notify user about registration reset',
+          userId: result.userId,
+          reason,
+        })
+      }
+
+      // Create response matching the schema
+      const response: businessAdmin.AdminResetBusinessRegistrationResponse = {
+        success: result.success,
+        message: result.message,
+        registrationId: result.registrationId,
+        userId: result.userId as any, // userId comes as string from service
+      }
+
+      // Validate response
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminResetBusinessRegistrationResponse,
+        response,
+        'AdminBusinessController.resetBusinessRegistration',
       )
 
       res.json(validatedResponse)

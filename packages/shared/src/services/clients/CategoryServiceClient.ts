@@ -14,10 +14,7 @@ import {
 export class CategoryServiceClient extends BaseServiceClient {
   constructor(config?: Partial<ServiceClientConfig>) {
     super({
-      serviceUrl:
-        config?.serviceUrl ||
-        process.env.CATEGORY_API_URL ||
-        'http://localhost:5020',
+      serviceUrl: config?.serviceUrl || CATEGORY_API_URL,
       serviceName: config?.serviceName || 'CategoryServiceClient',
       ...config,
     })
@@ -37,11 +34,16 @@ export class CategoryServiceClient extends BaseServiceClient {
         headers['Accept-Language'] = language
       }
 
-      return await this.get<CategoryDomain>(`/internal/categories/${categoryId}`, {
-        ...context,
-        useServiceAuth: true,
-        headers,
-      })
+      const response = await this.request<CategoryDomain>(
+        `/internal/categories/${categoryId}`,
+        {
+          method: 'GET',
+          headers,
+          useServiceAuth: true,
+        },
+        context,
+      )
+      return response
     } catch (error: any) {
       if (error.context?.metadata?.status === 404) {
         return null
@@ -58,30 +60,23 @@ export class CategoryServiceClient extends BaseServiceClient {
     language?: LanguageCode,
     context?: ServiceContext,
   ): Promise<CategoryDomain[]> {
-    try {
-      const headers: Record<string, string> = {}
-      if (language) {
-        headers['Accept-Language'] = language
-      }
-
-      const response = await this.post<{ data: CategoryDomain[] }>(
-        '/internal/categories/bulk',
-        { categoryIds },
-        {
-          ...context,
-          useServiceAuth: true,
-          headers,
-        },
-      )
-
-      return response.data
-    } catch (error: any) {
-      // If categories don't exist, return empty array
-      if (error.context?.metadata?.status === 404) {
-        return []
-      }
-      throw error
+    const headers: Record<string, string> = {}
+    if (language) {
+      headers['Accept-Language'] = language
     }
+
+    const response = await this.request<{ data: CategoryDomain[] }>(
+      '/internal/categories/bulk',
+      {
+        method: 'POST',
+        body: { categoryIds },
+        headers,
+        useServiceAuth: true,
+      },
+      context,
+    )
+
+    return response.data
   }
 
   /**
@@ -128,13 +123,14 @@ export class CategoryServiceClient extends BaseServiceClient {
         headers['Accept-Language'] = language
       }
 
-      const response = await this.get<{ data: CategoryDomain[] }>(
+      const response = await this.request<{ data: CategoryDomain[] }>(
         '/internal/categories/active',
         {
-          ...context,
-          useServiceAuth: true,
+          method: 'GET',
           headers,
+          useServiceAuth: true,
         },
+        context,
       )
 
       return response.data

@@ -733,8 +733,8 @@ export class VoucherMapper {
     return {
       voucherId,
       period: {
-        start: filters?.startDate || new Date(),
-        end: filters?.endDate || new Date(),
+        start: (filters?.startDate || new Date()).toISOString(),
+        end: (filters?.endDate || new Date()).toISOString(),
       },
       totalScans: analytics.totalScans || 0,
       totalClaims: analytics.totalClaims || 0,
@@ -754,8 +754,8 @@ export class VoucherMapper {
     return {
       businessId: stats.businessId,
       period: {
-        start: new Date(),
-        end: new Date(),
+        start: new Date().toISOString(),
+        end: new Date().toISOString(),
       },
       totalVouchers: stats.totalVouchers,
       activeVouchers: stats.activeVouchers,

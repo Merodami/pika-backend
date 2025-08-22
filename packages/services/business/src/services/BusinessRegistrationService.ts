@@ -39,6 +39,12 @@ export interface IBusinessRegistrationService {
     userId: string,
     request: CompleteBusinessRegistrationRequest,
   ): Promise<CompleteBusinessRegistrationResponse>
+  resetRegistration(registrationId: string, reason: string): Promise<{
+    success: boolean
+    message: string
+    registrationId: string
+    userId: string
+  }>
 }
 
 /**
@@ -443,6 +449,89 @@ export class BusinessRegistrationService
       )
     } catch (error) {
       logger.error('Error completing registration', { userId, error })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Reset a business registration (admin only)
+   * Clears all registration data and allows user to start over
+   */
+  async resetRegistration(
+    userId: string,
+    reason: string,
+  ): Promise<{
+    success: boolean
+    message: string
+    registrationId: string
+    userId: string
+  }> {
+    try {
+      logger.info('Resetting business registration', {
+        userId,
+        reason,
+      })
+
+      // Get registration by user ID
+      const registration =
+        await this.registrationRepository.findByUserId(userId)
+
+      if (!registration) {
+        throw ErrorFactory.resourceNotFound(
+          'Business registration',
+          `No registration found for user ${userId}`,
+        )
+      }
+
+      // If there's an associated business, we should delete it
+      if (registration.businessId) {
+        logger.info('Deleting associated business', {
+          businessId: registration.businessId,
+          registrationId: registration.id,
+        })
+        
+        // Soft delete the business
+        await this.businessRepository.delete(registration.businessId)
+        
+        // Also delete business details if they exist
+        try {
+          const details = await this.businessDetailsRepository.findByBusinessId(
+            registration.businessId,
+          )
+          if (details) {
+            await this.businessDetailsRepository.delete(details.id)
+          }
+        } catch (error) {
+          // Log but don't fail if details don't exist
+          logger.warn('Could not delete business details', {
+            businessId: registration.businessId,
+            error,
+          })
+        }
+      }
+
+      // Reset the registration
+      const resetRegistration =
+        await this.registrationRepository.reset(registration.id)
+
+      logger.info('Business registration reset successfully', {
+        registrationId: registration.id,
+        userId: resetRegistration.userId,
+        reason,
+      })
+
+      return {
+        success: true,
+        message: 'Business registration has been reset successfully',
+        registrationId: resetRegistration.id,
+        userId: resetRegistration.userId,
+      }
+    } catch (error) {
+      logger.error('Error resetting business registration', {
+        userId,
+        reason,
+        error,
+      })
       throw ErrorFactory.fromError(error)
     }
   }

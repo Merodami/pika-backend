@@ -115,7 +115,7 @@ async function loginAsAdmin(): Promise<string> {
   }
 }
 
-async function loginAsBusinessOwner(): Promise<string> {
+async function loginAsBusinessOwner(): Promise<{ token: string; userId: string }> {
   logInfo('Logging in as business owner...')
 
   try {
@@ -127,7 +127,10 @@ async function loginAsBusinessOwner(): Promise<string> {
 
     logSuccess('Business owner logged in successfully')
 
-    return response.data.accessToken
+    return {
+      token: response.data.accessToken,
+      userId: response.data.user.id,
+    }
   } catch (error: any) {
     logError(
       `Business owner login failed: ${error.response?.data?.message || error.message}`,
@@ -141,12 +144,9 @@ async function getBusinessForUser(
   businessOwnerToken: string,
   adminToken: string,
   categoryId: string,
+  userId: string,
 ): Promise<any> {
-  // Get user info to find their business via admin endpoint
-  const userResponse = await api.get('/auth/me', {
-    headers: { Authorization: `Bearer ${businessOwnerToken}` },
-  })
-  const userId = userResponse.data.id
+  // Use the userId passed from login response instead of calling /auth/me
 
   logInfo(`Looking for business for user: ${userId}`)
 
@@ -525,12 +525,13 @@ async function runVoucherCreationFlow() {
 
     logStep(3, 'Setup Business Details')
 
-    const businessOwnerToken = await loginAsBusinessOwner()
+    const businessOwnerAuth = await loginAsBusinessOwner()
 
     businessDetails = await getBusinessForUser(
-      businessOwnerToken,
+      businessOwnerAuth.token,
       adminToken,
       selectedCategory.id,
+      businessOwnerAuth.userId,
     )
 
     // Phase 2: Voucher Creation

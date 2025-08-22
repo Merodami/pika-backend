@@ -25,6 +25,7 @@ import * as adminSupportSchemas from '@api/schemas/support/admin/tickets.js'
 import * as supportParameterSchemas from '@api/schemas/support/common/parameters.js'
 import * as adminUserSchemas from '@api/schemas/user/admin/index.js'
 import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
+import * as userParameters from '@api/schemas/user/admin/parameters.js'
 import * as userVerificationSchemas from '@api/schemas/user/public/verification.js'
 import * as adminVoucherSchemas from '@api/schemas/voucher/admin/management.js'
 import * as adminVoucherQueries from '@api/schemas/voucher/admin/queries.js'
@@ -156,7 +157,19 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'PatchBusinessVerificationResponse',
     adminBusinessSchemas.PatchBusinessVerificationResponse,
   )
+  registry.registerSchema(
+    'AdminResetBusinessRegistrationRequest',
+    adminBusinessSchemas.AdminResetBusinessRegistrationRequest,
+  )
+  registry.registerSchema(
+    'AdminResetBusinessRegistrationResponse',
+    adminBusinessSchemas.AdminResetBusinessRegistrationResponse,
+  )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
+  registry.registerSchema(
+    'BusinessRegistrationIdParam',
+    businessParameters.BusinessRegistrationIdParam,
+  )
 
   // ============= Category Management Schemas =============
   // Register public category schema used in business responses
@@ -1155,6 +1168,37 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: adminBusinessSchemas.AdminBulkBusinessOperationResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Reset business registration
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/businesses/users/{id}/registration/reset',
+    operationId: 'resetBusinessRegistration',
+    summary: 'Reset a business registration by user ID',
+    description: 'Reset a business registration to allow the user to restart the registration process',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: userParameters.UserIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminResetBusinessRegistrationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business registration reset successfully',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminResetBusinessRegistrationResponse,
           },
         },
       },

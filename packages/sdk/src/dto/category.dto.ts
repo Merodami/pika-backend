@@ -7,8 +7,8 @@
 
 export interface CategoryDTO {
   id: string
-  nameKey: string
-  descriptionKey?: string
+  name: string // Resolved translation for display
+  description?: string // Resolved translation for display
   icon?: string
   parentId?: string
   isActive: boolean

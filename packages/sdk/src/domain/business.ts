@@ -29,6 +29,19 @@ export interface BusinessDomain {
   // Optional relations
   user?: UserDomain
   category?: CategoryDomain
+  businessRegistration?: {
+    id: string
+    userId: string
+    businessId: string | null
+    currentStep: number
+    registrationStatus: string
+    startedAt: Date
+    completedAt: Date | null
+    submittedAt: Date | null
+    rejectionReason: string | null
+    createdAt: Date
+    updatedAt: Date
+  }
 }
 
 // ============= Business Creation and Update =============

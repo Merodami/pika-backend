@@ -33,6 +33,7 @@ import {
   MockTranslationClient,
   TestDatabaseResult,
 } from '@pika/tests'
+import { UserServiceClientMock } from '@tests/mocks/services'
 import { UserRole, UserStatus } from '@pika/types'
 import type { Express } from 'express'
 import { v4 as uuid } from 'uuid'
@@ -46,6 +47,7 @@ describe('Business Service - Admin API Integration Tests', () => {
   let authHelper: E2EAuthHelper
   let cacheService: MemoryCacheService
   let translationClient: MockTranslationClient
+  let userServiceClient: UserServiceClientMock
 
   // Authenticated clients for different user types
   let adminClient: AuthenticatedRequestClient
@@ -74,11 +76,15 @@ describe('Business Service - Admin API Integration Tests', () => {
     // Create server
     cacheService = new MemoryCacheService()
     translationClient = createMockTranslationClient()
+    
+    // Create mock user service client for business registration functionality
+    userServiceClient = new UserServiceClientMock()
 
     app = await createBusinessServer({
       prisma: testDb.prisma,
       cacheService,
       translationClient,
+      userServiceClient,
     })
 
     logger.debug('Express server ready for testing.')
@@ -254,7 +260,7 @@ describe('Business Service - Admin API Integration Tests', () => {
 
       // The response should have the base business fields at minimum
       expect(firstBusiness).toHaveProperty('id')
-      expect(firstBusiness).toHaveProperty('businessNameKey')
+      expect(firstBusiness).toHaveProperty('businessName') // Now returns resolved translation
     })
 
     it('should require admin role for admin endpoints', async () => {
@@ -850,6 +856,197 @@ describe('Business Service - Admin API Integration Tests', () => {
         .send({ businessName: 'Test Business Admin Quick Update' })
         .set('Accept', 'application/json')
         .expect(200)
+    })
+  })
+
+  // Business Registration Reset Tests
+  describe('Business Registration Reset', () => {
+    it('should allow admin to reset a business registration', async () => {
+      // First, create a business registration for a user
+      const testUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `reset-test-${Date.now()}@example.com`,
+          role: UserRole.BUSINESS,
+          status: UserStatus.ACTIVE,
+          firstName: 'Reset',
+          lastName: 'Test',
+          emailVerified: true,
+        },
+      })
+
+      // Create a business registration with some progress
+      const registration = await testDb.prisma.businessRegistration.create({
+        data: {
+          userId: testUser.id,
+          currentStep: 3,
+          registrationStatus: 'SUBMITTED',
+          step1Data: { businessName: 'Test Business' },
+          step2Data: { description: 'Test Description' },
+          step3Data: { operatingHours: {} },
+          startedAt: new Date(),
+          submittedAt: new Date(),
+        },
+      })
+
+      // Reset the registration
+      const response = await adminClient
+        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .send({
+          reason: 'Test reset for integration testing',
+          notifyUser: false,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body).toMatchObject({
+        success: true,
+        message: expect.stringContaining('reset successfully'),
+        registrationId: registration.id,
+        userId: testUser.id,
+      })
+
+      // Verify the registration was reset in the database
+      const resetRegistration = await testDb.prisma.businessRegistration.findUnique({
+        where: { id: registration.id },
+      })
+
+      expect(resetRegistration).toBeDefined()
+      expect(resetRegistration?.currentStep).toBe(1)
+      expect(resetRegistration?.registrationStatus).toBe('IN_PROGRESS')
+      expect(resetRegistration?.step1Data).toBeNull()
+      expect(resetRegistration?.step2Data).toBeNull()
+      expect(resetRegistration?.step3Data).toBeNull()
+      expect(resetRegistration?.submittedAt).toBeNull()
+      expect(resetRegistration?.completedAt).toBeNull()
+    })
+
+    it('should delete associated business when resetting registration', async () => {
+      // Create a user with a completed registration and business
+      const testUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `reset-with-business-${Date.now()}@example.com`,
+          role: UserRole.BUSINESS,
+          status: UserStatus.ACTIVE,
+          firstName: 'Reset',
+          lastName: 'WithBusiness',
+          emailVerified: true,
+        },
+      })
+
+      // Create a business
+      const business = await testDb.prisma.business.create({
+        data: {
+          userId: testUser.id,
+          businessNameKey: 'test_business_key',
+          businessDescriptionKey: 'test_description_key',
+          verified: false,
+          active: true,
+        },
+      })
+
+      // Create a completed registration linked to the business
+      const registration = await testDb.prisma.businessRegistration.create({
+        data: {
+          userId: testUser.id,
+          businessId: business.id,
+          currentStep: 3,
+          registrationStatus: 'SUBMITTED',
+          step1Data: { businessName: 'Test Business' },
+          step2Data: { description: 'Test Description' },
+          step3Data: { operatingHours: {} },
+          startedAt: new Date(),
+          submittedAt: new Date(),
+        },
+      })
+
+      // Reset the registration
+      const response = await adminClient
+        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .send({
+          reason: 'Resetting registration with associated business',
+          notifyUser: true,
+        })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.success).toBe(true)
+
+      // Verify the business was soft deleted
+      const deletedBusiness = await testDb.prisma.business.findUnique({
+        where: { id: business.id },
+      })
+      
+      expect(deletedBusiness?.deletedAt).not.toBeNull()
+
+      // Verify the registration was reset and businessId cleared
+      const resetRegistration = await testDb.prisma.businessRegistration.findUnique({
+        where: { id: registration.id },
+      })
+
+      expect(resetRegistration?.businessId).toBeNull()
+      expect(resetRegistration?.currentStep).toBe(1)
+      expect(resetRegistration?.registrationStatus).toBe('IN_PROGRESS')
+    })
+
+    it('should return 404 for non-existent registration', async () => {
+      const fakeId = uuid()
+
+      const response = await adminClient
+        .post(`/admin/businesses/registrations/${fakeId}/reset`)
+        .send({
+          reason: 'Attempting to reset non-existent registration',
+          notifyUser: false,
+        })
+        .set('Accept', 'application/json')
+        .expect(404)
+
+      expect(response.body.error).toBeDefined()
+    })
+
+    it('should require admin role to reset registration', async () => {
+      // Create a registration
+      const testUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `reset-forbidden-${Date.now()}@example.com`,
+          role: UserRole.BUSINESS,
+          status: UserStatus.ACTIVE,
+          firstName: 'Forbidden',
+          lastName: 'Test',
+          emailVerified: true,
+        },
+      })
+
+      const registration = await testDb.prisma.businessRegistration.create({
+        data: {
+          userId: testUser.id,
+          currentStep: 2,
+          registrationStatus: 'IN_PROGRESS',
+          startedAt: new Date(),
+        },
+      })
+
+      // Try to reset as customer - should be forbidden
+      await customerClient
+        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .send({
+          reason: 'Customer trying to reset',
+          notifyUser: false,
+        })
+        .set('Accept', 'application/json')
+        .expect(403)
+
+      // Try to reset as business user - should be forbidden
+      await businessClient
+        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .send({
+          reason: 'Business user trying to reset',
+          notifyUser: false,
+        })
+        .set('Accept', 'application/json')
+        .expect(403)
     })
   })
 })

@@ -194,6 +194,24 @@ export class BusinessRepository implements IBusinessRepository {
       }
     }
 
+    if (includes?.businessRegistration) {
+      include.businessRegistration = {
+        select: {
+          id: true,
+          userId: true,
+          businessId: true,
+          currentStep: true,
+          registrationStatus: true,
+          startedAt: true,
+          completedAt: true,
+          submittedAt: true,
+          rejectionReason: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }
+    }
+
     return include
   }
 

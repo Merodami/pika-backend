@@ -649,7 +649,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       expect(statusResponse4.body.registrationStatus).toBe(
         BusinessRegistrationStatus.SUBMITTED,
       )
-      expect(statusResponse4.body.needsRegistration).toBe(true) // Still true until approved
+      expect(statusResponse4.body.needsRegistration).toBe(false) // False when submitted (waiting for approval)
       expect(statusResponse4.body.businessId).toBeDefined()
     })
   })

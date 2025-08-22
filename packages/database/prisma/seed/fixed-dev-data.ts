@@ -88,7 +88,7 @@ const DEV_BUSINESSES = [
       description: {
         es: 'Salón de belleza y spa con servicios integrales de cuidado personal',
         en: 'Beauty salon and spa with comprehensive personal care services',
-        gn: 'Iporã salon ha spa ojeporu hag̃ua ñe' ñongatu',
+        gn: 'Iporã salon ha spa ojeporu hag̃ua ñe ñongatu',
       },
     },
   },

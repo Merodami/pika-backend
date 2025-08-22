@@ -123,15 +123,18 @@ export async function createBusinessServer({
     app.use('/businesses/registration', registrationRouter)
   }
 
-  // Register admin routes
-  const adminRouter = createAdminBusinessRoutes(
-    prisma,
-    cacheService,
-    translationClient,
-    translationResolver,
-  )
+  // Register admin routes (only if userServiceClient is provided)
+  if (userServiceClient) {
+    const adminRouter = createAdminBusinessRoutes(
+      prisma,
+      cacheService,
+      translationClient,
+      userServiceClient,
+      translationResolver,
+    )
 
-  app.use('/admin/businesses', adminRouter)
+    app.use('/admin/businesses', adminRouter)
+  }
 
   // Register internal routes
   const internalRouter = createInternalBusinessRoutes(

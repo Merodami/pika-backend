@@ -34,6 +34,19 @@ export interface BusinessDocument {
   // Optional relations
   user?: UserDocument | null
   category?: CategoryDocument | null
+  businessRegistration?: {
+    id: string
+    userId: string
+    businessId: string | null
+    currentStep: number
+    registrationStatus: string
+    startedAt: Date
+    completedAt: Date | null
+    submittedAt: Date | null
+    rejectionReason: string | null
+    createdAt: Date
+    updatedAt: Date
+  } | null
 }
 
 /**
@@ -82,6 +95,7 @@ export class BusinessMapper {
       category: doc.category
         ? CategoryMapper.fromDocument(doc.category)
         : undefined,
+      businessRegistration: doc.businessRegistration || undefined,
     }
   }
 
@@ -93,8 +107,9 @@ export class BusinessMapper {
     return {
       id: domain.id,
       userId: domain.userId,
-      businessNameKey: domain.businessNameKey,
-      businessDescriptionKey: domain.businessDescriptionKey || undefined,
+      // Use resolved translations if available, fallback to keys
+      businessName: domain.businessName || domain.businessNameKey,
+      businessDescription: domain.businessDescription || domain.businessDescriptionKey || undefined,
       categoryId: domain.categoryId,
       verified: domain.verified,
       active: domain.active,
@@ -109,6 +124,13 @@ export class BusinessMapper {
       user: domain.user ? UserMapper.toAdminDTO(domain.user) : undefined,
       category: domain.category
         ? CategoryMapper.toDTO(domain.category)
+        : undefined,
+      businessRegistration: domain.businessRegistration
+        ? {
+            id: domain.businessRegistration.id,
+            registrationStatus: domain.businessRegistration.registrationStatus,
+            currentStep: domain.businessRegistration.currentStep,
+          }
         : undefined,
     }
   }

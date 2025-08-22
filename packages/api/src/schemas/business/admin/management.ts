@@ -72,6 +72,14 @@ export const AdminBusinessResponse = withTimestamps({
   category: CategoryResponse.optional().describe(
     'Category information when ?include=category',
   ),
+  businessRegistration: z
+    .object({
+      id: UUID.describe('Registration ID'),
+      registrationStatus: z.string().describe('Registration status'),
+      currentStep: z.number().describe('Current registration step'),
+    })
+    .optional()
+    .describe('Business registration info when ?include=businessRegistration'),
 })
 
 /**
@@ -452,4 +460,67 @@ export const AdminBusinessApprovalResponse = BusinessApprovalResponse
 
 export type AdminBusinessApprovalResponse = z.infer<
   typeof AdminBusinessApprovalResponse
+>
+
+// ============= Business Registration Reset =============
+
+/**
+ * Reset business registration request (raw Zod)
+ */
+const ResetBusinessRegistrationRequest = z.object({
+  reason: z
+    .string()
+    .min(1)
+    .max(500)
+    .describe('Reason for resetting the registration'),
+  notifyUser: z
+    .boolean()
+    .default(true)
+    .describe('Whether to notify the user about the reset'),
+})
+
+/**
+ * Reset business registration request (OpenAPI documented)
+ */
+export const AdminResetBusinessRegistrationRequestSchema =
+  ResetBusinessRegistrationRequest.openapi(
+    'AdminResetBusinessRegistrationRequest',
+    {
+      description: 'Reset a business registration to allow user to restart',
+    },
+  )
+
+export const AdminResetBusinessRegistrationRequest =
+  ResetBusinessRegistrationRequest
+
+export type AdminResetBusinessRegistrationRequest = z.infer<
+  typeof AdminResetBusinessRegistrationRequest
+>
+
+/**
+ * Reset business registration response (raw Zod)
+ */
+const ResetBusinessRegistrationResponse = z.object({
+  success: z.boolean().describe('Whether the reset was successful'),
+  message: z.string().describe('Status message'),
+  registrationId: UUID.describe('Registration ID that was reset'),
+  userId: UserId.describe('User ID associated with the registration'),
+})
+
+/**
+ * Reset business registration response (OpenAPI documented)
+ */
+export const AdminResetBusinessRegistrationResponseSchema =
+  ResetBusinessRegistrationResponse.openapi(
+    'AdminResetBusinessRegistrationResponse',
+    {
+      description: 'Business registration reset result',
+    },
+  )
+
+export const AdminResetBusinessRegistrationResponse =
+  ResetBusinessRegistrationResponse
+
+export type AdminResetBusinessRegistrationResponse = z.infer<
+  typeof AdminResetBusinessRegistrationResponse
 >
