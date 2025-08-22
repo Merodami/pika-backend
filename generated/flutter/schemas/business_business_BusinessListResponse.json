@@ -21,15 +21,15 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
           },
-          "businessNameKey": {
-            "description": "Translation key for business name",
+          "businessName": {
+            "description": "Business name in requested language",
             "type": "string",
-            "maxLength": 255
+            "maxLength": 200
           },
-          "businessDescriptionKey": {
-            "description": "Translation key for business description",
+          "businessDescription": {
+            "description": "Business description in requested language",
             "type": "string",
-            "maxLength": 255
+            "maxLength": 2000
           },
           "categoryId": {
             "description": "Category this business belongs to",
@@ -45,6 +45,11 @@
           "active": {
             "description": "Whether business is active",
             "default": true,
+            "type": "boolean"
+          },
+          "approved": {
+            "description": "Whether business is approved by admin",
+            "default": false,
             "type": "boolean"
           },
           "avgRating": {
@@ -285,10 +290,11 @@
         "required": [
           "id",
           "userId",
-          "businessNameKey",
+          "businessName",
           "categoryId",
           "verified",
           "active",
+          "approved",
           "avgRating",
           "createdAt",
           "updatedAt"
