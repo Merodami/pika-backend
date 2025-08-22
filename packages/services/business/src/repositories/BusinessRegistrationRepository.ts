@@ -198,10 +198,29 @@ export class BusinessRegistrationRepository
     stepData: any,
   ): Promise<BusinessRegistration> {
     try {
+      // First get the current registration to check existing progress
+      const currentRegistration = await this.prisma.businessRegistration.findUnique({
+        where: { id },
+        select: { currentStep: true },
+      })
+
+      if (!currentRegistration) {
+        throw ErrorFactory.resourceNotFound('BusinessRegistration', id)
+      }
+
       // Build update data based on step number
-      // For steps 1 and 2, advance to the next step
-      // For step 3 (final), stay at step 3
-      const nextStep = step < 3 ? step + 1 : 3
+      // - If step == currentStep: completing current step, advance
+      // - If step < currentStep: editing previous step, maintain current progress
+      // - If step > currentStep: should be prevented by validation, but handle gracefully
+      let nextStep: number
+      if (step >= currentRegistration.currentStep) {
+        // Completing current step or advancing to new step
+        nextStep = step < 3 ? step + 1 : 3
+      } else {
+        // Editing a previous step - keep current step
+        nextStep = currentRegistration.currentStep
+      }
+
       const updateData: Prisma.BusinessRegistrationUpdateInput = {
         currentStep: nextStep,
         updatedAt: new Date(),

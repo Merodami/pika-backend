@@ -300,7 +300,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       expect(response.body.error.code).toBe('notAuthorized')
     })
 
-    it('should prevent duplicate submissions', async () => {
+    it('should allow updating step 1 data', async () => {
       const step1Data: businessPublic.BusinessRegistrationStep1Request = {
         businessName: 'Test Business',
         businessType: BusinessType.SERVICE,
@@ -316,14 +316,19 @@ describe('Business Service - Registration Flow Integration Tests', () => {
 
       expect(response1.status).toBe(200)
 
-      // Second submission should fail
+      // Second submission with updated data should succeed (update, not conflict)
+      const updatedData = {
+        ...step1Data,
+        businessName: 'Updated Business Name',
+      }
+      
       const response2 = await businessOwnerClient
         .post('/businesses/registration/step1')
-        .send(step1Data)
+        .send(updatedData)
         .set('Accept', 'application/json')
 
-      expect(response2.status).toBe(409)
-      expect(response2.body.error.code).toBe(ErrorCode.RESOURCE_CONFLICT)
+      expect(response2.status).toBe(200)
+      expect(response2.body.step1Data.businessName).toBe('Updated Business Name')
     })
   })
 
@@ -513,8 +518,8 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       expect(business?.verified).toBe(false) // Should start as unverified
     })
 
-    it('should prevent registration if user already has a business', async () => {
-      // First complete registration
+    it('should allow editing registration data after completing step 3', async () => {
+      // Complete step 3
       const step3Data: businessPublic.BusinessRegistrationStep3Request = {
         operatingHours: {
           monday: { open: '09:00', close: '18:00' },
@@ -528,9 +533,9 @@ describe('Business Service - Registration Flow Integration Tests', () => {
 
       expect(response1.status).toBe(200)
 
-      // Try to start a new registration
+      // Should be able to go back and edit step 1 data before completing registration
       const step1Data: businessPublic.BusinessRegistrationStep1Request = {
-        businessName: 'Another Business',
+        businessName: 'Updated Business Name After Step 3',
         businessType: BusinessType.SERVICE,
         categoryId: testCategoryId,
         primaryLanguage: 'en',
@@ -541,8 +546,9 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .send(step1Data)
         .set('Accept', 'application/json')
 
-      expect(response2.status).toBe(409)
-      expect(response2.body.error.code).toBe(ErrorCode.RESOURCE_CONFLICT)
+      expect(response2.status).toBe(200)
+      expect(response2.body.step1Data.businessName).toBe('Updated Business Name After Step 3')
+      expect(response2.body.currentStep).toBe(3) // Should maintain progress at step 3
     })
   })
 
@@ -766,6 +772,133 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       }
       expect(response.status).toBe(400)
       expect(response.body.error.code).toBe(ErrorCode.VALIDATION_ERROR)
+    })
+  })
+
+  describe('Step Updates - Editing Previous Steps', () => {
+    it('should allow users to go back and edit completed steps', async () => {
+      // Setup initial registration
+      const registrationResponse = await businessOwnerClient
+        .post('/businesses/registration/start')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(registrationResponse.body.started).toBe(true)
+
+      // Complete step 1
+      const step1Data: businessPublic.BusinessRegistrationStep1Request = {
+        businessName: 'Original Business Name',
+        businessType: BusinessType.RESTAURANT,
+        categoryId: testCategoryId,
+        primaryLanguage: 'en',
+      }
+
+      const step1Response = await businessOwnerClient
+        .post('/businesses/registration/step1')
+        .send(step1Data)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(step1Response.body.currentStep).toBe(2) // Advanced to step 2
+      expect(step1Response.body.step1Data.businessName).toBe('Original Business Name')
+
+      // Complete step 2
+      const step2Data: businessPublic.BusinessRegistrationStep2Request = {
+        description: 'Original description',
+        address: {
+          street: '123 Original Street',
+          city: 'Original City',
+          state: 'OR',
+          postalCode: '12345',
+          country: 'US',
+        },
+        phone: '+1234567890',
+      }
+
+      const step2Response = await businessOwnerClient
+        .post('/businesses/registration/step2')
+        .send(step2Data)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(step2Response.body.currentStep).toBe(3) // Advanced to step 3
+      expect(step2Response.body.step2Data.description).toBe('Original description')
+
+      // Now go back and edit step 1 - this should work now!
+      const updatedStep1Data: businessPublic.BusinessRegistrationStep1Request = {
+        businessName: 'Updated Business Name',
+        businessType: BusinessType.SERVICE, // Changed type
+        categoryId: testCategoryId,
+        primaryLanguage: 'es', // Changed language
+      }
+
+      const updatedStep1Response = await businessOwnerClient
+        .post('/businesses/registration/step1')
+        .send(updatedStep1Data)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      // Should still be on step 3 (don't go backwards)
+      expect(updatedStep1Response.body.currentStep).toBe(3)
+      // But step 1 data should be updated
+      expect(updatedStep1Response.body.step1Data.businessName).toBe('Updated Business Name')
+      expect(updatedStep1Response.body.step1Data.businessType).toBe(BusinessType.SERVICE)
+      expect(updatedStep1Response.body.step1Data.primaryLanguage).toBe('es')
+      // Step 2 data should remain unchanged
+      expect(updatedStep1Response.body.step2Data.description).toBe('Original description')
+
+      // Also test editing step 2
+      const updatedStep2Data: businessPublic.BusinessRegistrationStep2Request = {
+        description: 'Updated description',
+        address: {
+          street: '456 Updated Avenue',
+          city: 'Updated City',
+          state: 'UP',
+          postalCode: '67890',
+          country: 'US',
+        },
+        phone: '+9876543210',
+        email: 'updated@example.com',
+      }
+
+      const updatedStep2Response = await businessOwnerClient
+        .post('/businesses/registration/step2')
+        .send(updatedStep2Data)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      // Should still be on step 3
+      expect(updatedStep2Response.body.currentStep).toBe(3)
+      // Step 2 data should be updated
+      expect(updatedStep2Response.body.step2Data.description).toBe('Updated description')
+      expect(updatedStep2Response.body.step2Data.address.street).toBe('456 Updated Avenue')
+      expect(updatedStep2Response.body.step2Data.email).toBe('updated@example.com')
+      // Step 1 data should still show the updates
+      expect(updatedStep2Response.body.step1Data.businessName).toBe('Updated Business Name')
+    })
+
+    it('should not allow users to skip to future steps', async () => {
+      // Setup fresh registration
+      await businessOwnerClient
+        .post('/businesses/registration/start')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      // Try to skip directly to step 3 without completing steps 1 and 2
+      const step3Data: businessPublic.BusinessRegistrationStep3Request = {
+        operatingHours: {
+          monday: { open: '09:00', close: '17:00' },
+        },
+      }
+
+      const response = await businessOwnerClient
+        .post('/businesses/registration/step3')
+        .send(step3Data)
+        .set('Accept', 'application/json')
+
+      expect(response.status).toBe(400)
+      expect(response.body.error.code).toBe(ErrorCode.VALIDATION_ERROR)
+      expect(response.body.error.message).toContain('Cannot skip steps')
     })
   })
 })

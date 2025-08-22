@@ -165,6 +165,14 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     'AdminResetBusinessRegistrationResponse',
     adminBusinessSchemas.AdminResetBusinessRegistrationResponse,
   )
+  registry.registerSchema(
+    'AdminBusinessApprovalRequest',
+    adminBusinessSchemas.AdminBusinessApprovalRequest,
+  )
+  registry.registerSchema(
+    'AdminBusinessApprovalResponse',
+    adminBusinessSchemas.AdminBusinessApprovalResponse,
+  )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
   registry.registerSchema(
     'BusinessRegistrationIdParam',
@@ -1110,6 +1118,36 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: adminBusinessSchemas.AdminBusinessResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Approve or reject business
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/businesses/{id}/approve',
+    operationId: 'approveAdminBusiness',
+    summary: 'Approve or reject a business',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessApprovalRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Business approval status updated',
+        content: {
+          'application/json': {
+            schema: adminBusinessSchemas.AdminBusinessApprovalResponse,
           },
         },
       },

@@ -65,6 +65,7 @@ export class UserRepository implements IUserRepository {
       // General search across multiple fields
       if (search) {
         where.OR = [
+          { id: { equals: search } }, // UUID exact match
           { email: { contains: search, mode: 'insensitive' } },
           { firstName: { contains: search, mode: 'insensitive' } },
           { lastName: { contains: search, mode: 'insensitive' } },

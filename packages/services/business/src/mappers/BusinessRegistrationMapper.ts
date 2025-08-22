@@ -233,18 +233,23 @@ export class BusinessRegistrationMapper {
   }
 
   /**
-   * Check if registration can proceed to next step
+   * Check if registration can proceed to or update a specific step
    */
   static canProceedToStep(
     domain: BusinessRegistrationDomain,
     targetStep: number,
   ): boolean {
-    // Can't skip steps
+    // Allow editing any step that's been reached (current or previous)
+    if (targetStep <= domain.currentStep) {
+      return true
+    }
+
+    // For new steps, can't skip ahead more than one step
     if (targetStep > domain.currentStep + 1) {
       return false
     }
 
-    // Check if previous steps are completed
+    // Check if previous steps are completed before proceeding to new steps
     if (targetStep === 2 && !domain.step1Data) {
       return false
     }

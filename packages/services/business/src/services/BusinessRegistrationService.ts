@@ -145,18 +145,9 @@ export class BusinessRegistrationService
     userId: string,
   ): Promise<{ started: boolean; currentStep: number }> {
     try {
-      // Check if user already has a business
-      const existingBusiness =
-        await this.businessRepository.findByUserId(userId)
-
-      if (existingBusiness) {
-        throw ErrorFactory.businessRuleViolation(
-          'BUSINESS_ALREADY_EXISTS',
-          'User already has a registered business',
-          { metadata: { businessId: existingBusiness.id } },
-        )
-      }
-
+      // Users can have multiple businesses, so we don't check for existing businesses
+      // We only check if there's an incomplete registration in progress
+      
       // Check if registration already exists
       const existing = await this.registrationRepository.findByUserId(userId)
 
@@ -221,24 +212,8 @@ export class BusinessRegistrationService
 
       // Validate step progression
       if (!request.saveAsDraft) {
-        // Check if step is already completed (prevent duplicate submissions)
-        const isStepCompleted = BusinessRegistrationMapper.isStepCompleted(
-          domain,
-          request.stepNumber,
-        )
-
-        if (isStepCompleted) {
-          throw ErrorFactory.resourceConflict(
-            'BusinessRegistrationStep',
-            `Step ${request.stepNumber} has already been completed. Use step ${domain.currentStep} to continue.`,
-            {
-              metadata: {
-                completedStep: request.stepNumber,
-                currentStep: domain.currentStep,
-              },
-            },
-          )
-        }
+        // Allow updates to previously completed steps for better UX
+        // Users should be able to go back and edit their information
 
         if (
           !BusinessRegistrationMapper.canProceedToStep(

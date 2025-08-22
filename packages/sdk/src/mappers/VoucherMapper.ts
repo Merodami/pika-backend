@@ -181,14 +181,14 @@ export class VoucherMapper {
       id: domain.id,
       businessId: domain.businessId,
       categoryId: domain.categoryId,
-      state: this.mapStateToDTO(domain.state),
+      state: VoucherMapper.mapStateToDTO(domain.state),
       title: domain.title || '',
       description: domain.description || '',
       terms: domain.termsAndConditions || '',
-      discountType: this.mapDiscountTypeToDTO(domain.discountType),
+      discountType: VoucherMapper.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
-      location: domain.location ? this.mapLocationToDTO(domain.location) : null,
+      location: domain.location ? VoucherMapper.mapLocationToDTO(domain.location) : null,
       imageUrl: domain.imageUrl || undefined,
       validFrom: formatDateToISO(domain.validFrom),
       expiresAt: formatDateToISO(domain.expiresAt),
@@ -198,7 +198,7 @@ export class VoucherMapper {
       metadata: domain.metadata || undefined,
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
-      codes: domain.codes?.map((code) => this.mapCodeToDTO(code)),
+      codes: domain.codes?.map((code) => VoucherMapper.mapCodeToDTO(code)),
     }
   }
 
@@ -415,7 +415,7 @@ export class VoucherMapper {
       expiresAt: domain.expiresAt.toISOString(),
       redemptionCode: domain.redemptionCode || undefined,
       redemptionLocation: domain.redemptionLocation
-        ? this.mapLocationToDTO(domain.redemptionLocation)
+        ? VoucherMapper.mapLocationToDTO(domain.redemptionLocation)
         : undefined,
       metadata: domain.metadata || undefined,
       createdAt: domain.createdAt.toISOString(),
@@ -645,7 +645,7 @@ export class VoucherMapper {
       id: domain.id,
       businessId: domain.businessId,
       categoryId: domain.categoryId,
-      state: this.mapStateToDTO(domain.state),
+      state: VoucherMapper.mapStateToDTO(domain.state),
 
       // Only resolved content - no translation keys exposed
       title: domain.title || '',
@@ -653,12 +653,12 @@ export class VoucherMapper {
       terms: domain.termsAndConditions || '',
 
       // Discount configuration
-      discountType: this.mapDiscountTypeToDTO(domain.discountType),
+      discountType: VoucherMapper.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
 
       // Geographic targeting
-      location: domain.location ? this.mapLocationToDTO(domain.location) : null,
+      location: domain.location ? VoucherMapper.mapLocationToDTO(domain.location) : null,
 
       // Media
       imageUrl: domain.imageUrl,
@@ -700,7 +700,7 @@ export class VoucherMapper {
       daysUntilExpiry,
 
       // Optional includes (will be undefined unless populated)
-      codes: domain.codes?.map((code) => this.mapCodeToDTO(code)),
+      codes: domain.codes?.map((code) => VoucherMapper.mapCodeToDTO(code)),
     }
   }
 
