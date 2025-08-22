@@ -1,7 +1,5 @@
 import { supportAdmin, supportCommon } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, validateResponse } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
 import type { IProblemService } from '@support/services/ProblemService.js'

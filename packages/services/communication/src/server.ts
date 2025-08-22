@@ -18,7 +18,7 @@ export interface ServerConfig {
 export async function createCommunicationServer(config: ServerConfig) {
   // Set up global cache service for decorators
   setCacheService(config.cacheService)
-  
+
   const app = await createExpressServer({
     serviceName: 'communication-service',
     port: config.port,

@@ -269,6 +269,7 @@ export class VoucherService implements IVoucherService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
       const language = args[1] || 'en'
+
       return `${prefix}:${params.userId}:${language}:${JSON.stringify({ page: params.page, limit: params.limit, status: params.status })}`
     },
   })

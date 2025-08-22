@@ -1,12 +1,11 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
-
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { VoucherBookDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 import type { VoucherBookStatus, VoucherBookType } from '@prisma/client'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   IAdPlacementRepository,
   IBookDistributionRepository,
@@ -188,6 +187,7 @@ export class VoucherBookService implements IVoucherBookService {
     prefix: CACHE_KEYS.VOUCHER_BOOK.SINGLE,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const id = args[0]
+
       return `${prefix}:${id}`
     },
   })
@@ -215,6 +215,7 @@ export class VoucherBookService implements IVoucherBookService {
     prefix: CACHE_KEYS.VOUCHER_BOOK.LIST,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
+
       return `${prefix}:${JSON.stringify(params)}`
     },
   })

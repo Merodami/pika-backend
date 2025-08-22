@@ -1,6 +1,6 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
+import { Cache } from '@pika/redis'
 import type {
   CreateProblemDTO,
   ProblemDomain,
@@ -83,6 +83,7 @@ export class ProblemService implements IProblemService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const id = args[0]
       const parsedIncludes = args[1]
+
       return `${prefix}:${id}:${JSON.stringify(parsedIncludes || {})}`
     },
   })
@@ -103,6 +104,7 @@ export class ProblemService implements IProblemService {
     prefix: CACHE_KEYS.PROBLEM.BY_USER,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
+
       return `${prefix}:${params.userId}:${JSON.stringify({ page: params.page, limit: params.limit })}`
     },
   })

@@ -4,9 +4,10 @@ import { Cache } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import { SubscriptionStatus } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import { CACHE_TTL_MULTIPLIERS } from '@subscription/types/constants.js'
 import type { UserMembershipStatus } from '@subscription/types/interfaces.js'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IUserMembershipService {
   getUserMembershipStatus(userId: string): Promise<UserMembershipStatus>

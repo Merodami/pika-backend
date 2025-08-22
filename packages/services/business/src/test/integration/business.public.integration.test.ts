@@ -418,11 +418,11 @@ describe('Business Service - Public API Integration Tests', () => {
         .get(`/businesses/me`)
         .set('Accept', 'application/json')
         .expect(200)
-      
+
       // Should return empty paginated list
       expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      expect(response.body.data.length).toBe(0)
+      expect(response.body.data).toHaveLength(0)
       expect(response.body.pagination.total).toBe(0)
     })
 
@@ -469,7 +469,7 @@ describe('Business Service - Public API Integration Tests', () => {
 
       expect(response.body.data.length).toBeGreaterThanOrEqual(3)
       expect(response.body.pagination.total).toBeGreaterThanOrEqual(3)
-      
+
       // Test filtering by active status
       const activeResponse = await businessClient
         .get('/businesses/me?active=true')
@@ -477,6 +477,7 @@ describe('Business Service - Public API Integration Tests', () => {
         .expect(200)
 
       const activeCount = response.body.data.filter((b: any) => b.active).length
+
       expect(activeResponse.body.data.length).toBeGreaterThanOrEqual(2)
       expect(activeResponse.body.data.every((b: any) => b.active)).toBe(true)
     })

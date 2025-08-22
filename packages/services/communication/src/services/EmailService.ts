@@ -6,8 +6,6 @@ import { TemplateService } from '@communication/templates/TemplateRegistry.js'
 import { NODE_ENV, REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
-
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   BulkEmailDTO,
   CommunicationLogDomain,
@@ -18,6 +16,7 @@ import type { EmailTemplateKey, PaginatedResult } from '@pika/types'
 import Handlebars from 'handlebars'
 import { nth } from 'lodash-es'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   BulkEmailParams,
   EmailParams,
@@ -361,14 +360,15 @@ export class EmailService implements IEmailService {
     }
   }
 
-  @Cache({ 
-    ttl: REDIS_DEFAULT_TTL, 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.EMAIL.HISTORY,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const userId = args[0]
       const params = args[1]
+
       return `${prefix}:${userId}:${JSON.stringify(params)}`
-    }
+    },
   })
   async getEmailHistory(
     userId: string,
@@ -389,8 +389,9 @@ export class EmailService implements IEmailService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const id = args[0]
       const userId = args[1]
+
       return `${prefix}:${id}:${userId || 'public'}`
-    }
+    },
   })
   async getEmailById(
     id: string,
@@ -417,7 +418,7 @@ export class EmailService implements IEmailService {
     try {
       // Clear all email history cache entries for this user
       const pattern = `service:email-history:${userId}:*`
-      
+
       if (this.cache.delPattern) {
         await this.cache.delPattern(pattern)
       } else {

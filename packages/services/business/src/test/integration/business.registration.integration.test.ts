@@ -18,8 +18,8 @@ vi.unmock('@pika/shared')
 import { createBusinessServer } from '@business/server.js'
 import { businessPublic } from '@pika/api'
 import { MemoryCacheService } from '@pika/redis'
-import { MockCacheService } from '@pika/tests'
 import { logger } from '@pika/shared'
+import { MockCacheService } from '@pika/tests'
 import {
   AuthenticatedRequestClient,
   cleanupTestDatabase,
@@ -208,9 +208,10 @@ describe('Business Service - Registration Flow Integration Tests', () => {
 
     it('should return cached status on second request', async () => {
       console.log('Starting cache test...')
-      
+
       // First request
       console.log('Making first request...')
+
       const response1 = await businessOwnerClient
         .get('/businesses/registration/status')
         .set('Accept', 'application/json')
@@ -220,6 +221,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
 
       // Second request should be cached
       console.log('Making second request...')
+
       const response2 = await businessOwnerClient
         .get('/businesses/registration/status')
         .set('Accept', 'application/json')
@@ -390,7 +392,6 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       expect(response.status).toBe(400)
       expect(response.body.error.code).toBe(ErrorCode.VALIDATION_ERROR)
     })
-
   })
 
   describe('POST /businesses/registration/step3', () => {
@@ -458,7 +459,10 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       if (response.status !== 200) {
-        console.error('Step3 completion error:', JSON.stringify(response.body, null, 2))
+        console.error(
+          'Step3 completion error:',
+          JSON.stringify(response.body, null, 2),
+        )
       }
       expect(response.status).toBe(200)
       expect(response.body.currentStep).toBe(3)
@@ -468,7 +472,6 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       )
       expect(response.body.businessId).toBeUndefined() // No business created until completion
     })
-
 
     it('should create a business entity after successful registration', async () => {
       const step3Data: businessPublic.BusinessRegistrationStep3Request = {
@@ -700,7 +703,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
     it('should not allow step 2 without completing step 1', async () => {
       // Ensure no registration exists
       await testDb.prisma.businessRegistration.deleteMany({
-        where: { userId: testUserId }
+        where: { userId: testUserId },
       })
 
       const step2Data: businessPublic.BusinessRegistrationStep2Request = {
@@ -721,7 +724,10 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       if (response.status !== 400) {
-        console.error('Step2 validation error:', JSON.stringify(response.body, null, 2))
+        console.error(
+          'Step2 validation error:',
+          JSON.stringify(response.body, null, 2),
+        )
       }
       expect(response.status).toBe(400)
       expect(response.body.error.code).toBe(ErrorCode.VALIDATION_ERROR)
@@ -730,7 +736,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
     it('should not allow step 3 without completing steps 1 and 2', async () => {
       // Ensure no registration exists
       await testDb.prisma.businessRegistration.deleteMany({
-        where: { userId: testUserId }
+        where: { userId: testUserId },
       })
 
       const step3Data: businessPublic.BusinessRegistrationStep3Request = {
@@ -753,7 +759,10 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       if (response.status !== 400) {
-        console.error('Step3 validation error:', JSON.stringify(response.body, null, 2))
+        console.error(
+          'Step3 validation error:',
+          JSON.stringify(response.body, null, 2),
+        )
       }
       expect(response.status).toBe(400)
       expect(response.body.error.code).toBe(ErrorCode.VALIDATION_ERROR)

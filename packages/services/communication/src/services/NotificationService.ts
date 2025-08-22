@@ -4,8 +4,6 @@ import type {
 } from '@communication/repositories/NotificationRepository.js'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
-
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   CreateNotificationDTO,
   NotificationDomain,
@@ -14,6 +12,7 @@ import type {
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { IEmailService } from './EmailService.js'
 
 export interface INotificationService {
@@ -116,8 +115,9 @@ export class NotificationService implements INotificationService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const userId = args[0]
       const params = args[1]
+
       return `${prefix}:${userId}:${JSON.stringify(params)}`
-    }
+    },
   })
   async getUserNotifications(
     userId: string,

@@ -1,6 +1,6 @@
 /**
  * Cache key constants for business service
- * 
+ *
  * Pattern: service:entity[-modifier]:identifier
  * - Use colons (:) for hierarchy levels
  * - Use hyphens (-) for compound words within a level
@@ -12,7 +12,7 @@ export const CACHE_KEYS = {
     STATUS: 'business:registration:status',
     USER: 'business:registration:user',
   },
-  
+
   // Business entity cache keys
   BUSINESS: {
     LIST: 'businesses',
@@ -20,7 +20,7 @@ export const CACHE_KEYS = {
     USER: 'business:user',
     DETAILS: 'business:details',
   },
-  
+
   // Admin cache keys
   ADMIN: {
     LIST: 'admin:businesses',
@@ -32,9 +32,13 @@ export const CACHE_KEYS = {
  * Helper functions to generate cache keys with user context
  */
 export const generateCacheKey = {
-  registrationStatus: (userId: string) => `${CACHE_KEYS.REGISTRATION.STATUS}:${userId}`,
-  registrationUser: (userId: string) => `${CACHE_KEYS.REGISTRATION.USER}:${userId}`,
+  registrationStatus: (userId: string) =>
+    `${CACHE_KEYS.REGISTRATION.STATUS}:${userId}`,
+  registrationUser: (userId: string) =>
+    `${CACHE_KEYS.REGISTRATION.USER}:${userId}`,
   businessByUser: (userId: string) => `${CACHE_KEYS.BUSINESS.USER}:${userId}`,
-  businessById: (businessId: string) => `${CACHE_KEYS.BUSINESS.SINGLE}:${businessId}`,
-  businessDetails: (businessId: string) => `${CACHE_KEYS.BUSINESS.DETAILS}:${businessId}`,
+  businessById: (businessId: string) =>
+    `${CACHE_KEYS.BUSINESS.SINGLE}:${businessId}`,
+  businessDetails: (businessId: string) =>
+    `${CACHE_KEYS.BUSINESS.DETAILS}:${businessId}`,
 }

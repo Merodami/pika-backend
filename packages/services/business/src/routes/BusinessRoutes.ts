@@ -3,6 +3,7 @@ import { BusinessRepository } from '@business/repositories/BusinessRepository.js
 import { BusinessService } from '@business/services/BusinessService.js'
 import { businessPublic, shared } from '@pika/api'
 import {
+  requireActiveBusinesses,
   requireAuth,
   requirePermissions,
   validateBody,
@@ -38,12 +39,13 @@ export function createBusinessRoutes(
     controller.getAllBusinesses,
   )
 
-  // Business owner routes (require auth and business permissions)
+  // Business owner routes (require auth, business permissions, and at least one active business)
   // GET /businesses/me - Get all current user's businesses (must come before /:id)
   router.get(
     '/me',
     requireAuth(),
     requirePermissions('businesses:read:own'),
+    // Note: Don't require active businesses - users need to see their businesses during approval process
     validateQuery(businessPublic.BusinessQueryParams),
     controller.getMyBusinesses,
   )
@@ -53,6 +55,7 @@ export function createBusinessRoutes(
     '/me',
     requireAuth(),
     requirePermissions('businesses:write:own'),
+    // Note: Don't require active businesses for creation - this is how users get their first business
     validateBody(businessPublic.CreateMyBusinessRequest),
     controller.createMyBusiness,
   )
@@ -62,6 +65,7 @@ export function createBusinessRoutes(
     '/me',
     requireAuth(),
     requirePermissions('businesses:write:own'),
+    requireActiveBusinesses(), // Ensure business user has at least one active business
     validateBody(businessPublic.UpdateMyBusinessRequest),
     controller.updateMyBusiness,
   )

@@ -16,10 +16,7 @@
           "maximum": 30
         }
       },
-      "required": [
-        "enableReminders",
-        "reminderDaysBefore"
-      ],
+      "required": ["enableReminders", "reminderDaysBefore"],
       "additionalProperties": false
     }
   },

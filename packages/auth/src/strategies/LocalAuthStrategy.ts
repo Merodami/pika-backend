@@ -13,7 +13,12 @@ import {
 } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, logger } from '@pika/shared'
-import { EmailTemplateKey, ErrorCode, UserRole, UserStatus } from '@pika/types'
+import {
+  EmailTemplateKey,
+  ErrorCode,
+  UserRole,
+  UserStatus,
+} from '@pika/types'
 
 import { JwtTokenService } from '../services/JwtTokenService.js'
 import { PasswordSecurityService } from '../services/PasswordSecurityService.js'
@@ -40,6 +45,7 @@ export interface UserService {
   invalidatePasswordResetToken(token: string): Promise<void>
   createEmailVerificationToken(userId: string): Promise<string>
   validateEmailVerificationToken(token: string): Promise<string | null>
+  hasActiveBusinesses?(userId: string): Promise<boolean>
 }
 
 export interface UserServiceUser {
@@ -156,8 +162,25 @@ export class LocalAuthStrategy implements AuthStrategy {
       // 5. Update last login time
       await this.userService.updateLastLogin(user.id, new Date())
 
-      // 6. Generate tokens
-      const tokens = await this.tokenService.generateTokens(user)
+      // 6. Check if business user has active businesses
+      let enrichedUser = user as any
+
+      if (
+        user.role === UserRole.BUSINESS &&
+        this.userService.hasActiveBusinesses
+      ) {
+        const hasActiveBusinesses = await this.userService.hasActiveBusinesses(
+          user.id,
+        )
+
+        enrichedUser = {
+          ...user,
+          hasActiveBusinesses,
+        }
+      }
+
+      // 7. Generate tokens with enriched user data
+      const tokens = await this.tokenService.generateTokens(enrichedUser)
 
       // 7. Return successful authentication
       logger.info('Local authentication successful', {

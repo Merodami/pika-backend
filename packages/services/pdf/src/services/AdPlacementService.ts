@@ -1,11 +1,10 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
-
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { AdPlacementDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { ContentType } from '@prisma/client'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   IAdPlacementRepository,
   IVoucherBookPageRepository,
@@ -181,6 +180,7 @@ export class AdPlacementService implements IAdPlacementService {
     prefix: CACHE_KEYS.AD_PLACEMENT.BY_TYPE,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const id = args[0]
+
       return `${prefix}:${id}`
     },
   })
@@ -208,6 +208,7 @@ export class AdPlacementService implements IAdPlacementService {
     prefix: CACHE_KEYS.AD_PLACEMENT.BY_BOOK,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const voucherBookId = args[0]
+
       return `${prefix}:${voucherBookId}`
     },
   })

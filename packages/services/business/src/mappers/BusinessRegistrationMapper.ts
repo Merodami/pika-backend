@@ -1,7 +1,9 @@
 import { businessPublic } from '@pika/api'
 
-type BusinessRegistrationStatusResponse = businessPublic.BusinessRegistrationStatusResponse
-type CompleteBusinessRegistrationResponse = businessPublic.CompleteBusinessRegistrationResponse
+type BusinessRegistrationStatusResponse =
+  businessPublic.BusinessRegistrationStatusResponse
+type CompleteBusinessRegistrationResponse =
+  businessPublic.CompleteBusinessRegistrationResponse
 type RegistrationProgressResponse = businessPublic.RegistrationProgressResponse
 import {
   BUSINESS_REGISTRATION_STEPS,

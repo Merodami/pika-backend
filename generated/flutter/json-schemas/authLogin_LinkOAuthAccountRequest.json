@@ -4,14 +4,7 @@
   "properties": {
     "provider": {
       "type": "string",
-      "enum": [
-        "local",
-        "google",
-        "facebook",
-        "apple",
-        "github",
-        "microsoft"
-      ]
+      "enum": ["local", "google", "facebook", "apple", "github", "microsoft"]
     },
     "redirectUri": {
       "description": "Redirect after linking",
@@ -19,8 +12,6 @@
       "format": "uri"
     }
   },
-  "required": [
-    "provider"
-  ],
+  "required": ["provider"],
   "additionalProperties": false
 }

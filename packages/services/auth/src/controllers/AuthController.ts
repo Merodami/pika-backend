@@ -14,7 +14,7 @@ import { AuthMapper } from '@auth-service/mappers/AuthMapper.js'
 import type { IAuthService } from '@auth-service/services/AuthService.js'
 import { RequestContext, validateResponse } from '@pika/http'
 import { UserMapper } from '@pika/sdk'
-import { ErrorFactory, logger } from '@pika/shared'
+import { cookieManager,ErrorFactory, logger } from '@pika/shared'
 import { mapRoleToPermissions, RegistrationSource, UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -328,6 +328,28 @@ export class AuthController {
           'AuthController.token',
         )
 
+        // Set auth cookies including business registration status
+        if (result.user.role === UserRole.BUSINESS) {
+          // For business users, check if they need registration
+          // Note: This will be checked via the /businesses/registration/status endpoint
+          // which will set the appropriate cookies
+          cookieManager.setAuthCookies(response, {
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
+            userId: result.user.id,
+            userRole: result.user.role,
+            // Registration status will be checked separately by frontend
+          })
+        } else {
+          // For non-business users, just set auth cookies
+          cookieManager.setAuthCookies(response, {
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
+            userId: result.user.id,
+            userRole: result.user.role,
+          })
+        }
+
         response.json(validatedResponse)
       } else if (grantType === 'refreshToken') {
         const { refreshToken } = request.body
@@ -433,6 +455,9 @@ export class AuthController {
         if (introspection.valid && introspection.payload) {
           await this.authService.logout(introspection.payload.userId, token)
 
+          // Clear all auth-related cookies on logout
+          cookieManager.clearAuthCookies(response)
+
           const responseData = {
             success: true,
             message: 'All tokens revoked successfully',
@@ -447,6 +472,9 @@ export class AuthController {
         } else {
           // Even if token is invalid, return success per OAuth spec
           // But still honor the allDevices flag for consistent messaging
+          // Clear cookies anyway for safety
+          cookieManager.clearAuthCookies(response)
+
           const responseData = {
             success: true,
             message: 'All tokens revoked successfully',
@@ -463,6 +491,9 @@ export class AuthController {
         // Revoke specific token
         await this.authService.revokeToken(token)
 
+        // Clear auth cookies when revoking token
+        cookieManager.clearAuthCookies(response)
+
         const responseData = {
           success: true,
           message: 'Token revoked successfully',
@@ -477,6 +508,9 @@ export class AuthController {
       }
     } catch {
       // For revocation, always return success (OAuth 2.0 spec)
+      // Clear cookies for safety
+      cookieManager.clearAuthCookies(response)
+
       response.json({
         success: true,
         message: 'Token revoked successfully',

@@ -1,11 +1,10 @@
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
-
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { BookDistributionDomain } from '@pika/sdk'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   BusinessDistributionStats,
   IBookDistributionRepository,
@@ -160,6 +159,7 @@ export class BookDistributionService implements IBookDistributionService {
     prefix: CACHE_KEYS.DISTRIBUTION.BY_BOOK,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const id = args[0]
+
       return `${prefix}:${id}`
     },
   })
@@ -187,6 +187,7 @@ export class BookDistributionService implements IBookDistributionService {
     prefix: CACHE_KEYS.DISTRIBUTION.BY_STATUS,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
+
       return `${prefix}:${JSON.stringify(params)}`
     },
   })
@@ -208,6 +209,7 @@ export class BookDistributionService implements IBookDistributionService {
     prefix: CACHE_KEYS.DISTRIBUTION.BY_BOOK,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const bookId = args[0]
+
       return `${prefix}:${bookId}`
     },
   })

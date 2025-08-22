@@ -1,7 +1,7 @@
 import { BusinessRegistrationController } from '@business/controllers/BusinessRegistrationController.js'
+import { BusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
 import { BusinessRegistrationRepository } from '@business/repositories/BusinessRegistrationRepository.js'
 import { BusinessRepository } from '@business/repositories/BusinessRepository.js'
-import { BusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
 import { BusinessRegistrationService } from '@business/services/BusinessRegistrationService.js'
 import { businessPublic } from '@pika/api'
 import { requireAuth, requirePermissions, validateBody } from '@pika/http'
@@ -39,7 +39,7 @@ export function createBusinessRegistrationRoutes(
   const controller = new BusinessRegistrationController(service)
 
   // Business registration routes (require auth and business permissions)
-  
+
   // POST /businesses/registration/start - Start registration process
   router.post(
     '/start',
@@ -47,7 +47,7 @@ export function createBusinessRegistrationRoutes(
     requirePermissions('businesses:write:own'),
     controller.startRegistration,
   )
-  
+
   // GET /businesses/registration/status - Get current registration status
   router.get(
     '/status',
@@ -55,7 +55,7 @@ export function createBusinessRegistrationRoutes(
     requirePermissions('businesses:write:own'),
     controller.getRegistrationStatus,
   )
-  
+
   // GET /businesses/registration/progress - Get detailed registration progress
   router.get(
     '/progress',
@@ -90,7 +90,7 @@ export function createBusinessRegistrationRoutes(
     validateBody(businessPublic.BusinessRegistrationStep3Request),
     controller.submitStep3,
   )
-  
+
   // POST /businesses/registration/complete - Complete registration with user consent
   router.post(
     '/complete',

@@ -1,8 +1,6 @@
 import { NODE_ENV, REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
-
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   BatchUploadDTO,
   FileStorageLogDomain,
@@ -16,6 +14,7 @@ import type {
 } from '@storage/repositories/FileStorageLogRepository.js'
 import { v4 as uuid } from 'uuid'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import {
   type ProviderConfig,
   ProviderFactory,
@@ -409,14 +408,15 @@ export class StorageService implements IStorageService {
     }
   }
 
-  @Cache({ 
-    ttl: REDIS_DEFAULT_TTL, 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.FILE.HISTORY,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const userId = args[0]
       const params = args[1]
+
       return `${prefix}:${userId}:${JSON.stringify(params)}`
-    }
+    },
   })
   async getFileHistory(
     userId: string,
@@ -436,8 +436,9 @@ export class StorageService implements IStorageService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const id = args[0]
       const userId = args[1]
+
       return `${prefix}:${id}:${userId || 'public'}`
-    }
+    },
   })
   async getFileById(
     id: string,
@@ -498,11 +499,14 @@ export class StorageService implements IStorageService {
   /**
    * Invalidate cache for a specific file
    */
-  private async invalidateFileCache(fileId: string, userId?: string): Promise<void> {
+  private async invalidateFileCache(
+    fileId: string,
+    userId?: string,
+  ): Promise<void> {
     try {
       // Invalidate specific file cache entries
       await this.cache.del(`service:file:${fileId}:${userId || 'public'}`)
-      
+
       // Invalidate user's file history cache if userId provided
       if (userId) {
         await this.invalidateUserFileCache(userId)
@@ -520,6 +524,7 @@ export class StorageService implements IStorageService {
       // Delete all file history cache entries for this user
       // Using pattern to clear all paginated results
       const pattern = `service:file-history:${userId}:*`
+
       if (this.cache.delPattern) {
         await this.cache.delPattern(pattern)
       } else {

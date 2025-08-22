@@ -1,6 +1,6 @@
 /**
  * Cache key constants for user service
- * 
+ *
  * Pattern: service:entity[-modifier]:identifier
  * - Use colons (:) for hierarchy levels
  * - Use hyphens (-) for compound words within a level
@@ -15,13 +15,13 @@ export const CACHE_KEYS = {
     PROFILE: 'service:user:profile',
     PREFERENCES: 'service:user:preferences',
   },
-  
+
   // User sessions cache keys
   SESSION: {
     USER: 'service:user:sessions',
     ACTIVE: 'service:user:sessions:active',
   },
-  
+
   // Admin cache keys
   ADMIN: {
     USERS: 'service:admin:users',
@@ -29,7 +29,7 @@ export const CACHE_KEYS = {
     STATS: 'service:admin:user:stats',
     ANALYTICS: 'service:admin:user:analytics',
   },
-  
+
   // Internal service cache keys
   INTERNAL: {
     USERS: 'service:internal:users',
@@ -47,6 +47,7 @@ export const generateCacheKey = {
   userById: (id: string) => `${CACHE_KEYS.USER.SINGLE}:${id}`,
   userByEmail: (email: string) => `${CACHE_KEYS.USER.BY_EMAIL}:${email}`,
   userProfile: (userId: string) => `${CACHE_KEYS.USER.PROFILE}:${userId}`,
-  userList: (params: any) => `${CACHE_KEYS.USER.LIST}:${JSON.stringify(params)}`,
+  userList: (params: any) =>
+    `${CACHE_KEYS.USER.LIST}:${JSON.stringify(params)}`,
   userSessions: (userId: string) => `${CACHE_KEYS.SESSION.USER}:${userId}`,
 }

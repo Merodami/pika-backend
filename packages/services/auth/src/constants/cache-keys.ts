@@ -23,6 +23,7 @@ export const CACHE_KEYS = {
 
 export const generateCacheKey = {
   userInfoById: (userId: string) => `${CACHE_KEYS.USER_INFO.BY_ID}:${userId}`,
-  tokenIntrospection: (token: string) => `${CACHE_KEYS.TOKEN.INTROSPECTION}:${token}`,
+  tokenIntrospection: (token: string) =>
+    `${CACHE_KEYS.TOKEN.INTROSPECTION}:${token}`,
   userSession: (userId: string) => `${CACHE_KEYS.SESSION.BY_USER}:${userId}`,
 }

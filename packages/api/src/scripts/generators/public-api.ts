@@ -669,7 +669,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // Create my business (authenticated users)
   registry.registerRoute({
     method: 'post',
-    path: '/my/business',
+    path: '/businesses/me',
     operationId: 'createMyBusiness',
     summary: 'Create my business',
     tags: ['My Business'],
@@ -698,7 +698,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // Get my business (authenticated users)
   registry.registerRoute({
     method: 'get',
-    path: '/my/business',
+    path: '/businesses/me',
     operationId: 'getMyBusiness',
     summary: 'Get my business details',
     tags: ['My Business'],
@@ -718,7 +718,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // Update my business (authenticated users)
   registry.registerRoute({
     method: 'put',
-    path: '/my/business',
+    path: '/businesses/me',
     operationId: 'updateMyBusiness',
     summary: 'Update my business',
     tags: ['My Business'],
@@ -747,7 +747,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // Delete my business (authenticated users)
   registry.registerRoute({
     method: 'delete',
-    path: '/my/business',
+    path: '/businesses/me',
     operationId: 'deleteMyBusiness',
     summary: 'Delete my business',
     tags: ['My Business'],
@@ -794,7 +794,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
         description: 'Registration status',
         content: {
           'application/json': {
-            schema: businessRegistrationSchemas.BusinessRegistrationStatusResponse,
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStatusResponse,
           },
         },
       },
@@ -833,7 +834,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: businessRegistrationSchemas.BusinessRegistrationStep1Request,
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStep1Request,
           },
         },
       },
@@ -862,7 +864,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: businessRegistrationSchemas.BusinessRegistrationStep2Request,
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStep2Request,
           },
         },
       },
@@ -891,7 +894,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: businessRegistrationSchemas.BusinessRegistrationStep3Request,
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStep3Request,
           },
         },
       },
@@ -920,7 +924,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       body: {
         content: {
           'application/json': {
-            schema: businessRegistrationSchemas.CompleteBusinessRegistrationRequest,
+            schema:
+              businessRegistrationSchemas.CompleteBusinessRegistrationRequest,
           },
         },
       },
@@ -930,7 +935,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
         description: 'Registration completed successfully',
         content: {
           'application/json': {
-            schema: businessRegistrationSchemas.CompleteBusinessRegistrationResponse,
+            schema:
+              businessRegistrationSchemas.CompleteBusinessRegistrationResponse,
           },
         },
       },

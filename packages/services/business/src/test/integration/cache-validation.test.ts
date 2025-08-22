@@ -1,11 +1,11 @@
 /**
  * Cache Validation Integration Tests for Business Service
  *
- * CRITICAL: These tests validate that the cache architecture fixes work correctly 
+ * CRITICAL: These tests validate that the cache architecture fixes work correctly
  * and prevent the hanging request bug from returning.
  *
- * The issue we fixed: @Cache decorators on controller methods cause HTTP requests 
- * to hang because when cache hits occur, the decorator returns cached data but 
+ * The issue we fixed: @Cache decorators on controller methods cause HTTP requests
+ * to hang because when cache hits occur, the decorator returns cached data but
  * never executes res.json(). We moved all caching to the service layer.
  */
 
@@ -22,18 +22,16 @@ import {
   createSharedBusinessTestData,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
-import { MockTranslationClient } from '@pika/tests'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
+import { MockTranslationClient } from '@pika/tests'
 import {
   cleanupTestDatabase,
   createE2EAuthHelper,
   createTestDatabase,
   E2EAuthHelper,
   TestDatabaseResult,
-  generateAccessToken,
 } from '@pika/tests'
-import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -99,15 +97,15 @@ describe('Business Service Cache Validation Tests', () => {
     customerClient = await authHelper.getUserClient(testDb.prisma)
     businessClient = await authHelper.getBusinessClient(testDb.prisma)
     adminClient = await authHelper.getAdminClient(testDb.prisma)
-    
+
     // Create a business for the business owner client user so /businesses/me works
     // The business client user is created by authHelper but doesn't have a business yet
     const businessUsers = await testDb.prisma.user.findMany({
       where: { role: 'business' },
       orderBy: { createdAt: 'desc' },
-      take: 1
+      take: 1,
     })
-    
+
     if (businessUsers.length > 0 && sharedTestData.activeCategory) {
       await testDb.prisma.business.create({
         data: {
@@ -118,7 +116,7 @@ describe('Business Service Cache Validation Tests', () => {
           verified: true,
           active: true,
           avgRating: 4.5,
-        }
+        },
       })
     }
 
@@ -145,7 +143,7 @@ describe('Business Service Cache Validation Tests', () => {
     it('should NOT hang when GET /businesses cache is hit (validates fix)', async () => {
       // This test validates the fix - controllers no longer have @Cache
       // so responses are properly sent even when cache is hit
-      
+
       // Prime the cache - first call should succeed
       await customerClient
         .get('/businesses')
@@ -164,11 +162,11 @@ describe('Business Service Cache Validation Tests', () => {
       expect(elapsed).toBeLessThan(500) // Should be very fast with cache
       expect(response.body).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      
+
       logger.info('GET /businesses cache hit performance:', {
         elapsedMs: elapsed,
         cacheHit: true,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
@@ -189,21 +187,22 @@ describe('Business Service Cache Validation Tests', () => {
 
       // Verify same data
       expect(response2.body).toEqual(response1.body)
-      
+
       // Second call should be significantly faster (cache hit)
       expect(time2).toBeLessThanOrEqual(time1)
-      
+
       logger.info('GET /businesses cache performance test:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        speedup: time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
-        status: 'PASS'
+        speedup:
+          time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
+        status: 'PASS',
       })
     })
 
     it('should NOT hang when GET /businesses/:id cache is hit (validates fix)', async () => {
       const testBusiness = sharedTestData.activeBusinesses[0]
-      
+
       // Prime the cache - first call should succeed
       await customerClient
         .get(`/businesses/${testBusiness.id}`)
@@ -221,18 +220,18 @@ describe('Business Service Cache Validation Tests', () => {
       // Should complete quickly when hitting cache
       expect(elapsed).toBeLessThan(500)
       expect(response.body.id).toBe(testBusiness.id)
-      
+
       logger.info('GET /businesses/:id cache hit performance:', {
         elapsedMs: elapsed,
         businessId: testBusiness.id,
         cacheHit: true,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
     it('should NOT hang when GET /businesses/user/:id cache is hit (validates fix)', async () => {
       const businessOwner = sharedTestData.businessOwners[0]
-      
+
       // Prime the cache
       await customerClient
         .get(`/businesses/user/${businessOwner.id}`)
@@ -249,11 +248,11 @@ describe('Business Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(500)
       expect(response.body).toBeDefined()
-      
+
       logger.info('GET /businesses/user/:id cache hit performance:', {
         elapsedMs: elapsed,
         userId: businessOwner.id,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -264,10 +263,7 @@ describe('Business Service Cache Validation Tests', () => {
   describe('Business Owner Endpoints - Cache Validation', () => {
     it('should NOT hang when GET /businesses/me cache is hit', async () => {
       // Prime the cache
-      await businessClient
-        .get('/businesses/me')
-        .timeout(3000)
-        .expect(200)
+      await businessClient.get('/businesses/me').timeout(3000).expect(200)
 
       // Second call should not hang
       const start = Date.now()
@@ -279,10 +275,10 @@ describe('Business Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(500)
       expect(response.body).toBeDefined()
-      
+
       logger.info('GET /businesses/me cache hit performance:', {
         elapsedMs: elapsed,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -294,9 +290,7 @@ describe('Business Service Cache Validation Tests', () => {
   describe('Concurrent Requests Tests', () => {
     it('should handle concurrent business list requests without hanging', async () => {
       const promises = Array.from({ length: 5 }, (_, index) => {
-        return customerClient
-          .get('/businesses?page=1&limit=5')
-            .timeout(3000) // Each request must complete within 3 seconds
+        return customerClient.get('/businesses?page=1&limit=5').timeout(3000) // Each request must complete within 3 seconds
       })
 
       const start = Date.now()
@@ -312,28 +306,29 @@ describe('Business Service Cache Validation Tests', () => {
 
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
+
       responses.forEach((response, index) => {
         expect(response.body).toEqual(firstResponse)
       })
 
       // Concurrent requests should complete reasonably quickly
       expect(elapsed).toBeLessThan(5000)
-      
+
       logger.info('Concurrent business requests performance:', {
         requestCount: promises.length,
         totalElapsedMs: elapsed,
         averageMs: elapsed / promises.length,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
     it('should handle concurrent single business requests without hanging', async () => {
       const testBusiness = sharedTestData.activeBusinesses[0]
-      
+
       const promises = Array.from({ length: 3 }, () => {
         return customerClient
           .get(`/businesses/${testBusiness.id}`)
-            .timeout(3000)
+          .timeout(3000)
       })
 
       const start = Date.now()
@@ -347,12 +342,12 @@ describe('Business Service Cache Validation Tests', () => {
       })
 
       expect(elapsed).toBeLessThan(4000)
-      
+
       logger.info('Concurrent single business requests performance:', {
         requestCount: promises.length,
         businessId: testBusiness.id,
         totalElapsedMs: elapsed,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -379,10 +374,10 @@ describe('Business Service Cache Validation Tests', () => {
 
       // Reconnect cache
       await cacheService.connect()
-      
+
       logger.info('Business cache failure resilience test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Service continued without cache'
+        status: 'PASS - Service continued without cache',
       })
     })
   })
@@ -393,9 +388,7 @@ describe('Business Service Cache Validation Tests', () => {
   describe('Cache Invalidation Tests', () => {
     it('should invalidate business cache when business data changes', async () => {
       // Get initial business list (prime cache)
-      const response1 = await customerClient
-        .get('/businesses')
-        .expect(200)
+      const response1 = await customerClient.get('/businesses').expect(200)
 
       const initialCount = response1.body.data.length
 
@@ -403,18 +396,16 @@ describe('Business Service Cache Validation Tests', () => {
       await cacheService.delPattern('*business*')
 
       // Get businesses again - should hit database again
-      const response2 = await customerClient
-        .get('/businesses')
-        .expect(200)
+      const response2 = await customerClient.get('/businesses').expect(200)
 
       // Should not hang and should return data
       expect(response2.body.data).toBeDefined()
       expect(Array.isArray(response2.body.data)).toBe(true)
-      
+
       logger.info('Business cache invalidation test:', {
         initialCount,
         afterInvalidationCount: response2.body.data.length,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -433,16 +424,16 @@ describe('Business Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Invalid business ID test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
     it('should handle non-existent business ID without hanging', async () => {
       const fakeUuid = '550e8400-e29b-41d4-a716-446655440000'
-      
+
       const start = Date.now()
       const response = await customerClient
         .get(`/businesses/${fakeUuid}`)
@@ -452,11 +443,11 @@ describe('Business Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(2000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Non-existent business ID test:', {
         elapsedMs: elapsed,
         businessId: fakeUuid,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
@@ -470,10 +461,10 @@ describe('Business Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Unauthorized access test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
   })

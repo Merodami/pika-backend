@@ -4,8 +4,6 @@
   "properties": {
     "email": {}
   },
-  "required": [
-    "email"
-  ],
+  "required": ["email"],
   "additionalProperties": false
 }

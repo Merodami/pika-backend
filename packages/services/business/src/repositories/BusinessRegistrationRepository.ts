@@ -59,11 +59,11 @@ export interface UpdateStepData {
 /**
  * Business registration repository implementation using Prisma
  * Manages the business_registration table for tracking registration progress
- * 
+ *
  * Cache Key Pattern (using constants from cache-keys.ts):
  * - business:registration:user:{userId} - Repository cache for user's registration data
  * - business:registration:status:{userId} - Service cache for registration status (used by @Cache decorator)
- * 
+ *
  * Cache invalidation happens on all write operations to ensure consistency
  */
 export class BusinessRegistrationRepository
@@ -150,8 +150,12 @@ export class BusinessRegistrationRepository
 
       // Invalidate both cache keys - service decorator and repository cache
       if (this.cacheService) {
-        await this.cacheService.del(generateCacheKey.registrationStatus(data.userId))
-        await this.cacheService.del(generateCacheKey.registrationUser(data.userId))
+        await this.cacheService.del(
+          generateCacheKey.registrationStatus(data.userId),
+        )
+        await this.cacheService.del(
+          generateCacheKey.registrationUser(data.userId),
+        )
       }
 
       logger.info('Business registration created', {

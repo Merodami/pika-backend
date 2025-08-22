@@ -46,11 +46,7 @@
       "properties": {
         "profileVisibility": {
           "type": "string",
-          "enum": [
-            "public",
-            "friends",
-            "private"
-          ]
+          "enum": ["public", "friends", "private"]
         },
         "showEmail": {
           "type": "boolean"
@@ -66,11 +62,7 @@
       "properties": {
         "theme": {
           "type": "string",
-          "enum": [
-            "light",
-            "dark",
-            "system"
-          ]
+          "enum": ["light", "dark", "system"]
         },
         "language": {
           "type": "string",

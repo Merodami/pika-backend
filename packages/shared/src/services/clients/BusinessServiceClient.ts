@@ -46,7 +46,7 @@ export class BusinessServiceClient extends BaseServiceClient {
   }
 
   /**
-   * Get business by user ID
+   * Get business by user ID (returns single business)
    */
   async getBusinessByUserId(
     userId: string,
@@ -66,6 +66,49 @@ export class BusinessServiceClient extends BaseServiceClient {
       context,
       useServiceAuth: true,
     })
+  }
+
+  /**
+   * Get all businesses by user ID (returns array of businesses)
+   */
+  async getBusinessesByUserId(
+    userId: string,
+    options?: { 
+      includeUser?: boolean
+      includeCategory?: boolean
+      page?: number
+      limit?: number
+      onlyActive?: boolean
+      onlyVerified?: boolean
+      include?: string
+    },
+    context?: ServiceContext,
+  ): Promise<BusinessDomain[]> {
+    const queryParams = new URLSearchParams()
+
+    if (options?.includeUser) queryParams.append('includeUser', 'true')
+    if (options?.includeCategory) queryParams.append('includeCategory', 'true')
+    if (options?.page) queryParams.append('page', options.page.toString())
+    if (options?.limit) queryParams.append('limit', options.limit.toString())
+    if (options?.onlyActive !== undefined)
+      queryParams.append('onlyActive', options.onlyActive.toString())
+    if (options?.onlyVerified !== undefined)
+      queryParams.append('onlyVerified', options.onlyVerified.toString())
+    if (options?.include) queryParams.append('include', options.include)
+
+    const path = queryParams.toString()
+      ? `/internal/businesses/user/${userId}/all?${queryParams.toString()}`
+      : `/internal/businesses/user/${userId}/all`
+
+    const response = await this.get<{
+      data: BusinessDomain[]
+      pagination: { page: number; limit: number; total: number; totalPages: number }
+    }>(path, {
+      context,
+      useServiceAuth: true,
+    })
+
+    return response.data
   }
 
   /**

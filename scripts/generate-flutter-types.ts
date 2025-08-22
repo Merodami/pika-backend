@@ -2,11 +2,11 @@
 
 /**
  * 🚀 Flutter Type Generator for Pika Backend
- * 
+ *
  * This script generates type-safe Dart models from your Zod schemas using:
  * - Zod 4's native JSON Schema generation (z.toJSONSchema)
  * - QuickType for Dart code generation
- * 
+ *
  * Features:
  * ✅ Single source of truth from Zod schemas
  * ✅ Type-safe Dart models with null safety
@@ -28,10 +28,10 @@ const CONFIG = {
   OUTPUT_DIR: path.resolve('generated/flutter'),
   JSON_SCHEMA_DIR: path.resolve('generated/flutter/schemas'),
   DART_OUTPUT_DIR: path.resolve('../pika-frontend-flutter/lib/generated/api'),
-  
+
   // JSON Schema settings
   JSON_SCHEMA_TARGET: 'draft-7' as const, // Best compatibility with quicktype
-  
+
   // QuickType settings
   DART_CLASS_PREFIX: '',
   DART_CLASS_SUFFIX: '',
@@ -46,20 +46,25 @@ const CONFIG = {
 const SCHEMA_MODULES = {
   auth: {
     login: () => import('../packages/api/src/schemas/auth/public/login.js'),
-    register: () => import('../packages/api/src/schemas/auth/public/register.js'),
-    password: () => import('../packages/api/src/schemas/auth/public/password.js'),
+    register: () =>
+      import('../packages/api/src/schemas/auth/public/register.js'),
+    password: () =>
+      import('../packages/api/src/schemas/auth/public/password.js'),
   },
   business: {
-    business: () => import('../packages/api/src/schemas/business/public/business.js'),
+    business: () =>
+      import('../packages/api/src/schemas/business/public/business.js'),
   },
   category: {
-    category: () => import('../packages/api/src/schemas/category/public/category.js'),
+    category: () =>
+      import('../packages/api/src/schemas/category/public/category.js'),
   },
   user: {
     profile: () => import('../packages/api/src/schemas/user/public/profile.js'),
   },
   voucher: {
-    voucher: () => import('../packages/api/src/schemas/voucher/public/voucher.js'),
+    voucher: () =>
+      import('../packages/api/src/schemas/voucher/public/voucher.js'),
   },
 }
 
@@ -71,43 +76,54 @@ function createDirectories() {
     CONFIG.JSON_SCHEMA_DIR,
     CONFIG.DART_OUTPUT_DIR,
   ]
-  
+
   for (const dir of dirs) {
     fs.mkdirSync(dir, { recursive: true })
   }
 }
 
 function isZodSchema(obj: any): boolean {
-  return obj && 
-         typeof obj === 'object' && 
-         typeof obj.parse === 'function' &&
-         obj._def !== undefined
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    typeof obj.parse === 'function' &&
+    obj._def !== undefined
+  )
 }
 
 function shouldSkipSchema(name: string): boolean {
   // Skip OpenAPI decorated schemas (we want raw Zod schemas)
-  return name.endsWith('Schema') || 
-         name.endsWith('ResponseSchema') || 
-         name.endsWith('RequestSchema')
+  return (
+    name.endsWith('Schema') ||
+    name.endsWith('ResponseSchema') ||
+    name.endsWith('RequestSchema')
+  )
 }
 
 function cleanJsonSchema(schema: any): any {
   if (!schema || typeof schema !== 'object') {
     return schema
   }
-  
+
   const cleaned = { ...schema }
-  
+
   // Clean up empty or invalid properties that cause QuickType issues
   if (cleaned.properties) {
     for (const [key, value] of Object.entries(cleaned.properties)) {
       if (typeof value === 'object') {
         const propSchema = value as any
-        
+
         // Check if the property schema is missing a type
-        if (!propSchema.type && !propSchema.enum && !propSchema.const && 
-            !propSchema.anyOf && !propSchema.oneOf && !propSchema.allOf &&
-            !propSchema.$ref && Object.keys(propSchema).length > 0) {
+        if (
+          !propSchema.type &&
+          !propSchema.enum &&
+          !propSchema.const &&
+          !propSchema.anyOf &&
+          !propSchema.oneOf &&
+          !propSchema.allOf &&
+          !propSchema.$ref &&
+          Object.keys(propSchema).length > 0
+        ) {
           // Has properties but no type definition - add string type
           cleaned.properties[key] = { ...propSchema, type: 'string' }
         } else if (Object.keys(propSchema).length === 0) {
@@ -120,16 +136,19 @@ function cleanJsonSchema(schema: any): any {
       }
     }
   }
-  
+
   // Clean up nested schemas
   if (cleaned.items) {
     cleaned.items = cleanJsonSchema(cleaned.items)
   }
-  
-  if (cleaned.additionalProperties && typeof cleaned.additionalProperties === 'object') {
+
+  if (
+    cleaned.additionalProperties &&
+    typeof cleaned.additionalProperties === 'object'
+  ) {
     cleaned.additionalProperties = cleanJsonSchema(cleaned.additionalProperties)
   }
-  
+
   return cleaned
 }
 
@@ -145,52 +164,62 @@ function formatDartFileName(moduleName: string, submoduleName: string): string {
 
 async function generateJsonSchemas() {
   console.log('📝 Generating JSON Schemas from Zod schemas...')
-  
+
   const generatedSchemas: Record<string, any> = {}
+
   let totalSchemas = 0
-  
+
   for (const [moduleName, submodules] of Object.entries(SCHEMA_MODULES)) {
     console.log(`\\n  📁 Processing ${moduleName} module...`)
-    
+
     for (const [submoduleName, importFn] of Object.entries(submodules)) {
       console.log(`    📄 Loading ${submoduleName} schemas...`)
-      
+
       try {
         const moduleSchemas = await importFn()
+
         let moduleSchemaCount = 0
-        
+
         for (const [schemaName, schema] of Object.entries(moduleSchemas)) {
           if (!isZodSchema(schema)) {
             continue
           }
-          
+
           if (shouldSkipSchema(schemaName)) {
             console.log(`      📄 Skipping ${schemaName}: OpenAPI decorated`)
             continue
           }
-          
+
           try {
             // Use Zod 4's native JSON Schema generation
             const rawJsonSchema = z.toJSONSchema(schema as any, {
               target: CONFIG.JSON_SCHEMA_TARGET,
               unrepresentable: 'any',
             })
-            
+
             // Clean the schema to fix QuickType compatibility issues
             const jsonSchema = cleanJsonSchema(rawJsonSchema)
-            
+
             const fullName = `${formatModuleName(moduleName, submoduleName)}_${schemaName}`
+
             generatedSchemas[fullName] = {
               schema: jsonSchema,
               moduleName,
               submoduleName,
               schemaName,
             }
-            
+
             // Save individual JSON schema file
-            const jsonSchemaPath = path.join(CONFIG.JSON_SCHEMA_DIR, `${fullName}.json`)
-            fs.writeFileSync(jsonSchemaPath, JSON.stringify(jsonSchema, null, 2))
-            
+            const jsonSchemaPath = path.join(
+              CONFIG.JSON_SCHEMA_DIR,
+              `${fullName}.json`,
+            )
+
+            fs.writeFileSync(
+              jsonSchemaPath,
+              JSON.stringify(jsonSchema, null, 2),
+            )
+
             moduleSchemaCount++
             totalSchemas++
             console.log(`      ✅ ${schemaName}`)
@@ -198,15 +227,18 @@ async function generateJsonSchemas() {
             console.log(`      ⚠️  Skipping ${schemaName}: ${error.message}`)
           }
         }
-        
-        console.log(`    📊 Generated ${moduleSchemaCount} schemas from ${submoduleName}`)
+
+        console.log(
+          `    📊 Generated ${moduleSchemaCount} schemas from ${submoduleName}`,
+        )
       } catch (error) {
         console.error(`    ❌ Failed to load ${submoduleName}:`, error.message)
       }
     }
   }
-  
+
   console.log(`\\n📊 Total: Generated ${totalSchemas} JSON schemas`)
+
   return generatedSchemas
 }
 
@@ -214,49 +246,59 @@ async function generateJsonSchemas() {
 
 function generateDartTypes(schemas: Record<string, any>) {
   console.log('\\n🎯 Generating Dart types...')
-  
+
   // Group schemas by module
   const moduleGroups: Record<string, any[]> = {}
-  
+
   for (const [fullName, schemaData] of Object.entries(schemas)) {
-    const moduleKey = formatModuleName(schemaData.moduleName, schemaData.submoduleName)
+    const moduleKey = formatModuleName(
+      schemaData.moduleName,
+      schemaData.submoduleName,
+    )
+
     if (!moduleGroups[moduleKey]) {
       moduleGroups[moduleKey] = []
     }
     moduleGroups[moduleKey].push(schemaData)
   }
-  
+
   let successCount = 0
   let failCount = 0
-  
+
   // Generate Dart files for each module
   for (const [moduleKey, moduleSchemas] of Object.entries(moduleGroups)) {
     console.log(`\\n  📁 Generating ${moduleKey} types...`)
-    
+
     try {
       // First, try the combined schema approach
       const moduleProperties: Record<string, any> = {}
-      
+
       for (const schemaData of moduleSchemas) {
         // Clean each schema before combining
-        moduleProperties[schemaData.schemaName] = cleanJsonSchema(schemaData.schema)
+        moduleProperties[schemaData.schemaName] = cleanJsonSchema(
+          schemaData.schema,
+        )
       }
-      
+
       const moduleSchema = {
         $schema: 'http://json-schema.org/draft-07/schema#',
         title: `${moduleKey.charAt(0).toUpperCase() + moduleKey.slice(1)}Types`,
         type: 'object',
         properties: moduleProperties,
       }
-      
+
       // Save module schema
-      const moduleSchemaPath = path.join(CONFIG.JSON_SCHEMA_DIR, `${moduleKey}_combined.json`)
+      const moduleSchemaPath = path.join(
+        CONFIG.JSON_SCHEMA_DIR,
+        `${moduleKey}_combined.json`,
+      )
+
       fs.writeFileSync(moduleSchemaPath, JSON.stringify(moduleSchema, null, 2))
-      
+
       // Generate Dart code using QuickType
       const dartFileName = `${moduleKey}.dart`
       const dartFilePath = path.join(CONFIG.DART_OUTPUT_DIR, dartFileName)
-      
+
       const quicktypeCommand = [
         'npx quicktype',
         `--src "${moduleSchemaPath}"`,
@@ -265,13 +307,17 @@ function generateDartTypes(schemas: Record<string, any>) {
         `--out "${dartFilePath}"`,
         `--top-level ${moduleKey.charAt(0).toUpperCase() + moduleKey.slice(1)}`,
       ].join(' ')
-      
+
       console.log(`    🔄 Running: ${quicktypeCommand}`)
-      const result = execSync(quicktypeCommand, { stdio: ['pipe', 'pipe', 'pipe'] })
-      
+
+      const result = execSync(quicktypeCommand, {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      })
+
       // Verify the file was created
       if (fs.existsSync(dartFilePath)) {
         const fileSize = fs.statSync(dartFilePath).size
+
         console.log(`    ✅ Generated ${dartFileName} (${fileSize} bytes)`)
         successCount++
       } else {
@@ -281,33 +327,47 @@ function generateDartTypes(schemas: Record<string, any>) {
     } catch (error) {
       console.log(`    ❌ Combined schema failed: ${error.message}`)
       console.log(`    🔄 Trying individual schemas approach...`)
-      
+
       // Fallback: Generate individual files for each schema
       let individualSuccessCount = 0
-      
+
       try {
         const individualDartContent: string[] = []
         const seenEnums = new Set<string>()
         const seenClasses = new Set<string>()
         const seenVariables = new Set<string>()
-        
+
         // Add Dart imports
         individualDartContent.push('// To parse this JSON data, do')
         individualDartContent.push('//')
-        individualDartContent.push(`//     final data = SomeClass.fromJson(jsonData);`)
+        individualDartContent.push(
+          `//     final data = SomeClass.fromJson(jsonData);`,
+        )
         individualDartContent.push('')
         individualDartContent.push('import "dart:convert";')
         individualDartContent.push('')
-        
+
         for (const schemaData of moduleSchemas) {
-          console.log(`      🔄 Generating individual ${schemaData.schemaName}...`)
-          
+          console.log(
+            `      🔄 Generating individual ${schemaData.schemaName}...`,
+          )
+
           const individualSchema = cleanJsonSchema(schemaData.schema)
-          const individualSchemaPath = path.join(CONFIG.JSON_SCHEMA_DIR, `${moduleKey}_${schemaData.schemaName}_individual.json`)
-          fs.writeFileSync(individualSchemaPath, JSON.stringify(individualSchema, null, 2))
-          
-          const tempDartPath = path.join(CONFIG.DART_OUTPUT_DIR, `temp_${schemaData.schemaName}.dart`)
-          
+          const individualSchemaPath = path.join(
+            CONFIG.JSON_SCHEMA_DIR,
+            `${moduleKey}_${schemaData.schemaName}_individual.json`,
+          )
+
+          fs.writeFileSync(
+            individualSchemaPath,
+            JSON.stringify(individualSchema, null, 2),
+          )
+
+          const tempDartPath = path.join(
+            CONFIG.DART_OUTPUT_DIR,
+            `temp_${schemaData.schemaName}.dart`,
+          )
+
           const individualCommand = [
             'npx quicktype',
             `--src "${individualSchemaPath}"`,
@@ -316,36 +376,42 @@ function generateDartTypes(schemas: Record<string, any>) {
             `--out "${tempDartPath}"`,
             `--top-level ${schemaData.schemaName}`,
           ].join(' ')
-          
+
           try {
             execSync(individualCommand, { stdio: ['pipe', 'pipe', 'pipe'] })
-            
+
             if (fs.existsSync(tempDartPath)) {
               const content = fs.readFileSync(tempDartPath, 'utf8')
               const lines = content.split('\n')
-              
+
               // Filter out duplicate definitions with improved logic
               const filteredLines: string[] = []
+
               let skipBlock = false
               let blockDepth = 0
-              
+
               for (const line of lines) {
                 const trimmedLine = line.trim()
-                
+
                 // Skip imports and initial comments
-                if (line.startsWith('//') || line.startsWith('import') || trimmedLine === '') {
+                if (
+                  line.startsWith('//') ||
+                  line.startsWith('import') ||
+                  trimmedLine === ''
+                ) {
                   continue
                 }
-                
+
                 // Track opening braces for block depth
                 if (trimmedLine.includes('{')) {
                   blockDepth += (trimmedLine.match(/{/g) || []).length
                 }
-                
+
                 // Check for duplicate definitions
                 if (!skipBlock) {
                   if (line.startsWith('enum ')) {
                     const enumName = line.split(' ')[1].replace('{', '')
+
                     if (seenEnums.has(enumName)) {
                       skipBlock = true
                       continue
@@ -353,6 +419,7 @@ function generateDartTypes(schemas: Record<string, any>) {
                     seenEnums.add(enumName)
                   } else if (line.startsWith('class ')) {
                     const className = line.split(' ')[1].replace('{', '')
+
                     if (seenClasses.has(className)) {
                       skipBlock = true
                       continue
@@ -360,6 +427,7 @@ function generateDartTypes(schemas: Record<string, any>) {
                     seenClasses.add(className)
                   } else if (line.startsWith('final ')) {
                     const varName = line.split(' ')[1]
+
                     if (seenVariables.has(varName)) {
                       skipBlock = true
                       continue
@@ -367,12 +435,13 @@ function generateDartTypes(schemas: Record<string, any>) {
                     seenVariables.add(varName)
                   }
                 }
-                
+
                 // Track closing braces for block end detection
                 if (trimmedLine.includes('}')) {
                   const closingBraces = (trimmedLine.match(/}/g) || []).length
+
                   blockDepth -= closingBraces
-                  
+
                   // End of block detection
                   if (skipBlock && blockDepth <= 0) {
                     skipBlock = false
@@ -380,33 +449,38 @@ function generateDartTypes(schemas: Record<string, any>) {
                     continue
                   }
                 }
-                
+
                 if (!skipBlock) {
                   filteredLines.push(line)
                 }
               }
-              
+
               if (filteredLines.length > 0) {
                 individualDartContent.push(...filteredLines)
                 individualDartContent.push('')
                 individualSuccessCount++
                 console.log(`        ✅ ${schemaData.schemaName}`)
               }
-              
+
               fs.unlinkSync(tempDartPath) // Clean up temp file
             }
           } catch (individualError) {
-            console.log(`        ❌ ${schemaData.schemaName}: ${individualError.message}`)
+            console.log(
+              `        ❌ ${schemaData.schemaName}: ${individualError.message}`,
+            )
           }
         }
-        
+
         if (individualSuccessCount > 0) {
           // Write the combined file
           const dartFileName = `${moduleKey}.dart`
           const dartFilePath = path.join(CONFIG.DART_OUTPUT_DIR, dartFileName)
+
           fs.writeFileSync(dartFilePath, individualDartContent.join('\n'))
-          
-          console.log(`    ✅ Generated ${dartFileName} with ${individualSuccessCount}/${moduleSchemas.length} schemas`)
+
+          console.log(
+            `    ✅ Generated ${dartFileName} with ${individualSuccessCount}/${moduleSchemas.length} schemas`,
+          )
           successCount++
         } else {
           console.log(`    ❌ All individual schemas failed for ${moduleKey}`)
@@ -418,11 +492,11 @@ function generateDartTypes(schemas: Record<string, any>) {
       }
     }
   }
-  
+
   console.log(`\\n📊 Dart Generation Summary:`)
   console.log(`   ✅ Successful: ${successCount} modules`)
   console.log(`   ❌ Failed: ${failCount} modules`)
-  
+
   return { successCount, failCount }
 }
 
@@ -430,48 +504,53 @@ function generateDartTypes(schemas: Record<string, any>) {
 
 function validateOutput() {
   console.log('\\n🔍 Validating generated files...')
-  
-  const dartFiles = fs.readdirSync(CONFIG.DART_OUTPUT_DIR)
-    .filter(f => f.endsWith('.dart'))
-  
+
+  const dartFiles = fs
+    .readdirSync(CONFIG.DART_OUTPUT_DIR)
+    .filter((f) => f.endsWith('.dart'))
+
   console.log(`\\n📁 Generated Dart files:`)
-  
+
   let totalClasses = 0
   let totalEnums = 0
   let totalMethods = 0
-  
+
   for (const file of dartFiles) {
     const filePath = path.join(CONFIG.DART_OUTPUT_DIR, file)
     const content = fs.readFileSync(filePath, 'utf8')
-    
+
     const classCount = (content.match(/class \\w+/g) || []).length
     const enumCount = (content.match(/enum \\w+/g) || []).length
-    const methodCount = (content.match(/factory \\w+\\.fromJson|Map<String, dynamic> toJson/g) || []).length
-    
+    const methodCount = (
+      content.match(/factory \\w+\\.fromJson|Map<String, dynamic> toJson/g) ||
+      []
+    ).length
+
     totalClasses += classCount
     totalEnums += enumCount
     totalMethods += methodCount
-    
+
     console.log(`   📄 ${file}:`)
     console.log(`      - ${classCount} classes`)
     console.log(`      - ${enumCount} enums`)
     console.log(`      - ${methodCount} serialization methods`)
   }
-  
+
   console.log(`\\n📊 Validation Summary:`)
   console.log(`   📄 ${dartFiles.length} Dart files`)
   console.log(`   🏗️  ${totalClasses} classes`)
   console.log(`   🔢 ${totalEnums} enums`)
   console.log(`   ⚙️  ${totalMethods} serialization methods`)
-  
+
   // Check Flutter project structure
   const pubspecPath = path.join(CONFIG.FLUTTER_PROJECT, 'pubspec.yaml')
+
   if (fs.existsSync(pubspecPath)) {
     console.log(`   ✅ Flutter project detected`)
   } else {
     console.log(`   ⚠️  Flutter project not found at ${CONFIG.FLUTTER_PROJECT}`)
   }
-  
+
   return {
     files: dartFiles.length,
     classes: totalClasses,
@@ -484,7 +563,7 @@ function validateOutput() {
 
 function generateDocumentation(stats: any) {
   const readmePath = path.join(CONFIG.OUTPUT_DIR, 'README.md')
-  
+
   const documentation = `# Generated Flutter Types
 
 This directory contains automatically generated Dart types from your Zod schemas.
@@ -540,55 +619,56 @@ yarn generate:flutter-types
 async function main() {
   console.log('🚀 Flutter Type Generator for Pika Backend')
   console.log('==========================================')
-  
+
   const startTime = Date.now()
-  
+
   try {
     // Step 1: Setup
     console.log('\\n🏗️  Setting up directories...')
     createDirectories()
-    
+
     // Step 2: Generate JSON Schemas
     const schemas = await generateJsonSchemas()
-    
+
     if (Object.keys(schemas).length === 0) {
       console.log('\\n❌ No schemas found to generate!')
       process.exit(1)
     }
-    
+
     // Step 3: Generate Dart Types
     const { successCount, failCount } = generateDartTypes(schemas)
-    
+
     if (successCount === 0) {
       console.log('\\n❌ No Dart files were generated!')
       process.exit(1)
     }
-    
+
     // Step 4: Validate Output
     const stats = validateOutput()
-    
+
     // Step 5: Generate Documentation
     generateDocumentation(stats)
-    
+
     const endTime = Date.now()
     const duration = ((endTime - startTime) / 1000).toFixed(2)
-    
+
     console.log('\\n🎉 Generation Complete!')
     console.log('========================')
     console.log(`⏱️  Duration: ${duration}s`)
     console.log(`📁 Output: ${CONFIG.DART_OUTPUT_DIR}`)
     console.log(`📚 Documentation: ${CONFIG.OUTPUT_DIR}/README.md`)
-    
+
     console.log('\\n📋 Next Steps:')
     console.log('1. Run "flutter pub get" in your Flutter project')
     console.log('2. Import the generated types in your Dart code')
     console.log('3. Use the type-safe models for API integration')
-    
+
     if (failCount > 0) {
-      console.log(`\\n⚠️  ${failCount} modules failed to generate. Check the logs above.`)
+      console.log(
+        `\\n⚠️  ${failCount} modules failed to generate. Check the logs above.`,
+      )
       process.exit(1)
     }
-    
   } catch (error) {
     console.error('\\n❌ Fatal error:', error)
     process.exit(1)

@@ -1,11 +1,11 @@
 /**
  * Cache Validation Integration Tests for User Service
  *
- * CRITICAL: These tests validate that the cache architecture fixes work correctly 
+ * CRITICAL: These tests validate that the cache architecture fixes work correctly
  * and prevent the hanging request bug from returning.
  *
- * The issue we fixed: @Cache decorators on controller methods cause HTTP requests 
- * to hang because when cache hits occur, the decorator returns cached data but 
+ * The issue we fixed: @Cache decorators on controller methods cause HTTP requests
+ * to hang because when cache hits occur, the decorator returns cached data but
  * never executes res.json(). We moved all caching to the service layer.
  */
 
@@ -17,11 +17,6 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
-import { createUserServer } from '@user/server.js'
-import {
-  createSharedUserTestData,
-  type SharedUserTestData,
-} from '@user/test/helpers/userTestHelpers.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -31,7 +26,11 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
-import { UserRole } from '@pika/types'
+import { createUserServer } from '@user/server.js'
+import {
+  createSharedUserTestData,
+  type SharedUserTestData,
+} from '@user/test/helpers/userTestHelpers.js'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -113,7 +112,7 @@ describe('User Service Cache Validation Tests', () => {
   describe('Public User Endpoints - Cache Validation Tests', () => {
     it('should NOT hang when cached getUserById is called (validates fix)', async () => {
       const testUser = sharedTestData.customerUsers[0]
-      
+
       // Prime the cache - first call should succeed
       await adminClient
         .get(`/users/${testUser.id}`)
@@ -132,18 +131,18 @@ describe('User Service Cache Validation Tests', () => {
       expect(elapsed).toBeLessThan(500) // Should be very fast with cache
       expect(response.body).toBeDefined()
       expect(response.body.id).toBe(testUser.id)
-      
+
       logger.info('GET /users/:id cache hit performance:', {
         elapsedMs: elapsed,
         userId: testUser.id,
         cacheHit: true,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
     it('should cache getUserById responses and improve performance', async () => {
       const testUser = sharedTestData.customerUsers[1]
-      
+
       // First call - hits service layer/database
       const start1 = Date.now()
       const response1 = await adminClient
@@ -161,22 +160,23 @@ describe('User Service Cache Validation Tests', () => {
       // Verify same data
       expect(response2.body).toEqual(response1.body)
       expect(response2.body.id).toBe(testUser.id)
-      
+
       // Second call should be significantly faster (cache hit)
       expect(time2).toBeLessThanOrEqual(time1)
-      
+
       logger.info('GET /users/:id cache performance test:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        speedup: time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
+        speedup:
+          time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
         userId: testUser.id,
-        status: 'PASS'
+        status: 'PASS',
       })
     })
 
     it('should NOT hang when cached getUserByEmail is called (validates fix)', async () => {
       const testUser = sharedTestData.customerUsers[2]
-      
+
       // Prime the cache
       await adminClient
         .get(`/admin/users/email/${encodeURIComponent(testUser.email)}`)
@@ -193,12 +193,12 @@ describe('User Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(500)
       expect(response.body.email).toBe(testUser.email)
-      
+
       logger.info('GET /users/email/:email cache hit performance:', {
         elapsedMs: elapsed,
         email: testUser.email,
         cacheHit: true,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
@@ -220,11 +220,11 @@ describe('User Service Cache Validation Tests', () => {
       expect(elapsed).toBeLessThan(500)
       expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      
+
       logger.info('GET /users cache hit performance:', {
         elapsedMs: elapsed,
         userCount: response.body.data.length,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -235,14 +235,14 @@ describe('User Service Cache Validation Tests', () => {
   describe('Internal User Endpoints - Cache Validation Tests', () => {
     it.skip('should NOT hang when cached getUserBySubToken is called (validates fix)', async () => {
       const testUser = sharedTestData.customerUsers[0]
-      
+
       // Create a mock subtoken for testing (in real scenario, this would be from external auth)
       const mockSubToken = `auth0|${testUser.id.replace(/-/g, '')}`
-      
+
       // Update user with subToken for this test
       await testDb.prisma.user.update({
         where: { id: testUser.id },
-        data: { subToken: mockSubToken }
+        data: { subToken: mockSubToken },
       })
 
       // Prime the cache
@@ -263,12 +263,15 @@ describe('User Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(500)
       expect(response.body.subToken).toBe(mockSubToken)
-      
-      logger.info('GET /internal/users/sub-token/:token cache hit performance:', {
-        elapsedMs: elapsed,
-        subToken: mockSubToken.substring(0, 10) + '...',
-        status: 'PASS - No hanging detected'
-      })
+
+      logger.info(
+        'GET /internal/users/sub-token/:token cache hit performance:',
+        {
+          elapsedMs: elapsed,
+          subToken: mockSubToken.substring(0, 10) + '...',
+          status: 'PASS - No hanging detected',
+        },
+      )
     })
   })
 
@@ -279,9 +282,7 @@ describe('User Service Cache Validation Tests', () => {
   describe('Concurrent Requests Tests', () => {
     it('should handle concurrent user list requests without hanging', async () => {
       const promises = Array.from({ length: 5 }, (_, index) => {
-        return adminClient
-          .get('/admin/users?page=1&limit=3')
-          .timeout(3000) // Each request must complete within 3 seconds
+        return adminClient.get('/admin/users?page=1&limit=3').timeout(3000) // Each request must complete within 3 seconds
       })
 
       const start = Date.now()
@@ -297,28 +298,27 @@ describe('User Service Cache Validation Tests', () => {
 
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
+
       responses.forEach((response, index) => {
         expect(response.body).toEqual(firstResponse)
       })
 
       // Concurrent requests should complete reasonably quickly
       expect(elapsed).toBeLessThan(5000)
-      
+
       logger.info('Concurrent user list requests performance:', {
         requestCount: promises.length,
         totalElapsedMs: elapsed,
         averageMs: elapsed / promises.length,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
     it('should handle concurrent single user requests without hanging', async () => {
       const testUser = sharedTestData.customerUsers[0]
-      
+
       const promises = Array.from({ length: 3 }, () => {
-        return adminClient
-          .get(`/users/${testUser.id}`)
-          .timeout(3000)
+        return adminClient.get(`/users/${testUser.id}`).timeout(3000)
       })
 
       const start = Date.now()
@@ -332,12 +332,12 @@ describe('User Service Cache Validation Tests', () => {
       })
 
       expect(elapsed).toBeLessThan(4000)
-      
+
       logger.info('Concurrent single user requests performance:', {
         requestCount: promises.length,
         userId: testUser.id,
         totalElapsedMs: elapsed,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -365,11 +365,11 @@ describe('User Service Cache Validation Tests', () => {
 
       // Reconnect cache
       await cacheService.connect()
-      
+
       logger.info('User cache failure resilience test:', {
         elapsedMs: elapsed,
         userId: testUser.id,
-        status: 'PASS - Service continued without cache'
+        status: 'PASS - Service continued without cache',
       })
     })
   })
@@ -380,7 +380,7 @@ describe('User Service Cache Validation Tests', () => {
   describe('Cache Invalidation Tests', () => {
     it('should invalidate user cache when user data changes', async () => {
       const testUser = sharedTestData.customerUsers[0]
-      
+
       // Get initial user data (prime cache)
       const response1 = await adminClient
         .get(`/users/${testUser.id}`)
@@ -391,7 +391,7 @@ describe('User Service Cache Validation Tests', () => {
       // Update user data directly in database to simulate change
       await testDb.prisma.user.update({
         where: { id: testUser.id },
-        data: { firstName: 'UpdatedName' }
+        data: { firstName: 'UpdatedName' },
       })
 
       // Clear cache to simulate invalidation
@@ -406,18 +406,18 @@ describe('User Service Cache Validation Tests', () => {
       expect(response2.body.id).toBe(testUser.id)
       expect(response2.body.firstName).toBe('UpdatedName')
       expect(response2.body.firstName).not.toBe(originalFirstName)
-      
+
       // Restore original data
       await testDb.prisma.user.update({
         where: { id: testUser.id },
-        data: { firstName: originalFirstName }
+        data: { firstName: originalFirstName },
       })
-      
+
       logger.info('User cache invalidation test:', {
         userId: testUser.id,
         originalName: originalFirstName,
         updatedName: response2.body.firstName,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -436,16 +436,16 @@ describe('User Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Invalid user ID test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
     it('should handle non-existent user ID without hanging', async () => {
       const fakeUuid = '550e8400-e29b-41d4-a716-446655440000'
-      
+
       const start = Date.now()
       const response = await adminClient
         .get(`/users/${fakeUuid}`)
@@ -455,17 +455,17 @@ describe('User Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(2000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Non-existent user ID test:', {
         elapsedMs: elapsed,
         userId: fakeUuid,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
     it('should handle unauthorized access without hanging', async () => {
       const testUser = sharedTestData.customerUsers[0]
-      
+
       const start = Date.now()
       const response = await request
         .get(`/users/${testUser.id}`)
@@ -475,10 +475,10 @@ describe('User Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Unauthorized user access test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
@@ -492,10 +492,10 @@ describe('User Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       // Not all 404s return error field, just check response completed
-      
+
       logger.info('Malformed email test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
   })
@@ -507,7 +507,7 @@ describe('User Service Cache Validation Tests', () => {
   describe('User Verification Endpoints - Cache Validation', () => {
     it('should handle verification requests without hanging', async () => {
       const testUser = sharedTestData.customerUsers[0]
-      
+
       // Test email verification endpoint (may involve caching)
       const start = Date.now()
       const response = await adminClient
@@ -522,11 +522,11 @@ describe('User Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(3000)
       // 204 No Content may have empty body, just check it completed
-      
+
       logger.info('Email verification test:', {
         elapsedMs: elapsed,
         userId: testUser.id,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })

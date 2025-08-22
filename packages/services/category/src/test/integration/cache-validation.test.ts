@@ -1,11 +1,11 @@
 /**
  * Cache Validation Integration Tests for Category Service
  *
- * CRITICAL: These tests validate that the cache architecture fixes work correctly 
+ * CRITICAL: These tests validate that the cache architecture fixes work correctly
  * and prevent the hanging request bug from returning.
  *
- * The issue we fixed: @Cache decorators on controller methods cause HTTP requests 
- * to hang because when cache hits occur, the decorator returns cached data but 
+ * The issue we fixed: @Cache decorators on controller methods cause HTTP requests
+ * to hang because when cache hits occur, the decorator returns cached data but
  * never executes res.json(). We moved all caching to the service layer.
  */
 
@@ -18,9 +18,7 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
 import { createCategoryServer } from '@category/server.js'
-import {
-  createSharedCategoryTestData,
-} from '@category/test/helpers/categoryTestHelpers.js'
+import { createSharedCategoryTestData } from '@category/test/helpers/categoryTestHelpers.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -113,7 +111,7 @@ describe('Category Service Cache Validation Tests', () => {
     it('should NOT hang when GET /categories cache is hit (validates fix)', async () => {
       // This test validates the fix - controllers no longer have @Cache
       // so responses are properly sent even when cache is hit
-      
+
       // Prime the cache - first call should succeed
       await customerClient
         .get('/categories')
@@ -132,11 +130,11 @@ describe('Category Service Cache Validation Tests', () => {
       expect(elapsed).toBeLessThan(500) // Should be very fast with cache
       expect(response.body).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      
+
       logger.info('GET /categories cache hit performance:', {
         elapsedMs: elapsed,
         cacheHit: true,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
@@ -157,21 +155,22 @@ describe('Category Service Cache Validation Tests', () => {
 
       // Verify same data
       expect(response2.body).toEqual(response1.body)
-      
+
       // Second call should be significantly faster (cache hit)
       expect(time2).toBeLessThanOrEqual(time1)
-      
+
       logger.info('GET /categories cache performance test:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        speedup: time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
-        status: 'PASS'
+        speedup:
+          time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
+        status: 'PASS',
       })
     })
 
     it('should NOT hang when GET /categories/:id cache is hit (validates fix)', async () => {
       const testCategory = sharedTestData.activeParentCategories[0]
-      
+
       // Prime the cache - first call should succeed
       await customerClient
         .get(`/categories/${testCategory.id}`)
@@ -189,18 +188,18 @@ describe('Category Service Cache Validation Tests', () => {
       // Should complete quickly when hitting cache
       expect(elapsed).toBeLessThan(500)
       expect(response.body.id).toBe(testCategory.id)
-      
+
       logger.info('GET /categories/:id cache hit performance:', {
         elapsedMs: elapsed,
         categoryId: testCategory.id,
         cacheHit: true,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
     it('should NOT hang when GET /categories/hierarchy cache is hit (validates fix)', async () => {
       // Test the hierarchy endpoint which returns a tree structure
-      
+
       // Prime the cache
       await customerClient
         .get('/categories/hierarchy')
@@ -219,10 +218,10 @@ describe('Category Service Cache Validation Tests', () => {
       expect(response.body).toBeDefined()
       // Hierarchy endpoint likely returns an object with data array
       expect(response.body.data || response.body).toBeDefined()
-      
+
       logger.info('GET /categories/hierarchy cache hit performance:', {
         elapsedMs: elapsed,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -234,9 +233,7 @@ describe('Category Service Cache Validation Tests', () => {
   describe('Concurrent Requests Tests', () => {
     it('should handle concurrent category list requests without hanging', async () => {
       const promises = Array.from({ length: 5 }, (_, index) => {
-        return customerClient
-          .get('/categories?page=1&limit=5')
-          .timeout(3000) // Each request must complete within 3 seconds
+        return customerClient.get('/categories?page=1&limit=5').timeout(3000) // Each request must complete within 3 seconds
       })
 
       const start = Date.now()
@@ -252,24 +249,25 @@ describe('Category Service Cache Validation Tests', () => {
 
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
+
       responses.forEach((response, index) => {
         expect(response.body).toEqual(firstResponse)
       })
 
       // Concurrent requests should complete reasonably quickly
       expect(elapsed).toBeLessThan(5000)
-      
+
       logger.info('Concurrent category requests performance:', {
         requestCount: promises.length,
         totalElapsedMs: elapsed,
         averageMs: elapsed / promises.length,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
     it('should handle concurrent single category requests without hanging', async () => {
       const testCategory = sharedTestData.activeParentCategories[0]
-      
+
       const promises = Array.from({ length: 3 }, () => {
         return customerClient
           .get(`/categories/${testCategory.id}`)
@@ -287,12 +285,12 @@ describe('Category Service Cache Validation Tests', () => {
       })
 
       expect(elapsed).toBeLessThan(4000)
-      
+
       logger.info('Concurrent single category requests performance:', {
         requestCount: promises.length,
         categoryId: testCategory.id,
         totalElapsedMs: elapsed,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -319,10 +317,10 @@ describe('Category Service Cache Validation Tests', () => {
 
       // Reconnect cache
       await cacheService.connect()
-      
+
       logger.info('Category cache failure resilience test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Service continued without cache'
+        status: 'PASS - Service continued without cache',
       })
     })
   })
@@ -333,9 +331,7 @@ describe('Category Service Cache Validation Tests', () => {
   describe('Cache Invalidation Tests', () => {
     it('should invalidate category cache when category data changes', async () => {
       // Get initial category list (prime cache)
-      const response1 = await customerClient
-        .get('/categories')
-        .expect(200)
+      const response1 = await customerClient.get('/categories').expect(200)
 
       const initialCount = response1.body.data.length
 
@@ -343,18 +339,16 @@ describe('Category Service Cache Validation Tests', () => {
       await cacheService.delPattern('*category*')
 
       // Get categories again - should hit database again
-      const response2 = await customerClient
-        .get('/categories')
-        .expect(200)
+      const response2 = await customerClient.get('/categories').expect(200)
 
       // Should not hang and should return data
       expect(response2.body.data).toBeDefined()
       expect(Array.isArray(response2.body.data)).toBe(true)
-      
+
       logger.info('Category cache invalidation test:', {
         initialCount,
         afterInvalidationCount: response2.body.data.length,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -373,16 +367,16 @@ describe('Category Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Invalid category ID test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
     it('should handle non-existent category ID without hanging', async () => {
       const fakeUuid = '550e8400-e29b-41d4-a716-446655440000'
-      
+
       const start = Date.now()
       const response = await customerClient
         .get(`/categories/${fakeUuid}`)
@@ -392,11 +386,11 @@ describe('Category Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(2000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Non-existent category ID test:', {
         elapsedMs: elapsed,
         categoryId: fakeUuid,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
@@ -407,7 +401,7 @@ describe('Category Service Cache Validation Tests', () => {
         .send({
           nameKey: 'test.category',
           slug: 'test-cat',
-          level: 1
+          level: 1,
         })
         .timeout(2000)
         .expect(401) // Should return unauthorized, not hang
@@ -415,10 +409,10 @@ describe('Category Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Unauthorized admin access test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
   })

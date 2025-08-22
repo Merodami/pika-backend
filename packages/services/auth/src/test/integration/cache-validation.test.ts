@@ -1,11 +1,11 @@
 /**
  * Cache Validation Integration Tests for Auth Service
  *
- * CRITICAL: These tests validate that the cache architecture fixes work correctly 
+ * CRITICAL: These tests validate that the cache architecture fixes work correctly
  * and prevent the hanging request bug from returning.
  *
- * The issue we fixed: @Cache decorators on controller methods cause HTTP requests 
- * to hang because when cache hits occur, the decorator returns cached data but 
+ * The issue we fixed: @Cache decorators on controller methods cause HTTP requests
+ * to hang because when cache hits occur, the decorator returns cached data but
  * never executes res.json(). We moved all caching to the service layer.
  */
 
@@ -33,7 +33,6 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
-import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
@@ -109,7 +108,7 @@ describe('Auth Service Cache Validation Tests', () => {
         password: sharedTestData.testPassword || 'Password123!',
       })
       .expect(200)
-    
+
     customerAccessToken = customerLoginResponse.body.accessToken
 
     const adminLoginResponse = await request
@@ -120,7 +119,7 @@ describe('Auth Service Cache Validation Tests', () => {
         password: sharedTestData.testPassword || 'Password123!',
       })
       .expect(200)
-    
+
     adminAccessToken = adminLoginResponse.body.accessToken
 
     logger.debug('Auth Service Cache Validation setup complete')
@@ -146,7 +145,7 @@ describe('Auth Service Cache Validation Tests', () => {
     it('should NOT hang when userinfo endpoint cache is hit (validates fix)', async () => {
       // This test validates the fix - controllers no longer have @Cache
       // so responses are properly sent even when cache is hit
-      
+
       // Prime the cache - first call should succeed
       await request
         .get('/auth/userinfo')
@@ -168,11 +167,11 @@ describe('Auth Service Cache Validation Tests', () => {
       // Should complete quickly when hitting cache
       expect(elapsed).toBeLessThan(500) // Should be very fast with cache
       expect(response.body).toBeDefined()
-      
+
       logger.info('Userinfo cache hit performance:', {
         elapsedMs: elapsed,
         cacheHit: true,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
 
@@ -197,23 +196,24 @@ describe('Auth Service Cache Validation Tests', () => {
 
       // Verify same data
       expect(response2.body).toEqual(response1.body)
-      
+
       // Second call should be reasonably fast (cache hit)
       // Note: In test environment with MemoryCache, the difference may be minimal
       // Just ensure it completes quickly, not necessarily faster
       expect(time2).toBeLessThan(100) // Should be fast regardless
-      
+
       logger.info('Userinfo cache performance test:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        speedup: time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
-        status: 'PASS'
+        speedup:
+          time1 > 0 ? `${Math.round((time1 / time2) * 100) / 100}x` : 'N/A',
+        status: 'PASS',
       })
     })
 
     it('should handle concurrent userinfo requests without hanging', async () => {
       // This test ensures concurrent requests don't cause deadlocks or hanging
-      
+
       const promises = Array.from({ length: 5 }, (_, index) => {
         return request
           .get('/auth/userinfo')
@@ -234,18 +234,19 @@ describe('Auth Service Cache Validation Tests', () => {
 
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
+
       responses.forEach((response, index) => {
         expect(response.body).toEqual(firstResponse)
       })
 
       // Concurrent requests should complete reasonably quickly
       expect(elapsed).toBeLessThan(3000)
-      
+
       logger.info('Concurrent userinfo requests performance:', {
         requestCount: promises.length,
         totalElapsedMs: elapsed,
         averageMs: elapsed / promises.length,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -257,7 +258,7 @@ describe('Auth Service Cache Validation Tests', () => {
   describe('OAuth Token Introspection - No Hanging Tests', () => {
     it('should handle token introspection without hanging', async () => {
       // Multiple introspection calls with same token
-      
+
       const introspectData = {
         token: customerAccessToken,
       }
@@ -289,7 +290,7 @@ describe('Auth Service Cache Validation Tests', () => {
       logger.info('Token introspection performance:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -309,9 +310,10 @@ describe('Auth Service Cache Validation Tests', () => {
 
       // Mock a user update that should invalidate cache
       const customerUser = sharedTestData.testUser
+
       userServiceClient.updateUserMock({
         ...customerUser,
-        firstName: 'UpdatedName'
+        firstName: 'UpdatedName',
       })
 
       // Clear the specific cache entry to simulate invalidation
@@ -327,11 +329,11 @@ describe('Auth Service Cache Validation Tests', () => {
 
       // Should not hang and should return updated data
       expect(response2.body).toBeDefined()
-      
+
       logger.info('Cache invalidation test:', {
         originalData: response1.body,
         updatedData: response2.body,
-        status: 'PASS - No hanging detected'
+        status: 'PASS - No hanging detected',
       })
     })
   })
@@ -360,10 +362,10 @@ describe('Auth Service Cache Validation Tests', () => {
 
       // Reconnect cache
       await cacheService.connect()
-      
+
       logger.info('Cache failure resilience test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Service continued without cache'
+        status: 'PASS - Service continued without cache',
       })
     })
   })
@@ -385,10 +387,10 @@ describe('Auth Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Invalid token test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
 
@@ -403,10 +405,10 @@ describe('Auth Service Cache Validation Tests', () => {
 
       expect(elapsed).toBeLessThan(1000)
       expect(response.body.error).toBeDefined()
-      
+
       logger.info('Missing auth header test:', {
         elapsedMs: elapsed,
-        status: 'PASS - Proper error response, no hanging'
+        status: 'PASS - Proper error response, no hanging',
       })
     })
   })

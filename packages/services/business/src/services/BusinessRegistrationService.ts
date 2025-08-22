@@ -1,22 +1,27 @@
 import { businessPublic } from '@pika/api'
 
-type BusinessRegistrationStatusResponse = businessPublic.BusinessRegistrationStatusResponse
-type CompleteBusinessRegistrationRequest = businessPublic.CompleteBusinessRegistrationRequest
-type CompleteBusinessRegistrationResponse = businessPublic.CompleteBusinessRegistrationResponse
+type BusinessRegistrationStatusResponse =
+  businessPublic.BusinessRegistrationStatusResponse
+type CompleteBusinessRegistrationRequest =
+  businessPublic.CompleteBusinessRegistrationRequest
+type CompleteBusinessRegistrationResponse =
+  businessPublic.CompleteBusinessRegistrationResponse
 type RegistrationProgressResponse = businessPublic.RegistrationProgressResponse
-type SubmitRegistrationStepRequest = businessPublic.SubmitRegistrationStepRequest
-type SubmitRegistrationStepResponse = businessPublic.SubmitRegistrationStepResponse
+type SubmitRegistrationStepRequest =
+  businessPublic.SubmitRegistrationStepRequest
+type SubmitRegistrationStepResponse =
+  businessPublic.SubmitRegistrationStepResponse
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { Cache } from '@pika/redis'
 import type { UserServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
 import { BusinessRegistrationStatus, UserRole } from '@pika/types'
-import { Cache } from '@pika/redis'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import { BusinessRegistrationMapper } from '../mappers/BusinessRegistrationMapper.js'
+import type { IBusinessDetailsRepository } from '../repositories/BusinessDetailsRepository.js'
 import type { IBusinessRegistrationRepository } from '../repositories/BusinessRegistrationRepository.js'
 import type { IBusinessRepository } from '../repositories/BusinessRepository.js'
-import type { IBusinessDetailsRepository } from '../repositories/BusinessDetailsRepository.js'
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IBusinessRegistrationService {
   checkRegistrationStatus(
@@ -61,6 +66,7 @@ export class BusinessRegistrationService
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       // Use userId as the cache key
       const userId = args[0]
+
       return `${prefix}:${userId}`
     },
   })
@@ -68,12 +74,20 @@ export class BusinessRegistrationService
     userId: string,
   ): Promise<BusinessRegistrationStatusResponse> {
     try {
+      logger.info('Checking registration status', { userId })
+
       // Get user details to check role
       const user = await this.userServiceClient.getUser(userId)
 
       if (!user) {
         throw ErrorFactory.resourceNotFound('User', userId)
       }
+
+      logger.info('User details for registration check', {
+        userId,
+        role: user.role,
+        email: user.email,
+      })
 
       // Only business users need registration
       const isBusinessRole = user.role === UserRole.BUSINESS
@@ -82,16 +96,33 @@ export class BusinessRegistrationService
       const registration =
         await this.registrationRepository.findByUserId(userId)
 
+      logger.info('Registration lookup result', {
+        userId,
+        hasRegistration: !!registration,
+        registrationId: registration?.id,
+        status: registration?.registrationStatus,
+      })
+
       // Map to response
       const domain = registration
         ? BusinessRegistrationMapper.fromDocument(registration)
         : null
 
-      return BusinessRegistrationMapper.toStatusResponse(
+      const response = BusinessRegistrationMapper.toStatusResponse(
         domain,
         userId,
         isBusinessRole,
       )
+
+      logger.info('Registration status response', {
+        userId,
+        isBusinessRole,
+        needsRegistration: response.needsRegistration,
+        currentStep: response.currentStep,
+        canAccessDashboard: response.canAccessDashboard,
+      })
+
+      return response
     } catch (error) {
       logger.error('Error checking registration status', { userId, error })
       throw ErrorFactory.databaseError(
@@ -109,7 +140,9 @@ export class BusinessRegistrationService
   ): Promise<{ started: boolean; currentStep: number }> {
     try {
       // Check if user already has a business
-      const existingBusiness = await this.businessRepository.findByUserId(userId)
+      const existingBusiness =
+        await this.businessRepository.findByUserId(userId)
+
       if (existingBusiness) {
         throw ErrorFactory.businessRuleViolation(
           'BUSINESS_ALREADY_EXISTS',
@@ -169,7 +202,11 @@ export class BusinessRegistrationService
 
       if (!registration) {
         throw ErrorFactory.validationError(
-          { registration: ['Registration not found. Please start registration first.'] },
+          {
+            registration: [
+              'Registration not found. Please start registration first.',
+            ],
+          },
           { metadata: { userId, step: request.stepNumber } },
         )
       }
@@ -192,7 +229,7 @@ export class BusinessRegistrationService
               metadata: {
                 completedStep: request.stepNumber,
                 currentStep: domain.currentStep,
-              }
+              },
             },
           )
         }
@@ -204,12 +241,16 @@ export class BusinessRegistrationService
           )
         ) {
           throw ErrorFactory.validationError(
-            { step: ['Cannot skip steps. Please complete previous steps first.'] },
+            {
+              step: [
+                'Cannot skip steps. Please complete previous steps first.',
+              ],
+            },
             {
               metadata: {
                 currentStep: domain.currentStep,
                 requestedStep: request.stepNumber,
-              }
+              },
             },
           )
         }
@@ -222,7 +263,11 @@ export class BusinessRegistrationService
           )
         ) {
           throw ErrorFactory.validationError(
-            { stepData: ['Invalid step data. Please check all required fields.'] },
+            {
+              stepData: [
+                'Invalid step data. Please check all required fields.',
+              ],
+            },
             { metadata: { step: request.stepNumber } },
           )
         }
@@ -294,7 +339,9 @@ export class BusinessRegistrationService
       // Validate request
       if (!request.confirmAllDataAccurate || !request.agreedToTerms) {
         throw ErrorFactory.validationError(
-          { confirmation: ['You must confirm data accuracy and agree to terms'] },
+          {
+            confirmation: ['You must confirm data accuracy and agree to terms'],
+          },
           { metadata: { request } },
         )
       }
@@ -312,7 +359,11 @@ export class BusinessRegistrationService
       // Check if ready for submission
       if (!BusinessRegistrationMapper.isReadyForSubmission(domain)) {
         throw ErrorFactory.validationError(
-          { registration: ['Registration is not complete. Please complete all required steps.'] },
+          {
+            registration: [
+              'Registration is not complete. Please complete all required steps.',
+            ],
+          },
           { metadata: { currentStep: domain.currentStep } },
         )
       }
@@ -343,7 +394,7 @@ export class BusinessRegistrationService
         active: false, // Inactive until approved
         approved: false, // Needs admin approval
       })
-      
+
       // Store additional business details
       await this.businessDetailsRepository.create({
         businessId: business.id,
@@ -362,7 +413,7 @@ export class BusinessRegistrationService
         socialMedia: step3Data?.socialMedia,
         additionalInfo: step3Data?.additionalInfo,
       })
-      
+
       logger.info('Business and details created successfully', {
         businessId: business.id,
         hasAddress: !!step2Data.address,

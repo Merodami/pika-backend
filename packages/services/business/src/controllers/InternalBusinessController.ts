@@ -8,6 +8,7 @@ import {
 } from '@pika/http'
 import { BusinessMapper } from '@pika/sdk'
 import { parseIncludeParam } from '@pika/shared'
+import { BusinessSortByType } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -18,6 +19,7 @@ export class InternalBusinessController {
     // Bind methods to preserve 'this' context
     this.getBusinessById = this.getBusinessById.bind(this)
     this.getBusinessByUserId = this.getBusinessByUserId.bind(this)
+    this.getBusinessesByUserId = this.getBusinessesByUserId.bind(this)
     this.getBusinessesByIds = this.getBusinessesByIds.bind(this)
     this.getBusinessesByCategory = this.getBusinessesByCategory.bind(this)
   }
@@ -60,7 +62,7 @@ export class InternalBusinessController {
 
   /**
    * GET /internal/businesses/user/:user_id
-   * Get business by user ID for internal services
+   * Get business by user ID for internal services (returns single business)
    */
   async getBusinessByUserId(
     req: Request<shared.UserIdParam>,
@@ -86,6 +88,45 @@ export class InternalBusinessController {
         businessInternal.InternalBusinessData,
         response,
         'InternalBusinessController.getBusinessByUserId',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /internal/businesses/user/:user_id/all
+   * Get all businesses by user ID for internal services with pagination
+   */
+  async getBusinessesByUserId(
+    req: Request<shared.UserIdParam>,
+    res: Response<businessInternal.GetBusinessesByUserResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: userId } = req.params
+      const query = getValidatedQuery<businessInternal.GetBusinessesByUserRequest>(req)
+      const includes = parseIncludeParam(query.include, ['user', 'category'])
+
+      const result = await this.businessService.getAllBusinesses({
+        userId, // Filter by user ID
+        active: query.onlyActive,
+        verified: query.onlyVerified,
+        page: query.page,
+        limit: query.limit || PAGINATION_DEFAULT_LIMIT,
+        sortBy: query.sortBy as BusinessSortByType | undefined,
+        sortOrder: query.sortOrder,
+        parsedIncludes: includes,
+      })
+
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, BusinessMapper.toDTO)
+      const validatedResponse = validateResponse(
+        businessInternal.GetBusinessesByUserResponse,
+        response,
+        'InternalBusinessController.getBusinessesByUserId',
       )
 
       res.json(validatedResponse)
@@ -157,14 +198,7 @@ export class InternalBusinessController {
         verified: query.onlyVerified,
         page: query.page,
         limit: query.limit || PAGINATION_DEFAULT_LIMIT,
-        sortBy: query.sortBy as
-          | 'businessName'
-          | 'avgRating'
-          | 'verified'
-          | 'active'
-          | 'createdAt'
-          | 'updatedAt'
-          | undefined,
+        sortBy: query.sortBy as BusinessSortByType | undefined,
         sortOrder: query.sortOrder,
         parsedIncludes: includes,
       })

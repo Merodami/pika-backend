@@ -115,6 +115,7 @@ export class AdminVoucherService implements IAdminVoucherService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
       const language = args[1] || 'en'
+
       return `${prefix}:${language}:${JSON.stringify(params)}`
     },
   })
@@ -149,6 +150,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       const id = args[0]
       const parsedIncludes = args[1]
       const language = args[2] || 'en'
+
       return `${prefix}:${id}:${language}:${JSON.stringify(parsedIncludes || {})}`
     },
   })

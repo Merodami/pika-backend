@@ -4,8 +4,6 @@
   "properties": {
     "avatar": {}
   },
-  "required": [
-    "avatar"
-  ],
+  "required": ["avatar"],
   "additionalProperties": false
 }

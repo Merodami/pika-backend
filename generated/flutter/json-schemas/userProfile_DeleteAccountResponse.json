@@ -10,9 +10,6 @@
       "description": "When the account will be permanently deleted"
     }
   },
-  "required": [
-    "message",
-    "deletionDate"
-  ],
+  "required": ["message", "deletionDate"],
   "additionalProperties": false
 }

@@ -107,8 +107,8 @@ export function createAdminUserRouter(
     controller.updateUser,
   )
 
-  // PUT /admin/users/:id/status - Update user status
-  router.put(
+  // PATCH /admin/users/:id/status - Update user status
+  router.patch(
     '/:id/status',
     requireAuth(),
     requirePermissions('admin:users'),

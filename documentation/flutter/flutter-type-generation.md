@@ -57,11 +57,13 @@ export const LoginResponseSchema = z.object({...})
 ### 3. Conversion Process
 
 #### Native Zod 4 Conversion
+
 ```typescript
 const jsonSchema = zodSchema.toJSONSchema()
 ```
 
 #### QuickType Generation
+
 ```typescript
 await quicktype({
   lang: 'dart',
@@ -74,13 +76,14 @@ await quicktype({
     'use-freezed': 'false',
     'use-hive': 'false',
     'part-name': moduleName,
-  }
+  },
 })
 ```
 
 ### 4. Deduplication Strategy
 
 When combined schema generation fails, the script:
+
 1. Generates individual schemas separately
 2. Tracks duplicate definitions (enums, classes, variables)
 3. Skips duplicates when combining files
@@ -106,11 +109,13 @@ if (line.startsWith('enum ')) {
 ### Prerequisites
 
 1. **Backend Dependencies**
+
 ```bash
 yarn add --dev quicktype quicktype-core glob
 ```
 
 2. **Flutter Dependencies**
+
 ```yaml
 # pubspec.yaml
 dependencies:
@@ -121,6 +126,7 @@ dependencies:
 ### Configuration
 
 1. **Package.json Script**
+
 ```json
 {
   "scripts": {
@@ -130,6 +136,7 @@ dependencies:
 ```
 
 2. **Environment Variables** (Optional)
+
 ```bash
 FLUTTER_PROJECT_PATH=/path/to/flutter/project
 ```
@@ -145,6 +152,7 @@ yarn generate:flutter-types
 ```
 
 Output:
+
 ```
 🚀 Starting Flutter type generation from Zod schemas...
 📂 Processing domain: auth
@@ -160,12 +168,14 @@ Output:
 ### Using Generated Types in Flutter
 
 #### 1. Import Generated Types
+
 ```dart
 import 'package:your_app/generated/api/auth_login.dart';
 import 'package:your_app/generated/api/user_profile.dart' as api;
 ```
 
 #### 2. API Service Implementation
+
 ```dart
 class ApiService {
   Future<AuthTokensResponse> login({
@@ -176,7 +186,7 @@ class ApiService {
       Uri.parse('$baseUrl/auth/login'),
       body: jsonEncode({'email': email, 'password': password}),
     );
-    
+
     if (response.statusCode == 200) {
       return AuthTokensResponse.fromJson(jsonDecode(response.body));
     }
@@ -186,17 +196,18 @@ class ApiService {
 ```
 
 #### 3. Using in Widgets
+
 ```dart
 class ProfileScreen extends StatefulWidget {
   api.CurrentUserProfile? profile;
-  
+
   Widget _buildRoleBadge(api.Role role) {
     final config = switch (role) {
       api.Role.ADMIN => ('Admin', Colors.red),
       api.Role.BUSINESS => ('Business', Colors.blue),
       api.Role.CUSTOMER => ('Customer', Colors.green),
     };
-    
+
     return Badge(text: config.$1, color: config.$2);
   }
 }
@@ -205,7 +216,9 @@ class ProfileScreen extends StatefulWidget {
 ## Type Safety Features
 
 ### 1. Null Safety
+
 All generated types use Dart's null safety:
+
 ```dart
 class CurrentUserProfile {
   final String id;          // Required
@@ -214,7 +227,9 @@ class CurrentUserProfile {
 ```
 
 ### 2. Enum Support
+
 Enums are generated with mapping utilities:
+
 ```dart
 enum Role { ADMIN, BUSINESS, CUSTOMER }
 
@@ -226,7 +241,9 @@ final roleValues = EnumValues({
 ```
 
 ### 3. Nested Objects
+
 Complex nested structures are properly handled:
+
 ```dart
 class BusinessListResponse {
   final List<Datum> data;
@@ -241,7 +258,9 @@ class Pagination {
 ```
 
 ### 4. Date/Time Handling
+
 DateTime fields are serialized as ISO strings:
+
 ```dart
 factory Session.fromJson(Map<String, dynamic> json) => Session(
   createdAt: DateTime.parse(json["createdAt"]),
@@ -256,6 +275,7 @@ factory Session.fromJson(Map<String, dynamic> json) => Session(
 **Problem**: Multiple schemas define the same enum (e.g., `Role`, `Status`)
 
 **Solution**: The script automatically deduplicates enums:
+
 - Tracks seen enum names
 - Skips duplicate definitions
 - Preserves the first occurrence
@@ -265,6 +285,7 @@ factory Session.fromJson(Map<String, dynamic> json) => Session(
 **Problem**: Generated types conflict with Flutter's built-in types (e.g., `Theme`)
 
 **Solution**: Use aliased imports:
+
 ```dart
 import '../generated/api/user_profile.dart' as api;
 
@@ -277,6 +298,7 @@ api.Theme userTheme = api.Theme.DARK;
 **Problem**: "s.codePointAt is not a function" error
 
 **Solution**: The script has automatic fallback:
+
 1. Tries combined generation first
 2. Falls back to individual schema generation
 3. Combines with deduplication
@@ -286,20 +308,22 @@ api.Theme userTheme = api.Theme.DARK;
 **Problem**: Custom types not serializing correctly
 
 **Solution**: Ensure Zod schemas use supported types:
+
 ```typescript
 // ✅ Good
-z.string().datetime()  // ISO datetime string
-z.number()            // Numeric values
-z.boolean()           // Boolean flags
+z.string().datetime() // ISO datetime string
+z.number() // Numeric values
+z.boolean() // Boolean flags
 
 // ❌ Avoid
-z.date()             // Use z.string().datetime() instead
-z.map()              // Use z.record() instead
+z.date() // Use z.string().datetime() instead
+z.map() // Use z.record() instead
 ```
 
 ## Best Practices
 
 ### 1. Schema Naming Convention
+
 ```typescript
 // Use descriptive suffixes
 export const LoginRequestSchema = z.object({...})
@@ -308,7 +332,9 @@ export const UserProfileSchema = z.object({...})
 ```
 
 ### 2. Shared Types
+
 Create common schemas for reused types:
+
 ```typescript
 // common.schema.ts
 export const PaginationSchema = z.object({
@@ -325,7 +351,9 @@ export const UsersListResponseSchema = z.object({
 ```
 
 ### 3. Documentation
+
 Add JSDoc comments to schemas:
+
 ```typescript
 export const UserSchema = z.object({
   /** Unique user identifier */
@@ -336,6 +364,7 @@ export const UserSchema = z.object({
 ```
 
 ### 4. Version Control
+
 - Commit generated files for consistency
 - Include generation in CI/CD pipeline
 - Document breaking changes
@@ -343,6 +372,7 @@ export const UserSchema = z.object({
 ## Testing
 
 ### Unit Tests
+
 ```dart
 test('User serialization works correctly', () {
   final user = User(
@@ -350,10 +380,10 @@ test('User serialization works correctly', () {
     email: 'test@example.com',
     role: Role.CUSTOMER,
   );
-  
+
   final json = user.toJson();
   final parsed = User.fromJson(json);
-  
+
   expect(parsed.id, equals(user.id));
   expect(parsed.email, equals(user.email));
   expect(parsed.role, equals(user.role));
@@ -361,15 +391,16 @@ test('User serialization works correctly', () {
 ```
 
 ### Integration Tests
+
 ```dart
 test('API call with generated types', () async {
   final apiService = ApiService();
-  
+
   final response = await apiService.login(
     email: 'test@example.com',
     password: 'password123',
   );
-  
+
   expect(response, isA<AuthTokensResponse>());
   expect(response.accessToken, isNotEmpty);
 });
@@ -378,18 +409,21 @@ test('API call with generated types', () async {
 ## Maintenance
 
 ### Updating Types
+
 1. Modify Zod schemas in backend
 2. Run `yarn generate:flutter-types`
 3. Test in Flutter app
 4. Commit both schema and generated files
 
 ### Adding New Domains
+
 1. Create schemas in `/src/domains/[new-domain]/schemas/`
 2. Follow naming convention: `*.schema.ts`
 3. Run generation script
 4. New files appear in `/generated/flutter/`
 
 ### Monitoring
+
 - Check generation stats in console output
 - Review README.md in generated folder
 - Validate with `flutter analyze`
@@ -408,6 +442,7 @@ test('API call with generated types', () async {
 ## Support
 
 For issues or improvements:
+
 1. Check existing schemas for examples
 2. Review generation script logs
 3. Test with simplified schemas first

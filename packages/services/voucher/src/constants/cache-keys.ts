@@ -1,6 +1,6 @@
 /**
  * Cache key constants for voucher service
- * 
+ *
  * Pattern: service:entity[-modifier]:identifier
  * - Use colons (:) for hierarchy levels
  * - Use hyphens (-) for compound words within a level
@@ -19,7 +19,7 @@ export const CACHE_KEYS = {
     POPULAR: 'service:vouchers:popular',
     VALIDATED: 'service:voucher:validated',
   },
-  
+
   // Redemption cache keys
   REDEMPTION: {
     LIST: 'service:redemptions',
@@ -28,7 +28,7 @@ export const CACHE_KEYS = {
     VOUCHER: 'service:redemptions:voucher',
     BUSINESS: 'service:redemptions:business',
   },
-  
+
   // Admin cache keys
   ADMIN: {
     VOUCHERS: 'service:admin:vouchers',
@@ -36,7 +36,7 @@ export const CACHE_KEYS = {
     STATS: 'service:admin:voucher:stats',
     ANALYTICS: 'service:admin:voucher:analytics',
   },
-  
+
   // Internal service cache keys
   INTERNAL: {
     VOUCHERS: 'service:internal:vouchers',
@@ -53,9 +53,14 @@ export const CACHE_KEYS = {
 export const generateCacheKey = {
   voucherById: (id: string) => `${CACHE_KEYS.VOUCHER.SINGLE}:${id}`,
   voucherByCode: (code: string) => `${CACHE_KEYS.VOUCHER.BY_CODE}:${code}`,
-  vouchersByBusiness: (businessId: string) => `${CACHE_KEYS.VOUCHER.BY_BUSINESS}:${businessId}`,
-  userVouchers: (userId: string) => `${CACHE_KEYS.VOUCHER.USER_VOUCHERS}:${userId}`,
-  voucherList: (params: any) => `${CACHE_KEYS.VOUCHER.LIST}:${JSON.stringify(params)}`,
-  redemptionsByUser: (userId: string) => `${CACHE_KEYS.REDEMPTION.USER}:${userId}`,
-  redemptionsByVoucher: (voucherId: string) => `${CACHE_KEYS.REDEMPTION.VOUCHER}:${voucherId}`,
+  vouchersByBusiness: (businessId: string) =>
+    `${CACHE_KEYS.VOUCHER.BY_BUSINESS}:${businessId}`,
+  userVouchers: (userId: string) =>
+    `${CACHE_KEYS.VOUCHER.USER_VOUCHERS}:${userId}`,
+  voucherList: (params: any) =>
+    `${CACHE_KEYS.VOUCHER.LIST}:${JSON.stringify(params)}`,
+  redemptionsByUser: (userId: string) =>
+    `${CACHE_KEYS.REDEMPTION.USER}:${userId}`,
+  redemptionsByVoucher: (voucherId: string) =>
+    `${CACHE_KEYS.REDEMPTION.VOUCHER}:${voucherId}`,
 }

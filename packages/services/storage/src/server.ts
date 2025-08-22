@@ -16,7 +16,7 @@ export interface ServerConfig {
 export async function createStorageServer(config: ServerConfig) {
   // Set up global cache service for decorators
   setCacheService(config.cacheService)
-  
+
   const app = await createExpressServer({
     serviceName: 'storage-service',
     port: config.port,

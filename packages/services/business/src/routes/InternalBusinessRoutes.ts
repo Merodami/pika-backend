@@ -39,12 +39,20 @@ export function createInternalBusinessRoutes(
     controller.getBusinessById,
   )
 
-  // GET /internal/businesses/user/:id - Get business by user ID
+  // GET /internal/businesses/user/:id - Get business by user ID (single business)
   router.get(
     '/user/:id',
     validateParams(shared.UserIdParam),
     validateQuery(businessInternal.GetBusinessRequest),
     controller.getBusinessByUserId,
+  )
+
+  // GET /internal/businesses/user/:id/all - Get all businesses by user ID (paginated)
+  router.get(
+    '/user/:id/all',
+    validateParams(shared.UserIdParam),
+    validateQuery(businessInternal.GetBusinessesByUserRequest),
+    controller.getBusinessesByUserId,
   )
 
   // POST /internal/businesses/batch - Get multiple businesses by IDs

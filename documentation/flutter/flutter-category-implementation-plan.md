@@ -22,6 +22,7 @@ The Flutter app has access to these generated category types from Zod schemas:
 ### 1.2 Category Data Structure
 
 Categories support a hierarchical structure with key properties:
+
 - **id**: UUID identifier
 - **nameKey**: Translation key for localization
 - **descriptionKey**: Optional description translation key
@@ -36,6 +37,7 @@ Categories support a hierarchical structure with key properties:
 ### 1.3 Available API Endpoints
 
 Based on the generated schemas, the category service likely provides:
+
 1. `GET /categories` - Paginated list with filtering
 2. `GET /categories/hierarchy` - Full tree structure
 3. `GET /categories/{id}` - Single category details
@@ -94,7 +96,7 @@ import 'api_service.dart';
 
 class CategoryService {
   final ApiService _apiService;
-  
+
   // Cache for hierarchy data
   cat.CategoryHierarchyResponse? _cachedHierarchy;
   DateTime? _hierarchyCacheTime;
@@ -132,8 +134,8 @@ class CategoryService {
     bool forceRefresh = false,
   }) async {
     // Check cache validity
-    if (!forceRefresh && 
-        _cachedHierarchy != null && 
+    if (!forceRefresh &&
+        _cachedHierarchy != null &&
         _hierarchyCacheTime != null &&
         DateTime.now().difference(_hierarchyCacheTime!) < _cacheValidityDuration) {
       return _cachedHierarchy!;
@@ -150,7 +152,7 @@ class CategoryService {
 
     _cachedHierarchy = cat.CategoryHierarchyResponse.fromJson(response.data);
     _hierarchyCacheTime = DateTime.now();
-    
+
     return _cachedHierarchy!;
   }
 
@@ -186,26 +188,26 @@ import '../services/category_service.dart';
 
 class CategoryProvider extends ChangeNotifier {
   final CategoryService _categoryService;
-  
+
   // State
   cat.CategoryHierarchyResponse? _hierarchy;
   cat.CategoryListResponse? _categoryList;
   cat.CategoryResponse? _selectedCategory;
   cat.CategoryPathResponse? _breadcrumb;
-  
+
   bool _isLoadingHierarchy = false;
   bool _isLoadingList = false;
   String? _error;
-  
+
   // View mode
   CategoryViewMode _viewMode = CategoryViewMode.hierarchy;
-  
+
   // Filters
   String? _searchQuery;
   String? _selectedParentId;
-  
+
   CategoryProvider(this._categoryService);
-  
+
   // Getters
   cat.CategoryHierarchyResponse? get hierarchy => _hierarchy;
   cat.CategoryListResponse? get categoryList => _categoryList;
@@ -213,18 +215,18 @@ class CategoryProvider extends ChangeNotifier {
   bool get isLoading => _isLoadingHierarchy || _isLoadingList;
   String? get error => _error;
   CategoryViewMode get viewMode => _viewMode;
-  
+
   // Load hierarchy view
   Future<void> loadHierarchy({bool forceRefresh = false}) async {
     try {
       _isLoadingHierarchy = true;
       _error = null;
       notifyListeners();
-      
+
       _hierarchy = await _categoryService.getCategoryHierarchy(
         forceRefresh: forceRefresh,
       );
-      
+
       _isLoadingHierarchy = false;
       notifyListeners();
     } catch (e) {
@@ -233,7 +235,7 @@ class CategoryProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Load list view with pagination
   Future<void> loadCategoryList({
     int page = 1,
@@ -243,13 +245,13 @@ class CategoryProvider extends ChangeNotifier {
       _isLoadingList = true;
       _error = null;
       notifyListeners();
-      
+
       final response = await _categoryService.getCategories(
         page: page,
         search: _searchQuery,
         parentId: _selectedParentId,
       );
-      
+
       if (append && _categoryList != null) {
         // Append for infinite scroll
         _categoryList = cat.CategoryListResponse(
@@ -259,7 +261,7 @@ class CategoryProvider extends ChangeNotifier {
       } else {
         _categoryList = response;
       }
-      
+
       _isLoadingList = false;
       notifyListeners();
     } catch (e) {
@@ -268,7 +270,7 @@ class CategoryProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Select category
   Future<void> selectCategory(String categoryId) async {
     try {
@@ -280,24 +282,24 @@ class CategoryProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Search categories
   void searchCategories(String query) {
     _searchQuery = query;
     loadCategoryList();
   }
-  
+
   // Filter by parent
   void filterByParent(String? parentId) {
     _selectedParentId = parentId;
     loadCategoryList();
   }
-  
+
   // Switch view mode
   void setViewMode(CategoryViewMode mode) {
     _viewMode = mode;
     notifyListeners();
-    
+
     if (mode == CategoryViewMode.hierarchy && _hierarchy == null) {
       loadHierarchy();
     } else if (mode == CategoryViewMode.list && _categoryList == null) {
@@ -365,7 +367,7 @@ class CategoryListParams {
   final int limit;
   final String? search;
   final String? parentId;
-  
+
   CategoryListParams({
     this.page = 1,
     this.limit = 20,
@@ -447,7 +449,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           if (provider.isLoading && provider.hierarchy == null) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (provider.error != null) {
             return Center(
               child: Column(
@@ -462,7 +464,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
             );
           }
-          
+
           // Switch between view modes
           switch (provider.viewMode) {
             case CategoryViewMode.hierarchy:
@@ -481,7 +483,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               );
             case CategoryViewMode.grid:
               return CategoryGridView(
-                categories: provider.categoryList?.data ?? 
+                categories: provider.categoryList?.data ??
                            provider.hierarchy?.data ?? [],
                 onCategoryTap: _handleCategorySelection,
               );
@@ -490,7 +492,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       ),
     );
   }
-  
+
   void _handleCategorySelection(String categoryId) {
     context.read<CategoryProvider>().selectCategory(categoryId);
     Navigator.pushNamed(
@@ -499,7 +501,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       arguments: categoryId,
     );
   }
-  
+
   void _showSearchDialog() {
     showDialog(
       context: context,
@@ -519,7 +521,7 @@ import '../generated/api/category_category.dart' as cat;
 class CategoryHierarchyView extends StatelessWidget {
   final cat.CategoryHierarchyResponse? hierarchy;
   final Function(String) onCategoryTap;
-  
+
   const CategoryHierarchyView({
     super.key,
     required this.hierarchy,
@@ -554,7 +556,7 @@ class CategoryTreeItem extends StatefulWidget {
   final cat.CategoryHierarchyResponseDatum category;
   final Function(String) onTap;
   final int level;
-  
+
   const CategoryTreeItem({
     super.key,
     required this.category,
@@ -568,12 +570,12 @@ class CategoryTreeItem extends StatefulWidget {
 
 class _CategoryTreeItemState extends State<CategoryTreeItem> {
   bool _isExpanded = false;
-  
+
   @override
   Widget build(BuildContext context) {
     final hasChildren = widget.category.children?.isNotEmpty ?? false;
     final indent = widget.level * 16.0;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -594,8 +596,8 @@ class _CategoryTreeItemState extends State<CategoryTreeItem> {
                     : null,
                 trailing: hasChildren
                     ? IconButton(
-                        icon: Icon(_isExpanded 
-                            ? Icons.expand_less 
+                        icon: Icon(_isExpanded
+                            ? Icons.expand_less
                             : Icons.expand_more),
                         onPressed: () {
                           setState(() {
@@ -608,7 +610,7 @@ class _CategoryTreeItemState extends State<CategoryTreeItem> {
             ),
           ),
         ),
-        
+
         // Render children if expanded
         if (_isExpanded && hasChildren)
           ...widget.category.children!.map((child) => CategoryTreeItem(
@@ -619,7 +621,7 @@ class _CategoryTreeItemState extends State<CategoryTreeItem> {
       ],
     );
   }
-  
+
   Widget _buildIcon() {
     if (widget.category.icon != null) {
       // Icon mapping logic
@@ -627,7 +629,7 @@ class _CategoryTreeItemState extends State<CategoryTreeItem> {
     }
     return const Icon(Icons.category);
   }
-  
+
   Widget _getIconFromIdentifier(String iconId) {
     // Map icon identifiers to Flutter icons
     final iconMap = {
@@ -641,10 +643,10 @@ class _CategoryTreeItemState extends State<CategoryTreeItem> {
       'sports': Icons.sports,
       // Add more mappings
     };
-    
+
     return Icon(iconMap[iconId] ?? Icons.category);
   }
-  
+
   String _getLocalizedName(String nameKey) {
     // TODO: Implement localization
     // For now, return the key formatted
@@ -652,7 +654,7 @@ class _CategoryTreeItemState extends State<CategoryTreeItem> {
         .map((word) => word[0].toUpperCase() + word.substring(1))
         .join(' ');
   }
-  
+
   String _getLocalizedDescription(String descKey) {
     // TODO: Implement localization
     return descKey.replaceAll('_', ' ');
@@ -671,7 +673,7 @@ class CategoryListView extends StatefulWidget {
   final cat.CategoryListResponse? categoryList;
   final Function(String) onCategoryTap;
   final VoidCallback onLoadMore;
-  
+
   const CategoryListView({
     super.key,
     required this.categoryList,
@@ -685,15 +687,15 @@ class CategoryListView extends StatefulWidget {
 
 class _CategoryListViewState extends State<CategoryListView> {
   final ScrollController _scrollController = ScrollController();
-  
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
   }
-  
+
   void _onScroll() {
-    if (_scrollController.position.pixels >= 
+    if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
       // Load more when near bottom
       if (widget.categoryList?.pagination.hasNext ?? false) {
@@ -701,16 +703,16 @@ class _CategoryListViewState extends State<CategoryListView> {
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     if (widget.categoryList == null || widget.categoryList!.data.isEmpty) {
       return const Center(child: Text('No categories found'));
     }
-    
+
     return ListView.builder(
       controller: _scrollController,
-      itemCount: widget.categoryList!.data.length + 
+      itemCount: widget.categoryList!.data.length +
                  (widget.categoryList!.pagination.hasNext ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= widget.categoryList!.data.length) {
@@ -721,7 +723,7 @@ class _CategoryListViewState extends State<CategoryListView> {
             ),
           );
         }
-        
+
         final category = widget.categoryList!.data[index];
         return CategoryListItem(
           category: category,
@@ -730,7 +732,7 @@ class _CategoryListViewState extends State<CategoryListView> {
       },
     );
   }
-  
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -741,13 +743,13 @@ class _CategoryListViewState extends State<CategoryListView> {
 class CategoryListItem extends StatelessWidget {
   final cat.CategoryListResponseDatum category;
   final VoidCallback onTap;
-  
+
   const CategoryListItem({
     super.key,
     required this.category,
     required this.onTap,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -792,20 +794,20 @@ class CacheService {
   static const String _categoryListKey = 'category_list_cache';
   static const String _cacheTimestampKey = 'cache_timestamp';
   static const Duration _cacheValidity = Duration(hours: 1);
-  
+
   final SharedPreferences _prefs;
-  
+
   CacheService(this._prefs);
-  
+
   Future<T?> getCached<T>(
-    String key, 
+    String key,
     T Function(Map<String, dynamic>) fromJson,
   ) async {
     final timestampKey = '${key}_timestamp';
     final timestamp = _prefs.getInt(timestampKey);
-    
+
     if (timestamp == null) return null;
-    
+
     final age = DateTime.now().millisecondsSinceEpoch - timestamp;
     if (age > _cacheValidity.inMilliseconds) {
       // Cache expired
@@ -813,10 +815,10 @@ class CacheService {
       await _prefs.remove(timestampKey);
       return null;
     }
-    
+
     final jsonString = _prefs.getString(key);
     if (jsonString == null) return null;
-    
+
     try {
       final json = jsonDecode(jsonString);
       return fromJson(json);
@@ -827,7 +829,7 @@ class CacheService {
       return null;
     }
   }
-  
+
   Future<void> cache<T>(
     String key,
     T data,
@@ -835,19 +837,19 @@ class CacheService {
   ) async {
     final timestampKey = '${key}_timestamp';
     final jsonString = jsonEncode(toJson(data));
-    
+
     await _prefs.setString(key, jsonString);
     await _prefs.setInt(
-      timestampKey, 
+      timestampKey,
       DateTime.now().millisecondsSinceEpoch,
     );
   }
-  
+
   Future<void> clearCache() async {
     final keys = _prefs.getKeys()
         .where((key) => key.startsWith('category_'))
         .toList();
-    
+
     for (final key in keys) {
       await _prefs.remove(key);
     }
@@ -866,14 +868,14 @@ class CategoryImage extends StatelessWidget {
   final String? imageUrl;
   final String? iconIdentifier;
   final double size;
-  
+
   const CategoryImage({
     super.key,
     this.imageUrl,
     this.iconIdentifier,
     this.size = 48,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     if (imageUrl != null) {
@@ -893,10 +895,10 @@ class CategoryImage extends StatelessWidget {
         errorWidget: (context, url, error) => _buildFallbackIcon(),
       );
     }
-    
+
     return _buildFallbackIcon();
   }
-  
+
   Widget _buildFallbackIcon() {
     return Container(
       width: size,
@@ -912,10 +914,10 @@ class CategoryImage extends StatelessWidget {
       ),
     );
   }
-  
+
   IconData _getIconFromIdentifier(String? id) {
     if (id == null) return Icons.category;
-    
+
     // Map identifiers to icons
     final iconMap = {
       'food': Icons.restaurant,
@@ -923,7 +925,7 @@ class CategoryImage extends StatelessWidget {
       'entertainment': Icons.movie,
       // ... more mappings
     };
-    
+
     return iconMap[id] ?? Icons.category;
   }
 }
@@ -939,13 +941,13 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 class VirtualCategoryList extends StatelessWidget {
   final List<dynamic> categories;
   final Function(String) onCategoryTap;
-  
+
   const VirtualCategoryList({
     super.key,
     required this.categories,
     required this.onCategoryTap,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return AnimationLimiter(
@@ -999,16 +1001,16 @@ class LocalizationService {
       // ... more translations
     },
   };
-  
+
   static String translate(String key, BuildContext context) {
     final locale = Localizations.localeOf(context);
     final languageCode = locale.languageCode;
-    
-    return _translations[languageCode]?[key] ?? 
-           _translations['en']?[key] ?? 
+
+    return _translations[languageCode]?[key] ??
+           _translations['en']?[key] ??
            _formatKey(key);
   }
-  
+
   static String _formatKey(String key) {
     // Fallback: format the key nicely
     return key
@@ -1031,14 +1033,14 @@ class ErrorStateWidget extends StatelessWidget {
   final String error;
   final VoidCallback onRetry;
   final IconData icon;
-  
+
   const ErrorStateWidget({
     super.key,
     required this.error,
     required this.onRetry,
     this.icon = Icons.error_outline,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -1083,14 +1085,14 @@ class EmptyStateWidget extends StatelessWidget {
   final String message;
   final IconData icon;
   final Widget? action;
-  
+
   const EmptyStateWidget({
     super.key,
     required this.message,
     this.icon = Icons.inbox,
     this.action,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -1133,36 +1135,36 @@ void main() {
   group('CategoryService', () {
     late CategoryService categoryService;
     late MockApiService mockApiService;
-    
+
     setUp(() {
       mockApiService = MockApiService();
       categoryService = CategoryService(mockApiService);
     });
-    
+
     test('getCategories returns CategoryListResponse', () async {
       when(mockApiService.get(any, queryParameters: anyNamed('queryParameters')))
           .thenAnswer((_) async => Response(data: mockCategoryListJson));
-      
+
       final result = await categoryService.getCategories();
-      
+
       expect(result, isA<CategoryListResponse>());
       expect(result.data.length, greaterThan(0));
     });
-    
+
     test('getCategoryHierarchy uses cache when valid', () async {
       // First call - fetches from API
       when(mockApiService.get(any, queryParameters: anyNamed('queryParameters')))
           .thenAnswer((_) async => Response(data: mockHierarchyJson));
-      
+
       await categoryService.getCategoryHierarchy();
-      
+
       // Second call - should use cache
       final cachedResult = await categoryService.getCategoryHierarchy();
-      
+
       // Verify API was called only once
       verify(mockApiService.get(any, queryParameters: anyNamed('queryParameters')))
           .called(1);
-      
+
       expect(cachedResult, isNotNull);
     });
   });
@@ -1191,7 +1193,7 @@ void main() {
           ),
         ],
       );
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -1202,16 +1204,16 @@ void main() {
           ),
         ),
       );
-      
+
       expect(find.text('Food'), findsOneWidget);
       expect(find.byType(CategoryTreeItem), findsWidgets);
     });
-    
+
     testWidgets('expands/collapses categories with children', (tester) async {
       // Test expand/collapse functionality
       await tester.tap(find.byIcon(Icons.expand_more).first);
       await tester.pumpAndSettle();
-      
+
       expect(find.byIcon(Icons.expand_less), findsOneWidget);
     });
   });
@@ -1227,28 +1229,28 @@ import 'package:integration_test/integration_test.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  
+
   group('Category Flow Integration', () {
     testWidgets('Complete category selection flow', (tester) async {
       await tester.pumpWidget(MyApp());
-      
+
       // Navigate to categories
       await tester.tap(find.text('Categories'));
       await tester.pumpAndSettle();
-      
+
       // Verify hierarchy loads
       expect(find.byType(CategoryHierarchyView), findsOneWidget);
-      
+
       // Switch to list view
       await tester.tap(find.byIcon(Icons.list));
       await tester.pumpAndSettle();
-      
+
       expect(find.byType(CategoryListView), findsOneWidget);
-      
+
       // Select a category
       await tester.tap(find.text('Food & Dining').first);
       await tester.pumpAndSettle();
-      
+
       // Verify navigation to detail
       expect(find.text('Category Details'), findsOneWidget);
     });
@@ -1259,30 +1261,35 @@ void main() {
 ## 8. Implementation Timeline
 
 ### Phase 1: Foundation (2-3 days)
+
 - [ ] Set up CategoryService with API integration
 - [ ] Implement generated type imports and usage
 - [ ] Create basic Provider/Riverpod setup
 - [ ] Add caching service
 
 ### Phase 2: Core UI (3-4 days)
+
 - [ ] Build CategoryScreen with view mode switching
 - [ ] Implement CategoryHierarchyView with tree structure
 - [ ] Create CategoryListView with pagination
 - [ ] Add CategoryGridView for grid layout
 
 ### Phase 3: Features (2-3 days)
+
 - [ ] Add search functionality
 - [ ] Implement filtering by parent category
 - [ ] Add pull-to-refresh
 - [ ] Create category detail screen
 
 ### Phase 4: Polish (2 days)
+
 - [ ] Add loading states and animations
 - [ ] Implement error handling
 - [ ] Add empty states
 - [ ] Optimize performance with lazy loading
 
 ### Phase 5: Testing (2 days)
+
 - [ ] Write unit tests for services
 - [ ] Create widget tests
 - [ ] Add integration tests
@@ -1291,23 +1298,27 @@ void main() {
 ## 9. Key Considerations
 
 ### 9.1 Architecture Decisions
+
 - **State Management**: Provider is recommended for simplicity, but Riverpod offers better testability
 - **Caching**: Two-tier caching (memory + SharedPreferences) for offline support
 - **View Modes**: Support hierarchy, list, and grid views for different use cases
 
 ### 9.2 Performance Metrics
+
 - Initial load time: < 500ms with cache
 - Scroll performance: 60 FPS maintained
 - Memory usage: < 50MB for 1000 categories
 - Cache hit ratio: > 80% for repeat visits
 
 ### 9.3 Accessibility
+
 - Screen reader support for all interactive elements
 - Keyboard navigation for desktop/web
 - High contrast mode support
 - Text scaling support
 
 ### 9.4 Future Enhancements
+
 - Offline-first architecture with SQLite
 - Real-time updates via WebSocket
 - Category favorites/bookmarks
@@ -1317,6 +1328,7 @@ void main() {
 ## 10. Conclusion
 
 This implementation plan provides a comprehensive approach to building a category listing page that:
+
 - Leverages generated types for type safety
 - Implements proper separation of concerns
 - Supports multiple view modes and interactions

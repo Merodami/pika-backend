@@ -194,8 +194,6 @@
       }
     }
   },
-  "required": [
-    "data"
-  ],
+  "required": ["data"],
   "additionalProperties": false
 }

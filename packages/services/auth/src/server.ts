@@ -1,6 +1,7 @@
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import { type ICacheService, setCacheService } from '@pika/redis'
 import {
+  BusinessServiceClient,
   CommunicationServiceClient,
   logger,
   UserServiceClient,
@@ -13,6 +14,7 @@ export interface ServerConfig {
   cacheService: ICacheService
   userServiceClient: UserServiceClient
   communicationClient?: CommunicationServiceClient
+  businessServiceClient?: BusinessServiceClient
 }
 
 export async function createAuthServer(config: ServerConfig) {
@@ -77,6 +79,7 @@ export async function createAuthServer(config: ServerConfig) {
     config.cacheService,
     config.userServiceClient,
     config.communicationClient,
+    config.businessServiceClient,
   )
 
   app.use('/auth', authRouter)

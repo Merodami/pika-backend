@@ -17,7 +17,6 @@ import {
 } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { IPlanRepository } from '@subscription/repositories/PlanRepository.js'
 import type {
   ISubscriptionRepository,
@@ -27,6 +26,8 @@ import {
   CACHE_TTL_MULTIPLIERS,
   TEMPLATE_KEYS,
 } from '@subscription/types/constants.js'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface ISubscriptionService {
   createSubscription(
@@ -401,7 +402,9 @@ export class SubscriptionService implements ISubscriptionService {
     userId: string,
   ): Promise<void> {
     try {
-      await this.cache.del(`${CACHE_KEYS.SUBSCRIPTION.SINGLE}:${subscriptionId}`)
+      await this.cache.del(
+        `${CACHE_KEYS.SUBSCRIPTION.SINGLE}:${subscriptionId}`,
+      )
       await this.cache.del(`${CACHE_KEYS.SUBSCRIPTION.USER}:${userId}`)
       await this.cache.delPattern?.(`${CACHE_KEYS.ADMIN.SUBSCRIPTIONS}:*`)
       await this.cache.delPattern?.(`${CACHE_KEYS.SUBSCRIPTION.ACTIVE}:*`)
@@ -416,8 +419,12 @@ export class SubscriptionService implements ISubscriptionService {
     try {
       await this.cache.del(`${CACHE_KEYS.SUBSCRIPTION.USER}:${userId}`)
       await this.cache.delPattern?.(`${CACHE_KEYS.ADMIN.SUBSCRIPTIONS}:*`)
-      await this.cache.delPattern?.(`${CACHE_KEYS.SUBSCRIPTION.HISTORY}:${userId}:*`)
-      await this.cache.delPattern?.(`${CACHE_KEYS.SUBSCRIPTION.STATUS}:${userId}`)
+      await this.cache.delPattern?.(
+        `${CACHE_KEYS.SUBSCRIPTION.HISTORY}:${userId}:*`,
+      )
+      await this.cache.delPattern?.(
+        `${CACHE_KEYS.SUBSCRIPTION.STATUS}:${userId}`,
+      )
     } catch (error) {
       logger.error('Failed to clear user subscription cache', error)
     }

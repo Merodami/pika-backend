@@ -10,7 +10,7 @@ import {
 } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import { UserRole, UserStatus } from '@pika/types'
+import {UserRole, UserStatus } from '@pika/types'
 import jwt from 'jsonwebtoken'
 
 export interface User {
@@ -19,6 +19,8 @@ export interface User {
   role: UserRole
   status: UserStatus
   isActive(): boolean
+  // Business-specific fields (optional, only for business users)
+  hasActiveBusinesses?: boolean // True if user has at least one active, approved business
 }
 
 export interface TokenPayload {
@@ -27,6 +29,8 @@ export interface TokenPayload {
   role: UserRole
   status: UserStatus
   type: 'access' | 'refresh'
+  // Business-specific claims (only for business role users)
+  hasActiveBusinesses?: boolean
   iat?: number
   exp?: number
   iss?: string
@@ -131,6 +135,11 @@ export class JwtTokenService {
         type: 'access',
       }
 
+      // Add business-specific claims if user is a business role
+      if (user.role === UserRole.BUSINESS) {
+        accessPayload.hasActiveBusinesses = user.hasActiveBusinesses || false
+      }
+
       // Use appropriate key based on algorithm
       const signingKey = this.getSigningKey()
 
@@ -150,6 +159,11 @@ export class JwtTokenService {
         role: user.role,
         status: user.status,
         type: 'refresh',
+      }
+
+      // Add business-specific claims if user is a business role
+      if (user.role === UserRole.BUSINESS) {
+        refreshPayload.hasActiveBusinesses = user.hasActiveBusinesses || false
       }
 
       const refreshToken = jwt.sign(refreshPayload, signingKey, {

@@ -87,9 +87,7 @@ export class BusinessService implements IBusinessService {
 
     if (userId) {
       // Invalidate user-specific caches
-      keysToInvalidate.push(
-        `${CACHE_KEYS.BUSINESS.USER}:${userId}`,
-      )
+      keysToInvalidate.push(`${CACHE_KEYS.BUSINESS.USER}:${userId}`)
     }
 
     // Delete all keys
@@ -97,7 +95,7 @@ export class BusinessService implements IBusinessService {
     // This means list caches won't be invalidated automatically
     // Consider implementing a more sophisticated cache invalidation strategy
     await Promise.all(
-      keysToInvalidate.map(key => this.cacheService!.del(key))
+      keysToInvalidate.map((key) => this.cacheService!.del(key)),
     )
   }
 
@@ -109,6 +107,7 @@ export class BusinessService implements IBusinessService {
     prefix: CACHE_KEYS.BUSINESS.LIST,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
+
       return `${prefix}:${JSON.stringify(params)}`
     },
     condition: (result) => result && result.data && Array.isArray(result.data),
@@ -141,6 +140,7 @@ export class BusinessService implements IBusinessService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const [id, includes] = args
       const key = includes ? `${id}:${JSON.stringify(includes)}` : id
+
       return `${prefix}:${key}`
     },
   })
@@ -177,6 +177,7 @@ export class BusinessService implements IBusinessService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const [userId, includes] = args
       const key = includes ? `${userId}:${JSON.stringify(includes)}` : userId
+
       return `${prefix}:${key}`
     },
   })
@@ -214,21 +215,8 @@ export class BusinessService implements IBusinessService {
     try {
       logger.debug(`Creating business for user: ${data.userId}`)
 
-      // Check if business already exists for this user
-      const existingBusiness = await this.businessRepository.findByUserId(
-        data.userId,
-      )
-
-      if (existingBusiness) {
-        throw ErrorFactory.resourceConflict(
-          'Business',
-          'Business already exists for this user',
-          {
-            source: 'BusinessService.createBusiness',
-            metadata: { userId: data.userId },
-          },
-        )
-      }
+      // Users can now create multiple businesses
+      // Removed the single business per user constraint
 
       // Generate translation keys for business name and description
       const businessNameKey = `business.name.${uuid()}`

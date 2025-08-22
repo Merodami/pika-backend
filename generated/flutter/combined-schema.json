@@ -29,12 +29,7 @@
           "maximum": 9007199254740991
         }
       },
-      "required": [
-        "accessToken",
-        "refreshToken",
-        "tokenType",
-        "expiresIn"
-      ],
+      "required": ["accessToken", "refreshToken", "tokenType", "expiresIn"],
       "additionalProperties": false
     },
     "authLogin_AuthUserResponse": {
@@ -59,20 +54,10 @@
         },
         "role": {
           "type": "string",
-          "enum": [
-            "admin",
-            "customer",
-            "business"
-          ]
+          "enum": ["admin", "customer", "business"]
         }
       },
-      "required": [
-        "id",
-        "email",
-        "firstName",
-        "lastName",
-        "role"
-      ],
+      "required": ["id", "email", "firstName", "lastName", "role"],
       "additionalProperties": false
     },
     "authLogin_GetSessionsResponse": {
@@ -94,12 +79,7 @@
               },
               "deviceType": {
                 "type": "string",
-                "enum": [
-                  "mobile",
-                  "tablet",
-                  "desktop",
-                  "other"
-                ]
+                "enum": ["mobile", "tablet", "desktop", "other"]
               },
               "browser": {
                 "type": "string"
@@ -133,11 +113,7 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
               }
             },
-            "required": [
-              "id",
-              "lastActive",
-              "createdAt"
-            ],
+            "required": ["id", "lastActive", "createdAt"],
             "additionalProperties": false
           }
         },
@@ -148,10 +124,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
         }
       },
-      "required": [
-        "sessions",
-        "current"
-      ],
+      "required": ["sessions", "current"],
       "additionalProperties": false
     },
     "authLogin_LinkOAuthAccountRequest": {
@@ -175,9 +148,7 @@
           "format": "uri"
         }
       },
-      "required": [
-        "provider"
-      ],
+      "required": ["provider"],
       "additionalProperties": false
     },
     "authLogin_OAuthCallbackRequest": {
@@ -206,11 +177,7 @@
           ]
         }
       },
-      "required": [
-        "code",
-        "state",
-        "provider"
-      ],
+      "required": ["code", "state", "provider"],
       "additionalProperties": false
     },
     "authLogin_RevokeSessionRequest": {
@@ -224,9 +191,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
         }
       },
-      "required": [
-        "sessionId"
-      ],
+      "required": ["sessionId"],
       "additionalProperties": false
     },
     "authLogin_SessionInfoResponse": {
@@ -243,12 +208,7 @@
         },
         "deviceType": {
           "type": "string",
-          "enum": [
-            "mobile",
-            "tablet",
-            "desktop",
-            "other"
-          ]
+          "enum": ["mobile", "tablet", "desktop", "other"]
         },
         "browser": {
           "type": "string"
@@ -282,11 +242,7 @@
           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
         }
       },
-      "required": [
-        "id",
-        "lastActive",
-        "createdAt"
-      ],
+      "required": ["id", "lastActive", "createdAt"],
       "additionalProperties": false
     },
     "authRegister_RegisterRequest": {
@@ -350,10 +306,7 @@
           "description": "Source of registration to determine user role",
           "default": "public",
           "type": "string",
-          "enum": [
-            "public",
-            "adminDashboard"
-          ]
+          "enum": ["public", "adminDashboard"]
         }
       },
       "required": [
@@ -386,11 +339,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "message",
-        "userId",
-        "emailSent"
-      ],
+      "required": ["message", "userId", "emailSent"],
       "additionalProperties": false
     },
     "authRegister_ResendVerificationRequest": {
@@ -399,9 +348,7 @@
       "properties": {
         "email": {}
       },
-      "required": [
-        "email"
-      ],
+      "required": ["email"],
       "additionalProperties": false
     },
     "authRegister_ResendVerificationResponse": {
@@ -413,9 +360,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "message"
-      ],
+      "required": ["message"],
       "additionalProperties": false
     },
     "authRegister_VerifyEmailRequest": {
@@ -428,9 +373,7 @@
           "minLength": 1
         }
       },
-      "required": [
-        "token"
-      ],
+      "required": ["token"],
       "additionalProperties": false
     },
     "authRegister_VerifyEmailResponse": {
@@ -446,10 +389,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "message",
-        "emailVerified"
-      ],
+      "required": ["message", "emailVerified"],
       "additionalProperties": false
     },
     "business_BusinessDetailQueryParams": {
@@ -544,12 +484,7 @@
                     "description": "ISO 8601 datetime with timezone"
                   }
                 },
-                "required": [
-                  "id",
-                  "firstName",
-                  "lastName",
-                  "createdAt"
-                ],
+                "required": ["id", "firstName", "lastName", "createdAt"],
                 "additionalProperties": false
               },
               "category": {
@@ -805,10 +740,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "business_BusinessPathParams": {
@@ -822,9 +754,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "business_BusinessQueryParams": {
@@ -861,10 +791,7 @@
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -891,12 +818,7 @@
           "maximum": 5
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "business_BusinessResponse": {
@@ -973,12 +895,7 @@
               "description": "ISO 8601 datetime with timezone"
             }
           },
-          "required": [
-            "id",
-            "firstName",
-            "lastName",
-            "createdAt"
-          ],
+          "required": ["id", "firstName", "lastName", "createdAt"],
           "additionalProperties": false
         },
         "category": {
@@ -1274,12 +1191,7 @@
                     "description": "ISO 8601 datetime with timezone"
                   }
                 },
-                "required": [
-                  "id",
-                  "firstName",
-                  "lastName",
-                  "createdAt"
-                ],
+                "required": ["id", "firstName", "lastName", "createdAt"],
                 "additionalProperties": false
               },
               "category": {
@@ -1494,12 +1406,7 @@
           "maximum": 9007199254740991
         }
       },
-      "required": [
-        "categoryId",
-        "categoryName",
-        "businesses",
-        "totalCount"
-      ],
+      "required": ["categoryId", "categoryName", "businesses", "totalCount"],
       "additionalProperties": false
     },
     "business_CreateMyBusinessRequest": {
@@ -1524,9 +1431,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
         }
       },
-      "required": [
-        "businessName"
-      ],
+      "required": ["businessName"],
       "additionalProperties": false
     },
     "business_CreateMyBusinessResponse": {
@@ -1553,12 +1458,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "businessNameKey",
-        "approved",
-        "message"
-      ],
+      "required": ["id", "businessNameKey", "approved", "message"],
       "additionalProperties": false
     },
     "business_UpdateMyBusinessRequest": {
@@ -1790,9 +1690,7 @@
           }
         }
       },
-      "required": [
-        "data"
-      ],
+      "required": ["data"],
       "additionalProperties": false
     },
     "category_CategoryListResponse": {
@@ -2035,10 +1933,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "category_CategoryPathParams": {
@@ -2052,9 +1947,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "category_CategoryPathResponse": {
@@ -2249,9 +2142,7 @@
           }
         }
       },
-      "required": [
-        "data"
-      ],
+      "required": ["data"],
       "additionalProperties": false
     },
     "category_CategoryQueryParams": {
@@ -2275,21 +2166,13 @@
         "sortBy": {
           "default": "sortOrder",
           "type": "string",
-          "enum": [
-            "name",
-            "sortOrder",
-            "createdAt",
-            "updatedAt"
-          ]
+          "enum": ["name", "sortOrder", "createdAt", "updatedAt"]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -2310,12 +2193,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "category_CategoryResponse": {
@@ -2541,20 +2419,11 @@
         },
         "role": {
           "type": "string",
-          "enum": [
-            "admin",
-            "customer",
-            "business"
-          ]
+          "enum": ["admin", "customer", "business"]
         },
         "status": {
           "type": "string",
-          "enum": [
-            "active",
-            "suspended",
-            "banned",
-            "unconfirmed"
-          ]
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
         },
         "emailVerified": {
           "type": "boolean"
@@ -2605,10 +2474,7 @@
           "const": true
         }
       },
-      "required": [
-        "password",
-        "confirmDeletion"
-      ],
+      "required": ["password", "confirmDeletion"],
       "additionalProperties": false
     },
     "userProfile_DeleteAccountResponse": {
@@ -2623,10 +2489,7 @@
           "description": "When the account will be permanently deleted"
         }
       },
-      "required": [
-        "message",
-        "deletionDate"
-      ],
+      "required": ["message", "deletionDate"],
       "additionalProperties": false
     },
     "userProfile_PublicUserProfile": {
@@ -2654,12 +2517,7 @@
           "description": "ISO 8601 datetime with timezone"
         }
       },
-      "required": [
-        "id",
-        "firstName",
-        "lastName",
-        "createdAt"
-      ],
+      "required": ["id", "firstName", "lastName", "createdAt"],
       "additionalProperties": false
     },
     "userProfile_UpdatePreferencesRequest": {
@@ -2710,11 +2568,7 @@
           "properties": {
             "profileVisibility": {
               "type": "string",
-              "enum": [
-                "public",
-                "friends",
-                "private"
-              ]
+              "enum": ["public", "friends", "private"]
             },
             "showEmail": {
               "type": "boolean"
@@ -2730,11 +2584,7 @@
           "properties": {
             "theme": {
               "type": "string",
-              "enum": [
-                "light",
-                "dark",
-                "system"
-              ]
+              "enum": ["light", "dark", "system"]
             },
             "language": {
               "type": "string",
@@ -2786,9 +2636,7 @@
       "properties": {
         "avatar": {}
       },
-      "required": [
-        "avatar"
-      ],
+      "required": ["avatar"],
       "additionalProperties": false
     },
     "userProfile_UploadAvatarResponse": {
@@ -2805,10 +2653,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "avatarUrl",
-        "message"
-      ],
+      "required": ["avatarUrl", "message"],
       "additionalProperties": false
     },
     "userProfile_UserFriendsResponse": {
@@ -2841,12 +2686,7 @@
                 "description": "ISO 8601 datetime with timezone"
               }
             },
-            "required": [
-              "id",
-              "firstName",
-              "lastName",
-              "createdAt"
-            ],
+            "required": ["id", "firstName", "lastName", "createdAt"],
             "additionalProperties": false
           }
         },
@@ -2856,10 +2696,7 @@
           "maximum": 9007199254740991
         }
       },
-      "required": [
-        "friends",
-        "totalCount"
-      ],
+      "required": ["friends", "totalCount"],
       "additionalProperties": false
     },
     "userProfile_UserPreferencesResponse": {
@@ -2921,10 +2758,7 @@
               "additionalProperties": false
             }
           },
-          "required": [
-            "email",
-            "push"
-          ],
+          "required": ["email", "push"],
           "additionalProperties": false
         },
         "privacy": {
@@ -2933,11 +2767,7 @@
             "profileVisibility": {
               "default": "friends",
               "type": "string",
-              "enum": [
-                "public",
-                "friends",
-                "private"
-              ]
+              "enum": ["public", "friends", "private"]
             },
             "showEmail": {
               "default": false,
@@ -2948,11 +2778,7 @@
               "type": "boolean"
             }
           },
-          "required": [
-            "profileVisibility",
-            "showEmail",
-            "showPhone"
-          ],
+          "required": ["profileVisibility", "showEmail", "showPhone"],
           "additionalProperties": false
         },
         "display": {
@@ -2961,11 +2787,7 @@
             "theme": {
               "default": "system",
               "type": "string",
-              "enum": [
-                "light",
-                "dark",
-                "system"
-              ]
+              "enum": ["light", "dark", "system"]
             },
             "language": {
               "type": "string",
@@ -2977,17 +2799,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "theme"
-          ],
+          "required": ["theme"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "notifications",
-        "privacy",
-        "display"
-      ],
+      "required": ["notifications", "privacy", "display"],
       "additionalProperties": false
     },
     "userProfile_UserProfileResponse": {
@@ -3028,20 +2844,11 @@
         },
         "role": {
           "type": "string",
-          "enum": [
-            "admin",
-            "customer",
-            "business"
-          ]
+          "enum": ["admin", "customer", "business"]
         },
         "status": {
           "type": "string",
-          "enum": [
-            "active",
-            "suspended",
-            "banned",
-            "unconfirmed"
-          ]
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
         },
         "emailVerified": {
           "type": "boolean"
@@ -3110,20 +2917,11 @@
         },
         "role": {
           "type": "string",
-          "enum": [
-            "admin",
-            "customer",
-            "business"
-          ]
+          "enum": ["admin", "customer", "business"]
         },
         "status": {
           "type": "string",
-          "enum": [
-            "active",
-            "suspended",
-            "banned",
-            "unconfirmed"
-          ]
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
         },
         "emailVerified": {
           "type": "boolean"
@@ -3201,10 +2999,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -3298,11 +3093,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -3315,12 +3106,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -3365,12 +3151,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "available",
-            "claimed",
-            "redeemed",
-            "expired"
-          ]
+          "enum": ["available", "claimed", "redeemed", "expired"]
         },
         "redeemedAt": {
           "anyOf": [
@@ -3385,11 +3166,7 @@
           ]
         }
       },
-      "required": [
-        "voucher",
-        "claimedAt",
-        "status"
-      ],
+      "required": ["voucher", "claimedAt", "status"],
       "additionalProperties": false
     },
     "voucher_UserVouchersListResponse": {
@@ -3446,10 +3223,7 @@
                   },
                   "discountType": {
                     "type": "string",
-                    "enum": [
-                      "fixed",
-                      "percentage"
-                    ]
+                    "enum": ["fixed", "percentage"]
                   },
                   "discountValue": {
                     "type": "number",
@@ -3543,11 +3317,7 @@
                         },
                         "type": {
                           "type": "string",
-                          "enum": [
-                            "qr",
-                            "short",
-                            "static"
-                          ]
+                          "enum": ["qr", "short", "static"]
                         },
                         "isActive": {
                           "type": "boolean"
@@ -3560,12 +3330,7 @@
                           "additionalProperties": {}
                         }
                       },
-                      "required": [
-                        "id",
-                        "code",
-                        "type",
-                        "isActive"
-                      ],
+                      "required": ["id", "code", "type", "isActive"],
                       "additionalProperties": false
                     }
                   },
@@ -3610,12 +3375,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "available",
-                  "claimed",
-                  "redeemed",
-                  "expired"
-                ]
+                "enum": ["available", "claimed", "redeemed", "expired"]
               },
               "redeemedAt": {
                 "anyOf": [
@@ -3630,11 +3390,7 @@
                 ]
               }
             },
-            "required": [
-              "voucher",
-              "claimedAt",
-              "status"
-            ],
+            "required": ["voucher", "claimedAt", "status"],
             "additionalProperties": false
           }
         },
@@ -3685,10 +3441,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "voucher_VoucherClaimRequest": {
@@ -3709,10 +3462,7 @@
               "maximum": 30
             }
           },
-          "required": [
-            "enableReminders",
-            "reminderDaysBefore"
-          ],
+          "required": ["enableReminders", "reminderDaysBefore"],
           "additionalProperties": false
         }
       },
@@ -3771,10 +3521,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -3868,11 +3615,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -3885,12 +3628,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -3975,11 +3713,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "qr",
-            "short",
-            "static"
-          ]
+          "enum": ["qr", "short", "static"]
         },
         "isActive": {
           "type": "boolean"
@@ -3992,12 +3726,7 @@
           "additionalProperties": {}
         }
       },
-      "required": [
-        "id",
-        "code",
-        "type",
-        "isActive"
-      ],
+      "required": ["id", "code", "type", "isActive"],
       "additionalProperties": false
     },
     "voucher_VoucherListResponse": {
@@ -4051,10 +3780,7 @@
               },
               "discountType": {
                 "type": "string",
-                "enum": [
-                  "fixed",
-                  "percentage"
-                ]
+                "enum": ["fixed", "percentage"]
               },
               "discountValue": {
                 "type": "number",
@@ -4148,11 +3874,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "qr",
-                        "short",
-                        "static"
-                      ]
+                      "enum": ["qr", "short", "static"]
                     },
                     "isActive": {
                       "type": "boolean"
@@ -4165,12 +3887,7 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": [
-                    "id",
-                    "code",
-                    "type",
-                    "isActive"
-                  ],
+                  "required": ["id", "code", "type", "isActive"],
                   "additionalProperties": false
                 }
               },
@@ -4256,10 +3973,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "voucher_VoucherQueryParams": {
@@ -4295,10 +4009,7 @@
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -4331,10 +4042,7 @@
         "discountType": {
           "description": "Filter by discount type",
           "type": "string",
-          "enum": [
-            "fixed",
-            "percentage"
-          ]
+          "enum": ["fixed", "percentage"]
         },
         "minDiscount": {
           "description": "Minimum discount value",
@@ -4418,12 +4126,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "voucher_VoucherRedeemRequest": {
@@ -4450,16 +4153,11 @@
               "maximum": 180
             }
           },
-          "required": [
-            "lat",
-            "lng"
-          ],
+          "required": ["lat", "lng"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "code"
-      ],
+      "required": ["code"],
       "additionalProperties": false
     },
     "voucher_VoucherRedeemResponse": {
@@ -4527,10 +4225,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -4624,11 +4319,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -4641,12 +4332,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -4738,10 +4424,7 @@
         },
         "discountType": {
           "type": "string",
-          "enum": [
-            "fixed",
-            "percentage"
-          ]
+          "enum": ["fixed", "percentage"]
         },
         "discountValue": {
           "type": "number",
@@ -4835,11 +4518,7 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "qr",
-                  "short",
-                  "static"
-                ]
+                "enum": ["qr", "short", "static"]
               },
               "isActive": {
                 "type": "boolean"
@@ -4852,12 +4531,7 @@
                 "additionalProperties": {}
               }
             },
-            "required": [
-              "id",
-              "code",
-              "type",
-              "isActive"
-            ],
+            "required": ["id", "code", "type", "isActive"],
             "additionalProperties": false
           }
         },
@@ -4901,12 +4575,7 @@
       "properties": {
         "scanSource": {
           "type": "string",
-          "enum": [
-            "camera",
-            "gallery",
-            "link",
-            "share"
-          ]
+          "enum": ["camera", "gallery", "link", "share"]
         },
         "location": {
           "type": "object",
@@ -4924,10 +4593,7 @@
               "maximum": 180
             }
           },
-          "required": [
-            "lat",
-            "lng"
-          ],
+          "required": ["lat", "lng"],
           "additionalProperties": false
         },
         "deviceInfo": {
@@ -4938,13 +4604,7 @@
             },
             "platform": {
               "type": "string",
-              "enum": [
-                "ios",
-                "android",
-                "web",
-                "desktop",
-                "other"
-              ]
+              "enum": ["ios", "android", "web", "desktop", "other"]
             },
             "appVersion": {
               "type": "string"
@@ -5005,10 +4665,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -5102,11 +4759,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -5119,12 +4772,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -5204,29 +4852,16 @@
                     "maximum": 180
                   }
                 },
-                "required": [
-                  "lat",
-                  "lng"
-                ],
+                "required": ["lat", "lng"],
                 "additionalProperties": false
               }
             },
-            "required": [
-              "name",
-              "address",
-              "distance",
-              "coordinates"
-            ],
+            "required": ["name", "address", "distance", "coordinates"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "voucher",
-        "scanId",
-        "canClaim",
-        "alreadyClaimed"
-      ],
+      "required": ["voucher", "scanId", "canClaim", "alreadyClaimed"],
       "additionalProperties": false
     }
   }

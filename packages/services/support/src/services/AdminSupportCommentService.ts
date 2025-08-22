@@ -50,6 +50,7 @@ export class AdminSupportCommentService implements IAdminSupportCommentService {
     prefix: CACHE_KEYS.ADMIN.COMMENTS,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const parsedIncludes = args[0]
+
       return `${prefix}:${JSON.stringify(parsedIncludes || {})}`
     },
   })
@@ -71,6 +72,7 @@ export class AdminSupportCommentService implements IAdminSupportCommentService {
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
       const parsedIncludes = args[1]
+
       return `${prefix}:${params.problemId}:admin:${JSON.stringify({ page: params.page, limit: params.limit })}:${JSON.stringify(parsedIncludes || {})}`
     },
   })

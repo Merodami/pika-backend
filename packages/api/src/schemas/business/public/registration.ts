@@ -29,7 +29,9 @@ import {
  * Start registration response (raw Zod)
  */
 export const StartRegistrationResponse = z.object({
-  started: z.boolean().describe('Whether registration was started or already existed'),
+  started: z
+    .boolean()
+    .describe('Whether registration was started or already existed'),
   currentStep: z.number().int().min(1).max(3).describe('Current step number'),
 })
 
@@ -43,7 +45,9 @@ export const StartRegistrationResponseSchema = openapi(
   },
 )
 
-export type StartRegistrationResponse = z.infer<typeof StartRegistrationResponse>
+export type StartRegistrationResponse = z.infer<
+  typeof StartRegistrationResponse
+>
 
 // ============= Registration Status =============
 

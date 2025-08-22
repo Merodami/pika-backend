@@ -3,6 +3,7 @@ import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
@@ -32,6 +33,7 @@ export class CategoryController {
   ): Promise<void> {
     try {
       const query = getValidatedQuery<categoryPublic.CategoryQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Map API query to service params
       const params = {
@@ -44,7 +46,7 @@ export class CategoryController {
         sortOrder: query.sortOrder,
       }
 
-      const result = await this.categoryService.getAllCategories(params)
+      const result = await this.categoryService.getAllCategories(params, language)
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)
@@ -71,8 +73,9 @@ export class CategoryController {
   ): Promise<void> {
     try {
       const { id } = req.params
+      const language = getRequestLanguage(req)
 
-      const category = await this.categoryService.getCategoryById(id)
+      const category = await this.categoryService.getCategoryById(id, language)
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
@@ -102,9 +105,11 @@ export class CategoryController {
     try {
       const query =
         getValidatedQuery<categoryPublic.CategoryHierarchyQuery>(req)
+      const language = getRequestLanguage(req)
 
       const categories = await this.categoryService.getCategoryHierarchy(
         query.rootId,
+        language,
       )
 
       // Transform to DTOs
@@ -136,8 +141,9 @@ export class CategoryController {
   ): Promise<void> {
     try {
       const { id } = req.params
+      const language = getRequestLanguage(req)
 
-      const path = await this.categoryService.getCategoryPath(id)
+      const path = await this.categoryService.getCategoryPath(id, language)
 
       // Transform to DTOs
       const response = {

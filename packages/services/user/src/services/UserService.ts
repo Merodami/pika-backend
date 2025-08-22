@@ -22,8 +22,6 @@ import {
   UserStatus,
   VerificationType,
 } from '@pika/types'
-
-import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   IUserRepository,
   UserSearchParams,
@@ -31,6 +29,8 @@ import type {
 import type { IInternalUserService } from '@user/services/InternalUserService.js'
 import bcrypt from 'bcrypt'
 import { randomInt } from 'crypto'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 // Unified verification system using proper enums
 export interface VerificationRequest {
@@ -174,7 +174,7 @@ export class UserService implements IUserService {
       const user = await this.repository.create({
         ...data,
         password,
-        role: data.role ? mapUserRole(data.role) : UserRole.CUSTOMER,
+        role: data.role ? mapUserRole(data.role) : UserRole.BUSINESS,
         status: data.status
           ? mapUserStatus(data.status)
           : UserStatus.UNCONFIRMED,

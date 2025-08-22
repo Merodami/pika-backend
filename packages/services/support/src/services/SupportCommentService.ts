@@ -45,6 +45,7 @@ export class SupportCommentService implements ISupportCommentService {
     prefix: CACHE_KEYS.COMMENT.BY_PROBLEM,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const params = args[0]
+
       return `${prefix}:${params.problemId}:public:${JSON.stringify({ page: params.page, limit: params.limit })}`
     },
   })

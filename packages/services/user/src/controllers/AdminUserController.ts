@@ -154,7 +154,7 @@ export class AdminUserController {
   }
 
   /**
-   * PUT /admin/users/:id/status
+   * PATCH /admin/users/:id/status
    * Update user account status
    */
   async updateUserStatus(

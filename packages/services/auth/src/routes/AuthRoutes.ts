@@ -3,13 +3,18 @@ import { AuthService } from '@auth-service/services/AuthService.js'
 import { authPublic } from '@pika/api'
 import { requireAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import { CommunicationServiceClient, UserServiceClient } from '@pika/shared'
+import {
+  BusinessServiceClient,
+  CommunicationServiceClient,
+  UserServiceClient,
+} from '@pika/shared'
 import { Router } from 'express'
 
 export function createAuthRouter(
   cache: ICacheService,
   userServiceClient: UserServiceClient,
   communicationClient?: CommunicationServiceClient,
+  businessServiceClient?: BusinessServiceClient,
 ): Router {
   const router = Router()
 
@@ -18,6 +23,7 @@ export function createAuthRouter(
     cache,
     userServiceClient,
     communicationClient,
+    businessServiceClient,
   )
   const controller = new AuthController(authService)
 

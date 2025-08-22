@@ -130,16 +130,16 @@ export type ValidateBusinessResponse = z.infer<typeof ValidateBusinessResponse>
 // ============= Get Businesses by User =============
 
 /**
- * Get businesses by user request
+ * Get businesses by user request query parameters
+ * Note: userId is passed as a path parameter, not in query
  */
 export const GetBusinessesByUserRequest = openapi(
-  z.object({
-    userId: UserId,
-    includeInactive: optionalBoolean().default(false),
-    includeUnverified: optionalBoolean().default(true),
-  }),
+  SearchParams.extend({
+    onlyActive: optionalBoolean(),
+    onlyVerified: optionalBoolean(),
+  }).merge(createIncludeParam(BUSINESS_RELATIONS)),
   {
-    description: 'Get all businesses owned by a user',
+    description: 'Query parameters for getting all businesses owned by a user',
   },
 )
 
@@ -148,17 +148,9 @@ export type GetBusinessesByUserRequest = z.infer<
 >
 
 /**
- * Get businesses by user response
+ * Get businesses by user response with pagination
  */
-export const GetBusinessesByUserResponse = openapi(
-  z.object({
-    businesses: z.array(InternalBusinessData),
-    totalCount: z.number().int().nonnegative(),
-  }),
-  {
-    description: 'User businesses data',
-  },
-)
+export const GetBusinessesByUserResponse = paginatedResponse(InternalBusinessData)
 
 export type GetBusinessesByUserResponse = z.infer<
   typeof GetBusinessesByUserResponse

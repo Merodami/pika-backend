@@ -41,6 +41,11 @@ export {
 } from './infrastructure/express/middleware/pagination.js'
 export { requestContextMiddleware } from './infrastructure/express/middleware/requestContext.js'
 export {
+  checkBusinessRegistration,
+  requireActiveBusinesses,
+  requireBusinessRegistration,
+} from './infrastructure/express/middleware/requireBusinessRegistration.js'
+export {
   allowServiceOrUserAuth,
   requireServiceAuth,
   type ServiceAuthContext,

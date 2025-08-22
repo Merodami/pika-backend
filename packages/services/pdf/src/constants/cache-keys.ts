@@ -37,8 +37,12 @@ export const CACHE_KEYS = {
 
 export const generateCacheKey = {
   voucherBookById: (id: string) => `${CACHE_KEYS.VOUCHER_BOOK.SINGLE}:${id}`,
-  voucherBooksByCity: (city: string) => `${CACHE_KEYS.VOUCHER_BOOK.BY_CITY}:${city}`,
-  voucherBooksByUser: (userId: string) => `${CACHE_KEYS.VOUCHER_BOOK.BY_USER}:${userId}`,
-  distributionByBook: (bookId: string) => `${CACHE_KEYS.DISTRIBUTION.BY_BOOK}:${bookId}`,
-  adPlacementsByBook: (bookId: string) => `${CACHE_KEYS.AD_PLACEMENT.BY_BOOK}:${bookId}`,
+  voucherBooksByCity: (city: string) =>
+    `${CACHE_KEYS.VOUCHER_BOOK.BY_CITY}:${city}`,
+  voucherBooksByUser: (userId: string) =>
+    `${CACHE_KEYS.VOUCHER_BOOK.BY_USER}:${userId}`,
+  distributionByBook: (bookId: string) =>
+    `${CACHE_KEYS.DISTRIBUTION.BY_BOOK}:${bookId}`,
+  adPlacementsByBook: (bookId: string) =>
+    `${CACHE_KEYS.AD_PLACEMENT.BY_BOOK}:${bookId}`,
 }

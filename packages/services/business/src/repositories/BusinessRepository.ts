@@ -483,10 +483,13 @@ export class BusinessRepository implements IBusinessRepository {
       return domainBusiness
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2002 unique constraint violations are now handled differently
+        // since users can have multiple businesses
         if (error.code === 'P2002') {
+          // Check if this is a legitimate unique constraint (e.g., business name within same category)
           throw ErrorFactory.resourceConflict(
             'Business',
-            'Business already exists for this user',
+            'A business with similar details already exists',
             {
               source: 'BusinessRepository.create',
               metadata: { userId: data.userId },

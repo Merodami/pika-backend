@@ -1,12 +1,10 @@
 import { supportPublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
 import type { IProblemService } from '@support/services/ProblemService.js'
 import type { NextFunction, Request, Response } from 'express'

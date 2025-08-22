@@ -1,6 +1,6 @@
 /**
  * Cache key constants for category service
- * 
+ *
  * Pattern: service:entity[-modifier]:identifier
  * - Use colons (:) for hierarchy levels
  * - Use hyphens (-) for compound words within a level
@@ -15,14 +15,14 @@ export const CACHE_KEYS = {
     HIERARCHY: 'service:category:hierarchy',
     PATH: 'service:category:path',
   },
-  
+
   // Admin cache keys
   ADMIN: {
     LIST: 'service:admin:categories',
     SINGLE: 'service:admin:category',
     HIERARCHY: 'service:admin:category:hierarchy',
   },
-  
+
   // Internal service cache keys
   INTERNAL: {
     LIST: 'service:internal:categories',
@@ -38,8 +38,11 @@ export const CACHE_KEYS = {
  */
 export const generateCacheKey = {
   categoryById: (id: string) => `${CACHE_KEYS.CATEGORY.SINGLE}:${id}`,
-  categoriesByIds: (ids: string[]) => `${CACHE_KEYS.CATEGORY.BY_IDS}:${JSON.stringify(ids.sort())}`,
-  categoryHierarchy: (rootId?: string) => `${CACHE_KEYS.CATEGORY.HIERARCHY}:${rootId || 'all'}`,
+  categoriesByIds: (ids: string[]) =>
+    `${CACHE_KEYS.CATEGORY.BY_IDS}:${JSON.stringify(ids.sort())}`,
+  categoryHierarchy: (rootId?: string) =>
+    `${CACHE_KEYS.CATEGORY.HIERARCHY}:${rootId || 'all'}`,
   categoryPath: (id: string) => `${CACHE_KEYS.CATEGORY.PATH}:${id}`,
-  categoryList: (params: any) => `${CACHE_KEYS.CATEGORY.LIST}:${JSON.stringify(params)}`,
+  categoryList: (params: any) =>
+    `${CACHE_KEYS.CATEGORY.LIST}:${JSON.stringify(params)}`,
 }

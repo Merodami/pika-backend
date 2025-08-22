@@ -1,5 +1,6 @@
 import { businessPublic } from '@pika/api'
 import { RequestContext, validateResponse } from '@pika/http'
+import { cookieManager } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
 import { BusinessRegistrationMapper } from '../mappers/BusinessRegistrationMapper.js'
@@ -98,6 +99,13 @@ export class BusinessRegistrationController {
         response,
         'BusinessRegistrationController.getRegistrationStatus',
       )
+
+      // Set cookie to help frontend middleware make quick decisions
+      cookieManager.setRegistrationStatus(res, {
+        needsRegistration: validatedResponse.needsRegistration,
+        currentStep: validatedResponse.currentStep,
+        businessId: validatedResponse.businessId,
+      })
 
       res.json(validatedResponse)
     } catch (error) {
@@ -241,6 +249,15 @@ export class BusinessRegistrationController {
         completion,
         'BusinessRegistrationController.completeRegistration',
       )
+
+      // Registration is complete - update cookies
+      cookieManager.setRegistrationStatus(res, {
+        needsRegistration: false,
+        businessId: validatedResponse.businessId,
+      })
+
+      // Clear the registration step cookie as it's no longer needed
+      cookieManager.clearCookie(res, 'registration-step')
 
       res.json(validatedResponse)
     } catch (error) {

@@ -72,12 +72,7 @@
           "description": "ISO 8601 datetime with timezone"
         }
       },
-      "required": [
-        "id",
-        "firstName",
-        "lastName",
-        "createdAt"
-      ],
+      "required": ["id", "firstName", "lastName", "createdAt"],
       "additionalProperties": false
     },
     "category": {

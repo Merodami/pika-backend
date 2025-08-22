@@ -22,15 +22,13 @@ import { CATEGORY_RELATIONS } from '../common/enums.js'
  */
 export const AdminCategoryResponse = withTimestamps({
   id: UUID,
-  nameKey: z
+  name: z
     .string()
-    .max(FIELD_LENGTH.SLUG_MAX)
-    .describe('Translation key for category name'),
-  descriptionKey: z
+    .describe('Category name in requested language'),
+  description: z
     .string()
-    .max(FIELD_LENGTH.SLUG_MAX)
     .optional()
-    .describe('Translation key for category description'),
+    .describe('Category description in requested language'),
   icon: z
     .string()
     .max(FIELD_LENGTH.ICON_MAX)

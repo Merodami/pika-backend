@@ -1,6 +1,6 @@
 /**
  * Cache key constants for support service
- * 
+ *
  * Pattern: service:entity[-modifier]:identifier
  * - Use colons (:) for hierarchy levels
  * - Use hyphens (-) for compound words within a level
@@ -15,7 +15,7 @@ export const CACHE_KEYS = {
     BY_STATUS: 'service:problems:status',
     BY_CATEGORY: 'service:problems:category',
   },
-  
+
   // Comment entity cache keys
   COMMENT: {
     LIST: 'service:comments',
@@ -23,7 +23,7 @@ export const CACHE_KEYS = {
     BY_PROBLEM: 'service:comments:problem',
     BY_USER: 'service:comments:user',
   },
-  
+
   // Admin cache keys
   ADMIN: {
     PROBLEMS: 'service:admin:problems',
@@ -33,7 +33,7 @@ export const CACHE_KEYS = {
     STATS: 'service:admin:support:stats',
     ANALYTICS: 'service:admin:support:analytics',
   },
-  
+
   // Internal service cache keys
   INTERNAL: {
     PROBLEMS: 'service:internal:problems',
@@ -50,9 +50,13 @@ export const CACHE_KEYS = {
 export const generateCacheKey = {
   problemById: (id: string) => `${CACHE_KEYS.PROBLEM.SINGLE}:${id}`,
   problemsByUser: (userId: string) => `${CACHE_KEYS.PROBLEM.BY_USER}:${userId}`,
-  problemsByStatus: (status: string) => `${CACHE_KEYS.PROBLEM.BY_STATUS}:${status}`,
+  problemsByStatus: (status: string) =>
+    `${CACHE_KEYS.PROBLEM.BY_STATUS}:${status}`,
   commentById: (id: string) => `${CACHE_KEYS.COMMENT.SINGLE}:${id}`,
-  commentsByProblem: (problemId: string) => `${CACHE_KEYS.COMMENT.BY_PROBLEM}:${problemId}`,
-  problemList: (params: any) => `${CACHE_KEYS.PROBLEM.LIST}:${JSON.stringify(params)}`,
-  commentList: (params: any) => `${CACHE_KEYS.COMMENT.LIST}:${JSON.stringify(params)}`,
+  commentsByProblem: (problemId: string) =>
+    `${CACHE_KEYS.COMMENT.BY_PROBLEM}:${problemId}`,
+  problemList: (params: any) =>
+    `${CACHE_KEYS.PROBLEM.LIST}:${JSON.stringify(params)}`,
+  commentList: (params: any) =>
+    `${CACHE_KEYS.COMMENT.LIST}:${JSON.stringify(params)}`,
 }

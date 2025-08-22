@@ -2,6 +2,8 @@
  * Domain interfaces for Category service
  */
 
+import type { LanguageCode } from '@pika/types'
+
 // ============= Repository Interfaces =============
 
 /**
@@ -65,17 +67,18 @@ export interface ICategoryService {
    */
   getAllCategories(
     params: CategorySearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<Category>>
 
   /**
    * Get category by ID
    */
-  getCategoryById(id: string): Promise<Category>
+  getCategoryById(id: string, language?: LanguageCode): Promise<Category>
 
   /**
    * Get multiple categories by IDs
    */
-  getCategoriesByIds(ids: string[]): Promise<PaginatedResult<Category>>
+  getCategoriesByIds(ids: string[], language?: LanguageCode): Promise<PaginatedResult<Category>>
 
   /**
    * Create new category
@@ -115,12 +118,12 @@ export interface ICategoryService {
   /**
    * Get category hierarchy
    */
-  getCategoryHierarchy(rootId?: string | null): Promise<Category[]>
+  getCategoryHierarchy(rootId?: string | null, language?: LanguageCode): Promise<Category[]>
 
   /**
    * Get category path (breadcrumb)
    */
-  getCategoryPath(id: string): Promise<Category[]>
+  getCategoryPath(id: string, language?: LanguageCode): Promise<Category[]>
 }
 
 // ============= Domain Types =============

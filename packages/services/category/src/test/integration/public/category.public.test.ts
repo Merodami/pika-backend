@@ -371,22 +371,22 @@ describe('Public Category Integration Tests', () => {
 
       // Verify same data returned
       expect(response2.body).toEqual(response1.body)
-      
+
       // Verify cache is working (both calls should be reasonably fast)
       // Note: In test environment with MemoryCache, timing differences may be minimal
       expect(time2).toBeLessThan(100) // Should complete quickly
       expect(time1).toBeLessThan(100) // First call should also be fast in test env
-      
+
       logger.info('Cache performance test:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`
+        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`,
       })
     })
 
     it('should cache getCategoryById responses at service layer', async () => {
       const testCategory = sharedTestData.activeParentCategories[0]
-      
+
       // First call - should hit database
       const start1 = Date.now()
       const response1 = await customerClient
@@ -405,15 +405,15 @@ describe('Public Category Integration Tests', () => {
 
       // Verify same data
       expect(response2.body).toEqual(response1.body)
-      
+
       // Verify cache is working (both should be fast)
       expect(time2).toBeLessThan(100) // Cache should be fast
       expect(time1).toBeLessThan(100) // First call also fast in test env
-      
+
       logger.info('Single category cache performance:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`
+        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`,
       })
     })
 
@@ -436,45 +436,47 @@ describe('Public Category Integration Tests', () => {
 
       // Verify same data
       expect(response2.body).toEqual(response1.body)
-      
+
       // Both calls should complete reasonably fast
       expect(time2).toBeLessThan(100) // Cache should be fast
       expect(time1).toBeLessThan(200) // Even first call shouldn't be too slow
-      
+
       logger.info('Hierarchy cache performance:', {
         firstCallMs: time1,
         secondCallMs: time2,
-        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`
+        speedup: `${Math.round((time1 / time2) * 100) / 100}x faster`,
       })
     })
 
     it('should NOT hang when cache is hit (validates fix)', async () => {
       // This test validates the fix - controllers no longer have @Cache
       // so responses are properly sent even when cache is hit
-      
+
       const testCategory = sharedTestData.activeParentCategories[0]
-      
+
       // Prime the cache
       await customerClient
         .get(`/categories/${testCategory.id}`)
         .set('Accept', 'application/json')
         .expect(200)
-      
+
       // Second call should complete quickly (not hang)
       const start = Date.now()
+
       await customerClient
         .get(`/categories/${testCategory.id}`)
         .set('Accept', 'application/json')
         .timeout(1000) // Fail if takes more than 1 second
         .expect(200)
+
       const elapsed = Date.now() - start
-      
+
       // Should complete in under 100ms when hitting cache
       expect(elapsed).toBeLessThan(100)
-      
+
       logger.info('No-hang validation:', {
         elapsedMs: elapsed,
-        status: 'PASSED - No hanging on cache hit'
+        status: 'PASSED - No hanging on cache hit',
       })
     })
   })

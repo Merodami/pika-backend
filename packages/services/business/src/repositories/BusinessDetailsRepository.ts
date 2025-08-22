@@ -63,7 +63,9 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
 
       // Invalidate business cache
       if (this.cacheService) {
-        await this.cacheService.del(generateCacheKey.businessDetails(data.businessId))
+        await this.cacheService.del(
+          generateCacheKey.businessDetails(data.businessId),
+        )
       }
 
       logger.info('Business details created', {
@@ -89,10 +91,13 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
     try {
       // Check cache first
       const cacheKey = generateCacheKey.businessDetails(businessId)
+
       if (this.cacheService) {
         const cached = await this.cacheService.get<BusinessDetails>(cacheKey)
+
         if (cached) {
           logger.debug('Business details cache hit', { businessId })
+
           return cached
         }
       }
@@ -144,14 +149,23 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
 
       // Invalidate cache
       if (this.cacheService) {
-        await this.cacheService.del(generateCacheKey.businessDetails(businessId))
+        await this.cacheService.del(
+          generateCacheKey.businessDetails(businessId),
+        )
       }
 
-      logger.info('Business details updated', { businessId, detailsId: details.id })
+      logger.info('Business details updated', {
+        businessId,
+        detailsId: details.id,
+      })
 
       return details
     } catch (error) {
-      logger.error('Error updating business details', { businessId, data, error })
+      logger.error('Error updating business details', {
+        businessId,
+        data,
+        error,
+      })
       throw ErrorFactory.databaseError(
         'update',
         'Failed to update business details',
@@ -171,7 +185,9 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
 
       // Invalidate cache
       if (this.cacheService) {
-        await this.cacheService.del(generateCacheKey.businessDetails(businessId))
+        await this.cacheService.del(
+          generateCacheKey.businessDetails(businessId),
+        )
       }
 
       logger.info('Business details deleted', { businessId })

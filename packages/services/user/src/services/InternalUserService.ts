@@ -58,6 +58,14 @@ export class InternalUserService implements IInternalUserService {
         return null
       }
 
+      // Debug logging
+      logger.info('getUserAuthDataByEmail - raw user data', {
+        email: user.email,
+        role: user.role,
+        roleType: typeof user.role,
+        status: user.status,
+      })
+
       // Map database user to UserAuthData
       const authData: UserAuthData = {
         id: user.id,
@@ -72,6 +80,12 @@ export class InternalUserService implements IInternalUserService {
         createdAt: user.createdAt.toISOString(),
         lastLoginAt: user.lastLoginAt?.toISOString(),
       }
+
+      logger.info('getUserAuthDataByEmail - mapped auth data', {
+        email: authData.email,
+        role: authData.role,
+        roleType: typeof authData.role,
+      })
 
       return authData
     } catch (error) {

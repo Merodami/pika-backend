@@ -1,14 +1,69 @@
 # Flutter Implementation Guide
 
-## Complete Implementation Example
+## Complete Implementation with Clean Architecture
 
-This guide demonstrates how to implement a fully functional Flutter app using the generated types from Zod schemas.
+This guide demonstrates how to implement a production-ready Flutter app using **Clean Architecture**, **Riverpod**, and generated types from Zod schemas.
+
+## Architecture Overview
+
+The Flutter application follows **Clean Architecture** with industry-standard patterns:
+
+### Layer Structure
+
+- **Domain Layer**: Business logic, entities, repository interfaces, use cases (Pure Dart, no dependencies)
+- **Data Layer**: API integration, local storage, repository implementations (Depends on Domain)
+- **Presentation Layer**: UI components (Atomic Design), state management (Riverpod) (Depends on Domain)
+
+### Key Technologies
+
+- **State Management**: Riverpod 2.0 with Hooks
+- **Dependency Injection**: get_it with injectable
+- **Error Handling**: Either pattern with fpdart
+- **Networking**: Dio with Talker logging
+- **UI Components**: Atomic Design (Atoms → Molecules → Organisms)
+- **Responsive Design**: flutter_screenutil
+- **Logging**: Talker with navigation observer
+- **Testing**: mocktail, patrol, golden_toolkit
+- **Linting**: very_good_analysis
 
 ## Project Structure
 
 ```
 lib/
-├── generated/
+├── core/                          # Core functionality
+│   ├── di/                       # Dependency injection
+│   │   └── injection_container.dart
+│   ├── error/                    # Error handling
+│   │   ├── exceptions.dart
+│   │   └── failures.dart
+│   ├── usecases/                 # Base use cases
+│   │   └── usecase.dart
+│   ├── network/                  # Network utilities
+│   │   └── network_info.dart
+│   ├── utils/                    # Utilities
+│   │   └── logger.dart
+│   └── config/                   # App configuration
+│       └── app_theme.dart
+├── features/                      # Feature modules
+│   └── category/                 # Example feature
+│       ├── domain/               # Business logic
+│       │   ├── entities/
+│       │   ├── repositories/
+│       │   └── usecases/
+│       ├── data/                 # Data implementation
+│       │   ├── models/
+│       │   ├── datasources/
+│       │   └── repositories/
+│       └── presentation/         # UI layer
+│           ├── providers/
+│           ├── pages/
+│           └── widgets/
+├── shared/                        # Shared components
+│   └── widgets/
+│       ├── atoms/                # Basic components
+│       ├── molecules/            # Composite components
+│       └── organisms/            # Complex components
+├── generated/                     # Generated from Zod
 │   └── api/
 │       ├── auth_login.dart
 │       ├── auth_register.dart
@@ -16,16 +71,7 @@ lib/
 │       ├── category_category.dart
 │       ├── user_profile.dart
 │       └── voucher_voucher.dart
-├── services/
-│   ├── api_service.dart
-│   └── auth_service.dart
-├── screens/
-│   ├── login_screen.dart
-│   ├── profile_screen.dart
-│   └── business_list_screen.dart
-├── models/
-│   └── validation_result.dart
-└── main.dart
+└── main.dart                      # App entry point
 ```
 
 ## Core Services
@@ -75,7 +121,7 @@ class ApiService {
       _accessToken = authData.accessToken;
       return authData;
     }
-    
+
     throw ApiException(
       message: 'Login failed',
       statusCode: response.statusCode,
@@ -97,7 +143,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return api.CurrentUserProfile.fromJson(jsonDecode(response.body));
     }
-    
+
     throw ApiException(
       message: 'Failed to fetch profile',
       statusCode: response.statusCode,
@@ -132,7 +178,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return BusinessListResponse.fromJson(jsonDecode(response.body));
     }
-    
+
     throw ApiException(
       message: 'Failed to fetch businesses',
       statusCode: response.statusCode,
@@ -197,10 +243,10 @@ class AuthService {
       try {
         final profile = await _apiService.getCurrentProfile();
         await prefs.setString(
-          _userProfileKey, 
+          _userProfileKey,
           jsonEncode(profile.toJson())
         );
-        
+
         return AuthResult.success(
           tokens: authData,
           profile: profile,
@@ -222,7 +268,7 @@ class AuthService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(_accessTokenKey);
-      
+
       if (token == null) return false;
 
       _apiService.setAccessToken(token);
@@ -292,8 +338,8 @@ class ValidationResult {
   });
 
   const ValidationResult.valid() : this(isValid: true);
-  
-  const ValidationResult.invalid(List<String> errors) 
+
+  const ValidationResult.invalid(List<String> errors)
       : this(isValid: false, errors: errors);
 
   ValidationResult combine(ValidationResult other) {
@@ -322,7 +368,7 @@ class FormValidator {
 
   static ValidationResult validatePassword(String? password) {
     final errors = <String>[];
-    
+
     if (password == null || password.isEmpty) {
       return const ValidationResult.invalid(['Password is required']);
     }
@@ -343,7 +389,7 @@ class FormValidator {
       errors.add('Password must contain at least one number');
     }
 
-    return errors.isEmpty 
+    return errors.isEmpty
         ? const ValidationResult.valid()
         : ValidationResult.invalid(errors);
   }
@@ -414,7 +460,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result.isSuccess) {
       // Navigate to home
       Navigator.of(context).pushReplacementNamed('/home');
-      
+
       if (result.warning != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result.warning!)),
@@ -535,8 +581,8 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
       final response = await widget.apiService.getBusinesses(
         page: 1,
         limit: 20,
-        search: _searchController.text.trim().isEmpty 
-            ? null 
+        search: _searchController.text.trim().isEmpty
+            ? null
             : _searchController.text.trim(),
       );
 
@@ -553,8 +599,8 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
   }
 
   Future<void> _loadMoreBusinesses() async {
-    if (_businessList == null || 
-        !_businessList!.pagination.hasNext || 
+    if (_businessList == null ||
+        !_businessList!.pagination.hasNext ||
         _isLoading) {
       return;
     }
@@ -610,7 +656,7 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
               onSubmitted: (_) => _loadBusinesses(refresh: true),
             ),
           ),
-          
+
           // Business List
           Expanded(
             child: _buildContent(),
@@ -646,7 +692,7 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
-        if (scrollInfo.metrics.pixels == 
+        if (scrollInfo.metrics.pixels ==
             scrollInfo.metrics.maxScrollExtent &&
             !_isLoading &&
             _businessList!.pagination.hasNext) {
@@ -655,7 +701,7 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
         return false;
       },
       child: ListView.builder(
-        itemCount: _businessList!.data.length + 
+        itemCount: _businessList!.data.length +
                    (_businessList!.pagination.hasNext ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= _businessList!.data.length) {
@@ -666,7 +712,7 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
               ),
             );
           }
-          
+
           return _buildBusinessCard(_businessList!.data[index]);
         },
       ),
@@ -679,7 +725,7 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
       child: ListTile(
         title: Text(business.businessNameKey),
         subtitle: Text('Rating: ${business.avgRating.toStringAsFixed(1)}'),
-        trailing: business.verified 
+        trailing: business.verified
             ? const Icon(Icons.verified, color: Colors.blue)
             : null,
         onTap: () {
@@ -784,6 +830,7 @@ void main() {
 ## Performance Optimization
 
 ### 1. Caching Strategy
+
 ```dart
 class CachedApiService extends ApiService {
   final Duration cacheDuration;
@@ -804,20 +851,21 @@ class CachedApiService extends ApiService {
       data: (response as dynamic).toJson(),
       timestamp: DateTime.now(),
     );
-    
+
     return response;
   }
 }
 ```
 
 ### 2. Lazy Loading
+
 ```dart
 class LazyBusinessList extends StatefulWidget {
   @override
   State<LazyBusinessList> createState() => _LazyBusinessListState();
 }
 
-class _LazyBusinessListState extends State<LazyBusinessList> 
+class _LazyBusinessListState extends State<LazyBusinessList>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
@@ -846,11 +894,12 @@ class _LazyBusinessListState extends State<LazyBusinessList>
 ## Error Handling Patterns
 
 ### Global Error Handler
+
 ```dart
 class ErrorHandler {
   static void handleApiError(BuildContext context, dynamic error) {
     String message = 'An unexpected error occurred';
-    
+
     if (error is ApiException) {
       switch (error.statusCode) {
         case 401:
@@ -870,7 +919,7 @@ class ErrorHandler {
           message = error.message;
       }
     }
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -884,6 +933,7 @@ class ErrorHandler {
 ## State Management Integration
 
 ### With Provider
+
 ```dart
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
@@ -920,6 +970,7 @@ class AuthProvider extends ChangeNotifier {
 ```
 
 ### With Riverpod
+
 ```dart
 final authServiceProvider = Provider((ref) => AuthService(
   ref.watch(apiServiceProvider),

@@ -87,12 +87,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "id",
-              "firstName",
-              "lastName",
-              "createdAt"
-            ],
+            "required": ["id", "firstName", "lastName", "createdAt"],
             "additionalProperties": false
           },
           "category": {
@@ -313,11 +308,6 @@
       "maximum": 9007199254740991
     }
   },
-  "required": [
-    "categoryId",
-    "categoryName",
-    "businesses",
-    "totalCount"
-  ],
+  "required": ["categoryId", "categoryName", "businesses", "totalCount"],
   "additionalProperties": false
 }
