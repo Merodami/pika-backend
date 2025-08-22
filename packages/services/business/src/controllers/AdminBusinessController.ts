@@ -2,6 +2,7 @@ import type { IBusinessRegistrationService } from '@business/services/BusinessRe
 import type { IBusinessService } from '@business/services/BusinessService.js'
 import { businessAdmin, businessCommon, businessPublic, mapSortOrder, userAdmin } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
+import { BusinessRegistrationStatus } from '@pika/types'
 import {
   getValidatedQuery,
   paginatedResponse,
@@ -364,6 +365,33 @@ export class AdminBusinessController {
         adminUserId,
         reason,
       )
+
+      // Also update the registration status if there's a linked registration
+      if (this.registrationService) {
+        try {
+          const registration = await this.registrationService.updateRegistrationStatusByBusinessId(
+            businessId,
+            approved ? BusinessRegistrationStatus.APPROVED : BusinessRegistrationStatus.REJECTED,
+            reason,
+          )
+          
+          if (registration) {
+            logger.info({
+              msg: 'Updated registration status after business approval',
+              businessId,
+              registrationId: registration.registrationId,
+              newStatus: approved ? BusinessRegistrationStatus.APPROVED : BusinessRegistrationStatus.REJECTED,
+            })
+          }
+        } catch (error) {
+          // Log but don't fail if registration update fails
+          logger.warn({
+            msg: 'Could not update registration status after business approval',
+            businessId,
+            error,
+          })
+        }
+      }
 
       // Transform to admin DTO using mapper
       const response = BusinessMapper.toAdminDTO(business)

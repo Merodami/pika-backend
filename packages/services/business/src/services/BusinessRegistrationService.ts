@@ -45,6 +45,11 @@ export interface IBusinessRegistrationService {
     registrationId: string
     userId: string
   }>
+  updateRegistrationStatusByBusinessId(
+    businessId: string,
+    status: BusinessRegistrationStatus,
+    reason?: string,
+  ): Promise<{ registrationId: string; userId: string } | null>
 }
 
 /**
@@ -505,6 +510,59 @@ export class BusinessRegistrationService
       logger.error('Error resetting business registration', {
         userId,
         reason,
+        error,
+      })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Update registration status by business ID (used when admin approves/rejects business)
+   * This ensures the registration status stays in sync with business approval
+   */
+  async updateRegistrationStatusByBusinessId(
+    businessId: string,
+    status: BusinessRegistrationStatus,
+    reason?: string,
+  ): Promise<{ registrationId: string; userId: string } | null> {
+    try {
+      logger.info('Updating registration status by business ID', {
+        businessId,
+        status,
+        reason,
+      })
+
+      // Find registration by business ID
+      const registration =
+        await this.registrationRepository.findByBusinessId(businessId)
+
+      if (!registration) {
+        logger.warn('No registration found for business', { businessId })
+        return null
+      }
+
+      // Update the registration status (including rejection reason if applicable)
+      const updatedRegistration = await this.registrationRepository.updateStatus(
+        registration.id,
+        status,
+        reason,
+      )
+
+      logger.info('Registration status updated successfully', {
+        registrationId: registration.id,
+        businessId,
+        userId: registration.userId,
+        newStatus: status,
+      })
+
+      return {
+        registrationId: registration.id,
+        userId: registration.userId,
+      }
+    } catch (error) {
+      logger.error('Error updating registration status by business ID', {
+        businessId,
+        status,
         error,
       })
       throw ErrorFactory.fromError(error)

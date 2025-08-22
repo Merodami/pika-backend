@@ -695,20 +695,23 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     },
   })
 
-  // Get my business (authenticated users)
+  // Get my businesses (authenticated users) - returns paginated list
   registry.registerRoute({
     method: 'get',
     path: '/businesses/me',
-    operationId: 'getMyBusiness',
-    summary: 'Get my business details',
+    operationId: 'getMyBusinesses',
+    summary: 'Get my businesses with pagination and filters',
     tags: ['My Business'],
     security: [{ bearerAuth: [] }],
+    request: {
+      query: businessSchemas.BusinessQueryParams,
+    },
     responses: {
       200: {
-        description: 'My business details',
+        description: 'Paginated list of my businesses',
         content: {
           'application/json': {
-            schema: businessSchemas.BusinessResponse,
+            schema: businessSchemas.BusinessListResponse,
           },
         },
       },

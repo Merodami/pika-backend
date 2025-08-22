@@ -33,13 +33,14 @@ function toPrismaStatus(domainStatus?: DomainStatus): PrismaStatus {
 export interface IBusinessRegistrationRepository {
   findByUserId(userId: string): Promise<BusinessRegistration | null>
   findById(id: string): Promise<BusinessRegistration | null>
+  findByBusinessId(businessId: string): Promise<BusinessRegistration | null>
   create(data: CreateRegistrationData): Promise<BusinessRegistration>
   updateStep(
     id: string,
     step: number,
     stepData: any,
   ): Promise<BusinessRegistration>
-  updateStatus(id: string, status: DomainStatus): Promise<BusinessRegistration>
+  updateStatus(id: string, status: DomainStatus, reason?: string): Promise<BusinessRegistration>
   complete(id: string, businessId: string): Promise<BusinessRegistration>
   reset(id: string): Promise<BusinessRegistration>
 }
@@ -129,6 +130,24 @@ export class BusinessRegistrationRepository
       logger.error('Error finding business registration by ID', { id, error })
       throw ErrorFactory.databaseError(
         'findById',
+        'Failed to find business registration',
+        error,
+      )
+    }
+  }
+
+  /**
+   * Find registration by business ID
+   */
+  async findByBusinessId(businessId: string): Promise<BusinessRegistration | null> {
+    try {
+      return await this.prisma.businessRegistration.findFirst({
+        where: { businessId },
+      })
+    } catch (error) {
+      logger.error('Error finding business registration by business ID', { businessId, error })
+      throw ErrorFactory.databaseError(
+        'findByBusinessId',
         'Failed to find business registration',
         error,
       )
@@ -286,6 +305,7 @@ export class BusinessRegistrationRepository
   async updateStatus(
     id: string,
     status: DomainStatus,
+    reason?: string,
   ): Promise<BusinessRegistration> {
     try {
       const updateData: Prisma.BusinessRegistrationUpdateInput = {
@@ -298,6 +318,8 @@ export class BusinessRegistrationRepository
         updateData.submittedAt = new Date()
       } else if (status === DomainStatus.APPROVED) {
         updateData.completedAt = new Date()
+      } else if (status === DomainStatus.REJECTED && reason) {
+        updateData.rejectionReason = reason
       }
 
       const registration = await this.prisma.businessRegistration.update({
