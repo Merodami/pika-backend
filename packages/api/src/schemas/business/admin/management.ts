@@ -29,15 +29,15 @@ import {
 export const AdminBusinessResponse = withTimestamps({
   id: UUID,
   userId: UserId.describe('User who owns this business'),
-  businessNameKey: z
+  businessName: z
     .string()
     .max(FIELD_LENGTH.SLUG_MAX)
-    .describe('Translation key for business name'),
-  businessDescriptionKey: z
+    .describe('Business name (resolved translation)'),
+  businessDescription: z
     .string()
     .max(FIELD_LENGTH.SLUG_MAX)
     .optional()
-    .describe('Translation key for business description'),
+    .describe('Business description (resolved translation)'),
   categoryId: UUID.nullable().describe('Category this business belongs to'),
   verified: z.boolean().default(false).describe('Whether business is verified'),
   active: z.boolean().default(true).describe('Whether business is active'),

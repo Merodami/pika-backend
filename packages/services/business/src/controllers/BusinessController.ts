@@ -2,6 +2,7 @@ import type { IBusinessService } from '@business/services/BusinessService.js'
 import { businessPublic, mapSortOrder, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
@@ -37,6 +38,7 @@ export class BusinessController {
   ): Promise<void> {
     try {
       const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Map API query to service params - only show active businesses to public
       const params = {
@@ -51,7 +53,7 @@ export class BusinessController {
         sortOrder: mapSortOrder(query.sortOrder),
       }
 
-      const result = await this.businessService.getAllBusinesses(params)
+      const result = await this.businessService.getAllBusinesses(params, language)
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
@@ -80,13 +82,18 @@ export class BusinessController {
       const { id: businessId } = req.params
       const query =
         getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Parse include parameter
       const includeRelations = query.include?.split(',') || []
-      const business = await this.businessService.getBusinessById(businessId, {
-        user: includeRelations.includes('user'),
-        category: includeRelations.includes('category'),
-      })
+      const business = await this.businessService.getBusinessById(
+        businessId,
+        {
+          user: includeRelations.includes('user'),
+          category: includeRelations.includes('category'),
+        },
+        language,
+      )
 
       // Check if business is active for public access
       if (!business.active) {
@@ -122,13 +129,18 @@ export class BusinessController {
       const { id: userId } = req.params
       const query =
         getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Parse include parameter
       const includeRelations = query.include?.split(',') || []
-      const business = await this.businessService.getBusinessByUserId(userId, {
-        user: includeRelations.includes('user'),
-        category: includeRelations.includes('category'),
-      })
+      const business = await this.businessService.getBusinessByUserId(
+        userId,
+        {
+          user: includeRelations.includes('user'),
+          category: includeRelations.includes('category'),
+        },
+        language,
+      )
 
       // Check if business is active for public access
       if (!business.active) {
@@ -165,6 +177,7 @@ export class BusinessController {
       const context = RequestContext.getContext(req)
       const userId = context.userId
       const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Build search params with userId filter
       // For business owners, show all their businesses (active and inactive)
@@ -182,7 +195,7 @@ export class BusinessController {
         sortOrder: mapSortOrder(query.sortOrder),
       }
 
-      const result = await this.businessService.getAllBusinesses(params)
+      const result = await this.businessService.getAllBusinesses(params, language)
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
@@ -210,13 +223,14 @@ export class BusinessController {
     try {
       const context = RequestContext.getContext(req)
       const authenticatedUserId = context.userId
+      const language = getRequestLanguage(req)
 
       const data = {
         ...req.body,
         userId: authenticatedUserId,
       }
 
-      const business = await this.businessService.createBusiness(data)
+      const business = await this.businessService.createBusiness(data, language)
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)

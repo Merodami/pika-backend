@@ -13,6 +13,9 @@ export interface BusinessDomain {
   userId: string
   businessNameKey: string
   businessDescriptionKey: string | null
+  // Resolved translations (populated by TranslationResolver in service layer)
+  businessName?: string
+  businessDescription?: string | null
   categoryId: string | null
   verified: boolean
   active: boolean

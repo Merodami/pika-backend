@@ -2,6 +2,7 @@ import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
 import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryCommon, categoryInternal } from '@pika/api'
 import {
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
@@ -34,7 +35,8 @@ export class InternalCategoryController {
     try {
       const { id } = req.params
 
-      const category = await this.categoryService.getCategoryById(id)
+      const language = getRequestLanguage(req)
+      const category = await this.categoryService.getCategoryById(id, language)
 
       // Return minimal data for internal use
       const response = CategoryMapper.toInternalDTO(category)
@@ -64,7 +66,8 @@ export class InternalCategoryController {
     try {
       const { categoryIds } = req.body
 
-      const result = await this.categoryService.getCategoriesByIds(categoryIds)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getCategoriesByIds(categoryIds, language)
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -99,8 +102,9 @@ export class InternalCategoryController {
               categoryId,
             ): Promise<categoryInternal.CategoryValidationResult> => {
               try {
+                const language = getRequestLanguage(req)
                 const category =
-                  await this.categoryService.getCategoryById(categoryId)
+                  await this.categoryService.getCategoryById(categoryId, language)
 
                 return {
                   categoryId,
@@ -159,7 +163,8 @@ export class InternalCategoryController {
         sortOrder: 'asc' as const,
       }
 
-      const result = await this.categoryService.getAllCategories(params)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getAllCategories(params, language)
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -196,7 +201,8 @@ export class InternalCategoryController {
         sortOrder: 'asc' as const,
       }
 
-      const result = await this.categoryService.getAllCategories(params)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getAllCategories(params, language)
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -222,7 +228,8 @@ export class InternalCategoryController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      const categories = await this.categoryService.getCategoryHierarchy()
+      const language = getRequestLanguage(req)
+      const categories = await this.categoryService.getCategoryHierarchy(undefined, language)
 
       // Transform to DTOs
       const response = {

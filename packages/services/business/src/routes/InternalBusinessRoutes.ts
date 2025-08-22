@@ -9,7 +9,7 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import type { TranslationClient } from '@pika/translation'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -20,12 +20,13 @@ export function createInternalBusinessRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
   translationClient: TranslationClient,
+  translationResolver?: TranslationResolver,
 ): Router {
   const router = Router()
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
-  const service = new BusinessService(repository, translationClient, cache)
+  const service = new BusinessService(repository, translationClient, cache, translationResolver)
   const controller = new InternalBusinessController(service)
 
   // All routes require internal authentication

@@ -91,9 +91,14 @@ export class BusinessRegistrationMapper {
         domain.registrationStatus === BusinessRegistrationStatus.APPROVED &&
         domain.businessId !== null
 
+      // User doesn't need registration if status is SUBMITTED or APPROVED
+      const needsRegistration = !(
+        domain.registrationStatus === BusinessRegistrationStatus.SUBMITTED ||
+        domain.registrationStatus === BusinessRegistrationStatus.APPROVED
+      )
+
       return {
-        needsRegistration:
-          domain.registrationStatus !== BusinessRegistrationStatus.APPROVED,
+        needsRegistration,
         currentStep: domain.currentStep,
         registrationStatus: domain.registrationStatus,
         canAccessDashboard,

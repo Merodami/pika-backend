@@ -2,10 +2,10 @@
 import '@pika/environment'
 
 import { BUSINESS_SERVICE_NAME, BUSINESS_SERVICE_PORT } from '@pika/environment'
-import { createExpressServer, errorMiddleware } from '@pika/http'
+import { createExpressServer, errorMiddleware, createLanguageMiddleware } from '@pika/http'
 import { ICacheService, setCacheService } from '@pika/redis'
 import { logger, UserServiceClient } from '@pika/shared'
-import { TranslationClient } from '@pika/translation'
+import { TranslationClient, createTranslationResolver } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminBusinessRoutes } from './routes/AdminBusinessRoutes.js'
@@ -94,11 +94,18 @@ export async function createBusinessServer({
     ],
   })
 
-  // Register business routes
+  // Add language detection middleware
+  app.use(createLanguageMiddleware(translationClient.service))
+
+  // Create translation resolver
+  const translationResolver = createTranslationResolver(translationClient)
+
+  // Register business routes with translation resolver
   const businessRouter = createBusinessRoutes(
     prisma,
     cacheService,
     translationClient,
+    translationResolver,
   )
 
   app.use('/businesses', businessRouter)
@@ -109,6 +116,7 @@ export async function createBusinessServer({
       prisma,
       cacheService,
       translationClient,
+      translationResolver,
       userServiceClient,
     )
 
@@ -120,6 +128,7 @@ export async function createBusinessServer({
     prisma,
     cacheService,
     translationClient,
+    translationResolver,
   )
 
   app.use('/admin/businesses', adminRouter)
@@ -129,6 +138,7 @@ export async function createBusinessServer({
     prisma,
     cacheService,
     translationClient,
+    translationResolver,
   )
 
   app.use('/internal/businesses', internalRouter)

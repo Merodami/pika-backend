@@ -11,11 +11,12 @@ import type { UserDTO } from './user.dto.js'
 export interface BusinessDTO {
   id: string
   userId: string
-  businessNameKey: string
-  businessDescriptionKey?: string
+  businessName: string
+  businessDescription?: string
   categoryId: string
   verified: boolean
   active: boolean
+  approved: boolean
   avgRating: number
   createdAt: string
   updatedAt: string

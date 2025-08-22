@@ -8,6 +8,8 @@
       "minLength": 1
     }
   },
-  "required": ["token"],
+  "required": [
+    "token"
+  ],
   "additionalProperties": false
 }

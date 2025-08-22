@@ -55,8 +55,8 @@ export interface CategoryDTO {
  */
 export interface InternalCategoryDTO {
   id: string
-  nameKey: string
-  descriptionKey?: string
+  name: string
+  description?: string
   icon?: string
   parentId?: string
   isActive: boolean
@@ -384,10 +384,14 @@ export class CategoryMapper {
    * Convert domain entity to internal DTO for service-to-service communication
    */
   static toInternalDTO(domain: CategoryDomain): InternalCategoryDTO {
+    // Use resolved translations if available, fallback to keys
+    const name = (domain as any).name || domain.nameKey
+    const description = (domain as any).description || domain.descriptionKey
+    
     return {
       id: domain.id,
-      nameKey: domain.nameKey,
-      descriptionKey: domain.descriptionKey,
+      name,
+      description,
       icon: domain.icon,
       parentId: domain.parentId,
       isActive: domain.isActive,

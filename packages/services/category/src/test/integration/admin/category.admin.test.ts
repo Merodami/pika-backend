@@ -9,6 +9,7 @@ import { vi } from 'vitest'
 // --- START MOCKING CONFIGURATION ---
 vi.unmock('@pika/http')
 vi.unmock('@pika/shared')
+vi.unmock('@pika/translation')
 
 vi.mock('@pika/api', async () => {
   const actualApi =
@@ -42,6 +43,7 @@ import {
   createE2EAuthHelper,
   E2EAuthHelper,
   MockCacheService,
+  MockTranslationClient,
 } from '@pika/tests'
 import { Express } from 'express'
 import supertest from 'supertest'
@@ -59,6 +61,7 @@ describe('Admin Category Integration Tests', () => {
   let sharedTestData: SharedCategoryTestData
 
   const mockCacheService = new MockCacheService()
+  const mockTranslationClient = new MockTranslationClient()
 
   beforeAll(async () => {
     testDb = await createTestDatabase({
@@ -72,6 +75,7 @@ describe('Admin Category Integration Tests', () => {
     const serverResult = await createCategoryServer({
       prisma: testDb.prisma,
       cacheService: mockCacheService as any,
+      translationClient: mockTranslationClient as any,
     })
 
     app = serverResult.app
@@ -147,8 +151,8 @@ describe('Admin Category Integration Tests', () => {
 
         // Verify core fields
         expect(response.body).toHaveProperty('id')
-        expect(response.body.nameKey).toBe(categoryData.nameKey)
-        expect(response.body.descriptionKey).toBe(categoryData.descriptionKey)
+        expect(response.body.name).toBe(categoryData.nameKey) // API returns resolved name
+        expect(response.body.description).toBe(categoryData.descriptionKey) // API returns resolved description
         expect(response.body.icon).toBe(categoryData.icon)
         expect(response.body.isActive).toBe(true)
         expect(response.body.sortOrder).toBe(categoryData.sortOrder)
@@ -197,7 +201,7 @@ describe('Admin Category Integration Tests', () => {
         expect(response.body.parentId).toBe(parentCategory.id)
         expect(response.body.level).toBe(2)
         expect(response.body.path).toBe(parentCategory.id)
-        expect(response.body.nameKey).toBe(childData.nameKey)
+        expect(response.body.name).toBe(childData.nameKey) // API returns resolved name
         expect(response.body.slug).toBe('categories-child-new-name')
       })
     })
@@ -228,7 +232,7 @@ describe('Admin Category Integration Tests', () => {
           .send(updateData)
           .expect(200)
 
-        expect(response.body.nameKey).toBe(updateData.nameKey)
+        expect(response.body.name).toBe(updateData.nameKey) // API returns resolved name
         expect(response.body.isActive).toBe(false)
         expect(response.body.slug).toBe('categories-updated-name')
         expect(response.body.level).toBe(1)

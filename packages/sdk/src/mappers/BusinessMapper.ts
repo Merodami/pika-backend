@@ -120,11 +120,13 @@ export class BusinessMapper {
     return {
       id: domain.id,
       userId: domain.userId,
-      businessNameKey: domain.businessNameKey,
-      businessDescriptionKey: domain.businessDescriptionKey || undefined,
+      // Use resolved translations if available, fallback to keys
+      businessName: domain.businessName || domain.businessNameKey,
+      businessDescription: domain.businessDescription || domain.businessDescriptionKey || undefined,
       categoryId: domain.categoryId || '', // Handle null categoryId
       verified: domain.verified,
       active: domain.active,
+      approved: domain.approved,
       avgRating: domain.avgRating,
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
@@ -144,8 +146,8 @@ export class BusinessMapper {
     return {
       id: dto.id,
       userId: dto.userId,
-      businessNameKey: dto.businessNameKey,
-      businessDescriptionKey: dto.businessDescriptionKey || null,
+      businessNameKey: dto.businessName,
+      businessDescriptionKey: dto.businessDescription || null,
       categoryId: dto.categoryId || null, // Handle empty string as null
       verified: dto.verified,
       active: dto.active,

@@ -43,6 +43,7 @@
     "flow:business-validation": "tsx scripts/flows/business-registration-validation-flow.ts",
     "flow:setup-users": "tsx scripts/flows/setup-test-users.ts",
     "flow:admin-users": "tsx scripts/flows/admin-user-management-flow.ts",
+    "flow:voucher": "tsx scripts/flows/voucher-creation-flow.ts",
     "test:auth-gateway": "yarn vitest \"packages/api-gateway/src/test/integration/auth-gateway.integration.test.ts\"",
     "test:auth-all": "yarn test:auth && yarn test:auth-gateway",
     "test:all": "yarn test",

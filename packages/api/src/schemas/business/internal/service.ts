@@ -23,8 +23,8 @@ export const InternalBusinessData = openapi(
   z.object({
     id: UUID,
     userId: UserId,
-    businessNameKey: z.string(),
-    businessDescriptionKey: z.string().optional(),
+    businessName: z.string(),
+    businessDescription: z.string().optional(),
     categoryId: UUID,
     verified: z.boolean(),
     active: z.boolean(),

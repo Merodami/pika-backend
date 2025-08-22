@@ -421,42 +421,7 @@ export class BusinessRepository implements IBusinessRepository {
           active: data.active ?? true,
           avgRating: data.avgRating ?? 0,
         },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-              phoneNumber: true,
-              role: true,
-              status: true,
-              avatarUrl: true,
-              emailVerified: true,
-              phoneVerified: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              slug: true,
-              nameKey: true,
-              descriptionKey: true,
-              icon: true,
-              parentId: true,
-              isActive: true,
-              sortOrder: true,
-              level: true,
-              path: true,
-              createdBy: true,
-              updatedBy: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          },
-        },
+        // No relations included - they can be loaded separately when needed
       })
 
       const domainBusiness = BusinessMapper.fromDocument({

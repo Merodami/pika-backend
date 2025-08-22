@@ -39,11 +39,20 @@
     },
     "role": {
       "type": "string",
-      "enum": ["admin", "customer", "business"]
+      "enum": [
+        "admin",
+        "customer",
+        "business"
+      ]
     },
     "status": {
       "type": "string",
-      "enum": ["active", "suspended", "banned", "unconfirmed"]
+      "enum": [
+        "active",
+        "suspended",
+        "banned",
+        "unconfirmed"
+      ]
     },
     "emailVerified": {
       "type": "boolean"

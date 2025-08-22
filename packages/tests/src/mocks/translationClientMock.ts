@@ -1,3 +1,4 @@
+import type { LanguageCode } from '@pika/types'
 import { vi } from 'vitest'
 
 /**
@@ -6,13 +7,25 @@ import { vi } from 'vitest'
  * Implements the same public interface as TranslationClient for type compatibility
  */
 export class MockTranslationClient {
-  private mockTranslations = new Map<string, Map<string, string>>()
-  private mockUserLanguages = new Map<string, string>()
+  private mockTranslations = new Map<string, Map<LanguageCode, string>>()
+  private mockUserLanguages = new Map<string, LanguageCode>()
+  
+  // Expose mock service for middleware compatibility
+  public readonly service = {
+    get: this.get.bind(this),
+    getBulk: this.getBulk.bind(this),
+    set: this.set.bind(this),
+    setBulk: this.setBulk.bind(this),
+    getUserLanguage: this.getUserLanguage.bind(this),
+    setUserLanguage: this.setUserLanguage.bind(this),
+    getAllLanguages: async (): Promise<LanguageCode[]> => ['en', 'es', 'gn'],
+    getDefaultLanguage: async (): Promise<LanguageCode> => 'en',
+  }
 
   /**
    * Get translation for a key in a specific language
    */
-  async get(key: string, language: string, fallback?: string): Promise<string> {
+  async get(key: string, language: LanguageCode, fallback?: string): Promise<string> {
     const translations = this.mockTranslations.get(key)
 
     if (!translations) {
@@ -43,7 +56,7 @@ export class MockTranslationClient {
    */
   async getBulk(
     keys: string[],
-    language: string,
+    language: LanguageCode,
   ): Promise<Record<string, string>> {
     const result: Record<string, string> = {}
 
@@ -57,7 +70,7 @@ export class MockTranslationClient {
   /**
    * Set translation for a key in a specific language
    */
-  async set(key: string, language: string, value: string): Promise<void> {
+  async set(key: string, language: LanguageCode, value: string): Promise<void> {
     if (!this.mockTranslations.has(key)) {
       this.mockTranslations.set(key, new Map())
     }
@@ -68,14 +81,14 @@ export class MockTranslationClient {
   /**
    * Get user's preferred language
    */
-  async getUserLanguage(userId: string): Promise<string> {
+  async getUserLanguage(userId: string): Promise<LanguageCode> {
     return this.mockUserLanguages.get(userId) || 'en'
   }
 
   /**
    * Set user's preferred language
    */
-  async setUserLanguage(userId: string, languageCode: string): Promise<void> {
+  async setUserLanguage(userId: string, languageCode: LanguageCode): Promise<void> {
     this.mockUserLanguages.set(userId, languageCode)
   }
 
@@ -97,7 +110,7 @@ export class MockTranslationClient {
       context?: string
       service?: string
     }>,
-    language: string,
+    language: LanguageCode,
   ): Promise<void> {
     for (const { key, value } of translations) {
       await this.set(key, language, value)
@@ -110,12 +123,12 @@ export class MockTranslationClient {
   seedTranslations(
     translations: Array<{
       key: string
-      translations: Record<string, string>
+      translations: Record<LanguageCode, string>
     }>,
   ): void {
     for (const { key, translations: translationData } of translations) {
-      const translationMap = new Map<string, string>(
-        Object.entries(translationData),
+      const translationMap = new Map<LanguageCode, string>(
+        Object.entries(translationData) as Array<[LanguageCode, string]>,
       )
 
       this.mockTranslations.set(key, translationMap)

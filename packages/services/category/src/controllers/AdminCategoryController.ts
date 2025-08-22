@@ -3,6 +3,7 @@ import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryAdmin, categoryCommon } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
@@ -53,7 +54,8 @@ export class AdminCategoryController {
         sortOrder: query.sortOrder,
       }
 
-      const result = await this.categoryService.getAllCategories(params)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getAllCategories(params, language)
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)
@@ -81,7 +83,8 @@ export class AdminCategoryController {
     try {
       const { id } = req.params
 
-      const category = await this.categoryService.getCategoryById(id)
+      const language = getRequestLanguage(req)
+      const category = await this.categoryService.getCategoryById(id, language)
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
@@ -351,8 +354,10 @@ export class AdminCategoryController {
     try {
       const query = getValidatedQuery<{ rootId?: string }>(req)
 
+      const language = getRequestLanguage(req)
       const categories = await this.categoryService.getCategoryHierarchy(
         query.rootId,
+        language,
       )
 
       // Transform to DTOs

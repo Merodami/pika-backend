@@ -143,7 +143,7 @@ describe('Business Service - Internal API Integration Tests', () => {
       )
       if (response.body.data.length > 0) {
         expect(response.body.data[0]).toHaveProperty('id')
-        expect(response.body.data[0]).toHaveProperty('businessNameKey')
+        expect(response.body.data[0]).toHaveProperty('businessName') // API returns resolved name
       }
     })
 
@@ -377,7 +377,7 @@ describe('Business Service - Internal API Integration Tests', () => {
         const business = response.body.data[0]
         expect(business.userId).toBe(userId)
         expect(business).toHaveProperty('id')
-        expect(business).toHaveProperty('businessNameKey')
+        expect(business).toHaveProperty('businessName') // API returns resolved name
       }
     })
   })
@@ -393,7 +393,7 @@ describe('Business Service - Internal API Integration Tests', () => {
         .expect(200)
 
       expect(response.body.id).toBe(business.id)
-      expect(response.body.businessNameKey).toBe(business.businessNameKey)
+      expect(response.body.businessName).toBe(business.businessNameKey)
       expect(response.body.userId).toBe(business.userId)
     })
 
@@ -517,8 +517,8 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       // Data should be consistent
       expect(batchResponse.body.businesses[0].id).toBe(userResponse.body.id)
-      expect(batchResponse.body.businesses[0].businessNameKey).toBe(
-        userResponse.body.businessNameKey,
+      expect(batchResponse.body.businesses[0].businessName).toBe(
+        userResponse.body.businessName, // API returns resolved name
       )
       expect(batchResponse.body.businesses[0].avgRating).toBe(
         userResponse.body.avgRating,
@@ -536,7 +536,7 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       // Should include relations when requested
       expect(response.body.id).toBe(business.id)
-      expect(response.body.businessNameKey).toBe(business.businessNameKey)
+      expect(response.body.businessName).toBe(business.businessNameKey)
     })
   })
 })

@@ -16,6 +16,7 @@ vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
+vi.unmock('@pika/translation')
 
 import { createBusinessServer } from '@business/server.js'
 import {

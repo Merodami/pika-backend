@@ -31,15 +31,13 @@
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
               },
-              "nameKey": {
-                "description": "Translation key for category name",
-                "type": "string",
-                "maxLength": 255
+              "name": {
+                "description": "Category name in requested language",
+                "type": "string"
               },
-              "descriptionKey": {
-                "description": "Translation key for category description",
-                "type": "string",
-                "maxLength": 255
+              "description": {
+                "description": "Category description in requested language",
+                "type": "string"
               },
               "icon": {
                 "description": "Category icon identifier",
@@ -111,15 +109,13 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
                     },
-                    "nameKey": {
-                      "description": "Translation key for category name",
-                      "type": "string",
-                      "maxLength": 255
+                    "name": {
+                      "description": "Category name in requested language",
+                      "type": "string"
                     },
-                    "descriptionKey": {
-                      "description": "Translation key for category description",
-                      "type": "string",
-                      "maxLength": 255
+                    "description": {
+                      "description": "Category description in requested language",
+                      "type": "string"
                     },
                     "icon": {
                       "description": "Category icon identifier",
@@ -182,7 +178,7 @@
                   },
                   "required": [
                     "id",
-                    "nameKey",
+                    "name",
                     "isActive",
                     "sortOrder",
                     "slug",
@@ -198,7 +194,7 @@
             },
             "required": [
               "id",
-              "nameKey",
+              "name",
               "isActive",
               "sortOrder",
               "slug",
@@ -212,7 +208,9 @@
           }
         }
       },
-      "required": ["data"],
+      "required": [
+        "data"
+      ],
       "additionalProperties": false
     },
     "CategoryListResponse": {
@@ -232,15 +230,13 @@
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
               },
-              "nameKey": {
-                "description": "Translation key for category name",
-                "type": "string",
-                "maxLength": 255
+              "name": {
+                "description": "Category name in requested language",
+                "type": "string"
               },
-              "descriptionKey": {
-                "description": "Translation key for category description",
-                "type": "string",
-                "maxLength": 255
+              "description": {
+                "description": "Category description in requested language",
+                "type": "string"
               },
               "icon": {
                 "description": "Category icon identifier",
@@ -312,15 +308,13 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
                     },
-                    "nameKey": {
-                      "description": "Translation key for category name",
-                      "type": "string",
-                      "maxLength": 255
+                    "name": {
+                      "description": "Category name in requested language",
+                      "type": "string"
                     },
-                    "descriptionKey": {
-                      "description": "Translation key for category description",
-                      "type": "string",
-                      "maxLength": 255
+                    "description": {
+                      "description": "Category description in requested language",
+                      "type": "string"
                     },
                     "icon": {
                       "description": "Category icon identifier",
@@ -383,7 +377,7 @@
                   },
                   "required": [
                     "id",
-                    "nameKey",
+                    "name",
                     "isActive",
                     "sortOrder",
                     "slug",
@@ -399,7 +393,7 @@
             },
             "required": [
               "id",
-              "nameKey",
+              "name",
               "isActive",
               "sortOrder",
               "slug",
@@ -459,7 +453,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "CategoryPathParams": {
@@ -473,7 +470,9 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "CategoryPathResponse": {
@@ -491,15 +490,13 @@
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
               },
-              "nameKey": {
-                "description": "Translation key for category name",
-                "type": "string",
-                "maxLength": 255
+              "name": {
+                "description": "Category name in requested language",
+                "type": "string"
               },
-              "descriptionKey": {
-                "description": "Translation key for category description",
-                "type": "string",
-                "maxLength": 255
+              "description": {
+                "description": "Category description in requested language",
+                "type": "string"
               },
               "icon": {
                 "description": "Category icon identifier",
@@ -571,15 +568,13 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
                     },
-                    "nameKey": {
-                      "description": "Translation key for category name",
-                      "type": "string",
-                      "maxLength": 255
+                    "name": {
+                      "description": "Category name in requested language",
+                      "type": "string"
                     },
-                    "descriptionKey": {
-                      "description": "Translation key for category description",
-                      "type": "string",
-                      "maxLength": 255
+                    "description": {
+                      "description": "Category description in requested language",
+                      "type": "string"
                     },
                     "icon": {
                       "description": "Category icon identifier",
@@ -642,7 +637,7 @@
                   },
                   "required": [
                     "id",
-                    "nameKey",
+                    "name",
                     "isActive",
                     "sortOrder",
                     "slug",
@@ -658,7 +653,7 @@
             },
             "required": [
               "id",
-              "nameKey",
+              "name",
               "isActive",
               "sortOrder",
               "slug",
@@ -672,7 +667,9 @@
           }
         }
       },
-      "required": ["data"],
+      "required": [
+        "data"
+      ],
       "additionalProperties": false
     },
     "CategoryQueryParams": {
@@ -696,13 +693,21 @@
         "sortBy": {
           "default": "sortOrder",
           "type": "string",
-          "enum": ["name", "sortOrder", "createdAt", "updatedAt"]
+          "enum": [
+            "name",
+            "sortOrder",
+            "createdAt",
+            "updatedAt"
+          ]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search query",
@@ -723,7 +728,12 @@
           "type": "string"
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "CategoryResponse": {
@@ -736,15 +746,13 @@
           "format": "uuid",
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
         },
-        "nameKey": {
-          "description": "Translation key for category name",
-          "type": "string",
-          "maxLength": 255
+        "name": {
+          "description": "Category name in requested language",
+          "type": "string"
         },
-        "descriptionKey": {
-          "description": "Translation key for category description",
-          "type": "string",
-          "maxLength": 255
+        "description": {
+          "description": "Category description in requested language",
+          "type": "string"
         },
         "icon": {
           "description": "Category icon identifier",
@@ -816,15 +824,13 @@
                 "format": "uuid",
                 "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
               },
-              "nameKey": {
-                "description": "Translation key for category name",
-                "type": "string",
-                "maxLength": 255
+              "name": {
+                "description": "Category name in requested language",
+                "type": "string"
               },
-              "descriptionKey": {
-                "description": "Translation key for category description",
-                "type": "string",
-                "maxLength": 255
+              "description": {
+                "description": "Category description in requested language",
+                "type": "string"
               },
               "icon": {
                 "description": "Category icon identifier",
@@ -887,7 +893,7 @@
             },
             "required": [
               "id",
-              "nameKey",
+              "name",
               "isActive",
               "sortOrder",
               "slug",
@@ -903,7 +909,7 @@
       },
       "required": [
         "id",
-        "nameKey",
+        "name",
         "isActive",
         "sortOrder",
         "slug",

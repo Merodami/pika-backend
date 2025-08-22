@@ -4487,11 +4487,13 @@ __metadata:
     "@prisma/client": "npm:^6.14.0"
     "@types/he": "npm:^1.2.3"
     "@types/pg": "npm:^8.15.5"
+    "@types/uuid": "npm:^10.0.0"
     he: "npm:^1.2.0"
     lodash-es: "npm:^4.17.21"
     pg: "npm:^8.16.3"
     prisma: "npm:^6.14.0"
     typescript: "npm:^5.9.2"
+    uuid: "npm:^11.1.0"
   languageName: unknown
   linkType: soft
 

@@ -9,6 +9,7 @@ import { vi } from 'vitest'
 // --- START MOCKING CONFIGURATION ---
 vi.unmock('@pika/http')
 vi.unmock('@pika/shared')
+vi.unmock('@pika/translation')
 
 vi.mock('@pika/api', async () => {
   const actualApi =
@@ -43,9 +44,10 @@ import {
   createE2EAuthHelper,
   createTestDatabase,
   E2EAuthHelper,
+  MockCacheService,
+  MockTranslationClient,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { MockCacheService } from '@pika/tests'
 import { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -61,6 +63,7 @@ describe('Public Category Integration Tests', () => {
   let sharedTestData: SharedCategoryTestData
 
   const mockCacheService = new MockCacheService()
+  const mockTranslationClient = new MockTranslationClient()
 
   beforeAll(async () => {
     testDb = await createTestDatabase({
@@ -74,6 +77,7 @@ describe('Public Category Integration Tests', () => {
     const serverResult = await createCategoryServer({
       prisma: testDb.prisma,
       cacheService: mockCacheService as any,
+      translationClient: mockTranslationClient as any,
     })
 
     app = serverResult.app
@@ -254,7 +258,7 @@ describe('Public Category Integration Tests', () => {
         .expect(200)
 
       expect(response.body.id).toBe(testCategory.id)
-      expect(response.body.nameKey).toBe(testCategory.nameKey)
+      expect(response.body.name).toBe(testCategory.nameKey) // API returns resolved name, not key
       expect(response.body).toHaveProperty('slug')
       expect(response.body).toHaveProperty('level')
       expect(response.body).toHaveProperty('path')

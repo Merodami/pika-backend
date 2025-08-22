@@ -15,15 +15,13 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
           },
-          "nameKey": {
-            "description": "Translation key for category name",
-            "type": "string",
-            "maxLength": 255
+          "name": {
+            "description": "Category name in requested language",
+            "type": "string"
           },
-          "descriptionKey": {
-            "description": "Translation key for category description",
-            "type": "string",
-            "maxLength": 255
+          "description": {
+            "description": "Category description in requested language",
+            "type": "string"
           },
           "icon": {
             "description": "Category icon identifier",
@@ -95,15 +93,13 @@
                   "format": "uuid",
                   "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
                 },
-                "nameKey": {
-                  "description": "Translation key for category name",
-                  "type": "string",
-                  "maxLength": 255
+                "name": {
+                  "description": "Category name in requested language",
+                  "type": "string"
                 },
-                "descriptionKey": {
-                  "description": "Translation key for category description",
-                  "type": "string",
-                  "maxLength": 255
+                "description": {
+                  "description": "Category description in requested language",
+                  "type": "string"
                 },
                 "icon": {
                   "description": "Category icon identifier",
@@ -166,7 +162,7 @@
               },
               "required": [
                 "id",
-                "nameKey",
+                "name",
                 "isActive",
                 "sortOrder",
                 "slug",
@@ -182,7 +178,7 @@
         },
         "required": [
           "id",
-          "nameKey",
+          "name",
           "isActive",
           "sortOrder",
           "slug",
@@ -242,6 +238,9 @@
       "additionalProperties": false
     }
   },
-  "required": ["data", "pagination"],
+  "required": [
+    "data",
+    "pagination"
+  ],
   "additionalProperties": false
 }

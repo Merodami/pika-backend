@@ -16,6 +16,7 @@ vi.unmock('@pika/http')
 vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
+vi.unmock('@pika/translation')
 
 import { createCategoryServer } from '@category/server.js'
 import { createSharedCategoryTestData } from '@category/test/helpers/categoryTestHelpers.js'
@@ -26,6 +27,7 @@ import {
   createE2EAuthHelper,
   createTestDatabase,
   E2EAuthHelper,
+  MockTranslationClient,
   TestDatabaseResult,
 } from '@pika/tests'
 import type { Express } from 'express'
@@ -63,10 +65,14 @@ describe('Category Service Cache Validation Tests', () => {
     cacheService = new MemoryCacheService()
     await cacheService.connect()
 
+    // Create mock translation client
+    const mockTranslationClient = new MockTranslationClient()
+
     // Create category server
     const serverResult = await createCategoryServer({
       prisma: testDb.prisma,
       cacheService,
+      translationClient: mockTranslationClient as any,
     })
 
     app = serverResult.app

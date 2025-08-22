@@ -279,21 +279,62 @@ async function getVoucherById(voucherId: string, token: string): Promise<any> {
 async function listBusinessVouchers(
   businessId: string,
   token: string,
-): Promise<void> {
-  logRequest('GET', `/admin/vouchers?businessId=${businessId}`)
+): Promise<any[]> {
+  logRequest('GET', `/admin/vouchers?businessId=${businessId}&limit=50`)
 
   try {
-    const response = await api.get(`/admin/vouchers?businessId=${businessId}`, {
+    const response = await api.get(`/admin/vouchers?businessId=${businessId}&limit=50`, {
       headers: { Authorization: `Bearer ${token}` },
     })
 
-    logSuccess(`Found ${response.data.data.length} vouchers for business`)
-    logInfo(`Total vouchers: ${response.data.pagination.total}`)
+    const vouchers = response.data.data || []
+    
+    logSuccess(`Found ${vouchers.length} vouchers for business`)
+    logInfo(`Total vouchers: ${response.data.pagination?.total || vouchers.length}`)
+    
+    // Display vouchers in a formatted way
+    if (vouchers.length > 0) {
+      console.log(`\n${colors.cyan}📋 Voucher List:${colors.reset}`)
+      console.log('─'.repeat(80))
+      
+      vouchers.forEach((voucher: any, index: number) => {
+        console.log(`\n${colors.bright}${index + 1}. ${voucher.title?.en || 'Untitled'}${colors.reset}`)
+        console.log(`   ID: ${colors.dim}${voucher.id}${colors.reset}`)
+        console.log(`   Type: ${voucher.discountType} (${voucher.discountValue}${voucher.discountType === 'percentage' ? '%' : ' ' + voucher.currency})`)
+        console.log(`   State: ${getStateColor(voucher.state)}${voucher.state}${colors.reset}`)
+        console.log(`   Valid: ${new Date(voucher.validFrom).toLocaleDateString()} - ${new Date(voucher.expiresAt).toLocaleDateString()}`)
+        console.log(`   Redemptions: ${voucher.currentRedemptions || 0}/${voucher.maxRedemptions || '∞'}`)
+        if (voucher.codes && voucher.codes.length > 0) {
+          console.log(`   Codes: ${voucher.codes.length} generated`)
+        }
+      })
+      
+      console.log('\n' + '─'.repeat(80))
+    }
+    
+    return vouchers
   } catch (error: any) {
     logError(
       `Failed to list business vouchers: ${error.response?.data?.message || error.message}`,
     )
     throw error
+  }
+}
+
+// Helper function for state colors
+function getStateColor(state: string): string {
+  switch (state) {
+    case 'published':
+    case 'active':
+      return colors.green
+    case 'draft':
+      return colors.yellow
+    case 'suspended':
+      return colors.yellow
+    case 'expired':
+      return colors.red
+    default:
+      return colors.dim
   }
 }
 
@@ -478,7 +519,7 @@ async function runVoucherCreationFlow() {
     } else {
       selectedCategory = categories[0]
       logInfo(
-        `Using existing category: ${selectedCategory.nameKey} (${selectedCategory.id})`,
+        `Using existing category: ${selectedCategory.name || selectedCategory.nameKey} (${selectedCategory.id})`,
       )
     }
 
@@ -505,14 +546,17 @@ async function runVoucherCreationFlow() {
       title: {
         en: `20% Off Special - ${timestamp}`,
         es: `20% de Descuento Especial - ${timestamp}`,
+        gn: `20% Jepi Especial - ${timestamp}`,
       },
       description: {
         en: 'Get 20% off on all services. Limited time offer!',
         es: '¡Obtén 20% de descuento en todos los servicios. ¡Oferta por tiempo limitado!',
+        gn: "¡Ejapova'erã 20% opaite servicio-pe. Oferta sapy'agua!",
       },
       termsAndConditions: {
         en: 'Valid for 30 days. Cannot be combined with other offers.',
         es: 'Válido por 30 días. No se puede combinar con otras ofertas.',
+        gn: 'Oikovéta 30 ára. Ndaikatúi oñembojuaju ambue oferta ndive.',
       },
       discountType: 'percentage',
       discountValue: 20,
@@ -533,16 +577,19 @@ async function runVoucherCreationFlow() {
       title: {
         en: `₲50,000 Off Voucher - ${timestamp}`,
         es: `Voucher de ₲50,000 de Descuento - ${timestamp}`,
+        gn: `Voucher ₲50,000 Jepi - ${timestamp}`,
       },
       description: {
         en: 'Save ₲50,000 on purchases over ₲200,000',
         es: 'Ahorra ₲50,000 en compras superiores a ₲200,000',
+        gn: 'Eñongatu ₲50,000 jogua ₲200,000 guive',
       },
       termsAndConditions: {
         en: 'Minimum purchase of ₲200,000 required. Valid for 60 days.',
         es: 'Compra mínima de ₲200,000 requerida. Válido por 60 días.',
+        gn: "Jogua michĩvéva ₲200,000 ñeikotevẽ. Oikovéta 60 ára.",
       },
-      discountType: 'fixed_amount',
+      discountType: 'fixed',
       discountValue: 50000,
       currency: 'PYG',
       validFrom: new Date().toISOString(),
@@ -561,14 +608,17 @@ async function runVoucherCreationFlow() {
       title: {
         en: `Free Service Voucher - ${timestamp}`,
         es: `Voucher de Servicio Gratis - ${timestamp}`,
+        gn: `Voucher Servicio Reirei - ${timestamp}`,
       },
       description: {
         en: 'Get one service completely free! Perfect for first-time customers.',
         es: '¡Obtén un servicio completamente gratis! Perfecto para clientes primerizos.',
+        gn: '¡Ereko peteĩ servicio reirei! Iporãiterei cliente pyahu-pe.',
       },
       termsAndConditions: {
         en: 'Valid for new customers only. Cannot be used with premium services.',
         es: 'Válido solo para clientes nuevos. No se puede usar con servicios premium.',
+        gn: 'Oikovéta cliente pyahu-peañõ. Ndaikatúi ojepuru servicio premium ndive.',
       },
       discountType: 'percentage',
       discountValue: 100,
@@ -585,7 +635,7 @@ async function runVoucherCreationFlow() {
     log(`\n${colors.bright}=== Phase 3: Voucher Management ===${colors.reset}`)
 
     logStep(7, 'List All Business Vouchers')
-    await listBusinessVouchers(businessDetails.id, adminToken)
+    const allVouchers = await listBusinessVouchers(businessDetails.id, adminToken)
 
     logStep(8, 'Get Detailed Voucher Information')
     await getVoucherById(percentageVoucher, adminToken)
@@ -595,13 +645,14 @@ async function runVoucherCreationFlow() {
       description: {
         en: 'UPDATED: Get 20% off on all services. Extended offer!',
         es: 'ACTUALIZADO: ¡Obtén 20% de descuento en todos los servicios. ¡Oferta extendida!',
+        gn: "OÑEMOAMBUE: ¡Ejapova'erã 20% opaite servicio-pe. Oferta ipukuve!",
       },
       maxRedemptions: 150, // Increase limit
     })
 
     logStep(10, 'Generate Voucher Codes')
     await generateVoucherCodes(percentageVoucher, adminToken, {
-      codeType: 'dynamic',
+      codeType: 'qr',
       quantity: 10,
     })
 
@@ -651,27 +702,35 @@ async function runVoucherCreationFlow() {
       await api.put(
         `/admin/vouchers/${fixedAmountVoucher}/state`,
         {
-          state: 'paused',
+          state: 'suspended',
           reason: 'Temporarily pausing voucher for maintenance',
         },
         {
           headers: { Authorization: `Bearer ${adminToken}` },
         },
       )
-      logSuccess('Voucher state updated to paused')
+      logSuccess('Voucher state updated to suspended')
     } catch (error: any) {
       logError(
         `Failed to update voucher state: ${error.response?.data?.message || error.message}`,
       )
     }
 
-    // Phase 6: Cleanup
-    log(`\n${colors.bright}=== Phase 6: Cleanup ===${colors.reset}`)
+    // Phase 6: Cleanup (optional - comment out to keep vouchers)
+    const shouldCleanup = process.env.CLEANUP_VOUCHERS !== 'false'
+    
+    if (shouldCleanup) {
+      log(`\n${colors.bright}=== Phase 6: Cleanup ===${colors.reset}`)
 
-    logStep(16, 'Delete Test Vouchers')
+      logStep(16, 'Delete Test Vouchers')
 
-    for (const voucherId of createdVouchers) {
-      await deleteVoucher(voucherId, adminToken)
+      for (const voucherId of createdVouchers) {
+        await deleteVoucher(voucherId, adminToken)
+      }
+    } else {
+      log(`\n${colors.yellow}⚠️  Skipping cleanup - vouchers kept for testing${colors.reset}`)
+      log(`Created voucher IDs:`)
+      createdVouchers.forEach(id => log(`  - ${id}`))
     }
 
     log(
@@ -681,10 +740,14 @@ async function runVoucherCreationFlow() {
     log(`- Created ${createdVouchers.length} different types of vouchers`)
     log(`- Demonstrated percentage, fixed amount, and free service vouchers`)
     log(
-      `- Managed voucher lifecycle: create → publish → update → expire → delete`,
+      `- Managed voucher lifecycle: create → publish → update → expire → ${shouldCleanup ? 'delete' : 'keep'}`,
     )
     log(`- Generated voucher codes and viewed analytics`)
     log(`- Complete business voucher management demonstrated`)
+    
+    if (!shouldCleanup) {
+      log(`\n${colors.yellow}To cleanup vouchers later, set CLEANUP_VOUCHERS=true${colors.reset}`)
+    }
   } catch (error: any) {
     log(
       `\n${colors.bright}${colors.red}❌ Voucher Creation Flow Failed!${colors.reset}`,
@@ -693,6 +756,9 @@ async function runVoucherCreationFlow() {
       log(`\nError details:`)
       log(`Status: ${error.response.status}`)
       log(`Message: ${error.response.data?.message || error.message}`)
+      if (error.response.data?.errors) {
+        log(`Validation errors: ${JSON.stringify(error.response.data.errors, null, 2)}`)
+      }
     } else {
       log(`\nError: ${error.message}`)
     }

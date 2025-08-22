@@ -7,7 +7,7 @@ import { businessPublic } from '@pika/api'
 import { requireAuth, requirePermissions, validateBody } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import { UserServiceClient } from '@pika/shared'
-import type { TranslationClient } from '@pika/translation'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -19,7 +19,8 @@ export function createBusinessRegistrationRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
   translationClient: TranslationClient,
-  userServiceClient: UserServiceClient,
+  translationResolver?: TranslationResolver,
+  userServiceClient?: UserServiceClient,
 ): Router {
   const router = Router()
 
@@ -30,6 +31,11 @@ export function createBusinessRegistrationRoutes(
   )
   const businessRepository = new BusinessRepository(prisma, cache)
   const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
+  
+  if (!userServiceClient) {
+    throw new Error('UserServiceClient is required for BusinessRegistrationRoutes')
+  }
+  
   const service = new BusinessRegistrationService(
     registrationRepository,
     businessRepository,
