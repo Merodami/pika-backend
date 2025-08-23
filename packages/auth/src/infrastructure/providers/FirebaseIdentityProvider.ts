@@ -5,7 +5,7 @@ import {
   isFirebaseConfigured,
 } from '@pika/environment'
 import { logger } from '@pika/shared'
-import * as admin from 'firebase-admin'
+import admin from 'firebase-admin'
 
 import {
   IdentityProvider,
@@ -34,8 +34,10 @@ export class FirebaseIdentityProvider implements IdentityProvider {
     }
 
     try {
-      const isEmulatorEnv = process.env.FIREBASE_AUTH_EMULATOR_HOST || process.env.NODE_ENV === 'test'
-      
+      const isEmulatorEnv =
+        process.env.FIREBASE_AUTH_EMULATOR_HOST ||
+        process.env.NODE_ENV === 'test'
+
       if (isEmulatorEnv) {
         // Initialize for emulator - no credentials needed
         this.app = admin.initializeApp(
@@ -44,7 +46,7 @@ export class FirebaseIdentityProvider implements IdentityProvider {
           },
           `auth-provider-${Date.now()}`, // Unique name for each instance
         )
-        
+
         logger.info('Firebase Identity Provider initialized for emulator', {
           projectId: FIREBASE_PROJECT_ID,
           emulatorHost: process.env.FIREBASE_AUTH_EMULATOR_HOST,
@@ -55,6 +57,7 @@ export class FirebaseIdentityProvider implements IdentityProvider {
           logger.warn(
             'Firebase configuration is incomplete. Firebase authentication will not be available.',
           )
+
           return
         }
 
@@ -69,7 +72,7 @@ export class FirebaseIdentityProvider implements IdentityProvider {
           },
           'auth-provider',
         )
-        
+
         logger.info('Firebase Identity Provider initialized for production')
       }
 
@@ -91,24 +94,32 @@ export class FirebaseIdentityProvider implements IdentityProvider {
     }
 
     try {
-      const isEmulatorEnv = process.env.FIREBASE_AUTH_EMULATOR_HOST || process.env.NODE_ENV === 'test'
-      
+      const isEmulatorEnv =
+        process.env.FIREBASE_AUTH_EMULATOR_HOST ||
+        process.env.NODE_ENV === 'test'
+
       if (isEmulatorEnv && this.isUnsignedToken(token)) {
         // For unsigned tokens in emulator environment (industry standard approach)
         logger.debug('Processing unsigned token in emulator environment')
+
         const decoded = this.decodeUnsignedToken(token)
-        
+
         // Validate token structure
-        if (!decoded.sub || !decoded.aud || decoded.aud !== FIREBASE_PROJECT_ID) {
+        if (
+          !decoded.sub ||
+          !decoded.aud ||
+          decoded.aud !== FIREBASE_PROJECT_ID
+        ) {
           throw new Error('Invalid token structure or audience')
         }
-        
+
         // Check expiration
         const now = Math.floor(Date.now() / 1000)
+
         if (decoded.exp && decoded.exp < now) {
           throw new Error('Token has expired')
         }
-        
+
         // Create normalized token payload matching Firebase ID token format
         return {
           sub: decoded.sub,
@@ -129,7 +140,7 @@ export class FirebaseIdentityProvider implements IdentityProvider {
           user_id: decoded.user_id,
         }
       }
-      
+
       // Standard ID token verification for production/signed tokens
       const decodedToken = await this.app.auth().verifyIdToken(token, true)
 
@@ -175,9 +186,11 @@ export class FirebaseIdentityProvider implements IdentityProvider {
   private isUnsignedToken(token: string): boolean {
     try {
       const parts = token.split('.')
+
       if (parts.length !== 3) return false
-      
+
       const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString())
+
       // Check for unsigned token (industry standard for Firebase emulator)
       return header.typ === 'JWT' && header.alg === 'none'
     } catch {
@@ -188,11 +201,13 @@ export class FirebaseIdentityProvider implements IdentityProvider {
   private decodeUnsignedToken(token: string): any {
     try {
       const parts = token.split('.')
+
       if (parts.length !== 3) {
         throw new Error('Invalid token format')
       }
-      
+
       const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString())
+
       return payload
     } catch (error) {
       logger.error('Failed to decode unsigned token', error as Error)

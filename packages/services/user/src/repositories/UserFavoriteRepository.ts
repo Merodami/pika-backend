@@ -1,11 +1,36 @@
-import type { PrismaClient, FavouriteBusiness, FavouriteVoucher } from '@prisma/client'
+import {
+  type BusinessDomain,
+  BusinessMapper,
+  type VoucherDomain,
+  VoucherMapper,
+} from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
-import type { PaginatedResult } from '@pika/types'
-import { BusinessMapper, VoucherMapper } from '@pika/sdk'
+import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import type { Prisma,PrismaClient } from '@prisma/client'
+
+// Domain types for favorites (following the business/category pattern)
+export interface FavoriteBusinessDomain {
+  id: string
+  userId: string
+  businessId: string
+  createdAt: Date
+  business?: BusinessDomain
+}
+
+export interface FavoriteVoucherDomain {
+  id: string
+  userId: string
+  voucherId: string
+  createdAt: Date
+  voucher?: VoucherDomain
+}
 
 export interface IUserFavoriteRepository {
   // Business favorites
-  addFavoriteBusiness(userId: string, businessId: string): Promise<FavouriteBusiness>
+  addFavoriteBusiness(
+    userId: string,
+    businessId: string,
+  ): Promise<FavoriteBusinessDomain>
   removeFavoriteBusiness(userId: string, businessId: string): Promise<void>
   getFavoriteBusinesses(
     userId: string,
@@ -14,15 +39,27 @@ export interface IUserFavoriteRepository {
       limit: number
       sortBy?: 'createdAt' | 'businessName'
       sortOrder?: 'asc' | 'desc'
-      includeDetails?: boolean
+      parsedIncludes?: ParsedIncludes
     },
-  ): Promise<PaginatedResult<FavouriteBusiness>>
-  isFavoriteBusiness(userId: string, businessId: string): Promise<{ isFavorited: boolean; favoritedAt?: Date }>
-  batchAddFavoriteBusinesses(userId: string, businessIds: string[]): Promise<{ added: number; errors: any[] }>
-  batchRemoveFavoriteBusinesses(userId: string, businessIds: string[]): Promise<{ removed: number; errors: any[] }>
+  ): Promise<PaginatedResult<FavoriteBusinessDomain>>
+  isFavoriteBusiness(
+    userId: string,
+    businessId: string,
+  ): Promise<{ isFavorited: boolean; favoritedAt?: Date }>
+  batchAddFavoriteBusinesses(
+    userId: string,
+    businessIds: string[],
+  ): Promise<{ added: number; errors: any[] }>
+  batchRemoveFavoriteBusinesses(
+    userId: string,
+    businessIds: string[],
+  ): Promise<{ removed: number; errors: any[] }>
 
   // Voucher favorites
-  addFavoriteVoucher(userId: string, voucherId: string): Promise<FavouriteVoucher>
+  addFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<FavoriteVoucherDomain>
   removeFavoriteVoucher(userId: string, voucherId: string): Promise<void>
   getFavoriteVouchers(
     userId: string,
@@ -31,22 +68,73 @@ export interface IUserFavoriteRepository {
       limit: number
       sortBy?: 'createdAt' | 'voucherTitle' | 'expiryDate'
       sortOrder?: 'asc' | 'desc'
-      includeDetails?: boolean
+      parsedIncludes?: ParsedIncludes
     },
-  ): Promise<PaginatedResult<FavouriteVoucher>>
-  isFavoriteVoucher(userId: string, voucherId: string): Promise<{ isFavorited: boolean; favoritedAt?: Date }>
-  batchAddFavoriteVouchers(userId: string, voucherIds: string[]): Promise<{ added: number; errors: any[] }>
-  batchRemoveFavoriteVouchers(userId: string, voucherIds: string[]): Promise<{ removed: number; errors: any[] }>
+  ): Promise<PaginatedResult<FavoriteVoucherDomain>>
+  isFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<{ isFavorited: boolean; favoritedAt?: Date }>
+  batchAddFavoriteVouchers(
+    userId: string,
+    voucherIds: string[],
+  ): Promise<{ added: number; errors: any[] }>
+  batchRemoveFavoriteVouchers(
+    userId: string,
+    voucherIds: string[],
+  ): Promise<{ removed: number; errors: any[] }>
 }
 
 export class UserFavoriteRepository implements IUserFavoriteRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
+  /**
+   * Builds include clause for business favorites based on ParsedIncludes
+   */
+  private buildBusinessIncludeClause(
+    includes?: ParsedIncludes,
+  ): Prisma.FavouriteBusinessInclude {
+    const include: Prisma.FavouriteBusinessInclude = {}
+
+    if (includes?.business) {
+      include.business = {
+        include: {
+          category: includes.category || includes.businessCategory,
+          businessDetails: includes.businessDetails,
+        },
+      }
+    }
+
+    return include
+  }
+
+  /**
+   * Builds include clause for voucher favorites based on ParsedIncludes
+   */
+  private buildVoucherIncludeClause(
+    includes?: ParsedIncludes,
+  ): Prisma.FavouriteVoucherInclude {
+    const include: Prisma.FavouriteVoucherInclude = {}
+
+    if (includes?.voucher) {
+      include.voucher = {
+        include: {
+          business: includes.business || includes.voucherBusiness,
+          category: includes.category || includes.voucherCategory,
+        },
+      }
+    }
+
+    return include
+  }
+
   // =============== Business Favorites ===============
 
-  async addFavoriteBusiness(userId: string, businessId: string): Promise<FavouriteBusiness> {
+  async addFavoriteBusiness(
+    userId: string,
+    businessId: string,
+  ): Promise<FavoriteBusinessDomain> {
     try {
-      // Create favorite and increment counter in a transaction
       const [favorite] = await this.prisma.$transaction([
         this.prisma.favouriteBusiness.create({
           data: {
@@ -60,10 +148,18 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
         }),
       ])
 
-      return favorite
+      return {
+        id: favorite.id,
+        userId: favorite.userId,
+        businessId: favorite.businessId,
+        createdAt: favorite.createdAt,
+      }
     } catch (error: any) {
       if (error.code === 'P2002') {
-        throw ErrorFactory.resourceConflict('favorite_business', 'Business already in favorites')
+        throw ErrorFactory.resourceConflict(
+          'favorite_business',
+          'Business already in favorites',
+        )
       }
       if (error.code === 'P2003') {
         throw ErrorFactory.resourceNotFound('business', businessId)
@@ -71,13 +167,19 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
       if (error.code === 'P2025') {
         throw ErrorFactory.resourceNotFound('business', businessId)
       }
-      throw ErrorFactory.databaseError('add favorite business', 'Failed to add business to favorites', error)
+      throw ErrorFactory.databaseError(
+        'add favorite business',
+        'Failed to add business to favorites',
+        error,
+      )
     }
   }
 
-  async removeFavoriteBusiness(userId: string, businessId: string): Promise<void> {
+  async removeFavoriteBusiness(
+    userId: string,
+    businessId: string,
+  ): Promise<void> {
     try {
-      // Remove favorite and decrement counter in a transaction
       await this.prisma.$transaction([
         this.prisma.favouriteBusiness.delete({
           where: {
@@ -96,7 +198,11 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
       if (error.code === 'P2025') {
         throw ErrorFactory.resourceNotFound('favorite_business', businessId)
       }
-      throw ErrorFactory.databaseError('remove favorite business', 'Failed to remove business from favorites', error)
+      throw ErrorFactory.databaseError(
+        'remove favorite business',
+        'Failed to remove business from favorites',
+        error,
+      )
     }
   }
 
@@ -107,29 +213,29 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
       limit: number
       sortBy?: 'createdAt' | 'businessName'
       sortOrder?: 'asc' | 'desc'
-      includeDetails?: boolean
+      parsedIncludes?: ParsedIncludes
     },
-  ): Promise<PaginatedResult<FavouriteBusiness>> {
-    const { page, limit, sortBy = 'createdAt', sortOrder = 'desc', includeDetails = false } = params
+  ): Promise<PaginatedResult<FavoriteBusinessDomain>> {
+    const {
+      page,
+      limit,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      parsedIncludes,
+    } = params
     const skip = (page - 1) * limit
 
     try {
-      const [data, total] = await this.prisma.$transaction([
+      const include = this.buildBusinessIncludeClause(parsedIncludes)
+
+      const [data, total] = await Promise.all([
         this.prisma.favouriteBusiness.findMany({
           where: { userId },
           skip,
           take: limit,
-          orderBy: sortBy === 'createdAt' ? { createdAt: sortOrder } : undefined,
-          include: includeDetails
-            ? {
-                business: {
-                  include: {
-                    category: true,
-                    businessDetails: true,
-                  },
-                },
-              }
-            : undefined,
+          orderBy:
+            sortBy === 'createdAt' ? { createdAt: sortOrder } : undefined,
+          include,
         }),
         this.prisma.favouriteBusiness.count({
           where: { userId },
@@ -138,28 +244,41 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
 
       // Sort by business name if needed (requires post-query sorting)
       let sortedData = data
-      if (sortBy === 'businessName' && includeDetails) {
+
+      if (sortBy === 'businessName' && parsedIncludes?.business) {
         sortedData = [...data].sort((a, b) => {
-          const nameA = (a as any).business?.businessNameKey || ''
-          const nameB = (b as any).business?.businessNameKey || ''
-          return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+          const nameA = a.business?.businessNameKey || ''
+          const nameB = b.business?.businessNameKey || ''
+
+          return sortOrder === 'asc'
+            ? nameA.localeCompare(nameB)
+            : nameB.localeCompare(nameA)
         })
       }
 
-      // Transform to domain objects using BusinessMapper (following business service pattern)
-      const domainFavorites = sortedData.map((favorite) => {
-        const baseFavorite = {
-          id: favorite.id,
-          businessId: favorite.businessId,
-          createdAt: favorite.createdAt,
-          business: favorite.business ? 
-            BusinessMapper.toDTO(BusinessMapper.fromDocument({
+      // Map to domain entities using BusinessMapper
+      const domainFavorites: FavoriteBusinessDomain[] = sortedData.map(
+        (favorite) => {
+          const domainFavorite: FavoriteBusinessDomain = {
+            id: favorite.id,
+            userId: favorite.userId,
+            businessId: favorite.businessId,
+            createdAt: favorite.createdAt,
+          }
+
+          // Include business domain if available
+          if (favorite.business) {
+            domainFavorite.business = BusinessMapper.fromDocument({
               ...favorite.business,
-              avgRating: (favorite.business as any).avgRating?.toNumber ? (favorite.business as any).avgRating.toNumber() : (favorite.business as any).avgRating || 0,
-            })) : undefined,
-        }
-        return baseFavorite
-      })
+              avgRating: favorite.business.avgRating.toNumber(),
+            })
+          }
+
+          return domainFavorite
+        },
+      )
+
+      const totalPages = Math.ceil(total / limit)
 
       return {
         data: domainFavorites,
@@ -167,13 +286,17 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
           total,
           page,
           limit,
-          totalPages: Math.ceil(total / limit),
-          hasNext: page < Math.ceil(total / limit),
+          totalPages,
+          hasNext: page < totalPages,
           hasPrev: page > 1,
         },
       }
     } catch (error) {
-      throw ErrorFactory.databaseError('get favorite businesses', 'Failed to get favorite businesses', error)
+      throw ErrorFactory.databaseError(
+        'get favorite businesses',
+        'Failed to get favorite businesses',
+        error,
+      )
     }
   }
 
@@ -196,7 +319,11 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
         favoritedAt: favorite?.createdAt,
       }
     } catch (error) {
-      throw ErrorFactory.databaseError('check favorite business', 'Failed to check favorite status', error)
+      throw ErrorFactory.databaseError(
+        'check favorite business',
+        'Failed to check favorite status',
+        error,
+      )
     }
   }
 
@@ -205,6 +332,7 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
     businessIds: string[],
   ): Promise<{ added: number; errors: any[] }> {
     const errors: any[] = []
+
     let added = 0
 
     for (const businessId of businessIds) {
@@ -228,6 +356,7 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
     businessIds: string[],
   ): Promise<{ removed: number; errors: any[] }> {
     const errors: any[] = []
+
     let removed = 0
 
     for (const businessId of businessIds) {
@@ -248,9 +377,11 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
 
   // =============== Voucher Favorites ===============
 
-  async addFavoriteVoucher(userId: string, voucherId: string): Promise<FavouriteVoucher> {
+  async addFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<FavoriteVoucherDomain> {
     try {
-      // Create favorite and increment counter in a transaction
       const [favorite] = await this.prisma.$transaction([
         this.prisma.favouriteVoucher.create({
           data: {
@@ -264,10 +395,18 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
         }),
       ])
 
-      return favorite
+      return {
+        id: favorite.id,
+        userId: favorite.userId,
+        voucherId: favorite.voucherId,
+        createdAt: favorite.createdAt,
+      }
     } catch (error: any) {
       if (error.code === 'P2002') {
-        throw ErrorFactory.resourceConflict('favorite_voucher', 'Voucher already in favorites')
+        throw ErrorFactory.resourceConflict(
+          'favorite_voucher',
+          'Voucher already in favorites',
+        )
       }
       if (error.code === 'P2003') {
         throw ErrorFactory.resourceNotFound('voucher', voucherId)
@@ -275,13 +414,19 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
       if (error.code === 'P2025') {
         throw ErrorFactory.resourceNotFound('voucher', voucherId)
       }
-      throw ErrorFactory.databaseError('add favorite voucher', 'Failed to add voucher to favorites', error)
+      throw ErrorFactory.databaseError(
+        'add favorite voucher',
+        'Failed to add voucher to favorites',
+        error,
+      )
     }
   }
 
-  async removeFavoriteVoucher(userId: string, voucherId: string): Promise<void> {
+  async removeFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<void> {
     try {
-      // Remove favorite and decrement counter in a transaction
       await this.prisma.$transaction([
         this.prisma.favouriteVoucher.delete({
           where: {
@@ -300,7 +445,11 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
       if (error.code === 'P2025') {
         throw ErrorFactory.resourceNotFound('favorite_voucher', voucherId)
       }
-      throw ErrorFactory.databaseError('remove favorite voucher', 'Failed to remove voucher from favorites', error)
+      throw ErrorFactory.databaseError(
+        'remove favorite voucher',
+        'Failed to remove voucher from favorites',
+        error,
+      )
     }
   }
 
@@ -311,29 +460,29 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
       limit: number
       sortBy?: 'createdAt' | 'voucherTitle' | 'expiryDate'
       sortOrder?: 'asc' | 'desc'
-      includeDetails?: boolean
+      parsedIncludes?: ParsedIncludes
     },
-  ): Promise<PaginatedResult<FavouriteVoucher>> {
-    const { page, limit, sortBy = 'createdAt', sortOrder = 'desc', includeDetails = false } = params
+  ): Promise<PaginatedResult<FavoriteVoucherDomain>> {
+    const {
+      page,
+      limit,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      parsedIncludes,
+    } = params
     const skip = (page - 1) * limit
 
     try {
-      const [data, total] = await this.prisma.$transaction([
+      const include = this.buildVoucherIncludeClause(parsedIncludes)
+
+      const [data, total] = await Promise.all([
         this.prisma.favouriteVoucher.findMany({
           where: { userId },
           skip,
           take: limit,
-          orderBy: sortBy === 'createdAt' ? { createdAt: sortOrder } : undefined,
-          include: includeDetails
-            ? {
-                voucher: {
-                  include: {
-                    business: true,
-                    category: true,
-                  },
-                },
-              }
-            : undefined,
+          orderBy:
+            sortBy === 'createdAt' ? { createdAt: sortOrder } : undefined,
+          include,
         }),
         this.prisma.favouriteVoucher.count({
           where: { userId },
@@ -342,38 +491,56 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
 
       // Sort by voucher title or expiry date if needed (requires post-query sorting)
       let sortedData = data
-      if (includeDetails) {
+
+      if (parsedIncludes?.voucher) {
         if (sortBy === 'voucherTitle') {
           sortedData = [...data].sort((a, b) => {
-            const titleA = (a as any).voucher?.titleKey || ''
-            const titleB = (b as any).voucher?.titleKey || ''
-            return sortOrder === 'asc' ? titleA.localeCompare(titleB) : titleB.localeCompare(titleA)
+            const titleA = a.voucher?.titleKey || ''
+            const titleB = b.voucher?.titleKey || ''
+
+            return sortOrder === 'asc'
+              ? titleA.localeCompare(titleB)
+              : titleB.localeCompare(titleA)
           })
         } else if (sortBy === 'expiryDate') {
           sortedData = [...data].sort((a, b) => {
-            const dateA = (a as any).voucher?.validUntil?.getTime() || 0
-            const dateB = (b as any).voucher?.validUntil?.getTime() || 0
+            const dateA = a.voucher?.validUntil?.getTime() || 0
+            const dateB = b.voucher?.validUntil?.getTime() || 0
+
             return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
           })
         }
       }
 
-      // Transform to domain objects using VoucherMapper (following business service pattern)  
-      const domainFavorites = sortedData.map((favorite) => {
-        const baseFavorite = {
-          id: favorite.id,
-          voucherId: favorite.voucherId,
-          createdAt: favorite.createdAt,
-          voucher: favorite.voucher ? 
-            VoucherMapper.toDTO(VoucherMapper.fromDocument({
+      // Map to domain entities using VoucherMapper
+      const domainFavorites: FavoriteVoucherDomain[] = sortedData.map(
+        (favorite) => {
+          const domainFavorite: FavoriteVoucherDomain = {
+            id: favorite.id,
+            userId: favorite.userId,
+            voucherId: favorite.voucherId,
+            createdAt: favorite.createdAt,
+          }
+
+          // Include voucher domain if available
+          if (favorite.voucher) {
+            domainFavorite.voucher = VoucherMapper.fromDocument({
               ...favorite.voucher,
-              // Handle Decimal fields if they exist
-              discount: (favorite.voucher as any).discount?.toNumber ? (favorite.voucher as any).discount.toNumber() : (favorite.voucher as any).discount,
-              value: (favorite.voucher as any).value?.toNumber ? (favorite.voucher as any).value.toNumber() : (favorite.voucher as any).value,
-            })) : undefined,
-        }
-        return baseFavorite
-      })
+              // Handle Decimal fields
+              discount: favorite.voucher.discount?.toNumber
+                ? favorite.voucher.discount.toNumber()
+                : favorite.voucher.discount,
+              value: favorite.voucher.value?.toNumber
+                ? favorite.voucher.value.toNumber()
+                : favorite.voucher.value,
+            })
+          }
+
+          return domainFavorite
+        },
+      )
+
+      const totalPages = Math.ceil(total / limit)
 
       return {
         data: domainFavorites,
@@ -381,17 +548,24 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
           total,
           page,
           limit,
-          totalPages: Math.ceil(total / limit),
-          hasNext: page < Math.ceil(total / limit),
+          totalPages,
+          hasNext: page < totalPages,
           hasPrev: page > 1,
         },
       }
     } catch (error) {
-      throw ErrorFactory.databaseError('get favorite vouchers', 'Failed to get favorite vouchers', error)
+      throw ErrorFactory.databaseError(
+        'get favorite vouchers',
+        'Failed to get favorite vouchers',
+        error,
+      )
     }
   }
 
-  async isFavoriteVoucher(userId: string, voucherId: string): Promise<{ isFavorited: boolean; favoritedAt?: Date }> {
+  async isFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<{ isFavorited: boolean; favoritedAt?: Date }> {
     try {
       const favorite = await this.prisma.favouriteVoucher.findUnique({
         where: {
@@ -407,7 +581,11 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
         favoritedAt: favorite?.createdAt,
       }
     } catch (error) {
-      throw ErrorFactory.databaseError('check favorite voucher', 'Failed to check favorite status', error)
+      throw ErrorFactory.databaseError(
+        'check favorite voucher',
+        'Failed to check favorite status',
+        error,
+      )
     }
   }
 
@@ -416,6 +594,7 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
     voucherIds: string[],
   ): Promise<{ added: number; errors: any[] }> {
     const errors: any[] = []
+
     let added = 0
 
     for (const voucherId of voucherIds) {
@@ -439,6 +618,7 @@ export class UserFavoriteRepository implements IUserFavoriteRepository {
     voucherIds: string[],
   ): Promise<{ removed: number; errors: any[] }> {
     const errors: any[] = []
+
     let removed = 0
 
     for (const voucherId of voucherIds) {
