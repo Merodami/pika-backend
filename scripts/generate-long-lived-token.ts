@@ -62,7 +62,7 @@ async function generateTokensForTestUsers() {
         const token = jwt.sign(payload, privateKey, {
           algorithm: process.env.JWT_ALGORITHM as jwt.Algorithm,
           issuer: process.env.JWT_ISSUER || 'pika-api',
-          audience: process.env.JWT_AUDIENCE || 'pika-app',
+          audience: process.env.JWT_AUDIENCE || 'the_voucherbook_app',
         })
 
         console.log(`✅ ${label} Token:`)
@@ -103,7 +103,7 @@ async function generateTokensForTestUsers() {
           const token = jwt.sign(payload, privateKey, {
             algorithm: process.env.JWT_ALGORITHM as jwt.Algorithm,
             issuer: process.env.JWT_ISSUER || 'pika-api',
-            audience: process.env.JWT_AUDIENCE || 'pika-app',
+            audience: process.env.JWT_AUDIENCE || 'the_voucherbook_app',
           })
 
           return {
