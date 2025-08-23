@@ -6,6 +6,26 @@
 import type { CategoryDTO } from './category.dto.js'
 import type { UserDTO } from './user.dto.js'
 
+// ============= Business Details DTO =============
+
+export interface BusinessDetailsDTO {
+  id: string
+  businessId: string
+  phone?: string
+  email?: string
+  website?: string
+  street?: string
+  city?: string
+  state?: string
+  postalCode?: string
+  country?: string
+  operatingHours?: any
+  socialMedia?: any
+  additionalInfo?: any
+  createdAt: string
+  updatedAt: string
+}
+
 // ============= Business DTO =============
 
 export interface BusinessDTO {
@@ -24,6 +44,7 @@ export interface BusinessDTO {
   // Optional relations
   user?: UserDTO
   category?: CategoryDTO
+  businessDetails?: BusinessDetailsDTO
 }
 
 // ============= Business List Response DTO =============

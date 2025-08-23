@@ -65,7 +65,9 @@ export const CurrentUserProfile = z.object({
   status: UserStatusSchema,
   emailVerified: z.boolean(),
   phoneVerified: z.boolean().optional(),
-  primaryBusinessId: UserId.optional().describe('Primary business for business users'),
+  primaryBusinessId: UserId.optional().describe(
+    'Primary business for business users',
+  ),
   createdAt: DateTime,
   updatedAt: DateTime,
   lastLoginAt: DateTime.optional(),

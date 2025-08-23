@@ -33,8 +33,8 @@ import {
   MockTranslationClient,
   TestDatabaseResult,
 } from '@pika/tests'
-import { UserServiceClientMock } from '@tests/mocks/services'
 import { UserRole, UserStatus } from '@pika/types'
+import { UserServiceClientMock } from '@tests/mocks/services'
 import type { Express } from 'express'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

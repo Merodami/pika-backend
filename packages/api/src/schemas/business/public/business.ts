@@ -14,8 +14,8 @@ import { UUID } from '../../shared/primitives.js'
 import { createByIdQuerySchema } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { PublicUserProfile } from '../../user/public/profile.js'
-import { BusinessDetailsResponse } from './businessDetails.js'
 import { BUSINESS_RELATIONS, BusinessSortBy } from '../common/enums.js'
+import { BusinessDetailsResponse } from './businessDetails.js'
 
 /**
  * Public business schemas

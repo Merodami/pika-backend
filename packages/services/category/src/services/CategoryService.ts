@@ -12,6 +12,7 @@ import { Cache, ICacheService } from '@pika/redis'
 import { ErrorFactory, isUuidV4, logger } from '@pika/shared'
 import type { TranslationResolver } from '@pika/translation'
 import type { LanguageCode } from '@pika/types'
+
 import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export class CategoryService implements ICategoryService {
@@ -41,6 +42,7 @@ export class CategoryService implements ICategoryService {
           result.data,
           language,
         )
+
         return { data: resolvedData, pagination: result.pagination }
       }
 
@@ -80,6 +82,7 @@ export class CategoryService implements ICategoryService {
           category,
           language,
         )
+
         return resolved
       }
 
@@ -121,6 +124,7 @@ export class CategoryService implements ICategoryService {
           result.data,
           language,
         )
+
         return { data: resolvedData, pagination: result.pagination }
       }
 
@@ -326,6 +330,7 @@ export class CategoryService implements ICategoryService {
     prefix: CACHE_KEYS.CATEGORY.HIERARCHY,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const rootId = args[0]
+
       return `${prefix}:${rootId || 'all'}`
     },
   })
@@ -342,6 +347,7 @@ export class CategoryService implements ICategoryService {
           categories,
           language,
         )
+
         return resolvedData
       }
 
@@ -381,6 +387,7 @@ export class CategoryService implements ICategoryService {
           path,
           language,
         )
+
         return resolvedData
       }
 

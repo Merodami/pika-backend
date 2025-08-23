@@ -88,6 +88,7 @@ export async function seedTestBusinesses(
 
   // If userId is provided, create/use that user, otherwise create multiple users
   let singleUser = null
+
   if (userId) {
     // Check if user already exists
     singleUser = await prismaClient.user.findUnique({ where: { id: userId } })
@@ -133,6 +134,7 @@ export async function seedTestBusinesses(
           emailVerified: true,
         },
       })
+
       users.push(user)
       businessUserId = user.id
     }

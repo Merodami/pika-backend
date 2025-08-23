@@ -212,6 +212,28 @@ export class BusinessRepository implements IBusinessRepository {
       }
     }
 
+    if (includes?.businessDetails) {
+      include.businessDetails = {
+        select: {
+          id: true,
+          businessId: true,
+          phone: true,
+          email: true,
+          website: true,
+          street: true,
+          city: true,
+          state: true,
+          postalCode: true,
+          country: true,
+          operatingHours: true,
+          socialMedia: true,
+          additionalInfo: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }
+    }
+
     return include
   }
 

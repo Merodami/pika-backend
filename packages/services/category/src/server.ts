@@ -1,8 +1,8 @@
 import { CATEGORY_SERVICE_PORT } from '@pika/environment'
 import {
   createExpressServer,
-  errorMiddleware,
   createLanguageMiddleware,
+  errorMiddleware,
 } from '@pika/http'
 import { type ICacheService, setCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'

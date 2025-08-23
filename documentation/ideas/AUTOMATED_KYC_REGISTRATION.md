@@ -35,6 +35,7 @@ The registration process should be so seamless that a business owner in Santiago
 ### 1. Business Document Verification
 
 **Required Documents:**
+
 - Business license/registration
 - Tax identification documents
 - Proof of address
@@ -42,6 +43,7 @@ The registration process should be so seamless that a business owner in Santiago
 - Legal representative identification
 
 **Automated Validation:**
+
 ```mermaid
 graph LR
     A[Document Upload] --> B[OCR Extraction]
@@ -52,6 +54,7 @@ graph LR
 ```
 
 **Technology Stack:**
+
 - **OCR Service:** AWS Textract or Google Document AI
 - **Validation APIs:** Government business registries
 - **Risk Scoring:** ML-based document authenticity check
@@ -76,6 +79,7 @@ graph LR
    - Pattern recognition
 
 **Implementation:**
+
 ```javascript
 // Example verification flow
 const verifyIdentity = async (user) => {
@@ -85,13 +89,13 @@ const verifyIdentity = async (user) => {
     liveness: livenessCheck,
     match: documentMatch,
     device: user.deviceFingerprint,
-    location: user.geoLocation
+    location: user.geoLocation,
   })
-  
+
   return {
     verified: riskScore.confidence > 0.95,
     score: riskScore,
-    details: riskScore.factors
+    details: riskScore.factors,
   }
 }
 ```
@@ -107,13 +111,14 @@ const verifyIdentity = async (user) => {
 - **Automatic Renewal:** Smart contract renewal reminders
 
 **Contract Workflow:**
+
 ```mermaid
 sequenceDiagram
     participant Business
     participant Platform
     participant Legal
     participant Blockchain
-    
+
     Business->>Platform: Complete KYC
     Platform->>Legal: Generate Contract
     Legal->>Business: Present Terms
@@ -135,28 +140,28 @@ services:
       - Process management
       - Status tracking
       - Notification dispatch
-  
+
   document-validator:
     description: Document processing and validation
     integrations:
       - OCR services
       - Government APIs
       - ML validation models
-  
+
   biometric-service:
     description: Face scanning and liveness detection
     features:
       - Real-time video processing
       - Anti-spoofing detection
       - Face matching algorithms
-  
+
   contract-service:
     description: Digital contract management
     capabilities:
       - Template generation
       - E-signature integration
       - Legal compliance checks
-  
+
   risk-assessment:
     description: Comprehensive risk scoring
     components:
@@ -196,6 +201,7 @@ services:
 ## Implementation Phases
 
 ### Phase 1: MVP (Months 1-2)
+
 **Basic Automated Verification**
 
 - Simple document upload and OCR
@@ -204,6 +210,7 @@ services:
 - Manual review fallback
 
 ### Phase 2: Enhanced Automation (Months 3-4)
+
 **Advanced Verification**
 
 - Government API integrations
@@ -212,6 +219,7 @@ services:
 - Automated approval for low-risk
 
 ### Phase 3: Full Automation (Months 5-6)
+
 **Complete KYC Automation**
 
 - ML-based fraud detection
@@ -220,6 +228,7 @@ services:
 - Real-time decision making
 
 ### Phase 4: Scale & Optimize (Months 7+)
+
 **Market Expansion Ready**
 
 - Multi-country support
@@ -232,6 +241,7 @@ services:
 ### Market Entry Approach
 
 **Pilot Market: Paraguay**
+
 - Test full KYC flow
 - Validate with local regulations
 - Optimize for local documents
@@ -261,6 +271,7 @@ services:
 ### Localization Requirements
 
 **Per Country Needs:**
+
 - Document type mappings
 - Government API integrations
 - Legal framework compliance
@@ -271,35 +282,37 @@ services:
 
 ### KYC Performance Indicators
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Registration Completion Rate | >80% | Daily |
-| Average Time to Verify | <5 minutes | Per user |
-| Automated Approval Rate | >70% | Weekly |
-| False Positive Rate | <5% | Weekly |
-| Document Processing Accuracy | >95% | Daily |
-| User Satisfaction Score | >4.5/5 | Weekly |
+| Metric                       | Target     | Measurement |
+| ---------------------------- | ---------- | ----------- |
+| Registration Completion Rate | >80%       | Daily       |
+| Average Time to Verify       | <5 minutes | Per user    |
+| Automated Approval Rate      | >70%       | Weekly      |
+| False Positive Rate          | <5%        | Weekly      |
+| Document Processing Accuracy | >95%       | Daily       |
+| User Satisfaction Score      | >4.5/5     | Weekly      |
 
 ### Business Impact Metrics
 
-| Metric | Target | Timeline |
-|--------|--------|----------|
-| Business Acquisition Cost | <$10 | 6 months |
-| Time to First Voucher | <1 hour | 3 months |
-| Geographic Coverage | 10 cities | Year 1 |
-| Cross-border Registrations | 20% | Year 2 |
+| Metric                     | Target    | Timeline |
+| -------------------------- | --------- | -------- |
+| Business Acquisition Cost  | <$10      | 6 months |
+| Time to First Voucher      | <1 hour   | 3 months |
+| Geographic Coverage        | 10 cities | Year 1   |
+| Cross-border Registrations | 20%       | Year 2   |
 
 ## Compliance & Security
 
 ### Regulatory Compliance
 
 **Data Protection:**
+
 - GDPR compliance for EU expansion
 - LGPD compliance for Brazil
 - Local data residency requirements
 - Right to deletion implementation
 
 **Financial Regulations:**
+
 - AML (Anti-Money Laundering) checks
 - CTF (Counter-Terrorist Financing) screening
 - PEP (Politically Exposed Persons) verification
@@ -308,12 +321,14 @@ services:
 ### Security Measures
 
 **Data Security:**
+
 - End-to-end encryption for sensitive data
 - Secure document storage (encrypted at rest)
 - Tokenization of personal information
 - Regular security audits
 
 **Access Control:**
+
 - Role-based access to KYC data
 - Audit trails for all access
 - Time-limited data retention
@@ -352,23 +367,23 @@ ml_services:
 
 ### Development Costs
 
-| Component | Cost (USD) | Timeline |
-|-----------|------------|----------|
-| KYC Platform Development | $150,000 | 6 months |
-| Third-party Integrations | $30,000 | 2 months |
-| ML Model Development | $50,000 | 3 months |
-| Security Audit | $20,000 | 1 month |
-| **Total Development** | **$250,000** | **6 months** |
+| Component                | Cost (USD)   | Timeline     |
+| ------------------------ | ------------ | ------------ |
+| KYC Platform Development | $150,000     | 6 months     |
+| Third-party Integrations | $30,000      | 2 months     |
+| ML Model Development     | $50,000      | 3 months     |
+| Security Audit           | $20,000      | 1 month      |
+| **Total Development**    | **$250,000** | **6 months** |
 
 ### Operational Costs (Monthly)
 
-| Service | Cost (USD) | Volume |
-|---------|------------|---------|
-| Face Recognition API | $2,000 | 10,000 verifications |
-| Document OCR | $1,500 | 10,000 documents |
-| Government API calls | $500 | 5,000 checks |
-| Infrastructure | $3,000 | AWS/Cloud |
-| **Total Monthly** | **$7,000** | **10,000 businesses** |
+| Service              | Cost (USD) | Volume                |
+| -------------------- | ---------- | --------------------- |
+| Face Recognition API | $2,000     | 10,000 verifications  |
+| Document OCR         | $1,500     | 10,000 documents      |
+| Government API calls | $500       | 5,000 checks          |
+| Infrastructure       | $3,000     | AWS/Cloud             |
+| **Total Monthly**    | **$7,000** | **10,000 businesses** |
 
 ### Cost Per Verification
 
@@ -399,21 +414,21 @@ ml_services:
 
 ### Technical Risks
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| API Downtime | High | Multiple provider redundancy |
-| False Rejections | Medium | Manual review queue |
-| Fraud Attempts | High | ML-based detection |
-| Data Breach | Critical | Encryption & security audits |
+| Risk             | Impact   | Mitigation                   |
+| ---------------- | -------- | ---------------------------- |
+| API Downtime     | High     | Multiple provider redundancy |
+| False Rejections | Medium   | Manual review queue          |
+| Fraud Attempts   | High     | ML-based detection           |
+| Data Breach      | Critical | Encryption & security audits |
 
 ### Business Risks
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Regulatory Changes | High | Flexible rule engine |
-| Market Resistance | Medium | Gradual rollout with incentives |
-| Competition | Medium | Fast execution & patents |
-| Cost Overruns | Low | Phased implementation |
+| Risk               | Impact | Mitigation                      |
+| ------------------ | ------ | ------------------------------- |
+| Regulatory Changes | High   | Flexible rule engine            |
+| Market Resistance  | Medium | Gradual rollout with incentives |
+| Competition        | Medium | Fast execution & patents        |
+| Cost Overruns      | Low    | Phased implementation           |
 
 ## Future Enhancements
 
@@ -439,24 +454,28 @@ ml_services:
 ## Implementation Roadmap
 
 ### Immediate Actions (Week 1-2)
+
 - Assemble KYC development team
 - Select technology providers
 - Design UX/UI mockups
 - Define MVP scope
 
 ### Month 1 Deliverables
+
 - Basic document upload system
 - OCR integration prototype
 - Database schema design
 - API architecture
 
 ### Month 3 Milestones
+
 - Complete MVP with basic KYC
 - Face recognition integration
 - Risk scoring algorithm v1
 - Pilot with 100 businesses
 
 ### Month 6 Goals
+
 - Full automation achieved
 - 1,000+ businesses onboarded
 - <$5 cost per verification

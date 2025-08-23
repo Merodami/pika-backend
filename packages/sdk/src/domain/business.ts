@@ -6,6 +6,29 @@
 import type { CategoryDomain } from './category.js'
 import type { UserDomain } from './user.js'
 
+// ============= Business Details Domain =============
+
+export interface BusinessDetailsDomain {
+  id: string
+  businessId: string
+  // Contact Information
+  phone: string | null
+  email: string | null
+  website: string | null
+  // Address Information
+  street: string | null
+  city: string | null
+  state: string | null
+  postalCode: string | null
+  country: string | null
+  // Operating Information
+  operatingHours: any | null // JSON
+  socialMedia: any | null // JSON
+  additionalInfo: any | null // JSON
+  createdAt: Date
+  updatedAt: Date
+}
+
 // ============= Business Domain =============
 
 export interface BusinessDomain {
@@ -29,6 +52,7 @@ export interface BusinessDomain {
   // Optional relations
   user?: UserDomain
   category?: CategoryDomain
+  businessDetails?: BusinessDetailsDomain
   businessRegistration?: {
     id: string
     userId: string

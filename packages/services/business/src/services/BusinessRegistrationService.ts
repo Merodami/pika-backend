@@ -481,6 +481,7 @@ export class BusinessRegistrationService
           const details = await this.businessDetailsRepository.findByBusinessId(
             registration.businessId,
           )
+
           if (details) {
             await this.businessDetailsRepository.delete(details.id)
           }
@@ -542,6 +543,7 @@ export class BusinessRegistrationService
 
       if (!registration) {
         logger.warn('No registration found for business', { businessId })
+
         return null
       }
 

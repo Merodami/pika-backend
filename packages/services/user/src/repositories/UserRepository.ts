@@ -73,6 +73,7 @@ export class UserRepository implements IUserRepository {
         // Only search by ID if the search string looks like a UUID
         const uuidRegex =
           /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
         if (uuidRegex.test(search)) {
           searchConditions.unshift({ id: { equals: search } }) // UUID exact match
         }

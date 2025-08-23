@@ -17,10 +17,6 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "message",
-    "userId",
-    "emailSent"
-  ],
+  "required": ["message", "userId", "emailSent"],
   "additionalProperties": false
 }

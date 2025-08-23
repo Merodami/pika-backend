@@ -66,10 +66,7 @@
           "description": "Source of registration to determine user role",
           "default": "public",
           "type": "string",
-          "enum": [
-            "public",
-            "adminDashboard"
-          ]
+          "enum": ["public", "adminDashboard"]
         }
       },
       "required": [
@@ -102,11 +99,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "message",
-        "userId",
-        "emailSent"
-      ],
+      "required": ["message", "userId", "emailSent"],
       "additionalProperties": false
     },
     "ResendVerificationRequest": {
@@ -117,9 +110,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "email"
-      ],
+      "required": ["email"],
       "additionalProperties": false
     },
     "ResendVerificationResponse": {
@@ -131,9 +122,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "message"
-      ],
+      "required": ["message"],
       "additionalProperties": false
     },
     "VerifyEmailRequest": {
@@ -146,9 +135,7 @@
           "minLength": 1
         }
       },
-      "required": [
-        "token"
-      ],
+      "required": ["token"],
       "additionalProperties": false
     },
     "VerifyEmailResponse": {
@@ -164,10 +151,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "message",
-        "emailVerified"
-      ],
+      "required": ["message", "emailVerified"],
       "additionalProperties": false
     }
   }

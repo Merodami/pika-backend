@@ -9,7 +9,7 @@ import { Cache, type ICacheService } from '@pika/redis'
 import type { BusinessDomain } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { TranslationClient, TranslationResolver } from '@pika/translation'
-import type { PaginatedResult, ParsedIncludes, LanguageCode } from '@pika/types'
+import type { LanguageCode,PaginatedResult, ParsedIncludes } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
 import { CACHE_KEYS } from '../constants/cache-keys.js'
@@ -134,6 +134,7 @@ export class BusinessService implements IBusinessService {
           result.data,
           language,
         )
+
         return { data: resolvedData, pagination: result.pagination }
       }
 
@@ -183,6 +184,7 @@ export class BusinessService implements IBusinessService {
           business,
           language,
         )
+
         return resolved
       }
 
@@ -233,6 +235,7 @@ export class BusinessService implements IBusinessService {
           business,
           language,
         )
+
         return resolved
       }
 
@@ -303,6 +306,7 @@ export class BusinessService implements IBusinessService {
           business,
           language,
         )
+
         return resolved
       }
 

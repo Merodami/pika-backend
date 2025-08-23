@@ -1,7 +1,8 @@
+import { VoucherState } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
+
 import { FIXED_DEV_IDS } from './fixed-ids.js'
 import type { SeedModule } from './types.js'
-import { VoucherState } from '@pika/types'
 
 /**
  * Voucher Seeder Module
@@ -350,16 +351,16 @@ const DEV_VOUCHERS_DATA = [
  */
 async function seedVouchers(prisma: PrismaClient): Promise<void> {
   console.log('🎫 Seeding dev vouchers...')
-  
+
   let vouchersCreated = 0
   let translationsCreated = 0
   let restaurantVouchers = 0
   let beautyVouchers = 0
-  
+
   try {
     for (const voucherData of DEV_VOUCHERS_DATA) {
       const { translations, ...voucher } = voucherData
-      
+
       // Create/update voucher
       await prisma.voucher.upsert({
         where: { id: voucher.id },
@@ -379,16 +380,16 @@ async function seedVouchers(prisma: PrismaClient): Promise<void> {
         },
         create: voucher,
       })
-      
+
       vouchersCreated++
-      
+
       // Count by business
       if (voucher.businessId === FIXED_DEV_IDS.businesses.restaurant) {
         restaurantVouchers++
       } else if (voucher.businessId === FIXED_DEV_IDS.businesses.beautySalon) {
         beautyVouchers++
       }
-      
+
       // Create translations for title
       for (const [langCode, value] of Object.entries(translations.title)) {
         await prisma.translation.upsert({
@@ -407,7 +408,7 @@ async function seedVouchers(prisma: PrismaClient): Promise<void> {
         })
         translationsCreated++
       }
-      
+
       // Create translations for description
       for (const [langCode, value] of Object.entries(translations.description)) {
         await prisma.translation.upsert({
@@ -426,7 +427,7 @@ async function seedVouchers(prisma: PrismaClient): Promise<void> {
         })
         translationsCreated++
       }
-      
+
       // Create translations for terms
       for (const [langCode, value] of Object.entries(translations.terms)) {
         await prisma.translation.upsert({
@@ -445,17 +446,17 @@ async function seedVouchers(prisma: PrismaClient): Promise<void> {
         })
         translationsCreated++
       }
-      
+
       console.log(`  ✅ ${translations.title.en}`)
     }
-    
+
     console.log(`✅ Vouchers seeded successfully:`)
     console.log(`   - ${vouchersCreated} vouchers created/updated`)
     console.log(`   - ${restaurantVouchers} restaurant vouchers`)
     console.log(`   - ${beautyVouchers} beauty salon vouchers`)
     console.log(`   - ${translationsCreated} translations created/updated`)
     console.log(`   - All vouchers published and ready`)
-    
+
   } catch (error) {
     console.error('❌ Failed to seed vouchers:', error)
     throw error
@@ -467,13 +468,13 @@ async function seedVouchers(prisma: PrismaClient): Promise<void> {
  */
 async function cleanupVouchers(prisma: PrismaClient): Promise<void> {
   console.log('🗑️ Cleaning up dev vouchers...')
-  
+
   try {
     // Get all voucher IDs
     const restaurantVoucherIds = Object.values(FIXED_DEV_IDS.vouchers.restaurant)
     const beautyVoucherIds = Object.values(FIXED_DEV_IDS.vouchers.beauty)
     const allVoucherIds = [...restaurantVoucherIds, ...beautyVoucherIds]
-    
+
     // Delete voucher translations
     const voucherKeys = DEV_VOUCHERS_DATA.flatMap(v => [
       v.titleKey,
@@ -483,16 +484,16 @@ async function cleanupVouchers(prisma: PrismaClient): Promise<void> {
     const deletedTranslations = await prisma.translation.deleteMany({
       where: { key: { in: voucherKeys } },
     })
-    
+
     // Delete vouchers
     const deletedVouchers = await prisma.voucher.deleteMany({
       where: { id: { in: allVoucherIds } },
     })
-    
+
     console.log(`✅ Vouchers cleanup completed:`)
     console.log(`   - ${deletedVouchers.count} vouchers deleted`)
     console.log(`   - ${deletedTranslations.count} translations deleted`)
-    
+
   } catch (error) {
     console.error('❌ Failed to cleanup vouchers:', error)
     throw error
@@ -507,12 +508,12 @@ async function checkVouchers(prisma: PrismaClient): Promise<boolean> {
     const restaurantVoucherIds = Object.values(FIXED_DEV_IDS.vouchers.restaurant)
     const beautyVoucherIds = Object.values(FIXED_DEV_IDS.vouchers.beauty)
     const allVoucherIds = [...restaurantVoucherIds, ...beautyVoucherIds]
-    
+
     const vouchers = await prisma.voucher.findMany({
       where: { id: { in: allVoucherIds } },
-      select: { 
-        id: true, 
-        titleKey: true, 
+      select: {
+        id: true,
+        titleKey: true,
         state: true,
         businessId: true,
         type: true,
@@ -520,23 +521,26 @@ async function checkVouchers(prisma: PrismaClient): Promise<boolean> {
         value: true,
       },
     })
-    
+
     const restaurantCount = vouchers.filter(v => v.businessId === FIXED_DEV_IDS.businesses.restaurant).length
     const beautyCount = vouchers.filter(v => v.businessId === FIXED_DEV_IDS.businesses.beautySalon).length
-    
+
     console.log(`📊 Vouchers status: ${vouchers.length}/${allVoucherIds.length} found`)
     console.log(`   - Restaurant vouchers: ${restaurantCount}/5`)
     console.log(`   - Beauty salon vouchers: ${beautyCount}/5`)
-    
+
     if (vouchers.length === allVoucherIds.length) {
       console.log(`✅ All vouchers exist`)
+
       return true
     } else {
       console.log(`⚠️ Missing ${allVoucherIds.length - vouchers.length} vouchers`)
+
       return false
     }
   } catch (error) {
     console.error('❌ Failed to check vouchers:', error)
+
     return false
   }
 }

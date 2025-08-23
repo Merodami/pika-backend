@@ -85,12 +85,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "id",
-              "firstName",
-              "lastName",
-              "createdAt"
-            ],
+            "required": ["id", "firstName", "lastName", "createdAt"],
             "additionalProperties": false
           },
           "category": {
@@ -349,9 +344,6 @@
       "additionalProperties": false
     }
   },
-  "required": [
-    "data",
-    "pagination"
-  ],
+  "required": ["data", "pagination"],
   "additionalProperties": false
 }

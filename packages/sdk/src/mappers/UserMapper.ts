@@ -138,6 +138,7 @@ export class UserMapper {
    */
   static toDTO(domain: UserDomain): UserDTO {
     const name = `${domain.firstName} ${domain.lastName}`.trim()
+
     return {
       id: domain.id,
       email: domain.email,

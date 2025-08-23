@@ -48,10 +48,7 @@
         },
         "discountType": {
           "type": "string",
-          "enum": [
-            "fixed",
-            "percentage"
-          ]
+          "enum": ["fixed", "percentage"]
         },
         "discountValue": {
           "type": "number",
@@ -145,11 +142,7 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "qr",
-                  "short",
-                  "static"
-                ]
+                "enum": ["qr", "short", "static"]
               },
               "isActive": {
                 "type": "boolean"
@@ -162,12 +155,7 @@
                 "additionalProperties": {}
               }
             },
-            "required": [
-              "id",
-              "code",
-              "type",
-              "isActive"
-            ],
+            "required": ["id", "code", "type", "isActive"],
             "additionalProperties": false
           }
         },
@@ -247,28 +235,15 @@
                 "maximum": 180
               }
             },
-            "required": [
-              "lat",
-              "lng"
-            ],
+            "required": ["lat", "lng"],
             "additionalProperties": false
           }
         },
-        "required": [
-          "name",
-          "address",
-          "distance",
-          "coordinates"
-        ],
+        "required": ["name", "address", "distance", "coordinates"],
         "additionalProperties": false
       }
     }
   },
-  "required": [
-    "voucher",
-    "scanId",
-    "canClaim",
-    "alreadyClaimed"
-  ],
+  "required": ["voucher", "scanId", "canClaim", "alreadyClaimed"],
   "additionalProperties": false
 }

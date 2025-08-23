@@ -237,7 +237,12 @@ export const UserActivityLog = z.object({
   userId: UserId,
   action: z.string(),
   category: createZodEnum(UserActivityCategoryEnum),
-  details: z.record(z.string(), z.any()).optional(),
+  details: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
   timestamp: DateTime,

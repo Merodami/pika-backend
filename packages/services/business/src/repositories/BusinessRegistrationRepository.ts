@@ -242,6 +242,7 @@ export class BusinessRegistrationRepository
       // - If step < currentStep: editing previous step, maintain current progress
       // - If step > currentStep: should be prevented by validation, but handle gracefully
       let nextStep: number
+
       if (step >= currentRegistration.currentStep) {
         // Completing current step or advancing to new step
         nextStep = step < 3 ? step + 1 : 3

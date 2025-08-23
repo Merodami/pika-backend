@@ -115,7 +115,10 @@ async function loginAsAdmin(): Promise<string> {
   }
 }
 
-async function loginAsBusinessOwner(): Promise<{ token: string; userId: string }> {
+async function loginAsBusinessOwner(): Promise<{
+  token: string
+  userId: string
+}> {
   logInfo('Logging in as business owner...')
 
   try {
@@ -283,35 +286,50 @@ async function listBusinessVouchers(
   logRequest('GET', `/admin/vouchers?businessId=${businessId}&limit=50`)
 
   try {
-    const response = await api.get(`/admin/vouchers?businessId=${businessId}&limit=50`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const response = await api.get(
+      `/admin/vouchers?businessId=${businessId}&limit=50`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    )
 
     const vouchers = response.data.data || []
-    
+
     logSuccess(`Found ${vouchers.length} vouchers for business`)
-    logInfo(`Total vouchers: ${response.data.pagination?.total || vouchers.length}`)
-    
+    logInfo(
+      `Total vouchers: ${response.data.pagination?.total || vouchers.length}`,
+    )
+
     // Display vouchers in a formatted way
     if (vouchers.length > 0) {
       console.log(`\n${colors.cyan}📋 Voucher List:${colors.reset}`)
       console.log('─'.repeat(80))
-      
+
       vouchers.forEach((voucher: any, index: number) => {
-        console.log(`\n${colors.bright}${index + 1}. ${voucher.title?.en || 'Untitled'}${colors.reset}`)
+        console.log(
+          `\n${colors.bright}${index + 1}. ${voucher.title?.en || 'Untitled'}${colors.reset}`,
+        )
         console.log(`   ID: ${colors.dim}${voucher.id}${colors.reset}`)
-        console.log(`   Type: ${voucher.discountType} (${voucher.discountValue}${voucher.discountType === 'percentage' ? '%' : ' ' + voucher.currency})`)
-        console.log(`   State: ${getStateColor(voucher.state)}${voucher.state}${colors.reset}`)
-        console.log(`   Valid: ${new Date(voucher.validFrom).toLocaleDateString()} - ${new Date(voucher.expiresAt).toLocaleDateString()}`)
-        console.log(`   Redemptions: ${voucher.currentRedemptions || 0}/${voucher.maxRedemptions || '∞'}`)
+        console.log(
+          `   Type: ${voucher.discountType} (${voucher.discountValue}${voucher.discountType === 'percentage' ? '%' : ' ' + voucher.currency})`,
+        )
+        console.log(
+          `   State: ${getStateColor(voucher.state)}${voucher.state}${colors.reset}`,
+        )
+        console.log(
+          `   Valid: ${new Date(voucher.validFrom).toLocaleDateString()} - ${new Date(voucher.expiresAt).toLocaleDateString()}`,
+        )
+        console.log(
+          `   Redemptions: ${voucher.currentRedemptions || 0}/${voucher.maxRedemptions || '∞'}`,
+        )
         if (voucher.codes && voucher.codes.length > 0) {
           console.log(`   Codes: ${voucher.codes.length} generated`)
         }
       })
-      
+
       console.log('\n' + '─'.repeat(80))
     }
-    
+
     return vouchers
   } catch (error: any) {
     logError(
@@ -588,7 +606,7 @@ async function runVoucherCreationFlow() {
       termsAndConditions: {
         en: 'Minimum purchase of ₲200,000 required. Valid for 60 days.',
         es: 'Compra mínima de ₲200,000 requerida. Válido por 60 días.',
-        gn: "Jogua michĩvéva ₲200,000 ñeikotevẽ. Oikovéta 60 ára.",
+        gn: 'Jogua michĩvéva ₲200,000 ñeikotevẽ. Oikovéta 60 ára.',
       },
       discountType: 'fixed',
       discountValue: 50000,
@@ -636,7 +654,11 @@ async function runVoucherCreationFlow() {
     log(`\n${colors.bright}=== Phase 3: Voucher Management ===${colors.reset}`)
 
     logStep(7, 'List All Business Vouchers')
-    const allVouchers = await listBusinessVouchers(businessDetails.id, adminToken)
+
+    const allVouchers = await listBusinessVouchers(
+      businessDetails.id,
+      adminToken,
+    )
 
     logStep(8, 'Get Detailed Voucher Information')
     await getVoucherById(percentageVoucher, adminToken)
@@ -719,7 +741,7 @@ async function runVoucherCreationFlow() {
 
     // Phase 6: Cleanup (optional - comment out to keep vouchers)
     const shouldCleanup = process.env.CLEANUP_VOUCHERS !== 'false'
-    
+
     if (shouldCleanup) {
       log(`\n${colors.bright}=== Phase 6: Cleanup ===${colors.reset}`)
 
@@ -729,9 +751,11 @@ async function runVoucherCreationFlow() {
         await deleteVoucher(voucherId, adminToken)
       }
     } else {
-      log(`\n${colors.yellow}⚠️  Skipping cleanup - vouchers kept for testing${colors.reset}`)
+      log(
+        `\n${colors.yellow}⚠️  Skipping cleanup - vouchers kept for testing${colors.reset}`,
+      )
       log(`Created voucher IDs:`)
-      createdVouchers.forEach(id => log(`  - ${id}`))
+      createdVouchers.forEach((id) => log(`  - ${id}`))
     }
 
     log(
@@ -745,9 +769,11 @@ async function runVoucherCreationFlow() {
     )
     log(`- Generated voucher codes and viewed analytics`)
     log(`- Complete business voucher management demonstrated`)
-    
+
     if (!shouldCleanup) {
-      log(`\n${colors.yellow}To cleanup vouchers later, set CLEANUP_VOUCHERS=true${colors.reset}`)
+      log(
+        `\n${colors.yellow}To cleanup vouchers later, set CLEANUP_VOUCHERS=true${colors.reset}`,
+      )
     }
   } catch (error: any) {
     log(
@@ -758,7 +784,9 @@ async function runVoucherCreationFlow() {
       log(`Status: ${error.response.status}`)
       log(`Message: ${error.response.data?.message || error.message}`)
       if (error.response.data?.errors) {
-        log(`Validation errors: ${JSON.stringify(error.response.data.errors, null, 2)}`)
+        log(
+          `Validation errors: ${JSON.stringify(error.response.data.errors, null, 2)}`,
+        )
       }
     } else {
       log(`\nError: ${error.message}`)

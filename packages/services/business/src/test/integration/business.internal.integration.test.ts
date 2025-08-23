@@ -281,7 +281,7 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      expect(response.body.data.length).toBe(3)
+      expect(response.body.data).toHaveLength(3)
       expect(response.body.pagination).toBeDefined()
       expect(response.body.pagination.total).toBe(3)
 
@@ -316,10 +316,11 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      expect(response.body.data.length).toBe(1) // Only one business is both active and verified
+      expect(response.body.data).toHaveLength(1) // Only one business is both active and verified
 
       // Check the returned business has the correct properties
       const business = response.body.data[0]
+
       expect(business.active).toBe(true)
       expect(business.verified).toBe(true)
       expect(business.userId).toBe(userId)
@@ -342,7 +343,7 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      expect(response.body.data.length).toBe(5)
+      expect(response.body.data).toHaveLength(5)
       expect(response.body.pagination).toBeDefined()
       expect(response.body.pagination.page).toBe(1)
       expect(response.body.pagination.limit).toBe(5)
@@ -377,6 +378,7 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       if (response.body.data.length > 0) {
         const business = response.body.data[0]
+
         expect(business.userId).toBe(userId)
         expect(business).toHaveProperty('id')
         expect(business).toHaveProperty('businessName') // API returns resolved name

@@ -39,7 +39,12 @@ export const FileStorageLog = withTimestamps({
   region: z.string().optional(),
   uploadedAt: DateTime.optional(),
   deletedAt: DateTime.optional(),
-  metadata: z.record(z.string(), z.any()).optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
   error: z.string().optional(),
 })
 
@@ -69,7 +74,13 @@ export const FileUploadResponse = z.object({
   provider: StorageProviderSchema,
   url: z.string().url().optional().describe('Presigned URL if applicable'),
   uploadedAt: DateTime,
-  metadata: z.record(z.string(), z.any()).optional().describe('File metadata'),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional()
+    .describe('File metadata'),
 })
 
 /**

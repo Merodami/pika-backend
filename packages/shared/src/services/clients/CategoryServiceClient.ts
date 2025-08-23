@@ -1,6 +1,6 @@
 import { CATEGORY_API_URL } from '@pika/environment'
 import type { CategoryDomain } from '@pika/sdk'
-import type { ServiceContext, LanguageCode } from '@pika/types'
+import type { LanguageCode,ServiceContext } from '@pika/types'
 
 import {
   BaseServiceClient,
@@ -30,6 +30,7 @@ export class CategoryServiceClient extends BaseServiceClient {
   ): Promise<CategoryDomain | null> {
     try {
       const headers: Record<string, string> = {}
+
       if (language) {
         headers['Accept-Language'] = language
       }
@@ -43,6 +44,7 @@ export class CategoryServiceClient extends BaseServiceClient {
         },
         context,
       )
+
       return response
     } catch (error: any) {
       if (error.context?.metadata?.status === 404) {
@@ -61,6 +63,7 @@ export class CategoryServiceClient extends BaseServiceClient {
     context?: ServiceContext,
   ): Promise<CategoryDomain[]> {
     const headers: Record<string, string> = {}
+
     if (language) {
       headers['Accept-Language'] = language
     }
@@ -128,6 +131,7 @@ export class CategoryServiceClient extends BaseServiceClient {
   ): Promise<CategoryDomain[]> {
     try {
       const headers: Record<string, string> = {}
+
       if (language) {
         headers['Accept-Language'] = language
       }

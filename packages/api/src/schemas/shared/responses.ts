@@ -20,7 +20,16 @@ import { DateTime } from './primitives.js'
 export const ErrorDetails = z.object({
   code: z.string().describe('Machine-readable error code'),
   message: z.string().describe('Human-readable error message'),
-  details: z.any().optional().describe('Additional error details'),
+  details: z
+    .union([
+      z.string(),
+      z.number(),
+      z.boolean(),
+      z.record(z.string(), z.unknown()),
+      z.null(),
+    ])
+    .optional()
+    .describe('Additional error details'),
   correlationId: CorrelationId.describe('Request correlation ID for tracing'),
   timestamp: DateTime.describe('When the error occurred'),
 })
@@ -344,7 +353,17 @@ export const AsyncOperationResponse = z.object({
     .max(100)
     .optional()
     .describe('Progress percentage'),
-  result: z.any().optional().describe('Operation result (when completed)'),
+  result: z
+    .union([
+      z.string(),
+      z.number(),
+      z.boolean(),
+      z.record(z.string(), z.unknown()),
+      z.array(z.unknown()),
+      z.null(),
+    ])
+    .optional()
+    .describe('Operation result (when completed)'),
   error: ErrorDetails.optional().describe('Error details (when failed)'),
   createdAt: DateTime,
   updatedAt: DateTime,

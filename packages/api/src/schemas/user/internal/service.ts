@@ -138,7 +138,12 @@ export const UpdateUserCreditsRequest = openapi(
     amount: z.number().int(),
     operation: createZodEnum(CreditOperationEnum),
     reason: z.string(),
-    metadata: z.record(z.string(), z.any()).optional(),
+    metadata: z
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
+      .optional(),
   }),
   {
     description: 'Update user credit balance',

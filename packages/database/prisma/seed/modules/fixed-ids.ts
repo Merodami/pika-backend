@@ -18,7 +18,7 @@ export const generateFixedUUID = (seed: string): string => {
 export const FIXED_DEV_IDS = {
   // User module
   user: generateFixedUUID('dev-business-owner'),
-  
+
   // Category module - 10 categories
   categories: {
     restaurants: generateFixedUUID('dev-category-restaurants'),
@@ -32,13 +32,13 @@ export const FIXED_DEV_IDS = {
     entertainment: generateFixedUUID('dev-category-entertainment'),
     education: generateFixedUUID('dev-category-education'),
   },
-  
+
   // Business module - 2 businesses
   businesses: {
     restaurant: generateFixedUUID('dev-business-restaurant'),
     beautySalon: generateFixedUUID('dev-business-beauty-salon'),
   },
-  
+
   // Voucher module - 10 vouchers (5 per business)
   vouchers: {
     restaurant: {
@@ -63,14 +63,14 @@ export const FIXED_DEV_IDS = {
  */
 export const getModuleIds = (module: keyof typeof FIXED_DEV_IDS) => {
   const moduleData = FIXED_DEV_IDS[module]
-  
+
   if (typeof moduleData === 'string') {
     return [moduleData]
   }
-  
+
   if (typeof moduleData === 'object') {
     const ids: string[] = []
-    
+
     const collectIds = (obj: any): void => {
       for (const value of Object.values(obj)) {
         if (typeof value === 'string') {
@@ -80,11 +80,12 @@ export const getModuleIds = (module: keyof typeof FIXED_DEV_IDS) => {
         }
       }
     }
-    
+
     collectIds(moduleData)
+
     return ids
   }
-  
+
   return []
 }
 
@@ -92,7 +93,7 @@ export const getModuleIds = (module: keyof typeof FIXED_DEV_IDS) => {
  * Get all dev entity IDs across all modules
  */
 export const getAllDevIds = (): string[] => {
-  return Object.keys(FIXED_DEV_IDS).flatMap(key => 
+  return Object.keys(FIXED_DEV_IDS).flatMap(key =>
     getModuleIds(key as keyof typeof FIXED_DEV_IDS)
   )
 }

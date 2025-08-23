@@ -50,7 +50,12 @@ export const AdminCreateSubscriptionRequest = z.object({
   planId: UUID,
   stripeCustomerId: z.string().optional(),
   trialEnd: DateTime.optional(),
-  metadata: z.record(z.string(), z.any()).optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
 })
 
 export const AdminCreateSubscriptionRequestSchema =
@@ -73,7 +78,12 @@ export const AdminUpdateSubscriptionRequest = z.object({
   trialEnd: DateTime.optional(),
   cancelAtPeriodEnd: z.boolean().optional(),
   cancelledAt: DateTime.optional(),
-  metadata: z.record(z.string(), z.any()).optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
   stripeSubscriptionId: z.string().optional(),
   stripeCustomerId: z.string().optional(),
 })
@@ -159,7 +169,12 @@ export const AdminCreatePlanRequest = z.object({
   intervalCount: z.number().int().positive().default(1),
   trialPeriodDays: z.number().int().nonnegative().optional(),
   features: z.array(z.string()),
-  metadata: z.record(z.string(), z.any()).optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
   stripeProductId: z.string().optional(),
   stripePriceId: z.string().optional(),
   isActive: z.boolean().default(true),
@@ -182,7 +197,12 @@ export const AdminUpdatePlanRequest = z.object({
   description: z.string().optional(),
   features: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
-  metadata: z.record(z.string(), z.any()).optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
   trialPeriodDays: z.number().int().nonnegative().optional(),
 })
 

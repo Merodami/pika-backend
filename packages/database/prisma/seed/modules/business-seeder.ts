@@ -1,8 +1,9 @@
 import type { PrismaClient } from '@prisma/client'
+
 import { FIXED_DEV_IDS } from './fixed-ids.js'
 
 /**
- * Business Seeder Module  
+ * Business Seeder Module
  * Creates 2 businesses for the dev user with complete translations
  */
 
@@ -57,14 +58,14 @@ const DEV_BUSINESSES_DATA = [
 
 export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
   console.log('🏢 Seeding dev businesses...')
-  
+
   let businessesCreated = 0
   let translationsCreated = 0
-  
+
   try {
     for (const businessData of DEV_BUSINESSES_DATA) {
       const { translations, ...business } = businessData
-      
+
       // Create/update business
       const createdBusiness = await prisma.business.upsert({
         where: { id: business.id },
@@ -79,9 +80,9 @@ export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
         },
         create: business,
       })
-      
+
       businessesCreated++
-      
+
       // Create translations for business name
       for (const [langCode, value] of Object.entries(translations.name)) {
         await prisma.translation.upsert({
@@ -100,7 +101,7 @@ export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
         })
         translationsCreated++
       }
-      
+
       // Create translations for business description
       for (const [langCode, value] of Object.entries(translations.description)) {
         await prisma.translation.upsert({
@@ -119,15 +120,15 @@ export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
         })
         translationsCreated++
       }
-      
+
       console.log(`  ✅ ${translations.name.en}`)
     }
-    
+
     console.log(`✅ Businesses seeded successfully:`)
     console.log(`   - ${businessesCreated} businesses created/updated`)
     console.log(`   - ${translationsCreated} translations created/updated`)
     console.log(`   - All businesses verified and approved`)
-    
+
   } catch (error) {
     console.error('❌ Failed to seed businesses:', error)
     throw error
@@ -136,25 +137,25 @@ export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
 
 export async function cleanupBusinesses(prisma: PrismaClient): Promise<void> {
   console.log('🗑️ Cleaning up dev businesses...')
-  
+
   try {
     const businessIds = Object.values(FIXED_DEV_IDS.businesses)
-    
+
     // Delete business translations
     const businessKeys = DEV_BUSINESSES_DATA.flatMap(b => [b.businessNameKey, b.businessDescriptionKey])
     const deletedTranslations = await prisma.translation.deleteMany({
       where: { key: { in: businessKeys } },
     })
-    
+
     // Delete businesses
     const deletedBusinesses = await prisma.business.deleteMany({
       where: { id: { in: businessIds } },
     })
-    
+
     console.log(`✅ Businesses cleanup completed:`)
     console.log(`   - ${deletedBusinesses.count} businesses deleted`)
     console.log(`   - ${deletedTranslations.count} translations deleted`)
-    
+
   } catch (error) {
     console.error('❌ Failed to cleanup businesses:', error)
     throw error
@@ -166,29 +167,32 @@ export async function checkBusinesses(prisma: PrismaClient): Promise<boolean> {
     const businessIds = Object.values(FIXED_DEV_IDS.businesses)
     const businesses = await prisma.business.findMany({
       where: { id: { in: businessIds } },
-      select: { 
-        id: true, 
-        businessNameKey: true, 
+      select: {
+        id: true,
+        businessNameKey: true,
         active: true,
         verified: true,
         approved: true,
       },
     })
-    
+
     console.log(`📊 Businesses status: ${businesses.length}/${businessIds.length} found`)
-    
+
     if (businesses.length === businessIds.length) {
       console.log(`✅ All businesses exist`)
       businesses.forEach(b => {
         console.log(`   - ${b.businessNameKey}: active=${b.active}, verified=${b.verified}, approved=${b.approved}`)
       })
+
       return true
     } else {
       console.log(`⚠️ Missing ${businessIds.length - businesses.length} businesses`)
+
       return false
     }
   } catch (error) {
     console.error('❌ Failed to check businesses:', error)
+
     return false
   }
 }

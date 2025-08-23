@@ -755,6 +755,7 @@ describe('Business Service - Public API Integration Tests', () => {
       const foundBusiness = listResponse.body.data.find(
         (b: any) => b.id === approvedBusiness.id,
       )
+
       expect(foundBusiness).toBeDefined()
       expect(foundBusiness).toHaveProperty('approved')
       expect(foundBusiness.approved).toBe(true)

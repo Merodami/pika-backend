@@ -1,4 +1,5 @@
 import type { PrismaClient } from '@prisma/client'
+
 import { FIXED_DEV_IDS } from './fixed-ids.js'
 
 /**
@@ -211,14 +212,14 @@ const DEV_CATEGORIES_DATA = [
 
 export async function seedCategories(prisma: PrismaClient): Promise<void> {
   console.log('🏷️ Seeding dev categories...')
-  
+
   let categoriesCreated = 0
   let translationsCreated = 0
-  
+
   try {
     for (const categoryData of DEV_CATEGORIES_DATA) {
       const { id, nameKey, descriptionKey, icon, slug, sortOrder, translations } = categoryData
-      
+
       // Create/update category
       const category = await prisma.category.upsert({
         where: { id },
@@ -242,9 +243,9 @@ export async function seedCategories(prisma: PrismaClient): Promise<void> {
           createdBy: FIXED_DEV_IDS.user,
         },
       })
-      
+
       categoriesCreated++
-      
+
       // Create translations for name
       for (const [langCode, value] of Object.entries(translations.name)) {
         await prisma.translation.upsert({
@@ -263,7 +264,7 @@ export async function seedCategories(prisma: PrismaClient): Promise<void> {
         })
         translationsCreated++
       }
-      
+
       // Create translations for description
       for (const [langCode, value] of Object.entries(translations.description)) {
         await prisma.translation.upsert({
@@ -282,15 +283,15 @@ export async function seedCategories(prisma: PrismaClient): Promise<void> {
         })
         translationsCreated++
       }
-      
+
       console.log(`  ✅ ${translations.name.en}`)
     }
-    
+
     console.log(`✅ Categories seeded successfully:`)
     console.log(`   - ${categoriesCreated} categories created/updated`)
     console.log(`   - ${translationsCreated} translations created/updated`)
     console.log(`   - Languages: ES, EN, GN`)
-    
+
   } catch (error) {
     console.error('❌ Failed to seed categories:', error)
     throw error
@@ -299,25 +300,25 @@ export async function seedCategories(prisma: PrismaClient): Promise<void> {
 
 export async function cleanupCategories(prisma: PrismaClient): Promise<void> {
   console.log('🗑️ Cleaning up dev categories...')
-  
+
   try {
     const categoryIds = Object.values(FIXED_DEV_IDS.categories)
-    
+
     // Delete category translations
     const categoryKeys = DEV_CATEGORIES_DATA.flatMap(c => [c.nameKey, c.descriptionKey])
     const deletedTranslations = await prisma.translation.deleteMany({
       where: { key: { in: categoryKeys } },
     })
-    
+
     // Delete categories
     const deletedCategories = await prisma.category.deleteMany({
       where: { id: { in: categoryIds } },
     })
-    
+
     console.log(`✅ Categories cleanup completed:`)
     console.log(`   - ${deletedCategories.count} categories deleted`)
     console.log(`   - ${deletedTranslations.count} translations deleted`)
-    
+
   } catch (error) {
     console.error('❌ Failed to cleanup categories:', error)
     throw error
@@ -331,18 +332,21 @@ export async function checkCategories(prisma: PrismaClient): Promise<boolean> {
       where: { id: { in: categoryIds } },
       select: { id: true, nameKey: true, isActive: true },
     })
-    
+
     console.log(`📊 Categories status: ${categories.length}/${categoryIds.length} found`)
-    
+
     if (categories.length === categoryIds.length) {
       console.log(`✅ All categories exist`)
+
       return true
     } else {
       console.log(`⚠️ Missing ${categoryIds.length - categories.length} categories`)
+
       return false
     }
   } catch (error) {
     console.error('❌ Failed to check categories:', error)
+
     return false
   }
 }
