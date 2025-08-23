@@ -1,6 +1,6 @@
 import { CATEGORY_API_URL } from '@pika/environment'
 import type { CategoryDomain } from '@pika/sdk'
-import type { LanguageCode,ServiceContext } from '@pika/types'
+import type { LanguageCode, ServiceContext } from '@pika/types'
 
 import {
   BaseServiceClient,
@@ -105,21 +105,17 @@ export class CategoryServiceClient extends BaseServiceClient {
     valid: boolean
     results: Array<{ categoryId: string; valid: boolean }>
   }> {
-    try {
-      return await this.post<{
-        valid: boolean
-        results: Array<{ categoryId: string; valid: boolean }>
-      }>(
-        '/internal/categories/validate',
-        { categoryIds },
-        {
-          ...context,
-          useServiceAuth: true,
-        },
-      )
-    } catch (error: any) {
-      throw error
-    }
+    return await this.post<{
+      valid: boolean
+      results: Array<{ categoryId: string; valid: boolean }>
+    }>(
+      '/internal/categories/validate',
+      { categoryIds },
+      {
+        ...context,
+        useServiceAuth: true,
+      },
+    )
   }
 
   /**
@@ -129,26 +125,22 @@ export class CategoryServiceClient extends BaseServiceClient {
     language?: LanguageCode,
     context?: ServiceContext,
   ): Promise<CategoryDomain[]> {
-    try {
-      const headers: Record<string, string> = {}
+    const headers: Record<string, string> = {}
 
-      if (language) {
-        headers['Accept-Language'] = language
-      }
-
-      const response = await this.request<{ data: CategoryDomain[] }>(
-        '/internal/categories/active',
-        {
-          method: 'GET',
-          headers,
-          useServiceAuth: true,
-        },
-        context,
-      )
-
-      return response.data
-    } catch (error: any) {
-      throw error
+    if (language) {
+      headers['Accept-Language'] = language
     }
+
+    const response = await this.request<{ data: CategoryDomain[] }>(
+      '/internal/categories/active',
+      {
+        method: 'GET',
+        headers,
+        useServiceAuth: true,
+      },
+      context,
+    )
+
+    return response.data
   }
 }

@@ -23,6 +23,7 @@ export async function createVoucherServer({
   translationClient,
   translationResolver,
   communicationClient,
+  businessServiceClient,
 }: {
   prisma: PrismaClient
   cacheService: ICacheService
@@ -30,9 +31,10 @@ export async function createVoucherServer({
   translationClient: TranslationClient
   translationResolver: TranslationResolver
   communicationClient?: any
+  businessServiceClient?: BusinessServiceClient
 }) {
   // Initialize service clients
-  const businessServiceClient = new BusinessServiceClient()
+  const businessClient = businessServiceClient || new BusinessServiceClient()
 
   // Set up global cache service for decorators
   setCacheService(cacheService)
@@ -114,7 +116,7 @@ export async function createVoucherServer({
     translationResolver,
     fileStorage,
     communicationClient,
-    businessServiceClient,
+    businessClient,
   )
 
   app.use('/admin/vouchers', adminRouter)

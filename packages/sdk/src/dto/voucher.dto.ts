@@ -80,6 +80,7 @@ export interface CreateVoucherRequestData {
 }
 
 export interface UpdateVoucherRequestData {
+  categoryId?: string
   title?: Record<string, string>
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>

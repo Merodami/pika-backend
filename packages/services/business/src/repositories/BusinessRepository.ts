@@ -21,6 +21,7 @@ export interface IBusinessRepository {
   create(data: CreateBusinessData): Promise<BusinessDomain>
   update(id: string, data: UpdateBusinessData): Promise<BusinessDomain>
   delete(id: string): Promise<void>
+  countByUserId(userId: string): Promise<number>
 }
 
 export interface CreateBusinessData {
@@ -671,6 +672,28 @@ export class BusinessRepository implements IBusinessRepository {
           metadata: { businessId: id },
         },
       )
+    }
+  }
+
+  /**
+   * Count businesses by user ID
+   */
+  async countByUserId(userId: string): Promise<number> {
+    try {
+      const count = await this.prisma.business.count({
+        where: {
+          userId,
+          deletedAt: null,
+        },
+      })
+
+      return count
+    } catch (error) {
+      logger.error('Failed to count businesses by user ID:', error)
+      throw ErrorFactory.fromError(error, 'Failed to count user businesses', {
+        severity: ErrorSeverity.ERROR,
+        metadata: { userId },
+      })
     }
   }
 }

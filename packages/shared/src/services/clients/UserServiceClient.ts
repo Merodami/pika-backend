@@ -36,6 +36,11 @@ export interface ValidatePasswordResetTokenRequest {
   token: string
 }
 
+export interface UpdateUserPrimaryBusinessRequest {
+  userId: string
+  primaryBusinessId: string | null
+}
+
 export interface UserAuthData extends UserDomain {
   passwordHash?: string
 }
@@ -381,5 +386,22 @@ export class UserServiceClient extends BaseServiceClient {
       }
       throw error
     }
+  }
+
+  /**
+   * Update user's primary business ID
+   */
+  async updateUserPrimaryBusiness(
+    data: UpdateUserPrimaryBusinessRequest,
+    context?: ServiceContext,
+  ): Promise<void> {
+    await this.post(
+      `/internal/users/${data.userId}/primary-business`,
+      { primaryBusinessId: data.primaryBusinessId },
+      {
+        ...context,
+        useServiceAuth: true,
+      },
+    )
   }
 }

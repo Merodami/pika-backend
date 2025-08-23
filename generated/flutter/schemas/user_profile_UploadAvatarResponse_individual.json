@@ -12,6 +12,9 @@
       "type": "string"
     }
   },
-  "required": ["avatarUrl", "message"],
+  "required": [
+    "avatarUrl",
+    "message"
+  ],
   "additionalProperties": false
 }

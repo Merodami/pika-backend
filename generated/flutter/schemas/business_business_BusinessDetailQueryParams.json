@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "include": {
-      "description": "Comma-separated relations: user,category",
+      "description": "Comma-separated relations: user,category,businessDetails",
       "type": "string"
     }
   },

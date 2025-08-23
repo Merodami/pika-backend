@@ -7,9 +7,14 @@ import type { BusinessSearchParams } from '@business/types/search.js'
 import { DEFAULT_LANGUAGE, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, type ICacheService } from '@pika/redis'
 import type { BusinessDomain } from '@pika/sdk'
-import { ErrorFactory, logger } from '@pika/shared'
+import {
+  ErrorFactory,
+  logger,
+  UserServiceClient,
+  ValidationError,
+} from '@pika/shared'
 import type { TranslationClient, TranslationResolver } from '@pika/translation'
-import type { LanguageCode,PaginatedResult, ParsedIncludes } from '@pika/types'
+import type { LanguageCode, PaginatedResult, ParsedIncludes } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
 import { CACHE_KEYS } from '../constants/cache-keys.js'
@@ -74,6 +79,7 @@ export class BusinessService implements IBusinessService {
   constructor(
     private readonly businessRepository: IBusinessRepository,
     private readonly translationService: TranslationClient,
+    private readonly userServiceClient?: UserServiceClient,
     private readonly cacheService?: ICacheService,
     private readonly translationResolver?: TranslationResolver,
   ) {}
@@ -258,8 +264,10 @@ export class BusinessService implements IBusinessService {
     try {
       logger.debug(`Creating business for user: ${data.userId}`)
 
-      // Users can now create multiple businesses
-      // Removed the single business per user constraint
+      // Check if this is the user's first business
+      const existingBusinessesCount =
+        await this.businessRepository.countByUserId(data.userId)
+      const isFirstBusiness = existingBusinessesCount === 0
 
       // Generate translation keys for business name and description
       const businessNameKey = `business.name.${uuid()}`
@@ -294,6 +302,30 @@ export class BusinessService implements IBusinessService {
       }
 
       const business = await this.businessRepository.create(createData)
+
+      // If this is the user's first business, set it as primaryBusinessId
+      if (isFirstBusiness && this.userServiceClient) {
+        try {
+          await this.userServiceClient.updateUserPrimaryBusiness({
+            userId: data.userId,
+            primaryBusinessId: business.id,
+          })
+          logger.info(
+            `Set business ${business.id} as primary for user ${data.userId}`,
+          )
+        } catch (error) {
+          logger.error(
+            `Failed to set primary business for user ${data.userId}:`,
+            error,
+          )
+          // Don't throw here - business creation succeeded, but primary business setting failed
+          // This could be handled by a background job or retry mechanism in production
+        }
+      } else if (isFirstBusiness && !this.userServiceClient) {
+        logger.warn(
+          `Cannot set primary business ${business.id} for user ${data.userId} - UserServiceClient not available`,
+        )
+      }
 
       // Invalidate cache after creation
       await this.invalidateBusinessCache(business.id, business.userId)
@@ -426,7 +458,84 @@ export class BusinessService implements IBusinessService {
         })
       }
 
+      // Check business rule: Cannot delete primary business if it's the only business
+      const userBusinessCount = await this.businessRepository.countByUserId(
+        business.userId,
+      )
+
+      if (userBusinessCount === 1 && this.userServiceClient) {
+        // Get user to check if this is their primary business
+        try {
+          const user = await this.userServiceClient.getUser(business.userId)
+
+          if (user && user.primaryBusinessId === id) {
+            throw ErrorFactory.validationError(
+              {
+                business: [
+                  'Cannot delete the primary business when it is the only business for this user',
+                ],
+              },
+              {
+                source: 'BusinessService.deleteBusiness',
+                userId: business.userId,
+              },
+            )
+          }
+        } catch (error: any) {
+          // Re-throw validation errors, but catch service errors
+          if (error instanceof ValidationError) {
+            throw error
+          }
+          // If we can't get user info due to service error, log error but don't prevent deletion
+          logger.warn(
+            `Could not verify primary business status for user ${business.userId}:`,
+            error,
+          )
+        }
+      } else if (userBusinessCount === 1 && !this.userServiceClient) {
+        logger.warn(
+          `Cannot verify primary business status for user ${business.userId} - UserServiceClient not available`,
+        )
+      }
+
       await this.businessRepository.delete(id)
+
+      // If this was the primary business and user has other businesses,
+      // we should set another business as primary
+      if (userBusinessCount > 1 && this.userServiceClient) {
+        try {
+          const user = await this.userServiceClient.getUser(business.userId)
+
+          if (user && user.primaryBusinessId === id) {
+            // Find another business for this user to set as primary
+            const remainingBusinesses = await this.businessRepository.findAll({
+              userId: business.userId,
+              page: 1,
+              limit: 1,
+            })
+
+            if (remainingBusinesses.data.length > 0) {
+              await this.userServiceClient.updateUserPrimaryBusiness({
+                userId: business.userId,
+                primaryBusinessId: remainingBusinesses.data[0].id,
+              })
+              logger.info(
+                `Updated primary business to ${remainingBusinesses.data[0].id} for user ${business.userId} after deleting ${id}`,
+              )
+            }
+          }
+        } catch (error) {
+          logger.error(
+            `Failed to update primary business after deletion for user ${business.userId}:`,
+            error,
+          )
+          // Don't throw here - business deletion succeeded
+        }
+      } else if (userBusinessCount > 1 && !this.userServiceClient) {
+        logger.warn(
+          `Cannot reassign primary business for user ${business.userId} - UserServiceClient not available`,
+        )
+      }
 
       // Invalidate cache
       await this.invalidateBusinessCache(id, business.userId)

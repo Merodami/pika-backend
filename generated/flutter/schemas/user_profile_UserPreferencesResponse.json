@@ -49,11 +49,18 @@
               "type": "boolean"
             }
           },
-          "required": ["bookingReminders", "sessionUpdates", "friendRequests"],
+          "required": [
+            "bookingReminders",
+            "sessionUpdates",
+            "friendRequests"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["email", "push"],
+      "required": [
+        "email",
+        "push"
+      ],
       "additionalProperties": false
     },
     "privacy": {
@@ -62,7 +69,11 @@
         "profileVisibility": {
           "default": "friends",
           "type": "string",
-          "enum": ["public", "friends", "private"]
+          "enum": [
+            "public",
+            "friends",
+            "private"
+          ]
         },
         "showEmail": {
           "default": false,
@@ -73,7 +84,11 @@
           "type": "boolean"
         }
       },
-      "required": ["profileVisibility", "showEmail", "showPhone"],
+      "required": [
+        "profileVisibility",
+        "showEmail",
+        "showPhone"
+      ],
       "additionalProperties": false
     },
     "display": {
@@ -82,7 +97,11 @@
         "theme": {
           "default": "system",
           "type": "string",
-          "enum": ["light", "dark", "system"]
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ]
         },
         "language": {
           "type": "string",
@@ -94,10 +113,16 @@
           "type": "string"
         }
       },
-      "required": ["theme"],
+      "required": [
+        "theme"
+      ],
       "additionalProperties": false
     }
   },
-  "required": ["notifications", "privacy", "display"],
+  "required": [
+    "notifications",
+    "privacy",
+    "display"
+  ],
   "additionalProperties": false
 }

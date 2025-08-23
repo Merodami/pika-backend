@@ -119,6 +119,7 @@ export interface CreateVoucherData {
 }
 
 export interface UpdateVoucherData {
+  categoryId?: string
   title?: Record<string, string> // Multilingual: { es: "...", en: "..." }
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>

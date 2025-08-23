@@ -30,6 +30,13 @@ export default [
       'reports/**',
       '**/generated/**',
       '**/*.min.js',
+      // Build and generation scripts - ignore complexity/security warnings
+      'scripts/generate-*.ts',
+      'scripts/flows/*.ts',
+      // Database seed files - ignore complexity/unused vars
+      '**/prisma/seed/**',
+      // Documentation files
+      'documentation/**',
     ],
   },
 

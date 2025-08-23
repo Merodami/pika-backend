@@ -144,6 +144,9 @@ describe('Business Service - Admin API Integration Tests', () => {
     // Clear translations between tests
     translationClient.clear()
 
+    // Reset and setup user service mock for each test
+    userServiceClient.reset().setupAuthSuccess()
+
     // Verify shared test data still exists
     const businessCount = await testDb.prisma.business.count()
 
@@ -518,6 +521,148 @@ describe('Business Service - Admin API Integration Tests', () => {
         .delete(`/admin/businesses/${business.id}`)
         .set('Accept', 'application/json')
         .expect(403)
+    })
+
+    // Primary Business Deletion Tests
+    it('should prevent deleting the primary business when it is the only business', async () => {
+      // Create a test user
+      const testUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `primary-test-${Date.now()}@example.com`,
+          role: UserRole.BUSINESS,
+          status: UserStatus.ACTIVE,
+          firstName: 'Primary',
+          lastName: 'Test',
+          emailVerified: true,
+        },
+      })
+
+      // Create a single business for the user
+      const business = await testDb.prisma.business.create({
+        data: {
+          userId: testUser.id,
+          businessNameKey: 'business.name.primary',
+          categoryId: sharedTestData.activeCategory.id,
+          verified: true,
+          active: true,
+        },
+      })
+
+      // Mock user service to return this user with the business as primary
+      userServiceClient.getUser.mockResolvedValueOnce({
+        ...testUser,
+        primaryBusinessId: business.id,
+      } as any)
+
+      // Attempt to delete the primary business (should fail)
+      const response = await adminClient
+        .delete(`/admin/businesses/${business.id}`)
+        .set('Accept', 'application/json')
+        .expect(400)
+
+      expect(response.body.error.code).toBe('validationError')
+      expect(response.body.error.message).toContain(
+        'Cannot delete the primary business',
+      )
+
+      // Verify business was NOT deleted
+      const notDeletedBusiness = await testDb.prisma.business.findUnique({
+        where: { id: business.id },
+      })
+
+      expect(notDeletedBusiness?.deletedAt).toBeNull()
+    })
+
+    it('should reassign primary business when deleting current primary', async () => {
+      // Create a test user
+      const testUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `reassign-test-${Date.now()}@example.com`,
+          role: UserRole.BUSINESS,
+          status: UserStatus.ACTIVE,
+          firstName: 'Reassign',
+          lastName: 'Test',
+          emailVerified: true,
+        },
+      })
+
+      // Create two businesses for the user
+      const primaryBusiness = await testDb.prisma.business.create({
+        data: {
+          userId: testUser.id,
+          businessNameKey: 'business.name.primary',
+          categoryId: sharedTestData.activeCategory.id,
+          verified: true,
+          active: true,
+        },
+      })
+
+      const secondBusiness = await testDb.prisma.business.create({
+        data: {
+          userId: testUser.id,
+          businessNameKey: 'business.name.secondary',
+          categoryId: sharedTestData.activeCategory.id,
+          verified: true,
+          active: true,
+        },
+      })
+
+      // Mock user service to return this user with the first business as primary
+      userServiceClient.getUser.mockResolvedValue({
+        ...testUser,
+        primaryBusinessId: primaryBusiness.id,
+      } as any)
+
+      // Clear previous mock calls
+      userServiceClient.updateUserPrimaryBusiness.mockClear()
+
+      // Delete the primary business (should succeed and trigger reassignment)
+      await adminClient
+        .delete(`/admin/businesses/${primaryBusiness.id}`)
+        .set('Accept', 'application/json')
+        .expect(204)
+
+      // Verify primary business was deleted
+      const deletedBusiness = await testDb.prisma.business.findUnique({
+        where: { id: primaryBusiness.id },
+      })
+
+      expect(deletedBusiness?.deletedAt).not.toBeNull()
+
+      // Verify updateUserPrimaryBusiness was called to reassign primary business
+      expect(userServiceClient.updateUserPrimaryBusiness).toHaveBeenCalledTimes(
+        1,
+      )
+      expect(userServiceClient.updateUserPrimaryBusiness).toHaveBeenCalledWith({
+        userId: testUser.id,
+        primaryBusinessId: secondBusiness.id,
+      })
+    })
+
+    it('should handle deletion when user service is unavailable', async () => {
+      // Create a business without user service client (simulating service unavailability)
+      const { businesses } = await seedTestBusinesses(testDb.prisma)
+      const business = businesses[0]
+
+      // Mock user service to fail
+      userServiceClient.getUser.mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      // Should still delete the business (logs warning but doesn't fail)
+      await adminClient
+        .delete(`/admin/businesses/${business.id}`)
+        .set('Accept', 'application/json')
+        .expect(204)
+
+      // Verify business was deleted despite service failure
+      const deletedBusiness = await testDb.prisma.business.findUnique({
+        where: { id: business.id },
+      })
+
+      expect(deletedBusiness?.deletedAt).not.toBeNull()
     })
   })
 

@@ -35,6 +35,7 @@ export function createAdminBusinessRoutes(
   const service = new BusinessService(
     repository,
     translationClient,
+    userServiceClient,
     cache,
     translationResolver,
   )

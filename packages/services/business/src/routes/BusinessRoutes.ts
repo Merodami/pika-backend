@@ -11,6 +11,7 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
+import { UserServiceClient } from '@pika/shared'
 import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
@@ -23,6 +24,7 @@ export function createBusinessRoutes(
   cache: ICacheService,
   translationClient: TranslationClient,
   translationResolver?: TranslationResolver,
+  userServiceClient?: UserServiceClient,
 ): Router {
   const router = Router()
 
@@ -31,6 +33,7 @@ export function createBusinessRoutes(
   const service = new BusinessService(
     repository,
     translationClient,
+    userServiceClient,
     cache,
     translationResolver,
   )

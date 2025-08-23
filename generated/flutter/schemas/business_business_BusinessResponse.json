@@ -78,7 +78,12 @@
           "type": "string"
         }
       },
-      "required": ["id", "firstName", "lastName", "createdAt"],
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "createdAt"
+      ],
       "additionalProperties": false
     },
     "category": {
@@ -261,6 +266,136 @@
         "level",
         "path",
         "createdBy",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "businessDetails": {
+      "description": "Detailed contact and location information when ?include=businessDetails",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+        },
+        "businessId": {
+          "description": "Business ID this details belong to",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+        },
+        "phone": {
+          "description": "Business phone number",
+          "type": "string",
+          "maxLength": 20
+        },
+        "email": {
+          "description": "Business email address",
+          "type": "string",
+          "maxLength": 255,
+          "format": "email",
+          "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+        },
+        "website": {
+          "description": "Business website URL",
+          "type": "string",
+          "maxLength": 255,
+          "format": "uri"
+        },
+        "street": {
+          "description": "Street address",
+          "type": "string",
+          "maxLength": 255
+        },
+        "city": {
+          "description": "City",
+          "type": "string",
+          "maxLength": 100
+        },
+        "state": {
+          "description": "State or province",
+          "type": "string",
+          "maxLength": 100
+        },
+        "postalCode": {
+          "description": "Postal/ZIP code",
+          "type": "string",
+          "maxLength": 20
+        },
+        "country": {
+          "description": "Country code (ISO 3166-1 alpha-2)",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2
+        },
+        "operatingHours": {
+          "description": "Operating hours schedule (JSON)",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "open": {
+                "type": "string"
+              },
+              "close": {
+                "type": "string"
+              },
+              "closed": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "socialMedia": {
+          "description": "Social media links (JSON)",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "additionalInfo": {
+          "description": "Additional business information (JSON)",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "businessId",
         "createdAt",
         "updatedAt"
       ],

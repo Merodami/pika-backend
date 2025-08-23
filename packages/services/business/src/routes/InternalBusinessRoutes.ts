@@ -29,6 +29,7 @@ export function createInternalBusinessRoutes(
   const service = new BusinessService(
     repository,
     translationClient,
+    undefined, // userServiceClient not needed for internal routes
     cache,
     translationResolver,
   )

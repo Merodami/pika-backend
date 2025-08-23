@@ -32,6 +32,7 @@ import {
   E2EAuthHelper,
   MockTranslationClient,
   TestDatabaseResult,
+  UserServiceClientMock,
 } from '@pika/tests'
 import { ErrorCode } from '@pika/types'
 import { UserRole, UserStatus } from '@prisma/client'
@@ -47,6 +48,7 @@ describe('Business Service - Public API Integration Tests', () => {
   let authHelper: E2EAuthHelper
   let cacheService: MemoryCacheService
   let translationClient: MockTranslationClient
+  let userServiceClientMock: UserServiceClientMock
 
   // Authenticated clients for different user types
   let customerClient: AuthenticatedRequestClient
@@ -74,11 +76,16 @@ describe('Business Service - Public API Integration Tests', () => {
     // Create server
     cacheService = new MemoryCacheService()
     translationClient = createMockTranslationClient()
+    userServiceClientMock = new UserServiceClientMock()
+
+    // Setup the user service mock for successful operations
+    userServiceClientMock.setupAuthSuccess()
 
     app = await createBusinessServer({
       prisma: testDb.prisma,
       cacheService,
       translationClient,
+      userServiceClient: userServiceClientMock,
     })
 
     logger.debug('Express server ready for testing.')
@@ -140,6 +147,9 @@ describe('Business Service - Public API Integration Tests', () => {
 
     // Clear translations between tests to avoid cross-test pollution
     translationClient.clear()
+
+    // Reset and setup user service mock for each test
+    userServiceClientMock.reset().setupAuthSuccess()
 
     // Clean up only business-related data to preserve E2E auth users and shared test data
     if (testDb?.prisma) {
@@ -599,6 +609,71 @@ describe('Business Service - Public API Integration Tests', () => {
         .send(businessData)
         .set('Accept', 'application/json')
         .expect(403)
+    })
+
+    // Primary Business ID Tests
+    it('should call updateUserPrimaryBusiness when creating first business', async () => {
+      const businessData = {
+        businessName: 'Primary Business Test',
+        businessDescription: 'Testing primary business logic',
+        categoryId: sharedTestData.activeCategory.id,
+      }
+
+      // Reset mock to verify call
+      userServiceClientMock.updateUserPrimaryBusiness.mockClear()
+
+      const response = await clientWithoutBusiness
+        .post('/businesses/me')
+        .send(businessData)
+        .set('Accept', 'application/json')
+        .expect(201)
+
+      // Verify the updateUserPrimaryBusiness was called for first business
+      expect(
+        userServiceClientMock.updateUserPrimaryBusiness,
+      ).toHaveBeenCalledTimes(1)
+      expect(
+        userServiceClientMock.updateUserPrimaryBusiness,
+      ).toHaveBeenCalledWith({
+        userId: expect.any(String),
+        primaryBusinessId: response.body.id,
+      })
+    })
+
+    it('should not call updateUserPrimaryBusiness for subsequent businesses', async () => {
+      // First create a business
+      const firstBusinessData = {
+        businessName: 'First Business',
+        businessDescription: 'First business',
+        categoryId: sharedTestData.activeCategory.id,
+      }
+
+      await clientWithoutBusiness
+        .post('/businesses/me')
+        .send(firstBusinessData)
+        .set('Accept', 'application/json')
+        .expect(201)
+
+      // Reset mock after first business creation
+      userServiceClientMock.updateUserPrimaryBusiness.mockClear()
+
+      // Create second business
+      const secondBusinessData = {
+        businessName: 'Second Business',
+        businessDescription: 'Second business',
+        categoryId: sharedTestData.activeCategory.id,
+      }
+
+      await clientWithoutBusiness
+        .post('/businesses/me')
+        .send(secondBusinessData)
+        .set('Accept', 'application/json')
+        .expect(201)
+
+      // Verify updateUserPrimaryBusiness was NOT called for second business
+      expect(
+        userServiceClientMock.updateUserPrimaryBusiness,
+      ).not.toHaveBeenCalled()
     })
   })
 

@@ -263,6 +263,7 @@ export class VoucherMapper {
   ): UpdateVoucherData {
     const result: UpdateVoucherData = {}
 
+    if (data.categoryId !== undefined) result.categoryId = data.categoryId
     if (data.title !== undefined) result.title = data.title
     if (data.description !== undefined) result.description = data.description
     if (data.termsAndConditions !== undefined)

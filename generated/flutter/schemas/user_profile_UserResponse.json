@@ -18,6 +18,10 @@
       "type": "string",
       "maxLength": 50
     },
+    "name": {
+      "description": "Computed full name (firstName + lastName)",
+      "type": "string"
+    },
     "phoneNumber": {
       "description": "Phone number in E.164 format",
       "type": "string",
@@ -39,17 +43,32 @@
     },
     "role": {
       "type": "string",
-      "enum": ["admin", "customer", "business"]
+      "enum": [
+        "admin",
+        "customer",
+        "business"
+      ]
     },
     "status": {
       "type": "string",
-      "enum": ["active", "suspended", "banned", "unconfirmed"]
+      "enum": [
+        "active",
+        "suspended",
+        "banned",
+        "unconfirmed"
+      ]
     },
     "emailVerified": {
       "type": "boolean"
     },
     "phoneVerified": {
       "type": "boolean"
+    },
+    "primaryBusinessId": {
+      "description": "Primary business for business users",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
     },
     "createdAt": {
       "description": "ISO 8601 datetime with timezone",
@@ -69,6 +88,7 @@
     "email",
     "firstName",
     "lastName",
+    "name",
     "role",
     "status",
     "emailVerified",

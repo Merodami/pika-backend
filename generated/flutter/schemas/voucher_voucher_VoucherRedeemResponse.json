@@ -66,7 +66,10 @@
         },
         "discountType": {
           "type": "string",
-          "enum": ["fixed", "percentage"]
+          "enum": [
+            "fixed",
+            "percentage"
+          ]
         },
         "discountValue": {
           "type": "number",
@@ -160,7 +163,11 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["qr", "short", "static"]
+                "enum": [
+                  "qr",
+                  "short",
+                  "static"
+                ]
               },
               "isActive": {
                 "type": "boolean"
@@ -173,7 +180,12 @@
                 "additionalProperties": {}
               }
             },
-            "required": ["id", "code", "type", "isActive"],
+            "required": [
+              "id",
+              "code",
+              "type",
+              "isActive"
+            ],
             "additionalProperties": false
           }
         },

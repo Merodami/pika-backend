@@ -9,7 +9,7 @@ import {
 } from '@pika/http'
 import { ICacheService, setCacheService } from '@pika/redis'
 import { logger, UserServiceClient } from '@pika/shared'
-import { createTranslationResolver,TranslationClient } from '@pika/translation'
+import { createTranslationResolver, TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminBusinessRoutes } from './routes/AdminBusinessRoutes.js'
@@ -110,6 +110,7 @@ export async function createBusinessServer({
     cacheService,
     translationClient,
     translationResolver,
+    userServiceClient,
   )
 
   app.use('/businesses', businessRouter)

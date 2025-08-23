@@ -378,6 +378,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       }
 
       // Update other fields - these don't need translation
+      if (data.categoryId !== undefined) updateData.categoryId = data.categoryId
       if (data.discountType !== undefined) {
         updateData.type =
           data.discountType === VoucherDiscountType.PERCENTAGE
