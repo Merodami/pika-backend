@@ -60,6 +60,7 @@ export interface UserDTO {
   stripeUserId?: string
   preferredLanguage?: string
   primaryBusinessId?: string
+  settings?: any
 }
 
 // ============= Create/Update DTOs =============

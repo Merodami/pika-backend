@@ -64,6 +64,27 @@ export async function createUserRouter(
     controller.uploadMyAvatar,
   )
 
+  // ============= User Settings Routes =============
+
+  // GET /users/me/settings - Get current user settings
+  router.get('/me/settings', requireAuth(), controller.getSettings)
+
+  // PUT /users/me/settings - Update current user settings (full replace)
+  router.put(
+    '/me/settings',
+    requireAuth(),
+    validateBody(userPublic.UpdateUserSettingsRequest),
+    controller.updateSettings,
+  )
+
+  // PATCH /users/me/settings - Patch current user settings (partial update)
+  router.patch(
+    '/me/settings',
+    requireAuth(),
+    validateBody(userPublic.PatchUserSettingsRequest),
+    controller.patchSettings,
+  )
+
   // ============= User Discovery Routes =============
 
   // GET /users/:id - Get user by ID (authenticated users can view profiles)

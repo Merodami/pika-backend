@@ -1481,7 +1481,8 @@ CREATE TABLE users.users (
     date_of_birth date,
     stripe_user_id character varying(255),
     preferred_language character varying(2),
-    primary_business_id uuid
+    primary_business_id uuid,
+    settings jsonb
 );
 
 

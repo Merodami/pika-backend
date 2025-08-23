@@ -2,7 +2,12 @@ import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { type UserDomain, UserMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
-import type { PaginatedResult } from '@pika/types'
+import type {
+  PaginatedResult,
+  PartialUserSettings,
+  UserSettings,
+} from '@pika/types'
+import { createDefaultUserSettings, mergeUserSettings } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface UserSearchParams {
@@ -28,6 +33,17 @@ export interface IUserRepository {
   update(id: string, data: any): Promise<UserDomain>
   delete(id: string): Promise<void>
   updateStatus(id: string, status: string): Promise<UserDomain>
+
+  // Settings methods
+  getUserSettings(userId: string): Promise<UserSettings>
+  updateUserSettings(
+    userId: string,
+    settings: UserSettings,
+  ): Promise<UserSettings>
+  patchUserSettings(
+    userId: string,
+    settingsUpdate: PartialUserSettings,
+  ): Promise<UserSettings>
 
   // Internal API methods - return raw database data including password
   // TODO: In future, move these to a separate AuthDataRepository
@@ -455,6 +471,140 @@ export class UserRepository implements IUserRepository {
         throw ErrorFactory.databaseError(
           'getRawUserById',
           'Failed to retrieve user',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async getUserSettings(userId: string): Promise<UserSettings> {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          settings: true,
+        },
+      })
+
+      if (!user) {
+        throw ErrorFactory.resourceNotFound('User', userId)
+      }
+
+      // Return default settings if no settings exist
+      if (!user.settings) {
+        // Check if user is business user to determine default settings
+        const userDetails = await this.prisma.user.findUnique({
+          where: { id: userId },
+          select: { role: true },
+        })
+        const isBusinessUser = userDetails?.role === 'business'
+
+        return createDefaultUserSettings(isBusinessUser)
+      }
+
+      return user.settings as unknown as UserSettings
+    } catch (error) {
+      logger.error('Failed to get user settings', { error, userId })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'getUserSettings',
+          'Failed to retrieve user settings',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async updateUserSettings(
+    userId: string,
+    settings: UserSettings,
+  ): Promise<UserSettings> {
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          settings: settings as any,
+          updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          settings: true,
+        },
+      })
+
+      return user.settings as unknown as UserSettings
+    } catch (error) {
+      logger.error('Failed to update user settings', {
+        error,
+        userId,
+        settings,
+      })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw ErrorFactory.resourceNotFound('User', userId)
+        }
+
+        throw ErrorFactory.databaseError(
+          'updateUserSettings',
+          'Failed to update user settings',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async patchUserSettings(
+    userId: string,
+    settingsUpdate: PartialUserSettings,
+  ): Promise<UserSettings> {
+    try {
+      // First, get current settings
+      const currentSettings = await this.getUserSettings(userId)
+
+      // Deep merge the settings update with current settings
+      const mergedSettings = mergeUserSettings(currentSettings, settingsUpdate)
+
+      // Update with merged settings
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          settings: mergedSettings as any,
+          updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          settings: true,
+        },
+      })
+
+      return user.settings as unknown as UserSettings
+    } catch (error) {
+      logger.error('Failed to patch user settings', {
+        error,
+        userId,
+        settingsUpdate,
+      })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw ErrorFactory.resourceNotFound('User', userId)
+        }
+
+        throw ErrorFactory.databaseError(
+          'patchUserSettings',
+          'Failed to patch user settings',
           error,
         )
       }

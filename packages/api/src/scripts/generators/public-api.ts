@@ -36,6 +36,7 @@ import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
 import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
+import * as userSettingsSchemas from '@api/schemas/user/public/settings.js'
 import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
@@ -501,6 +502,32 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'CurrentUserProfile',
     userProfileSchemas.CurrentUserProfile,
+  )
+
+  // ============= User Settings Schemas =============
+  registry.registerSchema(
+    'UserSettings',
+    userSettingsSchemas.UserSettingsSchema,
+  )
+  registry.registerSchema(
+    'GetUserSettingsResponse',
+    userSettingsSchemas.GetUserSettingsResponse,
+  )
+  registry.registerSchema(
+    'UpdateUserSettingsRequest',
+    userSettingsSchemas.UpdateUserSettingsRequest,
+  )
+  registry.registerSchema(
+    'UpdateUserSettingsResponse',
+    userSettingsSchemas.UpdateUserSettingsResponse,
+  )
+  registry.registerSchema(
+    'PatchUserSettingsRequest',
+    userSettingsSchemas.PatchUserSettingsRequest,
+  )
+  registry.registerSchema(
+    'PatchUserSettingsResponse',
+    userSettingsSchemas.PatchUserSettingsResponse,
   )
 
   registry.registerSchema('UserAddress', userAddressSchemas.UserAddress)
@@ -1812,6 +1839,126 @@ function registerPublicRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: userProfileSchemas.UploadAvatarResponseSchema,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= User Settings Routes =============
+
+  // Get user settings
+  registry.registerRoute({
+    method: 'get',
+    path: '/users/me/settings',
+    operationId: 'getUserSettings',
+    summary: 'Get current user settings',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Current user settings',
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.GetUserSettingsResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Unauthorized',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update user settings (full replace)
+  registry.registerRoute({
+    method: 'put',
+    path: '/users/me/settings',
+    operationId: 'updateUserSettings',
+    summary: 'Update user settings (full replace)',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.UpdateUserSettingsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Updated user settings',
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.UpdateUserSettingsResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid settings data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Unauthorized',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Patch user settings (partial update)
+  registry.registerRoute({
+    method: 'patch',
+    path: '/users/me/settings',
+    operationId: 'patchUserSettings',
+    summary: 'Patch user settings (partial update)',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.PatchUserSettingsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Updated user settings',
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.PatchUserSettingsResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid settings data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Unauthorized',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
           },
         },
       },

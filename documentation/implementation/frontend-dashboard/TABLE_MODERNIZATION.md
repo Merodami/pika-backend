@@ -1,13 +1,15 @@
 # Table Modernization Plan - Frontend Dashboard
+
 **Version:** 1.0  
 **Date:** 2025-01-23  
-**Project:** Pika Frontend Dashboard  
+**Project:** Pika Frontend Dashboard
 
 ## Executive Summary
 
 This document outlines a comprehensive modernization strategy for the table components in the Pika Frontend Dashboard, transitioning from a basic Ant Design table implementation to a modern, industry-standard data grid solution that meets enterprise-grade requirements for performance, usability, and maintainability.
 
 ### Key Objectives
+
 - **Performance**: Handle 10,000+ rows with sub-100ms response times
 - **User Experience**: Implement modern data grid features (column management, advanced filtering, virtualization)
 - **Developer Experience**: Create reusable, type-safe components with minimal boilerplate
@@ -15,6 +17,7 @@ This document outlines a comprehensive modernization strategy for the table comp
 - **Maintainability**: Reduce code duplication by 60% and improve testability
 
 ### Business Impact
+
 - **User Productivity**: Reduce data processing time by 40% with advanced filtering and search
 - **Developer Velocity**: 50% faster implementation of new admin tables
 - **Performance**: Support 10x larger datasets without performance degradation
@@ -26,23 +29,26 @@ This document outlines a comprehensive modernization strategy for the table comp
 ## Current State Analysis
 
 ### Strengths
+
 ✅ **Solid Foundation**: Built on Ant Design with TypeScript support  
 ✅ **Server Integration**: Proper pagination, sorting, and filtering with React Query  
 ✅ **Internationalization**: Full i18n support with next-intl  
 ✅ **Responsive Design**: Mobile-friendly with card layouts  
-✅ **Action System**: Comprehensive bulk actions and row actions  
+✅ **Action System**: Comprehensive bulk actions and row actions
 
 ### Critical Gaps
+
 ❌ **Performance**: No virtualization for large datasets  
 ❌ **Column Management**: No reordering, resizing, or visibility controls  
 ❌ **Advanced Filtering**: Limited to basic filters, no complex queries  
 ❌ **Export System**: Placeholder implementations only  
 ❌ **Accessibility**: Missing ARIA labels and keyboard navigation  
-❌ **Code Reusability**: 40% code duplication across table implementations  
+❌ **Code Reusability**: 40% code duplication across table implementations
 
 ### Technical Debt
+
 - **Component Recreation**: Column definitions recreated on every render
-- **Tight Coupling**: Business logic mixed with UI components  
+- **Tight Coupling**: Business logic mixed with UI components
 - **Inconsistent Patterns**: Different error handling and state management approaches
 - **Missing Optimizations**: No memoization, debouncing, or caching strategies
 
@@ -51,17 +57,19 @@ This document outlines a comprehensive modernization strategy for the table comp
 ## Industry Standard Requirements
 
 ### Core Data Grid Features
-| Feature | Priority | Implementation Status | Industry Examples |
-|---------|----------|---------------------|-------------------|
-| Virtual Scrolling | Critical | ❌ Missing | AG-Grid, MUI X, TanStack |
-| Column Management | Critical | ❌ Missing | Salesforce, Airtable, Notion |
-| Advanced Filtering | Critical | 🟡 Basic | Excel, Google Sheets |
-| Export/Import | High | ❌ Placeholder | Retool, AdminJS |
-| Real-time Updates | High | ❌ Missing | Linear, Figma |
-| Keyboard Navigation | Critical | ❌ Limited | GitHub, JIRA |
-| Mobile Optimization | High | 🟡 Basic | Modern SaaS platforms |
+
+| Feature             | Priority | Implementation Status | Industry Examples            |
+| ------------------- | -------- | --------------------- | ---------------------------- |
+| Virtual Scrolling   | Critical | ❌ Missing            | AG-Grid, MUI X, TanStack     |
+| Column Management   | Critical | ❌ Missing            | Salesforce, Airtable, Notion |
+| Advanced Filtering  | Critical | 🟡 Basic              | Excel, Google Sheets         |
+| Export/Import       | High     | ❌ Placeholder        | Retool, AdminJS              |
+| Real-time Updates   | High     | ❌ Missing            | Linear, Figma                |
+| Keyboard Navigation | Critical | ❌ Limited            | GitHub, JIRA                 |
+| Mobile Optimization | High     | 🟡 Basic              | Modern SaaS platforms        |
 
 ### Modern UX Patterns
+
 - **Optimistic Updates**: Immediate UI feedback with rollback capability
 - **Contextual Actions**: Smart action menus based on selection and permissions
 - **Progressive Disclosure**: Show complexity only when needed
@@ -69,6 +77,7 @@ This document outlines a comprehensive modernization strategy for the table comp
 - **Undo/Redo**: Non-destructive operations with history
 
 ### Performance Benchmarks
+
 - **Initial Load**: < 200ms for 1,000 rows
 - **Scrolling**: 60 FPS with 50,000+ rows
 - **Filtering**: < 100ms response time for complex queries
@@ -81,16 +90,10 @@ This document outlines a comprehensive modernization strategy for the table comp
 ### Phase 1: Headless Foundation (Weeks 1-4)
 
 #### Migrate to TanStack Table v8
+
 ```typescript
 // New headless architecture
-import { 
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  flexRender
-} from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, flexRender } from '@tanstack/react-table'
 
 interface ModernTableConfig<T> {
   data: T[]
@@ -105,6 +108,7 @@ interface ModernTableConfig<T> {
 ```
 
 #### Compound Component Architecture
+
 ```typescript
 <DataGrid>
   <DataGrid.Toolbar>
@@ -119,11 +123,11 @@ interface ModernTableConfig<T> {
       <DataGrid.ColumnManager />
     </DataGrid.Actions>
   </DataGrid.Toolbar>
-  
+
   <DataGrid.Table>
     <DataGrid.VirtualizedBody />
   </DataGrid.Table>
-  
+
   <DataGrid.Footer>
     <DataGrid.Pagination />
     <DataGrid.Summary />
@@ -132,6 +136,7 @@ interface ModernTableConfig<T> {
 ```
 
 #### Type-Safe Configuration System
+
 ```typescript
 interface TableSchema<T> {
   name: string
@@ -151,6 +156,7 @@ type BusinessTableSchema = TableSchema<GetAdminBusinessList200DataItem>
 ### Phase 2: Advanced Features (Weeks 5-8)
 
 #### Virtual Scrolling Implementation
+
 ```typescript
 import { useVirtualizer } from '@tanstack/react-virtual'
 
@@ -168,7 +174,7 @@ const VirtualTable = <T,>({ data, ...props }: VirtualTableProps<T>) => {
     estimateSize: props.estimateSize,
     overscan: props.overscan ?? 10,
   })
-  
+
   return (
     <div ref={parentRef} className="virtual-table-container">
       <div style={{ height: virtualizer.getTotalSize() }}>
@@ -192,6 +198,7 @@ const VirtualTable = <T,>({ data, ...props }: VirtualTableProps<T>) => {
 ```
 
 #### Advanced Filter System
+
 ```typescript
 interface FilterCondition {
   field: string
@@ -200,7 +207,7 @@ interface FilterCondition {
   logic?: 'AND' | 'OR'
 }
 
-type FilterOperator = 
+type FilterOperator =
   | 'equals' | 'not_equals' | 'contains' | 'not_contains'
   | 'starts_with' | 'ends_with' | 'is_empty' | 'is_not_empty'
   | 'greater_than' | 'less_than' | 'between' | 'in' | 'not_in'
@@ -219,7 +226,7 @@ const FilterBuilderUI = ({ onFilterChange }: FilterBuilderProps) => {
         <FilterPreset name="Recent Signups" />
         <FilterPreset name="Verified Businesses" />
       </div>
-      
+
       <div className="filter-conditions">
         {conditions.map((condition, index) => (
           <FilterCondition
@@ -233,7 +240,7 @@ const FilterBuilderUI = ({ onFilterChange }: FilterBuilderProps) => {
         ))}
         <Button onClick={addCondition}>Add Condition</Button>
       </div>
-      
+
       <div className="quick-filters">
         <QuickFilter field="status" values={['active', 'inactive']} />
         <QuickFilter field="role" values={['admin', 'business', 'user']} />
@@ -244,6 +251,7 @@ const FilterBuilderUI = ({ onFilterChange }: FilterBuilderProps) => {
 ```
 
 #### Column Management System
+
 ```typescript
 interface ColumnManager {
   visible: Set<string>
@@ -272,14 +280,14 @@ const ColumnManagerUI = ({ columns, manager, onChange }: ColumnManagerProps) => 
             onResize={handleResize}
           />
         </div>
-        
+
         <div className="column-settings">
           <h3>Column Settings</h3>
           <ColumnPinning pinned={manager.pinned} onChange={handlePinning} />
           <ColumnGrouping groups={manager.grouped} onChange={handleGrouping} />
           <ColumnWidths widths={manager.widths} onChange={handleWidths} />
         </div>
-        
+
         <div className="presets">
           <h3>View Presets</h3>
           <ViewPreset name="Default View" />
@@ -296,27 +304,23 @@ const ColumnManagerUI = ({ columns, manager, onChange }: ColumnManagerProps) => 
 ### Phase 3: Performance & Polish (Weeks 9-12)
 
 #### Optimistic Updates
+
 ```typescript
-const useOptimisticMutation = <T, V>(
-  mutationFn: (variables: V) => Promise<T>,
-  options: OptimisticMutationOptions<T, V>
-) => {
+const useOptimisticMutation = <T, V>(mutationFn: (variables: V) => Promise<T>, options: OptimisticMutationOptions<T, V>) => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn,
     onMutate: async (variables) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: options.queryKey })
-      
+
       // Snapshot previous value
       const previousData = queryClient.getQueryData(options.queryKey)
-      
+
       // Optimistically update cache
-      queryClient.setQueryData(options.queryKey, (old: T[]) => 
-        options.optimisticUpdate(old, variables)
-      )
-      
+      queryClient.setQueryData(options.queryKey, (old: T[]) => options.optimisticUpdate(old, variables))
+
       return { previousData }
     },
     onError: (err, variables, context) => {
@@ -328,12 +332,13 @@ const useOptimisticMutation = <T, V>(
     onSettled: () => {
       // Refetch to ensure consistency
       queryClient.invalidateQueries({ queryKey: options.queryKey })
-    }
+    },
   })
 }
 ```
 
 #### Real-time Synchronization
+
 ```typescript
 interface RealtimeConfig {
   enabled: boolean
@@ -345,43 +350,36 @@ interface RealtimeConfig {
 const useRealtimeTable = <T>(config: RealtimeConfig) => {
   const [socket, setSocket] = useState<Socket | null>(null)
   const queryClient = useQueryClient()
-  
+
   useEffect(() => {
     if (!config.enabled) return
-    
+
     const newSocket = io(process.env.NEXT_PUBLIC_REALTIME_URL)
-    
+
     newSocket.on(config.channel, (event: RealtimeEvent) => {
       switch (event.type) {
         case 'INSERT':
-          queryClient.setQueryData<T[]>(config.queryKey, (old = []) => 
-            [event.data, ...old]
-          )
+          queryClient.setQueryData<T[]>(config.queryKey, (old = []) => [event.data, ...old])
           break
         case 'UPDATE':
-          queryClient.setQueryData<T[]>(config.queryKey, (old = []) =>
-            old.map(item => 
-              item.id === event.data.id ? { ...item, ...event.data } : item
-            )
-          )
+          queryClient.setQueryData<T[]>(config.queryKey, (old = []) => old.map((item) => (item.id === event.data.id ? { ...item, ...event.data } : item)))
           break
         case 'DELETE':
-          queryClient.setQueryData<T[]>(config.queryKey, (old = []) =>
-            old.filter(item => item.id !== event.data.id)
-          )
+          queryClient.setQueryData<T[]>(config.queryKey, (old = []) => old.filter((item) => item.id !== event.data.id))
           break
       }
     })
-    
+
     setSocket(newSocket)
     return () => newSocket.close()
   }, [config.enabled, config.channel])
-  
+
   return socket
 }
 ```
 
 #### Export System
+
 ```typescript
 interface ExportConfig<T> {
   formats: ExportFormat[]
@@ -399,7 +397,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
       return await generateExport(exportData, options.format)
     }
   })
-  
+
   const handleExport = useCallback((format: ExportFormat) => {
     exportMutation.mutate({
       format,
@@ -408,7 +406,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
       filename: `${config.name}-${new Date().toISOString()}.${format}`
     })
   }, [config, exportMutation])
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -441,9 +439,11 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 ## Migration Strategy
 
 ### Phase 1: Foundation (Weeks 1-4)
+
 **Goal**: Establish headless architecture without breaking existing functionality
 
 #### Week 1: TanStack Table Integration
+
 - [ ] Install and configure @tanstack/react-table
 - [ ] Create base `ModernDataGrid` component
 - [ ] Migrate `UsersTable` as proof of concept
@@ -451,6 +451,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] Add unit tests for core functionality
 
 #### Week 2: State Management
+
 - [ ] Refactor `useDataTable` hook for TanStack Table
 - [ ] Implement server-side pagination integration
 - [ ] Add sorting and basic filtering capabilities
@@ -458,6 +459,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] Test with existing API endpoints
 
 #### Week 3: Component Architecture
+
 - [ ] Implement compound component pattern
 - [ ] Create reusable filter components
 - [ ] Build action system with dropdown menus
@@ -465,6 +467,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] Implement responsive behavior
 
 #### Week 4: Migration & Testing
+
 - [ ] Migrate `BusinessesTable` to new architecture
 - [ ] Run comprehensive comparison tests
 - [ ] Performance baseline measurements
@@ -474,13 +477,15 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 ### Phase 2: Advanced Features (Weeks 5-8)
 
 #### Week 5: Virtualization
+
 - [ ] Implement row virtualization with @tanstack/react-virtual
-- [ ] Add column virtualization for wide tables  
+- [ ] Add column virtualization for wide tables
 - [ ] Performance testing with large datasets
 - [ ] Mobile virtualization optimization
 - [ ] Accessibility testing for virtual scrolling
 
 #### Week 6: Column Management
+
 - [ ] Drag-and-drop column reordering
 - [ ] Column visibility controls
 - [ ] Column width resizing and persistence
@@ -488,6 +493,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] Column grouping functionality
 
 #### Week 7: Advanced Filtering
+
 - [ ] Visual filter builder UI
 - [ ] Complex filter conditions (AND/OR logic)
 - [ ] Filter presets and saved searches
@@ -495,6 +501,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] Full-text search with highlighting
 
 #### Week 8: Export System
+
 - [ ] Multi-format export (CSV, Excel, PDF)
 - [ ] Custom field selection for exports
 - [ ] Export progress indicators
@@ -504,6 +511,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 ### Phase 3: Performance & Polish (Weeks 9-12)
 
 #### Week 9: Performance Optimization
+
 - [ ] Implement optimistic updates
 - [ ] Add proper memoization strategies
 - [ ] Optimize re-rendering performance
@@ -511,6 +519,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] Performance monitoring setup
 
 #### Week 10: Real-time Features
+
 - [ ] WebSocket integration for live updates
 - [ ] Collaborative cursors and selections
 - [ ] Conflict resolution strategies
@@ -518,6 +527,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] Offline synchronization
 
 #### Week 11: Accessibility & UX
+
 - [ ] Complete WCAG 2.1 AA compliance
 - [ ] Keyboard navigation improvements
 - [ ] Screen reader optimization
@@ -525,6 +535,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 - [ ] High contrast mode support
 
 #### Week 12: Polish & Documentation
+
 - [ ] Comprehensive testing suite
 - [ ] Performance regression tests
 - [ ] Developer documentation
@@ -536,6 +547,7 @@ const ExportManager = <T>({ data, config }: ExportManagerProps<T>) => {
 ## Implementation Details
 
 ### Core Component Structure
+
 ```
 components/
 ├── ui/
@@ -569,12 +581,13 @@ components/
 ```
 
 ### Configuration Schema
+
 ```typescript
 interface DataGridConfig<T = any> {
   // Core configuration
   name: string
   entity: EntityDefinition<T>
-  
+
   // Data source
   data: {
     source: DataSource<T>
@@ -582,7 +595,7 @@ interface DataGridConfig<T = any> {
     sorting: SortingConfig
     filtering: FilteringConfig
   }
-  
+
   // UI configuration
   columns: ColumnDefinition<T>[]
   display: {
@@ -590,7 +603,7 @@ interface DataGridConfig<T = any> {
     theme: 'light' | 'dark' | 'auto'
     responsive: ResponsiveConfig
   }
-  
+
   // Features
   features: {
     virtualization: VirtualizationConfig
@@ -600,7 +613,7 @@ interface DataGridConfig<T = any> {
     realtime: RealtimeConfig
     accessibility: AccessibilityConfig
   }
-  
+
   // Permissions
   permissions: {
     read: PermissionRule[]
@@ -612,16 +625,18 @@ interface DataGridConfig<T = any> {
 ```
 
 ### Performance Targets
-| Metric | Target | Current | Improvement |
-|--------|--------|---------|-------------|
-| Initial Load (1K rows) | < 200ms | ~800ms | 4x faster |
-| Column Sort | < 50ms | ~200ms | 4x faster |
-| Filter Application | < 100ms | ~400ms | 4x faster |
-| Virtual Scroll (50K rows) | 60 FPS | N/A | New feature |
-| Bundle Size | < 100KB | ~180KB | 45% reduction |
-| Memory Usage | < 50MB | ~120MB | 60% reduction |
+
+| Metric                    | Target  | Current | Improvement   |
+| ------------------------- | ------- | ------- | ------------- |
+| Initial Load (1K rows)    | < 200ms | ~800ms  | 4x faster     |
+| Column Sort               | < 50ms  | ~200ms  | 4x faster     |
+| Filter Application        | < 100ms | ~400ms  | 4x faster     |
+| Virtual Scroll (50K rows) | 60 FPS  | N/A     | New feature   |
+| Bundle Size               | < 100KB | ~180KB  | 45% reduction |
+| Memory Usage              | < 50MB  | ~120MB  | 60% reduction |
 
 ### Accessibility Compliance
+
 - **ARIA Labels**: Complete labeling for all interactive elements
 - **Keyboard Navigation**: Full table navigation with arrow keys
 - **Screen Reader**: Proper announcements for all state changes
@@ -634,6 +649,7 @@ interface DataGridConfig<T = any> {
 ## Testing Strategy
 
 ### Unit Testing (Jest + Testing Library)
+
 ```typescript
 describe('ModernDataGrid', () => {
   it('should render with minimal configuration', () => {
@@ -644,11 +660,11 @@ describe('ModernDataGrid', () => {
         config={minimalConfig}
       />
     )
-    
+
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.getAllByRole('row')).toHaveLength(mockUsers.length + 1)
   })
-  
+
   it('should handle virtual scrolling performance', async () => {
     const largeDataset = generateMockData(10000)
     const { container } = render(
@@ -658,21 +674,21 @@ describe('ModernDataGrid', () => {
         config={{ features: { virtualization: { enabled: true } } }}
       />
     )
-    
+
     // Only visible rows should be rendered
     expect(container.querySelectorAll('[data-row]')).toHaveLength(50) // viewport size
   })
-  
+
   it('should handle complex filtering', async () => {
     const user = userEvent.setup()
     render(<DataGrid data={mockUsers} columns={columns} />)
-    
+
     await user.click(screen.getByLabelText('Open filter builder'))
     await user.selectOptions(screen.getByLabelText('Field'), 'status')
     await user.selectOptions(screen.getByLabelText('Operator'), 'equals')
     await user.type(screen.getByLabelText('Value'), 'active')
     await user.click(screen.getByRole('button', { name: 'Apply filters' }))
-    
+
     expect(screen.getAllByRole('row')).toHaveLength(
       mockUsers.filter(u => u.status === 'active').length + 1
     )
@@ -681,21 +697,22 @@ describe('ModernDataGrid', () => {
 ```
 
 ### Integration Testing (Playwright)
+
 ```typescript
 test('should export data in multiple formats', async ({ page }) => {
   await page.goto('/admin/users')
-  
+
   // Wait for data to load
   await expect(page.locator('[data-testid="users-table"]')).toBeVisible()
-  
+
   // Test CSV export
   const downloadPromise = page.waitForEvent('download')
   await page.click('button[aria-label="Export menu"]')
   await page.click('text=Export as CSV')
   const download = await downloadPromise
-  
+
   expect(download.suggestedFilename()).toMatch(/users-.*\.csv$/)
-  
+
   // Verify CSV content
   const path = await download.path()
   const content = await fs.readFile(path, 'utf8')
@@ -706,30 +723,31 @@ test('should handle real-time updates', async ({ page, context }) => {
   // Open table in first tab
   await page.goto('/admin/users')
   await expect(page.locator('[data-testid="users-table"]')).toBeVisible()
-  
+
   // Open admin panel in second tab to create user
   const adminPage = await context.newPage()
   await adminPage.goto('/admin/users/new')
-  
+
   // Create new user
   await adminPage.fill('[name="firstName"]', 'John')
   await adminPage.fill('[name="lastName"]', 'Doe')
   await adminPage.fill('[name="email"]', 'john.doe@test.com')
   await adminPage.click('button[type="submit"]')
-  
+
   // Verify real-time update in first tab
   await expect(page.locator('text=John Doe')).toBeVisible({ timeout: 5000 })
 })
 ```
 
 ### Performance Testing
+
 ```typescript
 import { performance } from 'perf_hooks'
 
 describe('Performance Tests', () => {
   it('should render 10,000 rows under 500ms', async () => {
     const largeDataset = generateMockData(10000)
-    
+
     const start = performance.now()
     render(
       <DataGrid
@@ -739,30 +757,30 @@ describe('Performance Tests', () => {
       />
     )
     const end = performance.now()
-    
+
     expect(end - start).toBeLessThan(500)
   })
-  
+
   it('should maintain 60fps during virtual scrolling', async () => {
     const { container } = render(<LargeDataTable />)
     const scrollContainer = container.querySelector('[data-virtual-scroll]')
-    
+
     const frameRates: number[] = []
     let lastTime = performance.now()
-    
+
     const measureFrameRate = () => {
       const currentTime = performance.now()
       frameRates.push(1000 / (currentTime - lastTime))
       lastTime = currentTime
     }
-    
+
     // Simulate scrolling
     for (let i = 0; i < 100; i++) {
       measureFrameRate()
       fireEvent.scroll(scrollContainer, { target: { scrollTop: i * 50 } })
       await new Promise(resolve => requestAnimationFrame(resolve))
     }
-    
+
     const averageFPS = frameRates.reduce((a, b) => a + b) / frameRates.length
     expect(averageFPS).toBeGreaterThan(55) // Allow for minor variance
   })
@@ -770,6 +788,7 @@ describe('Performance Tests', () => {
 ```
 
 ### Accessibility Testing
+
 ```typescript
 import { axe, toHaveNoViolations } from 'jest-axe'
 
@@ -780,25 +799,25 @@ describe('Accessibility Tests', () => {
     const { container } = render(
       <DataGrid data={mockUsers} columns={columns} />
     )
-    
+
     const results = await axe(container)
     expect(results).toHaveNoViolations()
   })
-  
+
   it('should support keyboard navigation', async () => {
     render(<DataGrid data={mockUsers} columns={columns} />)
-    
+
     const firstRow = screen.getAllByRole('row')[1] // Skip header
     const firstCell = within(firstRow).getAllByRole('cell')[0]
-    
+
     firstCell.focus()
-    
+
     // Arrow key navigation
     await userEvent.keyboard('{ArrowDown}')
     expect(document.activeElement).toBe(
       screen.getAllByRole('row')[2].querySelector('[role="cell"]')
     )
-    
+
     await userEvent.keyboard('{ArrowRight}')
     expect(document.activeElement).toBe(
       within(screen.getAllByRole('row')[2]).getAllByRole('cell')[1]
@@ -812,14 +831,16 @@ describe('Accessibility Tests', () => {
 ## Success Metrics & KPIs
 
 ### Performance Metrics
+
 - **Initial Load Time**: < 200ms for 1,000 rows (vs current ~800ms)
 - **Virtual Scroll Performance**: 60 FPS with 50,000+ rows
-- **Filter Response Time**: < 100ms (vs current ~400ms)  
+- **Filter Response Time**: < 100ms (vs current ~400ms)
 - **Column Operations**: < 50ms for resize/reorder
 - **Memory Usage**: < 50MB for large datasets (vs current ~120MB)
 - **Bundle Size**: < 100KB total (vs current ~180KB)
 
-### User Experience Metrics  
+### User Experience Metrics
+
 - **Feature Adoption**: 80% of users utilize advanced features within 30 days
 - **Task Completion Time**: 40% reduction in data analysis tasks
 - **User Satisfaction**: > 4.5/5 rating in usability testing
@@ -827,15 +848,17 @@ describe('Accessibility Tests', () => {
 - **Accessibility Score**: 100% WCAG 2.1 AA compliance
 
 ### Developer Experience Metrics
+
 - **Implementation Time**: 50% faster for new admin tables
-- **Code Reusability**: 60% reduction in table-related code duplication  
+- **Code Reusability**: 60% reduction in table-related code duplication
 - **Bug Reports**: 70% reduction in table-related issues
 - **Developer Satisfaction**: > 4.0/5 rating from internal team
 - **Documentation Coverage**: 100% API surface documented
 
 ### Business Metrics
+
 - **Admin Productivity**: 25% improvement in data processing efficiency
-- **Support Tickets**: 40% reduction in table-related user issues  
+- **Support Tickets**: 40% reduction in table-related user issues
 - **Feature Delivery**: 30% faster shipping of admin features
 - **User Retention**: Improved admin panel usage metrics
 - **Accessibility Compliance**: Zero accessibility audit failures
@@ -846,25 +869,26 @@ describe('Accessibility Tests', () => {
 
 ### Technical Risks
 
-| Risk | Probability | Impact | Mitigation Strategy |
-|------|-------------|---------|-------------------|
-| Performance Regression | Medium | High | Comprehensive performance testing, gradual rollout |
-| Breaking Changes | Low | High | Maintain backward compatibility, feature flags |
-| Third-party Dependencies | Medium | Medium | Vendor evaluation, fallback strategies |
-| Data Loss | Low | Critical | Optimistic update rollbacks, data validation |
+| Risk                     | Probability | Impact   | Mitigation Strategy                                |
+| ------------------------ | ----------- | -------- | -------------------------------------------------- |
+| Performance Regression   | Medium      | High     | Comprehensive performance testing, gradual rollout |
+| Breaking Changes         | Low         | High     | Maintain backward compatibility, feature flags     |
+| Third-party Dependencies | Medium      | Medium   | Vendor evaluation, fallback strategies             |
+| Data Loss                | Low         | Critical | Optimistic update rollbacks, data validation       |
 
 ### Business Risks
 
-| Risk | Probability | Impact | Mitigation Strategy |
-|------|-------------|---------|-------------------|
-| User Adoption Resistance | Medium | Medium | Change management, training, gradual feature introduction |
-| Development Timeline | High | Medium | Phased approach, MVP focus, stakeholder communication |
-| Resource Constraints | Medium | High | Cross-team collaboration, external expertise if needed |
-| Scope Creep | High | Medium | Clear requirements, regular stakeholder reviews |
+| Risk                     | Probability | Impact | Mitigation Strategy                                       |
+| ------------------------ | ----------- | ------ | --------------------------------------------------------- |
+| User Adoption Resistance | Medium      | Medium | Change management, training, gradual feature introduction |
+| Development Timeline     | High        | Medium | Phased approach, MVP focus, stakeholder communication     |
+| Resource Constraints     | Medium      | High   | Cross-team collaboration, external expertise if needed    |
+| Scope Creep              | High        | Medium | Clear requirements, regular stakeholder reviews           |
 
 ### Mitigation Strategies
 
 #### Feature Flags
+
 ```typescript
 interface FeatureFlags {
   modernDataGrid: boolean
@@ -880,22 +904,24 @@ const useFeatureFlag = (flag: keyof FeatureFlags) => {
 ```
 
 #### Gradual Rollout
+
 1. **Phase 1**: Internal team testing (Week 4)
-2. **Phase 2**: Beta users (10% traffic) (Week 8)  
+2. **Phase 2**: Beta users (10% traffic) (Week 8)
 3. **Phase 3**: Staged rollout (50% traffic) (Week 10)
 4. **Phase 4**: Full rollout (100% traffic) (Week 12)
 
 #### Fallback Strategy
+
 ```typescript
 const TableComponent = ({ fallbackEnabled = false, ...props }) => {
   const [hasError, setHasError] = useState(false)
-  
+
   if (hasError && fallbackEnabled) {
     return <LegacyDataTable {...props} />
   }
-  
+
   return (
-    <ErrorBoundary 
+    <ErrorBoundary
       fallback={<LegacyDataTable {...props} />}
       onError={() => setHasError(true)}
     >
@@ -910,26 +936,30 @@ const TableComponent = ({ fallbackEnabled = false, ...props }) => {
 ## Timeline & Resources
 
 ### Project Timeline: 12 Weeks
+
 - **Phase 1 (Weeks 1-4)**: Foundation & Migration
-- **Phase 2 (Weeks 5-8)**: Advanced Features  
+- **Phase 2 (Weeks 5-8)**: Advanced Features
 - **Phase 3 (Weeks 9-12)**: Performance & Polish
 
 ### Resource Requirements
 
 #### Development Team
+
 - **1 Senior Frontend Developer** (12 weeks) - Architecture & complex features
-- **1 Mid-level Frontend Developer** (8 weeks) - Component implementation  
+- **1 Mid-level Frontend Developer** (8 weeks) - Component implementation
 - **1 UI/UX Designer** (4 weeks) - Design system integration
 - **1 QA Engineer** (4 weeks) - Testing & validation
 
 #### External Dependencies
+
 - **Backend Team**: 2 weeks for API optimizations
 - **DevOps Team**: 1 week for performance monitoring setup
 - **Accessibility Consultant**: 1 week for compliance audit
 
 ### Budget Estimation
+
 - **Development**: $180,000 (900 hours @ $200/hour)
-- **Design**: $20,000 (100 hours @ $200/hour)  
+- **Design**: $20,000 (100 hours @ $200/hour)
 - **Testing**: $16,000 (80 hours @ $200/hour)
 - **External Consulting**: $8,000
 - **Tools & Licenses**: $2,000
@@ -940,24 +970,28 @@ const TableComponent = ({ fallbackEnabled = false, ...props }) => {
 ## Maintenance & Support Plan
 
 ### Documentation Strategy
+
 - **Developer Documentation**: Complete API reference, examples, migration guides
 - **User Documentation**: Feature guides, keyboard shortcuts, troubleshooting
 - **Video Tutorials**: Feature demonstrations, best practices
 - **Storybook**: Interactive component documentation
 
 ### Support Structure
+
 - **Level 1**: Community support via GitHub discussions
-- **Level 2**: Internal team support for implementation questions  
+- **Level 2**: Internal team support for implementation questions
 - **Level 3**: Architecture team for complex customizations
 - **Escalation**: External consultant for critical issues
 
 ### Update Strategy
+
 - **Major Updates**: Quarterly releases with new features
 - **Minor Updates**: Monthly releases with improvements and bug fixes
 - **Patch Updates**: Weekly releases for critical bugs
 - **Security Updates**: Immediate releases for security issues
 
 ### Monitoring & Analytics
+
 ```typescript
 interface TableMetrics {
   performance: {
@@ -986,7 +1020,7 @@ interface TableMetrics {
 This table modernization initiative represents a strategic investment in the Pika Frontend Dashboard's future scalability and user experience. By adopting industry-standard practices and modern technologies, we will:
 
 1. **Enhance User Productivity** through advanced features and improved performance
-2. **Improve Developer Experience** with reusable, well-documented components  
+2. **Improve Developer Experience** with reusable, well-documented components
 3. **Ensure Accessibility Compliance** for all user types
 4. **Future-proof the Architecture** for upcoming requirements
 5. **Reduce Technical Debt** and maintenance overhead
@@ -994,6 +1028,7 @@ This table modernization initiative represents a strategic investment in the Pik
 The phased approach ensures minimal disruption while delivering incremental value throughout the implementation period. With proper resource allocation and risk mitigation strategies, this modernization will establish the Pika Dashboard as a best-in-class administrative interface.
 
 ### Next Steps
+
 1. **Stakeholder Approval**: Present plan to leadership team
 2. **Resource Allocation**: Secure development team and budget
 3. **Technical Preparation**: Environment setup and tool selection
@@ -1007,4 +1042,4 @@ The phased approach ensures minimal disruption while delivering incremental valu
 
 ---
 
-*This document serves as the comprehensive guide for the Pika Frontend Dashboard table modernization initiative. Regular updates will be made as the project progresses and requirements evolve.*
+_This document serves as the comprehensive guide for the Pika Frontend Dashboard table modernization initiative. Regular updates will be made as the project progresses and requirements evolve._

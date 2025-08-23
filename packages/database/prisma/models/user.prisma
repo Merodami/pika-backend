@@ -21,6 +21,7 @@ model User {
   stripeUserId      String?           @map("stripe_user_id") @db.VarChar(255)
   preferredLanguage String?           @map("preferred_language") @db.VarChar(2) // ISO 639-1 language code
   primaryBusinessId String?           @map("primary_business_id") @db.Uuid // Primary business for business users
+  settings          Json?             @map("settings") // User preferences and settings
 
   // Relations
   problems          Problem[]

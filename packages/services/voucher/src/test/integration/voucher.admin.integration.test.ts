@@ -16,12 +16,6 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/translation')
 vi.unmock('@pika/shared') // Unmock shared to use real error classes with real middleware
 
-import { createVoucherServer } from '@voucher/server.js'
-import {
-  createSharedVoucherTestData,
-  seedTestVouchers,
-  type SharedVoucherTestData,
-} from '@voucher/test/helpers/voucherTestHelpers.js'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -34,20 +28,29 @@ import {
   MockTranslationClient,
   TestDatabaseResult,
 } from '@pika/tests'
-import { UserRole, UserStatus, VoucherState, VoucherType } from '@pika/types'
-import {
-  CommunicationServiceClientMock
-} from '@tests/mocks/services'
 import {
   createCommunicationServiceClientMock,
-  createUserServiceClientMock,
 } from '@pika/tests'
 import { createTranslationResolver } from '@pika/translation'
+import { UserRole, UserStatus, VoucherState } from '@pika/types'
 import { Decimal } from '@prisma/client/runtime/library'
+import { createVoucherServer } from '@voucher/server.js'
+import {
+  createSharedVoucherTestData,
+  type SharedVoucherTestData,
+} from '@voucher/test/helpers/voucherTestHelpers.js'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest'
 
 // Note: Using shared helper from businessTestHelpers.js
 
@@ -91,22 +94,28 @@ describe('Voucher Service - Admin API Integration Tests', () => {
     // Create mock services
     cacheService = new MemoryCacheService()
     translationClient = createMockTranslationClient()
-    
+
     fileStorageClient = {
-      uploadFile: vi.fn().mockResolvedValue({ url: 'https://example.com/file.jpg' }),
+      uploadFile: vi
+        .fn()
+        .mockResolvedValue({ url: 'https://example.com/file.jpg' }),
       deleteFile: vi.fn().mockResolvedValue(undefined),
       reset: vi.fn().mockReturnThis(),
     }
-    
+
     communicationClient = createCommunicationServiceClientMock()
-    
+
     // Create business service client mock manually
     const businessServiceClient = {
       getBusiness: vi.fn().mockImplementation(async (id: string) => {
-        const business = await testDb.prisma.business.findUnique({ where: { id } })
+        const business = await testDb.prisma.business.findUnique({
+          where: { id },
+        })
+
         if (!business) {
           throw new Error(`Business with ID ${id} not found`)
         }
+
         return business
       }),
       getBusinesses: vi.fn().mockResolvedValue([]),
@@ -200,14 +209,13 @@ describe('Voucher Service - Admin API Integration Tests', () => {
     logger.debug('Creating shared voucher test data...')
     sharedTestData = await createSharedVoucherTestData(testDb.prisma, {
       businessId: testBusiness.id,
-      includeCategories: [testCategory1.id, testCategory2.id]
+      includeCategories: [testCategory1.id, testCategory2.id],
     })
-    logger.debug(
-      `Created ${sharedTestData.allVouchers.length} test vouchers`,
-    )
+    logger.debug(`Created ${sharedTestData.allVouchers.length} test vouchers`)
 
     // Verify shared data was created
     const voucherCount = await testDb.prisma.voucher.count()
+
     logger.debug(
       `Database has ${voucherCount} vouchers after shared data creation`,
     )
@@ -231,6 +239,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
     // Verify shared test data still exists
     const voucherCount = await testDb.prisma.voucher.count()
+
     logger.debug(`Database has ${voucherCount} vouchers at start of test`)
 
     if (voucherCount === 0) {
@@ -238,9 +247,11 @@ describe('Voucher Service - Admin API Integration Tests', () => {
       logger.debug('Shared test data was cleared - recreating...')
       sharedTestData = await createSharedVoucherTestData(testDb.prisma, {
         businessId: testBusiness.id,
-        includeCategories: [testCategory1.id, testCategory2.id]
+        includeCategories: [testCategory1.id, testCategory2.id],
       })
+
       const newCount = await testDb.prisma.voucher.count()
+
       logger.debug(`Recreated ${newCount} vouchers`)
     }
 
@@ -309,7 +320,11 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
       // All returned vouchers should belong to the specified category
       if (response.body.data.length > 0) {
-        expect(response.body.data.every((v: any) => v.categoryId === testCategory1.id)).toBe(true)
+        expect(
+          response.body.data.every(
+            (v: any) => v.categoryId === testCategory1.id,
+          ),
+        ).toBe(true)
       }
     })
 
@@ -323,7 +338,9 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
       // All returned vouchers should be published
       if (response.body.data.length > 0) {
-        expect(response.body.data.every((v: any) => v.state === 'published')).toBe(true)
+        expect(
+          response.body.data.every((v: any) => v.state === 'published'),
+        ).toBe(true)
       }
     })
 
@@ -384,7 +401,8 @@ describe('Voucher Service - Admin API Integration Tests', () => {
       // All results should match the filter criteria
       if (response.body.data.length > 0) {
         const allMatch = response.body.data.every(
-          (v: any) => v.state === 'published' && v.categoryId === testCategory1.id,
+          (v: any) =>
+            v.state === 'published' && v.categoryId === testCategory1.id,
         )
 
         expect(allMatch).toBe(true)
@@ -437,7 +455,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
           value: new Decimal(10000),
           currency: 'PYG',
           state: VoucherState.DRAFT,
-            validUntil: new Date('2025-12-31T23:59:59.000Z'),
+          validUntil: new Date('2025-12-31T23:59:59.000Z'),
         },
       })
 
@@ -472,7 +490,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
           value: new Decimal(5000),
           currency: 'PYG',
           state: VoucherState.DRAFT,
-            validUntil: new Date('2025-12-31T23:59:59.000Z'),
+          validUntil: new Date('2025-12-31T23:59:59.000Z'),
         },
       })
 
@@ -495,6 +513,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
         const updatedVoucher = await testDb.prisma.voucher.findUnique({
           where: { id: testVoucher.id },
         })
+
         expect(updatedVoucher?.categoryId).toBeNull()
       }
     })
@@ -535,7 +554,10 @@ describe('Voucher Service - Admin API Integration Tests', () => {
       const voucherData = {
         title: { en: 'New Admin Voucher', es: 'Nuevo Vale de Administrador' },
         description: { en: 'Created by admin', es: 'Creado por administrador' },
-        termsAndConditions: { en: 'Terms and conditions', es: 'Términos y condiciones' },
+        termsAndConditions: {
+          en: 'Terms and conditions',
+          es: 'Términos y condiciones',
+        },
         categoryId: testCategory1.id,
         businessId: testBusiness.id,
         discountType: 'fixed',
@@ -551,16 +573,16 @@ describe('Voucher Service - Admin API Integration Tests', () => {
         .post('/admin/vouchers')
         .send(voucherData)
         .set('Accept', 'application/json')
-      
+
       // Debug: Log response if not 201
       if (response.status !== 201) {
         console.log('Create voucher failed:', response.status, response.body)
       }
-      
+
       expect(response.status).toBe(201)
 
       expect(response.body).toHaveProperty('id')
-      // API returns resolved translation string, not translation object  
+      // API returns resolved translation string, not translation object
       expect(typeof response.body.title).toBe('string')
       expect(response.body.categoryId).toBe(voucherData.categoryId)
       // API uses 'discountValue' field
@@ -643,7 +665,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
       // API returns resolved translation string, not translation object
       expect(typeof response.body.title).toBe('string')
-// API uses discountValue field
+      // API uses discountValue field
       expect(response.body.discountValue).toBeDefined()
     })
 
@@ -745,9 +767,9 @@ describe('Voucher Service - Admin API Integration Tests', () => {
       // Create a redemption for this voucher
       // Use the business owner user ID that already exists
       const businessOwner = await testDb.prisma.user.findFirst({
-        where: { role: UserRole.BUSINESS }
+        where: { role: UserRole.BUSINESS },
       })
-      
+
       await testDb.prisma.voucherRedemption.create({
         data: {
           voucherId: testVoucher.id,
@@ -762,7 +784,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
       const response = await adminClient
         .delete(`/admin/vouchers/${testVoucher.id}`)
         .set('Accept', 'application/json')
-      
+
       // Either 204 (soft delete) or 422 (blocked due to redemptions)
       expect([204, 422]).toContain(response.status)
 
@@ -771,6 +793,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
         const deletedVoucher = await testDb.prisma.voucher.findUnique({
           where: { id: testVoucher.id },
         })
+
         expect(deletedVoucher?.deletedAt).not.toBeNull()
       }
     })
@@ -889,7 +912,10 @@ describe('Voucher Service - Admin API Integration Tests', () => {
     it('should validate price constraints', async () => {
       const invalidVoucherData = {
         title: { en: 'Invalid Price Voucher', es: 'Vale de Precio Inválido' },
-        description: { en: 'Testing price validation', es: 'Probando validación de precio' },
+        description: {
+          en: 'Testing price validation',
+          es: 'Probando validación de precio',
+        },
         termsAndConditions: { en: 'Terms', es: 'Términos' },
         categoryId: testCategory1.id,
         businessId: testBusiness.id,
@@ -914,7 +940,10 @@ describe('Voucher Service - Admin API Integration Tests', () => {
     it('should validate expiration date is in future', async () => {
       const expiredVoucherData = {
         title: { en: 'Expired Voucher', es: 'Vale Expirado' },
-        description: { en: 'Testing expiration validation', es: 'Probando validación de expiración' },
+        description: {
+          en: 'Testing expiration validation',
+          es: 'Probando validación de expiración',
+        },
         termsAndConditions: { en: 'Terms', es: 'Términos' },
         categoryId: testCategory1.id,
         businessId: testBusiness.id,
@@ -959,7 +988,8 @@ describe('Voucher Service - Admin API Integration Tests', () => {
       ]
 
       for (const endpoint of adminEndpoints) {
-        await supertest(app)[endpoint.method](endpoint.url)
+        await supertest(app)
+          [endpoint.method](endpoint.url)
           .set('Accept', 'application/json')
           .expect(401)
       }
@@ -1066,10 +1096,12 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
       // Verify all were updated in database
       const updatedVouchers = await testDb.prisma.voucher.findMany({
-        where: { id: { in: testVouchers.map(v => v.id) } },
+        where: { id: { in: testVouchers.map((v) => v.id) } },
       })
 
-      expect(updatedVouchers.every(v => v.categoryId === testCategory2.id)).toBe(true)
+      expect(
+        updatedVouchers.every((v) => v.categoryId === testCategory2.id),
+      ).toBe(true)
     })
 
     it('should maintain audit trail for category changes', async () => {
@@ -1104,7 +1136,9 @@ describe('Voucher Service - Admin API Integration Tests', () => {
       })
 
       expect(updatedVoucher?.categoryId).toBe(testCategory2.id)
-      expect(updatedVoucher?.updatedAt.getTime()).toBeGreaterThan(originalUpdatedAt.getTime())
+      expect(updatedVoucher?.updatedAt.getTime()).toBeGreaterThan(
+        originalUpdatedAt.getTime(),
+      )
     })
   })
 
@@ -1128,7 +1162,12 @@ describe('Voucher Service - Admin API Integration Tests', () => {
         ](endpoint.url)
 
         if (endpoint.method === 'patch') {
-          customerReq.send({ title: { en: 'Unauthorized Update', es: 'Actualización No Autorizada' } })
+          customerReq.send({
+            title: {
+              en: 'Unauthorized Update',
+              es: 'Actualización No Autorizada',
+            },
+          })
         }
         await customerReq.set('Accept', 'application/json').expect(403)
 
@@ -1138,7 +1177,12 @@ describe('Voucher Service - Admin API Integration Tests', () => {
         ](endpoint.url)
 
         if (endpoint.method === 'patch') {
-          businessReq.send({ title: { en: 'Unauthorized Update', es: 'Actualización No Autorizada' } })
+          businessReq.send({
+            title: {
+              en: 'Unauthorized Update',
+              es: 'Actualización No Autorizada',
+            },
+          })
         }
         await businessReq.set('Accept', 'application/json').expect(403)
       }
@@ -1177,10 +1221,10 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
       // Verify we have vouchers with different categories
       const vouchersWithCategory1 = sharedTestData.allVouchers.filter(
-        v => v.categoryId === testCategory1.id
+        (v) => v.categoryId === testCategory1.id,
       )
       const vouchersWithCategory2 = sharedTestData.allVouchers.filter(
-        v => v.categoryId === testCategory2.id
+        (v) => v.categoryId === testCategory2.id,
       )
 
       expect(vouchersWithCategory1.length).toBeGreaterThan(0)
@@ -1189,25 +1233,36 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
     it('should handle category updates across different voucher states', async () => {
       // Test category updates on different voucher states
-      const states = [VoucherState.DRAFT, VoucherState.PUBLISHED, VoucherState.SUSPENDED] // Using SUSPENDED instead of 'paused'
+      const states = [
+        VoucherState.DRAFT,
+        VoucherState.PUBLISHED,
+        VoucherState.SUSPENDED,
+      ] // Using SUSPENDED instead of 'paused'
       const testResults = []
 
       for (const state of states) {
-        const voucher = sharedTestData.allVouchers.find(v => v.state === state)
+        const voucher = sharedTestData.allVouchers.find(
+          (v) => v.state === state,
+        )
+
         if (voucher) {
           const response = await adminClient
             .patch(`/admin/vouchers/${voucher.id}`)
             .send({ categoryId: testCategory2.id })
             .set('Accept', 'application/json')
 
-          testResults.push({ state, status: response.status, categoryId: response.body.categoryId })
+          testResults.push({
+            state,
+            status: response.status,
+            categoryId: response.body.categoryId,
+          })
         }
       }
 
       // All successful updates should have the new category
       testResults
-        .filter(result => result.status === 200)
-        .forEach(result => {
+        .filter((result) => result.status === 200)
+        .forEach((result) => {
           expect(result.categoryId).toBe(testCategory2.id)
         })
     })

@@ -3,7 +3,7 @@
  * These represent the core business entities used internally
  */
 
-import type { UserRoleType, UserStatusType } from '@pika/types'
+import type { UserRoleType, UserSettings, UserStatusType } from '@pika/types'
 
 // ============= User Domain =============
 
@@ -28,6 +28,7 @@ export interface UserDomain {
   stripeUserId?: string | null
   preferredLanguage?: string | null
   primaryBusinessId?: string | null
+  settings?: UserSettings | null // Structured user settings
 }
 
 // ============= Address Domain =============

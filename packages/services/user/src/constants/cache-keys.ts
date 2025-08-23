@@ -14,6 +14,7 @@ export const CACHE_KEYS = {
     BY_EMAIL: 'service:user:email',
     PROFILE: 'service:user:profile',
     PREFERENCES: 'service:user:preferences',
+    SETTINGS: 'service:user:settings',
   },
 
   // User sessions cache keys

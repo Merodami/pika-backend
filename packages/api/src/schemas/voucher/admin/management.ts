@@ -230,7 +230,13 @@ export const AdminUpdateVoucherRequest = z.object({
   maxRedemptionsPerUser: z.number().int().positive().optional(),
 
   // Extensibility
-  metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).nullable().optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .nullable()
+    .optional(),
 })
 
 export const AdminUpdateVoucherRequestSchema =

@@ -38,6 +38,7 @@ export interface UserDocument {
   stripeUserId?: string | null
   preferredLanguage?: string | null
   primaryBusinessId?: string | null
+  settings?: any | null // JSON settings field
 }
 
 /**
@@ -129,6 +130,7 @@ export class UserMapper {
       stripeUserId: doc.stripeUserId,
       preferredLanguage: doc.preferredLanguage,
       primaryBusinessId: doc.primaryBusinessId,
+      settings: doc.settings,
     }
   }
 
@@ -160,6 +162,7 @@ export class UserMapper {
       stripeUserId: domain.stripeUserId || undefined,
       preferredLanguage: domain.preferredLanguage || undefined,
       primaryBusinessId: domain.primaryBusinessId || undefined,
+      settings: domain.settings || undefined,
     }
   }
 
@@ -210,6 +213,7 @@ export class UserMapper {
       stripeUserId: dto.stripeUserId || null,
       preferredLanguage: dto.preferredLanguage || null,
       primaryBusinessId: dto.primaryBusinessId || null,
+      settings: dto.settings || null,
     }
   }
 

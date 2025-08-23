@@ -14,20 +14,9 @@
     },
     "provider": {
       "type": "string",
-      "enum": [
-        "local",
-        "google",
-        "facebook",
-        "apple",
-        "github",
-        "microsoft"
-      ]
+      "enum": ["local", "google", "facebook", "apple", "github", "microsoft"]
     }
   },
-  "required": [
-    "code",
-    "state",
-    "provider"
-  ],
+  "required": ["code", "state", "provider"],
   "additionalProperties": false
 }

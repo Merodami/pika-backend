@@ -35,6 +35,9 @@ export class UserController {
     this.getMe = this.getMe.bind(this)
     this.updateMe = this.updateMe.bind(this)
     this.uploadMyAvatar = this.uploadMyAvatar.bind(this)
+    this.getSettings = this.getSettings.bind(this)
+    this.updateSettings = this.updateSettings.bind(this)
+    this.patchSettings = this.patchSettings.bind(this)
   }
 
   /**
@@ -477,6 +480,96 @@ export class UserController {
         userPublic.UploadAvatarResponse,
         response,
         'UserController.uploadMyAvatar',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /users/me/settings
+   * Get current user settings
+   */
+  async getSettings(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const settings = await this.userService.getUserSettings(userId)
+
+      const response = { settings }
+      const validatedResponse = validateResponse(
+        userPublic.GetUserSettingsResponse,
+        response,
+        'UserController.getSettings',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PUT /users/me/settings
+   * Update current user settings (full replace)
+   */
+  async updateSettings(
+    req: Request<{}, {}, userPublic.UpdateUserSettingsRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const settings = await this.userService.updateUserSettings(
+        userId,
+        req.body,
+      )
+
+      const response = { settings, message: 'Settings updated successfully' }
+      const validatedResponse = validateResponse(
+        userPublic.UpdateUserSettingsResponse,
+        response,
+        'UserController.updateSettings',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PATCH /users/me/settings
+   * Patch current user settings (partial update)
+   */
+  async patchSettings(
+    req: Request<{}, {}, userPublic.PatchUserSettingsRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const settings = await this.userService.patchUserSettings(
+        userId,
+        req.body,
+      )
+
+      const response = { settings, message: 'Settings updated successfully' }
+      const validatedResponse = validateResponse(
+        userPublic.PatchUserSettingsResponse,
+        response,
+        'UserController.patchSettings',
       )
 
       res.json(validatedResponse)

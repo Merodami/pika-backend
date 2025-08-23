@@ -11,9 +11,9 @@
  * - Handles business and category relationships
  */
 
+import { VoucherState } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
-import { VoucherState } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
 export interface VoucherTestData {
@@ -62,7 +62,7 @@ export interface SeedVoucherOptions {
  */
 export async function createSharedVoucherTestData(
   prisma: PrismaClient,
-  options: SeedVoucherOptions = {}
+  options: SeedVoucherOptions = {},
 ): Promise<SharedVoucherTestData> {
   const {
     businessId = uuid(),
@@ -74,6 +74,7 @@ export async function createSharedVoucherTestData(
 
   // Create categories if not provided
   let categories = []
+
   if (includeCategories.length > 0) {
     categories = await prisma.category.findMany({
       where: { id: { in: includeCategories } },
@@ -88,7 +89,7 @@ export async function createSharedVoucherTestData(
           slug: `active-cat-${uuid().substring(0, 8)}`,
           level: 1,
           path: '/active',
-            sortOrder: 1,
+          sortOrder: 1,
           createdBy: uuid(),
         },
       }),
@@ -107,11 +108,12 @@ export async function createSharedVoucherTestData(
     ])
   }
 
-  const activeCategories = categories.filter(c => c.isActive)
-  const inactiveCategories = categories.filter(c => !c.isActive)
+  const activeCategories = categories.filter((c) => c.isActive)
+  const inactiveCategories = categories.filter((c) => !c.isActive)
 
   // Create businesses if not provided
   let business
+
   try {
     business = await prisma.business.findUnique({
       where: { id: businessId },
@@ -135,7 +137,11 @@ export async function createSharedVoucherTestData(
 
   // Create vouchers with different states
   const vouchers = []
-  const voucherStates = [VoucherState.DRAFT, VoucherState.PUBLISHED, VoucherState.SUSPENDED] // Using SUSPENDED instead of 'paused'
+  const voucherStates = [
+    VoucherState.DRAFT,
+    VoucherState.PUBLISHED,
+    VoucherState.SUSPENDED,
+  ] // Using SUSPENDED instead of 'paused'
   const now = new Date()
   const futureDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
   const pastDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
@@ -143,9 +149,10 @@ export async function createSharedVoucherTestData(
   for (let i = 0; i < count; i++) {
     const state = voucherStates[i % voucherStates.length]
     const isExpired = generateExpired && i % 5 === 4 // 20% expired if generating expired
-    const categoryId = activeCategories.length > 0 
-      ? activeCategories[i % activeCategories.length].id 
-      : null
+    const categoryId =
+      activeCategories.length > 0
+        ? activeCategories[i % activeCategories.length].id
+        : null
 
     const voucher = await prisma.voucher.create({
       data: {
@@ -155,11 +162,11 @@ export async function createSharedVoucherTestData(
         categoryId,
         businessId: business.id,
         type: 'fixed',
-        value: new Decimal(5000 + (i * 1000)), // $50 + $10 per voucher
+        value: new Decimal(5000 + i * 1000), // $50 + $10 per voucher
         currency: 'PYG',
         state: isExpired ? VoucherState.EXPIRED : state,
         validUntil: isExpired ? pastDate : futureDate,
-        maxRedemptions: 50 + (i * 10), // Acts like quantity
+        maxRedemptions: 50 + i * 10, // Acts like quantity
       },
     })
 
@@ -167,15 +174,22 @@ export async function createSharedVoucherTestData(
   }
 
   // Categorize vouchers
-  const activeVouchers = vouchers.filter(v => v.state !== VoucherState.EXPIRED)
-  const inactiveVouchers = [] // No isActive field in schema
-  const expiredVouchers = vouchers.filter(v => v.state === VoucherState.EXPIRED)
-  const draftVouchers = vouchers.filter(v => v.state === VoucherState.DRAFT)
-  const publishedVouchers = vouchers.filter(v => v.state === VoucherState.PUBLISHED)
+  const activeVouchers = vouchers.filter(
+    (v) => v.state !== VoucherState.EXPIRED,
+  )
+  const inactiveVouchers: typeof vouchers = [] // No isActive field in schema
+  const expiredVouchers = vouchers.filter(
+    (v) => v.state === VoucherState.EXPIRED,
+  )
+  const draftVouchers = vouchers.filter((v) => v.state === VoucherState.DRAFT)
+  const publishedVouchers = vouchers.filter(
+    (v) => v.state === VoucherState.PUBLISHED,
+  )
 
   // Create lookup map
   const voucherById = new Map()
-  vouchers.forEach(voucher => {
+
+  vouchers.forEach((voucher) => {
     voucherById.set(voucher.id, voucher)
   })
 
@@ -200,16 +214,13 @@ export async function createSharedVoucherTestData(
  */
 export async function seedTestVouchers(
   prisma: PrismaClient,
-  options: SeedVoucherOptions = {}
+  options: SeedVoucherOptions = {},
 ): Promise<VoucherTestData> {
-  const {
-    businessId = uuid(),
-    includeCategories = [],
-    count = 5,
-  } = options
+  const { businessId = uuid(), includeCategories = [], count = 5 } = options
 
   // Get or create categories
   let categories = []
+
   if (includeCategories.length > 0) {
     categories = await prisma.category.findMany({
       where: { id: { in: includeCategories } },
@@ -226,11 +237,13 @@ export async function seedTestVouchers(
         createdBy: uuid(),
       },
     })
+
     categories = [category]
   }
 
   // Get or create business
   let business
+
   try {
     business = await prisma.business.findUniqueOrThrow({
       where: { id: businessId },
@@ -250,6 +263,7 @@ export async function seedTestVouchers(
 
   // Create vouchers
   const vouchers = []
+
   for (let i = 0; i < count; i++) {
     const voucher = await prisma.voucher.create({
       data: {
@@ -259,11 +273,11 @@ export async function seedTestVouchers(
         categoryId: categories[i % categories.length].id,
         businessId: business.id,
         type: 'fixed',
-        value: new Decimal(3000 + (i * 500)),
+        value: new Decimal(3000 + i * 500),
         currency: 'PYG',
         state: VoucherState.PUBLISHED,
         validUntil: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days from now
-        maxRedemptions: 25 + (i * 5), // Acts like quantity
+        maxRedemptions: 25 + i * 5, // Acts like quantity
       },
     })
 
@@ -286,7 +300,7 @@ export async function cleanupVoucherTestData(
   options: {
     preserveSharedData?: boolean
     sharedVoucherIds?: string[]
-  } = {}
+  } = {},
 ): Promise<void> {
   const { preserveSharedData = false, sharedVoucherIds = [] } = options
 

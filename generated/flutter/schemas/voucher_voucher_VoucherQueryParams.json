@@ -19,22 +19,13 @@
     "sortBy": {
       "default": "createdAt",
       "type": "string",
-      "enum": [
-        "createdAt",
-        "updatedAt",
-        "expiresAt",
-        "discountValue",
-        "title"
-      ]
+      "enum": ["createdAt", "updatedAt", "expiresAt", "discountValue", "title"]
     },
     "sortOrder": {
       "description": "Sort order",
       "default": "desc",
       "type": "string",
-      "enum": [
-        "asc",
-        "desc"
-      ]
+      "enum": ["asc", "desc"]
     },
     "search": {
       "description": "Search query",
@@ -67,10 +58,7 @@
     "discountType": {
       "description": "Filter by discount type",
       "type": "string",
-      "enum": [
-        "fixed",
-        "percentage"
-      ]
+      "enum": ["fixed", "percentage"]
     },
     "minDiscount": {
       "description": "Minimum discount value",
@@ -154,11 +142,6 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "page",
-    "limit",
-    "sortBy",
-    "sortOrder"
-  ],
+  "required": ["page", "limit", "sortBy", "sortOrder"],
   "additionalProperties": false
 }
