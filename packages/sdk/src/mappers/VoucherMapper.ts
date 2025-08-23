@@ -115,7 +115,7 @@ export class VoucherMapper {
     return {
       id: doc.id,
       businessId: doc.businessId,
-      categoryId: doc.categoryId || '',
+      categoryId: doc.categoryId ?? undefined,
       state: doc.state as VoucherState,
       // Translation keys from database
       titleKey: doc.titleKey,
