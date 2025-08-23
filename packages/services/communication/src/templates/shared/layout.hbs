@@ -73,8 +73,32 @@
   <body>
     <div class='container'>
       <div class='header'>
-        <div class='logo'>Pika</div>
-        <p>Your Ultimate Gym Management Platform</p>
+        <div style="display: inline-flex; align-items: center; gap: 8px;">
+          <div style="
+            width: 32px;
+            height: 32px;
+            background-color: #2563eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+            <span style="
+              color: white;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              font-weight: 700;
+              font-size: 14px;
+            ">T</span>
+          </div>
+          <span style="
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #111827;
+            font-size: 18px;
+          ">
+            <span style="font-weight: 600;">THE VOUCHER</span><span style="font-weight: 300;">BOOK</span>
+          </span>
+        </div>
+        <p>Your voucher marketplace</p>
       </div>
 
       <div class='content'>
@@ -87,7 +111,7 @@
           <a href='{{frontendUrl}}/contact'>Contact</a>
           <a href='{{frontendUrl}}/privacy'>Privacy Policy</a>
         </div>
-        <p>© {{currentYear}} Pika. All rights reserved.</p>
+        <p>© {{currentYear}} The VoucherBook. All rights reserved.</p>
         <p>This email was sent to
           {{recipientEmail}}. If you no longer wish to receive these emails, you
           can

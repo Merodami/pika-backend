@@ -274,7 +274,7 @@ export const UserAuthData = openapi(
   z.object({
     id: UserId,
     email: Email,
-    password: z.string().optional(),
+    password: z.string().optional().nullable(), // Can be null for social auth users
     firstName: z.string(),
     lastName: z.string(),
     phoneNumber: z.string().optional(),
@@ -285,7 +285,7 @@ export const UserAuthData = openapi(
     lastLoginAt: DateTime.optional(),
   }),
   {
-    description: 'User data for authentication',
+    description: 'User data for authentication. password is null for social auth users',
   },
 )
 
@@ -297,7 +297,7 @@ export type UserAuthData = z.infer<typeof UserAuthData>
 export const CreateUserRequest = openapi(
   z.object({
     email: Email,
-    passwordHash: z.string(),
+    passwordHash: z.string().optional(),
     firstName: z.string(),
     lastName: z.string(),
     phoneNumber: z.string().optional(),
@@ -308,7 +308,7 @@ export const CreateUserRequest = openapi(
     avatarUrl: z.string().url().optional(),
   }),
   {
-    description: 'Create new user for registration with full profile data',
+    description: 'Create new user for registration with full profile data. passwordHash is optional for social auth users',
   },
 )
 

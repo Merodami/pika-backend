@@ -23,6 +23,7 @@ import {
   GOOGLE_CLIENT_SECRET,
   FACEBOOK_APP_ID,
   FACEBOOK_APP_SECRET,
+  FIREBASE_AUTH_EMULATOR_HOST,
 } from '@pika/environment'
 import { type ICacheService } from '@pika/redis'
 import {
@@ -543,6 +544,22 @@ export class SocialAuthService implements ISocialAuthService {
     code: string,
     redirectUri: string,
   ): Promise<{ idToken: string; accessToken?: string }> {
+    // Check if we're using Firebase emulator (development mode)
+    const isEmulator = FIREBASE_AUTH_EMULATOR_HOST || 
+                      NODE_ENV === 'development' || 
+                      NODE_ENV === 'test'
+    
+    if (isEmulator) {
+      // In development/emulator mode, the code IS the ID token
+      // Firebase emulator handles the OAuth flow internally
+      logger.info('Using Firebase emulator - bypassing OAuth client')
+      return {
+        idToken: code, // The code from Firebase emulator is already an ID token
+        accessToken: undefined,
+      }
+    }
+    
+    // Production mode - use actual OAuth client
     const googleClient = new GoogleOAuthClient()
     
     try {
@@ -567,6 +584,22 @@ export class SocialAuthService implements ISocialAuthService {
     code: string,
     redirectUri: string,
   ): Promise<{ idToken: string; accessToken?: string }> {
+    // Check if we're using Firebase emulator (development mode)
+    const isEmulator = FIREBASE_AUTH_EMULATOR_HOST || 
+                      NODE_ENV === 'development' || 
+                      NODE_ENV === 'test'
+    
+    if (isEmulator) {
+      // In development/emulator mode, the code IS the ID token
+      // Firebase emulator handles the OAuth flow internally
+      logger.info('Using Firebase emulator for Facebook - bypassing OAuth client')
+      return {
+        idToken: code, // The code from Firebase emulator is already an ID token
+        accessToken: undefined,
+      }
+    }
+    
+    // Production mode - use actual OAuth client
     const facebookClient = new FacebookOAuthClient()
     
     try {

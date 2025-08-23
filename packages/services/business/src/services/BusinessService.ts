@@ -125,9 +125,9 @@ export class BusinessService implements IBusinessService {
     ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.BUSINESS.LIST,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
-      const params = args[0]
+      const [params, language] = args
 
-      return `${prefix}:${JSON.stringify(params)}`
+      return `${prefix}:${JSON.stringify(params)}:${language || 'default'}`
     },
     condition: (result) => result && result.data && Array.isArray(result.data),
   })
@@ -168,10 +168,10 @@ export class BusinessService implements IBusinessService {
     ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.BUSINESS.SINGLE,
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
-      const [id, includes] = args
+      const [id, includes, language] = args
       const key = includes ? `${id}:${JSON.stringify(includes)}` : id
 
-      return `${prefix}:${key}`
+      return `${prefix}:${key}:${language || 'default'}`
     },
   })
   async getBusinessById(

@@ -14,6 +14,7 @@ import {
 } from '@pika/translation'
 import { createUserServer } from '@pika/user'
 import { createVoucherServer } from '@pika/voucher-service'
+import { EMAIL_FROM, EMAIL_FROM_NAME } from '@pika/environment'
 
 import type { ServiceDefinition, ServiceDependencies } from '../types/index.js'
 
@@ -136,8 +137,8 @@ export function getServiceDefinitions(): ServiceDefinition[] {
           cacheService: deps.cache,
           emailConfig: {
             region: 'us-east-1',
-            fromEmail: process.env.EMAIL_FROM || 'noreply@pika.com',
-            fromName: 'Pika',
+            fromEmail: EMAIL_FROM,
+            fromName: EMAIL_FROM_NAME,
           },
         })
 

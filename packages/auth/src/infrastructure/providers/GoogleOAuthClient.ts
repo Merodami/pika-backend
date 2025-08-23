@@ -12,14 +12,13 @@ import {
 export class GoogleOAuthClient {
   private readonly tokenEndpoint = 'https://oauth2.googleapis.com/token'
   private readonly userInfoEndpoint = 'https://www.googleapis.com/oauth2/v3/userinfo'
+  private configWarningShown = false
   
   constructor(
     private readonly clientId: string = GOOGLE_CLIENT_ID || '',
     private readonly clientSecret: string = GOOGLE_CLIENT_SECRET || '',
   ) {
-    if (!this.clientId || !this.clientSecret) {
-      logger.warn('Google OAuth client not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET')
-    }
+    // Don't warn on initialization, only when actually used
   }
 
   /**

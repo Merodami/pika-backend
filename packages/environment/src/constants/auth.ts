@@ -211,6 +211,13 @@ export const FIREBASE_SERVICE_ACCOUNT = {
   universe_domain: 'googleapis.com',
 }
 
+// Firebase Emulator Configuration
+export const FIREBASE_AUTH_EMULATOR_HOST = getEnvVariable(
+  'FIREBASE_AUTH_EMULATOR_HOST',
+  parseString,
+  '',
+)
+
 // Helper to check if Firebase is configured
 export const isFirebaseConfigured = (): boolean => {
   return !!(

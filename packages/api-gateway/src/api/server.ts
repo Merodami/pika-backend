@@ -159,6 +159,8 @@ async function startGateway(): Promise<Express> {
         '/api/v1/auth/resend-verification',
         '/api/v1/auth/introspect',
         '/api/v1/auth/revoke',
+        '/api/v1/auth/social/login',
+        '/api/v1/auth/exchange-token',
       ],
     }),
   )

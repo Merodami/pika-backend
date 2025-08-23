@@ -17,8 +17,8 @@ export const API_GATEWAY_BASE_URL = getEnvVariable(
   'API_GATEWAY_BASE_URL',
   String,
   NODE_ENV === 'production'
-    ? 'https://api.pika.com'
+    ? 'https://api.thevoucherbook.com'
     : NODE_ENV === 'staging'
-      ? 'https://staging-api.pikaom'
+      ? 'https://staging-api.thevoucherbook.com'
       : `http://localhost:${API_GATEWAY_PORT}`,
 )

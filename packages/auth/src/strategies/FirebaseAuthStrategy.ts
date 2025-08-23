@@ -1,5 +1,5 @@
 import { CommunicationServiceClient, logger } from '@pika/shared'
-import { UserRole } from '@pika/types'
+import { UserRole, EmailTemplateKey } from '@pika/types'
 
 import {
   FirebaseIdentityProvider,
@@ -230,7 +230,7 @@ export class FirebaseAuthStrategy implements AuthStrategy {
       try {
         await this.communicationClient.sendEmail({
           to: firebaseUser.email,
-          templateId: 'WELCOME_SOCIAL',
+          templateId: EmailTemplateKey.WELCOME_SOCIAL,
           templateParams: {
             firstName: userData.firstName,
             provider: this.getProviderName(firebaseUser),

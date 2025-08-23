@@ -8,7 +8,7 @@ import { BaseServiceClient } from '../BaseServiceClient.js'
 // Service client request/response types - NOT API schemas
 export interface CreateUserRequest {
   email: string
-  passwordHash: string
+  passwordHash?: string // Optional for social auth users
   firstName: string
   lastName: string
   phoneNumber?: string

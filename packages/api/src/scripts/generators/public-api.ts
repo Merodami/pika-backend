@@ -360,6 +360,14 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     'LinkedAccountDetails',
     authSocialSchemas.LinkedAccountDetails,
   )
+  registry.registerSchema(
+    'ExchangeTokenRequest',
+    authSocialSchemas.ExchangeTokenRequestSchema,
+  )
+  registry.registerSchema(
+    'ExchangeTokenResponse',
+    authSocialSchemas.ExchangeTokenResponseSchema,
+  )
 
   registry.registerSchema(
     'ForgotPasswordRequest',
@@ -1907,6 +1915,211 @@ function registerPublicRoutes(registry: ZodRegistry): void {
       },
       400: {
         description: 'Invalid current password',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Social Authentication Routes =============
+
+  // Social login (Firebase ID token)
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/social/login',
+    operationId: 'socialLogin',
+    summary: 'Social authentication login',
+    description: 'Login using Firebase ID token from social provider (Google, Facebook, Apple)',
+    tags: ['Authentication'],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.SocialLoginRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Login successful',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.SocialLoginResponseSchema,
+          },
+        },
+      },
+      401: {
+        description: 'Invalid token or authentication failed',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Exchange OAuth code for tokens
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/exchange-token',
+    operationId: 'exchangeToken',
+    summary: 'Exchange OAuth authorization code',
+    description: 'Exchange OAuth authorization code from provider for JWT tokens',
+    tags: ['Authentication'],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.ExchangeTokenRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Token exchange successful',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.ExchangeTokenResponseSchema,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid authorization code or request',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication failed',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Link social account
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/social/link',
+    operationId: 'linkSocialAccount',
+    summary: 'Link social account to user',
+    description: 'Link a social provider account to existing authenticated user',
+    tags: ['Authentication'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.LinkAccountRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Account linked successfully',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.LinkAccountResponseSchema,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request or account already linked',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication required',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Unlink social account
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/social/unlink',
+    operationId: 'unlinkSocialAccount',
+    summary: 'Unlink social account from user',
+    description: 'Remove social provider account link from authenticated user',
+    tags: ['Authentication'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.UnlinkAccountRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Account unlinked successfully',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.UnlinkAccountResponseSchema,
+          },
+        },
+      },
+      400: {
+        description: 'Cannot unlink account or account not linked',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication required',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get linked social accounts
+  registry.registerRoute({
+    method: 'get',
+    path: '/auth/social/accounts',
+    operationId: 'getLinkedAccounts',
+    summary: 'Get user linked social accounts',
+    description: 'Get list of social provider accounts linked to authenticated user',
+    tags: ['Authentication'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'List of linked accounts',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.GetLinkedAccountsResponseSchema,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication required',
         content: {
           'application/json': {
             schema: ErrorResponse,

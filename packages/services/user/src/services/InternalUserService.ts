@@ -136,21 +136,15 @@ export class InternalUserService implements IInternalUserService {
         )
       }
 
-      // Only accept passwordHash - internal APIs should not handle plain passwords
-      if (!data.passwordHash) {
-        throw ErrorFactory.validationError({
-          passwordHash: ['passwordHash is required'],
-        })
-      }
-
       // Extract passwordHash and rename it to password for the create method
+      // passwordHash is optional for social auth users
       const { passwordHash, ...userData } = data
 
       const user = await this.repository.create({
         ...userData,
-        password: passwordHash,
-        emailVerified: false,
-        status: UserStatus.UNCONFIRMED,
+        password: passwordHash || null, // null for social auth users
+        emailVerified: !passwordHash, // Social auth users (no password) are pre-verified
+        status: !passwordHash ? UserStatus.ACTIVE : UserStatus.UNCONFIRMED, // Social auth users are immediately active
       })
 
       // After creating, fetch the raw user data to get the password

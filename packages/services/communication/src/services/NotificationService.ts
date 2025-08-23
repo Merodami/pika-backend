@@ -262,7 +262,7 @@ export class NotificationService implements INotificationService {
             // Send general notification email
             await this.emailService.sendEmail({
               to: email,
-              subject: notification.title || 'Notification from Pika',
+              subject: notification.title || 'Notification from The VoucherBook',
               body: notification.description,
               templateParams: notification.metadata,
             })
