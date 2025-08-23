@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "code": {
+      "description": "Authorization code from OAuth provider",
+      "type": "string",
+      "minLength": 1
+    },
+    "provider": {
+      "description": "OAuth provider (google or facebook)",
+      "type": "string",
+      "enum": [
+        "google",
+        "facebook",
+        "apple"
+      ]
+    },
+    "redirectUri": {
+      "description": "Redirect URI used in OAuth flow",
+      "type": "string",
+      "format": "uri"
+    },
+    "state": {
+      "description": "State parameter for CSRF protection",
+      "type": "string"
+    }
+  },
+  "required": [
+    "code",
+    "provider",
+    "redirectUri"
+  ],
+  "additionalProperties": false
+}

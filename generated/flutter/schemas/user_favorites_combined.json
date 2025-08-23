@@ -337,6 +337,12 @@
                       "maxLength": 255,
                       "format": "uri"
                     },
+                    "logoUrl": {
+                      "description": "Business logo image URL",
+                      "type": "string",
+                      "maxLength": 512,
+                      "format": "uri"
+                    },
                     "street": {
                       "description": "Street address",
                       "type": "string",
@@ -1234,6 +1240,12 @@
                         "description": "Business website URL",
                         "type": "string",
                         "maxLength": 255,
+                        "format": "uri"
+                      },
+                      "logoUrl": {
+                        "description": "Business logo image URL",
+                        "type": "string",
+                        "maxLength": 512,
                         "format": "uri"
                       },
                       "street": {

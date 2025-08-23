@@ -104,6 +104,13 @@ export function createAuthRouter(
     socialAuthController.socialLogin,
   )
 
+  // OAuth authorization code exchange (public endpoint)
+  router.post(
+    '/exchange-token',
+    validateBody(authPublic.ExchangeTokenRequest),
+    socialAuthController.exchangeToken,
+  )
+
   router.post(
     '/social/link',
     requireAuth(),

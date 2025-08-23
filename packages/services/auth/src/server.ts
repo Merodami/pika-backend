@@ -37,6 +37,7 @@ export async function createAuthServer(config: ServerConfig) {
         '/auth/introspect',
         '/auth/revoke',
         '/auth/social/login', // Social login is public - no auth required
+        '/auth/exchange-token', // OAuth code exchange is public
         '/health',
         '/metrics',
       ],

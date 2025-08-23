@@ -6,6 +6,8 @@ import {
   FirebaseIdentityProvider,
   FirebaseIdentityProviderFactory,
   JwtTokenService,
+  GoogleOAuthClient,
+  FacebookOAuthClient,
 } from '@pika/auth'
 import {
   isFirebaseConfigured,
@@ -17,6 +19,10 @@ import {
   JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
   JWT_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  FACEBOOK_APP_ID,
+  FACEBOOK_APP_SECRET,
 } from '@pika/environment'
 import { type ICacheService } from '@pika/redis'
 import {
@@ -33,6 +39,7 @@ export interface ISocialAuthService {
   linkAccount(data: LinkAccountInput): Promise<LinkAccountResult>
   unlinkAccount(data: UnlinkAccountInput): Promise<UnlinkAccountResult>
   getLinkedAccounts(userId: string): Promise<GetLinkedAccountsResult>
+  exchangeToken(data: ExchangeTokenInput): Promise<ExchangeTokenResult>
 }
 
 export interface SocialLoginInput {
@@ -83,6 +90,21 @@ export interface GetLinkedAccountsResult {
     photoUrl?: string
     linkedAt: Date
   }>
+}
+
+export interface ExchangeTokenInput {
+  code: string
+  provider: string
+  redirectUri: string
+  state?: string
+}
+
+export interface ExchangeTokenResult {
+  user: any
+  accessToken: string
+  refreshToken: string
+  isNewUser: boolean
+  linkedAccounts?: SocialProvider[]
 }
 
 /**
@@ -469,6 +491,161 @@ export class SocialAuthService implements ISocialAuthService {
       return !!(user as any).password
     } catch {
       return false
+    }
+  }
+
+  /**
+   * Exchange OAuth authorization code for tokens
+   * Supports Google and Facebook OAuth flows
+   */
+  async exchangeToken(data: ExchangeTokenInput): Promise<ExchangeTokenResult> {
+    const { code, provider, redirectUri } = data
+
+    try {
+      // Exchange authorization code for ID token based on provider
+      let idToken: string
+      let providerAccessToken: string | undefined
+
+      if (provider === 'google') {
+        // Exchange Google authorization code for tokens
+        const googleTokens = await this.exchangeGoogleCode(code, redirectUri)
+        idToken = googleTokens.idToken
+        providerAccessToken = googleTokens.accessToken
+      } else if (provider === 'facebook') {
+        // Exchange Facebook authorization code for tokens
+        const fbTokens = await this.exchangeFacebookCode(code, redirectUri)
+        idToken = fbTokens.idToken
+        providerAccessToken = fbTokens.accessToken
+      } else {
+        throw ErrorFactory.badRequest(`Unsupported provider: ${provider}`)
+      }
+
+      // Use the existing socialLogin flow with the obtained ID token
+      const result = await this.socialLogin({
+        provider,
+        idToken,
+        accessToken: providerAccessToken,
+        deviceInfo: undefined,
+        marketingConsent: false,
+      })
+
+      return result
+    } catch (error) {
+      logger.error('OAuth code exchange failed', error as Error)
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Exchange Google authorization code for tokens
+   */
+  private async exchangeGoogleCode(
+    code: string,
+    redirectUri: string,
+  ): Promise<{ idToken: string; accessToken?: string }> {
+    const googleClient = new GoogleOAuthClient()
+    
+    try {
+      // Exchange authorization code for tokens
+      const tokens = await googleClient.exchangeCodeForTokens(code, redirectUri)
+      
+      // Google provides an ID token directly, which works with Firebase
+      return {
+        idToken: tokens.idToken,
+        accessToken: tokens.accessToken,
+      }
+    } catch (error) {
+      logger.error('Google OAuth code exchange failed', error as Error)
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Exchange Facebook authorization code for tokens
+   */
+  private async exchangeFacebookCode(
+    code: string,
+    redirectUri: string,
+  ): Promise<{ idToken: string; accessToken?: string }> {
+    const facebookClient = new FacebookOAuthClient()
+    
+    try {
+      // Exchange authorization code for access token
+      const tokens = await facebookClient.exchangeCodeForTokens(code, redirectUri)
+      
+      // Get user info from Facebook
+      const userInfo = await facebookClient.getUserInfo(tokens.accessToken)
+      
+      // For Facebook, we need to handle this differently since Facebook 
+      // doesn't provide Firebase-compatible ID tokens directly
+      if (!this.firebaseProvider) {
+        throw ErrorFactory.serviceUnavailable('Firebase provider not initialized')
+      }
+      
+      const auth = this.firebaseProvider.getAuth()
+      
+      // Check if user exists with this Facebook ID
+      const facebookUid = `facebook:${userInfo.id}`
+      let firebaseUser
+      
+      try {
+        // Try to get existing user by UID
+        firebaseUser = await auth.getUser(facebookUid)
+      } catch (error: any) {
+        // User doesn't exist, try by email if available
+        if (userInfo.email) {
+          try {
+            firebaseUser = await auth.getUserByEmail(userInfo.email)
+            // Update the user with Facebook provider data
+            await auth.updateUser(firebaseUser.uid, {
+              providerToLink: {
+                uid: facebookUid,
+                displayName: userInfo.name,
+                email: userInfo.email,
+                photoURL: userInfo.picture,
+                providerId: 'facebook.com',
+              }
+            } as any)
+          } catch {
+            // Create new user with Facebook data
+            firebaseUser = await auth.createUser({
+              uid: facebookUid,
+              email: userInfo.email || `facebook_${userInfo.id}@placeholder.com`,
+              displayName: userInfo.name,
+              photoURL: userInfo.picture,
+              emailVerified: userInfo.emailVerified || false,
+            })
+          }
+        } else {
+          // No email, create user with Facebook ID only
+          firebaseUser = await auth.createUser({
+            uid: facebookUid,
+            displayName: userInfo.name,
+            photoURL: userInfo.picture,
+          })
+        }
+      }
+      
+      // Set custom claims for the user
+      await auth.setCustomUserClaims(firebaseUser.uid, {
+        provider: 'facebook',
+        facebook_id: userInfo.id,
+      })
+      
+      // Create a custom token that can be used to sign in
+      const customToken = await auth.createCustomToken(firebaseUser.uid)
+      
+      // Important: The frontend needs to exchange this custom token for a Firebase ID token
+      // by calling signInWithCustomToken(customToken) and then getting the ID token
+      // For API consistency, we return the custom token as the ID token
+      // The socialLogin method will handle it properly
+      return {
+        idToken: customToken,
+        accessToken: tokens.accessToken,
+      }
+    } catch (error) {
+      logger.error('Facebook OAuth code exchange failed', error as Error)
+      throw ErrorFactory.fromError(error)
     }
   }
 }

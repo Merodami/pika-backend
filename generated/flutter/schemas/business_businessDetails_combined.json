@@ -37,6 +37,12 @@
           "maxLength": 255,
           "format": "uri"
         },
+        "logoUrl": {
+          "description": "Business logo image URL",
+          "type": "string",
+          "maxLength": 512,
+          "format": "uri"
+        },
         "street": {
           "description": "Street address",
           "type": "string",
@@ -152,6 +158,11 @@
           "maxLength": 255,
           "format": "uri"
         },
+        "logoUrl": {
+          "type": "string",
+          "maxLength": 512,
+          "format": "uri"
+        },
         "street": {
           "type": "string",
           "maxLength": 255
@@ -224,6 +235,21 @@
           }
         }
       },
+      "additionalProperties": false
+    },
+    "UploadBusinessLogoResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "logoUrl": {
+          "description": "URL of the uploaded business logo",
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "logoUrl"
+      ],
       "additionalProperties": false
     }
   }

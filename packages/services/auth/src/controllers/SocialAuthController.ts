@@ -8,6 +8,8 @@ type SocialLoginRequest = z.infer<typeof authPublic.SocialLoginRequest>
 type SocialLoginResponse = z.infer<typeof authPublic.SocialLoginResponse>
 type UnlinkAccountRequest = z.infer<typeof authPublic.UnlinkAccountRequest>
 type UnlinkAccountResponse = z.infer<typeof authPublic.UnlinkAccountResponse>
+type ExchangeTokenRequest = z.infer<typeof authPublic.ExchangeTokenRequest>
+type ExchangeTokenResponse = z.infer<typeof authPublic.ExchangeTokenResponse>
 import { ErrorFactory } from '@pika/shared'
 import { SocialProvider } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
@@ -26,6 +28,7 @@ export class SocialAuthController {
     this.linkAccount = this.linkAccount.bind(this)
     this.unlinkAccount = this.unlinkAccount.bind(this)
     this.getLinkedAccounts = this.getLinkedAccounts.bind(this)
+    this.exchangeToken = this.exchangeToken.bind(this)
   }
 
   /**
@@ -172,6 +175,44 @@ export class SocialAuthController {
           photoUrl: account.photoUrl,
           linkedAt: account.linkedAt.toISOString(),
         })),
+      }
+
+      response.json(responseData)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Exchange authorization code for tokens
+   * POST /auth/exchange-token
+   * Public endpoint for OAuth authorization code flow
+   */
+  async exchangeToken(
+    request: Request<{}, {}, ExchangeTokenRequest>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { code, provider, redirectUri, state } = request.body
+
+      // Call service to exchange code for tokens
+      const result = await this.socialAuthService.exchangeToken({
+        code,
+        provider,
+        redirectUri,
+        state,
+      })
+
+      // Transform to DTO using mapper
+      const responseData: ExchangeTokenResponse = {
+        user: UserMapper.toAuthDTO(result.user) as any,
+        accessToken: result.accessToken as any,
+        refreshToken: result.refreshToken as any,
+        tokenType: 'Bearer',
+        expiresIn: 7200, // 2 hours
+        isNewUser: result.isNewUser,
+        linkedAccounts: result.linkedAccounts,
       }
 
       response.json(responseData)

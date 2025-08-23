@@ -5,7 +5,7 @@
   "description": "API testing tools and utilities",
   "type": "module",
   "scripts": {
-    "generate:tokens": "tsx generate-test-tokens.ts",
+    "generate:tokens": "echo 'This command has been replaced. Use npm run generate:test-tokens from the root directory instead.'",
     "show:tokens": "tsx show-test-tokens.ts"
   },
   "dependencies": {

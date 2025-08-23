@@ -45,6 +45,14 @@ export {
   isSocialAuthToken,
 } from './infrastructure/providers/FirebaseIdentityProvider.js'
 export {
+  GoogleOAuthClient,
+  googleOAuthClient,
+} from './infrastructure/providers/GoogleOAuthClient.js'
+export {
+  FacebookOAuthClient,
+  facebookOAuthClient,
+} from './infrastructure/providers/FacebookOAuthClient.js'
+export {
   createFirebaseAuthStrategy,
   FirebaseAuthStrategy,
   type FirebaseCredentials,

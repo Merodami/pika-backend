@@ -289,6 +289,17 @@ export class FirebaseIdentityProvider implements IdentityProvider {
   }
 
   /**
+   * Get Firebase Auth instance
+   * Used for advanced operations like creating users with providers
+   */
+  getAuth(): admin.auth.Auth {
+    if (!this.app) {
+      throw new Error('Firebase Identity Provider not initialized')
+    }
+    return this.app.auth()
+  }
+
+  /**
    * Revoke refresh tokens for a user
    * Forces re-authentication on all devices
    */

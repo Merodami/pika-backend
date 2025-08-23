@@ -291,3 +291,75 @@ export type GetLinkedAccountsResponse = z.infer<
   typeof GetLinkedAccountsResponse
 >
 export type LinkedAccountDetails = z.infer<typeof LinkedAccountDetails>
+
+// ============= Exchange Token Request =============
+
+/**
+ * OAuth authorization code exchange request (raw Zod)
+ * For exchanging authorization codes from OAuth providers (Google, Facebook)
+ */
+export const ExchangeTokenRequest = z.object({
+  code: z.string().min(1).describe('Authorization code from OAuth provider'),
+  provider: SocialProviderSchema.describe('OAuth provider (google or facebook)'),
+  redirectUri: z.string().url().describe('Redirect URI used in OAuth flow'),
+  state: z.string().optional().describe('State parameter for CSRF protection'),
+})
+
+/**
+ * Exchange token request (OpenAPI documented)
+ */
+export const ExchangeTokenRequestSchema = openapi(ExchangeTokenRequest, {
+  description: 'Request to exchange OAuth authorization code for tokens',
+  example: {
+    code: '4/0AY0e-g7...',
+    provider: SocialProvider.GOOGLE,
+    redirectUri: 'https://app.voucherbook.com/auth/callback',
+    state: 'random-state-string',
+  },
+})
+
+export type ExchangeTokenRequest = z.infer<typeof ExchangeTokenRequest>
+
+// ============= Exchange Token Response =============
+
+/**
+ * Exchange token response (raw Zod)
+ * Returns JWT tokens after successful OAuth code exchange
+ */
+export const ExchangeTokenResponse = z.object({
+  user: AuthUserResponse.describe('Authenticated user information'),
+  accessToken: JWTToken.describe('JWT access token'),
+  refreshToken: JWTToken.describe('JWT refresh token'),
+  tokenType: z.literal('Bearer').describe('Token type'),
+  expiresIn: z.number().int().positive().describe('Token lifetime in seconds'),
+  isNewUser: z.boolean().describe('Whether this is a newly created user'),
+  linkedAccounts: z
+    .array(SocialProviderSchema)
+    .optional()
+    .describe('List of linked social accounts'),
+})
+
+/**
+ * Exchange token response (OpenAPI documented)
+ */
+export const ExchangeTokenResponseSchema = openapi(ExchangeTokenResponse, {
+  description: 'Response after successful OAuth code exchange',
+  example: {
+    user: {
+      id: '123e4567-e89b-12d3-a456-426614174000' as any,
+      email: 'user@example.com' as any,
+      firstName: 'John',
+      lastName: 'Doe',
+      profilePicture: 'https://example.com/avatar.jpg',
+      role: UserRole.CUSTOMER,
+    },
+    accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' as any,
+    refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' as any,
+    tokenType: 'Bearer',
+    expiresIn: 7200,
+    isNewUser: false,
+    linkedAccounts: [SocialProvider.GOOGLE],
+  },
+})
+
+export type ExchangeTokenResponse = z.infer<typeof ExchangeTokenResponse>

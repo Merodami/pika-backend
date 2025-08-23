@@ -17,6 +17,11 @@
       "maxLength": 255,
       "format": "uri"
     },
+    "logoUrl": {
+      "type": "string",
+      "maxLength": 512,
+      "format": "uri"
+    },
     "street": {
       "type": "string",
       "maxLength": 255

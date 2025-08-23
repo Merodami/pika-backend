@@ -47,9 +47,9 @@ export async function seedInitialTranslations(
     // Email translations
     {
       key: 'email.welcome.subject',
-      en: 'Welcome to Pika!',
-      es: '¡Bienvenido a Pika!',
-      gn: 'Tereg̃ua Pika-pe!',
+      en: 'Welcome to The VoucherBook!',
+      es: '¡Bienvenido a The VoucherBook!',
+      gn: 'Tereg̃ua The VoucherBook-pe!',
     },
     {
       key: 'email.welcome.greeting',
