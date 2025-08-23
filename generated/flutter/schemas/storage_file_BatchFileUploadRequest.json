@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "folder": {
+      "description": "Target folder for uploads",
+      "type": "string"
+    },
+    "isPublic": {
+      "description": "Whether files should be publicly accessible",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

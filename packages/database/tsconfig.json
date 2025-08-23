@@ -33,7 +33,7 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["dist", "../../node_modules", "node_modules"],
+  "exclude": ["dist", "../../node_modules", "node_modules", "prisma/seed/fixed-dev-data.ts"],
   "references": [
     {
       "path": "../shared"

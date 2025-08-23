@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "phone": {
+      "type": "string",
+      "maxLength": 20
+    },
+    "email": {
+      "type": "string",
+      "maxLength": 255,
+      "format": "email",
+      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+    },
+    "website": {
+      "type": "string",
+      "maxLength": 255,
+      "format": "uri"
+    },
+    "street": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "city": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "state": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "postalCode": {
+      "type": "string",
+      "maxLength": 20
+    },
+    "country": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2
+    },
+    "operatingHours": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "open": {
+            "type": "string"
+          },
+          "close": {
+            "type": "string"
+          },
+          "closed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "socialMedia": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "additionalInfo": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

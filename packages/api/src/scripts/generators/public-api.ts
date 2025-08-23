@@ -3,9 +3,11 @@ import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
+import * as authSocialSchemas from '@api/schemas/auth/public/social.js'
 import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as businessSchemas from '@api/schemas/business/public/business.js'
+import * as businessDetailsSchemas from '@api/schemas/business/public/businessDetails.js'
 import * as businessRegistrationSchemas from '@api/schemas/business/public/registration.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
 import * as categorySchemas from '@api/schemas/category/public/category.js'
@@ -37,6 +39,7 @@ import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
 import * as userSettingsSchemas from '@api/schemas/user/public/settings.js'
+import * as userFavoritesSchemas from '@api/schemas/user/public/favorites.js'
 import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
@@ -132,6 +135,20 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     businessSchemas.UpdateMyBusinessRequest,
   )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
+
+  // ============= Business Details Schemas =============
+  registry.registerSchema(
+    'BusinessDetailsResponse',
+    businessDetailsSchemas.BusinessDetailsResponse,
+  )
+  registry.registerSchema(
+    'UpdateBusinessDetailsRequest',
+    businessDetailsSchemas.UpdateBusinessDetailsRequest,
+  )
+  registry.registerSchema(
+    'UploadBusinessLogoResponse',
+    businessDetailsSchemas.UploadBusinessLogoResponse,
+  )
 
   // ============= Business Registration Schemas =============
   registry.registerSchema(
@@ -305,6 +322,44 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     authOauthSchemas.RevokeTokenResponse,
   )
   registry.registerSchema('UserInfoResponse', authOauthSchemas.UserInfoResponse)
+
+  // ============= Social Auth Schemas =============
+  registry.registerSchema(
+    'SocialLoginRequest',
+    authSocialSchemas.SocialLoginRequestSchema,
+  )
+  registry.registerSchema(
+    'SocialLoginResponse',
+    authSocialSchemas.SocialLoginResponseSchema,
+  )
+  registry.registerSchema(
+    'LinkAccountRequest',
+    authSocialSchemas.LinkAccountRequestSchema,
+  )
+  registry.registerSchema(
+    'LinkAccountResponse',
+    authSocialSchemas.LinkAccountResponseSchema,
+  )
+  registry.registerSchema(
+    'UnlinkAccountRequest',
+    authSocialSchemas.UnlinkAccountRequestSchema,
+  )
+  registry.registerSchema(
+    'UnlinkAccountResponse',
+    authSocialSchemas.UnlinkAccountResponseSchema,
+  )
+  registry.registerSchema(
+    'GetLinkedAccountsResponse',
+    authSocialSchemas.GetLinkedAccountsResponseSchema,
+  )
+  registry.registerSchema(
+    'DeviceInfo',
+    authSocialSchemas.DeviceInfoSchema,
+  )
+  registry.registerSchema(
+    'LinkedAccountDetails',
+    authSocialSchemas.LinkedAccountDetails,
+  )
 
   registry.registerSchema(
     'ForgotPasswordRequest',
@@ -502,6 +557,60 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'CurrentUserProfile',
     userProfileSchemas.CurrentUserProfile,
+  )
+
+  // ============= User Favorites Schemas =============
+  registry.registerSchema(
+    'FavoriteBusinessItem',
+    userFavoritesSchemas.FavoriteBusinessItemSchema,
+  )
+  registry.registerSchema(
+    'FavoriteVoucherItem',
+    userFavoritesSchemas.FavoriteVoucherItemSchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteBusinessesQuery',
+    userFavoritesSchemas.GetFavoriteBusinessesQuerySchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteVouchersQuery',
+    userFavoritesSchemas.GetFavoriteVouchersQuerySchema,
+  )
+  registry.registerSchema(
+    'AddFavoriteBusinessResponse',
+    userFavoritesSchemas.AddFavoriteBusinessResponseSchema,
+  )
+  registry.registerSchema(
+    'AddFavoriteVoucherResponse',
+    userFavoritesSchemas.AddFavoriteVoucherResponseSchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteBusinessesResponse',
+    userFavoritesSchemas.GetFavoriteBusinessesResponseSchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteVouchersResponse',
+    userFavoritesSchemas.GetFavoriteVouchersResponseSchema,
+  )
+  registry.registerSchema(
+    'FavoriteStatusResponse',
+    userFavoritesSchemas.FavoriteStatusResponseSchema,
+  )
+  registry.registerSchema(
+    'RemoveFavoriteResponse',
+    userFavoritesSchemas.RemoveFavoriteResponseSchema,
+  )
+  registry.registerSchema(
+    'BatchFavoriteBusinessesRequest',
+    userFavoritesSchemas.BatchFavoriteBusinessesRequestSchema,
+  )
+  registry.registerSchema(
+    'BatchFavoriteVouchersRequest',
+    userFavoritesSchemas.BatchFavoriteVouchersRequestSchema,
+  )
+  registry.registerSchema(
+    'BatchFavoriteOperationResponse',
+    userFavoritesSchemas.BatchFavoriteOperationResponseSchema,
   )
 
   // ============= User Settings Schemas =============
@@ -785,6 +894,54 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     responses: {
       204: {
         description: 'Business deleted successfully',
+      },
+    },
+  })
+
+  // Upload business logo (authenticated users)
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/me/logo',
+    operationId: 'uploadBusinessLogo',
+    summary: 'Upload business logo',
+    tags: ['My Business'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              properties: {
+                logo: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Logo image file'
+                }
+              },
+              required: ['logo']
+            }
+          },
+        },
+        required: true,
+      },
+    },
+    responses: {
+      200: {
+        description: 'Logo uploaded successfully',
+        content: {
+          'application/json': {
+            schema: businessDetailsSchemas.UploadBusinessLogoResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid file or request',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
       },
     },
   })

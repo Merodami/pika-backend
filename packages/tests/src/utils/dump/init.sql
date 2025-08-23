@@ -950,7 +950,8 @@ CREATE TABLE business.business_details (
     social_media jsonb,
     additional_info jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    logo_url character varying(512)
 );
 
 

@@ -15,6 +15,7 @@ export interface BusinessDetailsDomain {
   phone: string | null
   email: string | null
   website: string | null
+  logoUrl: string | null
   // Address Information
   street: string | null
   city: string | null

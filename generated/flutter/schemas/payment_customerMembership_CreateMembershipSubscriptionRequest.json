@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "priceId": {
+      "description": "Stripe price ID",
+      "type": "string",
+      "minLength": 1
+    },
+    "paymentMethodId": {
+      "description": "Stripe payment method ID",
+      "type": "string",
+      "minLength": 1
+    },
+    "couponCode": {
+      "description": "Promotional coupon code",
+      "type": "string"
+    },
+    "trialDays": {
+      "description": "Trial period in days",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "metadata": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "priceId",
+    "paymentMethodId"
+  ],
+  "additionalProperties": false
+}

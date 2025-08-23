@@ -1,0 +1,241 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "summary": {
+      "type": "object",
+      "properties": {
+        "totalSent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalDelivered": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalOpened": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalClicked": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalFailed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalBounced": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "deliveryRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "openRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "clickRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "bounceRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "totalSent",
+        "totalDelivered",
+        "totalOpened",
+        "totalClicked",
+        "totalFailed",
+        "totalBounced",
+        "deliveryRate",
+        "openRate",
+        "clickRate",
+        "bounceRate"
+      ],
+      "additionalProperties": false
+    },
+    "byChannel": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "email",
+              "sms",
+              "push",
+              "inApp",
+              "webhook"
+            ]
+          },
+          "sent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "delivered": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "opened": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "clicked": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "failed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "channel",
+          "sent",
+          "delivered",
+          "opened",
+          "clicked",
+          "failed"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "sent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "delivered": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "opened": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "clicked": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "failed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "date",
+          "sent",
+          "delivered",
+          "opened",
+          "clicked",
+          "failed"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "topTemplates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "templateId": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "templateName": {
+            "type": "string"
+          },
+          "sent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "openRate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "clickRate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "templateId",
+          "templateName",
+          "sent",
+          "openRate",
+          "clickRate"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "costs": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "byChannel": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "required": [
+        "total",
+        "byChannel"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "summary",
+    "byChannel",
+    "timeline"
+  ],
+  "additionalProperties": false
+}

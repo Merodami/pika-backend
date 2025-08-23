@@ -6,6 +6,8 @@
       "type": "string"
     }
   },
-  "required": ["avatar"],
+  "required": [
+    "avatar"
+  ],
   "additionalProperties": false
 }

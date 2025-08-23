@@ -87,13 +87,21 @@ export async function seedBusinesses(
           active: business.active,
           approved: business.approved,
           avgRating: business.avgRating,
-          ...(logoUrl && { logoUrl }),
         },
-        create: {
-          ...business,
-          ...(logoUrl && { logoUrl }),
-        },
+        create: business,
       })
+
+      // Create or update business details with logo if we have an image
+      if (logoUrl) {
+        await prisma.businessDetails.upsert({
+          where: { businessId: createdBusiness.id },
+          update: { logoUrl },
+          create: {
+            businessId: createdBusiness.id,
+            logoUrl,
+          },
+        })
+      }
 
       businessesCreated++
 

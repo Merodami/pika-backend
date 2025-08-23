@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "success": {
+      "default": true,
+      "type": "boolean"
+    },
+    "message": {
+      "default": "Token revoked successfully",
+      "type": "string"
+    },
+    "revokedCount": {
+      "description": "Number of tokens revoked",
+      "type": "number"
+    }
+  },
+  "required": [
+    "success",
+    "message"
+  ],
+  "additionalProperties": false
+}

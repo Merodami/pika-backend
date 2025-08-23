@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
 
 import type { PrismaClient } from '@prisma/client'
@@ -128,7 +128,6 @@ export function prepareImageFiles(
 }> {
   try {
     const categoryPath = join(baseDir, `size-${size}`, category)
-    const { readdirSync } = require('fs')
     
     const files = readdirSync(categoryPath).filter((file: string) => 
       file.toLowerCase().endsWith('.jpg') || 

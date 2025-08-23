@@ -23,6 +23,7 @@ export interface BusinessDetailsDocument {
   phone: string | null
   email: string | null
   website: string | null
+  logoUrl: string | null
   street: string | null
   city: string | null
   state: string | null
@@ -277,6 +278,7 @@ export class BusinessMapper {
       phone: doc.phone,
       email: doc.email,
       website: doc.website,
+      logoUrl: doc.logoUrl,
       street: doc.street,
       city: doc.city,
       state: doc.state,
@@ -308,6 +310,7 @@ export class BusinessMapper {
       phone: domain.phone || undefined,
       email: domain.email || undefined,
       website: domain.website || undefined,
+      logoUrl: domain.logoUrl || undefined,
       street: domain.street || undefined,
       city: domain.city || undefined,
       state: domain.state || undefined,

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "token": {
+      "description": "Token to revoke",
+      "type": "string",
+      "minLength": 1
+    },
+    "tokenTypeHint": {
+      "type": "string",
+      "enum": [
+        "accessToken",
+        "refreshToken"
+      ]
+    },
+    "allDevices": {
+      "description": "Revoke all tokens for user",
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "token",
+    "allDevices"
+  ],
+  "additionalProperties": false
+}

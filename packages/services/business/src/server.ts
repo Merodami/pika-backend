@@ -8,7 +8,7 @@ import {
   errorMiddleware,
 } from '@pika/http'
 import { ICacheService, setCacheService } from '@pika/redis'
-import { logger, UserServiceClient } from '@pika/shared'
+import { logger, StorageServiceClient, UserServiceClient } from '@pika/shared'
 import { createTranslationResolver, TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 
@@ -26,11 +26,13 @@ export async function createBusinessServer({
   cacheService,
   translationClient,
   userServiceClient,
+  storageServiceClient,
 }: {
   prisma: PrismaClient
   cacheService: ICacheService
   translationClient: TranslationClient
   userServiceClient?: UserServiceClient
+  storageServiceClient?: StorageServiceClient
 }) {
   // Set up global cache service for decorators
   setCacheService(cacheService)
@@ -111,6 +113,7 @@ export async function createBusinessServer({
     translationClient,
     translationResolver,
     userServiceClient,
+    storageServiceClient,
   )
 
   app.use('/businesses', businessRouter)
@@ -136,6 +139,7 @@ export async function createBusinessServer({
       translationClient,
       userServiceClient,
       translationResolver,
+      storageServiceClient,
     )
 
     app.use('/admin/businesses', adminRouter)

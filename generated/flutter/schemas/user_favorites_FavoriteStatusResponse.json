@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "isFavorited": {
+      "description": "Whether the item is favorited",
+      "type": "boolean"
+    },
+    "favoritedAt": {
+      "description": "When the item was favorited (if favorited)",
+      "type": "string"
+    }
+  },
+  "required": [
+    "isFavorited"
+  ],
+  "additionalProperties": false
+}

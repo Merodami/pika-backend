@@ -1,0 +1,572 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Subscription_subscriptionPlanTypes",
+  "type": "object",
+  "properties": {
+    "CreateSubscriptionPlanRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "default": "USD",
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "interval": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
+        },
+        "intervalCount": {
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "trialPeriodDays": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "stripeProductId": {
+          "type": "string"
+        },
+        "stripePriceId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "price",
+        "currency",
+        "interval",
+        "intervalCount",
+        "features"
+      ],
+      "additionalProperties": false
+    },
+    "PlanSyncResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "SubscriptionPlan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "name": {
+          "description": "Name of the subscription plan",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the subscription plan",
+          "type": "string"
+        },
+        "price": {
+          "description": "Price per billing period",
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "description": "Currency code (e.g., usd, gbp)",
+          "default": "USD",
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "interval": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
+        },
+        "intervalCount": {
+          "description": "Number of intervals between billings",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "trialPeriodDays": {
+          "description": "Number of trial days",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "features": {
+          "description": "Array of feature descriptions",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "description": "Additional configuration",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "stripeProductId": {
+          "description": "Stripe product ID",
+          "type": "string"
+        },
+        "stripePriceId": {
+          "description": "Stripe price ID",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        },
+        "isActive": {
+          "description": "Whether the record is active",
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price",
+        "currency",
+        "interval",
+        "intervalCount",
+        "features",
+        "createdAt",
+        "updatedAt",
+        "isActive"
+      ],
+      "additionalProperties": false
+    },
+    "SubscriptionPlanDetailResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "name": {
+          "description": "Name of the subscription plan",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the subscription plan",
+          "type": "string"
+        },
+        "price": {
+          "description": "Price per billing period",
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "description": "Currency code (e.g., usd, gbp)",
+          "default": "USD",
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "interval": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
+        },
+        "intervalCount": {
+          "description": "Number of intervals between billings",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "trialPeriodDays": {
+          "description": "Number of trial days",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "features": {
+          "description": "Array of feature descriptions",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "description": "Additional configuration",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "stripeProductId": {
+          "description": "Stripe product ID",
+          "type": "string"
+        },
+        "stripePriceId": {
+          "description": "Stripe price ID",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        },
+        "isActive": {
+          "description": "Whether the record is active",
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price",
+        "currency",
+        "interval",
+        "intervalCount",
+        "features",
+        "createdAt",
+        "updatedAt",
+        "isActive"
+      ],
+      "additionalProperties": false
+    },
+    "SubscriptionPlanListResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Paginated response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Page items",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "name": {
+                "description": "Name of the subscription plan",
+                "type": "string"
+              },
+              "description": {
+                "description": "Description of the subscription plan",
+                "type": "string"
+              },
+              "price": {
+                "description": "Price per billing period",
+                "type": "number",
+                "minimum": 0
+              },
+              "currency": {
+                "description": "Currency code (e.g., usd, gbp)",
+                "default": "USD",
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 3
+              },
+              "interval": {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "year"
+                ]
+              },
+              "intervalCount": {
+                "description": "Number of intervals between billings",
+                "default": 1,
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "trialPeriodDays": {
+                "description": "Number of trial days",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "features": {
+                "description": "Array of feature descriptions",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "metadata": {
+                "description": "Additional configuration",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "stripeProductId": {
+                "description": "Stripe product ID",
+                "type": "string"
+              },
+              "stripePriceId": {
+                "description": "Stripe price ID",
+                "type": "string"
+              },
+              "createdAt": {
+                "description": "When the record was created",
+                "type": "string"
+              },
+              "updatedAt": {
+                "description": "When the record was last updated",
+                "type": "string"
+              },
+              "isActive": {
+                "description": "Whether the record is active",
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "price",
+              "currency",
+              "interval",
+              "intervalCount",
+              "features",
+              "createdAt",
+              "updatedAt",
+              "isActive"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "description": "Current page number",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Items per page",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "total": {
+              "description": "Total number of items",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalPages": {
+              "description": "Total number of pages",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasNext": {
+              "description": "Whether there is a next page",
+              "type": "boolean"
+            },
+            "hasPrev": {
+              "description": "Whether there is a previous page",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "page",
+            "limit",
+            "total",
+            "totalPages",
+            "hasNext",
+            "hasPrev"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
+      "additionalProperties": false
+    },
+    "SubscriptionPlanQueryParams": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "Page number",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "description": "Items per page",
+          "default": 20,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        },
+        "sortBy": {
+          "default": "name",
+          "type": "string",
+          "enum": [
+            "name",
+            "price",
+            "createdAt",
+            "updatedAt"
+          ]
+        },
+        "sortOrder": {
+          "description": "Sort order",
+          "default": "desc",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        },
+        "search": {
+          "description": "Search query",
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "interval": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
+        },
+        "planType": {
+          "type": "string",
+          "enum": [
+            "basic",
+            "premium",
+            "enterprise",
+            "trial"
+          ]
+        }
+      },
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
+      "additionalProperties": false
+    },
+    "UpdateSubscriptionPlanRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "minimum": 0
+        },
+        "trialPeriodDays": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "stripePriceId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

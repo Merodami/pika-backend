@@ -31,6 +31,12 @@ export const BusinessDetailsResponse = withTimestamps({
     .max(255)
     .optional()
     .describe('Business website URL'),
+  logoUrl: z
+    .string()
+    .url()
+    .max(512)
+    .optional()
+    .describe('Business logo image URL'),
 
   // Address Information
   street: z.string().max(255).optional().describe('Street address'),
@@ -88,6 +94,7 @@ export const UpdateBusinessDetailsRequest = z
     phone: z.string().max(20).optional(),
     email: z.string().email().max(255).optional(),
     website: z.string().url().max(255).optional(),
+    logoUrl: z.string().url().max(512).optional(),
 
     // Address Information
     street: z.string().max(255).optional(),
@@ -128,4 +135,27 @@ export const UpdateBusinessDetailsRequestSchema = openapi(
 
 export type UpdateBusinessDetailsRequest = z.infer<
   typeof UpdateBusinessDetailsRequest
+>
+
+// ============= Upload Logo Request =============
+
+/**
+ * Upload business logo response (raw Zod)
+ */
+export const UploadBusinessLogoResponse = z.object({
+  logoUrl: z.string().url().describe('URL of the uploaded business logo'),
+})
+
+/**
+ * Upload business logo response (OpenAPI documented)
+ */
+export const UploadBusinessLogoResponseSchema = openapi(
+  UploadBusinessLogoResponse,
+  {
+    description: 'Business logo upload result',
+  },
+)
+
+export type UploadBusinessLogoResponse = z.infer<
+  typeof UploadBusinessLogoResponse
 >

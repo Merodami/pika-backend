@@ -221,6 +221,7 @@ export class BusinessRepository implements IBusinessRepository {
           phone: true,
           email: true,
           website: true,
+          logoUrl: true,
           street: true,
           city: true,
           state: true,

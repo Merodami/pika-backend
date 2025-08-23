@@ -16,19 +16,19 @@
                 "description": "Universally Unique Identifier",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "businessId": {
                 "description": "Universally Unique Identifier",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "categoryId": {
                 "description": "Universally Unique Identifier",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "state": {
                 "type": "string",
@@ -55,7 +55,10 @@
               },
               "discountType": {
                 "type": "string",
-                "enum": ["fixed", "percentage"]
+                "enum": [
+                  "fixed",
+                  "percentage"
+                ]
               },
               "discountValue": {
                 "type": "number",
@@ -142,14 +145,18 @@
                       "description": "Universally Unique Identifier",
                       "type": "string",
                       "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "code": {
                       "type": "string"
                     },
                     "type": {
                       "type": "string",
-                      "enum": ["qr", "short", "static"]
+                      "enum": [
+                        "qr",
+                        "short",
+                        "static"
+                      ]
                     },
                     "isActive": {
                       "type": "boolean"
@@ -162,7 +169,12 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": ["id", "code", "type", "isActive"],
+                  "required": [
+                    "id",
+                    "code",
+                    "type",
+                    "isActive"
+                  ],
                   "additionalProperties": false
                 }
               },
@@ -182,7 +194,6 @@
             "required": [
               "id",
               "businessId",
-              "categoryId",
               "state",
               "title",
               "description",
@@ -207,7 +218,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["available", "claimed", "redeemed", "expired"]
+            "enum": [
+              "available",
+              "claimed",
+              "redeemed",
+              "expired"
+            ]
           },
           "redeemedAt": {
             "anyOf": [
@@ -222,7 +238,11 @@
             ]
           }
         },
-        "required": ["voucher", "claimedAt", "status"],
+        "required": [
+          "voucher",
+          "claimedAt",
+          "status"
+        ],
         "additionalProperties": false
       }
     },
@@ -273,6 +293,9 @@
       "additionalProperties": false
     }
   },
-  "required": ["data", "pagination"],
+  "required": [
+    "data",
+    "pagination"
+  ],
   "additionalProperties": false
 }

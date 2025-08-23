@@ -2,6 +2,7 @@ import type { IBusinessService } from '@business/services/BusinessService.js'
 import { businessPublic, mapSortOrder, shared } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
+  adaptMulterFile,
   getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
@@ -25,6 +26,7 @@ export class BusinessController {
     this.getMyBusinesses = this.getMyBusinesses.bind(this)
     this.createMyBusiness = this.createMyBusiness.bind(this)
     this.updateMyBusiness = this.updateMyBusiness.bind(this)
+    this.uploadBusinessLogo = this.uploadBusinessLogo.bind(this)
   }
 
   /**
@@ -290,6 +292,54 @@ export class BusinessController {
         businessPublic.BusinessResponse,
         response,
         'BusinessController.updateMyBusiness',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /businesses/me/logo
+   * Upload business logo for current authenticated user's business
+   */
+  async uploadBusinessLogo(
+    req: Request,
+    res: Response<businessPublic.UploadBusinessLogoResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      // Get user's business first
+      const existingBusiness = await this.businessService.getBusinessByUserId(
+        userId,
+        undefined,
+      )
+
+      // Get the uploaded file from Multer
+      const multerFile = req.file
+
+      // Validate the uploaded file (this will throw if file is undefined)
+      if (!multerFile) {
+        throw ErrorFactory.badRequest('No file uploaded')
+      }
+
+      // Adapt the multer file to our FileUpload format (file is validated above)
+      const adaptedFile = adaptMulterFile(multerFile)
+
+      const logoUrl = await this.businessService.uploadBusinessLogo(
+        existingBusiness.id,
+        adaptedFile,
+      )
+
+      const response = { logoUrl }
+      const validatedResponse = validateResponse(
+        businessPublic.UploadBusinessLogoResponse,
+        response,
+        'BusinessController.uploadBusinessLogo',
       )
 
       res.json(validatedResponse)

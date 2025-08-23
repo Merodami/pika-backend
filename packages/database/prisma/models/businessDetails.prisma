@@ -10,6 +10,7 @@ model BusinessDetails {
   phone      String?   @db.VarChar(20)
   email      String?   @db.VarChar(255)
   website    String?   @db.VarChar(255)
+  logoUrl    String?   @map("logo_url") @db.VarChar(512)
   
   // Address Information
   street     String?   @db.VarChar(255)

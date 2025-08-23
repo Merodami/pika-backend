@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "confirmAllDataAccurate": {
+      "description": "Confirm all data is accurate",
+      "type": "boolean",
+      "const": true
+    },
+    "agreedToTerms": {
+      "description": "Agree to terms and conditions",
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "confirmAllDataAccurate",
+    "agreedToTerms"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "objectType": {
+      "type": "string",
+      "const": "subscription"
+    },
+    "customer": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "incomplete",
+        "incomplete_expired",
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "unpaid",
+        "paused"
+      ]
+    },
+    "current_period_start": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "current_period_end": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "metadata": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "objectType",
+    "customer",
+    "status",
+    "current_period_start",
+    "current_period_end",
+    "metadata"
+  ],
+  "additionalProperties": false
+}

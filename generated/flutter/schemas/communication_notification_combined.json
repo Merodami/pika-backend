@@ -1,0 +1,1023 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Communication_notificationTypes",
+  "type": "object",
+  "properties": {
+    "BatchCreateNotificationsRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "userIds": {
+          "description": "Send to specific users",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "isGlobal": {
+          "description": "Send to all users",
+          "default": false,
+          "type": "boolean"
+        },
+        "notification": {
+          "type": "object",
+          "properties": {
+            "subToken": {
+              "description": "Subscription token for push notifications",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "email",
+                "inApp",
+                "sms",
+                "push"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": {
+              "type": "string"
+            },
+            "priority": {
+              "default": "normal",
+              "type": "string",
+              "enum": [
+                "low",
+                "normal",
+                "high",
+                "urgent"
+              ]
+            },
+            "category": {
+              "type": "string"
+            },
+            "actionUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "imageUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "metadata": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            },
+            "expiresAt": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            }
+          },
+          "required": [
+            "description",
+            "priority"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "isGlobal",
+        "notification"
+      ],
+      "additionalProperties": false
+    },
+    "CreateNotificationRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "subToken": {
+          "description": "Subscription token for push notifications",
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": {
+          "type": "string"
+        },
+        "isGlobal": {
+          "default": false,
+          "type": "boolean"
+        },
+        "priority": {
+          "default": "normal",
+          "type": "string",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
+        },
+        "category": {
+          "type": "string"
+        },
+        "actionUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "imageUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "expiresAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "isGlobal",
+        "priority"
+      ],
+      "additionalProperties": false
+    },
+    "DeleteNotificationResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "message": {
+          "default": "Notification deleted successfully",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "MarkAllAsReadResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "updated": {
+          "description": "Number of notifications marked as read",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "updated"
+      ],
+      "additionalProperties": false
+    },
+    "MarkNotificationsReadRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "notificationIds": {
+          "type": "array",
+          "items": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "all": {
+          "default": false,
+          "type": "boolean"
+        },
+        "category": {
+          "description": "Mark all in category as read",
+          "type": "string"
+        }
+      },
+      "required": [
+        "all"
+      ],
+      "additionalProperties": false
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "description": "User ID who receives the notification",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
+        },
+        "status": {
+          "default": "pending",
+          "type": "string",
+          "enum": [
+            "pending",
+            "sent",
+            "delivered",
+            "failed",
+            "read"
+          ]
+        },
+        "priority": {
+          "default": "normal",
+          "type": "string",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": {
+          "type": "string"
+        },
+        "isGlobal": {
+          "description": "Whether this is a global notification",
+          "default": false,
+          "type": "boolean"
+        },
+        "isRead": {
+          "description": "Whether the notification has been read",
+          "default": false,
+          "type": "boolean"
+        },
+        "readAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "metadata": {
+          "description": "Additional metadata for the notification",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "category": {
+          "description": "Notification category for filtering",
+          "type": "string"
+        },
+        "actionUrl": {
+          "description": "URL to navigate when notification is clicked",
+          "type": "string",
+          "format": "uri"
+        },
+        "imageUrl": {
+          "description": "Notification image",
+          "type": "string",
+          "format": "uri"
+        },
+        "expiresAt": {
+          "description": "When the notification expires",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "priority",
+        "isGlobal",
+        "isRead",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationListResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Paginated response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Page items",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "userId": {
+                "description": "User ID who receives the notification",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "email",
+                  "inApp",
+                  "sms",
+                  "push"
+                ]
+              },
+              "status": {
+                "default": "pending",
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "sent",
+                  "delivered",
+                  "failed",
+                  "read"
+                ]
+              },
+              "priority": {
+                "default": "normal",
+                "type": "string",
+                "enum": [
+                  "low",
+                  "normal",
+                  "high",
+                  "urgent"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "description": {
+                "type": "string"
+              },
+              "isGlobal": {
+                "description": "Whether this is a global notification",
+                "default": false,
+                "type": "boolean"
+              },
+              "isRead": {
+                "description": "Whether the notification has been read",
+                "default": false,
+                "type": "boolean"
+              },
+              "readAt": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              },
+              "metadata": {
+                "description": "Additional metadata for the notification",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "category": {
+                "description": "Notification category for filtering",
+                "type": "string"
+              },
+              "actionUrl": {
+                "description": "URL to navigate when notification is clicked",
+                "type": "string",
+                "format": "uri"
+              },
+              "imageUrl": {
+                "description": "Notification image",
+                "type": "string",
+                "format": "uri"
+              },
+              "expiresAt": {
+                "description": "When the notification expires",
+                "type": "string"
+              },
+              "createdAt": {
+                "description": "When the record was created",
+                "type": "string"
+              },
+              "updatedAt": {
+                "description": "When the record was last updated",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "priority",
+              "isGlobal",
+              "isRead",
+              "createdAt",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "description": "Current page number",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Items per page",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "total": {
+              "description": "Total number of items",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalPages": {
+              "description": "Total number of pages",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasNext": {
+              "description": "Whether there is a next page",
+              "type": "boolean"
+            },
+            "hasPrev": {
+              "description": "Whether there is a previous page",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "page",
+            "limit",
+            "total",
+            "totalPages",
+            "hasNext",
+            "hasPrev"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationPreferencesResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "inApp": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "sms": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "push": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "token": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "quietHours": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "start": {
+              "type": "string",
+              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            "end": {
+              "type": "string",
+              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            "timezone": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "email",
+        "inApp",
+        "sms",
+        "push",
+        "quietHours"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "description": "User ID who receives the notification",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
+        },
+        "status": {
+          "default": "pending",
+          "type": "string",
+          "enum": [
+            "pending",
+            "sent",
+            "delivered",
+            "failed",
+            "read"
+          ]
+        },
+        "priority": {
+          "default": "normal",
+          "type": "string",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "description": {
+          "type": "string"
+        },
+        "isGlobal": {
+          "description": "Whether this is a global notification",
+          "default": false,
+          "type": "boolean"
+        },
+        "isRead": {
+          "description": "Whether the notification has been read",
+          "default": false,
+          "type": "boolean"
+        },
+        "readAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "metadata": {
+          "description": "Additional metadata for the notification",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "category": {
+          "description": "Notification category for filtering",
+          "type": "string"
+        },
+        "actionUrl": {
+          "description": "URL to navigate when notification is clicked",
+          "type": "string",
+          "format": "uri"
+        },
+        "imageUrl": {
+          "description": "Notification image",
+          "type": "string",
+          "format": "uri"
+        },
+        "expiresAt": {
+          "description": "When the notification expires",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "priority",
+        "isGlobal",
+        "isRead",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "NotificationSearchParams": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "Page number",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "description": "Items per page",
+          "default": 20,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        },
+        "sortBy": {
+          "default": "createdAt",
+          "type": "string",
+          "enum": [
+            "createdAt",
+            "priority",
+            "expiresAt"
+          ]
+        },
+        "sortOrder": {
+          "description": "Sort order",
+          "default": "desc",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        },
+        "search": {
+          "description": "Search query",
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "sent",
+            "delivered",
+            "failed",
+            "read"
+          ]
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
+        },
+        "isRead": {
+          "type": "boolean"
+        },
+        "isGlobal": {
+          "type": "boolean"
+        },
+        "category": {
+          "type": "string"
+        },
+        "fromDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "toDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
+      "additionalProperties": false
+    },
+    "RegisterPushTokenRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "ios",
+            "android",
+            "web",
+            "desktop",
+            "other"
+          ]
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "deviceName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "token",
+        "platform"
+      ],
+      "additionalProperties": false
+    },
+    "UnregisterPushTokenRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "token"
+      ],
+      "additionalProperties": false
+    },
+    "UpdateNotificationPreferencesRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "inApp": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "sms": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "push": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            },
+            "categories": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "token": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "categories"
+          ],
+          "additionalProperties": false
+        },
+        "quietHours": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "start": {
+              "type": "string",
+              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            "end": {
+              "type": "string",
+              "pattern": "^([01]?[0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            "timezone": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "UpdateNotificationStatusRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "isRead": {
+          "type": "boolean"
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "queued",
+        "sent",
+        "delivered",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "deliveredAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "openedAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "clickedAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "failedAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "errorCode": {
+      "type": "string"
+    },
+    "errorMessage": {
+      "type": "string"
+    },
+    "bounceType": {
+      "type": "string",
+      "enum": [
+        "soft",
+        "hard"
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    }
+  },
+  "required": [
+    "status"
+  ],
+  "additionalProperties": false
+}

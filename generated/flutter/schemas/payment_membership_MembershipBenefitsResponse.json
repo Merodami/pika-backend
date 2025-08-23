@@ -1,0 +1,242 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "membership": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "stripeCustomerId": {
+          "description": "Stripe customer ID",
+          "type": "string"
+        },
+        "stripeSubscriptionId": {
+          "description": "Stripe subscription ID",
+          "type": "string"
+        },
+        "active": {
+          "default": false,
+          "type": "boolean"
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "enum": [
+            "active",
+            "pastDue",
+            "canceled",
+            "incomplete",
+            "incompleteExpired",
+            "trialing",
+            "unpaid"
+          ]
+        },
+        "planType": {
+          "type": "string",
+          "enum": [
+            "basic",
+            "premium",
+            "enterprise",
+            "trial"
+          ]
+        },
+        "lastPaymentDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodStart": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodEnd": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "cancelAtPeriodEnd": {
+          "default": false,
+          "type": "boolean"
+        },
+        "cancelledAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "trialStart": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "trialEnd": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        },
+        "plan": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "price": {
+              "description": "Monthly price in cents",
+              "type": "number"
+            },
+            "currency": {
+              "default": "usd",
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 3
+            },
+            "features": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "creditsPerMonth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "maxBookingsPerMonth": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "priorityBooking": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "price",
+            "currency",
+            "features",
+            "priorityBooking"
+          ],
+          "additionalProperties": false
+        },
+        "benefits": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "active",
+        "subscriptionStatus",
+        "planType",
+        "cancelAtPeriodEnd",
+        "createdAt",
+        "updatedAt",
+        "plan",
+        "benefits"
+      ],
+      "additionalProperties": false
+    },
+    "availablePlans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "basic",
+              "premium",
+              "enterprise",
+              "trial"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "highlighted": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "description",
+          "price",
+          "currency",
+          "features",
+          "highlighted"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "comparePlans": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "availablePlans",
+    "comparePlans"
+  ],
+  "additionalProperties": false
+}

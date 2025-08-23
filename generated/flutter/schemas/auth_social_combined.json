@@ -1,0 +1,459 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Auth_socialTypes",
+  "type": "object",
+  "properties": {
+    "DeviceInfo": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "deviceId": {
+          "description": "Unique device identifier",
+          "type": "string"
+        },
+        "deviceName": {
+          "description": "Device name or model",
+          "type": "string"
+        },
+        "deviceType": {
+          "type": "string",
+          "enum": [
+            "ios",
+            "android",
+            "web",
+            "desktop"
+          ]
+        },
+        "browserInfo": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "userAgent": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "fcmToken": {
+          "description": "Firebase Cloud Messaging token",
+          "type": "string"
+        },
+        "ipAddress": {
+          "description": "Device IP address",
+          "type": "string"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "number"
+            },
+            "lng": {
+              "type": "number"
+            },
+            "city": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "GetLinkedAccountsResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "linkedAccounts": {
+          "description": "List of linked social accounts with details",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "google",
+                  "facebook",
+                  "apple"
+                ]
+              },
+              "email": {
+                "type": "string"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "photoUrl": {
+                "type": "string",
+                "format": "uri"
+              },
+              "linkedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+              }
+            },
+            "required": [
+              "provider",
+              "linkedAt"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "linkedAccounts"
+      ],
+      "additionalProperties": false
+    },
+    "LinkAccountRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "Social provider to link",
+          "type": "string",
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
+        },
+        "idToken": {
+          "description": "Firebase ID token from provider",
+          "type": "string",
+          "minLength": 1
+        },
+        "replace": {
+          "description": "Replace existing linked account",
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "provider",
+        "idToken",
+        "replace"
+      ],
+      "additionalProperties": false
+    },
+    "LinkAccountResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "success": {
+          "description": "Whether linking was successful",
+          "type": "boolean"
+        },
+        "message": {
+          "description": "Success or error message",
+          "type": "string"
+        },
+        "linkedAccounts": {
+          "description": "Updated list of linked accounts",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "google",
+              "facebook",
+              "apple"
+            ]
+          }
+        }
+      },
+      "required": [
+        "success",
+        "message",
+        "linkedAccounts"
+      ],
+      "additionalProperties": false
+    },
+    "LinkedAccountDetails": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
+        },
+        "email": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "photoUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "linkedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        }
+      },
+      "required": [
+        "provider",
+        "linkedAt"
+      ],
+      "additionalProperties": false
+    },
+    "SocialLoginRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "Social auth provider",
+          "type": "string",
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
+        },
+        "idToken": {
+          "description": "Firebase ID token from social provider",
+          "type": "string",
+          "minLength": 1
+        },
+        "accessToken": {
+          "description": "Provider access token (optional)",
+          "type": "string"
+        },
+        "deviceInfo": {
+          "description": "Device information for tracking",
+          "type": "object",
+          "properties": {
+            "deviceId": {
+              "description": "Unique device identifier",
+              "type": "string"
+            },
+            "deviceName": {
+              "description": "Device name or model",
+              "type": "string"
+            },
+            "deviceType": {
+              "type": "string",
+              "enum": [
+                "ios",
+                "android",
+                "web",
+                "desktop"
+              ]
+            },
+            "browserInfo": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "string"
+                },
+                "userAgent": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "fcmToken": {
+              "description": "Firebase Cloud Messaging token",
+              "type": "string"
+            },
+            "ipAddress": {
+              "description": "Device IP address",
+              "type": "string"
+            },
+            "location": {
+              "type": "object",
+              "properties": {
+                "lat": {
+                  "type": "number"
+                },
+                "lng": {
+                  "type": "number"
+                },
+                "city": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "marketingConsent": {
+          "description": "Marketing consent",
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "provider",
+        "idToken",
+        "marketingConsent"
+      ],
+      "additionalProperties": false
+    },
+    "SocialLoginResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "user": {
+          "description": "Authenticated user information",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "email": {
+              "type": "string"
+            },
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            },
+            "profilePicture": {
+              "type": "string",
+              "format": "uri"
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "admin",
+                "customer",
+                "business"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "email",
+            "firstName",
+            "lastName",
+            "role"
+          ],
+          "additionalProperties": false
+        },
+        "accessToken": {
+          "description": "JWT access token",
+          "type": "string",
+          "minLength": 1
+        },
+        "refreshToken": {
+          "description": "JWT refresh token",
+          "type": "string",
+          "minLength": 1
+        },
+        "tokenType": {
+          "description": "Token type",
+          "type": "string",
+          "const": "Bearer"
+        },
+        "expiresIn": {
+          "description": "Token lifetime in seconds",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "isNewUser": {
+          "description": "Whether this is a newly created user",
+          "type": "boolean"
+        },
+        "linkedAccounts": {
+          "description": "List of linked social accounts",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "google",
+              "facebook",
+              "apple"
+            ]
+          }
+        }
+      },
+      "required": [
+        "user",
+        "accessToken",
+        "refreshToken",
+        "tokenType",
+        "expiresIn",
+        "isNewUser"
+      ],
+      "additionalProperties": false
+    },
+    "UnlinkAccountRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "description": "Social provider to unlink",
+          "type": "string",
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "additionalProperties": false
+    },
+    "UnlinkAccountResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "success": {
+          "description": "Whether unlinking was successful",
+          "type": "boolean"
+        },
+        "message": {
+          "description": "Success or error message",
+          "type": "string"
+        },
+        "linkedAccounts": {
+          "description": "Updated list of linked accounts",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "google",
+              "facebook",
+              "apple"
+            ]
+          }
+        }
+      },
+      "required": [
+        "success",
+        "message",
+        "linkedAccounts"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

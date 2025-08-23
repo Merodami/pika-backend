@@ -2,7 +2,7 @@
 import { BUSINESS_SERVICE_PORT, REDIS_PASSWORD } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { initializeCache, RedisConfigService } from '@pika/redis'
-import { logger, UserServiceClient } from '@pika/shared'
+import { logger, StorageServiceClient, UserServiceClient } from '@pika/shared'
 import { createTranslationService, TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 import { Redis } from 'ioredis'
@@ -50,6 +50,10 @@ export async function startBusinessService() {
 
   // Initialize service clients for inter-service communication
   const userServiceClient = new UserServiceClient()
+  
+  // Initialize storage service client for file uploads
+  logger.info('Initializing storage service client for file uploads')
+  const storageServiceClient = new StorageServiceClient()
 
   logger.info(`Business service starting on port: ${BUSINESS_SERVICE_PORT}`)
 
@@ -59,6 +63,7 @@ export async function startBusinessService() {
     cacheService,
     translationClient,
     userServiceClient,
+    storageServiceClient,
   })
 
   // Start the server

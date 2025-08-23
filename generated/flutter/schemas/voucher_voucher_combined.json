@@ -14,19 +14,19 @@
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "businessId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "categoryId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "state": {
               "type": "string",
@@ -53,7 +53,10 @@
             },
             "discountType": {
               "type": "string",
-              "enum": ["fixed", "percentage"]
+              "enum": [
+                "fixed",
+                "percentage"
+              ]
             },
             "discountValue": {
               "type": "number",
@@ -140,14 +143,18 @@
                     "description": "Universally Unique Identifier",
                     "type": "string",
                     "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "code": {
                     "type": "string"
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["qr", "short", "static"]
+                    "enum": [
+                      "qr",
+                      "short",
+                      "static"
+                    ]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -160,7 +167,12 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": ["id", "code", "type", "isActive"],
+                "required": [
+                  "id",
+                  "code",
+                  "type",
+                  "isActive"
+                ],
                 "additionalProperties": false
               }
             },
@@ -180,7 +192,6 @@
           "required": [
             "id",
             "businessId",
-            "categoryId",
             "state",
             "title",
             "description",
@@ -205,7 +216,12 @@
         },
         "status": {
           "type": "string",
-          "enum": ["available", "claimed", "redeemed", "expired"]
+          "enum": [
+            "available",
+            "claimed",
+            "redeemed",
+            "expired"
+          ]
         },
         "redeemedAt": {
           "anyOf": [
@@ -220,7 +236,11 @@
           ]
         }
       },
-      "required": ["voucher", "claimedAt", "status"],
+      "required": [
+        "voucher",
+        "claimedAt",
+        "status"
+      ],
       "additionalProperties": false
     },
     "UserVouchersListResponse": {
@@ -241,19 +261,19 @@
                     "description": "Universally Unique Identifier",
                     "type": "string",
                     "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "businessId": {
                     "description": "Universally Unique Identifier",
                     "type": "string",
                     "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "categoryId": {
                     "description": "Universally Unique Identifier",
                     "type": "string",
                     "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "state": {
                     "type": "string",
@@ -280,7 +300,10 @@
                   },
                   "discountType": {
                     "type": "string",
-                    "enum": ["fixed", "percentage"]
+                    "enum": [
+                      "fixed",
+                      "percentage"
+                    ]
                   },
                   "discountValue": {
                     "type": "number",
@@ -367,14 +390,18 @@
                           "description": "Universally Unique Identifier",
                           "type": "string",
                           "format": "uuid",
-                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                         },
                         "code": {
                           "type": "string"
                         },
                         "type": {
                           "type": "string",
-                          "enum": ["qr", "short", "static"]
+                          "enum": [
+                            "qr",
+                            "short",
+                            "static"
+                          ]
                         },
                         "isActive": {
                           "type": "boolean"
@@ -387,7 +414,12 @@
                           "additionalProperties": {}
                         }
                       },
-                      "required": ["id", "code", "type", "isActive"],
+                      "required": [
+                        "id",
+                        "code",
+                        "type",
+                        "isActive"
+                      ],
                       "additionalProperties": false
                     }
                   },
@@ -407,7 +439,6 @@
                 "required": [
                   "id",
                   "businessId",
-                  "categoryId",
                   "state",
                   "title",
                   "description",
@@ -432,7 +463,12 @@
               },
               "status": {
                 "type": "string",
-                "enum": ["available", "claimed", "redeemed", "expired"]
+                "enum": [
+                  "available",
+                  "claimed",
+                  "redeemed",
+                  "expired"
+                ]
               },
               "redeemedAt": {
                 "anyOf": [
@@ -447,7 +483,11 @@
                 ]
               }
             },
-            "required": ["voucher", "claimedAt", "status"],
+            "required": [
+              "voucher",
+              "claimedAt",
+              "status"
+            ],
             "additionalProperties": false
           }
         },
@@ -498,7 +538,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "VoucherClaimRequest": {
@@ -519,7 +562,10 @@
               "maximum": 30
             }
           },
-          "required": ["enableReminders", "reminderDaysBefore"],
+          "required": [
+            "enableReminders",
+            "reminderDaysBefore"
+          ],
           "additionalProperties": false
         }
       },
@@ -533,7 +579,7 @@
           "description": "Universally Unique Identifier",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "voucher": {
           "type": "object",
@@ -542,19 +588,19 @@
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "businessId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "categoryId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "state": {
               "type": "string",
@@ -581,7 +627,10 @@
             },
             "discountType": {
               "type": "string",
-              "enum": ["fixed", "percentage"]
+              "enum": [
+                "fixed",
+                "percentage"
+              ]
             },
             "discountValue": {
               "type": "number",
@@ -668,14 +717,18 @@
                     "description": "Universally Unique Identifier",
                     "type": "string",
                     "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "code": {
                     "type": "string"
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["qr", "short", "static"]
+                    "enum": [
+                      "qr",
+                      "short",
+                      "static"
+                    ]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -688,7 +741,12 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": ["id", "code", "type", "isActive"],
+                "required": [
+                  "id",
+                  "code",
+                  "type",
+                  "isActive"
+                ],
                 "additionalProperties": false
               }
             },
@@ -708,7 +766,6 @@
           "required": [
             "id",
             "businessId",
-            "categoryId",
             "state",
             "title",
             "description",
@@ -766,14 +823,18 @@
           "description": "Universally Unique Identifier",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "code": {
           "type": "string"
         },
         "type": {
           "type": "string",
-          "enum": ["qr", "short", "static"]
+          "enum": [
+            "qr",
+            "short",
+            "static"
+          ]
         },
         "isActive": {
           "type": "boolean"
@@ -786,7 +847,12 @@
           "additionalProperties": {}
         }
       },
-      "required": ["id", "code", "type", "isActive"],
+      "required": [
+        "id",
+        "code",
+        "type",
+        "isActive"
+      ],
       "additionalProperties": false
     },
     "VoucherListResponse": {
@@ -804,19 +870,19 @@
                 "description": "Universally Unique Identifier",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "businessId": {
                 "description": "Universally Unique Identifier",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "categoryId": {
                 "description": "Universally Unique Identifier",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "state": {
                 "type": "string",
@@ -843,7 +909,10 @@
               },
               "discountType": {
                 "type": "string",
-                "enum": ["fixed", "percentage"]
+                "enum": [
+                  "fixed",
+                  "percentage"
+                ]
               },
               "discountValue": {
                 "type": "number",
@@ -930,14 +999,18 @@
                       "description": "Universally Unique Identifier",
                       "type": "string",
                       "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
                     "code": {
                       "type": "string"
                     },
                     "type": {
                       "type": "string",
-                      "enum": ["qr", "short", "static"]
+                      "enum": [
+                        "qr",
+                        "short",
+                        "static"
+                      ]
                     },
                     "isActive": {
                       "type": "boolean"
@@ -950,7 +1023,12 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": ["id", "code", "type", "isActive"],
+                  "required": [
+                    "id",
+                    "code",
+                    "type",
+                    "isActive"
+                  ],
                   "additionalProperties": false
                 }
               },
@@ -970,7 +1048,6 @@
             "required": [
               "id",
               "businessId",
-              "categoryId",
               "state",
               "title",
               "description",
@@ -1036,7 +1113,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "VoucherQueryParams": {
@@ -1072,7 +1152,10 @@
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search query",
@@ -1082,13 +1165,13 @@
           "description": "Filter by business ID",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "categoryId": {
           "description": "Filter by category ID",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "state": {
           "description": "Filter by voucher state",
@@ -1105,7 +1188,10 @@
         "discountType": {
           "description": "Filter by discount type",
           "type": "string",
-          "enum": ["fixed", "percentage"]
+          "enum": [
+            "fixed",
+            "percentage"
+          ]
         },
         "minDiscount": {
           "description": "Minimum discount value",
@@ -1189,7 +1275,12 @@
           "type": "boolean"
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "VoucherRedeemRequest": {
@@ -1216,11 +1307,16 @@
               "maximum": 180
             }
           },
-          "required": ["lat", "lng"],
+          "required": [
+            "lat",
+            "lng"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["code"],
+      "required": [
+        "code"
+      ],
       "additionalProperties": false
     },
     "VoucherRedeemResponse": {
@@ -1234,7 +1330,7 @@
           "description": "Universally Unique Identifier",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "redeemedAt": {
           "type": "string",
@@ -1252,19 +1348,19 @@
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "businessId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "categoryId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "state": {
               "type": "string",
@@ -1291,7 +1387,10 @@
             },
             "discountType": {
               "type": "string",
-              "enum": ["fixed", "percentage"]
+              "enum": [
+                "fixed",
+                "percentage"
+              ]
             },
             "discountValue": {
               "type": "number",
@@ -1378,14 +1477,18 @@
                     "description": "Universally Unique Identifier",
                     "type": "string",
                     "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "code": {
                     "type": "string"
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["qr", "short", "static"]
+                    "enum": [
+                      "qr",
+                      "short",
+                      "static"
+                    ]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -1398,7 +1501,12 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": ["id", "code", "type", "isActive"],
+                "required": [
+                  "id",
+                  "code",
+                  "type",
+                  "isActive"
+                ],
                 "additionalProperties": false
               }
             },
@@ -1418,7 +1526,6 @@
           "required": [
             "id",
             "businessId",
-            "categoryId",
             "state",
             "title",
             "description",
@@ -1454,19 +1561,19 @@
           "description": "Universally Unique Identifier",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "businessId": {
           "description": "Universally Unique Identifier",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "categoryId": {
           "description": "Universally Unique Identifier",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "state": {
           "type": "string",
@@ -1493,7 +1600,10 @@
         },
         "discountType": {
           "type": "string",
-          "enum": ["fixed", "percentage"]
+          "enum": [
+            "fixed",
+            "percentage"
+          ]
         },
         "discountValue": {
           "type": "number",
@@ -1580,14 +1690,18 @@
                 "description": "Universally Unique Identifier",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "code": {
                 "type": "string"
               },
               "type": {
                 "type": "string",
-                "enum": ["qr", "short", "static"]
+                "enum": [
+                  "qr",
+                  "short",
+                  "static"
+                ]
               },
               "isActive": {
                 "type": "boolean"
@@ -1600,7 +1714,12 @@
                 "additionalProperties": {}
               }
             },
-            "required": ["id", "code", "type", "isActive"],
+            "required": [
+              "id",
+              "code",
+              "type",
+              "isActive"
+            ],
             "additionalProperties": false
           }
         },
@@ -1620,7 +1739,6 @@
       "required": [
         "id",
         "businessId",
-        "categoryId",
         "state",
         "title",
         "description",
@@ -1644,7 +1762,12 @@
       "properties": {
         "scanSource": {
           "type": "string",
-          "enum": ["camera", "gallery", "link", "share"]
+          "enum": [
+            "camera",
+            "gallery",
+            "link",
+            "share"
+          ]
         },
         "location": {
           "type": "object",
@@ -1662,7 +1785,10 @@
               "maximum": 180
             }
           },
-          "required": ["lat", "lng"],
+          "required": [
+            "lat",
+            "lng"
+          ],
           "additionalProperties": false
         },
         "deviceInfo": {
@@ -1673,7 +1799,13 @@
             },
             "platform": {
               "type": "string",
-              "enum": ["ios", "android", "web", "desktop", "other"]
+              "enum": [
+                "ios",
+                "android",
+                "web",
+                "desktop",
+                "other"
+              ]
             },
             "appVersion": {
               "type": "string"
@@ -1698,19 +1830,19 @@
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "businessId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "categoryId": {
               "description": "Universally Unique Identifier",
               "type": "string",
               "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             },
             "state": {
               "type": "string",
@@ -1737,7 +1869,10 @@
             },
             "discountType": {
               "type": "string",
-              "enum": ["fixed", "percentage"]
+              "enum": [
+                "fixed",
+                "percentage"
+              ]
             },
             "discountValue": {
               "type": "number",
@@ -1824,14 +1959,18 @@
                     "description": "Universally Unique Identifier",
                     "type": "string",
                     "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                   },
                   "code": {
                     "type": "string"
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["qr", "short", "static"]
+                    "enum": [
+                      "qr",
+                      "short",
+                      "static"
+                    ]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -1844,7 +1983,12 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": ["id", "code", "type", "isActive"],
+                "required": [
+                  "id",
+                  "code",
+                  "type",
+                  "isActive"
+                ],
                 "additionalProperties": false
               }
             },
@@ -1864,7 +2008,6 @@
           "required": [
             "id",
             "businessId",
-            "categoryId",
             "state",
             "title",
             "description",
@@ -1886,7 +2029,7 @@
           "description": "Universally Unique Identifier",
           "type": "string",
           "format": "uuid",
-          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         },
         "canClaim": {
           "type": "boolean"
@@ -1924,16 +2067,29 @@
                     "maximum": 180
                   }
                 },
-                "required": ["lat", "lng"],
+                "required": [
+                  "lat",
+                  "lng"
+                ],
                 "additionalProperties": false
               }
             },
-            "required": ["name", "address", "distance", "coordinates"],
+            "required": [
+              "name",
+              "address",
+              "distance",
+              "coordinates"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["voucher", "scanId", "canClaim", "alreadyClaimed"],
+      "required": [
+        "voucher",
+        "scanId",
+        "canClaim",
+        "alreadyClaimed"
+      ],
       "additionalProperties": false
     }
   }

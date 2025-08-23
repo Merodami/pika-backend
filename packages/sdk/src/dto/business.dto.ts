@@ -14,6 +14,7 @@ export interface BusinessDetailsDTO {
   phone?: string
   email?: string
   website?: string
+  logoUrl?: string
   street?: string
   city?: string
   state?: string

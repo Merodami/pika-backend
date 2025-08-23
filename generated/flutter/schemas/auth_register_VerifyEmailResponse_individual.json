@@ -11,6 +11,9 @@
       "type": "boolean"
     }
   },
-  "required": ["message", "emailVerified"],
+  "required": [
+    "message",
+    "emailVerified"
+  ],
   "additionalProperties": false
 }

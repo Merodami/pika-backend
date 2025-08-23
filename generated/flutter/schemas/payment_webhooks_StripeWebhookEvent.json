@@ -1,0 +1,1535 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "payment_intent.succeeded"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "payment_intent"
+                },
+                "amount": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "currency": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                "customer": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "requires_payment_method",
+                    "requires_confirmation",
+                    "requires_action",
+                    "processing",
+                    "requires_capture",
+                    "canceled",
+                    "succeeded"
+                  ]
+                },
+                "created": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "amount",
+                "currency",
+                "customer",
+                "metadata",
+                "status",
+                "created"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "payment_intent.payment_failed"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "payment_intent"
+                },
+                "amount": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "currency": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                "customer": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "requires_payment_method",
+                    "requires_confirmation",
+                    "requires_action",
+                    "processing",
+                    "requires_capture",
+                    "canceled",
+                    "succeeded"
+                  ]
+                },
+                "created": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "amount",
+                "currency",
+                "customer",
+                "metadata",
+                "status",
+                "created"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "payment_intent.canceled"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "payment_intent"
+                },
+                "amount": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "currency": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                "customer": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "requires_payment_method",
+                    "requires_confirmation",
+                    "requires_action",
+                    "processing",
+                    "requires_capture",
+                    "canceled",
+                    "succeeded"
+                  ]
+                },
+                "created": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "amount",
+                "currency",
+                "customer",
+                "metadata",
+                "status",
+                "created"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "customer.subscription.created"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "subscription"
+                },
+                "customer": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "incomplete",
+                    "incomplete_expired",
+                    "trialing",
+                    "active",
+                    "past_due",
+                    "canceled",
+                    "unpaid",
+                    "paused"
+                  ]
+                },
+                "current_period_start": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "current_period_end": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "customer",
+                "status",
+                "current_period_start",
+                "current_period_end",
+                "metadata"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "customer.subscription.updated"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "subscription"
+                },
+                "customer": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "incomplete",
+                    "incomplete_expired",
+                    "trialing",
+                    "active",
+                    "past_due",
+                    "canceled",
+                    "unpaid",
+                    "paused"
+                  ]
+                },
+                "current_period_start": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "current_period_end": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "customer",
+                "status",
+                "current_period_start",
+                "current_period_end",
+                "metadata"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "customer.subscription.deleted"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "subscription"
+                },
+                "customer": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "incomplete",
+                    "incomplete_expired",
+                    "trialing",
+                    "active",
+                    "past_due",
+                    "canceled",
+                    "unpaid",
+                    "paused"
+                  ]
+                },
+                "current_period_start": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "current_period_end": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "customer",
+                "status",
+                "current_period_start",
+                "current_period_end",
+                "metadata"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "invoice.payment_succeeded"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "invoice"
+                },
+                "customer": {
+                  "type": "string"
+                },
+                "subscription": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "amount_paid": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "amount_due": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "currency": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "draft",
+                    "open",
+                    "paid",
+                    "uncollectible",
+                    "void"
+                  ]
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "customer",
+                "subscription",
+                "amount_paid",
+                "amount_due",
+                "currency",
+                "status",
+                "metadata"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "invoice.payment_failed"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "invoice"
+                },
+                "customer": {
+                  "type": "string"
+                },
+                "subscription": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "amount_paid": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "amount_due": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "currency": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "draft",
+                    "open",
+                    "paid",
+                    "uncollectible",
+                    "void"
+                  ]
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "customer",
+                "subscription",
+                "amount_paid",
+                "amount_due",
+                "currency",
+                "status",
+                "metadata"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "checkout.session.completed"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "checkout.session"
+                },
+                "customer": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "payment_intent": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "subscription": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "amount_total": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "currency": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 3,
+                      "maxLength": 3
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "payment_status": {
+                  "type": "string",
+                  "enum": [
+                    "paid",
+                    "unpaid",
+                    "no_payment_required"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "customer",
+                "payment_intent",
+                "subscription",
+                "amount_total",
+                "currency",
+                "metadata",
+                "payment_status"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "const": "checkout.session.expired"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "objectData": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string",
+                  "const": "checkout.session"
+                },
+                "customer": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "payment_intent": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "subscription": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "amount_total": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "currency": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 3,
+                      "maxLength": 3
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "metadata": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "payment_status": {
+                  "type": "string",
+                  "enum": [
+                    "paid",
+                    "unpaid",
+                    "no_payment_required"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "objectType",
+                "customer",
+                "payment_intent",
+                "subscription",
+                "amount_total",
+                "currency",
+                "metadata",
+                "payment_status"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "objectData"
+          ],
+          "additionalProperties": false
+        },
+        "created": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "livemode": {
+          "type": "boolean"
+        },
+        "pending_webhooks": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "request": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "idempotency_key": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "idempotency_key"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "data",
+        "created",
+        "livemode",
+        "pending_webhooks",
+        "request"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

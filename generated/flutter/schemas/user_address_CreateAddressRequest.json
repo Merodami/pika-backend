@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "street": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "street2": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "city": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "state": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "postalCode": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20
+    },
+    "country": {
+      "description": "ISO 3166-1 alpha-2 country code",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "home",
+        "work",
+        "billing",
+        "shipping",
+        "other"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "isDefault": {
+      "type": "boolean"
+    },
+    "instructions": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "accessCode": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "coordinates": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "description": "Latitude",
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lng": {
+          "description": "Longitude",
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "street",
+    "city",
+    "state",
+    "postalCode",
+    "country",
+    "type"
+  ],
+  "additionalProperties": false
+}

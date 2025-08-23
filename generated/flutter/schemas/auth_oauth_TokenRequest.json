@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "grantType": {
+          "type": "string",
+          "const": "password"
+        },
+        "username": {
+          "description": "User email address"
+        },
+        "password": {
+          "description": "User password",
+          "type": "string",
+          "minLength": 8
+        },
+        "scope": {
+          "description": "Requested permissions",
+          "type": "string"
+        }
+      },
+      "required": [
+        "grantType",
+        "username",
+        "password"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "grantType": {
+          "type": "string",
+          "const": "refreshToken"
+        },
+        "refreshToken": {
+          "description": "Valid refresh token",
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "description": "Requested permissions (subset of original)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "grantType",
+        "refreshToken"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

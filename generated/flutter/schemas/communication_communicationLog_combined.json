@@ -1,0 +1,1373 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Communication_communicationLogTypes",
+  "type": "object",
+  "properties": {
+    "BulkCommunicationLogResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "error": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "index",
+              "error"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "created",
+        "failed"
+      ],
+      "additionalProperties": false
+    },
+    "BulkCreateCommunicationLogsRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "logs": {
+          "minItems": 1,
+          "maxItems": 1000,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "channel": {
+                "type": "string",
+                "enum": [
+                  "email",
+                  "sms",
+                  "push",
+                  "inApp",
+                  "webhook"
+                ]
+              },
+              "direction": {
+                "default": "outbound",
+                "type": "string",
+                "enum": [
+                  "inbound",
+                  "outbound"
+                ]
+              },
+              "status": {
+                "default": "pending",
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "queued",
+                  "sent",
+                  "delivered",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "userId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "recipient": {
+                "type": "string"
+              },
+              "sender": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "templateId": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "templateName": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "messageId": {
+                "type": "string"
+              },
+              "conversationId": {
+                "type": "string"
+              },
+              "referenceId": {
+                "type": "string"
+              },
+              "referenceType": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "channel",
+              "direction",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "logs"
+      ],
+      "additionalProperties": false
+    },
+    "CommunicationAnalyticsRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "sms",
+            "push",
+            "inApp",
+            "webhook"
+          ]
+        },
+        "fromDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "toDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "groupBy": {
+          "default": "day",
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month"
+          ]
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "templateId": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fromDate",
+        "toDate",
+        "groupBy"
+      ],
+      "additionalProperties": false
+    },
+    "CommunicationAnalyticsResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "object",
+          "properties": {
+            "totalSent": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalDelivered": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalOpened": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalClicked": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalFailed": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalBounced": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "deliveryRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "openRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "clickRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "bounceRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "totalSent",
+            "totalDelivered",
+            "totalOpened",
+            "totalClicked",
+            "totalFailed",
+            "totalBounced",
+            "deliveryRate",
+            "openRate",
+            "clickRate",
+            "bounceRate"
+          ],
+          "additionalProperties": false
+        },
+        "byChannel": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "channel": {
+                "type": "string",
+                "enum": [
+                  "email",
+                  "sms",
+                  "push",
+                  "inApp",
+                  "webhook"
+                ]
+              },
+              "sent": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "delivered": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "opened": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "clicked": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "failed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "channel",
+              "sent",
+              "delivered",
+              "opened",
+              "clicked",
+              "failed"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "sent": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "delivered": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "opened": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "clicked": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "failed": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "date",
+              "sent",
+              "delivered",
+              "opened",
+              "clicked",
+              "failed"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "topTemplates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "templateId": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "templateName": {
+                "type": "string"
+              },
+              "sent": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "openRate": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "clickRate": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [
+              "templateId",
+              "templateName",
+              "sent",
+              "openRate",
+              "clickRate"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "costs": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "number",
+              "minimum": 0
+            },
+            "byChannel": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "required": [
+            "total",
+            "byChannel"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "summary",
+        "byChannel",
+        "timeline"
+      ],
+      "additionalProperties": false
+    },
+    "CommunicationLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "sms",
+            "push",
+            "inApp",
+            "webhook"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "inbound",
+            "outbound"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "queued",
+            "sent",
+            "delivered",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "recipient": {
+          "description": "Email, phone, or device ID",
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "templateId": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "templateName": {
+          "type": "string"
+        },
+        "content": {
+          "description": "Truncated content preview",
+          "type": "string"
+        },
+        "messageId": {
+          "description": "External message ID",
+          "type": "string"
+        },
+        "conversationId": {
+          "description": "Thread/conversation ID",
+          "type": "string"
+        },
+        "referenceId": {
+          "description": "Related entity ID",
+          "type": "string"
+        },
+        "referenceType": {
+          "description": "Related entity type",
+          "type": "string"
+        },
+        "sentAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "deliveredAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "openedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "clickedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "failedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "bounceType": {
+          "type": "string",
+          "enum": [
+            "soft",
+            "hard"
+          ]
+        },
+        "openCount": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "clickCount": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "provider": {
+          "description": "Email/SMS provider",
+          "type": "string"
+        },
+        "cost": {
+          "description": "Cost in cents",
+          "type": "number",
+          "minimum": 0
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "tags": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "channel",
+        "direction",
+        "status",
+        "openCount",
+        "clickCount",
+        "tags",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "CommunicationLogListResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Paginated response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Page items",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "channel": {
+                "type": "string",
+                "enum": [
+                  "email",
+                  "sms",
+                  "push",
+                  "inApp",
+                  "webhook"
+                ]
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "inbound",
+                  "outbound"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "queued",
+                  "sent",
+                  "delivered",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "userId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "recipient": {
+                "description": "Email, phone, or device ID",
+                "type": "string"
+              },
+              "sender": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string",
+                "maxLength": 255
+              },
+              "templateId": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "templateName": {
+                "type": "string"
+              },
+              "content": {
+                "description": "Truncated content preview",
+                "type": "string"
+              },
+              "messageId": {
+                "description": "External message ID",
+                "type": "string"
+              },
+              "conversationId": {
+                "description": "Thread/conversation ID",
+                "type": "string"
+              },
+              "referenceId": {
+                "description": "Related entity ID",
+                "type": "string"
+              },
+              "referenceType": {
+                "description": "Related entity type",
+                "type": "string"
+              },
+              "sentAt": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              },
+              "deliveredAt": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              },
+              "openedAt": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              },
+              "clickedAt": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              },
+              "failedAt": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              },
+              "errorCode": {
+                "type": "string"
+              },
+              "errorMessage": {
+                "type": "string"
+              },
+              "bounceType": {
+                "type": "string",
+                "enum": [
+                  "soft",
+                  "hard"
+                ]
+              },
+              "openCount": {
+                "default": 0,
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "clickCount": {
+                "default": 0,
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "provider": {
+                "description": "Email/SMS provider",
+                "type": "string"
+              },
+              "cost": {
+                "description": "Cost in cents",
+                "type": "number",
+                "minimum": 0
+              },
+              "metadata": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {}
+              },
+              "tags": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "createdAt": {
+                "description": "When the record was created",
+                "type": "string"
+              },
+              "updatedAt": {
+                "description": "When the record was last updated",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "channel",
+              "direction",
+              "status",
+              "openCount",
+              "clickCount",
+              "tags",
+              "createdAt",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "description": "Current page number",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Items per page",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "total": {
+              "description": "Total number of items",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalPages": {
+              "description": "Total number of pages",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasNext": {
+              "description": "Whether there is a next page",
+              "type": "boolean"
+            },
+            "hasPrev": {
+              "description": "Whether there is a previous page",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "page",
+            "limit",
+            "total",
+            "totalPages",
+            "hasNext",
+            "hasPrev"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "data",
+        "pagination"
+      ],
+      "additionalProperties": false
+    },
+    "CommunicationLogResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "sms",
+            "push",
+            "inApp",
+            "webhook"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "inbound",
+            "outbound"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "queued",
+            "sent",
+            "delivered",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "recipient": {
+          "description": "Email, phone, or device ID",
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "templateId": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "templateName": {
+          "type": "string"
+        },
+        "content": {
+          "description": "Truncated content preview",
+          "type": "string"
+        },
+        "messageId": {
+          "description": "External message ID",
+          "type": "string"
+        },
+        "conversationId": {
+          "description": "Thread/conversation ID",
+          "type": "string"
+        },
+        "referenceId": {
+          "description": "Related entity ID",
+          "type": "string"
+        },
+        "referenceType": {
+          "description": "Related entity type",
+          "type": "string"
+        },
+        "sentAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "deliveredAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "openedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "clickedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "failedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "bounceType": {
+          "type": "string",
+          "enum": [
+            "soft",
+            "hard"
+          ]
+        },
+        "openCount": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "clickCount": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "provider": {
+          "description": "Email/SMS provider",
+          "type": "string"
+        },
+        "cost": {
+          "description": "Cost in cents",
+          "type": "number",
+          "minimum": 0
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "tags": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "channel",
+        "direction",
+        "status",
+        "openCount",
+        "clickCount",
+        "tags",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "CommunicationLogSearchParams": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "Page number",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "description": "Items per page",
+          "default": 20,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        },
+        "sortBy": {
+          "default": "createdAt",
+          "type": "string",
+          "enum": [
+            "createdAt",
+            "sentAt",
+            "deliveredAt"
+          ]
+        },
+        "sortOrder": {
+          "description": "Sort order",
+          "default": "desc",
+          "type": "string",
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        },
+        "search": {
+          "description": "Search query",
+          "type": "string"
+        },
+        "fromDate": {
+          "description": "Start date (ISO 8601)",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "toDate": {
+          "description": "End date (ISO 8601)",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "sms",
+            "push",
+            "inApp",
+            "webhook"
+          ]
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "inbound",
+            "outbound"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "queued",
+            "sent",
+            "delivered",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "recipient": {
+          "type": "string"
+        },
+        "templateId": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "conversationId": {
+          "type": "string"
+        },
+        "referenceId": {
+          "type": "string"
+        },
+        "referenceType": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hasOpened": {
+          "type": "boolean"
+        },
+        "hasClicked": {
+          "type": "boolean"
+        },
+        "hasFailed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
+      "additionalProperties": false
+    },
+    "CreateCommunicationLogRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": [
+            "email",
+            "sms",
+            "push",
+            "inApp",
+            "webhook"
+          ]
+        },
+        "direction": {
+          "default": "outbound",
+          "type": "string",
+          "enum": [
+            "inbound",
+            "outbound"
+          ]
+        },
+        "status": {
+          "default": "pending",
+          "type": "string",
+          "enum": [
+            "pending",
+            "queued",
+            "sent",
+            "delivered",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "recipient": {
+          "type": "string"
+        },
+        "sender": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "templateId": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "templateName": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "conversationId": {
+          "type": "string"
+        },
+        "referenceId": {
+          "type": "string"
+        },
+        "referenceType": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "channel",
+        "direction",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "TrackCommunicationEventRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "type": "string"
+        },
+        "event": {
+          "type": "string",
+          "enum": [
+            "sent",
+            "delivered",
+            "opened",
+            "clicked",
+            "bounced",
+            "complained",
+            "unsubscribed"
+          ]
+        },
+        "timestamp": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "url": {
+          "description": "For click events",
+          "type": "string",
+          "format": "uri"
+        },
+        "userAgent": {
+          "type": "string"
+        },
+        "ipAddress": {
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "bounceType": {
+          "type": "string",
+          "enum": [
+            "soft",
+            "hard"
+          ]
+        }
+      },
+      "required": [
+        "messageId",
+        "event",
+        "timestamp"
+      ],
+      "additionalProperties": false
+    },
+    "UpdateCommunicationStatusRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "queued",
+            "sent",
+            "delivered",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "deliveredAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "openedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "clickedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "failedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "errorCode": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "bounceType": {
+          "type": "string",
+          "enum": [
+            "soft",
+            "hard"
+          ]
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

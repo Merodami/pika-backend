@@ -1,0 +1,164 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "to": {
+      "description": "Primary recipient(s)",
+      "anyOf": [
+        {},
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "email": {},
+              "name": {
+                "type": "string",
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "email"
+            ],
+            "additionalProperties": false
+          }
+        }
+      ]
+    },
+    "cc": {
+      "description": "CC recipients",
+      "type": "array",
+      "items": {}
+    },
+    "bcc": {
+      "description": "BCC recipients",
+      "type": "array",
+      "items": {}
+    },
+    "subject": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "templateId": {
+      "description": "Template ID to use for the email",
+      "type": "string"
+    },
+    "templateParams": {
+      "description": "Parameters to pass to the template",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "variables": {
+      "description": "Variables for template rendering",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "body": {
+      "description": "Plain text content (deprecated, use textContent)",
+      "type": "string"
+    },
+    "htmlContent": {
+      "description": "HTML content of the email",
+      "type": "string"
+    },
+    "textContent": {
+      "description": "Plain text content of the email",
+      "type": "string"
+    },
+    "isHtml": {
+      "description": "Whether the content is HTML (deprecated)",
+      "default": false,
+      "type": "boolean"
+    },
+    "replyTo": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "description": "Name of the attachment file",
+            "type": "string",
+            "maxLength": 255
+          },
+          "content": {
+            "description": "Base64 encoded content or URL",
+            "type": "string"
+          },
+          "contentType": {
+            "description": "MIME type of the attachment",
+            "type": "string"
+          },
+          "size": {
+            "description": "File size in bytes",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "filename",
+          "content"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "priority": {
+      "default": "normal",
+      "type": "string",
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "urgent"
+      ]
+    },
+    "trackOpens": {
+      "default": true,
+      "type": "boolean"
+    },
+    "trackClicks": {
+      "default": true,
+      "type": "boolean"
+    },
+    "metadata": {
+      "description": "Additional metadata for tracking",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "scheduledAt": {
+      "description": "When to send the email",
+      "type": "string"
+    },
+    "headers": {
+      "description": "Custom email headers",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "to",
+    "subject",
+    "isHtml",
+    "priority",
+    "trackOpens",
+    "trackClicks"
+  ],
+  "additionalProperties": false
+}

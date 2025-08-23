@@ -6,6 +6,7 @@ import { BusinessRegistrationService } from '@business/services/BusinessRegistra
 import { BusinessService } from '@business/services/BusinessService.js'
 import { businessAdmin, businessCommon, userAdmin } from '@pika/api'
 import {
+  createAvatarUploadMiddleware,
   requireAuth,
   requirePermissions,
   validateBody,
@@ -13,7 +14,7 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import type { UserServiceClient } from '@pika/shared'
+import type { StorageServiceClient, UserServiceClient } from '@pika/shared'
 import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
@@ -27,17 +28,21 @@ export function createAdminBusinessRoutes(
   translationClient: TranslationClient,
   userServiceClient: UserServiceClient,
   translationResolver?: TranslationResolver,
+  storageServiceClient?: StorageServiceClient,
 ): Router {
   const router = Router()
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
+  const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
   const service = new BusinessService(
     repository,
     translationClient,
     userServiceClient,
     cache,
     translationResolver,
+    businessDetailsRepository,
+    storageServiceClient,
   )
 
   // Initialize registration service dependencies
@@ -45,7 +50,6 @@ export function createAdminBusinessRoutes(
     prisma,
     cache,
   )
-  const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
   const registrationService = new BusinessRegistrationService(
     registrationRepository,
     repository,
@@ -54,6 +58,9 @@ export function createAdminBusinessRoutes(
   )
 
   const controller = new AdminBusinessController(service, registrationService)
+
+  // Configure upload middleware for logo uploads
+  const upload = createAvatarUploadMiddleware() // Reuse avatar upload middleware for business logos
 
   // All routes require authentication
   router.use(requireAuth())
@@ -150,6 +157,15 @@ export function createAdminBusinessRoutes(
     validateParams(userAdmin.UserIdParam),
     validateBody(businessAdmin.AdminResetBusinessRegistrationRequest),
     controller.resetBusinessRegistration,
+  )
+
+  // POST /admin/businesses/:id/logo - Admin uploads logo for any business
+  router.post(
+    '/:id/logo',
+    requirePermissions('admin:businesses'),
+    validateParams(businessCommon.BusinessIdParam),
+    upload.single('logo'),
+    controller.uploadBusinessLogo,
   )
 
   return router

@@ -9,6 +9,7 @@ export interface CreateBusinessDetailsData {
   phone?: string
   email?: string
   website?: string
+  logoUrl?: string
   street?: string
   city?: string
   state?: string
@@ -50,6 +51,7 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
           phone: data.phone,
           email: data.email,
           website: data.website,
+          logoUrl: data.logoUrl,
           street: data.street,
           city: data.city,
           state: data.state,
@@ -136,6 +138,7 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
           phone: data.phone,
           email: data.email,
           website: data.website,
+          logoUrl: data.logoUrl,
           street: data.street,
           city: data.city,
           state: data.state,

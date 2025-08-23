@@ -3,6 +3,7 @@ import type { ZodRegistry } from '@api/common/registry/base.js'
 import * as adminBusinessSchemas from '@api/schemas/business/admin/management.js'
 import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
+import * as businessDetailsSchemas from '@api/schemas/business/public/businessDetails.js'
 import * as adminCategorySchemas from '@api/schemas/category/admin/management.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
 import * as categorySchemas from '@api/schemas/category/public/category.js'
@@ -140,6 +141,10 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'AdminBulkBusinessOperationResponse',
     adminBusinessSchemas.AdminBulkBusinessOperationResponse,
+  )
+  registry.registerSchema(
+    'UploadBusinessLogoResponse',
+    businessDetailsSchemas.UploadBusinessLogoResponse,
   )
   registry.registerSchema(
     'AdminBulkDeleteBusinessesRequest',
@@ -1274,6 +1279,63 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: adminBusinessSchemas.AdminResetBusinessRegistrationResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Admin uploads business logo
+  registry.registerRoute({
+    method: 'post',
+    path: '/admin/businesses/{id}/logo',
+    operationId: 'uploadAdminBusinessLogo',
+    summary: 'Admin uploads logo for any business',
+    tags: ['Business Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              properties: {
+                logo: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Logo image file'
+                }
+              },
+              required: ['logo']
+            }
+          },
+        },
+        required: true,
+      },
+    },
+    responses: {
+      200: {
+        description: 'Logo uploaded successfully',
+        content: {
+          'application/json': {
+            schema: businessDetailsSchemas.UploadBusinessLogoResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid file or request',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Business not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
           },
         },
       },

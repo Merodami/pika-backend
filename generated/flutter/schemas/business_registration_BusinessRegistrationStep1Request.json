@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "businessName": {
+      "description": "Business name",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "businessType": {
+      "description": "Type of business",
+      "type": "string",
+      "enum": [
+        "retail",
+        "service",
+        "restaurant",
+        "healthcare",
+        "fitness",
+        "education",
+        "entertainment",
+        "other"
+      ]
+    },
+    "categoryId": {
+      "description": "Category ID",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "primaryLanguage": {
+      "description": "Primary language code",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2,
+      "pattern": "^[a-z]{2}$"
+    }
+  },
+  "required": [
+    "businessName",
+    "businessType",
+    "categoryId",
+    "primaryLanguage"
+  ],
+  "additionalProperties": false
+}

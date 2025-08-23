@@ -1,0 +1,406 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "settings": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "display": {
+          "type": "object",
+          "properties": {
+            "theme": {
+              "type": "string",
+              "enum": [
+                "light",
+                "dark",
+                "system"
+              ]
+            },
+            "language": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2
+            },
+            "timezone": {
+              "type": "string"
+            },
+            "dateFormat": {
+              "type": "string",
+              "enum": [
+                "MM/DD/YYYY",
+                "DD/MM/YYYY",
+                "YYYY-MM-DD"
+              ]
+            },
+            "timeFormat": {
+              "type": "string",
+              "enum": [
+                "12h",
+                "24h"
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 3
+            },
+            "compactMode": {
+              "type": "boolean"
+            },
+            "showAvatars": {
+              "type": "boolean"
+            },
+            "itemsPerPage": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "theme",
+            "language",
+            "dateFormat",
+            "timeFormat",
+            "currency",
+            "compactMode",
+            "showAvatars",
+            "itemsPerPage"
+          ],
+          "additionalProperties": false
+        },
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "marketing": {
+                  "type": "boolean"
+                },
+                "productUpdates": {
+                  "type": "boolean"
+                },
+                "securityAlerts": {
+                  "type": "boolean"
+                },
+                "voucherExpiry": {
+                  "type": "boolean"
+                },
+                "businessUpdates": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled",
+                "marketing",
+                "productUpdates",
+                "securityAlerts",
+                "voucherExpiry",
+                "businessUpdates"
+              ],
+              "additionalProperties": false
+            },
+            "push": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "marketing": {
+                  "type": "boolean"
+                },
+                "voucherExpiry": {
+                  "type": "boolean"
+                },
+                "businessUpdates": {
+                  "type": "boolean"
+                },
+                "orderUpdates": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled",
+                "marketing",
+                "voucherExpiry",
+                "businessUpdates",
+                "orderUpdates"
+              ],
+              "additionalProperties": false
+            },
+            "sms": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "securityAlerts": {
+                  "type": "boolean"
+                },
+                "orderUpdates": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled",
+                "securityAlerts",
+                "orderUpdates"
+              ],
+              "additionalProperties": false
+            },
+            "inApp": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "sound": {
+                  "type": "boolean"
+                },
+                "vibration": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "enabled",
+                "sound",
+                "vibration"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "email",
+            "push",
+            "sms",
+            "inApp"
+          ],
+          "additionalProperties": false
+        },
+        "privacy": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "type": "object",
+              "properties": {
+                "visibility": {
+                  "type": "string",
+                  "enum": [
+                    "public",
+                    "private",
+                    "friends"
+                  ]
+                },
+                "showEmail": {
+                  "type": "boolean"
+                },
+                "showPhone": {
+                  "type": "boolean"
+                },
+                "showBirthDate": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "visibility",
+                "showEmail",
+                "showPhone",
+                "showBirthDate"
+              ],
+              "additionalProperties": false
+            },
+            "search": {
+              "type": "object",
+              "properties": {
+                "allowDiscovery": {
+                  "type": "boolean"
+                },
+                "showInRecommendations": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "allowDiscovery",
+                "showInRecommendations"
+              ],
+              "additionalProperties": false
+            },
+            "analytics": {
+              "type": "object",
+              "properties": {
+                "allowTracking": {
+                  "type": "boolean"
+                },
+                "shareUsageData": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "allowTracking",
+                "shareUsageData"
+              ],
+              "additionalProperties": false
+            },
+            "marketing": {
+              "type": "object",
+              "properties": {
+                "allowPersonalization": {
+                  "type": "boolean"
+                },
+                "shareWithPartners": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "allowPersonalization",
+                "shareWithPartners"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "profile",
+            "search",
+            "analytics",
+            "marketing"
+          ],
+          "additionalProperties": false
+        },
+        "business": {
+          "type": "object",
+          "properties": {
+            "dashboard": {
+              "type": "object",
+              "properties": {
+                "defaultView": {
+                  "type": "string",
+                  "enum": [
+                    "overview",
+                    "analytics",
+                    "vouchers",
+                    "customers"
+                  ]
+                },
+                "autoRefresh": {
+                  "type": "boolean"
+                },
+                "refreshInterval": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 60
+                }
+              },
+              "required": [
+                "defaultView",
+                "autoRefresh",
+                "refreshInterval"
+              ],
+              "additionalProperties": false
+            },
+            "vouchers": {
+              "type": "object",
+              "properties": {
+                "autoApprove": {
+                  "type": "boolean"
+                },
+                "requireCustomerData": {
+                  "type": "boolean"
+                },
+                "allowBulkActions": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "autoApprove",
+                "requireCustomerData",
+                "allowBulkActions"
+              ],
+              "additionalProperties": false
+            },
+            "notifications": {
+              "type": "object",
+              "properties": {
+                "newCustomers": {
+                  "type": "boolean"
+                },
+                "voucherRedemptions": {
+                  "type": "boolean"
+                },
+                "lowStockAlerts": {
+                  "type": "boolean"
+                },
+                "reviewRequests": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "newCustomers",
+                "voucherRedemptions",
+                "lowStockAlerts",
+                "reviewRequests"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "dashboard",
+            "vouchers",
+            "notifications"
+          ],
+          "additionalProperties": false
+        },
+        "accessibility": {
+          "type": "object",
+          "properties": {
+            "reduceMotion": {
+              "type": "boolean"
+            },
+            "highContrast": {
+              "type": "boolean"
+            },
+            "largeText": {
+              "type": "boolean"
+            },
+            "screenReader": {
+              "type": "boolean"
+            },
+            "keyboardNavigation": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "reduceMotion",
+            "highContrast",
+            "largeText",
+            "screenReader",
+            "keyboardNavigation"
+          ],
+          "additionalProperties": false
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "display",
+        "notifications",
+        "privacy",
+        "accessibility",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "settings"
+  ],
+  "additionalProperties": false
+}

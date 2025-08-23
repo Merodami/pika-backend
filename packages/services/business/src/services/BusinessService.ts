@@ -3,13 +3,16 @@ import type {
   IBusinessRepository,
   UpdateBusinessData,
 } from '@business/repositories/BusinessRepository.js'
+import type { IBusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
 import type { BusinessSearchParams } from '@business/types/search.js'
 import { DEFAULT_LANGUAGE, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, type ICacheService } from '@pika/redis'
 import type { BusinessDomain } from '@pika/sdk'
 import {
   ErrorFactory,
+  FileUpload,
   logger,
+  StorageServiceClient,
   UserServiceClient,
   ValidationError,
 } from '@pika/shared'
@@ -52,6 +55,7 @@ export interface IBusinessService {
     approvedBy: string,
     reason?: string,
   ): Promise<BusinessDomain>
+  uploadBusinessLogo(businessId: string, file: FileUpload): Promise<string>
 }
 
 export interface CreateBusinessRequest {
@@ -82,6 +86,8 @@ export class BusinessService implements IBusinessService {
     private readonly userServiceClient?: UserServiceClient,
     private readonly cacheService?: ICacheService,
     private readonly translationResolver?: TranslationResolver,
+    private readonly businessDetailsRepository?: IBusinessDetailsRepository,
+    private readonly storageService?: StorageServiceClient,
   ) {}
 
   /**
@@ -675,6 +681,86 @@ export class BusinessService implements IBusinessService {
       throw ErrorFactory.fromError(error, 'Error approving business', {
         source: 'BusinessService.approveBusiness',
       })
+    }
+  }
+
+  /**
+   * Upload business logo and update business details
+   */
+  async uploadBusinessLogo(
+    businessId: string,
+    file: FileUpload,
+  ): Promise<string> {
+    try {
+      if (!this.storageService) {
+        throw ErrorFactory.badRequest(
+          'Storage service not configured',
+          {
+            source: 'BusinessService.uploadBusinessLogo',
+          },
+        )
+      }
+
+      if (!this.businessDetailsRepository) {
+        throw ErrorFactory.badRequest(
+          'Business details repository not configured',
+          {
+            source: 'BusinessService.uploadBusinessLogo',
+          },
+        )
+      }
+
+      // Validate that business exists
+      const business = await this.businessRepository.findById(businessId)
+      if (!business) {
+        throw ErrorFactory.resourceNotFound('Business', businessId)
+      }
+
+      // Validate file type (images only)
+      if (!file.mimetype.startsWith('image/')) {
+        throw ErrorFactory.badRequest('Only image files are allowed')
+      }
+
+      // Upload file with business context for service-to-service call
+      const uploadResult = await this.storageService.saveFile(
+        file,
+        `businesses/${businessId}/logo`,
+        {
+          context: {
+            businessId,
+            operation: 'logo-upload',
+          },
+        },
+      )
+
+      // Get or create business details if they don't exist
+      let businessDetails = await this.businessDetailsRepository.findByBusinessId(businessId)
+      
+      if (businessDetails) {
+        // Update existing business details with the new logo URL
+        await this.businessDetailsRepository.update(businessId, {
+          logoUrl: uploadResult.url,
+        })
+      } else {
+        // Create business details with logo URL
+        await this.businessDetailsRepository.create({
+          businessId,
+          logoUrl: uploadResult.url,
+        })
+      }
+
+      // Invalidate business cache
+      await this.invalidateBusinessCache(businessId, business.userId)
+
+      logger.info('Business logo uploaded successfully', {
+        businessId,
+        logoUrl: uploadResult.url,
+      })
+
+      return uploadResult.url
+    } catch (error) {
+      logger.error('Failed to upload business logo', { error, businessId })
+      throw ErrorFactory.fromError(error)
     }
   }
 }

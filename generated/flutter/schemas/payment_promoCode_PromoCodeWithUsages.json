@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "code": {
+      "description": "Unique promo code",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "discount": {
+      "description": "Discount percentage (0-100)",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "active": {
+      "default": true,
+      "type": "boolean"
+    },
+    "allowedTimes": {
+      "description": "Total number of times this code can be used",
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "amountAvailable": {
+      "description": "Remaining uses",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "expirationDate": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "createdBy": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "cancelledAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "createdAt": {
+      "description": "When the record was created",
+      "type": "string"
+    },
+    "updatedAt": {
+      "description": "When the record was last updated",
+      "type": "string"
+    },
+    "usages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "promoCodeId": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "transactionId": {
+            "description": "Related payment transaction",
+            "type": "string"
+          },
+          "usedAt": {
+            "description": "ISO 8601 datetime with timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "promoCodeId",
+          "userId",
+          "usedAt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "totalUsed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "remainingUses": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "id",
+    "code",
+    "discount",
+    "active",
+    "allowedTimes",
+    "amountAvailable",
+    "expirationDate",
+    "createdBy",
+    "createdAt",
+    "updatedAt",
+    "usages",
+    "totalUsed",
+    "remainingUses"
+  ],
+  "additionalProperties": false
+}

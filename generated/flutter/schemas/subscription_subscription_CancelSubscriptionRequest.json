@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "cancelAtPeriodEnd": {
+      "description": "Whether to cancel at period end",
+      "default": true,
+      "type": "boolean"
+    },
+    "reason": {
+      "description": "Cancellation reason",
+      "type": "string"
+    },
+    "feedback": {
+      "description": "User feedback",
+      "type": "string"
+    }
+  },
+  "required": [
+    "cancelAtPeriodEnd"
+  ],
+  "additionalProperties": false
+}

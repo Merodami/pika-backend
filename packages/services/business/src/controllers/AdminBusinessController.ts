@@ -2,19 +2,21 @@ import type { IBusinessRegistrationService } from '@business/services/BusinessRe
 import type { IBusinessService } from '@business/services/BusinessService.js'
 import {
   businessAdmin,
+  businessCommon,
   businessPublic,
   mapSortOrder,
   userAdmin,
 } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
+  adaptMulterFile,
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
 import { RequestContext } from '@pika/http'
 import { BusinessMapper } from '@pika/sdk'
-import { logger, parseIncludeParam } from '@pika/shared'
+import { ErrorFactory, logger, parseIncludeParam } from '@pika/shared'
 import { BusinessRegistrationStatus } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -38,6 +40,7 @@ export class AdminBusinessController {
     this.updateBusinessRating = this.updateBusinessRating.bind(this)
     this.approveBusiness = this.approveBusiness.bind(this)
     this.resetBusinessRegistration = this.resetBusinessRegistration.bind(this)
+    this.uploadBusinessLogo = this.uploadBusinessLogo.bind(this)
   }
 
   /**
@@ -485,6 +488,47 @@ export class AdminBusinessController {
         businessAdmin.AdminResetBusinessRegistrationResponse,
         response,
         'AdminBusinessController.resetBusinessRegistration',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/businesses/:id/logo
+   * Admin uploads logo for any business
+   */
+  async uploadBusinessLogo(
+    req: Request<businessCommon.BusinessIdParam>,
+    res: Response<businessPublic.UploadBusinessLogoResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: businessId } = req.params
+
+      // Get the uploaded file from Multer
+      const multerFile = req.file
+
+      // Validate the uploaded file
+      if (!multerFile) {
+        throw ErrorFactory.badRequest('No file uploaded')
+      }
+
+      // Adapt the multer file to our FileUpload format
+      const adaptedFile = adaptMulterFile(multerFile)
+
+      const logoUrl = await this.businessService.uploadBusinessLogo(
+        businessId,
+        adaptedFile,
+      )
+
+      const response = { logoUrl }
+      const validatedResponse = validateResponse(
+        businessPublic.UploadBusinessLogoResponse,
+        response,
+        'AdminBusinessController.uploadBusinessLogo',
       )
 
       res.json(validatedResponse)

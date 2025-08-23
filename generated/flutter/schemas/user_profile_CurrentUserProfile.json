@@ -5,7 +5,7 @@
     "id": {
       "type": "string",
       "format": "uuid",
-      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
     },
     "email": {
       "type": "string"
@@ -43,11 +43,20 @@
     },
     "role": {
       "type": "string",
-      "enum": ["admin", "customer", "business"]
+      "enum": [
+        "admin",
+        "customer",
+        "business"
+      ]
     },
     "status": {
       "type": "string",
-      "enum": ["active", "suspended", "banned", "unconfirmed"]
+      "enum": [
+        "active",
+        "suspended",
+        "banned",
+        "unconfirmed"
+      ]
     },
     "emailVerified": {
       "type": "boolean"
@@ -59,7 +68,7 @@
       "description": "Primary business for business users",
       "type": "string",
       "format": "uuid",
-      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
     },
     "createdAt": {
       "description": "ISO 8601 datetime with timezone",

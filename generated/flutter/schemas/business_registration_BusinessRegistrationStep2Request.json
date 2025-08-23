@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "description": {
+      "description": "Business description",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "address": {
+      "description": "Business address",
+      "type": "object",
+      "properties": {
+        "street": {
+          "description": "Street address",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "city": {
+          "description": "City",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "state": {
+          "description": "State/Province",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "postalCode": {
+          "description": "Postal code",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "country": {
+          "description": "Country code (ISO 3166-1 alpha-2)",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2
+        }
+      },
+      "required": [
+        "street",
+        "city",
+        "state",
+        "postalCode",
+        "country"
+      ],
+      "additionalProperties": false
+    },
+    "phone": {
+      "description": "Business phone number",
+      "type": "string",
+      "pattern": "^\\+[1-9]\\d{1,14}$"
+    },
+    "website": {
+      "description": "Business website URL",
+      "type": "string",
+      "maxLength": 2048,
+      "format": "uri"
+    },
+    "email": {
+      "description": "Business contact email",
+      "type": "string"
+    }
+  },
+  "required": [
+    "description",
+    "address",
+    "phone"
+  ],
+  "additionalProperties": false
+}

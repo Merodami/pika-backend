@@ -50,17 +50,70 @@ const SCHEMA_MODULES = {
       import('../packages/api/src/schemas/auth/public/register.js'),
     password: () =>
       import('../packages/api/src/schemas/auth/public/password.js'),
+    social: () => import('../packages/api/src/schemas/auth/public/social.js'),
+    oauth: () => import('../packages/api/src/schemas/auth/public/oauth.js'),
   },
   business: {
     business: () =>
       import('../packages/api/src/schemas/business/public/business.js'),
+    businessDetails: () =>
+      import('../packages/api/src/schemas/business/public/businessDetails.js'),
+    registration: () =>
+      import('../packages/api/src/schemas/business/public/registration.js'),
   },
   category: {
     category: () =>
       import('../packages/api/src/schemas/category/public/category.js'),
   },
+  communication: {
+    notification: () =>
+      import('../packages/api/src/schemas/communication/public/notification.js'),
+    email: () =>
+      import('../packages/api/src/schemas/communication/public/email.js'),
+    communicationLog: () =>
+      import('../packages/api/src/schemas/communication/public/communicationLog.js'),
+  },
+  payment: {
+    membership: () =>
+      import('../packages/api/src/schemas/payment/public/membership.js'),
+    customerMembership: () =>
+      import('../packages/api/src/schemas/payment/public/customerMembership.js'),
+    product: () =>
+      import('../packages/api/src/schemas/payment/public/product.js'),
+    promoCode: () =>
+      import('../packages/api/src/schemas/payment/public/promoCode.js'),
+    webhooks: () =>
+      import('../packages/api/src/schemas/payment/public/webhooks.js'),
+  },
+  pdf: {
+    voucherBook: () =>
+      import('../packages/api/src/schemas/pdf/public/voucher-book.js'),
+  },
+  storage: {
+    file: () =>
+      import('../packages/api/src/schemas/storage/public/file.js'),
+  },
+  subscription: {
+    subscription: () =>
+      import('../packages/api/src/schemas/subscription/public/subscription.js'),
+    subscriptionPlan: () =>
+      import('../packages/api/src/schemas/subscription/public/subscriptionPlan.js'),
+  },
+  support: {
+    problem: () =>
+      import('../packages/api/src/schemas/support/public/problem.js'),
+    comment: () =>
+      import('../packages/api/src/schemas/support/public/comment.js'),
+  },
   user: {
     profile: () => import('../packages/api/src/schemas/user/public/profile.js'),
+    favorites: () => import('../packages/api/src/schemas/user/public/favorites.js'),
+    address: () => import('../packages/api/src/schemas/user/public/address.js'),
+    settings: () => import('../packages/api/src/schemas/user/public/settings.js'),
+    paymentMethod: () =>
+      import('../packages/api/src/schemas/user/public/paymentMethod.js'),
+    verification: () =>
+      import('../packages/api/src/schemas/user/public/verification.js'),
   },
   voucher: {
     voucher: () =>

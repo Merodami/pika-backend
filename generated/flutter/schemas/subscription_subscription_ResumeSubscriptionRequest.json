@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "resumeImmediately": {
+      "description": "Resume immediately or at period end",
+      "default": true,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "resumeImmediately"
+  ],
+  "additionalProperties": false
+}

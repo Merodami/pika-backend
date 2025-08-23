@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "deviceId": {
+      "description": "Unique device identifier",
+      "type": "string"
+    },
+    "deviceName": {
+      "description": "Device name or model",
+      "type": "string"
+    },
+    "deviceType": {
+      "type": "string",
+      "enum": [
+        "ios",
+        "android",
+        "web",
+        "desktop"
+      ]
+    },
+    "browserInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "userAgent": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fcmToken": {
+      "description": "Firebase Cloud Messaging token",
+      "type": "string"
+    },
+    "ipAddress": {
+      "description": "Device IP address",
+      "type": "string"
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number"
+        },
+        "lng": {
+          "type": "number"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
