@@ -59,6 +59,10 @@ ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS bo
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_updated_by_fkey;
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_page_id_fkey;
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_created_by_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXISTS favourite_vouchers_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXISTS favourite_vouchers_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_business_id_fkey;
 ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_parent_id_fkey;
 ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_category_id_fkey;
@@ -77,6 +81,7 @@ DROP INDEX IF EXISTS voucher.vouchers_state_idx;
 DROP INDEX IF EXISTS voucher.vouchers_state_business_id_idx;
 DROP INDEX IF EXISTS voucher.vouchers_qr_code_key;
 DROP INDEX IF EXISTS voucher.vouchers_qr_code_idx;
+DROP INDEX IF EXISTS voucher.vouchers_favorite_count_idx;
 DROP INDEX IF EXISTS voucher.vouchers_deleted_at_idx;
 DROP INDEX IF EXISTS voucher.vouchers_created_at_idx;
 DROP INDEX IF EXISTS voucher.vouchers_category_id_state_idx;
@@ -216,6 +221,14 @@ DROP INDEX IF EXISTS files.ad_placements_page_id_position_key;
 DROP INDEX IF EXISTS files.ad_placements_page_id_idx;
 DROP INDEX IF EXISTS files.ad_placements_created_by_idx;
 DROP INDEX IF EXISTS files.ad_placements_content_type_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_voucher_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_user_id_voucher_id_key;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_user_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_created_at_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_user_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_user_id_business_id_key;
+DROP INDEX IF EXISTS favourites.favourite_businesses_created_at_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_business_id_idx;
 DROP INDEX IF EXISTS catalog.categories_sort_order_idx;
 DROP INDEX IF EXISTS catalog.categories_slug_key;
 DROP INDEX IF EXISTS catalog.categories_slug_idx;
@@ -228,6 +241,7 @@ DROP INDEX IF EXISTS catalog.categories_level_idx;
 DROP INDEX IF EXISTS catalog.categories_is_active_deleted_at_idx;
 DROP INDEX IF EXISTS business.businesses_verified_active_idx;
 DROP INDEX IF EXISTS business.businesses_user_id_idx;
+DROP INDEX IF EXISTS business.businesses_favorite_count_idx;
 DROP INDEX IF EXISTS business.businesses_deleted_at_idx;
 DROP INDEX IF EXISTS business.businesses_category_id_idx;
 DROP INDEX IF EXISTS business.businesses_avg_rating_idx;
@@ -276,6 +290,8 @@ ALTER TABLE IF EXISTS ONLY files.voucher_book_pages DROP CONSTRAINT IF EXISTS vo
 ALTER TABLE IF EXISTS ONLY files.file_storage_logs DROP CONSTRAINT IF EXISTS file_storage_logs_pkey;
 ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS book_distributions_pkey;
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_pkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXISTS favourite_vouchers_pkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_pkey;
 ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_pkey;
 ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_pkey;
 ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS business_registration_pkey;
@@ -308,6 +324,8 @@ DROP TABLE IF EXISTS files.voucher_book_pages;
 DROP TABLE IF EXISTS files.file_storage_logs;
 DROP TABLE IF EXISTS files.book_distributions;
 DROP TABLE IF EXISTS files.ad_placements;
+DROP TABLE IF EXISTS favourites.favourite_vouchers;
+DROP TABLE IF EXISTS favourites.favourite_businesses;
 DROP TABLE IF EXISTS catalog.categories;
 DROP TABLE IF EXISTS business.businesses;
 DROP TABLE IF EXISTS business.business_registration;
@@ -352,12 +370,12 @@ DROP SCHEMA IF EXISTS tiger_data;
 DROP SCHEMA IF EXISTS tiger;
 DROP SCHEMA IF EXISTS support;
 DROP SCHEMA IF EXISTS security;
--- *not* dropping schema, since initdb creates it
 DROP SCHEMA IF EXISTS payments;
 DROP SCHEMA IF EXISTS marketplace;
 DROP SCHEMA IF EXISTS identity;
 DROP SCHEMA IF EXISTS i18n;
 DROP SCHEMA IF EXISTS files;
+DROP SCHEMA IF EXISTS favourites;
 DROP SCHEMA IF EXISTS catalog;
 DROP SCHEMA IF EXISTS business;
 DROP SCHEMA IF EXISTS audit;
@@ -388,6 +406,13 @@ CREATE SCHEMA business;
 --
 
 CREATE SCHEMA catalog;
+
+
+--
+-- Name: favourites; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA favourites;
 
 
 --
@@ -423,20 +448,6 @@ CREATE SCHEMA marketplace;
 --
 
 CREATE SCHEMA payments;
-
-
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
--- *not* creating schema, since initdb creates it
-
-
---
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON SCHEMA public IS '';
 
 
 --
@@ -983,7 +994,8 @@ CREATE TABLE business.businesses (
     avg_rating numeric(3,2) DEFAULT 0 NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at timestamp(6) with time zone
+    deleted_at timestamp(6) with time zone,
+    favorite_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1007,6 +1019,30 @@ CREATE TABLE catalog.categories (
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     deleted_at timestamp(6) with time zone
+);
+
+
+--
+-- Name: favourite_businesses; Type: TABLE; Schema: favourites; Owner: -
+--
+
+CREATE TABLE favourites.favourite_businesses (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    business_id uuid NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: favourite_vouchers; Type: TABLE; Schema: favourites; Owner: -
+--
+
+CREATE TABLE favourites.favourite_vouchers (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    voucher_id uuid NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -1564,7 +1600,8 @@ CREATE TABLE voucher.vouchers (
     qr_code character varying(500),
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at timestamp(6) with time zone
+    deleted_at timestamp(6) with time zone,
+    favorite_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1606,6 +1643,22 @@ ALTER TABLE ONLY business.businesses
 
 ALTER TABLE ONLY catalog.categories
     ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favourite_businesses favourite_businesses_pkey; Type: CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_businesses
+    ADD CONSTRAINT favourite_businesses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favourite_vouchers favourite_vouchers_pkey; Type: CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_vouchers
+    ADD CONSTRAINT favourite_vouchers_pkey PRIMARY KEY (id);
 
 
 --
@@ -1972,6 +2025,13 @@ CREATE INDEX businesses_deleted_at_idx ON business.businesses USING btree (delet
 
 
 --
+-- Name: businesses_favorite_count_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_favorite_count_idx ON business.businesses USING btree (favorite_count DESC);
+
+
+--
 -- Name: businesses_user_id_idx; Type: INDEX; Schema: business; Owner: -
 --
 
@@ -2053,6 +2113,62 @@ CREATE UNIQUE INDEX categories_slug_key ON catalog.categories USING btree (slug)
 --
 
 CREATE INDEX categories_sort_order_idx ON catalog.categories USING btree (sort_order);
+
+
+--
+-- Name: favourite_businesses_business_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_business_id_idx ON favourites.favourite_businesses USING btree (business_id);
+
+
+--
+-- Name: favourite_businesses_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_created_at_idx ON favourites.favourite_businesses USING btree (created_at DESC);
+
+
+--
+-- Name: favourite_businesses_user_id_business_id_key; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE UNIQUE INDEX favourite_businesses_user_id_business_id_key ON favourites.favourite_businesses USING btree (user_id, business_id);
+
+
+--
+-- Name: favourite_businesses_user_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_user_id_idx ON favourites.favourite_businesses USING btree (user_id);
+
+
+--
+-- Name: favourite_vouchers_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_created_at_idx ON favourites.favourite_vouchers USING btree (created_at DESC);
+
+
+--
+-- Name: favourite_vouchers_user_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_user_id_idx ON favourites.favourite_vouchers USING btree (user_id);
+
+
+--
+-- Name: favourite_vouchers_user_id_voucher_id_key; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE UNIQUE INDEX favourite_vouchers_user_id_voucher_id_key ON favourites.favourite_vouchers USING btree (user_id, voucher_id);
+
+
+--
+-- Name: favourite_vouchers_voucher_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_voucher_id_idx ON favourites.favourite_vouchers USING btree (voucher_id);
 
 
 --
@@ -3029,6 +3145,13 @@ CREATE INDEX vouchers_deleted_at_idx ON voucher.vouchers USING btree (deleted_at
 
 
 --
+-- Name: vouchers_favorite_count_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_favorite_count_idx ON voucher.vouchers USING btree (favorite_count DESC);
+
+
+--
 -- Name: vouchers_qr_code_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
@@ -3161,6 +3284,38 @@ ALTER TABLE ONLY business.businesses
 
 ALTER TABLE ONLY catalog.categories
     ADD CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: favourite_businesses favourite_businesses_business_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_businesses
+    ADD CONSTRAINT favourite_businesses_business_id_fkey FOREIGN KEY (business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: favourite_businesses favourite_businesses_user_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_businesses
+    ADD CONSTRAINT favourite_businesses_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: favourite_vouchers favourite_vouchers_user_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_vouchers
+    ADD CONSTRAINT favourite_vouchers_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: favourite_vouchers favourite_vouchers_voucher_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_vouchers
+    ADD CONSTRAINT favourite_vouchers_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

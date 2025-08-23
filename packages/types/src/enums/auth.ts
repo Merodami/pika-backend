@@ -39,6 +39,15 @@ export enum AuthProvider {
 // Keep OAuthProvider for backward compatibility
 export { AuthProvider as OAuthProvider }
 
+/**
+ * Social authentication providers (subset of AuthProvider)
+ */
+export enum SocialProvider {
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+  APPLE = 'apple',
+}
+
 export enum OAuthError {
   INVALID_REQUEST = 'invalidRequest',
   INVALID_CLIENT = 'invalidClient',
@@ -51,10 +60,10 @@ export enum OAuthError {
 }
 
 export enum DeviceType {
-  MOBILE = 'mobile',
-  TABLET = 'tablet',
+  IOS = 'ios',
+  ANDROID = 'android',
+  WEB = 'web',
   DESKTOP = 'desktop',
-  OTHER = 'other',
 }
 
 /**

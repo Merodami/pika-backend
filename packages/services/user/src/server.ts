@@ -8,6 +8,7 @@ import { FileStoragePort, logger } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminUserRouter } from './routes/AdminUserRoutes.js'
+import { createFavoriteRoutes } from './routes/FavoriteRoutes.js'
 import { createInternalUserRouter } from './routes/InternalUserRoutes.js'
 import { createUserRouter } from './routes/UserRoutes.js'
 
@@ -95,6 +96,10 @@ export async function createUserServer({
   )
 
   app.use('/users', userRouter)
+
+  // Register favorite routes
+  const favoriteRouter = createFavoriteRoutes(prisma, cacheService)
+  app.use('/users/me/favorites', favoriteRouter)
 
   // Register admin routes
   const adminRouter = createAdminUserRouter(

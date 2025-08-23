@@ -2,6 +2,7 @@ import type { PrismaClient } from '@prisma/client'
 
 import { BUSINESS_MODULE } from './business-seeder.js'
 import { CATEGORY_MODULE } from './category-seeder.js'
+import { seedImages, cleanupImages, type ImageSeedingResult } from './image-seeder.js'
 import { USER_MODULE } from './user-seeder.js'
 import { VOUCHER_MODULE } from './voucher-seeder.js'
 
@@ -320,7 +321,68 @@ export const QUICK_COMMANDS = {
   seedBusiness: (prisma: PrismaClient) =>
     seedModules(prisma, ['User', 'Categories', 'Businesses']),
 
+  /**
+   * Seed everything with images
+   */
+  seedAllWithImages: async (prisma: PrismaClient) => {
+    console.log('🖼️ Starting complete seed with images...')
+    
+    // First seed images
+    const images = await seedImages(prisma)
+    
+    // Then seed data with image URLs
+    await seedWithImages(prisma, images)
+  },
+
+  /**
+   * Cleanup everything including images
+   */
+  cleanAllWithImages: async (prisma: PrismaClient) => {
+    // Clean up modules first
+    await cleanupModules(prisma, ['Vouchers', 'Businesses', 'Categories', 'User'])
+    
+    // Then cleanup images
+    await cleanupImages(prisma)
+  },
+
 } as const
+
+/**
+ * Seed modules with image integration
+ */
+export async function seedWithImages(
+  prisma: PrismaClient,
+  images: ImageSeedingResult,
+  moduleNames: ModuleName[] = ['User', 'Categories', 'Businesses', 'Vouchers']
+): Promise<void> {
+  console.log('🌱 Seeding modules with image integration...')
+  
+  try {
+    const executionOrder = getExecutionOrder(moduleNames)
+    console.log(`🔗 Execution order: ${executionOrder.join(' → ')}`)
+
+    for (const moduleName of executionOrder) {
+      const module = getModule(moduleName)
+      console.log(`\n🔧 ${module.name}: ${module.description}`)
+
+      // Call seed function with images parameter for compatible modules
+      if (moduleName === 'Businesses') {
+        // Business module supports images
+        await module.seed(prisma, images)
+      } else {
+        // Regular modules
+        await module.seed(prisma)
+      }
+      
+      console.log(`✅ ${module.name} seeded successfully`)
+    }
+
+    console.log('\n🎉 All modules with images seeded successfully!')
+  } catch (error) {
+    console.error('❌ Failed to seed with images:', error)
+    throw error
+  }
+}
 
 // Export module constants for external use
 export { ALL_MODULES }

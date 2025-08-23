@@ -28,9 +28,7 @@ import {
   MockTranslationClient,
   TestDatabaseResult,
 } from '@pika/tests'
-import {
-  createCommunicationServiceClientMock,
-} from '@pika/tests'
+import { createCommunicationServiceClientMock } from '@pika/tests'
 import { createTranslationResolver } from '@pika/translation'
 import { UserRole, UserStatus, VoucherState } from '@pika/types'
 import { Decimal } from '@prisma/client/runtime/library'

@@ -3,6 +3,7 @@
  */
 
 export * from './address.js'
+export * from './favorites.js'
 export * from './parameters.js'
 export * from './profile.js'
 export * from './queries.js'

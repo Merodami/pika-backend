@@ -81,8 +81,14 @@ async function seedDevData() {
         case 'seedBusiness':
           await QUICK_COMMANDS.seedBusiness(prisma)
           break
+        case 'seedWithImages':
+          await QUICK_COMMANDS.seedAllWithImages(prisma)
+          break
+        case 'cleanWithImages':
+          await QUICK_COMMANDS.cleanAllWithImages(prisma)
+          break
         default:
-          console.log('❌ Unknown quick command. Available: seedAll, cleanAll, resetAll, checkAll, seedBasic, seedBusiness')
+          console.log('❌ Unknown quick command. Available: seedAll, cleanAll, resetAll, checkAll, seedBasic, seedBusiness, seedWithImages, cleanWithImages')
           process.exit(1)
       }
 
@@ -141,6 +147,8 @@ Quick Commands:
   checkAll       - Check all modules
   seedBasic      - Seed just User + Categories
   seedBusiness   - Seed User + Categories + Businesses
+  seedWithImages - Seed all modules with test images uploaded to MinIO
+  cleanWithImages- Cleanup all modules including uploaded test images
 
 Examples:
   yarn seed:dev                                # Seed everything
@@ -149,6 +157,7 @@ Examples:
   yarn seed:dev check                         # Check status of all modules
   yarn seed:dev reset Businesses Vouchers     # Reset businesses and vouchers
   yarn seed:dev quick seedBasic               # Quick seed basic modules
+  yarn seed:dev quick seedWithImages          # Seed everything with test images
   yarn seed:dev legacy                        # Use legacy category system only
 `)
 }

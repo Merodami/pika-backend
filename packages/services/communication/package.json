@@ -7,8 +7,8 @@
   "type": "module",
   "main": "dist/index.js",
   "dependencies": {
-    "@aws-sdk/client-ses": "^3.864.0",
-    "@aws-sdk/client-sns": "^3.864.0",
+    "@aws-sdk/client-ses": "^3.873.0",
+    "@aws-sdk/client-sns": "^3.873.0",
     "@pika/api": "workspace:^",
     "@pika/auth": "workspace:^",
     "@pika/database": "workspace:^",

@@ -70,6 +70,10 @@ model User {
 
   // Translation system relations
   languagePreference    UserLanguagePreference? // User's preferred language
+  
+  // Favorites system relations
+  favoriteBusinesses    FavouriteBusiness[] // Businesses favorited by this user
+  favoriteVouchers      FavouriteVoucher[]  // Vouchers favorited by this user
 
   @@index([email])
   @@index([phoneNumber])

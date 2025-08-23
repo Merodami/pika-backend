@@ -34,6 +34,7 @@ model Voucher {
   // Analytics counters (denormalized for performance)
   scanCount              Int                 @default(0) @map("scan_count")
   claimCount             Int                 @default(0) @map("claim_count")
+  favoriteCount          Int                 @default(0) @map("favorite_count") // Number of users who favorited this voucher
   
   // Additional metadata and settings
   metadata               Json?               // Additional voucher metadata
@@ -52,6 +53,7 @@ model Voucher {
   scans                  VoucherScan[]
   customerVouchers       CustomerVoucher[]
   fraudCases             FraudCase[]
+  favoritedBy            FavouriteVoucher[]  // Users who favorited this voucher
   
   @@index([businessId])
   @@index([categoryId])
@@ -63,6 +65,7 @@ model Voucher {
   @@index([updatedAt])
   @@index([deletedAt])
   @@index([qrCode])
+  @@index([favoriteCount(sort: Desc)])
   @@index([state, businessId]) // For business voucher filtering
   @@index([state, validUntil]) // For expiry checking
   @@index([businessId, createdAt]) // For business voucher listing

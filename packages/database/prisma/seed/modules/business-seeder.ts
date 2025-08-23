@@ -1,6 +1,8 @@
 import type { PrismaClient } from '@prisma/client'
 
 import { FIXED_DEV_IDS } from './fixed-ids.js'
+import type { ImageSeedingResult } from './image-seeder.js'
+import { getRandomBusinessImage } from './image-seeder.js'
 
 /**
  * Business Seeder Module
@@ -56,7 +58,10 @@ const DEV_BUSINESSES_DATA = [
   },
 ] as const
 
-export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
+export async function seedBusinesses(
+  prisma: PrismaClient, 
+  images?: ImageSeedingResult
+): Promise<void> {
   console.log('🏢 Seeding dev businesses...')
 
   let businessesCreated = 0
@@ -65,6 +70,11 @@ export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
   try {
     for (const businessData of DEV_BUSINESSES_DATA) {
       const { translations, ...business } = businessData
+
+      // Assign a business image if available
+      const logoUrl = images && images.businessImages.length > 0 
+        ? getRandomBusinessImage(images.businessImages)
+        : undefined
 
       // Create/update business
       const createdBusiness = await prisma.business.upsert({
@@ -77,8 +87,12 @@ export async function seedBusinesses(prisma: PrismaClient): Promise<void> {
           active: business.active,
           approved: business.approved,
           avgRating: business.avgRating,
+          ...(logoUrl && { logoUrl }),
         },
-        create: business,
+        create: {
+          ...business,
+          ...(logoUrl && { logoUrl }),
+        },
       })
 
       businessesCreated++

@@ -31,7 +31,7 @@ import {
 export const AdminVoucherDetailResponse = withTimestampsString({
   id: UUID,
   businessId: UUID,
-  categoryId: UUID,
+  categoryId: UUID.optional(),
 
   // Lifecycle
   state: VoucherStateSchema,
@@ -144,7 +144,7 @@ export type AdminVoucherResponse = z.infer<typeof AdminVoucherResponse>
  */
 export const AdminCreateVoucherRequest = z.object({
   businessId: UUID,
-  categoryId: UUID,
+  categoryId: UUID.optional(),
 
   // Content translations (translation service will create the keys)
   title: z

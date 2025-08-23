@@ -1,5 +1,7 @@
 import { AuthController } from '@auth-service/controllers/AuthController.js'
+import { SocialAuthController } from '@auth-service/controllers/SocialAuthController.js'
 import { AuthService } from '@auth-service/services/AuthService.js'
+import { SocialAuthService } from '@auth-service/services/SocialAuthService.js'
 import { authPublic } from '@pika/api'
 import { requireAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
@@ -26,6 +28,15 @@ export function createAuthRouter(
     businessServiceClient,
   )
   const controller = new AuthController(authService)
+
+  // Initialize social auth service and controller
+  const socialAuthService = new SocialAuthService(
+    cache,
+    userServiceClient,
+    communicationClient,
+    businessServiceClient,
+  )
+  const socialAuthController = new SocialAuthController(socialAuthService)
 
   // Public routes (no authentication required)
   router.post(
@@ -85,6 +96,33 @@ export function createAuthRouter(
 
   // Protected route - auth is handled manually in the controller
   router.get('/userinfo', controller.userinfo)
+
+  // Social Authentication routes
+  router.post(
+    '/social/login',
+    validateBody(authPublic.SocialLoginRequest),
+    socialAuthController.socialLogin,
+  )
+
+  router.post(
+    '/social/link',
+    requireAuth(),
+    validateBody(authPublic.LinkAccountRequest),
+    socialAuthController.linkAccount,
+  )
+
+  router.post(
+    '/social/unlink',
+    requireAuth(),
+    validateBody(authPublic.UnlinkAccountRequest),
+    socialAuthController.unlinkAccount,
+  )
+
+  router.get(
+    '/social/accounts',
+    requireAuth(),
+    socialAuthController.getLinkedAccounts,
+  )
 
   return router
 }
