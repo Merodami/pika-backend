@@ -26,7 +26,12 @@ export function createInternalBusinessRoutes(
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
-  const service = new BusinessService(repository, translationClient, cache, translationResolver)
+  const service = new BusinessService(
+    repository,
+    translationClient,
+    cache,
+    translationResolver,
+  )
   const controller = new InternalBusinessController(service)
 
   // All routes require internal authentication

@@ -64,12 +64,20 @@ export class UserRepository implements IUserRepository {
 
       // General search across multiple fields
       if (search) {
-        where.OR = [
-          { id: { equals: search } }, // UUID exact match
+        const searchConditions: any[] = [
           { email: { contains: search, mode: 'insensitive' } },
           { firstName: { contains: search, mode: 'insensitive' } },
           { lastName: { contains: search, mode: 'insensitive' } },
         ]
+
+        // Only search by ID if the search string looks like a UUID
+        const uuidRegex =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+        if (uuidRegex.test(search)) {
+          searchConditions.unshift({ id: { equals: search } }) // UUID exact match
+        }
+
+        where.OR = searchConditions
       }
 
       if (email) {

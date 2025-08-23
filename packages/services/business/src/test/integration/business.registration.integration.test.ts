@@ -321,14 +321,16 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         ...step1Data,
         businessName: 'Updated Business Name',
       }
-      
+
       const response2 = await businessOwnerClient
         .post('/businesses/registration/step1')
         .send(updatedData)
         .set('Accept', 'application/json')
 
       expect(response2.status).toBe(200)
-      expect(response2.body.step1Data.businessName).toBe('Updated Business Name')
+      expect(response2.body.step1Data.businessName).toBe(
+        'Updated Business Name',
+      )
     })
   })
 
@@ -547,7 +549,9 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .set('Accept', 'application/json')
 
       expect(response2.status).toBe(200)
-      expect(response2.body.step1Data.businessName).toBe('Updated Business Name After Step 3')
+      expect(response2.body.step1Data.businessName).toBe(
+        'Updated Business Name After Step 3',
+      )
       expect(response2.body.currentStep).toBe(3) // Should maintain progress at step 3
     })
   })
@@ -800,7 +804,9 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .expect(200)
 
       expect(step1Response.body.currentStep).toBe(2) // Advanced to step 2
-      expect(step1Response.body.step1Data.businessName).toBe('Original Business Name')
+      expect(step1Response.body.step1Data.businessName).toBe(
+        'Original Business Name',
+      )
 
       // Complete step 2
       const step2Data: businessPublic.BusinessRegistrationStep2Request = {
@@ -822,15 +828,18 @@ describe('Business Service - Registration Flow Integration Tests', () => {
         .expect(200)
 
       expect(step2Response.body.currentStep).toBe(3) // Advanced to step 3
-      expect(step2Response.body.step2Data.description).toBe('Original description')
+      expect(step2Response.body.step2Data.description).toBe(
+        'Original description',
+      )
 
       // Now go back and edit step 1 - this should work now!
-      const updatedStep1Data: businessPublic.BusinessRegistrationStep1Request = {
-        businessName: 'Updated Business Name',
-        businessType: BusinessType.SERVICE, // Changed type
-        categoryId: testCategoryId,
-        primaryLanguage: 'es', // Changed language
-      }
+      const updatedStep1Data: businessPublic.BusinessRegistrationStep1Request =
+        {
+          businessName: 'Updated Business Name',
+          businessType: BusinessType.SERVICE, // Changed type
+          categoryId: testCategoryId,
+          primaryLanguage: 'es', // Changed language
+        }
 
       const updatedStep1Response = await businessOwnerClient
         .post('/businesses/registration/step1')
@@ -841,25 +850,32 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       // Should still be on step 3 (don't go backwards)
       expect(updatedStep1Response.body.currentStep).toBe(3)
       // But step 1 data should be updated
-      expect(updatedStep1Response.body.step1Data.businessName).toBe('Updated Business Name')
-      expect(updatedStep1Response.body.step1Data.businessType).toBe(BusinessType.SERVICE)
+      expect(updatedStep1Response.body.step1Data.businessName).toBe(
+        'Updated Business Name',
+      )
+      expect(updatedStep1Response.body.step1Data.businessType).toBe(
+        BusinessType.SERVICE,
+      )
       expect(updatedStep1Response.body.step1Data.primaryLanguage).toBe('es')
       // Step 2 data should remain unchanged
-      expect(updatedStep1Response.body.step2Data.description).toBe('Original description')
+      expect(updatedStep1Response.body.step2Data.description).toBe(
+        'Original description',
+      )
 
       // Also test editing step 2
-      const updatedStep2Data: businessPublic.BusinessRegistrationStep2Request = {
-        description: 'Updated description',
-        address: {
-          street: '456 Updated Avenue',
-          city: 'Updated City',
-          state: 'UP',
-          postalCode: '67890',
-          country: 'US',
-        },
-        phone: '+9876543210',
-        email: 'updated@example.com',
-      }
+      const updatedStep2Data: businessPublic.BusinessRegistrationStep2Request =
+        {
+          description: 'Updated description',
+          address: {
+            street: '456 Updated Avenue',
+            city: 'Updated City',
+            state: 'UP',
+            postalCode: '67890',
+            country: 'US',
+          },
+          phone: '+9876543210',
+          email: 'updated@example.com',
+        }
 
       const updatedStep2Response = await businessOwnerClient
         .post('/businesses/registration/step2')
@@ -870,11 +886,19 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       // Should still be on step 3
       expect(updatedStep2Response.body.currentStep).toBe(3)
       // Step 2 data should be updated
-      expect(updatedStep2Response.body.step2Data.description).toBe('Updated description')
-      expect(updatedStep2Response.body.step2Data.address.street).toBe('456 Updated Avenue')
-      expect(updatedStep2Response.body.step2Data.email).toBe('updated@example.com')
+      expect(updatedStep2Response.body.step2Data.description).toBe(
+        'Updated description',
+      )
+      expect(updatedStep2Response.body.step2Data.address.street).toBe(
+        '456 Updated Avenue',
+      )
+      expect(updatedStep2Response.body.step2Data.email).toBe(
+        'updated@example.com',
+      )
       // Step 1 data should still show the updates
-      expect(updatedStep2Response.body.step1Data.businessName).toBe('Updated Business Name')
+      expect(updatedStep2Response.body.step1Data.businessName).toBe(
+        'Updated Business Name',
+      )
     })
 
     it('should not allow users to skip to future steps', async () => {

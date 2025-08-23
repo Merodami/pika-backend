@@ -39,7 +39,7 @@ export const BusinessStatusFilterSchema = BusinessStatusFilter.openapi({
 export type BusinessStatusFilter = z.infer<typeof BusinessStatusFilter>
 
 // Business relations that can be included
-export const BUSINESS_RELATIONS = ['user', 'category'] as const
+export const BUSINESS_RELATIONS = ['user', 'category', 'businessDetails'] as const
 
 export type BusinessRelations = (typeof BUSINESS_RELATIONS)[number]
 

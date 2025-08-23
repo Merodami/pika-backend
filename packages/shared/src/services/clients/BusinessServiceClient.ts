@@ -73,7 +73,7 @@ export class BusinessServiceClient extends BaseServiceClient {
    */
   async getBusinessesByUserId(
     userId: string,
-    options?: { 
+    options?: {
       includeUser?: boolean
       includeCategory?: boolean
       page?: number
@@ -102,7 +102,12 @@ export class BusinessServiceClient extends BaseServiceClient {
 
     const response = await this.get<{
       data: BusinessDomain[]
-      pagination: { page: number; limit: number; total: number; totalPages: number }
+      pagination: {
+        page: number
+        limit: number
+        total: number
+        totalPages: number
+      }
     }>(path, {
       context,
       useServiceAuth: true,

@@ -188,7 +188,9 @@ export class VoucherMapper {
       discountType: VoucherMapper.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
-      location: domain.location ? VoucherMapper.mapLocationToDTO(domain.location) : null,
+      location: domain.location
+        ? VoucherMapper.mapLocationToDTO(domain.location)
+        : null,
       imageUrl: domain.imageUrl || undefined,
       validFrom: formatDateToISO(domain.validFrom),
       expiresAt: formatDateToISO(domain.expiresAt),
@@ -658,7 +660,9 @@ export class VoucherMapper {
       currency: domain.currency,
 
       // Geographic targeting
-      location: domain.location ? VoucherMapper.mapLocationToDTO(domain.location) : null,
+      location: domain.location
+        ? VoucherMapper.mapLocationToDTO(domain.location)
+        : null,
 
       // Media
       imageUrl: domain.imageUrl,

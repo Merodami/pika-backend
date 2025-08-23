@@ -91,7 +91,7 @@ export async function seedTestBusinesses(
   if (userId) {
     // Check if user already exists
     singleUser = await prismaClient.user.findUnique({ where: { id: userId } })
-    
+
     if (!singleUser) {
       // Create the specified user
       singleUser = await prismaClient.user.create({
@@ -147,8 +147,8 @@ export async function seedTestBusinesses(
       isVerified = customData[i].verified ?? true
     } else {
       // Use original behavior: alternating pattern when generate flags are true
-      isActive = generateInactive ? i % 2 !== 0 : true  // When generateInactive=true, odd indices (1,3,5...) are inactive
-      isVerified = generateUnverified ? i % 2 !== 0 : true  // When generateUnverified=true, odd indices (1,3,5...) are unverified
+      isActive = generateInactive ? i % 2 !== 0 : true // When generateInactive=true, odd indices (1,3,5...) are inactive
+      isVerified = generateUnverified ? i % 2 !== 0 : true // When generateUnverified=true, odd indices (1,3,5...) are unverified
     }
 
     // Create business for this user

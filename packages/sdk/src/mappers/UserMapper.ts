@@ -37,6 +37,7 @@ export interface UserDocument {
   dateOfBirth?: Date | null
   stripeUserId?: string | null
   preferredLanguage?: string | null
+  primaryBusinessId?: string | null
 }
 
 /**
@@ -127,6 +128,7 @@ export class UserMapper {
         : undefined,
       stripeUserId: doc.stripeUserId,
       preferredLanguage: doc.preferredLanguage,
+      primaryBusinessId: doc.primaryBusinessId,
     }
   }
 
@@ -135,12 +137,14 @@ export class UserMapper {
    * Transforms camelCase to snake_case and handles date formatting
    */
   static toDTO(domain: UserDomain): UserDTO {
+    const name = `${domain.firstName} ${domain.lastName}`.trim()
     return {
       id: domain.id,
       email: domain.email,
       emailVerified: domain.emailVerified,
       firstName: domain.firstName,
       lastName: domain.lastName,
+      name, // Computed full name
       phoneNumber: domain.phoneNumber || undefined,
       phoneVerified: domain.phoneVerified,
       avatarUrl: domain.avatarUrl || undefined,
@@ -154,6 +158,7 @@ export class UserMapper {
       // Admin fields - default values when not available
       stripeUserId: domain.stripeUserId || undefined,
       preferredLanguage: domain.preferredLanguage || undefined,
+      primaryBusinessId: domain.primaryBusinessId || undefined,
     }
   }
 
@@ -203,6 +208,7 @@ export class UserMapper {
       dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
       stripeUserId: dto.stripeUserId || null,
       preferredLanguage: dto.preferredLanguage || null,
+      primaryBusinessId: dto.primaryBusinessId || null,
     }
   }
 

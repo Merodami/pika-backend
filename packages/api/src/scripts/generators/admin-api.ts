@@ -285,6 +285,10 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminVoucherSchemas.AdminVoucherListResponse,
   )
   registry.registerSchema(
+    'AdminVoucherResponse',
+    adminVoucherSchemas.AdminVoucherResponse,
+  )
+  registry.registerSchema(
     'AdminCreateVoucherRequest',
     adminVoucherSchemas.AdminCreateVoucherRequest,
   )
@@ -297,6 +301,14 @@ export function registerAdminAPI(registry: ZodRegistry): void {
     adminVoucherQueries.AdminVoucherQueryParams,
   )
   registry.registerSchema(
+    'BusinessVoucherStatsQueryParams',
+    adminVoucherQueries.BusinessVoucherStatsQueryParams,
+  )
+  registry.registerSchema(
+    'VoucherAnalyticsQueryParams',
+    adminVoucherQueries.VoucherAnalyticsQueryParams,
+  )
+  registry.registerSchema(
     'AdminBulkVoucherUpdateRequest',
     adminVoucherSchemas.AdminBulkVoucherUpdateRequest,
   )
@@ -307,6 +319,30 @@ export function registerAdminAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'AdminVoucherAnalyticsResponse',
     adminVoucherSchemas.AdminVoucherAnalyticsResponse,
+  )
+  registry.registerSchema(
+    'AdminUploadVoucherImageResponse',
+    adminVoucherSchemas.AdminUploadVoucherImageResponse,
+  )
+  registry.registerSchema(
+    'AdminUpdateVoucherStateRequest',
+    adminVoucherSchemas.AdminUpdateVoucherStateRequest,
+  )
+  registry.registerSchema(
+    'AdminGenerateVoucherCodesRequest',
+    adminVoucherSchemas.AdminGenerateVoucherCodesRequest,
+  )
+  registry.registerSchema(
+    'AdminUpdateVoucherTranslationsRequest',
+    adminVoucherSchemas.AdminUpdateVoucherTranslationsRequest,
+  )
+  registry.registerSchema(
+    'AdminVoucherTranslationsResponse',
+    adminVoucherSchemas.AdminVoucherTranslationsResponse,
+  )
+  registry.registerSchema(
+    'AdminBusinessVoucherStatsResponse',
+    adminVoucherSchemas.AdminBusinessVoucherStatsResponse,
   )
 
   // Voucher parameter schemas
@@ -1218,7 +1254,8 @@ function registerAdminRoutes(registry: ZodRegistry): void {
     path: '/admin/businesses/users/{id}/registration/reset',
     operationId: 'resetBusinessRegistration',
     summary: 'Reset a business registration by user ID',
-    description: 'Reset a business registration to allow the user to restart the registration process',
+    description:
+      'Reset a business registration to allow the user to restart the registration process',
     tags: ['Business Management'],
     security: [{ bearerAuth: [] }],
     request: {
@@ -1686,6 +1723,357 @@ function registerAdminRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: adminVoucherSchemas.AdminVoucherAnalyticsResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Publish voucher
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/{id}/publish',
+    operationId: 'publishAdminVoucher',
+    summary: 'Publish a voucher (DRAFT → PUBLISHED)',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher published successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      409: {
+        description: 'Invalid state transition',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Expire voucher
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/{id}/expire',
+    operationId: 'expireAdminVoucher',
+    summary: 'Expire a voucher (PUBLISHED → EXPIRED)',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher expired successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      409: {
+        description: 'Invalid state transition',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Upload voucher image
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/{id}/image',
+    operationId: 'uploadAdminVoucherImage',
+    summary: 'Upload voucher image',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              properties: {
+                image: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Image file (max 5MB)',
+                },
+              },
+              required: ['image'],
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Image uploaded successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminUploadVoucherImageResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      413: {
+        description: 'File too large',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update voucher state
+  registry.registerRoute({
+    method: 'put',
+    path: '/vouchers/{id}/state',
+    operationId: 'updateAdminVoucherState',
+    summary: 'Update voucher state with validation',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminUpdateVoucherStateRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher state updated successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      409: {
+        description: 'Invalid state transition',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Generate voucher codes
+  registry.registerRoute({
+    method: 'post',
+    path: '/vouchers/{id}/codes',
+    operationId: 'generateAdminVoucherCodes',
+    summary: 'Generate voucher codes',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminGenerateVoucherCodesRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher codes generated successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherDetailResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update voucher translations
+  registry.registerRoute({
+    method: 'put',
+    path: '/vouchers/{id}/translations',
+    operationId: 'updateAdminVoucherTranslations',
+    summary: 'Update voucher translations',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      body: {
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminUpdateVoucherTranslationsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Voucher translations updated successfully',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherTranslationsResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher translations
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers/{id}/translations',
+    operationId: 'getAdminVoucherTranslations',
+    summary: 'Get voucher translations',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher translations',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherTranslationsResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get voucher analytics (individual voucher)
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers/{id}/analytics',
+    operationId: 'getAdminVoucherAnalytics',
+    summary: 'Get analytics for specific voucher',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: voucherParameters.VoucherPathParams,
+      query: adminVoucherQueries.VoucherAnalyticsQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Voucher analytics data',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminVoucherAnalyticsResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Voucher not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get business voucher statistics
+  registry.registerRoute({
+    method: 'get',
+    path: '/vouchers/business/{id}/stats',
+    operationId: 'getAdminBusinessVoucherStats',
+    summary: 'Get voucher statistics for a specific business',
+    tags: ['Voucher Management'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      params: businessParameters.BusinessIdParam,
+      query: adminVoucherQueries.BusinessVoucherStatsQueryParams,
+    },
+    responses: {
+      200: {
+        description: 'Business voucher statistics',
+        content: {
+          'application/json': {
+            schema: adminVoucherSchemas.AdminBusinessVoucherStatsResponse,
+          },
+        },
+      },
+      404: {
+        description: 'Business not found',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
           },
         },
       },

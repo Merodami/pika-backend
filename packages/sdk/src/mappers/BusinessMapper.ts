@@ -101,15 +101,15 @@ export class BusinessMapper {
 
   /**
    * Maps a domain entity to an Admin API DTO
-   * Admin responses include branded types and formatted date strings
+   * Admin responses include translation keys for internal management
    */
   static toAdminDTO(domain: BusinessDomain): any {
     return {
       id: domain.id,
       userId: domain.userId,
-      // Use resolved translations if available, fallback to keys
-      businessName: domain.businessName || domain.businessNameKey,
-      businessDescription: domain.businessDescription || domain.businessDescriptionKey || undefined,
+      // Admin endpoints should show translation keys for internal management
+      businessName: domain.businessNameKey,
+      businessDescription: domain.businessDescriptionKey || undefined,
       categoryId: domain.categoryId,
       verified: domain.verified,
       active: domain.active,
@@ -137,14 +137,18 @@ export class BusinessMapper {
 
   /**
    * Maps a domain entity to an API DTO
+   * Public endpoints should show resolved translations when available
    */
   static toDTO(domain: BusinessDomain): BusinessDTO {
     return {
       id: domain.id,
       userId: domain.userId,
-      // Use resolved translations if available, fallback to keys
+      // Use resolved translations if available, fallback to keys for public endpoints
       businessName: domain.businessName || domain.businessNameKey,
-      businessDescription: domain.businessDescription || domain.businessDescriptionKey || undefined,
+      businessDescription:
+        domain.businessDescription ||
+        domain.businessDescriptionKey ||
+        undefined,
       categoryId: domain.categoryId || '', // Handle null categoryId
       verified: domain.verified,
       active: domain.active,

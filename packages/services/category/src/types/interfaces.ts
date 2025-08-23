@@ -78,7 +78,10 @@ export interface ICategoryService {
   /**
    * Get multiple categories by IDs
    */
-  getCategoriesByIds(ids: string[], language?: LanguageCode): Promise<PaginatedResult<Category>>
+  getCategoriesByIds(
+    ids: string[],
+    language?: LanguageCode,
+  ): Promise<PaginatedResult<Category>>
 
   /**
    * Create new category
@@ -118,7 +121,10 @@ export interface ICategoryService {
   /**
    * Get category hierarchy
    */
-  getCategoryHierarchy(rootId?: string | null, language?: LanguageCode): Promise<Category[]>
+  getCategoryHierarchy(
+    rootId?: string | null,
+    language?: LanguageCode,
+  ): Promise<Category[]>
 
   /**
    * Get category path (breadcrumb)

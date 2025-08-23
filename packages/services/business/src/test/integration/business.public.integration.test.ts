@@ -295,6 +295,36 @@ describe('Business Service - Public API Integration Tests', () => {
       expect(response.body.user).toBeDefined()
     })
 
+    it('should include businessDetails when requested', async () => {
+      const { businesses } = await seedTestBusinesses(testDb.prisma)
+      const testBusiness = businesses[0]
+
+      // Create business details for testing
+      await testDb.prisma.businessDetails.create({
+        data: {
+          businessId: testBusiness.id,
+          phone: '+1234567890',
+          email: 'contact@business.com',
+          street: '123 Main St',
+          city: 'Test City',
+          state: 'Test State',
+          postalCode: '12345',
+          country: 'US',
+        },
+      })
+
+      const response = await customerClient
+        .get(`/businesses/${testBusiness.id}`)
+        .query({ include: 'businessDetails' })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.businessDetails).toBeDefined()
+      expect(response.body.businessDetails.phone).toBe('+1234567890')
+      expect(response.body.businessDetails.email).toBe('contact@business.com')
+      expect(response.body.businessDetails.street).toBe('123 Main St')
+    })
+
     it('should return 404 for non-existent business ID', async () => {
       const nonExistentId = uuid()
 

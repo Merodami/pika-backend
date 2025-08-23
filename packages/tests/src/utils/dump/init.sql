@@ -24,6 +24,7 @@ ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_customer_id_fkey;
+ALTER TABLE IF EXISTS ONLY users.users DROP CONSTRAINT IF EXISTS users_primary_business_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_problem_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.problems DROP CONSTRAINT IF EXISTS problems_user_id_fkey;
@@ -105,6 +106,7 @@ DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_status_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_claimed_at_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_claimed_at_idx;
+DROP INDEX IF EXISTS users.users_primary_business_id_idx;
 DROP INDEX IF EXISTS users.users_phone_number_idx;
 DROP INDEX IF EXISTS users.users_email_key;
 DROP INDEX IF EXISTS users.users_email_idx;
@@ -1478,7 +1480,8 @@ CREATE TABLE users.users (
     deleted_at timestamp(6) with time zone,
     date_of_birth date,
     stripe_user_id character varying(255),
-    preferred_language character varying(2)
+    preferred_language character varying(2),
+    primary_business_id uuid
 );
 
 
@@ -2815,6 +2818,13 @@ CREATE INDEX users_phone_number_idx ON users.users USING btree (phone_number);
 
 
 --
+-- Name: users_primary_business_id_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_primary_business_id_idx ON users.users USING btree (primary_business_id);
+
+
+--
 -- Name: customer_vouchers_claimed_at_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
@@ -3422,6 +3432,14 @@ ALTER TABLE ONLY support.support_comments
 
 ALTER TABLE ONLY support.support_comments
     ADD CONSTRAINT support_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: users users_primary_business_id_fkey; Type: FK CONSTRAINT; Schema: users; Owner: -
+--
+
+ALTER TABLE ONLY users.users
+    ADD CONSTRAINT users_primary_business_id_fkey FOREIGN KEY (primary_business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --

@@ -29,7 +29,10 @@ export interface IBusinessService {
     includes?: ParsedIncludes,
     language?: LanguageCode,
   ): Promise<BusinessDomain>
-  createBusiness(data: CreateBusinessRequest, language?: LanguageCode): Promise<BusinessDomain>
+  createBusiness(
+    data: CreateBusinessRequest,
+    language?: LanguageCode,
+  ): Promise<BusinessDomain>
   updateBusiness(
     id: string,
     data: UpdateBusinessRequest,
@@ -245,7 +248,10 @@ export class BusinessService implements IBusinessService {
   /**
    * Create a new business
    */
-  async createBusiness(data: CreateBusinessRequest, language?: LanguageCode): Promise<BusinessDomain> {
+  async createBusiness(
+    data: CreateBusinessRequest,
+    language?: LanguageCode,
+  ): Promise<BusinessDomain> {
     try {
       logger.debug(`Creating business for user: ${data.userId}`)
 

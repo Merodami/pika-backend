@@ -20,6 +20,7 @@ model User {
   dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
   stripeUserId      String?           @map("stripe_user_id") @db.VarChar(255)
   preferredLanguage String?           @map("preferred_language") @db.VarChar(2) // ISO 639-1 language code
+  primaryBusinessId String?           @map("primary_business_id") @db.Uuid // Primary business for business users
 
   // Relations
   problems          Problem[]
@@ -48,6 +49,7 @@ model User {
   // Business relations
   businesses            Business[]
   businessRegistration  BusinessRegistration?
+  primaryBusiness       Business?             @relation("UserPrimaryBusiness", fields: [primaryBusinessId], references: [id], onDelete: SetNull)
   
   // PDF relations
   createdVoucherBooks   VoucherBook[]     @relation("VoucherBookCreatedBy")
@@ -71,6 +73,7 @@ model User {
   @@index([email])
   @@index([phoneNumber])
   @@index([deletedAt])
+  @@index([primaryBusinessId])
   @@map("users")
   @@schema("users")
 }

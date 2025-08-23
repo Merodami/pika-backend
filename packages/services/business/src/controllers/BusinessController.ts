@@ -53,7 +53,10 @@ export class BusinessController {
         sortOrder: mapSortOrder(query.sortOrder),
       }
 
-      const result = await this.businessService.getAllBusinesses(params, language)
+      const result = await this.businessService.getAllBusinesses(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
@@ -91,6 +94,7 @@ export class BusinessController {
         {
           user: includeRelations.includes('user'),
           category: includeRelations.includes('category'),
+          businessDetails: includeRelations.includes('businessDetails'),
         },
         language,
       )
@@ -138,6 +142,7 @@ export class BusinessController {
         {
           user: includeRelations.includes('user'),
           category: includeRelations.includes('category'),
+          businessDetails: includeRelations.includes('businessDetails'),
         },
         language,
       )
@@ -195,7 +200,10 @@ export class BusinessController {
         sortOrder: mapSortOrder(query.sortOrder),
       }
 
-      const result = await this.businessService.getAllBusinesses(params, language)
+      const result = await this.businessService.getAllBusinesses(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
@@ -260,10 +268,14 @@ export class BusinessController {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
+      const language = getRequestLanguage(req)
 
       // Get user's business first
-      const existingBusiness =
-        await this.businessService.getBusinessByUserId(userId)
+      const existingBusiness = await this.businessService.getBusinessByUserId(
+        userId,
+        undefined,
+        language,
+      )
 
       const business = await this.businessService.updateBusiness(
         existingBusiness.id,

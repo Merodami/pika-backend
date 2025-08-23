@@ -282,14 +282,6 @@ export enum CardFunding {
 }
 
 /**
- * Account holder types for bank accounts
- */
-export enum AccountHolderType {
-  INDIVIDUAL = 'individual',
-  COMPANY = 'company',
-}
-
-/**
  * Digital wallet types
  */
 export enum WalletType {
@@ -313,17 +305,6 @@ export enum PaymentVerificationStatus {
 export enum SetupIntentUsage {
   ON_SESSION = 'onSession',
   OFF_SESSION = 'offSession',
-}
-
-/**
- * Async operation statuses
- */
-export enum AsyncOperationStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'inProgress',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled',
 }
 
 /**

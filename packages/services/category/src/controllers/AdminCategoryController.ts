@@ -55,7 +55,10 @@ export class AdminCategoryController {
       }
 
       const language = getRequestLanguage(req)
-      const result = await this.categoryService.getAllCategories(params, language)
+      const result = await this.categoryService.getAllCategories(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)

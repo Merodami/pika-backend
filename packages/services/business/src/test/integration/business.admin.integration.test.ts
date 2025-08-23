@@ -76,7 +76,7 @@ describe('Business Service - Admin API Integration Tests', () => {
     // Create server
     cacheService = new MemoryCacheService()
     translationClient = createMockTranslationClient()
-    
+
     // Create mock user service client for business registration functionality
     userServiceClient = new UserServiceClientMock()
 
@@ -907,9 +907,10 @@ describe('Business Service - Admin API Integration Tests', () => {
       })
 
       // Verify the registration was reset in the database
-      const resetRegistration = await testDb.prisma.businessRegistration.findUnique({
-        where: { id: registration.id },
-      })
+      const resetRegistration =
+        await testDb.prisma.businessRegistration.findUnique({
+          where: { id: registration.id },
+        })
 
       expect(resetRegistration).toBeDefined()
       expect(resetRegistration?.currentStep).toBe(1)
@@ -977,13 +978,14 @@ describe('Business Service - Admin API Integration Tests', () => {
       const deletedBusiness = await testDb.prisma.business.findUnique({
         where: { id: business.id },
       })
-      
+
       expect(deletedBusiness?.deletedAt).not.toBeNull()
 
       // Verify the registration was reset and businessId cleared
-      const resetRegistration = await testDb.prisma.businessRegistration.findUnique({
-        where: { id: registration.id },
-      })
+      const resetRegistration =
+        await testDb.prisma.businessRegistration.findUnique({
+          where: { id: registration.id },
+        })
 
       expect(resetRegistration?.businessId).toBeNull()
       expect(resetRegistration?.currentStep).toBe(1)

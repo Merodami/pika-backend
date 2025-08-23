@@ -206,6 +206,14 @@ describe('User Service - Public API Integration Tests', () => {
       expect(response.body).toHaveProperty('firstName')
       expect(response.body).toHaveProperty('lastName')
       expect(response.body).toHaveProperty('role')
+      // Test new computed name field
+      expect(response.body).toHaveProperty('name')
+      expect(response.body.name).toBe(`${memberUser!.firstName} ${memberUser!.lastName}`)
+      // Test new primaryBusinessId field
+      expect(response.body).toHaveProperty('primaryBusinessId')
+      if (memberUser!.primaryBusinessId) {
+        expect(response.body.primaryBusinessId).toBe(memberUser!.primaryBusinessId)
+      }
     })
 
     it('should return 401 for unauthenticated requests', async () => {

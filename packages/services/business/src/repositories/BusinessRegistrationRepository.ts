@@ -40,7 +40,11 @@ export interface IBusinessRegistrationRepository {
     step: number,
     stepData: any,
   ): Promise<BusinessRegistration>
-  updateStatus(id: string, status: DomainStatus, reason?: string): Promise<BusinessRegistration>
+  updateStatus(
+    id: string,
+    status: DomainStatus,
+    reason?: string,
+  ): Promise<BusinessRegistration>
   complete(id: string, businessId: string): Promise<BusinessRegistration>
   reset(id: string): Promise<BusinessRegistration>
 }
@@ -139,13 +143,18 @@ export class BusinessRegistrationRepository
   /**
    * Find registration by business ID
    */
-  async findByBusinessId(businessId: string): Promise<BusinessRegistration | null> {
+  async findByBusinessId(
+    businessId: string,
+  ): Promise<BusinessRegistration | null> {
     try {
       return await this.prisma.businessRegistration.findFirst({
         where: { businessId },
       })
     } catch (error) {
-      logger.error('Error finding business registration by business ID', { businessId, error })
+      logger.error('Error finding business registration by business ID', {
+        businessId,
+        error,
+      })
       throw ErrorFactory.databaseError(
         'findByBusinessId',
         'Failed to find business registration',
@@ -218,10 +227,11 @@ export class BusinessRegistrationRepository
   ): Promise<BusinessRegistration> {
     try {
       // First get the current registration to check existing progress
-      const currentRegistration = await this.prisma.businessRegistration.findUnique({
-        where: { id },
-        select: { currentStep: true },
-      })
+      const currentRegistration =
+        await this.prisma.businessRegistration.findUnique({
+          where: { id },
+          select: { currentStep: true },
+        })
 
       if (!currentRegistration) {
         throw ErrorFactory.resourceNotFound('BusinessRegistration', id)

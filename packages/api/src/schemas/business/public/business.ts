@@ -14,6 +14,7 @@ import { UUID } from '../../shared/primitives.js'
 import { createByIdQuerySchema } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { PublicUserProfile } from '../../user/public/profile.js'
+import { BusinessDetailsResponse } from './businessDetails.js'
 import { BUSINESS_RELATIONS, BusinessSortBy } from '../common/enums.js'
 
 /**
@@ -40,7 +41,10 @@ export const BusinessResponse = withTimestamps({
   categoryId: UUID.describe('Category this business belongs to'),
   verified: z.boolean().default(false).describe('Whether business is verified'),
   active: z.boolean().default(true).describe('Whether business is active'),
-  approved: z.boolean().default(false).describe('Whether business is approved by admin'),
+  approved: z
+    .boolean()
+    .default(false)
+    .describe('Whether business is approved by admin'),
   avgRating: z
     .number()
     .min(NUMERIC_CONSTRAINTS.RATING_MIN)
@@ -53,6 +57,9 @@ export const BusinessResponse = withTimestamps({
   ),
   category: CategoryResponse.optional().describe(
     'Category information when ?include=category',
+  ),
+  businessDetails: BusinessDetailsResponse.optional().describe(
+    'Detailed contact and location information when ?include=businessDetails',
   ),
 })
 

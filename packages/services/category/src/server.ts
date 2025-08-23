@@ -1,5 +1,9 @@
 import { CATEGORY_SERVICE_PORT } from '@pika/environment'
-import { createExpressServer, errorMiddleware, createLanguageMiddleware } from '@pika/http'
+import {
+  createExpressServer,
+  errorMiddleware,
+  createLanguageMiddleware,
+} from '@pika/http'
 import { type ICacheService, setCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import type { TranslationClient } from '@pika/translation'
@@ -92,7 +96,11 @@ export async function createCategoryServer(config: ServerConfig) {
   // Initialize dependencies with dependency injection
   const categoryRepository = new CategoryRepository(prisma, cacheService)
   const translationResolver = createTranslationResolver(translationClient)
-  const categoryService = new CategoryService(categoryRepository, cacheService, translationResolver)
+  const categoryService = new CategoryService(
+    categoryRepository,
+    cacheService,
+    translationResolver,
+  )
 
   // Initialize controllers
   const categoryController = new CategoryController(categoryService)

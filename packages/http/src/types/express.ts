@@ -1,5 +1,5 @@
 import { ICacheService } from '@pika/redis'
-import { BusinessRegistrationStatus,UserRole } from '@pika/types'
+import { BusinessRegistrationStatus, UserRole } from '@pika/types'
 
 declare global {
   namespace Express {

@@ -28,7 +28,12 @@ export function createBusinessRoutes(
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
-  const service = new BusinessService(repository, translationClient, cache, translationResolver)
+  const service = new BusinessService(
+    repository,
+    translationClient,
+    cache,
+    translationResolver,
+  )
   const controller = new BusinessController(service)
 
   // Public routes (require authentication but available to all users)

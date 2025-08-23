@@ -30,6 +30,17 @@ export enum TimestampSortBy {
 export type TimestampSortByType = `${TimestampSortBy}`
 
 /**
+ * Async operation status for long-running operations
+ */
+export enum AsyncOperationStatus {
+  PENDING = 'pending',
+  IN_PROGRESS = 'inProgress',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  CANCELLED = 'cancelled',
+}
+
+/**
  * Analytics grouping periods for time-based aggregations
  * Used for analytics queries across different services
  */

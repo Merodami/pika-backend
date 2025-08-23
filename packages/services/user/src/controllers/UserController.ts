@@ -396,7 +396,7 @@ export class UserController {
    * GET /users/me
    * Get current authenticated user profile
    */
-  async getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getMe(req: Request, res: Response<userPublic.CurrentUserProfile>, next: NextFunction): Promise<void> {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
@@ -405,7 +405,7 @@ export class UserController {
 
       const dto = UserMapper.toDTO(user)
       const validatedResponse = validateResponse(
-        userPublic.UserProfileResponse,
+        userPublic.CurrentUserProfile,
         dto,
         'UserController.getMe',
       )

@@ -9,7 +9,7 @@ import { vi } from 'vitest'
 export class MockTranslationClient {
   private mockTranslations = new Map<string, Map<LanguageCode, string>>()
   private mockUserLanguages = new Map<string, LanguageCode>()
-  
+
   // Expose mock service for middleware compatibility
   public readonly service = {
     get: this.get.bind(this),
@@ -25,7 +25,11 @@ export class MockTranslationClient {
   /**
    * Get translation for a key in a specific language
    */
-  async get(key: string, language: LanguageCode, fallback?: string): Promise<string> {
+  async get(
+    key: string,
+    language: LanguageCode,
+    fallback?: string,
+  ): Promise<string> {
     const translations = this.mockTranslations.get(key)
 
     if (!translations) {
@@ -88,7 +92,10 @@ export class MockTranslationClient {
   /**
    * Set user's preferred language
    */
-  async setUserLanguage(userId: string, languageCode: LanguageCode): Promise<void> {
+  async setUserLanguage(
+    userId: string,
+    languageCode: LanguageCode,
+  ): Promise<void> {
     this.mockUserLanguages.set(userId, languageCode)
   }
 

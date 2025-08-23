@@ -39,7 +39,10 @@ export interface IBusinessRegistrationService {
     userId: string,
     request: CompleteBusinessRegistrationRequest,
   ): Promise<CompleteBusinessRegistrationResponse>
-  resetRegistration(registrationId: string, reason: string): Promise<{
+  resetRegistration(
+    registrationId: string,
+    reason: string,
+  ): Promise<{
     success: boolean
     message: string
     registrationId: string
@@ -152,7 +155,7 @@ export class BusinessRegistrationService
     try {
       // Users can have multiple businesses, so we don't check for existing businesses
       // We only check if there's an incomplete registration in progress
-      
+
       // Check if registration already exists
       const existing = await this.registrationRepository.findByUserId(userId)
 
@@ -469,10 +472,10 @@ export class BusinessRegistrationService
           businessId: registration.businessId,
           registrationId: registration.id,
         })
-        
+
         // Soft delete the business
         await this.businessRepository.delete(registration.businessId)
-        
+
         // Also delete business details if they exist
         try {
           const details = await this.businessDetailsRepository.findByBusinessId(
@@ -491,8 +494,9 @@ export class BusinessRegistrationService
       }
 
       // Reset the registration
-      const resetRegistration =
-        await this.registrationRepository.reset(registration.id)
+      const resetRegistration = await this.registrationRepository.reset(
+        registration.id,
+      )
 
       logger.info('Business registration reset successfully', {
         registrationId: registration.id,
@@ -542,11 +546,12 @@ export class BusinessRegistrationService
       }
 
       // Update the registration status (including rejection reason if applicable)
-      const updatedRegistration = await this.registrationRepository.updateStatus(
-        registration.id,
-        status,
-        reason,
-      )
+      const updatedRegistration =
+        await this.registrationRepository.updateStatus(
+          registration.id,
+          status,
+          reason,
+        )
 
       logger.info('Registration status updated successfully', {
         registrationId: registration.id,

@@ -14,7 +14,7 @@ import { AuthMapper } from '@auth-service/mappers/AuthMapper.js'
 import type { IAuthService } from '@auth-service/services/AuthService.js'
 import { RequestContext, validateResponse } from '@pika/http'
 import { UserMapper } from '@pika/sdk'
-import { cookieManager,ErrorFactory, logger } from '@pika/shared'
+import { cookieManager, ErrorFactory, logger } from '@pika/shared'
 import { mapRoleToPermissions, RegistrationSource, UserRole } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 

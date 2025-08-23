@@ -81,8 +81,8 @@ export const AdminTransactionDetailResponse = withTimestamps({
   refundReason: z.string().optional(),
   refundedAmount: Money.optional(),
 
-  // Metadata
-  metadata: z.record(z.string(), z.any()).optional(),
+  // Metadata - Allow common JSON types
+  metadata: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
 })

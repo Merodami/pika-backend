@@ -67,7 +67,10 @@ export class InternalCategoryController {
       const { categoryIds } = req.body
 
       const language = getRequestLanguage(req)
-      const result = await this.categoryService.getCategoriesByIds(categoryIds, language)
+      const result = await this.categoryService.getCategoriesByIds(
+        categoryIds,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -103,8 +106,10 @@ export class InternalCategoryController {
             ): Promise<categoryInternal.CategoryValidationResult> => {
               try {
                 const language = getRequestLanguage(req)
-                const category =
-                  await this.categoryService.getCategoryById(categoryId, language)
+                const category = await this.categoryService.getCategoryById(
+                  categoryId,
+                  language,
+                )
 
                 return {
                   categoryId,
@@ -164,7 +169,10 @@ export class InternalCategoryController {
       }
 
       const language = getRequestLanguage(req)
-      const result = await this.categoryService.getAllCategories(params, language)
+      const result = await this.categoryService.getAllCategories(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -202,7 +210,10 @@ export class InternalCategoryController {
       }
 
       const language = getRequestLanguage(req)
-      const result = await this.categoryService.getAllCategories(params, language)
+      const result = await this.categoryService.getAllCategories(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -229,7 +240,10 @@ export class InternalCategoryController {
   ): Promise<void> {
     try {
       const language = getRequestLanguage(req)
-      const categories = await this.categoryService.getCategoryHierarchy(undefined, language)
+      const categories = await this.categoryService.getCategoryHierarchy(
+        undefined,
+        language,
+      )
 
       // Transform to DTOs
       const response = {

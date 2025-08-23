@@ -308,7 +308,9 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       // Test filtering for only active and verified businesses
       const response = await internalClient
-        .get(`/internal/businesses/user/${userId}/all?onlyActive=true&onlyVerified=true`)
+        .get(
+          `/internal/businesses/user/${userId}/all?onlyActive=true&onlyVerified=true`,
+        )
         .set('Accept', 'application/json')
         .expect(200)
 
@@ -372,7 +374,7 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       expect(response.body.data).toBeDefined()
       expect(Array.isArray(response.body.data)).toBe(true)
-      
+
       if (response.body.data.length > 0) {
         const business = response.body.data[0]
         expect(business.userId).toBe(userId)

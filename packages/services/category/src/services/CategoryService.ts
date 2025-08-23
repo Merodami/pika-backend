@@ -58,7 +58,10 @@ export class CategoryService implements ICategoryService {
       return `${prefix}:${args[0]}`
     },
   })
-  async getCategoryById(id: string, language?: LanguageCode): Promise<Category> {
+  async getCategoryById(
+    id: string,
+    language?: LanguageCode,
+  ): Promise<Category> {
     try {
       // Validate UUID format
       if (!isUuidV4(id)) {
@@ -73,7 +76,10 @@ export class CategoryService implements ICategoryService {
 
       // Resolve translations if language is provided
       if (language) {
-        const resolved = await this.translationResolver.resolve(category, language)
+        const resolved = await this.translationResolver.resolve(
+          category,
+          language,
+        )
         return resolved
       }
 
@@ -93,7 +99,10 @@ export class CategoryService implements ICategoryService {
       return `${prefix}:${JSON.stringify(ids.sort())}`
     },
   })
-  async getCategoriesByIds(ids: string[], language?: LanguageCode): Promise<PaginatedResult<Category>> {
+  async getCategoriesByIds(
+    ids: string[],
+    language?: LanguageCode,
+  ): Promise<PaginatedResult<Category>> {
     try {
       // Validate all IDs are proper UUIDs
       const invalidIds = ids.filter((id) => !isUuidV4(id))
@@ -320,7 +329,10 @@ export class CategoryService implements ICategoryService {
       return `${prefix}:${rootId || 'all'}`
     },
   })
-  async getCategoryHierarchy(rootId?: string, language?: LanguageCode): Promise<Category[]> {
+  async getCategoryHierarchy(
+    rootId?: string,
+    language?: LanguageCode,
+  ): Promise<Category[]> {
     try {
       const categories = await this.repository.getHierarchy(rootId)
 
@@ -335,7 +347,11 @@ export class CategoryService implements ICategoryService {
 
       return categories
     } catch (error) {
-      logger.error('Failed to get category hierarchy', { error, rootId, language })
+      logger.error('Failed to get category hierarchy', {
+        error,
+        rootId,
+        language,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -347,7 +363,10 @@ export class CategoryService implements ICategoryService {
       return `${prefix}:${args[0]}`
     },
   })
-  async getCategoryPath(id: string, language?: LanguageCode): Promise<Category[]> {
+  async getCategoryPath(
+    id: string,
+    language?: LanguageCode,
+  ): Promise<Category[]> {
     try {
       // Validate UUID format
       if (!isUuidV4(id)) {

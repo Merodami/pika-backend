@@ -13,12 +13,7 @@ import {
 } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, logger } from '@pika/shared'
-import {
-  EmailTemplateKey,
-  ErrorCode,
-  UserRole,
-  UserStatus,
-} from '@pika/types'
+import { EmailTemplateKey, ErrorCode, UserRole, UserStatus } from '@pika/types'
 
 import { JwtTokenService } from '../services/JwtTokenService.js'
 import { PasswordSecurityService } from '../services/PasswordSecurityService.js'

@@ -387,7 +387,7 @@ export class CategoryMapper {
     // Use resolved translations if available, fallback to keys
     const name = (domain as any).name || domain.nameKey
     const description = (domain as any).description || domain.descriptionKey
-    
+
     return {
       id: domain.id,
       name,

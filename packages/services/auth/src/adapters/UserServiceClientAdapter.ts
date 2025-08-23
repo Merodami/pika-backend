@@ -1,5 +1,5 @@
 import type { CreateUserData, UserService, UserServiceUser } from '@pika/auth'
-import { BusinessServiceClient,UserServiceClient } from '@pika/shared'
+import { BusinessServiceClient, UserServiceClient } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
 
 /**
@@ -135,12 +135,14 @@ export class UserServiceClientAdapter implements UserService {
     try {
       // Query the business service to check if user has at least one active and approved business
       // We filter for only active and verified (approved) businesses
-      const businesses =
-        await this.businessServiceClient.getBusinessesByUserId(userId, {
+      const businesses = await this.businessServiceClient.getBusinessesByUserId(
+        userId,
+        {
           onlyActive: true,
           onlyVerified: true,
           limit: 1, // We only need to know if at least one exists
-        })
+        },
+      )
 
       // If we get any results, the user has at least one active and approved business
       return businesses.length > 0

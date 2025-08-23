@@ -46,7 +46,10 @@ export class CategoryController {
         sortOrder: query.sortOrder,
       }
 
-      const result = await this.categoryService.getAllCategories(params, language)
+      const result = await this.categoryService.getAllCategories(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)

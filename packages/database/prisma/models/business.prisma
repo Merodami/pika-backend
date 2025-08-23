@@ -31,6 +31,7 @@ model Business {
   fraudCases           FraudCase[]           // Fraud cases involving this business
   businessRegistration BusinessRegistration? // Registration data (one-time use)
   businessDetails      BusinessDetails?      // Additional business information
+  primaryBusinessUsers User[]                @relation("UserPrimaryBusiness") // Users who have this as their primary business
 
   @@index([userId])
   @@index([categoryId])

@@ -22,9 +22,7 @@ import { CATEGORY_RELATIONS } from '../common/enums.js'
  */
 const BaseCategoryResponse = withTimestamps({
   id: UUID,
-  name: z
-    .string()
-    .describe('Category name in requested language'),
+  name: z.string().describe('Category name in requested language'),
   description: z
     .string()
     .optional()

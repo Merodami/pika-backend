@@ -31,11 +31,13 @@ export function createBusinessRegistrationRoutes(
   )
   const businessRepository = new BusinessRepository(prisma, cache)
   const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
-  
+
   if (!userServiceClient) {
-    throw new Error('UserServiceClient is required for BusinessRegistrationRoutes')
+    throw new Error(
+      'UserServiceClient is required for BusinessRegistrationRoutes',
+    )
   }
-  
+
   const service = new BusinessRegistrationService(
     registrationRepository,
     businessRepository,

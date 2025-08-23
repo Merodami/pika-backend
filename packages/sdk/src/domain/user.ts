@@ -27,6 +27,7 @@ export interface UserDomain {
   dateOfBirth?: Date | null
   stripeUserId?: string | null
   preferredLanguage?: string | null
+  primaryBusinessId?: string | null
 }
 
 // ============= Address Domain =============

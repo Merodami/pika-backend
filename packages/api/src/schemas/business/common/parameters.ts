@@ -33,4 +33,6 @@ export const BusinessRegistrationIdParam = openapi(
   },
 )
 
-export type BusinessRegistrationIdParam = z.infer<typeof BusinessRegistrationIdParam>
+export type BusinessRegistrationIdParam = z.infer<
+  typeof BusinessRegistrationIdParam
+>

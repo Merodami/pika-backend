@@ -10,7 +10,7 @@ import {
 } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
-import {UserRole, UserStatus } from '@pika/types'
+import { UserRole, UserStatus } from '@pika/types'
 import jwt from 'jsonwebtoken'
 
 export interface User {

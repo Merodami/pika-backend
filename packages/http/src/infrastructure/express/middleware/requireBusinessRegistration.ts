@@ -1,5 +1,5 @@
-import { NotAuthenticatedError,NotAuthorizedError } from '@pika/shared'
-import { BusinessRegistrationStatus,UserRole } from '@pika/types'
+import { NotAuthenticatedError, NotAuthorizedError } from '@pika/shared'
+import { BusinessRegistrationStatus, UserRole } from '@pika/types'
 import { NextFunction, Request, RequestHandler, Response } from 'express'
 
 /**

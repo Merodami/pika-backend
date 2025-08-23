@@ -82,7 +82,10 @@ export class CategoryServiceClient extends BaseServiceClient {
   /**
    * Check if a category exists
    */
-  async categoryExists(categoryId: string, context?: ServiceContext): Promise<boolean> {
+  async categoryExists(
+    categoryId: string,
+    context?: ServiceContext,
+  ): Promise<boolean> {
     return this.exists(`/internal/categories/${categoryId}`, {
       ...context,
       useServiceAuth: true,
@@ -95,9 +98,15 @@ export class CategoryServiceClient extends BaseServiceClient {
   async validateCategories(
     categoryIds: string[],
     context?: ServiceContext,
-  ): Promise<{ valid: boolean; results: Array<{ categoryId: string; valid: boolean }> }> {
+  ): Promise<{
+    valid: boolean
+    results: Array<{ categoryId: string; valid: boolean }>
+  }> {
     try {
-      return await this.post<{ valid: boolean; results: Array<{ categoryId: string; valid: boolean }> }>(
+      return await this.post<{
+        valid: boolean
+        results: Array<{ categoryId: string; valid: boolean }>
+      }>(
         '/internal/categories/validate',
         { categoryIds },
         {

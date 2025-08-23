@@ -107,7 +107,8 @@ export class InternalBusinessController {
   ): Promise<void> {
     try {
       const { id: userId } = req.params
-      const query = getValidatedQuery<businessInternal.GetBusinessesByUserRequest>(req)
+      const query =
+        getValidatedQuery<businessInternal.GetBusinessesByUserRequest>(req)
       const includes = parseIncludeParam(query.include, ['user', 'category'])
 
       const result = await this.businessService.getAllBusinesses({

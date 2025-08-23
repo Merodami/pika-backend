@@ -19,7 +19,7 @@ import type {
  */
 export class ECDSAService {
   private readonly curve: ECDSACurve
-  private readonly curveImpl: any
+  private readonly curveImpl: any // TODO: Create proper interface for elliptic curve implementation
   private readonly hashFn: (data: Uint8Array) => Uint8Array
 
   constructor(config: ECDSAConfig) {

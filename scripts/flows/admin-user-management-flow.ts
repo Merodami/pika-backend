@@ -68,7 +68,7 @@ async function testListUsers(api: AxiosInstance): Promise<void> {
 
   try {
     // Test basic listing
-    const response = await api.get('/users', {
+    const response = await api.get('/admin/users', {
       params: {
         page: 1,
         limit: 10,
@@ -81,7 +81,7 @@ async function testListUsers(api: AxiosInstance): Promise<void> {
     logInfo(`Total users: ${response.data.pagination.total}`)
 
     // Test with filters
-    const filteredResponse = await api.get('/users', {
+    const filteredResponse = await api.get('/admin/users', {
       params: {
         role: 'customer',
         status: 'active',
@@ -94,7 +94,7 @@ async function testListUsers(api: AxiosInstance): Promise<void> {
     )
 
     // Test search by email
-    const searchResponse = await api.get('/users', {
+    const searchResponse = await api.get('/admin/users', {
       params: {
         search: TEST_USERS.customer.email,
       },
@@ -169,7 +169,7 @@ async function testGetUserDetails(api: AxiosInstance): Promise<void> {
   const userId = createdUserIds[0]
 
   try {
-    const response = await api.get(`/users/${userId}`)
+    const response = await api.get(`/admin/users/${userId}`)
 
     logSuccess(`Retrieved user details for ID: ${userId}`)
     logInfo(`Email: ${response.data.email}`)
@@ -215,7 +215,7 @@ async function testUpdateUser(api: AxiosInstance): Promise<void> {
       preferredLanguage: 'es',
     }
 
-    const response = await api.patch(`/users/${userId}`, updateData)
+    const response = await api.patch(`/admin/users/${userId}`, updateData)
 
     logSuccess(`Updated user ${userId}`)
     logInfo(`New name: ${response.data.firstName} ${response.data.lastName}`)
@@ -253,14 +253,14 @@ async function testChangeUserRole(api: AxiosInstance): Promise<void> {
 
   try {
     // Promote to business role
-    const response = await api.patch(`/users/${userId}/role`, {
+    const response = await api.patch(`/admin/users/${userId}/role`, {
       role: 'business',
     })
 
     logSuccess(`Changed user ${userId} role to: ${response.data.role}`)
 
     // Verify role change
-    const verifyResponse = await api.get(`/users/${userId}`)
+    const verifyResponse = await api.get(`/admin/users/${userId}`)
 
     if (verifyResponse.data.role === 'business') {
       logSuccess('Role change verified successfully')
@@ -297,7 +297,7 @@ async function testUpdateUserStatus(api: AxiosInstance): Promise<void> {
 
   try {
     // Suspend user
-    let response = await api.patch(`/users/${userId}/status`, {
+    let response = await api.patch(`/admin/users/${userId}/status`, {
       status: 'suspended',
       reason: 'Test suspension for administrative testing',
     })
@@ -306,7 +306,7 @@ async function testUpdateUserStatus(api: AxiosInstance): Promise<void> {
     logInfo(`New status: ${response.data.status}`)
 
     // Reactivate user
-    response = await api.patch(`/users/${userId}/status`, {
+    response = await api.patch(`/admin/users/${userId}/status`, {
       status: 'active',
       reason: 'Test reactivation',
     })
@@ -488,7 +488,7 @@ async function testDeleteUser(api: AxiosInstance): Promise<void> {
   const userToDelete = createdUserIds[createdUserIds.length - 1]
 
   try {
-    const response = await api.delete(`/users/${userToDelete}`)
+    const response = await api.delete(`/admin/users/${userToDelete}`)
 
     logSuccess(`User ${userToDelete} deleted`)
     if (response.data.message) {
@@ -497,7 +497,7 @@ async function testDeleteUser(api: AxiosInstance): Promise<void> {
 
     // Verify user is soft deleted (status should be 'deleted' or not accessible)
     try {
-      const verifyResponse = await api.get(`/users/${userToDelete}`)
+      const verifyResponse = await api.get(`/admin/users/${userToDelete}`)
 
       if (verifyResponse.data.status === 'deleted') {
         logSuccess('User soft deleted (marked as deleted)')
@@ -530,7 +530,7 @@ async function testSearchAndFilter(api: AxiosInstance): Promise<void> {
 
   try {
     // Search by name
-    const nameSearchResponse = await api.get('/users', {
+    const nameSearchResponse = await api.get('/admin/users', {
       params: {
         search: 'Test User',
         searchFields: 'firstName,lastName',
@@ -544,7 +544,7 @@ async function testSearchAndFilter(api: AxiosInstance): Promise<void> {
     const startOfDay = new Date(today.setHours(0, 0, 0, 0)).toISOString()
     const endOfDay = new Date(today.setHours(23, 59, 59, 999)).toISOString()
 
-    const dateRangeResponse = await api.get('/users', {
+    const dateRangeResponse = await api.get('/admin/users', {
       params: {
         createdFrom: startOfDay,
         createdTo: endOfDay,
@@ -556,7 +556,7 @@ async function testSearchAndFilter(api: AxiosInstance): Promise<void> {
     )
 
     // Complex filter
-    const complexFilterResponse = await api.get('/users', {
+    const complexFilterResponse = await api.get('/admin/users', {
       params: {
         role: 'customer',
         status: 'active',
@@ -602,7 +602,7 @@ async function testImpersonation(api: AxiosInstance): Promise<void> {
   try {
     // Generate impersonation token
     const impersonateResponse = await api.post(
-      `/users/${userToImpersonate}/impersonate`,
+      `/admin/users/${userToImpersonate}/impersonate`,
     )
 
     if (impersonateResponse.data.impersonationToken) {
@@ -653,7 +653,7 @@ async function cleanup(api: AxiosInstance): Promise<void> {
 
   for (const userId of createdUserIds) {
     try {
-      await api.delete(`/users/${userId}`)
+      await api.delete(`/admin/users/${userId}`)
       logSuccess(`Deleted test user ${userId}`)
     } catch (error: any) {
       logError(
