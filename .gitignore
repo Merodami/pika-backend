@@ -162,3 +162,10 @@ tsconfig.tsbuildinfo
 uploads/
 pika-old/
 docs
+# Admin user creation files (NEVER COMMIT)
+admin-user.sql
+admin-credentials.txt
+
+# Admin user creation files (NEVER COMMIT)
+admin-user-*.sql
+admin-credentials-*.txt

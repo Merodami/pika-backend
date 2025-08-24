@@ -6,7 +6,7 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
-      "includeFiles": "packages/**/dist/**"
+      "includeFiles": "packages/**/dist/**,packages/api/dist/*.html,packages/api/generated/openapi/*.json"
     }
   },
   "rewrites": [
