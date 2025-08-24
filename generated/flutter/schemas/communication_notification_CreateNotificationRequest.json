@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "subToken": {
+      "description": "Subscription token for push notifications",
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["email", "inApp", "sms", "push"]
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "description": {
+      "type": "string"
+    },
+    "isGlobal": {
+      "default": false,
+      "type": "boolean"
+    },
+    "priority": {
+      "default": "normal",
+      "type": "string",
+      "enum": ["low", "normal", "high", "urgent"]
+    },
+    "category": {
+      "type": "string"
+    },
+    "actionUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "imageUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "metadata": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "expiresAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    }
+  },
+  "required": ["description", "isGlobal", "priority"],
+  "additionalProperties": false
+}

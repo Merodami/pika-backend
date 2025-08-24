@@ -112,7 +112,7 @@ export class AuthMapper {
       firstName: user.firstName,
       lastName: user.lastName,
       profilePicture: user.avatarUrl,
-      role: user.role === 'admin' ? 'admin' : 'customer',
+      role: user.role as UserRole,
     }
   }
 }

@@ -1,5 +1,6 @@
 export * from './AuthServiceClient.js'
 export * from './BusinessServiceClient.js'
+export * from './CategoryServiceClient.js'
 export * from './CommunicationServiceClient.js'
 export * from './PaymentServiceClient.js'
 export * from './StorageServiceClient.js'

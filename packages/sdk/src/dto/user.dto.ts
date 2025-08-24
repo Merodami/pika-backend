@@ -46,6 +46,7 @@ export interface UserDTO {
   emailVerified: boolean
   firstName: string
   lastName: string
+  name: string // Computed full name
   phoneNumber?: string
   phoneVerified: boolean
   avatarUrl?: string
@@ -58,6 +59,8 @@ export interface UserDTO {
   dateOfBirth?: string
   stripeUserId?: string
   preferredLanguage?: string
+  primaryBusinessId?: string
+  settings?: any
 }
 
 // ============= Create/Update DTOs =============

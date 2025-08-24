@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 5000
+    },
+    "priority": {
+      "default": "medium",
+      "type": "string",
+      "enum": ["low", "medium", "high", "urgent", "critical"]
+    },
+    "type": {
+      "default": "general",
+      "type": "string",
+      "enum": [
+        "billing",
+        "technical",
+        "account",
+        "general",
+        "bugReport",
+        "featureRequest"
+      ]
+    },
+    "files": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["title", "description", "priority", "type", "files"],
+  "additionalProperties": false
+}

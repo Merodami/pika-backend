@@ -1,21 +1,18 @@
-import {
-  RegistrationSource,
-  UserRole as UserRoleEnum,
-  UserStatus as UserStatusEnum,
-} from '@pika/types'
+import { Language, RegistrationSource } from '@pika/types'
 import { z } from 'zod'
 
+import { createZodEnum } from '../../../common/utils/zodEnum.js'
 import { AdminCreateBusinessRequest } from '../../business/admin/management.js'
-// Note: Not using openapi() wrapper for frontend schemas as they don't need OpenAPI examples
 import { Email } from '../../shared/branded.js'
-import { SecurePassword } from '../../shared/primitives.js'
-// Import admin schemas we need to extend
+import {
+  DateOnlyString,
+  PhoneNumber,
+  SecurePassword,
+} from '../../shared/primitives.js'
 import { AdminCreateUserRequest } from '../../user/admin/management.js'
-import { TokenRequest } from '../public/oauth.js'
 import {
   ChangePasswordRequest,
   ForgotPasswordRequest,
-  ResetPasswordRequest,
 } from '../public/password.js'
 import { RegisterRequest } from '../public/register.js'
 
@@ -54,20 +51,6 @@ export type AdminBusinessLoginFormData = z.infer<
   typeof AdminBusinessLoginFormSchema
 >
 
-/**
- * Transform login form data to backend TokenRequest format
- */
-export function transformLoginToTokenRequest(
-  loginData: LoginFormData,
-): Extract<z.infer<typeof TokenRequest>, { grantType: 'password' }> {
-  return {
-    grantType: 'password' as const,
-    username: loginData.email as any, // Cast to any to bypass brand type checking
-    password: loginData.password,
-    // Note: rememberMe would be handled by token expiration logic
-  }
-}
-
 // ============= Registration Form =============
 
 /**
@@ -83,25 +66,6 @@ export const RegisterFormSchema = RegisterRequest.extend({
 })
 
 export type RegisterFormData = z.infer<typeof RegisterFormSchema>
-
-/**
- * Transform registration form data to backend RegisterRequest format
- */
-export function transformRegisterToAPI(
-  formData: RegisterFormData,
-): z.infer<typeof RegisterRequest> {
-  const {
-    confirmPassword: _confirmPassword,
-    agreedToMarketing,
-    ...apiData
-  } = formData
-
-  // Map UI field to API field
-  return {
-    ...apiData,
-    marketingConsent: agreedToMarketing,
-  }
-}
 
 // ============= Password Reset Forms =============
 
@@ -135,80 +99,6 @@ export const ResetPasswordFormSchema = z
 
 export type ResetPasswordFormData = z.infer<typeof ResetPasswordFormSchema>
 
-/**
- * Transform reset password form to backend format
- */
-export function transformResetPasswordToAPI(
-  formData: ResetPasswordFormData,
-): z.infer<typeof ResetPasswordRequest> {
-  const { confirmPassword: _confirmPassword, ...apiData } = formData
-
-  return apiData
-}
-
-// ============= Multi-Step Registration =============
-
-/**
- * Example: Multi-step registration form
- * Step 1: Basic info (subset of full registration)
- */
-export const RegistrationStep1Schema = RegisterRequest.pick({
-  email: true,
-  firstName: true,
-  lastName: true,
-}).extend({
-  agreedToTerms: z
-    .literal(true)
-    .describe('You must accept the terms and conditions'),
-})
-
-/**
- * Step 2: Security (password + confirmation)
- */
-export const RegistrationStep2Schema = RegisterRequest.pick({
-  password: true,
-})
-  .extend({
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  })
-
-/**
- * Step 3: Optional info
- */
-export const RegistrationStep3Schema = RegisterRequest.pick({
-  phoneNumber: true,
-  dateOfBirth: true,
-  marketingConsent: true,
-})
-
-export type RegistrationStep1Data = z.infer<typeof RegistrationStep1Schema>
-export type RegistrationStep2Data = z.infer<typeof RegistrationStep2Schema>
-export type RegistrationStep3Data = z.infer<typeof RegistrationStep3Schema>
-
-/**
- * Combine multi-step data into final registration request
- */
-export function combineRegistrationSteps(
-  step1: RegistrationStep1Data,
-  step2: RegistrationStep2Data,
-  step3: RegistrationStep3Data,
-): z.infer<typeof RegisterRequest> {
-  const { confirmPassword: _confirmPassword, ...passwordData } = step2
-  const { agreedToTerms: _agreedToTerms, ...basicData } = step1
-
-  return {
-    ...basicData,
-    ...passwordData,
-    ...step3,
-    acceptTerms: true as const, // agreedToTerms is already validated as true
-    registrationSource: RegistrationSource.PUBLIC,
-  }
-}
-
 // ============= Admin/Business Specific Forms =============
 
 /**
@@ -235,47 +125,6 @@ export const AdminCreateBusinessUserSchema = AdminCreateUserRequest.omit({
 export type AdminCreateBusinessUserData = z.infer<
   typeof AdminCreateBusinessUserSchema
 >
-
-/**
- * Frontend options returned with the user creation
- */
-export interface AdminCreateUserOptions {
-  temporaryPassword: string
-  sendWelcomeEmail: boolean
-  requirePasswordChange: boolean
-}
-
-/**
- * Transform to backend AdminCreateUserRequest with type-safe enums
- * Returns both the user request and frontend options
- */
-export function transformToAdminCreateUser(
-  formData: AdminCreateBusinessUserData,
-): {
-  createUser: z.infer<typeof AdminCreateUserRequest>
-  options: AdminCreateUserOptions
-} {
-  const {
-    temporaryPassword,
-    sendWelcomeEmail,
-    requirePasswordChange,
-    ...userData
-  } = formData
-
-  // Note: confirmPassword is validated by the schema but not needed for the API
-  return {
-    createUser: {
-      ...userData,
-      role: UserRoleEnum.BUSINESS, // Type-safe enum value
-      status: UserStatusEnum.UNCONFIRMED, // Type-safe enum value
-    },
-    options: {
-      temporaryPassword,
-      sendWelcomeEmail,
-      requirePasswordChange,
-    },
-  }
-}
 
 /**
  * Admin creates business form
@@ -305,18 +154,146 @@ export type AdminBusinessChangePasswordData = z.infer<
   typeof AdminBusinessChangePasswordSchema
 >
 
+// ============= Multi-Step User Registration =============
+
 /**
- * Transform to backend ChangePasswordRequest
+ * Step 1: Basic user information (raw Zod)
+ * Core user details for initial registration
  */
-export function transformToChangePassword(
-  formData: AdminBusinessChangePasswordData,
-): z.infer<typeof ChangePasswordRequest> {
-  // Note: confirmPassword is validated by the schema but not needed for the API
-  return {
-    currentPassword: formData.currentPassword,
-    newPassword: formData.newPassword,
-  }
-}
+export const RegistrationStep1Schema = z
+  .object({
+    email: Email,
+    password: SecurePassword,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    firstName: z
+      .string()
+      .min(1, 'First name is required')
+      .max(50, 'First name must not exceed 50 characters')
+      .regex(
+        /^[a-zA-Z\s\-']+$/,
+        'First name can only contain letters, spaces, hyphens, and apostrophes',
+      ),
+    lastName: z
+      .string()
+      .min(1, 'Last name is required')
+      .max(50, 'Last name must not exceed 50 characters')
+      .regex(
+        /^[a-zA-Z\s\-']+$/,
+        'Last name can only contain letters, spaces, hyphens, and apostrophes',
+      ),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
+
+/**
+ * Step 1: Basic user information (OpenAPI documented)
+ */
+export const RegistrationStep1SchemaDoc = RegistrationStep1Schema.openapi(
+  'RegistrationStep1',
+  {
+    description: 'Step 1 of user registration - basic information',
+    example: {
+      email: 'user@example.com' as any,
+      password: 'SecurePass123',
+      confirmPassword: 'SecurePass123',
+      firstName: 'John',
+      lastName: 'Doe',
+    },
+  },
+)
+
+export type RegistrationStep1Data = z.infer<typeof RegistrationStep1Schema>
+
+/**
+ * Step 2: Personal details and preferences (raw Zod)
+ * Additional information and user preferences
+ */
+export const RegistrationStep2Schema = z.object({
+  phoneNumber: PhoneNumber.optional(),
+  dateOfBirth: DateOnlyString.optional().describe(
+    'Date of birth in YYYY-MM-DD format',
+  ),
+  acceptTerms: z
+    .literal(true)
+    .refine((value) => value === true, {
+      message: 'You must accept the terms and conditions',
+    })
+    .describe('User must accept terms and conditions'),
+  marketingConsent: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe('User consent for marketing emails'),
+})
+
+/**
+ * Step 2: Personal details and preferences (OpenAPI documented)
+ */
+export const RegistrationStep2SchemaDoc = RegistrationStep2Schema.openapi(
+  'RegistrationStep2',
+  {
+    description: 'Step 2 of user registration - personal details and terms',
+    example: {
+      phoneNumber: '+1234567890' as any,
+      dateOfBirth: '1990-01-01' as any,
+      acceptTerms: true,
+      marketingConsent: false,
+    },
+  },
+)
+
+export type RegistrationStep2Data = z.infer<typeof RegistrationStep2Schema>
+
+/**
+ * Step 3: Account type and final setup (raw Zod)
+ * User role selection and final preferences
+ */
+export const RegistrationStep3Schema = z.object({
+  registrationSource: createZodEnum(RegistrationSource)
+    .optional()
+    .default(RegistrationSource.PUBLIC)
+    .describe('Source of registration to determine user role'),
+  preferredLanguage: createZodEnum(Language)
+    .optional()
+    .default(Language.EN)
+    .describe('Preferred language for the user interface'),
+  timezone: z
+    .string()
+    .optional()
+    .describe('User timezone (e.g., America/New_York)'),
+  notifications: z
+    .object({
+      email: z.boolean().default(true).describe('Email notifications enabled'),
+      sms: z.boolean().default(false).describe('SMS notifications enabled'),
+      push: z.boolean().default(true).describe('Push notifications enabled'),
+    })
+    .optional()
+    .describe('Notification preferences'),
+})
+
+/**
+ * Step 3: Account type and final setup (OpenAPI documented)
+ */
+export const RegistrationStep3SchemaDoc = RegistrationStep3Schema.openapi(
+  'RegistrationStep3',
+  {
+    description: 'Step 3 of user registration - final setup and preferences',
+    example: {
+      registrationSource: RegistrationSource.PUBLIC,
+      preferredLanguage: Language.EN,
+      timezone: 'America/New_York',
+      notifications: {
+        email: true,
+        sms: false,
+        push: true,
+      },
+    },
+  },
+)
+
+export type RegistrationStep3Data = z.infer<typeof RegistrationStep3Schema>
 
 // ============= Export All =============
 

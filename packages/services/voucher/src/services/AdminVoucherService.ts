@@ -1,5 +1,5 @@
-import { DEFAULT_LANGUAGE } from '@pika/environment'
-import { ICacheService } from '@pika/redis'
+import { DEFAULT_LANGUAGE, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { Cache, ICacheService } from '@pika/redis'
 import type { VoucherDomain } from '@pika/sdk'
 import type {
   CreateVoucherData as DomainCreateVoucherData,
@@ -22,6 +22,7 @@ import {
 } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { IAdminVoucherRepository } from '../repositories/AdminVoucherRepository.js'
 import type {
   BusinessVoucherStats,
@@ -108,6 +109,16 @@ export class AdminVoucherService implements IAdminVoucherService {
     private readonly businessServiceClient?: BusinessServiceClient,
   ) {}
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.ADMIN.VOUCHERS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      const language = args[1] || 'en'
+
+      return `${prefix}:${language}:${JSON.stringify(params)}`
+    },
+  })
   async getAllVouchers(
     params: VoucherSearchParams,
     language?: LanguageCode,
@@ -132,6 +143,17 @@ export class AdminVoucherService implements IAdminVoucherService {
     }
   }
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.ADMIN.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const id = args[0]
+      const parsedIncludes = args[1]
+      const language = args[2] || 'en'
+
+      return `${prefix}:${id}:${language}:${JSON.stringify(parsedIncludes || {})}`
+    },
+  })
   async getVoucherById(
     id: string,
     parsedIncludes?: ParsedIncludes,
@@ -356,6 +378,7 @@ export class AdminVoucherService implements IAdminVoucherService {
       }
 
       // Update other fields - these don't need translation
+      if (data.categoryId !== undefined) updateData.categoryId = data.categoryId
       if (data.discountType !== undefined) {
         updateData.type =
           data.discountType === VoucherDiscountType.PERCENTAGE

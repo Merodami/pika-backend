@@ -1,3 +1,4 @@
+import { ErrorCode } from '@pika/types'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -7,7 +8,6 @@ import {
   ErrorSeverity,
   ValidationError,
 } from './index.js'
-import { ErrorCode } from '@pika/types'
 
 describe('New Error System', () => {
   describe('ApplicationError', () => {

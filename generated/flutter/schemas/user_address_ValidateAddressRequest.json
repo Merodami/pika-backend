@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "street": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "street2": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "city": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "state": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "postalCode": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20
+    },
+    "country": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2
+    }
+  },
+  "required": ["street", "city", "state", "postalCode", "country"],
+  "additionalProperties": false
+}

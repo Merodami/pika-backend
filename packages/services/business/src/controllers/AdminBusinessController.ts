@@ -1,22 +1,33 @@
+import type { IBusinessRegistrationService } from '@business/services/BusinessRegistrationService.js'
 import type { IBusinessService } from '@business/services/BusinessService.js'
-import { businessAdmin, businessPublic, mapSortOrder } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
+  businessAdmin,
+  businessCommon,
+  businessPublic,
+  mapSortOrder,
+  userAdmin,
+} from '@pika/api'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
+import {
+  adaptMulterFile,
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
 import { RequestContext } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
-import { logger, parseIncludeParam } from '@pika/shared'
+import { ErrorFactory, logger, parseIncludeParam } from '@pika/shared'
+import { BusinessRegistrationStatus } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
  * Handles admin business management operations
  */
 export class AdminBusinessController {
-  constructor(private readonly businessService: IBusinessService) {
+  constructor(
+    private readonly businessService: IBusinessService,
+    private readonly registrationService?: IBusinessRegistrationService,
+  ) {
     // Bind methods to preserve 'this' context
     this.getAllBusinesses = this.getAllBusinesses.bind(this)
     this.getBusinessById = this.getBusinessById.bind(this)
@@ -28,18 +39,14 @@ export class AdminBusinessController {
     this.activateBusiness = this.activateBusiness.bind(this)
     this.updateBusinessRating = this.updateBusinessRating.bind(this)
     this.approveBusiness = this.approveBusiness.bind(this)
+    this.resetBusinessRegistration = this.resetBusinessRegistration.bind(this)
+    this.uploadBusinessLogo = this.uploadBusinessLogo.bind(this)
   }
 
   /**
    * GET /admin/businesses
    * Get all businesses with admin filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:businesses',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllBusinesses(
     req: Request,
     res: Response<businessAdmin.AdminBusinessListResponse>,
@@ -63,7 +70,11 @@ export class AdminBusinessController {
         sortBy: query.sortBy || 'createdAt',
         sortOrder: mapSortOrder(query.sortOrder),
         includeDeleted: query.includeDeleted,
-        parsedIncludes: parseIncludeParam(query.include, ['user', 'category']),
+        parsedIncludes: parseIncludeParam(query.include, [
+          'user',
+          'category',
+          'businessRegistration',
+        ]),
       }
 
       const result = await this.businessService.getAllBusinesses(params)
@@ -86,11 +97,6 @@ export class AdminBusinessController {
    * GET /admin/businesses/:business_id
    * Get business by ID with full details for admin
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:business',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getBusinessById(
     req: Request<businessPublic.BusinessPathParams>,
     res: Response<businessAdmin.AdminBusinessResponse>,
@@ -372,6 +378,38 @@ export class AdminBusinessController {
         reason,
       )
 
+      // Also update the registration status if there's a linked registration
+      if (this.registrationService) {
+        try {
+          const registration =
+            await this.registrationService.updateRegistrationStatusByBusinessId(
+              businessId,
+              approved
+                ? BusinessRegistrationStatus.APPROVED
+                : BusinessRegistrationStatus.REJECTED,
+              reason,
+            )
+
+          if (registration) {
+            logger.info({
+              msg: 'Updated registration status after business approval',
+              businessId,
+              registrationId: registration.registrationId,
+              newStatus: approved
+                ? BusinessRegistrationStatus.APPROVED
+                : BusinessRegistrationStatus.REJECTED,
+            })
+          }
+        } catch (error) {
+          // Log but don't fail if registration update fails
+          logger.warn({
+            msg: 'Could not update registration status after business approval',
+            businessId,
+            error,
+          })
+        }
+      }
+
       // Transform to admin DTO using mapper
       const response = BusinessMapper.toAdminDTO(business)
 
@@ -380,6 +418,117 @@ export class AdminBusinessController {
         businessAdmin.AdminBusinessApprovalResponse,
         response,
         'AdminBusinessController.approveBusiness',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/businesses/registrations/:registration_id/reset
+   * Reset a business registration to allow user to restart
+   */
+  async resetBusinessRegistration(
+    req: Request<
+      userAdmin.UserIdParam,
+      {},
+      businessAdmin.AdminResetBusinessRegistrationRequest
+    >,
+    res: Response<businessAdmin.AdminResetBusinessRegistrationResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      if (!this.registrationService) {
+        throw new Error('Registration service not configured')
+      }
+
+      const { id: userId } = req.params
+      const { reason, notifyUser } = req.body
+
+      // Get admin user ID from request context
+      const context = RequestContext.getContext(req)
+      const adminUserId = context.userId
+
+      // Log the reset action
+      logger.info({
+        msg: 'Business registration reset action',
+        userId,
+        reason,
+        notifyUser,
+        adminUserId,
+      })
+
+      // Reset the registration
+      const result = await this.registrationService.resetRegistration(
+        userId,
+        reason,
+      )
+
+      // TODO: If notifyUser is true, send notification to user
+      if (notifyUser) {
+        logger.info({
+          msg: 'Would notify user about registration reset',
+          userId: result.userId,
+          reason,
+        })
+      }
+
+      // Create response matching the schema
+      const response: businessAdmin.AdminResetBusinessRegistrationResponse = {
+        success: result.success,
+        message: result.message,
+        registrationId: result.registrationId,
+        userId: result.userId as any, // userId comes as string from service
+      }
+
+      // Validate response
+      const validatedResponse = validateResponse(
+        businessAdmin.AdminResetBusinessRegistrationResponse,
+        response,
+        'AdminBusinessController.resetBusinessRegistration',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/businesses/:id/logo
+   * Admin uploads logo for any business
+   */
+  async uploadBusinessLogo(
+    req: Request<businessCommon.BusinessIdParam>,
+    res: Response<businessPublic.UploadBusinessLogoResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: businessId } = req.params
+
+      // Get the uploaded file from Multer
+      const multerFile = req.file
+
+      // Validate the uploaded file
+      if (!multerFile) {
+        throw ErrorFactory.badRequest('No file uploaded')
+      }
+
+      // Adapt the multer file to our FileUpload format
+      const adaptedFile = adaptMulterFile(multerFile)
+
+      const logoUrl = await this.businessService.uploadBusinessLogo(
+        businessId,
+        adaptedFile,
+      )
+
+      const response = { logoUrl }
+      const validatedResponse = validateResponse(
+        businessPublic.UploadBusinessLogoResponse,
+        response,
+        'AdminBusinessController.uploadBusinessLogo',
       )
 
       res.json(validatedResponse)

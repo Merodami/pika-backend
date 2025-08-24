@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
+-- Dumped from database version 17.5 (Debian 17.5-1.pgdg110+1)
 -- Dumped by pg_dump version 17.5 (Debian 17.5-1.pgdg120+1)
 
 SET statement_timeout = 0;
@@ -17,7 +17,14 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY users.addresses DROP CONSTRAINT IF EXISTS addresses_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_category_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_business_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_customer_id_fkey;
+ALTER TABLE IF EXISTS ONLY users.users DROP CONSTRAINT IF EXISTS users_primary_business_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_problem_id_fkey;
 ALTER TABLE IF EXISTS ONLY support.problems DROP CONSTRAINT IF EXISTS problems_user_id_fkey;
@@ -33,14 +40,13 @@ ALTER TABLE IF EXISTS ONLY security.fraud_case_history DROP CONSTRAINT IF EXISTS
 ALTER TABLE IF EXISTS ONLY security.fraud_case_history DROP CONSTRAINT IF EXISTS fraud_case_history_case_id_fkey;
 ALTER TABLE IF EXISTS ONLY payments.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY payments.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_plan_id_fkey;
-ALTER TABLE IF EXISTS ONLY marketplace.businesses DROP CONSTRAINT IF EXISTS businesses_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY marketplace.businesses DROP CONSTRAINT IF EXISTS businesses_category_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_mfa_settings DROP CONSTRAINT IF EXISTS user_mfa_settings_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_identities DROP CONSTRAINT IF EXISTS user_identities_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_devices DROP CONSTRAINT IF EXISTS user_devices_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.user_auth_methods DROP CONSTRAINT IF EXISTS user_auth_methods_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY identity.security_events DROP CONSTRAINT IF EXISTS security_events_device_id_fkey;
+ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS user_language_preferences_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY i18n.user_language_preferences DROP CONSTRAINT IF EXISTS user_language_preferences_language_code_fkey;
 ALTER TABLE IF EXISTS ONLY i18n.translations DROP CONSTRAINT IF EXISTS translations_language_code_fkey;
 ALTER TABLE IF EXISTS ONLY files.voucher_books DROP CONSTRAINT IF EXISTS voucher_books_updated_by_fkey;
@@ -53,22 +59,63 @@ ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS bo
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_updated_by_fkey;
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_page_id_fkey;
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_created_by_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXISTS favourite_vouchers_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXISTS favourite_vouchers_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_business_id_fkey;
 ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_parent_id_fkey;
-ALTER TABLE IF EXISTS ONLY business.vouchers DROP CONSTRAINT IF EXISTS vouchers_category_id_fkey;
-ALTER TABLE IF EXISTS ONLY business.vouchers DROP CONSTRAINT IF EXISTS vouchers_business_id_fkey;
-ALTER TABLE IF EXISTS ONLY business.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_voucher_id_fkey;
-ALTER TABLE IF EXISTS ONLY business.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY business.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_voucher_id_fkey;
-ALTER TABLE IF EXISTS ONLY business.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_voucher_id_fkey;
-ALTER TABLE IF EXISTS ONLY business.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_customer_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_category_id_fkey;
+ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS "business_registration_userId_fkey";
+ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS "business_registration_businessId_fkey";
+ALTER TABLE IF EXISTS ONLY business.business_details DROP CONSTRAINT IF EXISTS "business_details_businessId_fkey";
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_business_id_fkey;
+DROP INDEX IF EXISTS voucher.vouchers_valid_until_idx;
+DROP INDEX IF EXISTS voucher.vouchers_valid_from_idx;
+DROP INDEX IF EXISTS voucher.vouchers_updated_at_idx;
+DROP INDEX IF EXISTS voucher.vouchers_type_idx;
+DROP INDEX IF EXISTS voucher.vouchers_state_valid_until_idx;
+DROP INDEX IF EXISTS voucher.vouchers_state_idx;
+DROP INDEX IF EXISTS voucher.vouchers_state_business_id_idx;
+DROP INDEX IF EXISTS voucher.vouchers_qr_code_key;
+DROP INDEX IF EXISTS voucher.vouchers_qr_code_idx;
+DROP INDEX IF EXISTS voucher.vouchers_favorite_count_idx;
+DROP INDEX IF EXISTS voucher.vouchers_deleted_at_idx;
+DROP INDEX IF EXISTS voucher.vouchers_created_at_idx;
+DROP INDEX IF EXISTS voucher.vouchers_category_id_state_idx;
+DROP INDEX IF EXISTS voucher.vouchers_category_id_idx;
+DROP INDEX IF EXISTS voucher.vouchers_business_id_idx;
+DROP INDEX IF EXISTS voucher.vouchers_business_id_created_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_user_id_key;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_redeemed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_user_id_redeemed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_user_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_redeemed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_code_used_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_type_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_is_active_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_type_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_is_active_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_code_key;
+DROP INDEX IF EXISTS voucher.voucher_codes_code_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_voucher_id_status_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_voucher_id_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_status_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_redeemed_at_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_voucher_id_key;
+DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_status_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_claimed_at_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_claimed_at_idx;
+DROP INDEX IF EXISTS users.users_primary_business_id_idx;
 DROP INDEX IF EXISTS users.users_phone_number_idx;
 DROP INDEX IF EXISTS users.users_email_key;
 DROP INDEX IF EXISTS users.users_email_idx;
 DROP INDEX IF EXISTS users.users_deleted_at_idx;
-DROP INDEX IF EXISTS users.addresses_user_id_idx;
 DROP INDEX IF EXISTS support.support_comments_user_id_idx;
 DROP INDEX IF EXISTS support.support_comments_problem_id_idx;
 DROP INDEX IF EXISTS support.support_comments_created_at_idx;
@@ -116,11 +163,6 @@ DROP INDEX IF EXISTS payments.subscription_plans_stripe_product_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_stripe_price_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_name_key;
 DROP INDEX IF EXISTS payments.subscription_plans_is_active_idx;
-DROP INDEX IF EXISTS marketplace.businesses_verified_active_idx;
-DROP INDEX IF EXISTS marketplace.businesses_user_id_idx;
-DROP INDEX IF EXISTS marketplace.businesses_deleted_at_idx;
-DROP INDEX IF EXISTS marketplace.businesses_category_id_idx;
-DROP INDEX IF EXISTS marketplace.businesses_avg_rating_idx;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_key;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_is_enabled_idx;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_idx;
@@ -145,9 +187,7 @@ DROP INDEX IF EXISTS identity.security_events_event_type_idx;
 DROP INDEX IF EXISTS identity.security_events_created_at_idx;
 DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_key;
 DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_idx;
-DROP INDEX IF EXISTS i18n.translations_service_key_idx;
 DROP INDEX IF EXISTS i18n.translations_key_language_code_key;
-DROP INDEX IF EXISTS i18n.translations_key_language_code_idx;
 DROP INDEX IF EXISTS files.voucher_books_year_month_idx;
 DROP INDEX IF EXISTS files.voucher_books_updated_by_idx;
 DROP INDEX IF EXISTS files.voucher_books_status_year_month_idx;
@@ -181,6 +221,14 @@ DROP INDEX IF EXISTS files.ad_placements_page_id_position_key;
 DROP INDEX IF EXISTS files.ad_placements_page_id_idx;
 DROP INDEX IF EXISTS files.ad_placements_created_by_idx;
 DROP INDEX IF EXISTS files.ad_placements_content_type_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_voucher_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_user_id_voucher_id_key;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_user_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_created_at_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_user_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_user_id_business_id_key;
+DROP INDEX IF EXISTS favourites.favourite_businesses_created_at_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_business_id_idx;
 DROP INDEX IF EXISTS catalog.categories_sort_order_idx;
 DROP INDEX IF EXISTS catalog.categories_slug_key;
 DROP INDEX IF EXISTS catalog.categories_slug_idx;
@@ -191,47 +239,19 @@ DROP INDEX IF EXISTS catalog.categories_name_key_idx;
 DROP INDEX IF EXISTS catalog.categories_level_sort_order_idx;
 DROP INDEX IF EXISTS catalog.categories_level_idx;
 DROP INDEX IF EXISTS catalog.categories_is_active_deleted_at_idx;
-DROP INDEX IF EXISTS business.vouchers_valid_until_idx;
-DROP INDEX IF EXISTS business.vouchers_valid_from_idx;
-DROP INDEX IF EXISTS business.vouchers_updated_at_idx;
-DROP INDEX IF EXISTS business.vouchers_type_idx;
-DROP INDEX IF EXISTS business.vouchers_state_valid_until_idx;
-DROP INDEX IF EXISTS business.vouchers_state_idx;
-DROP INDEX IF EXISTS business.vouchers_state_business_id_idx;
-DROP INDEX IF EXISTS business.vouchers_qr_code_key;
-DROP INDEX IF EXISTS business.vouchers_qr_code_idx;
-DROP INDEX IF EXISTS business.vouchers_deleted_at_idx;
-DROP INDEX IF EXISTS business.vouchers_created_at_idx;
-DROP INDEX IF EXISTS business.vouchers_category_id_state_idx;
-DROP INDEX IF EXISTS business.vouchers_category_id_idx;
-DROP INDEX IF EXISTS business.vouchers_business_id_idx;
-DROP INDEX IF EXISTS business.vouchers_business_id_created_at_idx;
-DROP INDEX IF EXISTS business.voucher_redemptions_voucher_id_user_id_key;
-DROP INDEX IF EXISTS business.voucher_redemptions_voucher_id_redeemed_at_idx;
-DROP INDEX IF EXISTS business.voucher_redemptions_voucher_id_idx;
-DROP INDEX IF EXISTS business.voucher_redemptions_user_id_redeemed_at_idx;
-DROP INDEX IF EXISTS business.voucher_redemptions_user_id_idx;
-DROP INDEX IF EXISTS business.voucher_redemptions_redeemed_at_idx;
-DROP INDEX IF EXISTS business.voucher_redemptions_code_used_idx;
-DROP INDEX IF EXISTS business.voucher_codes_voucher_id_type_idx;
-DROP INDEX IF EXISTS business.voucher_codes_voucher_id_is_active_idx;
-DROP INDEX IF EXISTS business.voucher_codes_voucher_id_idx;
-DROP INDEX IF EXISTS business.voucher_codes_type_idx;
-DROP INDEX IF EXISTS business.voucher_codes_is_active_idx;
-DROP INDEX IF EXISTS business.voucher_codes_code_key;
-DROP INDEX IF EXISTS business.voucher_codes_code_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_voucher_id_status_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_voucher_id_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_status_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_redeemed_at_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_customer_id_voucher_id_key;
-DROP INDEX IF EXISTS business.customer_vouchers_customer_id_status_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_customer_id_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_customer_id_claimed_at_idx;
-DROP INDEX IF EXISTS business.customer_vouchers_claimed_at_idx;
-DROP INDEX IF EXISTS audit.audit_logs_user_id_idx;
-DROP INDEX IF EXISTS audit.audit_logs_entity_type_entity_id_idx;
-DROP INDEX IF EXISTS audit.audit_logs_created_at_idx;
+DROP INDEX IF EXISTS business.businesses_verified_active_idx;
+DROP INDEX IF EXISTS business.businesses_user_id_idx;
+DROP INDEX IF EXISTS business.businesses_favorite_count_idx;
+DROP INDEX IF EXISTS business.businesses_deleted_at_idx;
+DROP INDEX IF EXISTS business.businesses_category_id_idx;
+DROP INDEX IF EXISTS business.businesses_avg_rating_idx;
+DROP INDEX IF EXISTS business."business_registration_userId_key";
+DROP INDEX IF EXISTS business."business_registration_userId_idx";
+DROP INDEX IF EXISTS business."business_registration_registrationStatus_idx";
+DROP INDEX IF EXISTS business."business_registration_businessId_key";
+DROP INDEX IF EXISTS business."business_registration_businessId_idx";
+DROP INDEX IF EXISTS business."business_details_businessId_key";
+DROP INDEX IF EXISTS business."business_details_businessId_idx";
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scan_type_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_idx;
@@ -243,8 +263,11 @@ DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_business_id_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_business_id_idx;
+ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_pkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_pkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_pkey;
+ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_pkey;
 ALTER TABLE IF EXISTS ONLY users.users DROP CONSTRAINT IF EXISTS users_pkey;
-ALTER TABLE IF EXISTS ONLY users.addresses DROP CONSTRAINT IF EXISTS addresses_pkey;
 ALTER TABLE IF EXISTS ONLY support.support_comments DROP CONSTRAINT IF EXISTS support_comments_pkey;
 ALTER TABLE IF EXISTS ONLY support.problems DROP CONSTRAINT IF EXISTS problems_pkey;
 ALTER TABLE IF EXISTS ONLY support.notifications DROP CONSTRAINT IF EXISTS notifications_pkey;
@@ -254,7 +277,6 @@ ALTER TABLE IF EXISTS ONLY security.fraud_case_history DROP CONSTRAINT IF EXISTS
 ALTER TABLE IF EXISTS ONLY public._prisma_migrations DROP CONSTRAINT IF EXISTS _prisma_migrations_pkey;
 ALTER TABLE IF EXISTS ONLY payments.subscriptions DROP CONSTRAINT IF EXISTS subscriptions_pkey;
 ALTER TABLE IF EXISTS ONLY payments.subscription_plans DROP CONSTRAINT IF EXISTS subscription_plans_pkey;
-ALTER TABLE IF EXISTS ONLY marketplace.businesses DROP CONSTRAINT IF EXISTS businesses_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_mfa_settings DROP CONSTRAINT IF EXISTS user_mfa_settings_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_identities DROP CONSTRAINT IF EXISTS user_identities_pkey;
 ALTER TABLE IF EXISTS ONLY identity.user_devices DROP CONSTRAINT IF EXISTS user_devices_pkey;
@@ -268,15 +290,18 @@ ALTER TABLE IF EXISTS ONLY files.voucher_book_pages DROP CONSTRAINT IF EXISTS vo
 ALTER TABLE IF EXISTS ONLY files.file_storage_logs DROP CONSTRAINT IF EXISTS file_storage_logs_pkey;
 ALTER TABLE IF EXISTS ONLY files.book_distributions DROP CONSTRAINT IF EXISTS book_distributions_pkey;
 ALTER TABLE IF EXISTS ONLY files.ad_placements DROP CONSTRAINT IF EXISTS ad_placements_pkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXISTS favourite_vouchers_pkey;
+ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_pkey;
 ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_pkey;
-ALTER TABLE IF EXISTS ONLY business.vouchers DROP CONSTRAINT IF EXISTS vouchers_pkey;
-ALTER TABLE IF EXISTS ONLY business.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_pkey;
-ALTER TABLE IF EXISTS ONLY business.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_pkey;
-ALTER TABLE IF EXISTS ONLY business.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_pkey;
-ALTER TABLE IF EXISTS ONLY audit.audit_logs DROP CONSTRAINT IF EXISTS audit_logs_pkey;
+ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_pkey;
+ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS business_registration_pkey;
+ALTER TABLE IF EXISTS ONLY business.business_details DROP CONSTRAINT IF EXISTS business_details_pkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_pkey;
+DROP TABLE IF EXISTS voucher.vouchers;
+DROP TABLE IF EXISTS voucher.voucher_redemptions;
+DROP TABLE IF EXISTS voucher.voucher_codes;
+DROP TABLE IF EXISTS voucher.customer_vouchers;
 DROP TABLE IF EXISTS users.users;
-DROP TABLE IF EXISTS users.addresses;
 DROP TABLE IF EXISTS support.support_comments;
 DROP TABLE IF EXISTS support.problems;
 DROP TABLE IF EXISTS support.notifications;
@@ -286,7 +311,6 @@ DROP TABLE IF EXISTS security.fraud_case_history;
 DROP TABLE IF EXISTS public._prisma_migrations;
 DROP TABLE IF EXISTS payments.subscriptions;
 DROP TABLE IF EXISTS payments.subscription_plans;
-DROP TABLE IF EXISTS marketplace.businesses;
 DROP TABLE IF EXISTS identity.user_mfa_settings;
 DROP TABLE IF EXISTS identity.user_identities;
 DROP TABLE IF EXISTS identity.user_devices;
@@ -300,13 +324,17 @@ DROP TABLE IF EXISTS files.voucher_book_pages;
 DROP TABLE IF EXISTS files.file_storage_logs;
 DROP TABLE IF EXISTS files.book_distributions;
 DROP TABLE IF EXISTS files.ad_placements;
+DROP TABLE IF EXISTS favourites.favourite_vouchers;
+DROP TABLE IF EXISTS favourites.favourite_businesses;
 DROP TABLE IF EXISTS catalog.categories;
-DROP TABLE IF EXISTS business.vouchers;
-DROP TABLE IF EXISTS business.voucher_redemptions;
-DROP TABLE IF EXISTS business.voucher_codes;
-DROP TABLE IF EXISTS business.customer_vouchers;
-DROP TABLE IF EXISTS audit.audit_logs;
+DROP TABLE IF EXISTS business.businesses;
+DROP TABLE IF EXISTS business.business_registration;
+DROP TABLE IF EXISTS business.business_details;
 DROP TABLE IF EXISTS analytics.voucher_scans;
+DROP TYPE IF EXISTS voucher."VoucherType";
+DROP TYPE IF EXISTS voucher."VoucherState";
+DROP TYPE IF EXISTS voucher."VoucherCodeType";
+DROP TYPE IF EXISTS voucher."CustomerVoucherStatus";
 DROP TYPE IF EXISTS support."ProblemType";
 DROP TYPE IF EXISTS support."ProblemStatus";
 DROP TYPE IF EXISTS support."ProblemPriority";
@@ -326,10 +354,7 @@ DROP TYPE IF EXISTS files."PageLayoutType";
 DROP TYPE IF EXISTS files."FileType";
 DROP TYPE IF EXISTS files."ContentType";
 DROP TYPE IF EXISTS files."AdSize";
-DROP TYPE IF EXISTS business."VoucherType";
-DROP TYPE IF EXISTS business."VoucherState";
-DROP TYPE IF EXISTS business."VoucherCodeType";
-DROP TYPE IF EXISTS business."CustomerVoucherStatus";
+DROP TYPE IF EXISTS business.business_registration_status;
 DROP TYPE IF EXISTS audit."AuditAction";
 DROP TYPE IF EXISTS analytics."VoucherScanType";
 DROP TYPE IF EXISTS analytics."VoucherScanSource";
@@ -338,18 +363,19 @@ DROP EXTENSION IF EXISTS postgis_tiger_geocoder;
 DROP EXTENSION IF EXISTS postgis;
 DROP EXTENSION IF EXISTS pgcrypto;
 DROP EXTENSION IF EXISTS fuzzystrmatch;
+DROP SCHEMA IF EXISTS voucher;
 DROP SCHEMA IF EXISTS users;
 DROP SCHEMA IF EXISTS topology;
 DROP SCHEMA IF EXISTS tiger_data;
 DROP SCHEMA IF EXISTS tiger;
 DROP SCHEMA IF EXISTS support;
 DROP SCHEMA IF EXISTS security;
--- *not* dropping schema, since initdb creates it
 DROP SCHEMA IF EXISTS payments;
 DROP SCHEMA IF EXISTS marketplace;
 DROP SCHEMA IF EXISTS identity;
 DROP SCHEMA IF EXISTS i18n;
 DROP SCHEMA IF EXISTS files;
+DROP SCHEMA IF EXISTS favourites;
 DROP SCHEMA IF EXISTS catalog;
 DROP SCHEMA IF EXISTS business;
 DROP SCHEMA IF EXISTS audit;
@@ -380,6 +406,13 @@ CREATE SCHEMA business;
 --
 
 CREATE SCHEMA catalog;
+
+
+--
+-- Name: favourites; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA favourites;
 
 
 --
@@ -415,20 +448,6 @@ CREATE SCHEMA marketplace;
 --
 
 CREATE SCHEMA payments;
-
-
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
--- *not* creating schema, since initdb creates it
-
-
---
--- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON SCHEMA public IS '';
 
 
 --
@@ -478,6 +497,13 @@ COMMENT ON SCHEMA topology IS 'PostGIS Topology schema';
 --
 
 CREATE SCHEMA users;
+
+
+--
+-- Name: voucher; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA voucher;
 
 
 --
@@ -587,48 +613,14 @@ CREATE TYPE audit."AuditAction" AS ENUM (
 
 
 --
--- Name: CustomerVoucherStatus; Type: TYPE; Schema: business; Owner: -
+-- Name: business_registration_status; Type: TYPE; Schema: business; Owner: -
 --
 
-CREATE TYPE business."CustomerVoucherStatus" AS ENUM (
-    'claimed',
-    'redeemed',
-    'expired'
-);
-
-
---
--- Name: VoucherCodeType; Type: TYPE; Schema: business; Owner: -
---
-
-CREATE TYPE business."VoucherCodeType" AS ENUM (
-    'qr',
-    'short',
-    'static'
-);
-
-
---
--- Name: VoucherState; Type: TYPE; Schema: business; Owner: -
---
-
-CREATE TYPE business."VoucherState" AS ENUM (
-    'draft',
-    'published',
-    'claimed',
-    'redeemed',
-    'expired',
-    'suspended'
-);
-
-
---
--- Name: VoucherType; Type: TYPE; Schema: business; Owner: -
---
-
-CREATE TYPE business."VoucherType" AS ENUM (
-    'percentage',
-    'fixed'
+CREATE TYPE business.business_registration_status AS ENUM (
+    'IN_PROGRESS',
+    'SUBMITTED',
+    'APPROVED',
+    'REJECTED'
 );
 
 
@@ -870,6 +862,52 @@ CREATE TYPE support."ProblemType" AS ENUM (
 );
 
 
+--
+-- Name: CustomerVoucherStatus; Type: TYPE; Schema: voucher; Owner: -
+--
+
+CREATE TYPE voucher."CustomerVoucherStatus" AS ENUM (
+    'claimed',
+    'redeemed',
+    'expired'
+);
+
+
+--
+-- Name: VoucherCodeType; Type: TYPE; Schema: voucher; Owner: -
+--
+
+CREATE TYPE voucher."VoucherCodeType" AS ENUM (
+    'qr',
+    'short',
+    'static'
+);
+
+
+--
+-- Name: VoucherState; Type: TYPE; Schema: voucher; Owner: -
+--
+
+CREATE TYPE voucher."VoucherState" AS ENUM (
+    'draft',
+    'published',
+    'claimed',
+    'redeemed',
+    'expired',
+    'suspended'
+);
+
+
+--
+-- Name: VoucherType; Type: TYPE; Schema: voucher; Owner: -
+--
+
+CREATE TYPE voucher."VoucherType" AS ENUM (
+    'percentage',
+    'fixed'
+);
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -894,99 +932,71 @@ CREATE TABLE analytics.voucher_scans (
 
 
 --
--- Name: audit_logs; Type: TABLE; Schema: audit; Owner: -
+-- Name: business_details; Type: TABLE; Schema: business; Owner: -
 --
 
-CREATE TABLE audit.audit_logs (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    entity_type character varying(50) NOT NULL,
-    entity_id uuid NOT NULL,
-    action audit."AuditAction" NOT NULL,
-    user_id uuid,
-    data jsonb,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP
-);
-
-
---
--- Name: customer_vouchers; Type: TABLE; Schema: business; Owner: -
---
-
-CREATE TABLE business.customer_vouchers (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    customer_id uuid NOT NULL,
-    voucher_id uuid NOT NULL,
-    claimed_at timestamp(6) with time zone NOT NULL,
-    status business."CustomerVoucherStatus" DEFAULT 'claimed'::business."CustomerVoucherStatus" NOT NULL,
-    notification_preferences jsonb,
-    redeemed_at timestamp(6) with time zone,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: voucher_codes; Type: TABLE; Schema: business; Owner: -
---
-
-CREATE TABLE business.voucher_codes (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    voucher_id uuid NOT NULL,
-    code character varying(500) NOT NULL,
-    type business."VoucherCodeType" NOT NULL,
-    is_active boolean DEFAULT true NOT NULL,
-    metadata jsonb,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: voucher_redemptions; Type: TABLE; Schema: business; Owner: -
---
-
-CREATE TABLE business.voucher_redemptions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    voucher_id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    code_used character varying(500) NOT NULL,
-    redeemed_at timestamp(6) with time zone NOT NULL,
-    location public.geography(Point,4326),
-    metadata jsonb,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: vouchers; Type: TABLE; Schema: business; Owner: -
---
-
-CREATE TABLE business.vouchers (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    business_id uuid NOT NULL,
-    category_id uuid,
-    state business."VoucherState" DEFAULT 'draft'::business."VoucherState" NOT NULL,
-    title_key character varying(255) NOT NULL,
-    description_key character varying(255) NOT NULL,
-    terms_and_conditions_key character varying(255) NOT NULL,
-    type business."VoucherType" NOT NULL,
-    value numeric(10,2),
-    discount numeric(5,2),
-    currency character varying(3) DEFAULT 'PYG'::character varying NOT NULL,
-    location public.geography(Point,4326),
-    image_url character varying(500),
-    valid_from timestamp(6) with time zone,
-    valid_until timestamp(6) with time zone,
-    max_redemptions integer,
-    max_redemptions_per_user integer DEFAULT 1 NOT NULL,
-    redemptions_count integer DEFAULT 0 NOT NULL,
-    scan_count integer DEFAULT 0 NOT NULL,
-    claim_count integer DEFAULT 0 NOT NULL,
-    metadata jsonb,
-    qr_code character varying(500),
+CREATE TABLE business.business_details (
+    id uuid NOT NULL,
+    "businessId" uuid NOT NULL,
+    phone character varying(20),
+    email character varying(255),
+    website character varying(255),
+    street character varying(255),
+    city character varying(100),
+    state character varying(100),
+    postal_code character varying(20),
+    country character varying(2),
+    operating_hours jsonb,
+    social_media jsonb,
+    additional_info jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at timestamp(6) with time zone
+    logo_url character varying(512)
+);
+
+
+--
+-- Name: business_registration; Type: TABLE; Schema: business; Owner: -
+--
+
+CREATE TABLE business.business_registration (
+    id uuid NOT NULL,
+    "userId" uuid NOT NULL,
+    "businessId" uuid,
+    "currentStep" integer DEFAULT 1 NOT NULL,
+    "step1Data" jsonb,
+    "step2Data" jsonb,
+    "step3Data" jsonb,
+    "registrationStatus" business.business_registration_status DEFAULT 'IN_PROGRESS'::business.business_registration_status NOT NULL,
+    "startedAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "completedAt" timestamp(3) without time zone,
+    "submittedAt" timestamp(3) without time zone,
+    "rejectionReason" text,
+    "createdAt" timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    "updatedAt" timestamp(3) without time zone NOT NULL
+);
+
+
+--
+-- Name: businesses; Type: TABLE; Schema: business; Owner: -
+--
+
+CREATE TABLE business.businesses (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    business_name_key character varying(255) NOT NULL,
+    business_description_key character varying(255),
+    category_id uuid,
+    verified boolean DEFAULT false NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    approved boolean DEFAULT false NOT NULL,
+    approved_by uuid,
+    approved_at timestamp(6) with time zone,
+    avg_rating numeric(3,2) DEFAULT 0 NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp(6) with time zone,
+    favorite_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1010,6 +1020,30 @@ CREATE TABLE catalog.categories (
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
     deleted_at timestamp(6) with time zone
+);
+
+
+--
+-- Name: favourite_businesses; Type: TABLE; Schema: favourites; Owner: -
+--
+
+CREATE TABLE favourites.favourite_businesses (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    business_id uuid NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: favourite_vouchers; Type: TABLE; Schema: favourites; Owner: -
+--
+
+CREATE TABLE favourites.favourite_vouchers (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    voucher_id uuid NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -1174,7 +1208,7 @@ CREATE TABLE i18n.translations (
 
 CREATE TABLE i18n.user_language_preferences (
     id text NOT NULL,
-    user_id text NOT NULL,
+    user_id uuid NOT NULL,
     language_code text NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(3) without time zone NOT NULL
@@ -1275,28 +1309,6 @@ CREATE TABLE identity.user_mfa_settings (
     phone_number_verified character varying(50),
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
---
--- Name: businesses; Type: TABLE; Schema: marketplace; Owner: -
---
-
-CREATE TABLE marketplace.businesses (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    business_name_key character varying(255) NOT NULL,
-    business_description_key character varying(255),
-    category_id uuid,
-    verified boolean DEFAULT false NOT NULL,
-    active boolean DEFAULT true NOT NULL,
-    avg_rating numeric(3,2) DEFAULT 0 NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at timestamp(6) with time zone,
-    approved boolean DEFAULT false NOT NULL,
-    approved_at timestamp(6) with time zone,
-    approved_by uuid
 );
 
 
@@ -1484,26 +1496,6 @@ CREATE TABLE support.support_comments (
 
 
 --
--- Name: addresses; Type: TABLE; Schema: users; Owner: -
---
-
-CREATE TABLE users.addresses (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    address_line1 character varying(255) NOT NULL,
-    address_line2 character varying(255),
-    city character varying(100) NOT NULL,
-    state character varying(100) NOT NULL,
-    postal_code character varying(20) NOT NULL,
-    country character varying(100) DEFAULT 'United States'::character varying NOT NULL,
-    is_default boolean DEFAULT false NOT NULL,
-    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
-    deleted_at timestamp(6) with time zone
-);
-
-
---
 -- Name: users; Type: TABLE; Schema: users; Owner: -
 --
 
@@ -1525,7 +1517,92 @@ CREATE TABLE users.users (
     deleted_at timestamp(6) with time zone,
     date_of_birth date,
     stripe_user_id character varying(255),
-    preferred_language character varying(2)
+    preferred_language character varying(2),
+    primary_business_id uuid,
+    settings jsonb
+);
+
+
+--
+-- Name: customer_vouchers; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.customer_vouchers (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    customer_id uuid NOT NULL,
+    voucher_id uuid NOT NULL,
+    claimed_at timestamp(6) with time zone NOT NULL,
+    status voucher."CustomerVoucherStatus" DEFAULT 'claimed'::voucher."CustomerVoucherStatus" NOT NULL,
+    notification_preferences jsonb,
+    redeemed_at timestamp(6) with time zone,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: voucher_codes; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.voucher_codes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    voucher_id uuid NOT NULL,
+    code character varying(500) NOT NULL,
+    type voucher."VoucherCodeType" NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    metadata jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: voucher_redemptions; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.voucher_redemptions (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    voucher_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    code_used character varying(500) NOT NULL,
+    redeemed_at timestamp(6) with time zone NOT NULL,
+    location public.geography(Point,4326),
+    metadata jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: vouchers; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.vouchers (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    business_id uuid NOT NULL,
+    category_id uuid,
+    state voucher."VoucherState" DEFAULT 'draft'::voucher."VoucherState" NOT NULL,
+    title_key character varying(255) NOT NULL,
+    description_key character varying(255) NOT NULL,
+    terms_and_conditions_key character varying(255) NOT NULL,
+    type voucher."VoucherType" NOT NULL,
+    value numeric(10,2),
+    discount numeric(5,2),
+    currency character varying(3) DEFAULT 'PYG'::character varying NOT NULL,
+    location public.geography(Point,4326),
+    image_url character varying(500),
+    valid_from timestamp(6) with time zone,
+    valid_until timestamp(6) with time zone,
+    max_redemptions integer,
+    max_redemptions_per_user integer DEFAULT 1 NOT NULL,
+    redemptions_count integer DEFAULT 0 NOT NULL,
+    scan_count integer DEFAULT 0 NOT NULL,
+    claim_count integer DEFAULT 0 NOT NULL,
+    metadata jsonb,
+    qr_code character varying(500),
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamp(6) with time zone,
+    favorite_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1538,43 +1615,27 @@ ALTER TABLE ONLY analytics.voucher_scans
 
 
 --
--- Name: audit_logs audit_logs_pkey; Type: CONSTRAINT; Schema: audit; Owner: -
+-- Name: business_details business_details_pkey; Type: CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY audit.audit_logs
-    ADD CONSTRAINT audit_logs_pkey PRIMARY KEY (id);
-
-
---
--- Name: customer_vouchers customer_vouchers_pkey; Type: CONSTRAINT; Schema: business; Owner: -
---
-
-ALTER TABLE ONLY business.customer_vouchers
-    ADD CONSTRAINT customer_vouchers_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY business.business_details
+    ADD CONSTRAINT business_details_pkey PRIMARY KEY (id);
 
 
 --
--- Name: voucher_codes voucher_codes_pkey; Type: CONSTRAINT; Schema: business; Owner: -
+-- Name: business_registration business_registration_pkey; Type: CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY business.voucher_codes
-    ADD CONSTRAINT voucher_codes_pkey PRIMARY KEY (id);
-
-
---
--- Name: voucher_redemptions voucher_redemptions_pkey; Type: CONSTRAINT; Schema: business; Owner: -
---
-
-ALTER TABLE ONLY business.voucher_redemptions
-    ADD CONSTRAINT voucher_redemptions_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY business.business_registration
+    ADD CONSTRAINT business_registration_pkey PRIMARY KEY (id);
 
 
 --
--- Name: vouchers vouchers_pkey; Type: CONSTRAINT; Schema: business; Owner: -
+-- Name: businesses businesses_pkey; Type: CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY business.vouchers
-    ADD CONSTRAINT vouchers_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY business.businesses
+    ADD CONSTRAINT businesses_pkey PRIMARY KEY (id);
 
 
 --
@@ -1583,6 +1644,22 @@ ALTER TABLE ONLY business.vouchers
 
 ALTER TABLE ONLY catalog.categories
     ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favourite_businesses favourite_businesses_pkey; Type: CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_businesses
+    ADD CONSTRAINT favourite_businesses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favourite_vouchers favourite_vouchers_pkey; Type: CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_vouchers
+    ADD CONSTRAINT favourite_vouchers_pkey PRIMARY KEY (id);
 
 
 --
@@ -1690,14 +1767,6 @@ ALTER TABLE ONLY identity.user_mfa_settings
 
 
 --
--- Name: businesses businesses_pkey; Type: CONSTRAINT; Schema: marketplace; Owner: -
---
-
-ALTER TABLE ONLY marketplace.businesses
-    ADD CONSTRAINT businesses_pkey PRIMARY KEY (id);
-
-
---
 -- Name: subscription_plans subscription_plans_pkey; Type: CONSTRAINT; Schema: payments; Owner: -
 --
 
@@ -1770,19 +1839,43 @@ ALTER TABLE ONLY support.support_comments
 
 
 --
--- Name: addresses addresses_pkey; Type: CONSTRAINT; Schema: users; Owner: -
---
-
-ALTER TABLE ONLY users.addresses
-    ADD CONSTRAINT addresses_pkey PRIMARY KEY (id);
-
-
---
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: users; Owner: -
 --
 
 ALTER TABLE ONLY users.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customer_vouchers customer_vouchers_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.customer_vouchers
+    ADD CONSTRAINT customer_vouchers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: voucher_codes voucher_codes_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_codes
+    ADD CONSTRAINT voucher_codes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: voucher_redemptions voucher_redemptions_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_redemptions
+    ADD CONSTRAINT voucher_redemptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: vouchers vouchers_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.vouchers
+    ADD CONSTRAINT vouchers_pkey PRIMARY KEY (id);
 
 
 --
@@ -1863,290 +1956,94 @@ CREATE INDEX voucher_scans_voucher_id_scanned_at_idx ON analytics.voucher_scans 
 
 
 --
--- Name: audit_logs_created_at_idx; Type: INDEX; Schema: audit; Owner: -
+-- Name: business_details_businessId_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX audit_logs_created_at_idx ON audit.audit_logs USING btree (created_at);
+CREATE INDEX "business_details_businessId_idx" ON business.business_details USING btree ("businessId");
 
 
 --
--- Name: audit_logs_entity_type_entity_id_idx; Type: INDEX; Schema: audit; Owner: -
+-- Name: business_details_businessId_key; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX audit_logs_entity_type_entity_id_idx ON audit.audit_logs USING btree (entity_type, entity_id);
+CREATE UNIQUE INDEX "business_details_businessId_key" ON business.business_details USING btree ("businessId");
 
 
 --
--- Name: audit_logs_user_id_idx; Type: INDEX; Schema: audit; Owner: -
+-- Name: business_registration_businessId_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX audit_logs_user_id_idx ON audit.audit_logs USING btree (user_id);
+CREATE INDEX "business_registration_businessId_idx" ON business.business_registration USING btree ("businessId");
 
 
 --
--- Name: customer_vouchers_claimed_at_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: business_registration_businessId_key; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_claimed_at_idx ON business.customer_vouchers USING btree (claimed_at);
+CREATE UNIQUE INDEX "business_registration_businessId_key" ON business.business_registration USING btree ("businessId");
 
 
 --
--- Name: customer_vouchers_customer_id_claimed_at_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: business_registration_registrationStatus_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_customer_id_claimed_at_idx ON business.customer_vouchers USING btree (customer_id, claimed_at);
+CREATE INDEX "business_registration_registrationStatus_idx" ON business.business_registration USING btree ("registrationStatus");
 
 
 --
--- Name: customer_vouchers_customer_id_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: business_registration_userId_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_customer_id_idx ON business.customer_vouchers USING btree (customer_id);
+CREATE INDEX "business_registration_userId_idx" ON business.business_registration USING btree ("userId");
 
 
 --
--- Name: customer_vouchers_customer_id_status_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: business_registration_userId_key; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_customer_id_status_idx ON business.customer_vouchers USING btree (customer_id, status);
+CREATE UNIQUE INDEX "business_registration_userId_key" ON business.business_registration USING btree ("userId");
 
 
 --
--- Name: customer_vouchers_customer_id_voucher_id_key; Type: INDEX; Schema: business; Owner: -
+-- Name: businesses_avg_rating_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE UNIQUE INDEX customer_vouchers_customer_id_voucher_id_key ON business.customer_vouchers USING btree (customer_id, voucher_id);
+CREATE INDEX businesses_avg_rating_idx ON business.businesses USING btree (avg_rating);
 
 
 --
--- Name: customer_vouchers_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: businesses_category_id_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_redeemed_at_idx ON business.customer_vouchers USING btree (redeemed_at);
+CREATE INDEX businesses_category_id_idx ON business.businesses USING btree (category_id);
 
 
 --
--- Name: customer_vouchers_status_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: businesses_deleted_at_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_status_idx ON business.customer_vouchers USING btree (status);
+CREATE INDEX businesses_deleted_at_idx ON business.businesses USING btree (deleted_at);
 
 
 --
--- Name: customer_vouchers_voucher_id_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: businesses_favorite_count_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_voucher_id_idx ON business.customer_vouchers USING btree (voucher_id);
+CREATE INDEX businesses_favorite_count_idx ON business.businesses USING btree (favorite_count DESC);
 
 
 --
--- Name: customer_vouchers_voucher_id_status_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: businesses_user_id_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX customer_vouchers_voucher_id_status_idx ON business.customer_vouchers USING btree (voucher_id, status);
+CREATE INDEX businesses_user_id_idx ON business.businesses USING btree (user_id);
 
 
 --
--- Name: voucher_codes_code_idx; Type: INDEX; Schema: business; Owner: -
+-- Name: businesses_verified_active_idx; Type: INDEX; Schema: business; Owner: -
 --
 
-CREATE INDEX voucher_codes_code_idx ON business.voucher_codes USING btree (code);
-
-
---
--- Name: voucher_codes_code_key; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE UNIQUE INDEX voucher_codes_code_key ON business.voucher_codes USING btree (code);
-
-
---
--- Name: voucher_codes_is_active_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_codes_is_active_idx ON business.voucher_codes USING btree (is_active);
-
-
---
--- Name: voucher_codes_type_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_codes_type_idx ON business.voucher_codes USING btree (type);
-
-
---
--- Name: voucher_codes_voucher_id_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_codes_voucher_id_idx ON business.voucher_codes USING btree (voucher_id);
-
-
---
--- Name: voucher_codes_voucher_id_is_active_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_codes_voucher_id_is_active_idx ON business.voucher_codes USING btree (voucher_id, is_active);
-
-
---
--- Name: voucher_codes_voucher_id_type_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_codes_voucher_id_type_idx ON business.voucher_codes USING btree (voucher_id, type);
-
-
---
--- Name: voucher_redemptions_code_used_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_redemptions_code_used_idx ON business.voucher_redemptions USING btree (code_used);
-
-
---
--- Name: voucher_redemptions_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_redemptions_redeemed_at_idx ON business.voucher_redemptions USING btree (redeemed_at);
-
-
---
--- Name: voucher_redemptions_user_id_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_redemptions_user_id_idx ON business.voucher_redemptions USING btree (user_id);
-
-
---
--- Name: voucher_redemptions_user_id_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_redemptions_user_id_redeemed_at_idx ON business.voucher_redemptions USING btree (user_id, redeemed_at);
-
-
---
--- Name: voucher_redemptions_voucher_id_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_redemptions_voucher_id_idx ON business.voucher_redemptions USING btree (voucher_id);
-
-
---
--- Name: voucher_redemptions_voucher_id_redeemed_at_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX voucher_redemptions_voucher_id_redeemed_at_idx ON business.voucher_redemptions USING btree (voucher_id, redeemed_at);
-
-
---
--- Name: voucher_redemptions_voucher_id_user_id_key; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE UNIQUE INDEX voucher_redemptions_voucher_id_user_id_key ON business.voucher_redemptions USING btree (voucher_id, user_id);
-
-
---
--- Name: vouchers_business_id_created_at_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_business_id_created_at_idx ON business.vouchers USING btree (business_id, created_at);
-
-
---
--- Name: vouchers_business_id_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_business_id_idx ON business.vouchers USING btree (business_id);
-
-
---
--- Name: vouchers_category_id_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_category_id_idx ON business.vouchers USING btree (category_id);
-
-
---
--- Name: vouchers_category_id_state_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_category_id_state_idx ON business.vouchers USING btree (category_id, state);
-
-
---
--- Name: vouchers_created_at_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_created_at_idx ON business.vouchers USING btree (created_at);
-
-
---
--- Name: vouchers_deleted_at_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_deleted_at_idx ON business.vouchers USING btree (deleted_at);
-
-
---
--- Name: vouchers_qr_code_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_qr_code_idx ON business.vouchers USING btree (qr_code);
-
-
---
--- Name: vouchers_qr_code_key; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE UNIQUE INDEX vouchers_qr_code_key ON business.vouchers USING btree (qr_code);
-
-
---
--- Name: vouchers_state_business_id_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_state_business_id_idx ON business.vouchers USING btree (state, business_id);
-
-
---
--- Name: vouchers_state_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_state_idx ON business.vouchers USING btree (state);
-
-
---
--- Name: vouchers_state_valid_until_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_state_valid_until_idx ON business.vouchers USING btree (state, valid_until);
-
-
---
--- Name: vouchers_type_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_type_idx ON business.vouchers USING btree (type);
-
-
---
--- Name: vouchers_updated_at_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_updated_at_idx ON business.vouchers USING btree (updated_at);
-
-
---
--- Name: vouchers_valid_from_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_valid_from_idx ON business.vouchers USING btree (valid_from);
-
-
---
--- Name: vouchers_valid_until_idx; Type: INDEX; Schema: business; Owner: -
---
-
-CREATE INDEX vouchers_valid_until_idx ON business.vouchers USING btree (valid_until);
+CREATE INDEX businesses_verified_active_idx ON business.businesses USING btree (verified, active);
 
 
 --
@@ -2217,6 +2114,62 @@ CREATE UNIQUE INDEX categories_slug_key ON catalog.categories USING btree (slug)
 --
 
 CREATE INDEX categories_sort_order_idx ON catalog.categories USING btree (sort_order);
+
+
+--
+-- Name: favourite_businesses_business_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_business_id_idx ON favourites.favourite_businesses USING btree (business_id);
+
+
+--
+-- Name: favourite_businesses_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_created_at_idx ON favourites.favourite_businesses USING btree (created_at DESC);
+
+
+--
+-- Name: favourite_businesses_user_id_business_id_key; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE UNIQUE INDEX favourite_businesses_user_id_business_id_key ON favourites.favourite_businesses USING btree (user_id, business_id);
+
+
+--
+-- Name: favourite_businesses_user_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_user_id_idx ON favourites.favourite_businesses USING btree (user_id);
+
+
+--
+-- Name: favourite_vouchers_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_created_at_idx ON favourites.favourite_vouchers USING btree (created_at DESC);
+
+
+--
+-- Name: favourite_vouchers_user_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_user_id_idx ON favourites.favourite_vouchers USING btree (user_id);
+
+
+--
+-- Name: favourite_vouchers_user_id_voucher_id_key; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE UNIQUE INDEX favourite_vouchers_user_id_voucher_id_key ON favourites.favourite_vouchers USING btree (user_id, voucher_id);
+
+
+--
+-- Name: favourite_vouchers_voucher_id_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_voucher_id_idx ON favourites.favourite_vouchers USING btree (voucher_id);
 
 
 --
@@ -2451,24 +2404,10 @@ CREATE INDEX voucher_books_year_month_idx ON files.voucher_books USING btree (ye
 
 
 --
--- Name: translations_key_language_code_idx; Type: INDEX; Schema: i18n; Owner: -
---
-
-CREATE INDEX translations_key_language_code_idx ON i18n.translations USING btree (key, language_code);
-
-
---
 -- Name: translations_key_language_code_key; Type: INDEX; Schema: i18n; Owner: -
 --
 
 CREATE UNIQUE INDEX translations_key_language_code_key ON i18n.translations USING btree (key, language_code);
-
-
---
--- Name: translations_service_key_idx; Type: INDEX; Schema: i18n; Owner: -
---
-
-CREATE INDEX translations_service_key_idx ON i18n.translations USING btree (service, key);
 
 
 --
@@ -2637,41 +2576,6 @@ CREATE INDEX user_mfa_settings_user_id_is_enabled_idx ON identity.user_mfa_setti
 --
 
 CREATE UNIQUE INDEX user_mfa_settings_user_id_key ON identity.user_mfa_settings USING btree (user_id);
-
-
---
--- Name: businesses_avg_rating_idx; Type: INDEX; Schema: marketplace; Owner: -
---
-
-CREATE INDEX businesses_avg_rating_idx ON marketplace.businesses USING btree (avg_rating);
-
-
---
--- Name: businesses_category_id_idx; Type: INDEX; Schema: marketplace; Owner: -
---
-
-CREATE INDEX businesses_category_id_idx ON marketplace.businesses USING btree (category_id);
-
-
---
--- Name: businesses_deleted_at_idx; Type: INDEX; Schema: marketplace; Owner: -
---
-
-CREATE INDEX businesses_deleted_at_idx ON marketplace.businesses USING btree (deleted_at);
-
-
---
--- Name: businesses_user_id_idx; Type: INDEX; Schema: marketplace; Owner: -
---
-
-CREATE INDEX businesses_user_id_idx ON marketplace.businesses USING btree (user_id);
-
-
---
--- Name: businesses_verified_active_idx; Type: INDEX; Schema: marketplace; Owner: -
---
-
-CREATE INDEX businesses_verified_active_idx ON marketplace.businesses USING btree (verified, active);
 
 
 --
@@ -3004,13 +2908,6 @@ CREATE INDEX support_comments_user_id_idx ON support.support_comments USING btre
 
 
 --
--- Name: addresses_user_id_idx; Type: INDEX; Schema: users; Owner: -
---
-
-CREATE INDEX addresses_user_id_idx ON users.addresses USING btree (user_id);
-
-
---
 -- Name: users_deleted_at_idx; Type: INDEX; Schema: users; Owner: -
 --
 
@@ -3039,11 +2936,291 @@ CREATE INDEX users_phone_number_idx ON users.users USING btree (phone_number);
 
 
 --
+-- Name: users_primary_business_id_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_primary_business_id_idx ON users.users USING btree (primary_business_id);
+
+
+--
+-- Name: customer_vouchers_claimed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_claimed_at_idx ON voucher.customer_vouchers USING btree (claimed_at);
+
+
+--
+-- Name: customer_vouchers_customer_id_claimed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_customer_id_claimed_at_idx ON voucher.customer_vouchers USING btree (customer_id, claimed_at);
+
+
+--
+-- Name: customer_vouchers_customer_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_customer_id_idx ON voucher.customer_vouchers USING btree (customer_id);
+
+
+--
+-- Name: customer_vouchers_customer_id_status_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_customer_id_status_idx ON voucher.customer_vouchers USING btree (customer_id, status);
+
+
+--
+-- Name: customer_vouchers_customer_id_voucher_id_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX customer_vouchers_customer_id_voucher_id_key ON voucher.customer_vouchers USING btree (customer_id, voucher_id);
+
+
+--
+-- Name: customer_vouchers_redeemed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_redeemed_at_idx ON voucher.customer_vouchers USING btree (redeemed_at);
+
+
+--
+-- Name: customer_vouchers_status_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_status_idx ON voucher.customer_vouchers USING btree (status);
+
+
+--
+-- Name: customer_vouchers_voucher_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_voucher_id_idx ON voucher.customer_vouchers USING btree (voucher_id);
+
+
+--
+-- Name: customer_vouchers_voucher_id_status_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_voucher_id_status_idx ON voucher.customer_vouchers USING btree (voucher_id, status);
+
+
+--
+-- Name: voucher_codes_code_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_code_idx ON voucher.voucher_codes USING btree (code);
+
+
+--
+-- Name: voucher_codes_code_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_codes_code_key ON voucher.voucher_codes USING btree (code);
+
+
+--
+-- Name: voucher_codes_is_active_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_is_active_idx ON voucher.voucher_codes USING btree (is_active);
+
+
+--
+-- Name: voucher_codes_type_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_type_idx ON voucher.voucher_codes USING btree (type);
+
+
+--
+-- Name: voucher_codes_voucher_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_voucher_id_idx ON voucher.voucher_codes USING btree (voucher_id);
+
+
+--
+-- Name: voucher_codes_voucher_id_is_active_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_voucher_id_is_active_idx ON voucher.voucher_codes USING btree (voucher_id, is_active);
+
+
+--
+-- Name: voucher_codes_voucher_id_type_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_voucher_id_type_idx ON voucher.voucher_codes USING btree (voucher_id, type);
+
+
+--
+-- Name: voucher_redemptions_code_used_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_code_used_idx ON voucher.voucher_redemptions USING btree (code_used);
+
+
+--
+-- Name: voucher_redemptions_redeemed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_redeemed_at_idx ON voucher.voucher_redemptions USING btree (redeemed_at);
+
+
+--
+-- Name: voucher_redemptions_user_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_user_id_idx ON voucher.voucher_redemptions USING btree (user_id);
+
+
+--
+-- Name: voucher_redemptions_user_id_redeemed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_user_id_redeemed_at_idx ON voucher.voucher_redemptions USING btree (user_id, redeemed_at);
+
+
+--
+-- Name: voucher_redemptions_voucher_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_voucher_id_idx ON voucher.voucher_redemptions USING btree (voucher_id);
+
+
+--
+-- Name: voucher_redemptions_voucher_id_redeemed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_voucher_id_redeemed_at_idx ON voucher.voucher_redemptions USING btree (voucher_id, redeemed_at);
+
+
+--
+-- Name: voucher_redemptions_voucher_id_user_id_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_redemptions_voucher_id_user_id_key ON voucher.voucher_redemptions USING btree (voucher_id, user_id);
+
+
+--
+-- Name: vouchers_business_id_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_business_id_created_at_idx ON voucher.vouchers USING btree (business_id, created_at);
+
+
+--
+-- Name: vouchers_business_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_business_id_idx ON voucher.vouchers USING btree (business_id);
+
+
+--
+-- Name: vouchers_category_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_category_id_idx ON voucher.vouchers USING btree (category_id);
+
+
+--
+-- Name: vouchers_category_id_state_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_category_id_state_idx ON voucher.vouchers USING btree (category_id, state);
+
+
+--
+-- Name: vouchers_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_created_at_idx ON voucher.vouchers USING btree (created_at);
+
+
+--
+-- Name: vouchers_deleted_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_deleted_at_idx ON voucher.vouchers USING btree (deleted_at);
+
+
+--
+-- Name: vouchers_favorite_count_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_favorite_count_idx ON voucher.vouchers USING btree (favorite_count DESC);
+
+
+--
+-- Name: vouchers_qr_code_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_qr_code_idx ON voucher.vouchers USING btree (qr_code);
+
+
+--
+-- Name: vouchers_qr_code_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX vouchers_qr_code_key ON voucher.vouchers USING btree (qr_code);
+
+
+--
+-- Name: vouchers_state_business_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_state_business_id_idx ON voucher.vouchers USING btree (state, business_id);
+
+
+--
+-- Name: vouchers_state_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_state_idx ON voucher.vouchers USING btree (state);
+
+
+--
+-- Name: vouchers_state_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_state_valid_until_idx ON voucher.vouchers USING btree (state, valid_until);
+
+
+--
+-- Name: vouchers_type_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_type_idx ON voucher.vouchers USING btree (type);
+
+
+--
+-- Name: vouchers_updated_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_updated_at_idx ON voucher.vouchers USING btree (updated_at);
+
+
+--
+-- Name: vouchers_valid_from_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_valid_from_idx ON voucher.vouchers USING btree (valid_from);
+
+
+--
+-- Name: vouchers_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_valid_until_idx ON voucher.vouchers USING btree (valid_until);
+
+
+--
 -- Name: voucher_scans voucher_scans_business_id_fkey; Type: FK CONSTRAINT; Schema: analytics; Owner: -
 --
 
 ALTER TABLE ONLY analytics.voucher_scans
-    ADD CONSTRAINT voucher_scans_business_id_fkey FOREIGN KEY (business_id) REFERENCES marketplace.businesses(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT voucher_scans_business_id_fkey FOREIGN KEY (business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -3059,63 +3236,47 @@ ALTER TABLE ONLY analytics.voucher_scans
 --
 
 ALTER TABLE ONLY analytics.voucher_scans
-    ADD CONSTRAINT voucher_scans_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT voucher_scans_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: customer_vouchers customer_vouchers_customer_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+-- Name: business_details business_details_businessId_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY business.customer_vouchers
-    ADD CONSTRAINT customer_vouchers_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: customer_vouchers customer_vouchers_voucher_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
---
-
-ALTER TABLE ONLY business.customer_vouchers
-    ADD CONSTRAINT customer_vouchers_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY business.business_details
+    ADD CONSTRAINT "business_details_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: voucher_codes voucher_codes_voucher_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+-- Name: business_registration business_registration_businessId_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY business.voucher_codes
-    ADD CONSTRAINT voucher_codes_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: voucher_redemptions voucher_redemptions_user_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
---
-
-ALTER TABLE ONLY business.voucher_redemptions
-    ADD CONSTRAINT voucher_redemptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE ONLY business.business_registration
+    ADD CONSTRAINT "business_registration_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
--- Name: voucher_redemptions voucher_redemptions_voucher_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+-- Name: business_registration business_registration_userId_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY business.voucher_redemptions
-    ADD CONSTRAINT voucher_redemptions_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: vouchers vouchers_business_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
---
-
-ALTER TABLE ONLY business.vouchers
-    ADD CONSTRAINT vouchers_business_id_fkey FOREIGN KEY (business_id) REFERENCES marketplace.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE ONLY business.business_registration
+    ADD CONSTRAINT "business_registration_userId_fkey" FOREIGN KEY ("userId") REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: vouchers vouchers_category_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+-- Name: businesses businesses_category_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
 --
 
-ALTER TABLE ONLY business.vouchers
-    ADD CONSTRAINT vouchers_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY business.businesses
+    ADD CONSTRAINT businesses_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: businesses businesses_user_id_fkey; Type: FK CONSTRAINT; Schema: business; Owner: -
+--
+
+ALTER TABLE ONLY business.businesses
+    ADD CONSTRAINT businesses_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3124,6 +3285,38 @@ ALTER TABLE ONLY business.vouchers
 
 ALTER TABLE ONLY catalog.categories
     ADD CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: favourite_businesses favourite_businesses_business_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_businesses
+    ADD CONSTRAINT favourite_businesses_business_id_fkey FOREIGN KEY (business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: favourite_businesses favourite_businesses_user_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_businesses
+    ADD CONSTRAINT favourite_businesses_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: favourite_vouchers favourite_vouchers_user_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_vouchers
+    ADD CONSTRAINT favourite_vouchers_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: favourite_vouchers favourite_vouchers_voucher_id_fkey; Type: FK CONSTRAINT; Schema: favourites; Owner: -
+--
+
+ALTER TABLE ONLY favourites.favourite_vouchers
+    ADD CONSTRAINT favourite_vouchers_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -3223,6 +3416,14 @@ ALTER TABLE ONLY i18n.user_language_preferences
 
 
 --
+-- Name: user_language_preferences user_language_preferences_user_id_fkey; Type: FK CONSTRAINT; Schema: i18n; Owner: -
+--
+
+ALTER TABLE ONLY i18n.user_language_preferences
+    ADD CONSTRAINT user_language_preferences_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
 -- Name: security_events security_events_device_id_fkey; Type: FK CONSTRAINT; Schema: identity; Owner: -
 --
 
@@ -3271,22 +3472,6 @@ ALTER TABLE ONLY identity.user_mfa_settings
 
 
 --
--- Name: businesses businesses_category_id_fkey; Type: FK CONSTRAINT; Schema: marketplace; Owner: -
---
-
-ALTER TABLE ONLY marketplace.businesses
-    ADD CONSTRAINT businesses_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: businesses businesses_user_id_fkey; Type: FK CONSTRAINT; Schema: marketplace; Owner: -
---
-
-ALTER TABLE ONLY marketplace.businesses
-    ADD CONSTRAINT businesses_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-
---
 -- Name: subscriptions subscriptions_plan_id_fkey; Type: FK CONSTRAINT; Schema: payments; Owner: -
 --
 
@@ -3323,7 +3508,7 @@ ALTER TABLE ONLY security.fraud_case_history
 --
 
 ALTER TABLE ONLY security.fraud_cases
-    ADD CONSTRAINT fraud_cases_business_id_fkey FOREIGN KEY (business_id) REFERENCES marketplace.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT fraud_cases_business_id_fkey FOREIGN KEY (business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3339,7 +3524,7 @@ ALTER TABLE ONLY security.fraud_cases
 --
 
 ALTER TABLE ONLY security.fraud_cases
-    ADD CONSTRAINT fraud_cases_redemption_id_fkey FOREIGN KEY (redemption_id) REFERENCES business.voucher_redemptions(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT fraud_cases_redemption_id_fkey FOREIGN KEY (redemption_id) REFERENCES voucher.voucher_redemptions(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3355,7 +3540,7 @@ ALTER TABLE ONLY security.fraud_cases
 --
 
 ALTER TABLE ONLY security.fraud_cases
-    ADD CONSTRAINT fraud_cases_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES business.vouchers(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT fraud_cases_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -3407,11 +3592,67 @@ ALTER TABLE ONLY support.support_comments
 
 
 --
--- Name: addresses addresses_user_id_fkey; Type: FK CONSTRAINT; Schema: users; Owner: -
+-- Name: users users_primary_business_id_fkey; Type: FK CONSTRAINT; Schema: users; Owner: -
 --
 
-ALTER TABLE ONLY users.addresses
-    ADD CONSTRAINT addresses_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE ONLY users.users
+    ADD CONSTRAINT users_primary_business_id_fkey FOREIGN KEY (primary_business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: customer_vouchers customer_vouchers_customer_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.customer_vouchers
+    ADD CONSTRAINT customer_vouchers_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: customer_vouchers customer_vouchers_voucher_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.customer_vouchers
+    ADD CONSTRAINT customer_vouchers_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: voucher_codes voucher_codes_voucher_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_codes
+    ADD CONSTRAINT voucher_codes_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: voucher_redemptions voucher_redemptions_user_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_redemptions
+    ADD CONSTRAINT voucher_redemptions_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: voucher_redemptions voucher_redemptions_voucher_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_redemptions
+    ADD CONSTRAINT voucher_redemptions_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: vouchers vouchers_business_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.vouchers
+    ADD CONSTRAINT vouchers_business_id_fkey FOREIGN KEY (business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: vouchers vouchers_category_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.vouchers
+    ADD CONSTRAINT vouchers_category_id_fkey FOREIGN KEY (category_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --

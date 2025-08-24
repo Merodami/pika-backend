@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "currency": {
+      "default": "USD",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 3
+    },
+    "interval": {
+      "type": "string",
+      "enum": ["day", "week", "month", "year"]
+    },
+    "intervalCount": {
+      "default": 1,
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "trialPeriodDays": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "stripeProductId": {
+      "type": "string"
+    },
+    "stripePriceId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "price",
+    "currency",
+    "interval",
+    "intervalCount",
+    "features"
+  ],
+  "additionalProperties": false
+}

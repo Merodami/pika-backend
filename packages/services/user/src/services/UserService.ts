@@ -18,8 +18,11 @@ import {
   mapUserRole,
   mapUserStatus,
   type PaginatedResult,
+  type PartialUserSettings,
   UserRole,
+  type UserSettings,
   UserStatus,
+  validateUserSettingsUpdate,
   VerificationType,
 } from '@pika/types'
 import type {
@@ -29,6 +32,8 @@ import type {
 import type { IInternalUserService } from '@user/services/InternalUserService.js'
 import bcrypt from 'bcrypt'
 import { randomInt } from 'crypto'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 // Unified verification system using proper enums
 export interface VerificationRequest {
@@ -67,6 +72,17 @@ export interface IUserService {
   ): Promise<UserDomain>
   uploadUserAvatar(userId: string, file: FileUpload): Promise<string>
 
+  // Settings methods
+  getUserSettings(userId: string): Promise<UserSettings>
+  updateUserSettings(
+    userId: string,
+    settings: UserSettings,
+  ): Promise<UserSettings>
+  patchUserSettings(
+    userId: string,
+    settingsUpdate: PartialUserSettings,
+  ): Promise<UserSettings>
+
   // Unified verification system
   verify(request: VerificationRequest): Promise<UserDomain>
   resendVerification(request: ResendRequest): Promise<void>
@@ -83,8 +99,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:users',
-    keyGenerator: (params) => JSON.stringify(params),
+    prefix: CACHE_KEYS.USER.LIST,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${JSON.stringify(args[0])}`
+    },
   })
   async getAllUsers(
     params: UserSearchParams,
@@ -101,8 +119,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:user',
-    keyGenerator: (id) => id,
+    prefix: CACHE_KEYS.USER.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getUserById(id: string): Promise<UserDomain> {
     try {
@@ -126,8 +146,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:user:email',
-    keyGenerator: (email) => email,
+    prefix: CACHE_KEYS.USER.BY_EMAIL,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getUserByEmail(email: string): Promise<UserDomain> {
     try {
@@ -166,7 +188,7 @@ export class UserService implements IUserService {
       const user = await this.repository.create({
         ...data,
         password,
-        role: data.role ? mapUserRole(data.role) : UserRole.CUSTOMER,
+        role: data.role ? mapUserRole(data.role) : UserRole.BUSINESS,
         status: data.status
           ? mapUserStatus(data.status)
           : UserStatus.UNCONFIRMED,
@@ -194,20 +216,53 @@ export class UserService implements IUserService {
         )
       }
 
-      // Admin creation - map schema fields to database fields
+      // Admin creation - map ALL schema fields to database fields
       const userData = {
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
         phoneNumber: data.phoneNumber,
         dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
+        password: data.password, // Handle optional password from schema
         role: data.role ? mapUserRole(data.role) : UserRole.CUSTOMER,
         status: data.status
           ? mapUserStatus(data.status)
           : UserStatus.UNCONFIRMED,
+        emailVerified: data.emailVerified || false,
+        phoneVerified: data.phoneVerified || false,
+        preferredLanguage: data.preferredLanguage,
       }
 
       const user = await this.repository.create(userData)
+
+      // Handle different authentication scenarios:
+      // 1. Password provided: User can login immediately with password
+      // 2. No password + SSO expected: User will authenticate via SSO provider
+      // 3. No password + no SSO: User needs to set password on first login
+      if (!data.password) {
+        if (data.authProvider && data.authProvider !== 'local') {
+          // SSO user - they'll authenticate through external provider
+          logger.info('SSO user created without password', {
+            userId: user.id,
+            email: data.email,
+            authProvider: data.authProvider,
+            message: 'User will authenticate via SSO provider',
+          })
+        } else if (data.status === UserStatus.ACTIVE) {
+          // Active user without password - needs password setup
+          logger.warn('Active user created without password - requires setup', {
+            userId: user.id,
+            email: data.email,
+            message: 'User will need to set password on first login or use SSO',
+          })
+        }
+      } else {
+        logger.info('User created with password', {
+          userId: user.id,
+          email: data.email,
+          canLoginImmediately: data.status === UserStatus.ACTIVE,
+        })
+      }
 
       // Invalidate cache
       await this.invalidateCache()
@@ -216,6 +271,9 @@ export class UserService implements IUserService {
         email: data.email,
         role: data.role,
         status: data.status,
+        emailVerified: data.emailVerified,
+        phoneVerified: data.phoneVerified,
+        hasPassword: !!data.password,
       })
 
       return user
@@ -284,8 +342,10 @@ export class UserService implements IUserService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:user:subtoken',
-    keyGenerator: (subToken) => subToken,
+    prefix: CACHE_KEYS.INTERNAL.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:subtoken:${args[0]}`
+    },
   })
   async getUserBySubToken(subToken: string): Promise<UserDomain> {
     try {
@@ -742,11 +802,119 @@ export class UserService implements IUserService {
     })
   }
 
+  /**
+   * Get user settings with caching
+   */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.USER.SETTINGS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
+  })
+  async getUserSettings(userId: string): Promise<UserSettings> {
+    try {
+      // Validate UUID format
+      if (!isUuidV4(userId)) {
+        throw ErrorFactory.badRequest('Invalid user ID format')
+      }
+
+      const settings = await this.repository.getUserSettings(userId)
+
+      return settings
+    } catch (error) {
+      logger.error('Failed to get user settings', { error, userId })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Update user settings (full replace)
+   */
+  async updateUserSettings(
+    userId: string,
+    settings: UserSettings,
+  ): Promise<UserSettings> {
+    try {
+      // Validate UUID format
+      if (!isUuidV4(userId)) {
+        throw ErrorFactory.badRequest('Invalid user ID format')
+      }
+
+      const updatedSettings = await this.repository.updateUserSettings(
+        userId,
+        settings,
+      )
+
+      // Invalidate settings cache
+      await this.invalidateSettingsCache(userId)
+
+      return updatedSettings
+    } catch (error) {
+      logger.error('Failed to update user settings', {
+        error,
+        userId,
+        settings,
+      })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  /**
+   * Patch user settings (partial update with deep merge)
+   */
+  async patchUserSettings(
+    userId: string,
+    settingsUpdate: PartialUserSettings,
+  ): Promise<UserSettings> {
+    try {
+      // Validate UUID format
+      if (!isUuidV4(userId)) {
+        throw ErrorFactory.badRequest('Invalid user ID format')
+      }
+
+      // Get current settings for validation
+      const currentSettings = await this.repository.getUserSettings(userId)
+
+      // Validate the settings update
+      if (!validateUserSettingsUpdate(currentSettings, settingsUpdate)) {
+        throw ErrorFactory.badRequest('Invalid settings update')
+      }
+
+      const updatedSettings = await this.repository.patchUserSettings(
+        userId,
+        settingsUpdate,
+      )
+
+      // Invalidate settings cache
+      await this.invalidateSettingsCache(userId)
+
+      return updatedSettings
+    } catch (error) {
+      logger.error('Failed to patch user settings', {
+        error,
+        userId,
+        settingsUpdate,
+      })
+      throw ErrorFactory.fromError(error)
+    }
+  }
+
+  private async invalidateSettingsCache(userId: string): Promise<void> {
+    try {
+      // Invalidate specific user settings cache
+      await this.cache.del(`${CACHE_KEYS.USER.SETTINGS}:${userId}`)
+    } catch (error) {
+      logger.warn('Failed to invalidate settings cache', { error, userId })
+    }
+  }
+
   private async invalidateCache(userId?: string): Promise<void> {
     try {
       // Invalidate specific user cache if ID provided
       if (userId) {
         await this.cache.del(`service:user:${userId}`)
+        await this.invalidateSettingsCache(userId)
       }
 
       // Invalidate list caches

@@ -6,6 +6,30 @@
 import type { CategoryDomain } from './category.js'
 import type { UserDomain } from './user.js'
 
+// ============= Business Details Domain =============
+
+export interface BusinessDetailsDomain {
+  id: string
+  businessId: string
+  // Contact Information
+  phone: string | null
+  email: string | null
+  website: string | null
+  logoUrl: string | null
+  // Address Information
+  street: string | null
+  city: string | null
+  state: string | null
+  postalCode: string | null
+  country: string | null
+  // Operating Information
+  operatingHours: any | null // JSON
+  socialMedia: any | null // JSON
+  additionalInfo: any | null // JSON
+  createdAt: Date
+  updatedAt: Date
+}
+
 // ============= Business Domain =============
 
 export interface BusinessDomain {
@@ -13,6 +37,9 @@ export interface BusinessDomain {
   userId: string
   businessNameKey: string
   businessDescriptionKey: string | null
+  // Resolved translations (populated by TranslationResolver in service layer)
+  businessName?: string
+  businessDescription?: string | null
   categoryId: string | null
   verified: boolean
   active: boolean
@@ -26,6 +53,20 @@ export interface BusinessDomain {
   // Optional relations
   user?: UserDomain
   category?: CategoryDomain
+  businessDetails?: BusinessDetailsDomain
+  businessRegistration?: {
+    id: string
+    userId: string
+    businessId: string | null
+    currentStep: number
+    registrationStatus: string
+    startedAt: Date
+    completedAt: Date | null
+    submittedAt: Date | null
+    rejectionReason: string | null
+    createdAt: Date
+    updatedAt: Date
+  }
 }
 
 // ============= Business Creation and Update =============

@@ -1,5 +1,5 @@
 import type { CreateUserData, UserService, UserServiceUser } from '@pika/auth'
-import { UserServiceClient } from '@pika/shared'
+import { BusinessServiceClient, UserServiceClient } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
 
 /**
@@ -7,7 +7,10 @@ import { UserRole, UserStatus } from '@pika/types'
  * This allows the auth service to use the User service via HTTP instead of direct database access
  */
 export class UserServiceClientAdapter implements UserService {
-  constructor(private readonly userServiceClient: UserServiceClient) {}
+  constructor(
+    private readonly userServiceClient: UserServiceClient,
+    private readonly businessServiceClient?: BusinessServiceClient,
+  ) {}
 
   async findByEmail(email: string): Promise<UserServiceUser | null> {
     const user = await this.userServiceClient.getUserAuthDataByEmail(email)
@@ -121,5 +124,33 @@ export class UserServiceClientAdapter implements UserService {
 
   async validateEmailVerificationToken(token: string): Promise<string | null> {
     return this.userServiceClient.validateEmailVerificationToken(token)
+  }
+
+  async hasActiveBusinesses(userId: string): Promise<boolean> {
+    // If business service client is not available, assume no active businesses
+    if (!this.businessServiceClient) {
+      return false
+    }
+
+    try {
+      // Query the business service to check if user has at least one active and approved business
+      // We filter for only active and verified (approved) businesses
+      const businesses = await this.businessServiceClient.getBusinessesByUserId(
+        userId,
+        {
+          onlyActive: true,
+          onlyVerified: true,
+          limit: 1, // We only need to know if at least one exists
+        },
+      )
+
+      // If we get any results, the user has at least one active and approved business
+      return businesses.length > 0
+    } catch (error) {
+      // If there's an error checking businesses, default to false for security
+      console.error('Error checking active businesses:', error)
+
+      return false
+    }
   }
 }

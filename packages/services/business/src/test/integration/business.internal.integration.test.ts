@@ -143,7 +143,7 @@ describe('Business Service - Internal API Integration Tests', () => {
       )
       if (response.body.data.length > 0) {
         expect(response.body.data[0]).toHaveProperty('id')
-        expect(response.body.data[0]).toHaveProperty('businessNameKey')
+        expect(response.body.data[0]).toHaveProperty('businessName') // API returns resolved name
       }
     })
 
@@ -264,6 +264,131 @@ describe('Business Service - Internal API Integration Tests', () => {
     })
   })
 
+  describe('GET /internal/businesses/user/:id/all', () => {
+    it('should get all businesses by user ID with pagination', async () => {
+      // Create multiple businesses for the same user
+      const userId = uuid()
+
+      await seedTestBusinesses(testDb.prisma, {
+        count: 3,
+        userId, // Same user for all businesses
+        sharedCategory: sharedTestData.activeCategory,
+      })
+
+      const response = await internalClient
+        .get(`/internal/businesses/user/${userId}/all`)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data).toHaveLength(3)
+      expect(response.body.pagination).toBeDefined()
+      expect(response.body.pagination.total).toBe(3)
+
+      // All businesses should belong to the same user
+      response.body.data.forEach((business: any) => {
+        expect(business.userId).toBe(userId)
+      })
+    })
+
+    it('should apply active and verified filters', async () => {
+      // Create businesses with different statuses for the same user
+      const userId = uuid()
+
+      await seedTestBusinesses(testDb.prisma, {
+        count: 4,
+        userId,
+        sharedCategory: sharedTestData.activeCategory,
+        customData: [
+          { active: true, verified: true },
+          { active: true, verified: false },
+          { active: false, verified: true },
+          { active: false, verified: false },
+        ],
+      })
+
+      // Test filtering for only active and verified businesses
+      const response = await internalClient
+        .get(
+          `/internal/businesses/user/${userId}/all?onlyActive=true&onlyVerified=true`,
+        )
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data).toHaveLength(1) // Only one business is both active and verified
+
+      // Check the returned business has the correct properties
+      const business = response.body.data[0]
+
+      expect(business.active).toBe(true)
+      expect(business.verified).toBe(true)
+      expect(business.userId).toBe(userId)
+    })
+
+    it('should handle pagination parameters', async () => {
+      // Create many businesses for the same user
+      const userId = uuid()
+
+      await seedTestBusinesses(testDb.prisma, {
+        count: 10,
+        userId,
+        sharedCategory: sharedTestData.activeCategory,
+      })
+
+      // Test pagination with limit
+      const response = await internalClient
+        .get(`/internal/businesses/user/${userId}/all?page=1&limit=5`)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data).toHaveLength(5)
+      expect(response.body.pagination).toBeDefined()
+      expect(response.body.pagination.page).toBe(1)
+      expect(response.body.pagination.limit).toBe(5)
+      expect(response.body.pagination.total).toBe(10)
+      expect(response.body.pagination.totalPages).toBe(2)
+    })
+
+    it('should return empty array for user with no businesses', async () => {
+      const userWithoutBusinesses = uuid()
+
+      const response = await internalClient
+        .get(`/internal/businesses/user/${userWithoutBusinesses}/all`)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data).toEqual([])
+      expect(response.body.pagination.total).toBe(0)
+    })
+
+    it('should handle include parameters', async () => {
+      // Use business from shared test data
+      const businessWithUser = sharedTestData.allBusinesses[0]
+      const userId = businessWithUser.userId
+
+      const response = await internalClient
+        .get(`/internal/businesses/user/${userId}/all?include=user,category`)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+
+      if (response.body.data.length > 0) {
+        const business = response.body.data[0]
+
+        expect(business.userId).toBe(userId)
+        expect(business).toHaveProperty('id')
+        expect(business).toHaveProperty('businessName') // API returns resolved name
+      }
+    })
+  })
+
   describe('GET /internal/businesses/:id', () => {
     it('should get business by ID for internal services', async () => {
       // Use business from shared test data
@@ -275,7 +400,7 @@ describe('Business Service - Internal API Integration Tests', () => {
         .expect(200)
 
       expect(response.body.id).toBe(business.id)
-      expect(response.body.businessNameKey).toBe(business.businessNameKey)
+      expect(response.body.businessName).toBe(business.businessNameKey)
       expect(response.body.userId).toBe(business.userId)
     })
 
@@ -399,8 +524,8 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       // Data should be consistent
       expect(batchResponse.body.businesses[0].id).toBe(userResponse.body.id)
-      expect(batchResponse.body.businesses[0].businessNameKey).toBe(
-        userResponse.body.businessNameKey,
+      expect(batchResponse.body.businesses[0].businessName).toBe(
+        userResponse.body.businessName, // API returns resolved name
       )
       expect(batchResponse.body.businesses[0].avgRating).toBe(
         userResponse.body.avgRating,
@@ -418,7 +543,7 @@ describe('Business Service - Internal API Integration Tests', () => {
 
       // Should include relations when requested
       expect(response.body.id).toBe(business.id)
-      expect(response.body.businessNameKey).toBe(business.businessNameKey)
+      expect(response.body.businessName).toBe(business.businessNameKey)
     })
   })
 })

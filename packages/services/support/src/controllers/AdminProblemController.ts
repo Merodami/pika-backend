@@ -1,7 +1,5 @@
 import { supportAdmin, supportCommon } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import { getValidatedQuery, validateResponse } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ProblemMapper } from '@pika/sdk'
 import { ErrorFactory, parseIncludeParam } from '@pika/shared'
 import type { IProblemService } from '@support/services/ProblemService.js'
@@ -23,11 +21,6 @@ export class AdminProblemController {
    * GET /admin/problems
    * Get all support tickets with filtering
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin-problems',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getAllProblems(
     request: Request,
     response: Response,
@@ -77,11 +70,6 @@ export class AdminProblemController {
    * GET /admin/problems/:id
    * Get support ticket by ID
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin-problem',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getProblemById(
     request: Request<supportCommon.ProblemIdParam>,
     response: Response,

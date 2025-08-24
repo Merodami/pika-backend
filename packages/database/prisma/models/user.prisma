@@ -20,9 +20,10 @@ model User {
   dateOfBirth       DateTime?         @map("date_of_birth") @db.Date
   stripeUserId      String?           @map("stripe_user_id") @db.VarChar(255)
   preferredLanguage String?           @map("preferred_language") @db.VarChar(2) // ISO 639-1 language code
+  primaryBusinessId String?           @map("primary_business_id") @db.Uuid // Primary business for business users
+  settings          Json?             @map("settings") // User preferences and settings
 
   // Relations
-  addresses         Address[]
   problems          Problem[]
   
   // Enhanced authentication relations
@@ -47,7 +48,9 @@ model User {
   assignedProblems  Problem[]         @relation("AssignedProblems")
   
   // Business relations
-  businesses        Business[]
+  businesses            Business[]
+  businessRegistration  BusinessRegistration?
+  primaryBusiness       Business?             @relation("UserPrimaryBusiness", fields: [primaryBusinessId], references: [id], onDelete: SetNull)
   
   // PDF relations
   createdVoucherBooks   VoucherBook[]     @relation("VoucherBookCreatedBy")
@@ -65,9 +68,17 @@ model User {
   reviewedFraudCases    FraudCase[]         @relation("FraudCaseReviewer") // Fraud cases reviewed by this user
   fraudCaseHistory      FraudCaseHistory[]  // Fraud case actions performed by this user
 
+  // Translation system relations
+  languagePreference    UserLanguagePreference? // User's preferred language
+  
+  // Favorites system relations
+  favoriteBusinesses    FavouriteBusiness[] // Businesses favorited by this user
+  favoriteVouchers      FavouriteVoucher[]  // Vouchers favorited by this user
+
   @@index([email])
   @@index([phoneNumber])
   @@index([deletedAt])
+  @@index([primaryBusinessId])
   @@map("users")
   @@schema("users")
 }

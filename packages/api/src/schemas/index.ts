@@ -30,12 +30,6 @@ export * as communicationCommon from './communication/common/index.js'
 export * as communicationInternal from './communication/internal/index.js'
 export * as communicationPublic from './communication/public/index.js'
 
-// Discovery Service
-export * as discoveryAdmin from './discovery/admin/index.js'
-export * as discoveryCommon from './discovery/common/index.js'
-export * as discoveryInternal from './discovery/internal/index.js'
-export * as discoveryPublic from './discovery/public/index.js'
-
 // Payment Service
 export * as paymentAdmin from './payment/admin/index.js'
 export * as paymentCommon from './payment/common/index.js'
@@ -65,12 +59,6 @@ export * as supportAdmin from './support/admin/index.js'
 export * as supportCommon from './support/common/index.js'
 export * as supportInternal from './support/internal/index.js'
 export * as supportPublic from './support/public/index.js'
-
-// System Service
-export * as systemAdmin from './system/admin/index.js'
-export * as systemCommon from './system/common/index.js'
-export * as systemInternal from './system/internal/index.js'
-export * as systemPublic from './system/public/index.js'
 
 // User Service
 export * as userAdmin from './user/admin/index.js'

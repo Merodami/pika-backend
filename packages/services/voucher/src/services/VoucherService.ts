@@ -21,12 +21,15 @@ import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import {
   type LanguageCode,
   type PaginatedResult,
+  VoucherRedemptionMethod,
+  VoucherRedemptionType,
   VoucherScanSource,
   VoucherScanType,
   VoucherState,
 } from '@pika/types'
 import { v4 as uuid } from 'uuid'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type { IVoucherRepository } from '../repositories/VoucherRepository.js'
 import type {
   UserVoucherSearchParams,
@@ -112,7 +115,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:vouchers',
+    prefix: CACHE_KEYS.VOUCHER.LIST,
     keyGenerator: (params) => JSON.stringify(params),
   })
   async getAllVouchers(
@@ -141,7 +144,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:voucher',
+    prefix: CACHE_KEYS.VOUCHER.SINGLE,
     keyGenerator: (id, parsedIncludes) =>
       `${id}:${JSON.stringify(parsedIncludes || {})}`,
   })
@@ -176,7 +179,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:vouchers:business',
+    prefix: CACHE_KEYS.VOUCHER.BY_BUSINESS,
     keyGenerator: (params) => {
       const searchParams = params as unknown as VoucherSearchParams
 
@@ -225,7 +228,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:vouchers:user',
+    prefix: CACHE_KEYS.VOUCHER.USER_VOUCHERS,
     keyGenerator: (userId, params) => `${userId}:${JSON.stringify(params)}`,
   })
   async getVouchersByUserId(
@@ -262,6 +265,16 @@ export class VoucherService implements IVoucherService {
     }
   }
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.VOUCHER.USER_VOUCHERS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      const language = args[1] || 'en'
+
+      return `${prefix}:${params.userId}:${language}:${JSON.stringify({ page: params.page, limit: params.limit, status: params.status })}`
+    },
+  })
   async getUserVouchers(
     params: UserVoucherSearchParams,
     language?: LanguageCode,
@@ -477,10 +490,31 @@ export class VoucherService implements IVoucherService {
         )
       }
 
+      // Prepare redemption log data
+      const redemptionLogData = {
+        businessId: voucher.businessId,
+        location: data.location,
+        locationName: data.locationName,
+        deviceInfo: data.deviceInfo ? { platform: data.deviceInfo } : undefined,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+        transactionId: data.transactionId,
+        transactionAmount: data.transactionAmount,
+        discountApplied: voucher.discountValue || 0,
+        redemptionType:
+          (data.redemptionType as VoucherRedemptionType) ||
+          VoucherRedemptionType.APP,
+        redemptionMethod:
+          (data.redemptionMethod as VoucherRedemptionMethod) ||
+          VoucherRedemptionMethod.MANUAL_CODE,
+        codeUsed: data.codeUsed,
+      }
+
       // Redeem the voucher in customer voucher table
       const redeemedCustomerVoucher = await this.repository.redeemVoucher(
         voucherId,
         userId,
+        redemptionLogData,
       )
 
       // Invalidate cache
@@ -711,7 +745,7 @@ export class VoucherService implements IVoucherService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
-    prefix: 'service:voucher:code',
+    prefix: CACHE_KEYS.VOUCHER.BY_CODE,
     keyGenerator: (code) => code,
   })
   async getVoucherByAnyCode(

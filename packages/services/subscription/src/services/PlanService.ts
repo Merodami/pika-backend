@@ -1,3 +1,4 @@
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import type { ICacheService } from '@pika/redis'
 import { Cache } from '@pika/redis'
 import type {
@@ -14,6 +15,8 @@ import {
 import type { PaginatedResult } from '@pika/types'
 import type { IPlanRepository } from '@subscription/repositories/PlanRepository.js'
 import type { PlanSearchParams } from '@subscription/types/search.js'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IPlanService {
   createPlan(data: CreateSubscriptionPlanDTO): Promise<SubscriptionPlanDomain>
@@ -77,8 +80,11 @@ export class PlanService implements IPlanService {
   }
 
   @Cache({
-    ttl: 3600,
-    prefix: 'plan',
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.PLAN.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getPlanById(id: string): Promise<SubscriptionPlanDomain> {
     // Validate UUID format
@@ -96,8 +102,11 @@ export class PlanService implements IPlanService {
   }
 
   @Cache({
-    ttl: 300,
-    prefix: 'plans',
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.PLAN.LIST,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${JSON.stringify(args[0])}`
+    },
   })
   async getAllPlans(
     params: PlanSearchParams,
@@ -223,8 +232,10 @@ export class PlanService implements IPlanService {
 
   private async clearPlanCache(): Promise<void> {
     try {
-      await this.cache.delPattern('plan:*')
-      await this.cache.delPattern('plans:*')
+      await this.cache.delPattern?.(`${CACHE_KEYS.PLAN.SINGLE}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.PLAN.LIST}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.PLAN.ACTIVE}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.PLAN.BY_TYPE}:*`)
     } catch (error) {
       logger.error('Failed to clear plan cache', error)
     }

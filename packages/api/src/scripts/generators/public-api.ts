@@ -3,9 +3,12 @@ import * as authLoginSchemas from '@api/schemas/auth/public/login.js'
 import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
+import * as authSocialSchemas from '@api/schemas/auth/public/social.js'
 import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as businessSchemas from '@api/schemas/business/public/business.js'
+import * as businessDetailsSchemas from '@api/schemas/business/public/businessDetails.js'
+import * as businessRegistrationSchemas from '@api/schemas/business/public/registration.js'
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
 import * as categorySchemas from '@api/schemas/category/public/category.js'
 import * as communicationNotificationSchemas from '@api/schemas/communication/public/notification.js'
@@ -32,9 +35,11 @@ import * as supportParameterSchemas from '@api/schemas/support/common/parameters
 import * as supportCommentSchemas from '@api/schemas/support/public/comment.js'
 import * as supportProblemSchemas from '@api/schemas/support/public/problem.js'
 import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
+import * as userFavoritesSchemas from '@api/schemas/user/public/favorites.js'
 import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
+import * as userSettingsSchemas from '@api/schemas/user/public/settings.js'
 import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
@@ -130,6 +135,54 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     businessSchemas.UpdateMyBusinessRequest,
   )
   registry.registerSchema('BusinessIdParam', businessParameters.BusinessIdParam)
+
+  // ============= Business Details Schemas =============
+  registry.registerSchema(
+    'BusinessDetailsResponse',
+    businessDetailsSchemas.BusinessDetailsResponse,
+  )
+  registry.registerSchema(
+    'UpdateBusinessDetailsRequest',
+    businessDetailsSchemas.UpdateBusinessDetailsRequest,
+  )
+  registry.registerSchema(
+    'UploadBusinessLogoResponse',
+    businessDetailsSchemas.UploadBusinessLogoResponse,
+  )
+
+  // ============= Business Registration Schemas =============
+  registry.registerSchema(
+    'StartRegistrationResponse',
+    businessRegistrationSchemas.StartRegistrationResponse,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStatusResponse',
+    businessRegistrationSchemas.BusinessRegistrationStatusResponse,
+  )
+  registry.registerSchema(
+    'RegistrationProgressResponse',
+    businessRegistrationSchemas.RegistrationProgressResponse,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStep1Request',
+    businessRegistrationSchemas.BusinessRegistrationStep1Request,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStep2Request',
+    businessRegistrationSchemas.BusinessRegistrationStep2Request,
+  )
+  registry.registerSchema(
+    'BusinessRegistrationStep3Request',
+    businessRegistrationSchemas.BusinessRegistrationStep3Request,
+  )
+  registry.registerSchema(
+    'CompleteBusinessRegistrationRequest',
+    businessRegistrationSchemas.CompleteBusinessRegistrationRequest,
+  )
+  registry.registerSchema(
+    'CompleteBusinessRegistrationResponse',
+    businessRegistrationSchemas.CompleteBusinessRegistrationResponse,
+  )
 
   // ============= Category Schemas =============
   registry.registerSchema('CategoryResponse', categorySchemas.CategoryResponse)
@@ -269,6 +322,49 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     authOauthSchemas.RevokeTokenResponse,
   )
   registry.registerSchema('UserInfoResponse', authOauthSchemas.UserInfoResponse)
+
+  // ============= Social Auth Schemas =============
+  registry.registerSchema(
+    'SocialLoginRequest',
+    authSocialSchemas.SocialLoginRequestSchema,
+  )
+  registry.registerSchema(
+    'SocialLoginResponse',
+    authSocialSchemas.SocialLoginResponseSchema,
+  )
+  registry.registerSchema(
+    'LinkAccountRequest',
+    authSocialSchemas.LinkAccountRequestSchema,
+  )
+  registry.registerSchema(
+    'LinkAccountResponse',
+    authSocialSchemas.LinkAccountResponseSchema,
+  )
+  registry.registerSchema(
+    'UnlinkAccountRequest',
+    authSocialSchemas.UnlinkAccountRequestSchema,
+  )
+  registry.registerSchema(
+    'UnlinkAccountResponse',
+    authSocialSchemas.UnlinkAccountResponseSchema,
+  )
+  registry.registerSchema(
+    'GetLinkedAccountsResponse',
+    authSocialSchemas.GetLinkedAccountsResponseSchema,
+  )
+  registry.registerSchema('DeviceInfo', authSocialSchemas.DeviceInfoSchema)
+  registry.registerSchema(
+    'LinkedAccountDetails',
+    authSocialSchemas.LinkedAccountDetails,
+  )
+  registry.registerSchema(
+    'ExchangeTokenRequest',
+    authSocialSchemas.ExchangeTokenRequestSchema,
+  )
+  registry.registerSchema(
+    'ExchangeTokenResponse',
+    authSocialSchemas.ExchangeTokenResponseSchema,
+  )
 
   registry.registerSchema(
     'ForgotPasswordRequest',
@@ -468,6 +564,86 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     userProfileSchemas.CurrentUserProfile,
   )
 
+  // ============= User Favorites Schemas =============
+  registry.registerSchema(
+    'FavoriteBusinessItem',
+    userFavoritesSchemas.FavoriteBusinessItemSchema,
+  )
+  registry.registerSchema(
+    'FavoriteVoucherItem',
+    userFavoritesSchemas.FavoriteVoucherItemSchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteBusinessesQuery',
+    userFavoritesSchemas.GetFavoriteBusinessesQuerySchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteVouchersQuery',
+    userFavoritesSchemas.GetFavoriteVouchersQuerySchema,
+  )
+  registry.registerSchema(
+    'AddFavoriteBusinessResponse',
+    userFavoritesSchemas.AddFavoriteBusinessResponseSchema,
+  )
+  registry.registerSchema(
+    'AddFavoriteVoucherResponse',
+    userFavoritesSchemas.AddFavoriteVoucherResponseSchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteBusinessesResponse',
+    userFavoritesSchemas.GetFavoriteBusinessesResponseSchema,
+  )
+  registry.registerSchema(
+    'GetFavoriteVouchersResponse',
+    userFavoritesSchemas.GetFavoriteVouchersResponseSchema,
+  )
+  registry.registerSchema(
+    'FavoriteStatusResponse',
+    userFavoritesSchemas.FavoriteStatusResponseSchema,
+  )
+  registry.registerSchema(
+    'RemoveFavoriteResponse',
+    userFavoritesSchemas.RemoveFavoriteResponseSchema,
+  )
+  registry.registerSchema(
+    'BatchFavoriteBusinessesRequest',
+    userFavoritesSchemas.BatchFavoriteBusinessesRequestSchema,
+  )
+  registry.registerSchema(
+    'BatchFavoriteVouchersRequest',
+    userFavoritesSchemas.BatchFavoriteVouchersRequestSchema,
+  )
+  registry.registerSchema(
+    'BatchFavoriteOperationResponse',
+    userFavoritesSchemas.BatchFavoriteOperationResponseSchema,
+  )
+
+  // ============= User Settings Schemas =============
+  registry.registerSchema(
+    'UserSettings',
+    userSettingsSchemas.UserSettingsSchema,
+  )
+  registry.registerSchema(
+    'GetUserSettingsResponse',
+    userSettingsSchemas.GetUserSettingsResponse,
+  )
+  registry.registerSchema(
+    'UpdateUserSettingsRequest',
+    userSettingsSchemas.UpdateUserSettingsRequest,
+  )
+  registry.registerSchema(
+    'UpdateUserSettingsResponse',
+    userSettingsSchemas.UpdateUserSettingsResponse,
+  )
+  registry.registerSchema(
+    'PatchUserSettingsRequest',
+    userSettingsSchemas.PatchUserSettingsRequest,
+  )
+  registry.registerSchema(
+    'PatchUserSettingsResponse',
+    userSettingsSchemas.PatchUserSettingsResponse,
+  )
+
   registry.registerSchema('UserAddress', userAddressSchemas.UserAddress)
   registry.registerSchema('AddressResponse', userAddressSchemas.AddressResponse)
   registry.registerSchema(
@@ -634,7 +810,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // Create my business (authenticated users)
   registry.registerRoute({
     method: 'post',
-    path: '/my/business',
+    path: '/businesses/me',
     operationId: 'createMyBusiness',
     summary: 'Create my business',
     tags: ['My Business'],
@@ -660,20 +836,23 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     },
   })
 
-  // Get my business (authenticated users)
+  // Get my businesses (authenticated users) - returns paginated list
   registry.registerRoute({
     method: 'get',
-    path: '/my/business',
-    operationId: 'getMyBusiness',
-    summary: 'Get my business details',
+    path: '/businesses/me',
+    operationId: 'getMyBusinesses',
+    summary: 'Get my businesses with pagination and filters',
     tags: ['My Business'],
     security: [{ bearerAuth: [] }],
+    request: {
+      query: businessSchemas.BusinessQueryParams,
+    },
     responses: {
       200: {
-        description: 'My business details',
+        description: 'Paginated list of my businesses',
         content: {
           'application/json': {
-            schema: businessSchemas.BusinessResponse,
+            schema: businessSchemas.BusinessListResponse,
           },
         },
       },
@@ -683,7 +862,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // Update my business (authenticated users)
   registry.registerRoute({
     method: 'put',
-    path: '/my/business',
+    path: '/businesses/me',
     operationId: 'updateMyBusiness',
     summary: 'Update my business',
     tags: ['My Business'],
@@ -712,7 +891,7 @@ function registerPublicRoutes(registry: ZodRegistry): void {
   // Delete my business (authenticated users)
   registry.registerRoute({
     method: 'delete',
-    path: '/my/business',
+    path: '/businesses/me',
     operationId: 'deleteMyBusiness',
     summary: 'Delete my business',
     tags: ['My Business'],
@@ -720,6 +899,238 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     responses: {
       204: {
         description: 'Business deleted successfully',
+      },
+    },
+  })
+
+  // Upload business logo (authenticated users)
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/me/logo',
+    operationId: 'uploadBusinessLogo',
+    summary: 'Upload business logo',
+    tags: ['My Business'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              properties: {
+                logo: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Logo image file',
+                },
+              },
+              required: ['logo'],
+            },
+          },
+        },
+        required: true,
+      },
+    },
+    responses: {
+      200: {
+        description: 'Logo uploaded successfully',
+        content: {
+          'application/json': {
+            schema: businessDetailsSchemas.UploadBusinessLogoResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid file or request',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= Business Registration Routes =============
+
+  // Start business registration
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/start',
+    operationId: 'startBusinessRegistration',
+    summary: 'Start business registration process',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Registration started',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.StartRegistrationResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get registration status
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses/registration/status',
+    operationId: 'getBusinessRegistrationStatus',
+    summary: 'Get current business registration status',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Registration status',
+        content: {
+          'application/json': {
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStatusResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get registration progress
+  registry.registerRoute({
+    method: 'get',
+    path: '/businesses/registration/progress',
+    operationId: 'getBusinessRegistrationProgress',
+    summary: 'Get detailed registration progress with all step data',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Registration progress details',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Submit step 1
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/step1',
+    operationId: 'submitBusinessRegistrationStep1',
+    summary: 'Submit business registration step 1 (basic info)',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStep1Request,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Step 1 submitted successfully',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Submit step 2
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/step2',
+    operationId: 'submitBusinessRegistrationStep2',
+    summary: 'Submit business registration step 2 (details)',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStep2Request,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Step 2 submitted successfully',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Submit step 3
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/step3',
+    operationId: 'submitBusinessRegistrationStep3',
+    summary: 'Submit business registration step 3 (additional info)',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema:
+              businessRegistrationSchemas.BusinessRegistrationStep3Request,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Step 3 submitted successfully',
+        content: {
+          'application/json': {
+            schema: businessRegistrationSchemas.RegistrationProgressResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Complete registration
+  registry.registerRoute({
+    method: 'post',
+    path: '/businesses/registration/complete',
+    operationId: 'completeBusinessRegistration',
+    summary: 'Complete business registration with user consent',
+    tags: ['Business Registration'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema:
+              businessRegistrationSchemas.CompleteBusinessRegistrationRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Registration completed successfully',
+        content: {
+          'application/json': {
+            schema:
+              businessRegistrationSchemas.CompleteBusinessRegistrationResponse,
+          },
+        },
       },
     },
   })
@@ -1510,6 +1921,215 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     },
   })
 
+  // ============= Social Authentication Routes =============
+
+  // Social login (Firebase ID token)
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/social/login',
+    operationId: 'socialLogin',
+    summary: 'Social authentication login',
+    description:
+      'Login using Firebase ID token from social provider (Google, Facebook, Apple)',
+    tags: ['Authentication'],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.SocialLoginRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Login successful',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.SocialLoginResponseSchema,
+          },
+        },
+      },
+      401: {
+        description: 'Invalid token or authentication failed',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Exchange OAuth code for tokens
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/exchange-token',
+    operationId: 'exchangeToken',
+    summary: 'Exchange OAuth authorization code',
+    description:
+      'Exchange OAuth authorization code from provider for JWT tokens',
+    tags: ['Authentication'],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.ExchangeTokenRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Token exchange successful',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.ExchangeTokenResponseSchema,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid authorization code or request',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication failed',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Link social account
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/social/link',
+    operationId: 'linkSocialAccount',
+    summary: 'Link social account to user',
+    description:
+      'Link a social provider account to existing authenticated user',
+    tags: ['Authentication'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.LinkAccountRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Account linked successfully',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.LinkAccountResponseSchema,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid request or account already linked',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication required',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Unlink social account
+  registry.registerRoute({
+    method: 'post',
+    path: '/auth/social/unlink',
+    operationId: 'unlinkSocialAccount',
+    summary: 'Unlink social account from user',
+    description: 'Remove social provider account link from authenticated user',
+    tags: ['Authentication'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.UnlinkAccountRequestSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Account unlinked successfully',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.UnlinkAccountResponseSchema,
+          },
+        },
+      },
+      400: {
+        description: 'Cannot unlink account or account not linked',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication required',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Get linked social accounts
+  registry.registerRoute({
+    method: 'get',
+    path: '/auth/social/accounts',
+    operationId: 'getLinkedAccounts',
+    summary: 'Get user linked social accounts',
+    description:
+      'Get list of social provider accounts linked to authenticated user',
+    tags: ['Authentication'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'List of linked accounts',
+        content: {
+          'application/json': {
+            schema: authSocialSchemas.GetLinkedAccountsResponseSchema,
+          },
+        },
+      },
+      401: {
+        description: 'Authentication required',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
   // User routes
   registry.registerRoute({
     method: 'get',
@@ -1590,6 +2210,126 @@ function registerPublicRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: userProfileSchemas.UploadAvatarResponseSchema,
+          },
+        },
+      },
+    },
+  })
+
+  // ============= User Settings Routes =============
+
+  // Get user settings
+  registry.registerRoute({
+    method: 'get',
+    path: '/users/me/settings',
+    operationId: 'getUserSettings',
+    summary: 'Get current user settings',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    responses: {
+      200: {
+        description: 'Current user settings',
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.GetUserSettingsResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Unauthorized',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Update user settings (full replace)
+  registry.registerRoute({
+    method: 'put',
+    path: '/users/me/settings',
+    operationId: 'updateUserSettings',
+    summary: 'Update user settings (full replace)',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.UpdateUserSettingsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Updated user settings',
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.UpdateUserSettingsResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid settings data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Unauthorized',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+    },
+  })
+
+  // Patch user settings (partial update)
+  registry.registerRoute({
+    method: 'patch',
+    path: '/users/me/settings',
+    operationId: 'patchUserSettings',
+    summary: 'Patch user settings (partial update)',
+    tags: ['Users'],
+    security: [{ bearerAuth: [] }],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.PatchUserSettingsRequest,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Updated user settings',
+        content: {
+          'application/json': {
+            schema: userSettingsSchemas.PatchUserSettingsResponse,
+          },
+        },
+      },
+      400: {
+        description: 'Invalid settings data',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
+          },
+        },
+      },
+      401: {
+        description: 'Unauthorized',
+        content: {
+          'application/json': {
+            schema: ErrorResponse,
           },
         },
       },

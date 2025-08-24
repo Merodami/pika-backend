@@ -71,7 +71,7 @@ export interface UserVoucherData {
 export interface VoucherDomain {
   id: string
   businessId: string
-  categoryId: string
+  categoryId?: string
   state: VoucherState
   // Translation keys - stored in database
   titleKey: string
@@ -102,7 +102,7 @@ export interface VoucherDomain {
 
 export interface CreateVoucherData {
   businessId: string
-  categoryId: string
+  categoryId?: string
   title: Record<string, string> // Multilingual: { es: "...", en: "..." }
   description: Record<string, string>
   termsAndConditions: Record<string, string>
@@ -119,6 +119,7 @@ export interface CreateVoucherData {
 }
 
 export interface UpdateVoucherData {
+  categoryId?: string
   title?: Record<string, string> // Multilingual: { es: "...", en: "..." }
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>

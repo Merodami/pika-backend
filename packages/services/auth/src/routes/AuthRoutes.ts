@@ -1,15 +1,22 @@
 import { AuthController } from '@auth-service/controllers/AuthController.js'
+import { SocialAuthController } from '@auth-service/controllers/SocialAuthController.js'
 import { AuthService } from '@auth-service/services/AuthService.js'
+import { SocialAuthService } from '@auth-service/services/SocialAuthService.js'
 import { authPublic } from '@pika/api'
 import { requireAuth, validateBody, validateParams } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import { CommunicationServiceClient, UserServiceClient } from '@pika/shared'
+import {
+  BusinessServiceClient,
+  CommunicationServiceClient,
+  UserServiceClient,
+} from '@pika/shared'
 import { Router } from 'express'
 
 export function createAuthRouter(
   cache: ICacheService,
   userServiceClient: UserServiceClient,
   communicationClient?: CommunicationServiceClient,
+  businessServiceClient?: BusinessServiceClient,
 ): Router {
   const router = Router()
 
@@ -18,8 +25,18 @@ export function createAuthRouter(
     cache,
     userServiceClient,
     communicationClient,
+    businessServiceClient,
   )
   const controller = new AuthController(authService)
+
+  // Initialize social auth service and controller
+  const socialAuthService = new SocialAuthService(
+    cache,
+    userServiceClient,
+    communicationClient,
+    businessServiceClient,
+  )
+  const socialAuthController = new SocialAuthController(socialAuthService)
 
   // Public routes (no authentication required)
   router.post(
@@ -79,6 +96,40 @@ export function createAuthRouter(
 
   // Protected route - auth is handled manually in the controller
   router.get('/userinfo', controller.userinfo)
+
+  // Social Authentication routes
+  router.post(
+    '/social/login',
+    validateBody(authPublic.SocialLoginRequest),
+    socialAuthController.socialLogin,
+  )
+
+  // OAuth authorization code exchange (public endpoint)
+  router.post(
+    '/exchange-token',
+    validateBody(authPublic.ExchangeTokenRequest),
+    socialAuthController.exchangeToken,
+  )
+
+  router.post(
+    '/social/link',
+    requireAuth(),
+    validateBody(authPublic.LinkAccountRequest),
+    socialAuthController.linkAccount,
+  )
+
+  router.post(
+    '/social/unlink',
+    requireAuth(),
+    validateBody(authPublic.UnlinkAccountRequest),
+    socialAuthController.unlinkAccount,
+  )
+
+  router.get(
+    '/social/accounts',
+    requireAuth(),
+    socialAuthController.getLinkedAccounts,
+  )
 
   return router
 }

@@ -21,15 +21,6 @@ export default [
       '**/infrastructure/cdk.out/**',
       '**/packages/shared/src/infrastructure/storage/providers/LocalFileStorage.ts',
       '**/infrastructure/config/pm2.ecosystem.config.js',
-      '**/packages/frontend/flutter-app/**',
-      '**/frontend/flutter-app/**',
-      '**/.dart_tool/**',
-      '**/ios/**',
-      '**/android/**',
-      '**/windows/**',
-      '**/linux/**',
-      '**/macos/**',
-      '**/web/**',
       '**/previous-architecture/**',
       '**/packages/sdk/src/openapi/**',
       'ai/**',
@@ -39,6 +30,13 @@ export default [
       'reports/**',
       '**/generated/**',
       '**/*.min.js',
+      // Build and generation scripts - ignore complexity/security warnings
+      'scripts/generate-*.ts',
+      'scripts/flows/*.ts',
+      // Database seed files - ignore complexity/unused vars
+      '**/prisma/seed/**',
+      // Documentation files
+      'documentation/**',
     ],
   },
 

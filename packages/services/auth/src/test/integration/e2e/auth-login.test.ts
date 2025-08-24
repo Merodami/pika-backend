@@ -18,7 +18,6 @@ import {
   createSharedAuthTestData,
   type SharedAuthTestData,
 } from '@auth-service/test/helpers/authTestHelpers.js'
-import { ErrorCode, ErrorType } from '@pika/types'
 import { CommunicationServiceClientMock } from '@auth-service/test/mocks/CommunicationServiceClientMock.js'
 import { UserServiceClientMock } from '@auth-service/test/mocks/UserServiceClientMock.js'
 import { MemoryCacheService } from '@pika/redis'
@@ -28,6 +27,7 @@ import {
   createTestDatabase,
   TestDatabaseResult,
 } from '@pika/tests'
+import { ErrorCode, ErrorType } from '@pika/types'
 import { UserRole } from '@pika/types'
 import type { Express } from 'express'
 import supertest from 'supertest'

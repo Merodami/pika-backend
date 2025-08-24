@@ -21,6 +21,7 @@ export interface IBusinessRepository {
   create(data: CreateBusinessData): Promise<BusinessDomain>
   update(id: string, data: UpdateBusinessData): Promise<BusinessDomain>
   delete(id: string): Promise<void>
+  countByUserId(userId: string): Promise<number>
 }
 
 export interface CreateBusinessData {
@@ -188,6 +189,47 @@ export class BusinessRepository implements IBusinessRepository {
           sortOrder: true,
           level: true,
           path: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }
+    }
+
+    if (includes?.businessRegistration) {
+      include.businessRegistration = {
+        select: {
+          id: true,
+          userId: true,
+          businessId: true,
+          currentStep: true,
+          registrationStatus: true,
+          startedAt: true,
+          completedAt: true,
+          submittedAt: true,
+          rejectionReason: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      }
+    }
+
+    if (includes?.businessDetails) {
+      include.businessDetails = {
+        select: {
+          id: true,
+          businessId: true,
+          phone: true,
+          email: true,
+          website: true,
+          logoUrl: true,
+          street: true,
+          city: true,
+          state: true,
+          postalCode: true,
+          country: true,
+          operatingHours: true,
+          socialMedia: true,
+          additionalInfo: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -421,42 +463,7 @@ export class BusinessRepository implements IBusinessRepository {
           active: data.active ?? true,
           avgRating: data.avgRating ?? 0,
         },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-              phoneNumber: true,
-              role: true,
-              status: true,
-              avatarUrl: true,
-              emailVerified: true,
-              phoneVerified: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              slug: true,
-              nameKey: true,
-              descriptionKey: true,
-              icon: true,
-              parentId: true,
-              isActive: true,
-              sortOrder: true,
-              level: true,
-              path: true,
-              createdBy: true,
-              updatedBy: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          },
-        },
+        // No relations included - they can be loaded separately when needed
       })
 
       const domainBusiness = BusinessMapper.fromDocument({
@@ -483,10 +490,13 @@ export class BusinessRepository implements IBusinessRepository {
       return domainBusiness
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // P2002 unique constraint violations are now handled differently
+        // since users can have multiple businesses
         if (error.code === 'P2002') {
+          // Check if this is a legitimate unique constraint (e.g., business name within same category)
           throw ErrorFactory.resourceConflict(
             'Business',
-            'Business already exists for this user',
+            'A business with similar details already exists',
             {
               source: 'BusinessRepository.create',
               metadata: { userId: data.userId },
@@ -663,6 +673,28 @@ export class BusinessRepository implements IBusinessRepository {
           metadata: { businessId: id },
         },
       )
+    }
+  }
+
+  /**
+   * Count businesses by user ID
+   */
+  async countByUserId(userId: string): Promise<number> {
+    try {
+      const count = await this.prisma.business.count({
+        where: {
+          userId,
+          deletedAt: null,
+        },
+      })
+
+      return count
+    } catch (error) {
+      logger.error('Failed to count businesses by user ID:', error)
+      throw ErrorFactory.fromError(error, 'Failed to count user businesses', {
+        severity: ErrorSeverity.ERROR,
+        metadata: { userId },
+      })
     }
   }
 }

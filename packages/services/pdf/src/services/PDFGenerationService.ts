@@ -461,7 +461,7 @@ export class PDFGenerationService {
     doc
       .moveDown(2)
       .fontSize(10)
-      .text('www.pika.com.py | contacto@pika.com.py', {
+      .text('www.thevoucherbook.com | contacto@thevoucherbook.com', {
         align: 'center',
       })
   }

@@ -172,14 +172,14 @@ enum VoucherState {
   expired
   suspended
 
-  @@schema("business")
+  @@schema("voucher")
 }
 
 enum VoucherType {
   percentage
   fixed
 
-  @@schema("business")
+  @@schema("voucher")
 }
 
 enum VoucherCodeType {
@@ -187,7 +187,7 @@ enum VoucherCodeType {
   short         // Short alphanumeric code
   static        // Static code (reusable)
 
-  @@schema("business")
+  @@schema("voucher")
 }
 
 enum VoucherScanType {
@@ -211,7 +211,7 @@ enum CustomerVoucherStatus {
   redeemed      // Voucher redeemed
   expired       // Voucher expired
 
-  @@schema("business")
+  @@schema("voucher")
 }
 
 enum FraudCaseStatus {

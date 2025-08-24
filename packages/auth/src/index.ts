@@ -38,6 +38,25 @@ export {
   CognitoIdentityProvider,
   CognitoIdentityProviderFactory,
 } from './infrastructure/providers/CognitoIdentityProvider.js'
+export {
+  FacebookOAuthClient,
+  facebookOAuthClient,
+} from './infrastructure/providers/FacebookOAuthClient.js'
+export {
+  FirebaseIdentityProvider,
+  FirebaseIdentityProviderFactory,
+  getProviderFromToken,
+  isSocialAuthToken,
+} from './infrastructure/providers/FirebaseIdentityProvider.js'
+export {
+  GoogleOAuthClient,
+  googleOAuthClient,
+} from './infrastructure/providers/GoogleOAuthClient.js'
+export {
+  createFirebaseAuthStrategy,
+  FirebaseAuthStrategy,
+  type FirebaseCredentials,
+} from './strategies/FirebaseAuthStrategy.js'
 
 // Config
 export * from './config/AuthServiceConfig.js'

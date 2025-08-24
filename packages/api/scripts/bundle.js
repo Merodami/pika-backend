@@ -1,8 +1,10 @@
 #!/usr/bin/env node
+/* eslint-disable security/detect-non-literal-fs-filename */
+/* global console */
 
 import * as esbuild from 'esbuild'
 import { readdir, stat, readFile, writeFile } from 'fs/promises'
-import { join, relative } from 'path'
+import { join } from 'path'
 
 /**
  * Bundle @pika/api with @pika/types included

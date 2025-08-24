@@ -24,8 +24,8 @@ import {
   E2EAuthHelper,
   TestDatabaseResult,
 } from '@pika/tests'
-import type { Express } from 'express'
 import { VoucherBookStatus } from '@prisma/client'
+import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

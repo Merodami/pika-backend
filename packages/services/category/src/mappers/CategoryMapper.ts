@@ -34,8 +34,8 @@ export interface CategoryDocument {
  */
 export interface CategoryDTO {
   id: string
-  nameKey: string
-  descriptionKey?: string
+  name: string
+  description?: string
   icon?: string
   parentId?: string
   isActive: boolean
@@ -55,8 +55,8 @@ export interface CategoryDTO {
  */
 export interface InternalCategoryDTO {
   id: string
-  nameKey: string
-  descriptionKey?: string
+  name: string
+  description?: string
   icon?: string
   parentId?: string
   isActive: boolean
@@ -149,10 +149,14 @@ export class CategoryMapper {
       return new Date().toISOString()
     }
 
+    // Use resolved translations if available, otherwise fall back to keys
+    const name = (domain as any).name || domain.nameKey
+    const description = (domain as any).description || domain.descriptionKey
+
     return {
       id: domain.id,
-      nameKey: domain.nameKey,
-      descriptionKey: domain.descriptionKey,
+      name,
+      description,
       icon: domain.icon,
       parentId: domain.parentId,
       isActive: domain.isActive,
@@ -177,8 +181,8 @@ export class CategoryMapper {
   static fromDTO(dto: CategoryDTO): CategoryDomain {
     return {
       id: dto.id,
-      nameKey: dto.nameKey,
-      descriptionKey: dto.descriptionKey,
+      nameKey: dto.name, // Use name as nameKey for backwards compatibility
+      descriptionKey: dto.description,
       icon: dto.icon,
       parentId: dto.parentId,
       isActive: dto.isActive,
@@ -380,10 +384,14 @@ export class CategoryMapper {
    * Convert domain entity to internal DTO for service-to-service communication
    */
   static toInternalDTO(domain: CategoryDomain): InternalCategoryDTO {
+    // Use resolved translations if available, fallback to keys
+    const name = (domain as any).name || domain.nameKey
+    const description = (domain as any).description || domain.descriptionKey
+
     return {
       id: domain.id,
-      nameKey: domain.nameKey,
-      descriptionKey: domain.descriptionKey,
+      name,
+      description,
       icon: domain.icon,
       parentId: domain.parentId,
       isActive: domain.isActive,

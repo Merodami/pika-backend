@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "membershipId": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "created",
+        "upgraded",
+        "downgraded",
+        "cancelled",
+        "reactivated",
+        "expired",
+        "paymentFailed",
+        "renewed"
+      ]
+    },
+    "fromPlan": {
+      "type": "string",
+      "enum": ["basic", "premium", "enterprise", "trial"]
+    },
+    "toPlan": {
+      "type": "string",
+      "enum": ["basic", "premium", "enterprise", "trial"]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "timestamp": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    }
+  },
+  "required": ["id", "membershipId", "action", "timestamp"],
+  "additionalProperties": false
+}

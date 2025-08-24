@@ -1,5 +1,5 @@
 import { authPublic, userAdmin, userCommon, userPublic } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   adaptMulterFile,
   getValidatedQuery,
@@ -8,7 +8,6 @@ import {
   validateAvatarFile,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import { UserRole } from '@pika/types'
@@ -36,18 +35,15 @@ export class UserController {
     this.getMe = this.getMe.bind(this)
     this.updateMe = this.updateMe.bind(this)
     this.uploadMyAvatar = this.uploadMyAvatar.bind(this)
+    this.getSettings = this.getSettings.bind(this)
+    this.updateSettings = this.updateSettings.bind(this)
+    this.patchSettings = this.patchSettings.bind(this)
   }
 
   /**
    * GET /users
    * Get all users with filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'users',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllUsers(
     req: Request,
     res: Response,
@@ -101,11 +97,6 @@ export class UserController {
    * GET /users/:user_id
    * Get user by ID
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserById(
     req: Request<userAdmin.UserIdParam>,
     res: Response,
@@ -133,11 +124,6 @@ export class UserController {
    * GET /users/email/:email
    * Get user by email address
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user:email',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserByEmail(
     req: Request<userAdmin.EmailParam>,
     res: Response,
@@ -310,11 +296,6 @@ export class UserController {
    * GET /users/sub/:sub_token
    * Get user by subscription token
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'user:subtoken',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getUserBySubToken(
     req: Request<userAdmin.SubTokenParam>,
     res: Response,
@@ -418,7 +399,11 @@ export class UserController {
    * GET /users/me
    * Get current authenticated user profile
    */
-  async getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getMe(
+    req: Request,
+    res: Response<userPublic.CurrentUserProfile>,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
@@ -427,7 +412,7 @@ export class UserController {
 
       const dto = UserMapper.toDTO(user)
       const validatedResponse = validateResponse(
-        userPublic.UserProfileResponse,
+        userPublic.CurrentUserProfile,
         dto,
         'UserController.getMe',
       )
@@ -495,6 +480,96 @@ export class UserController {
         userPublic.UploadAvatarResponse,
         response,
         'UserController.uploadMyAvatar',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /users/me/settings
+   * Get current user settings
+   */
+  async getSettings(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const settings = await this.userService.getUserSettings(userId)
+
+      const response = { settings }
+      const validatedResponse = validateResponse(
+        userPublic.GetUserSettingsResponse,
+        response,
+        'UserController.getSettings',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PUT /users/me/settings
+   * Update current user settings (full replace)
+   */
+  async updateSettings(
+    req: Request<{}, {}, userPublic.UpdateUserSettingsRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const settings = await this.userService.updateUserSettings(
+        userId,
+        req.body,
+      )
+
+      const response = { settings, message: 'Settings updated successfully' }
+      const validatedResponse = validateResponse(
+        userPublic.UpdateUserSettingsResponse,
+        response,
+        'UserController.updateSettings',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PATCH /users/me/settings
+   * Patch current user settings (partial update)
+   */
+  async patchSettings(
+    req: Request<{}, {}, userPublic.PatchUserSettingsRequest>,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      const settings = await this.userService.patchUserSettings(
+        userId,
+        req.body,
+      )
+
+      const response = { settings, message: 'Settings updated successfully' }
+      const validatedResponse = validateResponse(
+        userPublic.PatchUserSettingsResponse,
+        response,
+        'UserController.patchSettings',
       )
 
       res.json(validatedResponse)

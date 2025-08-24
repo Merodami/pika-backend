@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "type": "string"
+    },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "payment_intent.succeeded",
+        "payment_intent.payment_failed",
+        "payment_intent.canceled",
+        "payment_method.attached",
+        "customer.subscription.created",
+        "customer.subscription.updated",
+        "customer.subscription.deleted",
+        "invoice.payment_succeeded",
+        "invoice.payment_failed",
+        "checkout.session.completed",
+        "checkout.session.expired"
+      ]
+    },
+    "processed": {
+      "type": "boolean"
+    },
+    "message": {
+      "type": "string"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "actions": {
+      "description": "List of actions taken",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "timestamp": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    }
+  },
+  "required": [
+    "eventId",
+    "eventType",
+    "processed",
+    "message",
+    "actions",
+    "timestamp"
+  ],
+  "additionalProperties": false
+}

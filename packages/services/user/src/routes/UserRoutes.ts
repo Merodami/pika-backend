@@ -2,7 +2,6 @@ import { userAdmin, userPublic } from '@pika/api'
 import {
   createAvatarUploadMiddleware,
   requireAuth,
-  requirePermissions,
   validateBody,
   validateParams,
   validateQuery,
@@ -17,6 +16,7 @@ import { UserService } from '@user/services/UserService.js'
 import { Router } from 'express'
 
 // User route definitions for Pika gym platform
+// Public and authenticated user routes only
 
 export async function createUserRouter(
   prisma: PrismaClient,
@@ -40,13 +40,10 @@ export async function createUserRouter(
   )
   const controller = new UserController(service)
 
-  // GET /users - Get all users with filters (admin only)
-  router.get(
-    '/',
-    requirePermissions('admin:users'),
-    validateQuery(userAdmin.AdminUserQueryParams),
-    controller.getAllUsers,
-  )
+  // Configure upload middleware
+  const upload = createAvatarUploadMiddleware()
+
+  // ============= Public Profile Routes =============
 
   // GET /users/me - Get current user profile
   router.get('/me', requireAuth(), controller.getMe)
@@ -60,8 +57,6 @@ export async function createUserRouter(
   )
 
   // POST /users/me/avatar - Upload avatar for current user
-  const upload = createAvatarUploadMiddleware()
-
   router.post(
     '/me/avatar',
     requireAuth(),
@@ -69,46 +64,36 @@ export async function createUserRouter(
     controller.uploadMyAvatar,
   )
 
-  // GET /users/email/:email - Get user by email (admin only)
-  router.get(
-    '/email/:email',
-    requirePermissions('admin:users'),
-    validateParams(userAdmin.EmailParam),
-    controller.getUserByEmail,
+  // ============= User Settings Routes =============
+
+  // GET /users/me/settings - Get current user settings
+  router.get('/me/settings', requireAuth(), controller.getSettings)
+
+  // PUT /users/me/settings - Update current user settings (full replace)
+  router.put(
+    '/me/settings',
+    requireAuth(),
+    validateBody(userPublic.UpdateUserSettingsRequest),
+    controller.updateSettings,
   )
 
-  // GET /users/:id - Get user by ID
+  // PATCH /users/me/settings - Patch current user settings (partial update)
+  router.patch(
+    '/me/settings',
+    requireAuth(),
+    validateBody(userPublic.PatchUserSettingsRequest),
+    controller.patchSettings,
+  )
+
+  // ============= User Discovery Routes =============
+
+  // GET /users/:id - Get user by ID (authenticated users can view profiles)
   router.get(
     '/:id',
     requireAuth(),
     validateParams(userAdmin.UserIdParam),
     validateQuery(userPublic.GetUserByIdQuery),
     controller.getUserById,
-  )
-
-  // POST /users - Create new user (admin only)
-  router.post(
-    '/',
-    requirePermissions('admin:users'),
-    validateBody(userAdmin.AdminCreateUserRequest),
-    controller.createAdminUser,
-  )
-
-  // PATCH /users/:id - Update user (admin only)
-  router.patch(
-    '/:id',
-    requirePermissions('admin:users'),
-    validateParams(userAdmin.UserIdParam),
-    validateBody(userAdmin.AdminUpdateUserRequest),
-    controller.updateUser,
-  )
-
-  // DELETE /users/:id - Delete user (admin only)
-  router.delete(
-    '/:id',
-    requirePermissions('admin:users'),
-    validateParams(userAdmin.UserIdParam),
-    controller.deleteUser,
   )
 
   // GET /users/sub/:subToken - Get user by sub token
@@ -119,35 +104,7 @@ export async function createUserRouter(
     controller.getUserBySubToken,
   )
 
-  // PUT /users/:id/status - Update user status (admin only)
-  router.put(
-    '/:id/status',
-    requirePermissions('admin:users'),
-    validateParams(userAdmin.UserIdParam),
-    validateBody(userAdmin.AdminUpdateUserStatusRequest),
-    controller.updateUserStatus,
-  )
-
-  // PUT /users/:id/ban - Ban user (admin only)
-  router.put(
-    '/:id/ban',
-    requirePermissions('admin:users'),
-    validateParams(userAdmin.UserIdParam),
-    validateBody(userAdmin.AdminBanUserRequest),
-    controller.banUser,
-  )
-
-  // PUT /users/:id/unban - Unban user (admin only)
-  router.put(
-    '/:id/unban',
-    requirePermissions('admin:users'),
-    validateParams(userAdmin.UserIdParam),
-    validateBody(userAdmin.AdminUnbanUserRequest),
-    controller.unbanUser,
-  )
-
-  // POST /users/:id/avatar - Upload user avatar (admin or self)
-
+  // POST /users/:id/avatar - Upload user avatar (self or admin check done in controller)
   router.post(
     '/:id/avatar',
     requireAuth(),

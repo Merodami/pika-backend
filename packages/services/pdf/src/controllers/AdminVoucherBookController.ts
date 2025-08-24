@@ -1,5 +1,5 @@
 import { pdfAdmin, pdfCommon } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedBody,
   getValidatedQuery,
@@ -7,7 +7,6 @@ import {
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -35,12 +34,6 @@ export class AdminVoucherBookController {
    * GET /admin/voucher-books
    * Get all voucher books with admin filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:voucher-books',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllVoucherBooks(
     req: Request,
     res: Response<pdfAdmin.AdminVoucherBookListResponse>,
@@ -87,11 +80,6 @@ export class AdminVoucherBookController {
    * GET /admin/voucher-books/:id
    * Get voucher book by ID with full details
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:voucher-book',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getVoucherBookById(
     req: Request<pdfCommon.VoucherBookIdParam>,
     res: Response<pdfAdmin.AdminVoucherBookResponse>,
@@ -330,11 +318,6 @@ export class AdminVoucherBookController {
    * GET /admin/voucher-books/statistics
    * Get voucher book statistics
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:voucher-books:stats',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getVoucherBookStatistics(
     req: Request,
     res: Response,

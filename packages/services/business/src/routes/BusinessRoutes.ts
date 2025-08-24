@@ -1,8 +1,11 @@
 import { BusinessController } from '@business/controllers/BusinessController.js'
+import { BusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
 import { BusinessRepository } from '@business/repositories/BusinessRepository.js'
 import { BusinessService } from '@business/services/BusinessService.js'
 import { businessPublic, shared } from '@pika/api'
 import {
+  createAvatarUploadMiddleware,
+  requireActiveBusinesses,
   requireAuth,
   requirePermissions,
   validateBody,
@@ -10,7 +13,8 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import type { TranslationClient } from '@pika/translation'
+import { StorageServiceClient, UserServiceClient } from '@pika/shared'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -21,13 +25,28 @@ export function createBusinessRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
   translationClient: TranslationClient,
+  translationResolver?: TranslationResolver,
+  userServiceClient?: UserServiceClient,
+  storageServiceClient?: StorageServiceClient,
 ): Router {
   const router = Router()
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
-  const service = new BusinessService(repository, translationClient, cache)
+  const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
+  const service = new BusinessService(
+    repository,
+    translationClient,
+    userServiceClient,
+    cache,
+    translationResolver,
+    businessDetailsRepository,
+    storageServiceClient,
+  )
   const controller = new BusinessController(service)
+
+  // Configure upload middleware for logo uploads
+  const upload = createAvatarUploadMiddleware() // Reuse avatar upload middleware for business logos
 
   // Public routes (require authentication but available to all users)
   // GET /businesses - List all active businesses
@@ -38,14 +57,15 @@ export function createBusinessRoutes(
     controller.getAllBusinesses,
   )
 
-  // Business owner routes (require auth and business permissions)
-  // GET /businesses/me - Get current user's business (must come before /:id)
+  // Business owner routes (require auth, business permissions, and at least one active business)
+  // GET /businesses/me - Get all current user's businesses (must come before /:id)
   router.get(
     '/me',
     requireAuth(),
     requirePermissions('businesses:read:own'),
-    validateQuery(businessPublic.BusinessDetailQueryParams),
-    controller.getMyBusiness,
+    // Note: Don't require active businesses - users need to see their businesses during approval process
+    validateQuery(businessPublic.BusinessQueryParams),
+    controller.getMyBusinesses,
   )
 
   // POST /businesses/me - Create business for current user
@@ -53,6 +73,7 @@ export function createBusinessRoutes(
     '/me',
     requireAuth(),
     requirePermissions('businesses:write:own'),
+    // Note: Don't require active businesses for creation - this is how users get their first business
     validateBody(businessPublic.CreateMyBusinessRequest),
     controller.createMyBusiness,
   )
@@ -62,8 +83,19 @@ export function createBusinessRoutes(
     '/me',
     requireAuth(),
     requirePermissions('businesses:write:own'),
+    requireActiveBusinesses(), // Ensure business user has at least one active business
     validateBody(businessPublic.UpdateMyBusinessRequest),
     controller.updateMyBusiness,
+  )
+
+  // POST /businesses/me/logo - Upload logo for current user's business
+  router.post(
+    '/me/logo',
+    requireAuth(),
+    requirePermissions('businesses:write:own'),
+    requireActiveBusinesses(), // Ensure business user has at least one active business
+    upload.single('logo'),
+    controller.uploadBusinessLogo,
   )
 
   // GET /businesses/user/:id - Get business by user ID (must come before /:id)

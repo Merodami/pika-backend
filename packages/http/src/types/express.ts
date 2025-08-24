@@ -1,5 +1,5 @@
 import { ICacheService } from '@pika/redis'
-import { UserRole } from '@pika/types'
+import { BusinessRegistrationStatus, UserRole } from '@pika/types'
 
 declare global {
   namespace Express {
@@ -14,11 +14,23 @@ declare global {
         sessionId?: string
         issuedAt?: Date
         expiresAt?: Date
+        // Business-specific claims (only for business users)
+        hasActiveBusinesses?: boolean
       }
       serviceAuth?: {
         serviceId: string
         serviceName: string
         isInternalService: boolean
+      }
+      businessId?: string // Set by requireBusinessRegistration middleware
+      businessContext?: {
+        hasRegistration: boolean
+        registrationStatus?: BusinessRegistrationStatus
+        isApproved: boolean
+        businessId?: string
+        isBusinessActive: boolean
+        isBusinessApproved: boolean
+        isFullyOperational: boolean
       }
       accepts?: any
     }

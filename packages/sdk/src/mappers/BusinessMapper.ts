@@ -1,9 +1,11 @@
 import type {
+  BusinessDetailsDomain,
   BusinessDomain,
   CreateBusinessData,
   UpdateBusinessData,
 } from '../domain/business.js'
 import type {
+  BusinessDetailsDTO,
   BusinessDTO,
   CreateBusinessDTO,
   UpdateBusinessDTO,
@@ -11,6 +13,28 @@ import type {
 import { formatDateToISO } from '../utils/dateUtils.js'
 import { type CategoryDocument, CategoryMapper } from './CategoryMapper.js'
 import { type UserDocument, UserMapper } from './UserMapper.js'
+
+/**
+ * Interface representing a database BusinessDetails document
+ */
+export interface BusinessDetailsDocument {
+  id: string
+  businessId: string
+  phone: string | null
+  email: string | null
+  website: string | null
+  logoUrl: string | null
+  street: string | null
+  city: string | null
+  state: string | null
+  postalCode: string | null
+  country: string | null
+  operatingHours: any | null
+  socialMedia: any | null
+  additionalInfo: any | null
+  createdAt: Date | null
+  updatedAt: Date | null
+}
 
 /**
  * Interface representing a database Business document
@@ -34,6 +58,20 @@ export interface BusinessDocument {
   // Optional relations
   user?: UserDocument | null
   category?: CategoryDocument | null
+  businessDetails?: BusinessDetailsDocument | null
+  businessRegistration?: {
+    id: string
+    userId: string
+    businessId: string | null
+    currentStep: number
+    registrationStatus: string
+    startedAt: Date
+    completedAt: Date | null
+    submittedAt: Date | null
+    rejectionReason: string | null
+    createdAt: Date
+    updatedAt: Date
+  } | null
 }
 
 /**
@@ -82,19 +120,24 @@ export class BusinessMapper {
       category: doc.category
         ? CategoryMapper.fromDocument(doc.category)
         : undefined,
+      businessDetails: doc.businessDetails
+        ? BusinessMapper.fromBusinessDetailsDocument(doc.businessDetails)
+        : undefined,
+      businessRegistration: doc.businessRegistration || undefined,
     }
   }
 
   /**
    * Maps a domain entity to an Admin API DTO
-   * Admin responses include branded types and formatted date strings
+   * Admin responses include translation keys for internal management
    */
   static toAdminDTO(domain: BusinessDomain): any {
     return {
       id: domain.id,
       userId: domain.userId,
-      businessNameKey: domain.businessNameKey,
-      businessDescriptionKey: domain.businessDescriptionKey || undefined,
+      // Admin endpoints should show translation keys for internal management
+      businessName: domain.businessNameKey,
+      businessDescription: domain.businessDescriptionKey || undefined,
       categoryId: domain.categoryId,
       verified: domain.verified,
       active: domain.active,
@@ -110,21 +153,34 @@ export class BusinessMapper {
       category: domain.category
         ? CategoryMapper.toDTO(domain.category)
         : undefined,
+      businessRegistration: domain.businessRegistration
+        ? {
+            id: domain.businessRegistration.id,
+            registrationStatus: domain.businessRegistration.registrationStatus,
+            currentStep: domain.businessRegistration.currentStep,
+          }
+        : undefined,
     }
   }
 
   /**
    * Maps a domain entity to an API DTO
+   * Public endpoints should show resolved translations when available
    */
   static toDTO(domain: BusinessDomain): BusinessDTO {
     return {
       id: domain.id,
       userId: domain.userId,
-      businessNameKey: domain.businessNameKey,
-      businessDescriptionKey: domain.businessDescriptionKey || undefined,
+      // Use resolved translations if available, fallback to keys for public endpoints
+      businessName: domain.businessName || domain.businessNameKey,
+      businessDescription:
+        domain.businessDescription ||
+        domain.businessDescriptionKey ||
+        undefined,
       categoryId: domain.categoryId || '', // Handle null categoryId
       verified: domain.verified,
       active: domain.active,
+      approved: domain.approved,
       avgRating: domain.avgRating,
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
@@ -133,6 +189,9 @@ export class BusinessMapper {
       user: domain.user ? UserMapper.toDTO(domain.user) : undefined,
       category: domain.category
         ? CategoryMapper.toDTO(domain.category)
+        : undefined,
+      businessDetails: domain.businessDetails
+        ? BusinessMapper.toBusinessDetailsDTO(domain.businessDetails)
         : undefined,
     }
   }
@@ -144,8 +203,8 @@ export class BusinessMapper {
     return {
       id: dto.id,
       userId: dto.userId,
-      businessNameKey: dto.businessNameKey,
-      businessDescriptionKey: dto.businessDescriptionKey || null,
+      businessNameKey: dto.businessName,
+      businessDescriptionKey: dto.businessDescription || null,
       categoryId: dto.categoryId || null, // Handle empty string as null
       verified: dto.verified,
       active: dto.active,
@@ -205,5 +264,63 @@ export class BusinessMapper {
    */
   static toDTOArray(domains: BusinessDomain[]): BusinessDTO[] {
     return domains.map((domain) => this.toDTO(domain))
+  }
+
+  /**
+   * Maps a BusinessDetails document to domain entity
+   */
+  static fromBusinessDetailsDocument(
+    doc: BusinessDetailsDocument,
+  ): BusinessDetailsDomain {
+    return {
+      id: doc.id,
+      businessId: doc.businessId,
+      phone: doc.phone,
+      email: doc.email,
+      website: doc.website,
+      logoUrl: doc.logoUrl,
+      street: doc.street,
+      city: doc.city,
+      state: doc.state,
+      postalCode: doc.postalCode,
+      country: doc.country,
+      operatingHours: doc.operatingHours,
+      socialMedia: doc.socialMedia,
+      additionalInfo: doc.additionalInfo,
+      createdAt:
+        doc.createdAt instanceof Date
+          ? doc.createdAt
+          : new Date(doc.createdAt!),
+      updatedAt:
+        doc.updatedAt instanceof Date
+          ? doc.updatedAt
+          : new Date(doc.updatedAt!),
+    }
+  }
+
+  /**
+   * Maps BusinessDetails domain to DTO
+   */
+  static toBusinessDetailsDTO(
+    domain: BusinessDetailsDomain,
+  ): BusinessDetailsDTO {
+    return {
+      id: domain.id,
+      businessId: domain.businessId,
+      phone: domain.phone || undefined,
+      email: domain.email || undefined,
+      website: domain.website || undefined,
+      logoUrl: domain.logoUrl || undefined,
+      street: domain.street || undefined,
+      city: domain.city || undefined,
+      state: domain.state || undefined,
+      postalCode: domain.postalCode || undefined,
+      country: domain.country || undefined,
+      operatingHours: domain.operatingHours || undefined,
+      socialMedia: domain.socialMedia || undefined,
+      additionalInfo: domain.additionalInfo || undefined,
+      createdAt: formatDateToISO(domain.createdAt),
+      updatedAt: formatDateToISO(domain.updatedAt),
+    }
   }
 }

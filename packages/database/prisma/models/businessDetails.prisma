@@ -1,0 +1,39 @@
+// Business Details Model
+// Stores additional business information collected during registration
+// Keeps the main business table lean while storing detailed information
+
+model BusinessDetails {
+  id         String    @id @default(uuid()) @db.Uuid
+  businessId String    @unique @db.Uuid
+  
+  // Contact Information
+  phone      String?   @db.VarChar(20)
+  email      String?   @db.VarChar(255)
+  website    String?   @db.VarChar(255)
+  logoUrl    String?   @map("logo_url") @db.VarChar(512)
+  
+  // Address Information
+  street     String?   @db.VarChar(255)
+  city       String?   @db.VarChar(100)
+  state      String?   @db.VarChar(100)
+  postalCode String?   @map("postal_code") @db.VarChar(20)
+  country    String?   @db.VarChar(2) // ISO 3166-1 alpha-2
+  
+  // Operating Information
+  operatingHours Json? @map("operating_hours") // JSON for flexible schedule format
+  socialMedia    Json? @map("social_media")    // JSON for various social platforms
+  
+  // Additional Information (for future expansion)
+  additionalInfo Json? @map("additional_info")
+  
+  // Metadata
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relations
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@index([businessId])
+  @@map("business_details")
+  @@schema("business")
+}

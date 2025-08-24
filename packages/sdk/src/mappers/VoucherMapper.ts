@@ -115,7 +115,7 @@ export class VoucherMapper {
     return {
       id: doc.id,
       businessId: doc.businessId,
-      categoryId: doc.categoryId || '',
+      categoryId: doc.categoryId ?? undefined,
       state: doc.state as VoucherState,
       // Translation keys from database
       titleKey: doc.titleKey,
@@ -181,14 +181,16 @@ export class VoucherMapper {
       id: domain.id,
       businessId: domain.businessId,
       categoryId: domain.categoryId,
-      state: this.mapStateToDTO(domain.state),
+      state: VoucherMapper.mapStateToDTO(domain.state),
       title: domain.title || '',
       description: domain.description || '',
       terms: domain.termsAndConditions || '',
-      discountType: this.mapDiscountTypeToDTO(domain.discountType),
+      discountType: VoucherMapper.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
-      location: domain.location ? this.mapLocationToDTO(domain.location) : null,
+      location: domain.location
+        ? VoucherMapper.mapLocationToDTO(domain.location)
+        : null,
       imageUrl: domain.imageUrl || undefined,
       validFrom: formatDateToISO(domain.validFrom),
       expiresAt: formatDateToISO(domain.expiresAt),
@@ -198,7 +200,7 @@ export class VoucherMapper {
       metadata: domain.metadata || undefined,
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
-      codes: domain.codes?.map((code) => this.mapCodeToDTO(code)),
+      codes: domain.codes?.map((code) => VoucherMapper.mapCodeToDTO(code)),
     }
   }
 
@@ -261,6 +263,7 @@ export class VoucherMapper {
   ): UpdateVoucherData {
     const result: UpdateVoucherData = {}
 
+    if (data.categoryId !== undefined) result.categoryId = data.categoryId
     if (data.title !== undefined) result.title = data.title
     if (data.description !== undefined) result.description = data.description
     if (data.termsAndConditions !== undefined)
@@ -415,7 +418,7 @@ export class VoucherMapper {
       expiresAt: domain.expiresAt.toISOString(),
       redemptionCode: domain.redemptionCode || undefined,
       redemptionLocation: domain.redemptionLocation
-        ? this.mapLocationToDTO(domain.redemptionLocation)
+        ? VoucherMapper.mapLocationToDTO(domain.redemptionLocation)
         : undefined,
       metadata: domain.metadata || undefined,
       createdAt: domain.createdAt.toISOString(),
@@ -645,7 +648,7 @@ export class VoucherMapper {
       id: domain.id,
       businessId: domain.businessId,
       categoryId: domain.categoryId,
-      state: this.mapStateToDTO(domain.state),
+      state: VoucherMapper.mapStateToDTO(domain.state),
 
       // Only resolved content - no translation keys exposed
       title: domain.title || '',
@@ -653,12 +656,14 @@ export class VoucherMapper {
       terms: domain.termsAndConditions || '',
 
       // Discount configuration
-      discountType: this.mapDiscountTypeToDTO(domain.discountType),
+      discountType: VoucherMapper.mapDiscountTypeToDTO(domain.discountType),
       discountValue: domain.discountValue,
       currency: domain.currency,
 
       // Geographic targeting
-      location: domain.location ? this.mapLocationToDTO(domain.location) : null,
+      location: domain.location
+        ? VoucherMapper.mapLocationToDTO(domain.location)
+        : null,
 
       // Media
       imageUrl: domain.imageUrl,
@@ -700,7 +705,7 @@ export class VoucherMapper {
       daysUntilExpiry,
 
       // Optional includes (will be undefined unless populated)
-      codes: domain.codes?.map((code) => this.mapCodeToDTO(code)),
+      codes: domain.codes?.map((code) => VoucherMapper.mapCodeToDTO(code)),
     }
   }
 
@@ -733,8 +738,8 @@ export class VoucherMapper {
     return {
       voucherId,
       period: {
-        start: filters?.startDate || new Date(),
-        end: filters?.endDate || new Date(),
+        start: (filters?.startDate || new Date()).toISOString(),
+        end: (filters?.endDate || new Date()).toISOString(),
       },
       totalScans: analytics.totalScans || 0,
       totalClaims: analytics.totalClaims || 0,
@@ -754,8 +759,8 @@ export class VoucherMapper {
     return {
       businessId: stats.businessId,
       period: {
-        start: new Date(),
-        end: new Date(),
+        start: new Date().toISOString(),
+        end: new Date().toISOString(),
       },
       totalVouchers: stats.totalVouchers,
       activeVouchers: stats.activeVouchers,

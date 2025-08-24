@@ -1,0 +1,9 @@
+{
+  "$ref": "#/definitions/VerifyEmailResponseSchema",
+  "definitions": {
+    "VerifyEmailResponseSchema": {
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

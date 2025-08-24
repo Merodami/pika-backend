@@ -31,7 +31,7 @@ import {
 export const AdminVoucherDetailResponse = withTimestampsString({
   id: UUID,
   businessId: UUID,
-  categoryId: UUID,
+  categoryId: UUID.optional(),
 
   // Lifecycle
   state: VoucherStateSchema,
@@ -144,7 +144,7 @@ export type AdminVoucherResponse = z.infer<typeof AdminVoucherResponse>
  */
 export const AdminCreateVoucherRequest = z.object({
   businessId: UUID,
-  categoryId: UUID,
+  categoryId: UUID.optional(),
 
   // Content translations (translation service will create the keys)
   title: z
@@ -193,6 +193,9 @@ export type AdminCreateVoucherRequest = z.infer<
  * Update voucher request
  */
 export const AdminUpdateVoucherRequest = z.object({
+  // Admin can change voucher category
+  categoryId: UUID.optional(),
+
   // Content translations (will update translation keys)
   title: z
     .record(z.string(), z.string())
@@ -227,7 +230,13 @@ export const AdminUpdateVoucherRequest = z.object({
   maxRedemptionsPerUser: z.number().int().positive().optional(),
 
   // Extensibility
-  metadata: z.record(z.string(), z.any()).nullable().optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .nullable()
+    .optional(),
 })
 
 export const AdminUpdateVoucherRequestSchema =

@@ -1,14 +1,14 @@
 import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
 import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryAdmin, categoryCommon } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -33,12 +33,6 @@ export class AdminCategoryController {
    * GET /admin/categories
    * Get all categories with admin filters and pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:categories',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllCategories(
     req: Request,
     res: Response<categoryAdmin.AdminCategoryListResponse>,
@@ -60,7 +54,11 @@ export class AdminCategoryController {
         sortOrder: query.sortOrder,
       }
 
-      const result = await this.categoryService.getAllCategories(params)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getAllCategories(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toDTO)
@@ -80,11 +78,6 @@ export class AdminCategoryController {
    * GET /admin/categories/:id
    * Get category by ID for admin
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:category',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryById(
     req: Request<categoryCommon.CategoryIdParam>,
     res: Response<categoryAdmin.AdminCategoryResponse>,
@@ -93,7 +86,8 @@ export class AdminCategoryController {
     try {
       const { id } = req.params
 
-      const category = await this.categoryService.getCategoryById(id)
+      const language = getRequestLanguage(req)
+      const category = await this.categoryService.getCategoryById(id, language)
 
       // Transform to DTO
       const response = CategoryMapper.toDTO(category)
@@ -355,11 +349,6 @@ export class AdminCategoryController {
    * GET /admin/categories/hierarchy
    * Get category hierarchy for admin management
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'admin:category:hierarchy',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryHierarchy(
     req: Request,
     res: Response<categoryAdmin.AdminCategoryTreeResponse>,
@@ -368,8 +357,10 @@ export class AdminCategoryController {
     try {
       const query = getValidatedQuery<{ rootId?: string }>(req)
 
+      const language = getRequestLanguage(req)
       const categories = await this.categoryService.getCategoryHierarchy(
         query.rootId,
+        language,
       )
 
       // Transform to DTOs

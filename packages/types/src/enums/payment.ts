@@ -3,26 +3,19 @@
  */
 
 /**
- * Payment usage types for setup intents
- */
-export enum PaymentUsage {
-  ON_SESSION = 'onSession',
-  OFF_SESSION = 'offSession',
-}
-
-/**
- * Supported currencies (ISO 4217 lowercase)
- * Addresses hardcoded currency strings in payment schemas
+ * Supported currencies (ISO 4217 standard - uppercase)
+ * Following international currency code standards
  */
 export enum Currency {
-  USD = 'usd',
-  EUR = 'eur',
-  GBP = 'gbp',
-  CAD = 'cad',
-  AUD = 'aud',
-  JPY = 'jpy',
-  CNY = 'cny',
-  INR = 'inr',
+  PYG = 'PYG', // Paraguayan Guaraní
+  USD = 'USD', // US Dollar
+  EUR = 'EUR', // Euro
+  GBP = 'GBP', // British Pound
+  CAD = 'CAD', // Canadian Dollar
+  AUD = 'AUD', // Australian Dollar
+  JPY = 'JPY', // Japanese Yen
+  CNY = 'CNY', // Chinese Yuan
+  INR = 'INR', // Indian Rupee
 }
 
 /**
@@ -440,10 +433,27 @@ export enum StripeDeclineCode {
 }
 
 /**
+ * Payment usage for setup intents (Stripe-specific)
+ * IMPORTANT: These must match Stripe's exact usage values
+ */
+export enum PaymentUsage {
+  ON_SESSION = 'on_session',
+  OFF_SESSION = 'off_session',
+}
+
+/**
  * Webhook processing error codes
  */
 export enum WebhookErrorCode {
   INVALID_SIGNATURE = 'invalidSignature',
   PROCESSING_ERROR = 'processingError',
   UNKNOWN_EVENT_TYPE = 'unknownEventType',
+}
+
+/**
+ * Account holder types for bank accounts
+ */
+export enum AccountHolderType {
+  INDIVIDUAL = 'individual',
+  COMPANY = 'company',
 }

@@ -2,13 +2,18 @@
 import '@pika/environment'
 
 import { BUSINESS_SERVICE_NAME, BUSINESS_SERVICE_PORT } from '@pika/environment'
-import { createExpressServer, errorMiddleware } from '@pika/http'
-import { ICacheService } from '@pika/redis'
-import { logger } from '@pika/shared'
-import { TranslationClient } from '@pika/translation'
+import {
+  createExpressServer,
+  createLanguageMiddleware,
+  errorMiddleware,
+} from '@pika/http'
+import { ICacheService, setCacheService } from '@pika/redis'
+import { logger, StorageServiceClient, UserServiceClient } from '@pika/shared'
+import { createTranslationResolver, TranslationClient } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminBusinessRoutes } from './routes/AdminBusinessRoutes.js'
+import { createBusinessRegistrationRoutes } from './routes/BusinessRegistrationRoutes.js'
 import { createBusinessRoutes } from './routes/BusinessRoutes.js'
 import { createInternalBusinessRoutes } from './routes/InternalBusinessRoutes.js'
 
@@ -20,11 +25,17 @@ export async function createBusinessServer({
   prisma,
   cacheService,
   translationClient,
+  userServiceClient,
+  storageServiceClient,
 }: {
   prisma: PrismaClient
   cacheService: ICacheService
   translationClient: TranslationClient
+  userServiceClient?: UserServiceClient
+  storageServiceClient?: StorageServiceClient
 }) {
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
   logger.info(`Configuring Business service for port: ${BUSINESS_SERVICE_PORT}`)
 
   // Create Express server
@@ -89,29 +100,57 @@ export async function createBusinessServer({
     ],
   })
 
-  // Register business routes
+  // Add language detection middleware
+  app.use(createLanguageMiddleware(translationClient.service))
+
+  // Create translation resolver
+  const translationResolver = createTranslationResolver(translationClient)
+
+  // Register business routes with translation resolver
   const businessRouter = createBusinessRoutes(
     prisma,
     cacheService,
     translationClient,
+    translationResolver,
+    userServiceClient,
+    storageServiceClient,
   )
 
   app.use('/businesses', businessRouter)
 
-  // Register admin routes
-  const adminRouter = createAdminBusinessRoutes(
-    prisma,
-    cacheService,
-    translationClient,
-  )
+  // Register business registration routes (only if userServiceClient is provided)
+  if (userServiceClient) {
+    const registrationRouter = createBusinessRegistrationRoutes(
+      prisma,
+      cacheService,
+      translationClient,
+      translationResolver,
+      userServiceClient,
+    )
 
-  app.use('/admin/businesses', adminRouter)
+    app.use('/businesses/registration', registrationRouter)
+  }
+
+  // Register admin routes (only if userServiceClient is provided)
+  if (userServiceClient) {
+    const adminRouter = createAdminBusinessRoutes(
+      prisma,
+      cacheService,
+      translationClient,
+      userServiceClient,
+      translationResolver,
+      storageServiceClient,
+    )
+
+    app.use('/admin/businesses', adminRouter)
+  }
 
   // Register internal routes
   const internalRouter = createInternalBusinessRoutes(
     prisma,
     cacheService,
     translationClient,
+    translationResolver,
   )
 
   app.use('/internal/businesses', internalRouter)

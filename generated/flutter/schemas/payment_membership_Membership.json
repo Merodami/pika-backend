@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "stripeCustomerId": {
+      "description": "Stripe customer ID",
+      "type": "string"
+    },
+    "stripeSubscriptionId": {
+      "description": "Stripe subscription ID",
+      "type": "string"
+    },
+    "active": {
+      "default": false,
+      "type": "boolean"
+    },
+    "subscriptionStatus": {
+      "type": "string",
+      "enum": [
+        "active",
+        "pastDue",
+        "canceled",
+        "incomplete",
+        "incompleteExpired",
+        "trialing",
+        "unpaid"
+      ]
+    },
+    "planType": {
+      "type": "string",
+      "enum": ["basic", "premium", "enterprise", "trial"]
+    },
+    "lastPaymentDate": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "currentPeriodStart": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "currentPeriodEnd": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "cancelAtPeriodEnd": {
+      "default": false,
+      "type": "boolean"
+    },
+    "cancelledAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "trialStart": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "trialEnd": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "createdAt": {
+      "description": "When the record was created",
+      "type": "string"
+    },
+    "updatedAt": {
+      "description": "When the record was last updated",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "userId",
+    "active",
+    "subscriptionStatus",
+    "planType",
+    "cancelAtPeriodEnd",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

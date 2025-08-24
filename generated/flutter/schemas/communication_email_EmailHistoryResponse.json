@@ -1,0 +1,189 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Paginated response",
+  "type": "object",
+  "properties": {
+    "data": {
+      "description": "Page items",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "messageId": {
+            "type": "string"
+          },
+          "to": {
+            "type": "array",
+            "items": {}
+          },
+          "cc": {
+            "type": "array",
+            "items": {}
+          },
+          "bcc": {
+            "type": "array",
+            "items": {}
+          },
+          "subject": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "sent",
+              "delivered",
+              "failed",
+              "bounced",
+              "complained",
+              "rejected"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "normal", "high", "urgent"]
+          },
+          "templateId": {
+            "type": "string"
+          },
+          "hasHtmlContent": {
+            "type": "boolean"
+          },
+          "hasTextContent": {
+            "type": "boolean"
+          },
+          "attachmentCount": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "sentAt": {
+            "description": "ISO 8601 datetime with timezone",
+            "type": "string"
+          },
+          "deliveredAt": {
+            "description": "ISO 8601 datetime with timezone",
+            "type": "string"
+          },
+          "openedAt": {
+            "description": "ISO 8601 datetime with timezone",
+            "type": "string"
+          },
+          "firstClickedAt": {
+            "description": "ISO 8601 datetime with timezone",
+            "type": "string"
+          },
+          "openCount": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "clickCount": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "failedAt": {
+            "description": "ISO 8601 datetime with timezone",
+            "type": "string"
+          },
+          "failureReason": {
+            "type": "string"
+          },
+          "bounceType": {
+            "type": "string",
+            "enum": ["soft", "hard"]
+          },
+          "metadata": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "createdAt": {
+            "description": "When the record was created",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "When the record was last updated",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "messageId",
+          "to",
+          "subject",
+          "status",
+          "priority",
+          "hasHtmlContent",
+          "hasTextContent",
+          "attachmentCount",
+          "openCount",
+          "clickCount",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "Current page number",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "description": "Items per page",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        },
+        "total": {
+          "description": "Total number of items",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "totalPages": {
+          "description": "Total number of pages",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hasNext": {
+          "description": "Whether there is a next page",
+          "type": "boolean"
+        },
+        "hasPrev": {
+          "description": "Whether there is a previous page",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "page",
+        "limit",
+        "total",
+        "totalPages",
+        "hasNext",
+        "hasPrev"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": ["data", "pagination"],
+  "additionalProperties": false
+}

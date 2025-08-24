@@ -1,0 +1,1079 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Payment_membershipTypes",
+  "type": "object",
+  "properties": {
+    "CancelMembershipRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "immediately": {
+          "description": "Cancel immediately vs at period end",
+          "default": false,
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "feedback": {
+          "type": "string",
+          "enum": ["tooExpensive", "notUsing", "missingFeatures", "other"]
+        }
+      },
+      "required": ["immediately"],
+      "additionalProperties": false
+    },
+    "CancelMembershipResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "membership": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Universally Unique Identifier",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "userId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "stripeCustomerId": {
+              "description": "Stripe customer ID",
+              "type": "string"
+            },
+            "stripeSubscriptionId": {
+              "description": "Stripe subscription ID",
+              "type": "string"
+            },
+            "active": {
+              "default": false,
+              "type": "boolean"
+            },
+            "subscriptionStatus": {
+              "type": "string",
+              "enum": [
+                "active",
+                "pastDue",
+                "canceled",
+                "incomplete",
+                "incompleteExpired",
+                "trialing",
+                "unpaid"
+              ]
+            },
+            "planType": {
+              "type": "string",
+              "enum": ["basic", "premium", "enterprise", "trial"]
+            },
+            "lastPaymentDate": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "currentPeriodStart": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "currentPeriodEnd": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "cancelAtPeriodEnd": {
+              "default": false,
+              "type": "boolean"
+            },
+            "cancelledAt": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "trialStart": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "trialEnd": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "createdAt": {
+              "description": "When the record was created",
+              "type": "string"
+            },
+            "updatedAt": {
+              "description": "When the record was last updated",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "userId",
+            "active",
+            "subscriptionStatus",
+            "planType",
+            "cancelAtPeriodEnd",
+            "createdAt",
+            "updatedAt"
+          ],
+          "additionalProperties": false
+        },
+        "cancelledAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "effectiveDate": {
+          "description": "When the cancellation takes effect",
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "success",
+        "membership",
+        "cancelledAt",
+        "effectiveDate",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "CreateMembershipRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "stripeCustomerId": {
+          "type": "string"
+        },
+        "stripeSubscriptionId": {
+          "type": "string"
+        },
+        "active": {
+          "default": false,
+          "type": "boolean"
+        },
+        "subscriptionStatus": {
+          "default": "incomplete",
+          "type": "string",
+          "enum": [
+            "active",
+            "pastDue",
+            "canceled",
+            "incomplete",
+            "incompleteExpired",
+            "trialing",
+            "unpaid"
+          ]
+        },
+        "planType": {
+          "default": "basic",
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        }
+      },
+      "required": ["userId", "active", "subscriptionStatus", "planType"],
+      "additionalProperties": false
+    },
+    "Membership": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "stripeCustomerId": {
+          "description": "Stripe customer ID",
+          "type": "string"
+        },
+        "stripeSubscriptionId": {
+          "description": "Stripe subscription ID",
+          "type": "string"
+        },
+        "active": {
+          "default": false,
+          "type": "boolean"
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "enum": [
+            "active",
+            "pastDue",
+            "canceled",
+            "incomplete",
+            "incompleteExpired",
+            "trialing",
+            "unpaid"
+          ]
+        },
+        "planType": {
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        },
+        "lastPaymentDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodStart": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodEnd": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "cancelAtPeriodEnd": {
+          "default": false,
+          "type": "boolean"
+        },
+        "cancelledAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "trialStart": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "trialEnd": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "active",
+        "subscriptionStatus",
+        "planType",
+        "cancelAtPeriodEnd",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "MembershipBenefitsResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "membership": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Universally Unique Identifier",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "userId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "stripeCustomerId": {
+              "description": "Stripe customer ID",
+              "type": "string"
+            },
+            "stripeSubscriptionId": {
+              "description": "Stripe subscription ID",
+              "type": "string"
+            },
+            "active": {
+              "default": false,
+              "type": "boolean"
+            },
+            "subscriptionStatus": {
+              "type": "string",
+              "enum": [
+                "active",
+                "pastDue",
+                "canceled",
+                "incomplete",
+                "incompleteExpired",
+                "trialing",
+                "unpaid"
+              ]
+            },
+            "planType": {
+              "type": "string",
+              "enum": ["basic", "premium", "enterprise", "trial"]
+            },
+            "lastPaymentDate": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "currentPeriodStart": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "currentPeriodEnd": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "cancelAtPeriodEnd": {
+              "default": false,
+              "type": "boolean"
+            },
+            "cancelledAt": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "trialStart": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "trialEnd": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "createdAt": {
+              "description": "When the record was created",
+              "type": "string"
+            },
+            "updatedAt": {
+              "description": "When the record was last updated",
+              "type": "string"
+            },
+            "plan": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "price": {
+                  "description": "Monthly price in cents",
+                  "type": "number"
+                },
+                "currency": {
+                  "default": "usd",
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                "features": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "creditsPerMonth": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "maxBookingsPerMonth": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "priorityBooking": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "price",
+                "currency",
+                "features",
+                "priorityBooking"
+              ],
+              "additionalProperties": false
+            },
+            "benefits": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "name"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "id",
+            "userId",
+            "active",
+            "subscriptionStatus",
+            "planType",
+            "cancelAtPeriodEnd",
+            "createdAt",
+            "updatedAt",
+            "plan",
+            "benefits"
+          ],
+          "additionalProperties": false
+        },
+        "availablePlans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["basic", "premium", "enterprise", "trial"]
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "features": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "highlighted": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "type",
+              "name",
+              "description",
+              "price",
+              "currency",
+              "features",
+              "highlighted"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "comparePlans": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["availablePlans", "comparePlans"],
+      "additionalProperties": false
+    },
+    "MembershipHistoryEntry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "membershipId": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "created",
+            "upgraded",
+            "downgraded",
+            "cancelled",
+            "reactivated",
+            "expired",
+            "paymentFailed",
+            "renewed"
+          ]
+        },
+        "fromPlan": {
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        },
+        "toPlan": {
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "required": ["id", "membershipId", "action", "timestamp"],
+      "additionalProperties": false
+    },
+    "MembershipHistoryResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Paginated response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Page items",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "membershipId": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "created",
+                  "upgraded",
+                  "downgraded",
+                  "cancelled",
+                  "reactivated",
+                  "expired",
+                  "paymentFailed",
+                  "renewed"
+                ]
+              },
+              "fromPlan": {
+                "type": "string",
+                "enum": ["basic", "premium", "enterprise", "trial"]
+              },
+              "toPlan": {
+                "type": "string",
+                "enum": ["basic", "premium", "enterprise", "trial"]
+              },
+              "reason": {
+                "type": "string"
+              },
+              "timestamp": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "required": ["id", "membershipId", "action", "timestamp"],
+            "additionalProperties": false
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "description": "Current page number",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Items per page",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "total": {
+              "description": "Total number of items",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalPages": {
+              "description": "Total number of pages",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasNext": {
+              "description": "Whether there is a next page",
+              "type": "boolean"
+            },
+            "hasPrev": {
+              "description": "Whether there is a previous page",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "page",
+            "limit",
+            "total",
+            "totalPages",
+            "hasNext",
+            "hasPrev"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["data", "pagination"],
+      "additionalProperties": false
+    },
+    "MembershipIdParam": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+    "MembershipWithPlan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "stripeCustomerId": {
+          "description": "Stripe customer ID",
+          "type": "string"
+        },
+        "stripeSubscriptionId": {
+          "description": "Stripe subscription ID",
+          "type": "string"
+        },
+        "active": {
+          "default": false,
+          "type": "boolean"
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "enum": [
+            "active",
+            "pastDue",
+            "canceled",
+            "incomplete",
+            "incompleteExpired",
+            "trialing",
+            "unpaid"
+          ]
+        },
+        "planType": {
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        },
+        "lastPaymentDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodStart": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodEnd": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "cancelAtPeriodEnd": {
+          "default": false,
+          "type": "boolean"
+        },
+        "cancelledAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "trialStart": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "trialEnd": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        },
+        "plan": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "price": {
+              "description": "Monthly price in cents",
+              "type": "number"
+            },
+            "currency": {
+              "default": "usd",
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 3
+            },
+            "features": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "creditsPerMonth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "maxBookingsPerMonth": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "priorityBooking": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "price",
+            "currency",
+            "features",
+            "priorityBooking"
+          ],
+          "additionalProperties": false
+        },
+        "benefits": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "name"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "active",
+        "subscriptionStatus",
+        "planType",
+        "cancelAtPeriodEnd",
+        "createdAt",
+        "updatedAt",
+        "plan",
+        "benefits"
+      ],
+      "additionalProperties": false
+    },
+    "ReactivateMembershipRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "planType": {
+          "description": "Change plan on reactivation",
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "SubscribeToPlanRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "planType": {
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        },
+        "paymentMethodId": {
+          "description": "Stripe payment method ID",
+          "type": "string"
+        },
+        "couponCode": {
+          "type": "string"
+        }
+      },
+      "required": ["planType", "paymentMethodId"],
+      "additionalProperties": false
+    },
+    "SubscribeToPlanResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "membership": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Universally Unique Identifier",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "userId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "stripeCustomerId": {
+              "description": "Stripe customer ID",
+              "type": "string"
+            },
+            "stripeSubscriptionId": {
+              "description": "Stripe subscription ID",
+              "type": "string"
+            },
+            "active": {
+              "default": false,
+              "type": "boolean"
+            },
+            "subscriptionStatus": {
+              "type": "string",
+              "enum": [
+                "active",
+                "pastDue",
+                "canceled",
+                "incomplete",
+                "incompleteExpired",
+                "trialing",
+                "unpaid"
+              ]
+            },
+            "planType": {
+              "type": "string",
+              "enum": ["basic", "premium", "enterprise", "trial"]
+            },
+            "lastPaymentDate": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "currentPeriodStart": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "currentPeriodEnd": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "cancelAtPeriodEnd": {
+              "default": false,
+              "type": "boolean"
+            },
+            "cancelledAt": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "trialStart": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "trialEnd": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            },
+            "createdAt": {
+              "description": "When the record was created",
+              "type": "string"
+            },
+            "updatedAt": {
+              "description": "When the record was last updated",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "userId",
+            "active",
+            "subscriptionStatus",
+            "planType",
+            "cancelAtPeriodEnd",
+            "createdAt",
+            "updatedAt"
+          ],
+          "additionalProperties": false
+        },
+        "subscriptionId": {
+          "type": "string"
+        },
+        "clientSecret": {
+          "description": "For 3D Secure authentication",
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": ["success", "membership", "subscriptionId", "message"],
+      "additionalProperties": false
+    },
+    "UpdateMembershipRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "stripeCustomerId": {
+          "type": "string"
+        },
+        "stripeSubscriptionId": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "subscriptionStatus": {
+          "type": "string",
+          "enum": [
+            "active",
+            "pastDue",
+            "canceled",
+            "incomplete",
+            "incompleteExpired",
+            "trialing",
+            "unpaid"
+          ]
+        },
+        "planType": {
+          "type": "string",
+          "enum": ["basic", "premium", "enterprise", "trial"]
+        },
+        "lastPaymentDate": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodStart": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "currentPeriodEnd": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "cancelAtPeriodEnd": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

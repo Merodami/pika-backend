@@ -3,13 +3,14 @@ import '@pika/environment'
 
 import { VOUCHER_SERVICE_NAME, VOUCHER_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import { ICacheService } from '@pika/redis'
+import { ICacheService, setCacheService } from '@pika/redis'
 import { BusinessServiceClient, FileStoragePort, logger } from '@pika/shared'
 import { TranslationClient, TranslationResolver } from '@pika/translation'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminVoucherRoutes } from './routes/AdminVoucherRoutes.js'
 import { createInternalVoucherRoutes } from './routes/InternalVoucherRoutes.js'
+import { createRedemptionAnalyticsRoutes } from './routes/RedemptionAnalyticsRoutes.js'
 import { createVoucherRoutes } from './routes/VoucherRoutes.js'
 
 /**
@@ -23,6 +24,7 @@ export async function createVoucherServer({
   translationClient,
   translationResolver,
   communicationClient,
+  businessServiceClient,
 }: {
   prisma: PrismaClient
   cacheService: ICacheService
@@ -30,9 +32,13 @@ export async function createVoucherServer({
   translationClient: TranslationClient
   translationResolver: TranslationResolver
   communicationClient?: any
+  businessServiceClient?: BusinessServiceClient
 }) {
   // Initialize service clients
-  const businessServiceClient = new BusinessServiceClient()
+  const businessClient = businessServiceClient || new BusinessServiceClient()
+
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
 
   logger.info(`Configuring Voucher service for port: ${VOUCHER_SERVICE_PORT}`)
 
@@ -111,10 +117,18 @@ export async function createVoucherServer({
     translationResolver,
     fileStorage,
     communicationClient,
-    businessServiceClient,
+    businessClient,
   )
 
   app.use('/admin/vouchers', adminRouter)
+
+  // Register redemption analytics routes
+  const redemptionAnalyticsRouter = createRedemptionAnalyticsRoutes(
+    prisma,
+    cacheService,
+  )
+
+  app.use('/admin/vouchers', redemptionAnalyticsRouter)
 
   // Register internal routes
   const internalRouter = createInternalVoucherRoutes(

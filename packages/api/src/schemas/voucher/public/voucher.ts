@@ -55,7 +55,7 @@ export type VoucherCodeResponse = z.infer<typeof VoucherCodeResponse>
 export const VoucherResponse = withTimestampsString({
   id: UUID,
   businessId: UUID,
-  categoryId: UUID,
+  categoryId: UUID.optional(),
   state: VoucherStateSchema,
   title: z.any().describe('Multilingual voucher title'),
   description: z.any().describe('Multilingual voucher description'),

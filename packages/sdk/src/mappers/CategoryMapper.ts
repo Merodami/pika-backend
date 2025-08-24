@@ -96,8 +96,8 @@ export class CategoryMapper {
 
     return {
       id: domain.id,
-      nameKey: domain.nameKey,
-      descriptionKey: domain.descriptionKey || undefined,
+      name: domain.nameKey, // Map nameKey to name for API response
+      description: domain.descriptionKey || undefined, // Map descriptionKey to description
       icon: domain.icon || undefined,
       parentId: domain.parentId || undefined,
       isActive: domain.isActive,
@@ -124,8 +124,8 @@ export class CategoryMapper {
   static fromDTO(dto: CategoryDTO): CategoryDomain {
     return {
       id: dto.id,
-      nameKey: dto.nameKey,
-      descriptionKey: dto.descriptionKey || null,
+      nameKey: dto.name, // Map name back to nameKey for domain
+      descriptionKey: dto.description || null, // Map description back to descriptionKey
       icon: dto.icon || null,
       parentId: dto.parentId || null,
       isActive: dto.isActive,

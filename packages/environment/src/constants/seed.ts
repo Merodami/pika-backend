@@ -11,7 +11,7 @@ export const SEED_CLEAR_DATABASE = getEnvVariable(
 export const SEED_SUPERUSER_EMAIL = getEnvVariable(
   'SEED_SUPERUSER_EMAIL',
   parseString,
-  'admin@pika.com',
+  'admin@thevoucherbook.com',
 )
 
 export const SEED_SUPERUSER_PASSWORD = getEnvVariable(

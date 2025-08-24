@@ -3,6 +3,11 @@ import type { ITranslationService } from '../services/TranslationService.js'
 export class TranslationClient {
   constructor(private readonly translationService: ITranslationService) {}
 
+  // Expose the translation service for middleware usage
+  get service(): ITranslationService {
+    return this.translationService
+  }
+
   async get(key: string, language: string, fallback?: string): Promise<string> {
     return this.translationService.get(key, language, fallback)
   }

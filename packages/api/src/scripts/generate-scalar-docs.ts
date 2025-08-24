@@ -84,7 +84,7 @@ async function generateScalarDocs() {
       console.log(`✅ Generated ${api.output}`)
     }
 
-    // Create a modern index page
+    // Create a modern index page - with environment awareness
     const indexHtml = `
 <!DOCTYPE html>
 <html lang="en">
@@ -318,6 +318,18 @@ async function generateScalarDocs() {
         }
     </style>
     <script>
+        // Check if we're in a production environment (non-localhost, non-development)
+        function isProductionEnvironment() {
+            const hostname = window.location.hostname;
+            const isDevelopment = hostname === 'localhost' || 
+                                 hostname === '127.0.0.1' || 
+                                 hostname.includes('.local') ||
+                                 hostname.startsWith('192.168.') ||
+                                 hostname.startsWith('10.') ||
+                                 hostname.startsWith('172.');
+            return !isDevelopment;
+        }
+        
         function handleLink(event, filename) {
             // If running from http server, prevent default and use directory path
             if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
@@ -327,12 +339,48 @@ async function generateScalarDocs() {
                     'public-api-docs.html': 'public',
                     'admin-api-docs.html': 'admin',
                     'internal-api-docs.html': 'internal',
-                    'all-apis-docs.html': 'all-apis-docs.html' // This one stays as HTML
+                    'all-apis-docs.html': 'all'
                 };
                 window.location.href = pathMap[filename] || filename;
             }
             // If running from file://, the default href with .html will work
         }
+        
+        // Hide non-public documentation in production
+        window.addEventListener('DOMContentLoaded', function() {
+            if (isProductionEnvironment()) {
+                // Hide admin and internal API cards in production
+                const adminCard = document.querySelector('.api-card:nth-child(2)');
+                const internalCard = document.querySelector('.api-card:nth-child(3)');
+                const allApisSection = document.querySelector('.all-apis');
+                
+                if (adminCard) adminCard.style.display = 'none';
+                if (internalCard) internalCard.style.display = 'none';
+                if (allApisSection) allApisSection.style.display = 'none';
+                
+                // Add a notice for developers
+                const container = document.querySelector('.api-grid');
+                if (container) {
+                    const notice = document.createElement('div');
+                    notice.className = 'api-card';
+                    notice.style.gridColumn = 'span 2';
+                    notice.style.background = '#fef3c7';
+                    notice.style.border = '2px solid #f59e0b';
+                    notice.innerHTML = \`
+                        <h2 style="color: #92400e;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
+                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            Developer Notice
+                        </h2>
+                        <p style="color: #78350f;">Admin and Internal API documentation is only available in development environments. The OpenAPI JSON files remain accessible for tooling integration.</p>
+                    \`;
+                    container.appendChild(notice);
+                }
+            }
+        });
     </script>
 </head>
 <body>

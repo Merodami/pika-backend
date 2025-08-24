@@ -1,0 +1,635 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User_profileTypes",
+  "type": "object",
+  "properties": {
+    "CurrentUserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "lastName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "name": {
+          "description": "Computed full name (firstName + lastName)",
+          "type": "string"
+        },
+        "phoneNumber": {
+          "description": "Phone number in E.164 format",
+          "type": "string",
+          "pattern": "^\\+[1-9]\\d{1,14}$"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "dateOfBirth": {
+          "description": "Date in YYYY-MM-DD format",
+          "type": "string"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "pattern": "^[a-z]{2}$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "customer", "business"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
+        },
+        "emailVerified": {
+          "type": "boolean"
+        },
+        "phoneVerified": {
+          "type": "boolean"
+        },
+        "primaryBusinessId": {
+          "description": "Primary business for business users",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "createdAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "lastLoginAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "name",
+        "role",
+        "status",
+        "emailVerified",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "DeleteAccountRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "password": {
+          "description": "Current password for verification",
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "description": "Optional reason for account deletion",
+          "type": "string",
+          "maxLength": 500
+        },
+        "confirmDeletion": {
+          "description": "Must be true to confirm deletion",
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": ["password", "confirmDeletion"],
+      "additionalProperties": false
+    },
+    "DeleteAccountResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "message": {
+          "default": "Account deletion scheduled. You will receive a confirmation email.",
+          "type": "string"
+        },
+        "deletionDate": {
+          "description": "When the account will be permanently deleted",
+          "type": "string"
+        }
+      },
+      "required": ["message", "deletionDate"],
+      "additionalProperties": false
+    },
+    "PublicUserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "firstName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "lastName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "createdAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        }
+      },
+      "required": ["id", "firstName", "lastName", "createdAt"],
+      "additionalProperties": false
+    },
+    "UpdatePreferencesRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "type": "boolean"
+                },
+                "bookingReminders": {
+                  "type": "boolean"
+                },
+                "sessionUpdates": {
+                  "type": "boolean"
+                },
+                "friendRequests": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "push": {
+              "type": "object",
+              "properties": {
+                "bookingReminders": {
+                  "type": "boolean"
+                },
+                "sessionUpdates": {
+                  "type": "boolean"
+                },
+                "friendRequests": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "privacy": {
+          "type": "object",
+          "properties": {
+            "profileVisibility": {
+              "type": "string",
+              "enum": ["public", "friends", "private"]
+            },
+            "showEmail": {
+              "type": "boolean"
+            },
+            "showPhone": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "display": {
+          "type": "object",
+          "properties": {
+            "theme": {
+              "type": "string",
+              "enum": ["light", "dark", "system"]
+            },
+            "language": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "pattern": "^[a-z]{2}$"
+            },
+            "timezone": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "UpdateProfileRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "lastName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "phoneNumber": {
+          "description": "Phone number in E.164 format",
+          "type": "string",
+          "pattern": "^\\+[1-9]\\d{1,14}$"
+        },
+        "dateOfBirth": {
+          "description": "Date in YYYY-MM-DD format",
+          "type": "string"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "pattern": "^[a-z]{2}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UploadAvatarRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "avatar": {
+          "type": "string"
+        }
+      },
+      "required": ["avatar"],
+      "additionalProperties": false
+    },
+    "UploadAvatarResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "avatarUrl": {
+          "description": "URL of the uploaded avatar",
+          "type": "string",
+          "format": "uri"
+        },
+        "message": {
+          "default": "Avatar uploaded successfully",
+          "type": "string"
+        }
+      },
+      "required": ["avatarUrl", "message"],
+      "additionalProperties": false
+    },
+    "UserFriendsResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "friends": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "firstName": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "lastName": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "avatarUrl": {
+                "type": "string",
+                "format": "uri"
+              },
+              "createdAt": {
+                "description": "ISO 8601 datetime with timezone",
+                "type": "string"
+              }
+            },
+            "required": ["id", "firstName", "lastName", "createdAt"],
+            "additionalProperties": false
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["friends", "totalCount"],
+      "additionalProperties": false
+    },
+    "UserPreferencesResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "object",
+              "properties": {
+                "marketing": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "bookingReminders": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "sessionUpdates": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "friendRequests": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "marketing",
+                "bookingReminders",
+                "sessionUpdates",
+                "friendRequests"
+              ],
+              "additionalProperties": false
+            },
+            "push": {
+              "type": "object",
+              "properties": {
+                "bookingReminders": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "sessionUpdates": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "friendRequests": {
+                  "default": true,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "bookingReminders",
+                "sessionUpdates",
+                "friendRequests"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": ["email", "push"],
+          "additionalProperties": false
+        },
+        "privacy": {
+          "type": "object",
+          "properties": {
+            "profileVisibility": {
+              "default": "friends",
+              "type": "string",
+              "enum": ["public", "friends", "private"]
+            },
+            "showEmail": {
+              "default": false,
+              "type": "boolean"
+            },
+            "showPhone": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          "required": ["profileVisibility", "showEmail", "showPhone"],
+          "additionalProperties": false
+        },
+        "display": {
+          "type": "object",
+          "properties": {
+            "theme": {
+              "default": "system",
+              "type": "string",
+              "enum": ["light", "dark", "system"]
+            },
+            "language": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "pattern": "^[a-z]{2}$"
+            },
+            "timezone": {
+              "type": "string"
+            }
+          },
+          "required": ["theme"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["notifications", "privacy", "display"],
+      "additionalProperties": false
+    },
+    "UserProfileResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "lastName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "name": {
+          "description": "Computed full name (firstName + lastName)",
+          "type": "string"
+        },
+        "phoneNumber": {
+          "description": "Phone number in E.164 format",
+          "type": "string",
+          "pattern": "^\\+[1-9]\\d{1,14}$"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "dateOfBirth": {
+          "description": "Date in YYYY-MM-DD format",
+          "type": "string"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "pattern": "^[a-z]{2}$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "customer", "business"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
+        },
+        "emailVerified": {
+          "type": "boolean"
+        },
+        "phoneVerified": {
+          "type": "boolean"
+        },
+        "primaryBusinessId": {
+          "description": "Primary business for business users",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "createdAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "lastLoginAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "name",
+        "role",
+        "status",
+        "emailVerified",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "UserResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "lastName": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "name": {
+          "description": "Computed full name (firstName + lastName)",
+          "type": "string"
+        },
+        "phoneNumber": {
+          "description": "Phone number in E.164 format",
+          "type": "string",
+          "pattern": "^\\+[1-9]\\d{1,14}$"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "dateOfBirth": {
+          "description": "Date in YYYY-MM-DD format",
+          "type": "string"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "pattern": "^[a-z]{2}$"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "customer", "business"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
+        },
+        "emailVerified": {
+          "type": "boolean"
+        },
+        "phoneVerified": {
+          "type": "boolean"
+        },
+        "primaryBusinessId": {
+          "description": "Primary business for business users",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "createdAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        },
+        "lastLoginAt": {
+          "description": "ISO 8601 datetime with timezone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "name",
+        "role",
+        "status",
+        "emailVerified",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

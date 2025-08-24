@@ -144,7 +144,9 @@ describe('PDF Service - Public API Integration Tests', () => {
       // Should only show published books (2 published, 1 draft created)
       expect(response.body.data).toHaveLength(2)
       expect(
-        response.body.data.every((book: any) => book.status === VoucherBookStatus.PUBLISHED),
+        response.body.data.every(
+          (book: any) => book.status === VoucherBookStatus.PUBLISHED,
+        ),
       ).toBe(true)
     })
 

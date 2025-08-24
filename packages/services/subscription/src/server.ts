@@ -1,6 +1,7 @@
 import { SUBSCRIPTION_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
+import { setCacheService } from '@pika/redis'
 import { logger, PaymentServiceClient } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
@@ -19,6 +20,9 @@ export interface ServerConfig {
 }
 
 export async function createSubscriptionServer(config: ServerConfig) {
+  // Set up global cache service for decorators
+  setCacheService(config.cacheService)
+
   const app = await createExpressServer({
     serviceName: 'subscription-service',
     port: SUBSCRIPTION_SERVICE_PORT,

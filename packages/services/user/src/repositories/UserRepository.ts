@@ -2,7 +2,12 @@ import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { type UserDomain, UserMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
-import type { PaginatedResult } from '@pika/types'
+import type {
+  PaginatedResult,
+  PartialUserSettings,
+  UserSettings,
+} from '@pika/types'
+import { createDefaultUserSettings, mergeUserSettings } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 export interface UserSearchParams {
@@ -28,6 +33,26 @@ export interface IUserRepository {
   update(id: string, data: any): Promise<UserDomain>
   delete(id: string): Promise<void>
   updateStatus(id: string, status: string): Promise<UserDomain>
+
+  // Settings methods
+  getUserSettings(userId: string): Promise<UserSettings>
+  updateUserSettings(
+    userId: string,
+    settings: UserSettings,
+  ): Promise<UserSettings>
+  patchUserSettings(
+    userId: string,
+    settingsUpdate: PartialUserSettings,
+  ): Promise<UserSettings>
+
+  // Firebase/Social auth methods
+  findByFirebaseUid(firebaseUid: string): Promise<UserDomain | null>
+  createUserIdentity(identityData: any): Promise<void>
+  updateDeviceInfo(userId: string, deviceInfo: any): Promise<void>
+  hasActiveBusinesses(userId: string): Promise<boolean>
+  verifyEmail(userId: string): Promise<void>
+  updateLastLogin(userId: string, lastLogin: Date): Promise<void>
+  getLinkedProviders(userId: string): Promise<string[]>
 
   // Internal API methods - return raw database data including password
   // TODO: In future, move these to a separate AuthDataRepository
@@ -64,12 +89,21 @@ export class UserRepository implements IUserRepository {
 
       // General search across multiple fields
       if (search) {
-        where.OR = [
+        const searchConditions: any[] = [
           { email: { contains: search, mode: 'insensitive' } },
           { firstName: { contains: search, mode: 'insensitive' } },
           { lastName: { contains: search, mode: 'insensitive' } },
-          { alias: { contains: search, mode: 'insensitive' } },
         ]
+
+        // Only search by ID if the search string looks like a UUID
+        const uuidRegex =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+        if (uuidRegex.test(search)) {
+          searchConditions.unshift({ id: { equals: search } }) // UUID exact match
+        }
+
+        where.OR = searchConditions
       }
 
       if (email) {
@@ -454,6 +488,140 @@ export class UserRepository implements IUserRepository {
     }
   }
 
+  async getUserSettings(userId: string): Promise<UserSettings> {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          settings: true,
+        },
+      })
+
+      if (!user) {
+        throw ErrorFactory.resourceNotFound('User', userId)
+      }
+
+      // Return default settings if no settings exist
+      if (!user.settings) {
+        // Check if user is business user to determine default settings
+        const userDetails = await this.prisma.user.findUnique({
+          where: { id: userId },
+          select: { role: true },
+        })
+        const isBusinessUser = userDetails?.role === 'business'
+
+        return createDefaultUserSettings(isBusinessUser)
+      }
+
+      return user.settings as unknown as UserSettings
+    } catch (error) {
+      logger.error('Failed to get user settings', { error, userId })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'getUserSettings',
+          'Failed to retrieve user settings',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async updateUserSettings(
+    userId: string,
+    settings: UserSettings,
+  ): Promise<UserSettings> {
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          settings: settings as any,
+          updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          settings: true,
+        },
+      })
+
+      return user.settings as unknown as UserSettings
+    } catch (error) {
+      logger.error('Failed to update user settings', {
+        error,
+        userId,
+        settings,
+      })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw ErrorFactory.resourceNotFound('User', userId)
+        }
+
+        throw ErrorFactory.databaseError(
+          'updateUserSettings',
+          'Failed to update user settings',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async patchUserSettings(
+    userId: string,
+    settingsUpdate: PartialUserSettings,
+  ): Promise<UserSettings> {
+    try {
+      // First, get current settings
+      const currentSettings = await this.getUserSettings(userId)
+
+      // Deep merge the settings update with current settings
+      const mergedSettings = mergeUserSettings(currentSettings, settingsUpdate)
+
+      // Update with merged settings
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          settings: mergedSettings as any,
+          updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          settings: true,
+        },
+      })
+
+      return user.settings as unknown as UserSettings
+    } catch (error) {
+      logger.error('Failed to patch user settings', {
+        error,
+        userId,
+        settingsUpdate,
+      })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw ErrorFactory.resourceNotFound('User', userId)
+        }
+
+        throw ErrorFactory.databaseError(
+          'patchUserSettings',
+          'Failed to patch user settings',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
   private buildOrderBy(sortBy: string, sortOrder: 'asc' | 'desc'): any {
     // Handle nested sorting for related fields
     if (sortBy.includes('.')) {
@@ -468,6 +636,221 @@ export class UserRepository implements IUserRepository {
 
     return {
       [sortBy]: sortOrder,
+    }
+  }
+
+  // Firebase/Social auth methods
+  async findByFirebaseUid(firebaseUid: string): Promise<UserDomain | null> {
+    try {
+      const userIdentity = await this.prisma.userIdentity.findUnique({
+        where: { firebaseUid },
+        include: { user: true },
+      })
+
+      if (!userIdentity?.user) {
+        return null
+      }
+
+      return UserMapper.fromDocument(userIdentity.user)
+    } catch (error) {
+      logger.error('Failed to find user by Firebase UID', {
+        error,
+        firebaseUid,
+      })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'findByFirebaseUid',
+          'Failed to retrieve user',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async createUserIdentity(identityData: any): Promise<void> {
+    try {
+      await this.prisma.userIdentity.create({
+        data: {
+          userId: identityData.userId,
+          provider: identityData.provider,
+          providerId: identityData.providerId,
+          firebaseUid: identityData.firebaseUid,
+          providerData: identityData.providerData || {},
+          isEmailVerified: identityData.isEmailVerified || false,
+          isPhoneVerified: identityData.isPhoneVerified || false,
+        },
+      })
+
+      logger.info('User identity created', {
+        userId: identityData.userId,
+        provider: identityData.provider,
+      })
+    } catch (error) {
+      logger.error('Failed to create user identity', { error, identityData })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw ErrorFactory.businessRuleViolation(
+            'User identity already exists for this provider',
+            'Each provider can only be linked once per user',
+          )
+        }
+
+        throw ErrorFactory.databaseError(
+          'createUserIdentity',
+          'Failed to create user identity',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async updateDeviceInfo(userId: string, deviceInfo: any): Promise<void> {
+    try {
+      // Store device info in user metadata or separate device tracking table
+      // For now, we'll store it in the user's metadata field
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          settings: {
+            ...((
+              await this.prisma.user.findUnique({
+                where: { id: userId },
+                select: { settings: true },
+              })
+            )?.settings as any),
+            lastDevice: {
+              ...deviceInfo,
+              lastSeen: new Date(),
+            },
+          },
+          updatedAt: new Date(),
+        },
+      })
+
+      logger.info('Device info updated', { userId, deviceInfo })
+    } catch (error) {
+      logger.error('Failed to update device info', {
+        error,
+        userId,
+        deviceInfo,
+      })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'updateDeviceInfo',
+          'Failed to update device info',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async hasActiveBusinesses(userId: string): Promise<boolean> {
+    try {
+      const count = await this.prisma.business.count({
+        where: {
+          userId,
+          active: true,
+          deletedAt: null,
+        },
+      })
+
+      return count > 0
+    } catch (error) {
+      logger.error('Failed to check active businesses', { error, userId })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'hasActiveBusinesses',
+          'Failed to check active businesses',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async verifyEmail(userId: string): Promise<void> {
+    try {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          emailVerified: true,
+          updatedAt: new Date(),
+        },
+      })
+
+      logger.info('Email verified', { userId })
+    } catch (error) {
+      logger.error('Failed to verify email', { error, userId })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'verifyEmail',
+          'Failed to verify email',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async updateLastLogin(userId: string, lastLogin: Date): Promise<void> {
+    try {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          lastLoginAt: lastLogin,
+          updatedAt: new Date(),
+        },
+      })
+
+      logger.info('Last login updated', { userId, lastLogin })
+    } catch (error) {
+      logger.error('Failed to update last login', { error, userId, lastLogin })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'updateLastLogin',
+          'Failed to update last login',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  async getLinkedProviders(userId: string): Promise<string[]> {
+    try {
+      const identities = await this.prisma.userIdentity.findMany({
+        where: { userId },
+        select: { provider: true },
+      })
+
+      return identities.map((identity) => identity.provider)
+    } catch (error) {
+      logger.error('Failed to get linked providers', { error, userId })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'getLinkedProviders',
+          'Failed to get linked providers',
+          error,
+        )
+      }
+
+      throw error
     }
   }
 }

@@ -3,6 +3,7 @@ import {
   GrantType,
   OAuthError,
   OAuthProvider,
+  SocialProvider,
   TokenType,
 } from '@pika/types'
 
@@ -41,5 +42,11 @@ export const OAuthErrorSchema = openapi(createZodEnum(OAuthError), {
 // Device type schema
 export const DeviceTypeSchema = openapi(createZodEnum(DeviceType), {
   description: 'Type of device used for authentication',
-  example: DeviceType.MOBILE,
+  example: DeviceType.IOS,
+})
+
+// Social provider schema
+export const SocialProviderSchema = openapi(createZodEnum(SocialProvider), {
+  description: 'Social authentication provider',
+  example: SocialProvider.GOOGLE,
 })

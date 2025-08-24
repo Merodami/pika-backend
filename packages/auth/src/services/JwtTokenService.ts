@@ -19,6 +19,8 @@ export interface User {
   role: UserRole
   status: UserStatus
   isActive(): boolean
+  // Business-specific fields (optional, only for business users)
+  hasActiveBusinesses?: boolean // True if user has at least one active, approved business
 }
 
 export interface TokenPayload {
@@ -27,6 +29,8 @@ export interface TokenPayload {
   role: UserRole
   status: UserStatus
   type: 'access' | 'refresh'
+  // Business-specific claims (only for business role users)
+  hasActiveBusinesses?: boolean
   iat?: number
   exp?: number
   iss?: string
@@ -131,6 +135,11 @@ export class JwtTokenService {
         type: 'access',
       }
 
+      // Add business-specific claims if user is a business role
+      if (user.role === UserRole.BUSINESS) {
+        accessPayload.hasActiveBusinesses = user.hasActiveBusinesses || false
+      }
+
       // Use appropriate key based on algorithm
       const signingKey = this.getSigningKey()
 
@@ -150,6 +159,11 @@ export class JwtTokenService {
         role: user.role,
         status: user.status,
         type: 'refresh',
+      }
+
+      // Add business-specific claims if user is a business role
+      if (user.role === UserRole.BUSINESS) {
+        refreshPayload.hasActiveBusinesses = user.hasActiveBusinesses || false
       }
 
       const refreshToken = jwt.sign(refreshPayload, signingKey, {
@@ -463,45 +477,59 @@ export class JwtTokenService {
   }
 
   /**
+   * Check if token is blacklisted in Redis cache
+   */
+  private async checkRedisBlacklist(jti: string): Promise<boolean> {
+    if (!this.cacheService) return false
+
+    const blacklistKey = `${this.TOKEN_BLACKLIST_PREFIX}${jti}`
+
+    // Check if the cache service has the exists method
+    if (typeof this.cacheService.exists === 'function') {
+      return await this.cacheService.exists(blacklistKey)
+    }
+
+    // Fallback: try to get the value if exists method is not available
+    const value = await this.cacheService.get(blacklistKey)
+
+    return value !== null
+  }
+
+  /**
+   * Check if token is blacklisted in Redis with error handling
+   */
+  private async isTokenBlacklistedInRedis(token: string): Promise<boolean> {
+    if (!this.cacheService) return false
+
+    try {
+      const decoded = this.decodeTokenUnsafe(token)
+
+      if (!decoded?.jti) return false
+
+      return await this.checkRedisBlacklist(decoded.jti)
+    } catch (error) {
+      logger.warn(
+        'Redis blacklist check failed, falling back to memory',
+        error as Error,
+        {
+          component: 'jwt-service',
+          operation: 'check-blacklist',
+          fallback: 'memory',
+        },
+      )
+
+      return false
+    }
+  }
+
+  /**
    * Check if a token is blacklisted (Redis first, memory fallback)
    */
   private async isTokenBlacklisted(token: string): Promise<boolean> {
     // Check Redis first if available
-    if (this.cacheService) {
-      try {
-        const decoded = this.decodeTokenUnsafe(token)
+    const redisResult = await this.isTokenBlacklistedInRedis(token)
 
-        if (decoded?.jti) {
-          const blacklistKey = `${this.TOKEN_BLACKLIST_PREFIX}${decoded.jti}`
-
-          // Check if the cache service has the exists method
-          if (typeof this.cacheService.exists === 'function') {
-            const isBlacklisted = await this.cacheService.exists(blacklistKey)
-
-            if (isBlacklisted) {
-              return true
-            }
-          } else {
-            // Fallback: try to get the value if exists method is not available
-            const value = await this.cacheService.get(blacklistKey)
-
-            if (value !== null) {
-              return true
-            }
-          }
-        }
-      } catch (error) {
-        logger.warn(
-          'Redis blacklist check failed, falling back to memory',
-          error as Error,
-          {
-            component: 'jwt-service',
-            operation: 'check-blacklist',
-            fallback: 'memory',
-          },
-        )
-      }
-    }
+    if (redisResult) return true
 
     // Fallback to in-memory blacklist
     return this.blacklistedTokens.has(token)

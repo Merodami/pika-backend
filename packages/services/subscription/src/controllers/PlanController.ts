@@ -1,11 +1,9 @@
 import { subscriptionCommon, subscriptionPublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SubscriptionPlanMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 // Plan controller
@@ -61,11 +59,6 @@ export class PlanController {
    * GET /plans
    * Get all subscription plans
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'plans-list',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getPlans(
     request: Request,
     response: Response,

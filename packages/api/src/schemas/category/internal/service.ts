@@ -18,8 +18,8 @@ import { paginatedResponse } from '../../shared/responses.js'
 export const InternalCategoryData = openapi(
   z.object({
     id: UUID,
-    nameKey: z.string(),
-    descriptionKey: z.string().optional(),
+    name: z.string(),
+    description: z.string().optional(),
     icon: z.string().optional(),
     parentId: UUID.optional(),
     isActive: z.boolean(),

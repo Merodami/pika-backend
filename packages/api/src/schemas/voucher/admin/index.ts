@@ -5,3 +5,4 @@
 export * from './management.js'
 export * from './parameters.js'
 export * from './queries.js'
+export * from './redemptionAnalytics.js'

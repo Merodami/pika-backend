@@ -11,30 +11,28 @@ model Business {
   approvedBy             String?   @map("approved_by") @db.Uuid // Admin who approved
   approvedAt             DateTime? @map("approved_at") @db.Timestamptz(6) // When it was approved
   avgRating              Decimal   @default(0) @map("avg_rating") @db.Decimal(3, 2)
+  favoriteCount          Int       @default(0) @map("favorite_count") // Number of users who favorited this business
   createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt              DateTime? @map("deleted_at") @db.Timestamptz(6)
-  // TODO
-  // Add social media links
-  // Add business hours
-  // Add business address
-  // Add business phone number
-  // Add business email
-  // Add business website
-  // Add business logo
 
   // Relations
-  user        User          @relation(fields: [userId], references: [id])
-  category    Category?     @relation(fields: [categoryId], references: [id])
-  vouchers    Voucher[]     // Vouchers created by this business
-  scans       VoucherScan[] // Scans that happened at this business location
-  fraudCases  FraudCase[]   // Fraud cases involving this business
+  user                 User                  @relation(fields: [userId], references: [id])
+  category             Category?             @relation(fields: [categoryId], references: [id])
+  vouchers             Voucher[]             // Vouchers created by this business
+  scans                VoucherScan[]         // Scans that happened at this business location
+  fraudCases           FraudCase[]           // Fraud cases involving this business
+  businessRegistration BusinessRegistration? // Registration data (one-time use)
+  businessDetails      BusinessDetails?      // Additional business information
+  primaryBusinessUsers User[]                @relation("UserPrimaryBusiness") // Users who have this as their primary business
+  favoritedBy          FavouriteBusiness[]   // Users who favorited this business
 
   @@index([userId])
   @@index([categoryId])
   @@index([verified, active])
   @@index([avgRating])
+  @@index([favoriteCount(sort: Desc)])
   @@index([deletedAt])
   @@map("businesses")
-  @@schema("marketplace")
+  @@schema("business")
 }

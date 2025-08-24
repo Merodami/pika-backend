@@ -1,5 +1,10 @@
 import { userAdmin, userPublic } from '@pika/api'
-import { adaptMulterFile, RequestContext, validateResponse } from '@pika/http'
+import {
+  adaptMulterFile,
+  getValidatedQuery,
+  RequestContext,
+  validateResponse,
+} from '@pika/http'
 import { UserMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import { VerificationType } from '@pika/types'
@@ -16,6 +21,13 @@ import type { NextFunction, Request, Response } from 'express'
 export class AdminUserController {
   constructor(private readonly userService: IUserService) {
     // Bind methods to preserve 'this' context
+    this.getAllUsers = this.getAllUsers.bind(this)
+    this.getUserByEmail = this.getUserByEmail.bind(this)
+    this.createUser = this.createUser.bind(this)
+    this.updateUser = this.updateUser.bind(this)
+    this.updateUserStatus = this.updateUserStatus.bind(this)
+    this.banUser = this.banUser.bind(this)
+    this.unbanUser = this.unbanUser.bind(this)
     this.verifyUser = this.verifyUser.bind(this)
     this.resendVerification = this.resendVerification.bind(this)
     this.uploadUserAvatar = this.uploadUserAvatar.bind(this)
@@ -24,6 +36,200 @@ export class AdminUserController {
     this.getUserVerificationStatus = this.getUserVerificationStatus.bind(this)
     this.getUserById = this.getUserById.bind(this)
     this.deleteUser = this.deleteUser.bind(this)
+  }
+
+  /**
+   * GET /admin/users
+   * List all users with filters
+   */
+  async getAllUsers(
+    req: Request,
+    res: Response<userAdmin.AdminUserListResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const query = getValidatedQuery<userAdmin.AdminUserQueryParams>(req)
+
+      // Use validated query params directly
+      const result = await this.userService.getAllUsers(query)
+
+      // Convert to admin DTOs
+      const adminResult: userAdmin.AdminUserListResponse = {
+        data: result.data.map(UserMapper.toAdminDTO),
+        pagination: result.pagination,
+      }
+
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserListResponse,
+        adminResult,
+        'AdminUserController.getAllUsers',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /admin/users/email/:email
+   * Get user by email address
+   */
+  async getUserByEmail(
+    req: Request<userAdmin.EmailParam>,
+    res: Response<userAdmin.AdminUserDetailResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { email } = req.params
+
+      const user = await this.userService.getUserByEmail(email)
+
+      const adminDto = UserMapper.toAdminDTO(user)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserDetailResponse,
+        adminDto,
+        'AdminUserController.getUserByEmail',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /admin/users
+   * Create new user
+   */
+  async createUser(
+    req: Request<{}, {}, userAdmin.AdminCreateUserRequest>,
+    res: Response<userAdmin.AdminUserDetailResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const data = req.body
+
+      const user = await this.userService.createAdminUser(data)
+
+      const adminDto = UserMapper.toAdminDTO(user)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserDetailResponse,
+        adminDto,
+        'AdminUserController.createUser',
+      )
+
+      res.status(201).json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PATCH /admin/users/:id
+   * Update user information
+   */
+  async updateUser(
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminUpdateUserRequest>,
+    res: Response<userAdmin.AdminUserDetailResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: userId } = req.params
+      const data = req.body
+
+      const user = await this.userService.updateUser(userId, data)
+
+      const adminDto = UserMapper.toAdminDTO(user)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserDetailResponse,
+        adminDto,
+        'AdminUserController.updateUser',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PATCH /admin/users/:id/status
+   * Update user account status
+   */
+  async updateUserStatus(
+    req: Request<
+      userAdmin.UserIdParam,
+      {},
+      userAdmin.AdminUpdateUserStatusRequest
+    >,
+    res: Response<userAdmin.AdminUserDetailResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: userId } = req.params
+      const { status } = req.body
+
+      // Update user status
+      const user = await this.userService.updateUser(userId, { status })
+
+      // TODO: Handle suspension duration if status is SUSPENDED
+      // TODO: Send notification if notifyUser is true
+      // TODO: Log admin action with reason
+
+      const adminDto = UserMapper.toAdminDTO(user)
+      const validatedResponse = validateResponse(
+        userAdmin.AdminUserDetailResponse,
+        adminDto,
+        'AdminUserController.updateUserStatus',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PUT /admin/users/:id/ban
+   * Ban user account
+   */
+  async banUser(
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminBanUserRequest>,
+    res: Response<void>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: userId } = req.params
+      const { reason, duration, notifyUser } = req.body
+
+      await this.userService.banUser(userId, { reason, duration, notifyUser })
+
+      res.status(204).send()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * PUT /admin/users/:id/unban
+   * Unban user account
+   */
+  async unbanUser(
+    req: Request<userAdmin.UserIdParam, {}, userAdmin.AdminUnbanUserRequest>,
+    res: Response<void>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const { id: userId } = req.params
+      const { reason, notifyUser } = req.body
+
+      await this.userService.unbanUser(userId, { reason, notifyUser })
+
+      res.status(204).send()
+    } catch (error) {
+      next(error)
+    }
   }
 
   /**

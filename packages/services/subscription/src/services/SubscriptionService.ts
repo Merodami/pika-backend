@@ -27,6 +27,8 @@ import {
   TEMPLATE_KEYS,
 } from '@subscription/types/constants.js'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
+
 export interface ISubscriptionService {
   createSubscription(
     userId: string,
@@ -134,7 +136,10 @@ export class SubscriptionService implements ISubscriptionService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL * CACHE_TTL_MULTIPLIERS.SUBSCRIPTION,
-    prefix: 'subscription',
+    prefix: CACHE_KEYS.SUBSCRIPTION.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getSubscriptionById(id: string): Promise<SubscriptionWithPlanDomain> {
     // Validate UUID format
@@ -153,7 +158,10 @@ export class SubscriptionService implements ISubscriptionService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL * CACHE_TTL_MULTIPLIERS.USER_SUBSCRIPTION,
-    prefix: 'user-subscription',
+    prefix: CACHE_KEYS.SUBSCRIPTION.USER,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${args[0]}`
+    },
   })
   async getUserActiveSubscription(
     userId: string,
@@ -163,7 +171,10 @@ export class SubscriptionService implements ISubscriptionService {
 
   @Cache({
     ttl: REDIS_DEFAULT_TTL * CACHE_TTL_MULTIPLIERS.SUBSCRIPTIONS_LIST,
-    prefix: 'subscriptions',
+    prefix: CACHE_KEYS.ADMIN.SUBSCRIPTIONS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      return `${prefix}:${JSON.stringify(args[0])}`
+    },
   })
   async getAllSubscriptions(
     params: SubscriptionSearchParams,
@@ -391,9 +402,14 @@ export class SubscriptionService implements ISubscriptionService {
     userId: string,
   ): Promise<void> {
     try {
-      await this.cache.del(`subscription:${subscriptionId}`)
-      await this.cache.del(`user-subscription:${userId}`)
-      await this.cache.delPattern('subscriptions:*')
+      await this.cache.del(
+        `${CACHE_KEYS.SUBSCRIPTION.SINGLE}:${subscriptionId}`,
+      )
+      await this.cache.del(`${CACHE_KEYS.SUBSCRIPTION.USER}:${userId}`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.ADMIN.SUBSCRIPTIONS}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.SUBSCRIPTION.ACTIVE}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.SUBSCRIPTION.HISTORY}:*`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.SUBSCRIPTION.STATUS}:*`)
     } catch (error) {
       logger.error('Failed to clear subscription cache', error)
     }
@@ -401,8 +417,14 @@ export class SubscriptionService implements ISubscriptionService {
 
   private async clearUserSubscriptionCache(userId: string): Promise<void> {
     try {
-      await this.cache.del(`user-subscription:${userId}`)
-      await this.cache.delPattern('subscriptions:*')
+      await this.cache.del(`${CACHE_KEYS.SUBSCRIPTION.USER}:${userId}`)
+      await this.cache.delPattern?.(`${CACHE_KEYS.ADMIN.SUBSCRIPTIONS}:*`)
+      await this.cache.delPattern?.(
+        `${CACHE_KEYS.SUBSCRIPTION.HISTORY}:${userId}:*`,
+      )
+      await this.cache.delPattern?.(
+        `${CACHE_KEYS.SUBSCRIPTION.STATUS}:${userId}`,
+      )
     } catch (error) {
       logger.error('Failed to clear user subscription cache', error)
     }

@@ -261,6 +261,6 @@ export const VOUCHER_JWT_ALGORITHM = getEnvVariable(
 
 export const VOUCHER_JWT_PRIVATE_KEY = getEnvVariable(
   'VOUCHER_JWT_PRIVATE_KEY',
-  String,
+  (value: string) => value.replace(/\\n/g, '\n'),
   '',
 )

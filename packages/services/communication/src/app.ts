@@ -44,8 +44,8 @@ export async function startService(): Promise<void> {
         region: AWS_REGION || 'us-east-1',
         accessKeyId: AWS_ACCESS_KEY_ID,
         secretAccessKey: AWS_SECRET_ACCESS_KEY,
-        fromEmail: EMAIL_FROM || 'noreply@pikaom',
-        fromName: EMAIL_FROM_NAME || 'Pika',
+        fromEmail: EMAIL_FROM || 'noreply@thevoucherbook.com',
+        fromName: EMAIL_FROM_NAME || 'The VoucherBook',
       },
     })
 

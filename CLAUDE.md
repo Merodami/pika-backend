@@ -2,38 +2,31 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## CRITICAL: PROJECT MIGRATION IN PROGRESS
+## PROJECT NAME: VOUCHERBOOK
 
-**IMPORTANT CONTEXT**: This project is undergoing a major architectural migration from the old "Pika" codebase (located in `/pika` folder) to a new modern microservices architecture (formerly called "Solo60", now renamed to "Pika"). All references to "Solo60" have been renamed to "Pika" throughout the codebase.
+**IMPORTANT**: This project is now called **VoucherBook**. The previous name "Pika" is no longer used. All references throughout the codebase should use "VoucherBook" or "voucherbook" (lowercase for technical identifiers).
 
-### Migration Context
+### Project Context
 
-- **Old Project**: Original Pika codebase in `/pika-old` folder - legacy architecture
-- **New Project**: Modern microservices architecture (this codebase) - formerly Solo60, now Pika
-- **Status**: Active migration in progress - build/test commands may be broken due to renaming
+- **Current Name**: VoucherBook - A comprehensive voucher marketplace platform
+- **Previous Names**: Pika (deprecated), Solo60 (deprecated)
+- **Package Prefix**: Still using `@pika/` for technical reasons, but the product name is VoucherBook
+- **Status**: Active development - modern microservices architecture
 
-### Why This Migration
+### Architecture Overview
 
-- **Better Architecture**: Clean Architecture with proper separation of concerns (Controller → Service → Repository)
-- **Improved API Structure**: Proper separation between public, admin, and internal APIs
-- **Modern Infrastructure**: Working API Gateway on Vercel, better service communication patterns
-- **Superior Technology Choices**: Zod over Typebox, better storage service, integrated mailing system
-- **Firebase Ready**: Architecture prepared for future Firebase integration
+- **Clean Architecture**: Proper separation of concerns (Controller → Service → Repository)
+- **API Structure**: Clear separation between public, admin, and internal APIs
+- **Modern Infrastructure**: API Gateway on Vercel, robust service communication patterns
+- **Technology Choices**: Zod validation, comprehensive storage service, integrated mailing system
+- **External Integrations**: Firebase Auth, Stripe, AWS services
 
-### Migration Strategy
+### Development Guidelines
 
-- Follow the new project's Clean Architecture patterns for all migrated services
-- Consolidate related services where appropriate (e.g., voucher + redemptions)
-- Keep infrastructure and core services from new architecture
-- Remove domain-specific services (gym, session, social) and rebuild as needed
+- Follow Clean Architecture patterns for all services
 - Maintain proper API separation (public/admin/internal)
-
-### During Migration
-
-- **DO NOT** run build/test commands - they are temporarily broken due to renaming
-- **DO** analyze both architectures before making changes
-- **DO** follow patterns from the new architecture when migrating services
-- **DO** consolidate services where it makes architectural sense
+- Use established patterns from existing services as templates
+- Ensure all user-facing content uses "VoucherBook" branding
 
 ## TOP PRIORITY INSTRUCTIONS
 

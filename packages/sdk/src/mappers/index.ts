@@ -1,6 +1,7 @@
 export * from './BusinessMapper.js'
 export * from './CategoryMapper.js'
 export * from './CommunicationLogMapper.js'
+export * from './FavoriteMapper.js'
 export * from './FileStorageLogMapper.js'
 export * from './internal/InternalCommunicationMapper.js'
 export * from './NotificationMapper.js'

@@ -1,4 +1,5 @@
-import type { ICacheService } from '@pika/redis'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { Cache, type ICacheService } from '@pika/redis'
 import type {
   CreateSupportCommentDTO,
   SupportCommentDomain,
@@ -8,6 +9,7 @@ import { SupportCommentMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   CommentSearchParams,
   CreateSupportCommentInput,
@@ -43,6 +45,15 @@ export class AdminSupportCommentService implements IAdminSupportCommentService {
   /**
    * Get all comments in the system
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.ADMIN.COMMENTS,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const parsedIncludes = args[0]
+
+      return `${prefix}:${JSON.stringify(parsedIncludes || {})}`
+    },
+  })
   async getAllComments(
     parsedIncludes?: ParsedIncludes,
   ): Promise<SupportCommentDomain[]> {
@@ -55,6 +66,16 @@ export class AdminSupportCommentService implements IAdminSupportCommentService {
   /**
    * Get all comments for a problem including internal notes
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.COMMENT.BY_PROBLEM,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      const parsedIncludes = args[1]
+
+      return `${prefix}:${params.problemId}:admin:${JSON.stringify({ page: params.page, limit: params.limit })}:${JSON.stringify(parsedIncludes || {})}`
+    },
+  })
   async getCommentsByProblemId(
     params: CommentSearchParams,
     parsedIncludes?: ParsedIncludes,

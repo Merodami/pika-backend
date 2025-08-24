@@ -22,6 +22,8 @@ const CONTEXT_HEADERS = [
   'x-b3-sampled',
   'x-b3-flags',
   'x-ot-span-context',
+  'accept-language',
+  'x-user-language',
 ] as const
 
 /**

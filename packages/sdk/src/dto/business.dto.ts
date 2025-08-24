@@ -6,16 +6,38 @@
 import type { CategoryDTO } from './category.dto.js'
 import type { UserDTO } from './user.dto.js'
 
+// ============= Business Details DTO =============
+
+export interface BusinessDetailsDTO {
+  id: string
+  businessId: string
+  phone?: string
+  email?: string
+  website?: string
+  logoUrl?: string
+  street?: string
+  city?: string
+  state?: string
+  postalCode?: string
+  country?: string
+  operatingHours?: any
+  socialMedia?: any
+  additionalInfo?: any
+  createdAt: string
+  updatedAt: string
+}
+
 // ============= Business DTO =============
 
 export interface BusinessDTO {
   id: string
   userId: string
-  businessNameKey: string
-  businessDescriptionKey?: string
+  businessName: string
+  businessDescription?: string
   categoryId: string
   verified: boolean
   active: boolean
+  approved: boolean
   avgRating: number
   createdAt: string
   updatedAt: string
@@ -23,6 +45,7 @@ export interface BusinessDTO {
   // Optional relations
   user?: UserDTO
   category?: CategoryDTO
+  businessDetails?: BusinessDetailsDTO
 }
 
 // ============= Business List Response DTO =============

@@ -1,13 +1,14 @@
 import type { IBusinessService } from '@business/services/BusinessService.js'
 import { businessPublic, mapSortOrder, shared } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
+  adaptMulterFile,
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { BusinessMapper } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -22,21 +23,16 @@ export class BusinessController {
     this.getAllBusinesses = this.getAllBusinesses.bind(this)
     this.getBusinessById = this.getBusinessById.bind(this)
     this.getBusinessByUserId = this.getBusinessByUserId.bind(this)
-    this.getMyBusiness = this.getMyBusiness.bind(this)
+    this.getMyBusinesses = this.getMyBusinesses.bind(this)
     this.createMyBusiness = this.createMyBusiness.bind(this)
     this.updateMyBusiness = this.updateMyBusiness.bind(this)
+    this.uploadBusinessLogo = this.uploadBusinessLogo.bind(this)
   }
 
   /**
    * GET /businesses
    * Get all businesses with filters and pagination (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'businesses',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllBusinesses(
     req: Request,
     res: Response<businessPublic.BusinessListResponse>,
@@ -44,6 +40,7 @@ export class BusinessController {
   ): Promise<void> {
     try {
       const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Map API query to service params - only show active businesses to public
       const params = {
@@ -58,7 +55,10 @@ export class BusinessController {
         sortOrder: mapSortOrder(query.sortOrder),
       }
 
-      const result = await this.businessService.getAllBusinesses(params)
+      const result = await this.businessService.getAllBusinesses(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, BusinessMapper.toDTO)
@@ -78,11 +78,6 @@ export class BusinessController {
    * GET /businesses/:business_id
    * Get business by ID (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'business',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getBusinessById(
     req: Request<businessPublic.BusinessPathParams>,
     res: Response<businessPublic.BusinessResponse>,
@@ -92,13 +87,19 @@ export class BusinessController {
       const { id: businessId } = req.params
       const query =
         getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Parse include parameter
       const includeRelations = query.include?.split(',') || []
-      const business = await this.businessService.getBusinessById(businessId, {
-        user: includeRelations.includes('user'),
-        category: includeRelations.includes('category'),
-      })
+      const business = await this.businessService.getBusinessById(
+        businessId,
+        {
+          user: includeRelations.includes('user'),
+          category: includeRelations.includes('category'),
+          businessDetails: includeRelations.includes('businessDetails'),
+        },
+        language,
+      )
 
       // Check if business is active for public access
       if (!business.active) {
@@ -125,11 +126,6 @@ export class BusinessController {
    * GET /businesses/user/:user_id
    * Get business by user ID (public)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'business:user',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getBusinessByUserId(
     req: Request<shared.UserIdParam>,
     res: Response<businessPublic.BusinessResponse>,
@@ -139,13 +135,19 @@ export class BusinessController {
       const { id: userId } = req.params
       const query =
         getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
+      const language = getRequestLanguage(req)
 
       // Parse include parameter
       const includeRelations = query.include?.split(',') || []
-      const business = await this.businessService.getBusinessByUserId(userId, {
-        user: includeRelations.includes('user'),
-        category: includeRelations.includes('category'),
-      })
+      const business = await this.businessService.getBusinessByUserId(
+        userId,
+        {
+          user: includeRelations.includes('user'),
+          category: includeRelations.includes('category'),
+          businessDetails: includeRelations.includes('businessDetails'),
+        },
+        language,
+      )
 
       // Check if business is active for public access
       if (!business.active) {
@@ -170,34 +172,47 @@ export class BusinessController {
 
   /**
    * GET /businesses/me
-   * Get current authenticated user's business (business owner)
+   * Get all businesses for current authenticated user (business owner)
+   * Returns paginated list of user's businesses
    */
-  async getMyBusiness(
+  async getMyBusinesses(
     req: Request,
-    res: Response<businessPublic.BusinessResponse>,
+    res: Response<businessPublic.BusinessListResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
-      const query =
-        getValidatedQuery<businessPublic.BusinessDetailQueryParams>(req)
+      const query = getValidatedQuery<businessPublic.BusinessQueryParams>(req)
+      const language = getRequestLanguage(req)
 
-      // Parse include parameter
-      const includeRelations = query.include?.split(',') || []
-      const business = await this.businessService.getBusinessByUserId(userId, {
-        user: includeRelations.includes('user'),
-        category: includeRelations.includes('category'),
-      })
+      // Build search params with userId filter
+      // For business owners, show all their businesses (active and inactive)
+      // unless they specifically filter by active status
+      const params = {
+        userId, // Filter by current user
+        categoryId: query.categoryId,
+        verified: query.verified,
+        active: query.active, // undefined = show all, true/false = filter
+        minRating: query.minRating,
+        search: query.search,
+        page: query.page || 1,
+        limit: query.limit || PAGINATION_DEFAULT_LIMIT,
+        sortBy: query.sortBy || 'createdAt',
+        sortOrder: mapSortOrder(query.sortOrder),
+      }
 
-      // Transform to DTO
-      const response = BusinessMapper.toDTO(business)
+      const result = await this.businessService.getAllBusinesses(
+        params,
+        language,
+      )
 
-      // Validate response against Zod schema
+      // Use paginatedResponse utility + validation
+      const response = paginatedResponse(result, BusinessMapper.toDTO)
       const validatedResponse = validateResponse(
-        businessPublic.BusinessResponse,
+        businessPublic.BusinessListResponse,
         response,
-        'BusinessController.getMyBusiness',
+        'BusinessController.getMyBusinesses',
       )
 
       res.json(validatedResponse)
@@ -218,13 +233,14 @@ export class BusinessController {
     try {
       const context = RequestContext.getContext(req)
       const authenticatedUserId = context.userId
+      const language = getRequestLanguage(req)
 
       const data = {
         ...req.body,
         userId: authenticatedUserId,
       }
 
-      const business = await this.businessService.createBusiness(data)
+      const business = await this.businessService.createBusiness(data, language)
 
       // Transform to DTO
       const response = BusinessMapper.toDTO(business)
@@ -254,10 +270,14 @@ export class BusinessController {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
+      const language = getRequestLanguage(req)
 
       // Get user's business first
-      const existingBusiness =
-        await this.businessService.getBusinessByUserId(userId)
+      const existingBusiness = await this.businessService.getBusinessByUserId(
+        userId,
+        undefined,
+        language,
+      )
 
       const business = await this.businessService.updateBusiness(
         existingBusiness.id,
@@ -272,6 +292,54 @@ export class BusinessController {
         businessPublic.BusinessResponse,
         response,
         'BusinessController.updateMyBusiness',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * POST /businesses/me/logo
+   * Upload business logo for current authenticated user's business
+   */
+  async uploadBusinessLogo(
+    req: Request,
+    res: Response<businessPublic.UploadBusinessLogoResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const context = RequestContext.getContext(req)
+      const userId = context.userId
+
+      // Get user's business first
+      const existingBusiness = await this.businessService.getBusinessByUserId(
+        userId,
+        undefined,
+      )
+
+      // Get the uploaded file from Multer
+      const multerFile = req.file
+
+      // Validate the uploaded file (this will throw if file is undefined)
+      if (!multerFile) {
+        throw ErrorFactory.badRequest('No file uploaded')
+      }
+
+      // Adapt the multer file to our FileUpload format (file is validated above)
+      const adaptedFile = adaptMulterFile(multerFile)
+
+      const logoUrl = await this.businessService.uploadBusinessLogo(
+        existingBusiness.id,
+        adaptedFile,
+      )
+
+      const response = { logoUrl }
+      const validatedResponse = validateResponse(
+        businessPublic.UploadBusinessLogoResponse,
+        response,
+        'BusinessController.uploadBusinessLogo',
       )
 
       res.json(validatedResponse)
