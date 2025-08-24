@@ -1,9 +1,6 @@
-import axios from 'axios'
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
-import {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-} from '@pika/environment'
+import axios from 'axios'
 
 /**
  * Google OAuth 2.0 Client
@@ -11,9 +8,10 @@ import {
  */
 export class GoogleOAuthClient {
   private readonly tokenEndpoint = 'https://oauth2.googleapis.com/token'
-  private readonly userInfoEndpoint = 'https://www.googleapis.com/oauth2/v3/userinfo'
+  private readonly userInfoEndpoint =
+    'https://www.googleapis.com/oauth2/v3/userinfo'
   private configWarningShown = false
-  
+
   constructor(
     private readonly clientId: string = GOOGLE_CLIENT_ID || '',
     private readonly clientSecret: string = GOOGLE_CLIENT_SECRET || '',
@@ -35,7 +33,7 @@ export class GoogleOAuthClient {
   }> {
     if (!this.clientId || !this.clientSecret) {
       throw ErrorFactory.serviceUnavailable(
-        'Google OAuth not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.'
+        'Google OAuth not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.',
       )
     }
 
@@ -53,10 +51,11 @@ export class GoogleOAuthClient {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-        }
+        },
       )
 
-      const { id_token, access_token, refresh_token, expires_in } = response.data
+      const { id_token, access_token, refresh_token, expires_in } =
+        response.data
 
       if (!id_token) {
         throw ErrorFactory.badRequest('No ID token received from Google')
@@ -75,12 +74,13 @@ export class GoogleOAuthClient {
 
       if (error.response?.status === 400) {
         throw ErrorFactory.badRequest(
-          error.response?.data?.error_description || 'Invalid authorization code'
+          error.response?.data?.error_description ||
+            'Invalid authorization code',
         )
       }
 
       throw ErrorFactory.serviceUnavailable(
-        'Failed to exchange Google authorization code'
+        'Failed to exchange Google authorization code',
       )
     }
   }
@@ -120,7 +120,9 @@ export class GoogleOAuthClient {
         error: error.response?.data || error.message,
       })
 
-      throw ErrorFactory.serviceUnavailable('Failed to get Google user information')
+      throw ErrorFactory.serviceUnavailable(
+        'Failed to get Google user information',
+      )
     }
   }
 
@@ -149,7 +151,7 @@ export class GoogleOAuthClient {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-        }
+        },
       )
 
       return {
@@ -178,7 +180,7 @@ export class GoogleOAuthClient {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-        }
+        },
       )
     } catch (error: any) {
       logger.error('Google token revocation failed', {
@@ -196,13 +198,14 @@ export class GoogleOAuthClient {
     try {
       // Split the JWT token
       const parts = idToken.split('.')
+
       if (parts.length !== 3) {
         throw new Error('Invalid ID token format')
       }
 
       // Decode the payload (second part)
       const payload = JSON.parse(
-        Buffer.from(parts[1], 'base64url').toString('utf-8')
+        Buffer.from(parts[1], 'base64url').toString('utf-8'),
       )
 
       return payload

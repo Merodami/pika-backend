@@ -1,4 +1,9 @@
-import type { FavouriteBusiness, FavouriteVoucher, Business, Voucher } from '@prisma/client'
+import type {
+  Business,
+  FavouriteBusiness,
+  FavouriteVoucher,
+  Voucher,
+} from '@prisma/client'
 
 import { BusinessMapper } from './BusinessMapper.js'
 import { VoucherMapper } from './VoucherMapper.js'
@@ -33,8 +38,10 @@ export class FavoriteMapper {
       id: favorite.id,
       businessId: favorite.businessId,
       createdAt: favorite.createdAt,
-      business: favorite.business 
-        ? BusinessMapper.toDTO(BusinessMapper.fromDocument(favorite.business as any)) 
+      business: favorite.business
+        ? BusinessMapper.toDTO(
+            BusinessMapper.fromDocument(favorite.business as any),
+          )
         : undefined,
     }
   }
@@ -67,8 +74,10 @@ export class FavoriteMapper {
       id: favorite.id,
       voucherId: favorite.voucherId,
       createdAt: favorite.createdAt,
-      voucher: favorite.voucher 
-        ? VoucherMapper.toDTO(VoucherMapper.fromDocument(favorite.voucher as any)) 
+      voucher: favorite.voucher
+        ? VoucherMapper.toDTO(
+            VoucherMapper.fromDocument(favorite.voucher as any),
+          )
         : undefined,
     }
   }

@@ -300,7 +300,9 @@ export type LinkedAccountDetails = z.infer<typeof LinkedAccountDetails>
  */
 export const ExchangeTokenRequest = z.object({
   code: z.string().min(1).describe('Authorization code from OAuth provider'),
-  provider: SocialProviderSchema.describe('OAuth provider (google or facebook)'),
+  provider: SocialProviderSchema.describe(
+    'OAuth provider (google or facebook)',
+  ),
   redirectUri: z.string().url().describe('Redirect URI used in OAuth flow'),
   state: z.string().optional().describe('State parameter for CSRF protection'),
 })

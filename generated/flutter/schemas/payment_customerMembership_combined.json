@@ -22,11 +22,7 @@
           "maxLength": 200
         }
       },
-      "required": [
-        "userId",
-        "email",
-        "name"
-      ],
+      "required": ["userId", "email", "name"],
       "additionalProperties": false
     },
     "CreateMembershipSubscriptionRequest": {
@@ -63,10 +59,7 @@
           }
         }
       },
-      "required": [
-        "priceId",
-        "paymentMethodId"
-      ],
+      "required": ["priceId", "paymentMethodId"],
       "additionalProperties": false
     }
   }

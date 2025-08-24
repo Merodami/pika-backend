@@ -57,20 +57,11 @@
               "maximum": 180
             }
           },
-          "required": [
-            "lat",
-            "lng"
-          ],
+          "required": ["lat", "lng"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "street",
-        "city",
-        "state",
-        "postalCode",
-        "country"
-      ],
+      "required": ["street", "city", "state", "postalCode", "country"],
       "additionalProperties": false
     },
     "confidence": {
@@ -93,11 +84,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "field",
-          "original",
-          "suggested"
-        ],
+        "required": ["field", "original", "suggested"],
         "additionalProperties": false
       }
     },
@@ -117,10 +104,7 @@
           "maximum": 180
         }
       },
-      "required": [
-        "lat",
-        "lng"
-      ],
+      "required": ["lat", "lng"],
       "additionalProperties": false
     },
     "warnings": {
@@ -130,8 +114,6 @@
       }
     }
   },
-  "required": [
-    "isValid"
-  ],
+  "required": ["isValid"],
   "additionalProperties": false
 }

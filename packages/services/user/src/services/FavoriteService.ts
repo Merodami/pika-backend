@@ -8,7 +8,10 @@ import type { IUserFavoriteRepository } from '../repositories/UserFavoriteReposi
 
 export interface IFavoriteService {
   // Business favorites
-  addFavoriteBusiness(userId: string, businessId: string): Promise<FavouriteBusiness>
+  addFavoriteBusiness(
+    userId: string,
+    businessId: string,
+  ): Promise<FavouriteBusiness>
   removeFavoriteBusiness(userId: string, businessId: string): Promise<void>
   getFavoriteBusinesses(
     userId: string,
@@ -24,7 +27,10 @@ export interface IFavoriteService {
   ): Promise<BatchFavoriteResult>
 
   // Voucher favorites
-  addFavoriteVoucher(userId: string, voucherId: string): Promise<FavouriteVoucher>
+  addFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<FavouriteVoucher>
   removeFavoriteVoucher(userId: string, voucherId: string): Promise<void>
   getFavoriteVouchers(
     userId: string,
@@ -84,11 +90,17 @@ export class FavoriteService implements IFavoriteService {
 
   // =============== Business Favorites ===============
 
-  async addFavoriteBusiness(userId: string, businessId: string): Promise<FavouriteBusiness> {
+  async addFavoriteBusiness(
+    userId: string,
+    businessId: string,
+  ): Promise<FavouriteBusiness> {
     try {
       logger.info('Adding business to favorites', { userId, businessId })
 
-      const favorite = await this.favoriteRepository.addFavoriteBusiness(userId, businessId)
+      const favorite = await this.favoriteRepository.addFavoriteBusiness(
+        userId,
+        businessId,
+      )
 
       // Invalidate related caches
       await this.invalidateFavoriteCache(userId, 'business')
@@ -101,12 +113,19 @@ export class FavoriteService implements IFavoriteService {
 
       return favorite
     } catch (error) {
-      logger.error('Failed to add business to favorites', { error, userId, businessId })
+      logger.error('Failed to add business to favorites', {
+        error,
+        userId,
+        businessId,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async removeFavoriteBusiness(userId: string, businessId: string): Promise<void> {
+  async removeFavoriteBusiness(
+    userId: string,
+    businessId: string,
+  ): Promise<void> {
     try {
       logger.info('Removing business from favorites', { userId, businessId })
 
@@ -115,9 +134,16 @@ export class FavoriteService implements IFavoriteService {
       // Invalidate related caches
       await this.invalidateFavoriteCache(userId, 'business')
 
-      logger.info('Business removed from favorites successfully', { userId, businessId })
+      logger.info('Business removed from favorites successfully', {
+        userId,
+        businessId,
+      })
     } catch (error) {
-      logger.error('Failed to remove business from favorites', { error, userId, businessId })
+      logger.error('Failed to remove business from favorites', {
+        error,
+        userId,
+        businessId,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -127,6 +153,7 @@ export class FavoriteService implements IFavoriteService {
     prefix: 'favorites:businesses',
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const [userId, params] = args
+
       return `${prefix}:${userId}:${JSON.stringify(params)}`
     },
   })
@@ -137,7 +164,19 @@ export class FavoriteService implements IFavoriteService {
     try {
       logger.debug('Getting favorite businesses', { userId, params })
 
-      const result = await this.favoriteRepository.getFavoriteBusinesses(userId, params)
+      // Convert includeDetails to parsedIncludes for repository
+      const repositoryParams = {
+        page: params.page,
+        limit: params.limit,
+        sortBy: params.sortBy,
+        sortOrder: params.sortOrder,
+        parsedIncludes: params.includeDetails ? { business: true } : undefined,
+      }
+
+      const result = await this.favoriteRepository.getFavoriteBusinesses(
+        userId,
+        repositoryParams,
+      )
 
       logger.info('Retrieved favorite businesses', {
         userId,
@@ -147,7 +186,11 @@ export class FavoriteService implements IFavoriteService {
 
       return result
     } catch (error) {
-      logger.error('Failed to get favorite businesses', { error, userId, params })
+      logger.error('Failed to get favorite businesses', {
+        error,
+        userId,
+        params,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -157,6 +200,7 @@ export class FavoriteService implements IFavoriteService {
     prefix: 'favorites:business:status',
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const [userId, businessId] = args
+
       return `${prefix}:${userId}:${businessId}`
     },
   })
@@ -167,13 +211,24 @@ export class FavoriteService implements IFavoriteService {
     try {
       logger.debug('Checking favorite business status', { userId, businessId })
 
-      const status = await this.favoriteRepository.isFavoriteBusiness(userId, businessId)
+      const status = await this.favoriteRepository.isFavoriteBusiness(
+        userId,
+        businessId,
+      )
 
-      logger.debug('Favorite business status checked', { userId, businessId, ...status })
+      logger.debug('Favorite business status checked', {
+        userId,
+        businessId,
+        ...status,
+      })
 
       return status
     } catch (error) {
-      logger.error('Failed to check favorite business status', { error, userId, businessId })
+      logger.error('Failed to check favorite business status', {
+        error,
+        userId,
+        businessId,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -197,20 +252,24 @@ export class FavoriteService implements IFavoriteService {
 
       // Handle additions
       if (operation.add && operation.add.length > 0) {
-        const addResult = await this.favoriteRepository.batchAddFavoriteBusinesses(
-          userId,
-          operation.add,
-        )
+        const addResult =
+          await this.favoriteRepository.batchAddFavoriteBusinesses(
+            userId,
+            operation.add,
+          )
+
         result.added = addResult.added
         result.errors.push(...addResult.errors)
       }
 
       // Handle removals
       if (operation.remove && operation.remove.length > 0) {
-        const removeResult = await this.favoriteRepository.batchRemoveFavoriteBusinesses(
-          userId,
-          operation.remove,
-        )
+        const removeResult =
+          await this.favoriteRepository.batchRemoveFavoriteBusinesses(
+            userId,
+            operation.remove,
+          )
+
         result.removed = removeResult.removed
         result.errors.push(...removeResult.errors)
       }
@@ -238,11 +297,17 @@ export class FavoriteService implements IFavoriteService {
 
   // =============== Voucher Favorites ===============
 
-  async addFavoriteVoucher(userId: string, voucherId: string): Promise<FavouriteVoucher> {
+  async addFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<FavouriteVoucher> {
     try {
       logger.info('Adding voucher to favorites', { userId, voucherId })
 
-      const favorite = await this.favoriteRepository.addFavoriteVoucher(userId, voucherId)
+      const favorite = await this.favoriteRepository.addFavoriteVoucher(
+        userId,
+        voucherId,
+      )
 
       // Invalidate related caches
       await this.invalidateFavoriteCache(userId, 'voucher')
@@ -255,12 +320,19 @@ export class FavoriteService implements IFavoriteService {
 
       return favorite
     } catch (error) {
-      logger.error('Failed to add voucher to favorites', { error, userId, voucherId })
+      logger.error('Failed to add voucher to favorites', {
+        error,
+        userId,
+        voucherId,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
 
-  async removeFavoriteVoucher(userId: string, voucherId: string): Promise<void> {
+  async removeFavoriteVoucher(
+    userId: string,
+    voucherId: string,
+  ): Promise<void> {
     try {
       logger.info('Removing voucher from favorites', { userId, voucherId })
 
@@ -269,9 +341,16 @@ export class FavoriteService implements IFavoriteService {
       // Invalidate related caches
       await this.invalidateFavoriteCache(userId, 'voucher')
 
-      logger.info('Voucher removed from favorites successfully', { userId, voucherId })
+      logger.info('Voucher removed from favorites successfully', {
+        userId,
+        voucherId,
+      })
     } catch (error) {
-      logger.error('Failed to remove voucher from favorites', { error, userId, voucherId })
+      logger.error('Failed to remove voucher from favorites', {
+        error,
+        userId,
+        voucherId,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -281,6 +360,7 @@ export class FavoriteService implements IFavoriteService {
     prefix: 'favorites:vouchers',
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const [userId, params] = args
+
       return `${prefix}:${userId}:${JSON.stringify(params)}`
     },
   })
@@ -291,7 +371,19 @@ export class FavoriteService implements IFavoriteService {
     try {
       logger.debug('Getting favorite vouchers', { userId, params })
 
-      const result = await this.favoriteRepository.getFavoriteVouchers(userId, params)
+      // Convert includeDetails to parsedIncludes for repository
+      const repositoryParams = {
+        page: params.page,
+        limit: params.limit,
+        sortBy: params.sortBy,
+        sortOrder: params.sortOrder,
+        parsedIncludes: params.includeDetails ? { voucher: true } : undefined,
+      }
+
+      const result = await this.favoriteRepository.getFavoriteVouchers(
+        userId,
+        repositoryParams,
+      )
 
       logger.info('Retrieved favorite vouchers', {
         userId,
@@ -311,6 +403,7 @@ export class FavoriteService implements IFavoriteService {
     prefix: 'favorites:voucher:status',
     keyGenerator: (prefix: string, methodName: string, args: any[]) => {
       const [userId, voucherId] = args
+
       return `${prefix}:${userId}:${voucherId}`
     },
   })
@@ -321,13 +414,24 @@ export class FavoriteService implements IFavoriteService {
     try {
       logger.debug('Checking favorite voucher status', { userId, voucherId })
 
-      const status = await this.favoriteRepository.isFavoriteVoucher(userId, voucherId)
+      const status = await this.favoriteRepository.isFavoriteVoucher(
+        userId,
+        voucherId,
+      )
 
-      logger.debug('Favorite voucher status checked', { userId, voucherId, ...status })
+      logger.debug('Favorite voucher status checked', {
+        userId,
+        voucherId,
+        ...status,
+      })
 
       return status
     } catch (error) {
-      logger.error('Failed to check favorite voucher status', { error, userId, voucherId })
+      logger.error('Failed to check favorite voucher status', {
+        error,
+        userId,
+        voucherId,
+      })
       throw ErrorFactory.fromError(error)
     }
   }
@@ -351,20 +455,24 @@ export class FavoriteService implements IFavoriteService {
 
       // Handle additions
       if (operation.add && operation.add.length > 0) {
-        const addResult = await this.favoriteRepository.batchAddFavoriteVouchers(
-          userId,
-          operation.add,
-        )
+        const addResult =
+          await this.favoriteRepository.batchAddFavoriteVouchers(
+            userId,
+            operation.add,
+          )
+
         result.added = addResult.added
         result.errors.push(...addResult.errors)
       }
 
       // Handle removals
       if (operation.remove && operation.remove.length > 0) {
-        const removeResult = await this.favoriteRepository.batchRemoveFavoriteVouchers(
-          userId,
-          operation.remove,
-        )
+        const removeResult =
+          await this.favoriteRepository.batchRemoveFavoriteVouchers(
+            userId,
+            operation.remove,
+          )
+
         result.removed = removeResult.removed
         result.errors.push(...removeResult.errors)
       }
@@ -401,10 +509,14 @@ export class FavoriteService implements IFavoriteService {
       await this.cache.delPattern?.(`favorites:${type}es:${userId}:*`)
       // Invalidate status caches
       await this.cache.delPattern?.(`favorites:${type}:status:${userId}:*`)
-      
+
       logger.debug('Favorite cache invalidated', { userId, type })
     } catch (error) {
-      logger.warn('Failed to invalidate favorite cache', { error, userId, type })
+      logger.warn('Failed to invalidate favorite cache', {
+        error,
+        userId,
+        type,
+      })
       // Don't throw - cache invalidation failure shouldn't break the operation
     }
   }

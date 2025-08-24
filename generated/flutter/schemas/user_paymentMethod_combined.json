@@ -37,19 +37,11 @@
               "maxLength": 2
             }
           },
-          "required": [
-            "line1",
-            "city",
-            "state",
-            "postalCode",
-            "country"
-          ],
+          "required": ["line1", "city", "state", "postalCode", "country"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "stripePaymentMethodId"
-      ],
+      "required": ["stripePaymentMethodId"],
       "additionalProperties": false
     },
     "CardBrand": {
@@ -71,9 +63,7 @@
       "type": "object",
       "properties": {
         "paymentMethodTypes": {
-          "default": [
-            "card"
-          ],
+          "default": ["card"],
           "type": "array",
           "items": {
             "type": "string"
@@ -82,16 +72,10 @@
         "usage": {
           "default": "off_session",
           "type": "string",
-          "enum": [
-            "on_session",
-            "off_session"
-          ]
+          "enum": ["on_session", "off_session"]
         }
       },
-      "required": [
-        "paymentMethodTypes",
-        "usage"
-      ],
+      "required": ["paymentMethodTypes", "usage"],
       "additionalProperties": false
     },
     "PaymentMethod": {
@@ -114,13 +98,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "card",
-            "bankAccount",
-            "applePay",
-            "googlePay",
-            "wallet"
-          ]
+          "enum": ["card", "bankAccount", "applePay", "googlePay", "wallet"]
         },
         "isDefault": {
           "default": false,
@@ -167,20 +145,10 @@
             },
             "funding": {
               "type": "string",
-              "enum": [
-                "credit",
-                "debit",
-                "prepaid",
-                "unknown"
-              ]
+              "enum": ["credit", "debit", "prepaid", "unknown"]
             }
           },
-          "required": [
-            "brand",
-            "last4",
-            "expMonth",
-            "expYear"
-          ],
+          "required": ["brand", "last4", "expMonth", "expYear"],
           "additionalProperties": false
         },
         "bankAccount": {
@@ -199,10 +167,7 @@
             },
             "accountHolderType": {
               "type": "string",
-              "enum": [
-                "individual",
-                "company"
-              ]
+              "enum": ["individual", "company"]
             },
             "country": {
               "type": "string",
@@ -229,11 +194,7 @@
           "properties": {
             "type": {
               "type": "string",
-              "enum": [
-                "applePay",
-                "googlePay",
-                "samsungPay"
-              ]
+              "enum": ["applePay", "googlePay", "samsungPay"]
             },
             "dynamicLast4": {
               "type": "string",
@@ -241,9 +202,7 @@
               "maxLength": 4
             }
           },
-          "required": [
-            "type"
-          ],
+          "required": ["type"],
           "additionalProperties": false
         },
         "billingAddress": {
@@ -320,11 +279,7 @@
       "properties": {
         "status": {
           "type": "string",
-          "enum": [
-            "succeeded",
-            "requiresAction",
-            "failed"
-          ]
+          "enum": ["succeeded", "requiresAction", "failed"]
         },
         "clientSecret": {
           "description": "Client secret for frontend verification",
@@ -345,16 +300,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "code",
-            "message"
-          ],
+          "required": ["code", "message"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "status"
-      ],
+      "required": ["status"],
       "additionalProperties": false
     },
     "SetupIntentResponse": {
@@ -368,10 +318,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "clientSecret",
-        "setupIntentId"
-      ],
+      "required": ["clientSecret", "setupIntentId"],
       "additionalProperties": false
     },
     "UpdatePaymentMethodRequest": {
@@ -488,20 +435,10 @@
                   },
                   "funding": {
                     "type": "string",
-                    "enum": [
-                      "credit",
-                      "debit",
-                      "prepaid",
-                      "unknown"
-                    ]
+                    "enum": ["credit", "debit", "prepaid", "unknown"]
                   }
                 },
-                "required": [
-                  "brand",
-                  "last4",
-                  "expMonth",
-                  "expYear"
-                ],
+                "required": ["brand", "last4", "expMonth", "expYear"],
                 "additionalProperties": false
               },
               "bankAccount": {
@@ -520,10 +457,7 @@
                   },
                   "accountHolderType": {
                     "type": "string",
-                    "enum": [
-                      "individual",
-                      "company"
-                    ]
+                    "enum": ["individual", "company"]
                   },
                   "country": {
                     "type": "string",
@@ -550,11 +484,7 @@
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "applePay",
-                      "googlePay",
-                      "samsungPay"
-                    ]
+                    "enum": ["applePay", "googlePay", "samsungPay"]
                   },
                   "dynamicLast4": {
                     "type": "string",
@@ -562,9 +492,7 @@
                     "maxLength": 4
                   }
                 },
-                "required": [
-                  "type"
-                ],
+                "required": ["type"],
                 "additionalProperties": false
               },
               "billingAddress": {
@@ -646,10 +574,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "paymentMethods",
-        "hasValidPaymentMethod"
-      ],
+      "required": ["paymentMethods", "hasValidPaymentMethod"],
       "additionalProperties": false
     },
     "VerifyPaymentMethodRequest": {
@@ -674,9 +599,7 @@
           "format": "uri"
         }
       },
-      "required": [
-        "paymentMethodId"
-      ],
+      "required": ["paymentMethodId"],
       "additionalProperties": false
     }
   }

@@ -130,7 +130,6 @@ export class BusinessRegistrationMapper {
   static toProgressResponse(
     domain: BusinessRegistrationDomain,
   ): RegistrationProgressResponse {
-    const totalSteps = Object.keys(BUSINESS_REGISTRATION_STEPS).length
     const completedSteps: number[] = []
 
     // Check which steps have data

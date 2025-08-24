@@ -48,20 +48,11 @@
         },
         "role": {
           "type": "string",
-          "enum": [
-            "admin",
-            "customer",
-            "business"
-          ]
+          "enum": ["admin", "customer", "business"]
         },
         "status": {
           "type": "string",
-          "enum": [
-            "active",
-            "suspended",
-            "banned",
-            "unconfirmed"
-          ]
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
         },
         "emailVerified": {
           "type": "boolean"
@@ -122,10 +113,7 @@
           "const": true
         }
       },
-      "required": [
-        "password",
-        "confirmDeletion"
-      ],
+      "required": ["password", "confirmDeletion"],
       "additionalProperties": false
     },
     "DeleteAccountResponse": {
@@ -141,10 +129,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "message",
-        "deletionDate"
-      ],
+      "required": ["message", "deletionDate"],
       "additionalProperties": false
     },
     "PublicUserProfile": {
@@ -173,12 +158,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "firstName",
-        "lastName",
-        "createdAt"
-      ],
+      "required": ["id", "firstName", "lastName", "createdAt"],
       "additionalProperties": false
     },
     "UpdatePreferencesRequest": {
@@ -229,11 +209,7 @@
           "properties": {
             "profileVisibility": {
               "type": "string",
-              "enum": [
-                "public",
-                "friends",
-                "private"
-              ]
+              "enum": ["public", "friends", "private"]
             },
             "showEmail": {
               "type": "boolean"
@@ -249,11 +225,7 @@
           "properties": {
             "theme": {
               "type": "string",
-              "enum": [
-                "light",
-                "dark",
-                "system"
-              ]
+              "enum": ["light", "dark", "system"]
             },
             "language": {
               "type": "string",
@@ -308,9 +280,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "avatar"
-      ],
+      "required": ["avatar"],
       "additionalProperties": false
     },
     "UploadAvatarResponse": {
@@ -327,10 +297,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "avatarUrl",
-        "message"
-      ],
+      "required": ["avatarUrl", "message"],
       "additionalProperties": false
     },
     "UserFriendsResponse": {
@@ -364,12 +331,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "id",
-              "firstName",
-              "lastName",
-              "createdAt"
-            ],
+            "required": ["id", "firstName", "lastName", "createdAt"],
             "additionalProperties": false
           }
         },
@@ -379,10 +341,7 @@
           "maximum": 9007199254740991
         }
       },
-      "required": [
-        "friends",
-        "totalCount"
-      ],
+      "required": ["friends", "totalCount"],
       "additionalProperties": false
     },
     "UserPreferencesResponse": {
@@ -444,10 +403,7 @@
               "additionalProperties": false
             }
           },
-          "required": [
-            "email",
-            "push"
-          ],
+          "required": ["email", "push"],
           "additionalProperties": false
         },
         "privacy": {
@@ -456,11 +412,7 @@
             "profileVisibility": {
               "default": "friends",
               "type": "string",
-              "enum": [
-                "public",
-                "friends",
-                "private"
-              ]
+              "enum": ["public", "friends", "private"]
             },
             "showEmail": {
               "default": false,
@@ -471,11 +423,7 @@
               "type": "boolean"
             }
           },
-          "required": [
-            "profileVisibility",
-            "showEmail",
-            "showPhone"
-          ],
+          "required": ["profileVisibility", "showEmail", "showPhone"],
           "additionalProperties": false
         },
         "display": {
@@ -484,11 +432,7 @@
             "theme": {
               "default": "system",
               "type": "string",
-              "enum": [
-                "light",
-                "dark",
-                "system"
-              ]
+              "enum": ["light", "dark", "system"]
             },
             "language": {
               "type": "string",
@@ -500,17 +444,11 @@
               "type": "string"
             }
           },
-          "required": [
-            "theme"
-          ],
+          "required": ["theme"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "notifications",
-        "privacy",
-        "display"
-      ],
+      "required": ["notifications", "privacy", "display"],
       "additionalProperties": false
     },
     "UserProfileResponse": {
@@ -558,20 +496,11 @@
         },
         "role": {
           "type": "string",
-          "enum": [
-            "admin",
-            "customer",
-            "business"
-          ]
+          "enum": ["admin", "customer", "business"]
         },
         "status": {
           "type": "string",
-          "enum": [
-            "active",
-            "suspended",
-            "banned",
-            "unconfirmed"
-          ]
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
         },
         "emailVerified": {
           "type": "boolean"
@@ -657,20 +586,11 @@
         },
         "role": {
           "type": "string",
-          "enum": [
-            "admin",
-            "customer",
-            "business"
-          ]
+          "enum": ["admin", "customer", "business"]
         },
         "status": {
           "type": "string",
-          "enum": [
-            "active",
-            "suspended",
-            "banned",
-            "unconfirmed"
-          ]
+          "enum": ["active", "suspended", "banned", "unconfirmed"]
         },
         "emailVerified": {
           "type": "boolean"

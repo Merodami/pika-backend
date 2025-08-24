@@ -285,7 +285,8 @@ export const UserAuthData = openapi(
     lastLoginAt: DateTime.optional(),
   }),
   {
-    description: 'User data for authentication. password is null for social auth users',
+    description:
+      'User data for authentication. password is null for social auth users',
   },
 )
 
@@ -308,7 +309,8 @@ export const CreateUserRequest = openapi(
     avatarUrl: z.string().url().optional(),
   }),
   {
-    description: 'Create new user for registration with full profile data. passwordHash is optional for social auth users',
+    description:
+      'Create new user for registration with full profile data. passwordHash is optional for social auth users',
   },
 )
 

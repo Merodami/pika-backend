@@ -42,7 +42,13 @@ export const FileStorageLog = withTimestamps({
   metadata: z
     .record(
       z.string(),
-      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      z.union([
+        z.string(),
+        z.number(),
+        z.boolean(),
+        z.null(),
+        z.array(z.string()), // Allow arrays of strings for tags, etc.
+      ]),
     )
     .optional(),
   error: z.string().optional(),
@@ -77,7 +83,13 @@ export const FileUploadResponse = z.object({
   metadata: z
     .record(
       z.string(),
-      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      z.union([
+        z.string(),
+        z.number(),
+        z.boolean(),
+        z.null(),
+        z.array(z.string()), // Allow arrays of strings for tags, etc.
+      ]),
     )
     .optional()
     .describe('File metadata'),

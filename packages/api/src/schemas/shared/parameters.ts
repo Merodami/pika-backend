@@ -40,12 +40,9 @@ export const UserIdParam = z.object({
 /**
  * User ID path parameter (OpenAPI documented)
  */
-export const UserIdParamSchema = UserIdParam.openapi(
-  'UserIdParam',
-  {
-    description: 'User ID path parameter',
-  },
-)
+export const UserIdParamSchema = UserIdParam.openapi('UserIdParam', {
+  description: 'User ID path parameter',
+})
 
 export type UserIdParam = z.infer<typeof UserIdParam>
 
@@ -59,12 +56,9 @@ export const EmailParam = z.object({
 /**
  * Email path parameter (OpenAPI documented)
  */
-export const EmailParamSchema = EmailParam.openapi(
-  'EmailParam',
-  {
-    description: 'Email path parameter',
-  },
-)
+export const EmailParamSchema = EmailParam.openapi('EmailParam', {
+  description: 'Email path parameter',
+})
 
 export type EmailParam = z.infer<typeof EmailParam>
 
@@ -101,12 +95,9 @@ export const VoucherIdParam = z.object({
 /**
  * Voucher ID path parameter (OpenAPI documented)
  */
-export const VoucherIdParamSchema = VoucherIdParam.openapi(
-  'VoucherIdParam',
-  {
-    description: 'Voucher ID path parameter',
-  },
-)
+export const VoucherIdParamSchema = VoucherIdParam.openapi('VoucherIdParam', {
+  description: 'Voucher ID path parameter',
+})
 
 export type VoucherIdParam = z.infer<typeof VoucherIdParam>
 
@@ -122,11 +113,8 @@ export const UUIDParam = z.object({
 /**
  * Generic UUID path parameter (OpenAPI documented)
  */
-export const UUIDParamSchema = UUIDParam.openapi(
-  'UUIDParam',
-  {
-    description: 'UUID path parameter',
-  },
-)
+export const UUIDParamSchema = UUIDParam.openapi('UUIDParam', {
+  description: 'UUID path parameter',
+})
 
 export type UUIDParam = z.infer<typeof UUIDParam>

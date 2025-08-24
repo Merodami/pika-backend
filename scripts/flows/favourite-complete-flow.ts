@@ -127,7 +127,7 @@ async function getOrCreateTestVoucher(
     const response = await api.get(
       `/admin/vouchers?businessId=${businessId}&limit=10&state=published`,
     )
-    
+
     if (response.data.data && response.data.data.length > 0) {
       const voucher = response.data.data[0]
       logSuccess(`Found existing published voucher: ${voucher.id}`)
@@ -189,11 +189,13 @@ async function checkBusinessFavouriteStatus(
   const isFavorited = response.data.isFavorited
   const status = isFavorited ? 'Favorited' : 'Not favorited'
   const color = getStatusColor(isFavorited)
-  
+
   logInfo(`Business status: ${color}${status}${colors.reset}`)
-  
+
   if (isFavorited && response.data.favoritedAt) {
-    logInfo(`Favorited at: ${new Date(response.data.favoritedAt).toLocaleString()}`)
+    logInfo(
+      `Favorited at: ${new Date(response.data.favoritedAt).toLocaleString()}`,
+    )
   }
 
   return isFavorited
@@ -226,10 +228,12 @@ async function removeBusinessFromFavourites(
 async function listFavouriteBusinesses(customerToken: string): Promise<void> {
   api.defaults.headers.common['Authorization'] = `Bearer ${customerToken}`
 
-  const response = await api.get('/favorites/businesses?limit=10&include=business')
+  const response = await api.get(
+    '/favorites/businesses?limit=10&include=business',
+  )
 
   const favourites = response.data.data || []
-  
+
   logSuccess(`Found ${favourites.length} favourite businesses`)
 
   if (favourites.length > 0) {
@@ -240,14 +244,12 @@ async function listFavouriteBusinesses(customerToken: string): Promise<void> {
       console.log(
         `\n${colors.bright}${index + 1}. ${item.business?.businessName || item.businessId}${colors.reset}`,
       )
-      console.log(`   Business ID: ${colors.dim}${item.businessId}${colors.reset}`)
       console.log(
-        `   Added: ${new Date(item.createdAt).toLocaleDateString()}`,
+        `   Business ID: ${colors.dim}${item.businessId}${colors.reset}`,
       )
+      console.log(`   Added: ${new Date(item.createdAt).toLocaleDateString()}`)
       if (item.business) {
-        console.log(
-          `   Category: ${item.business.category?.name || 'N/A'}`,
-        )
+        console.log(`   Category: ${item.business.category?.name || 'N/A'}`)
         console.log(
           `   Status: ${item.business.active ? colors.green + 'Active' : colors.red + 'Inactive'}${colors.reset}`,
         )
@@ -270,11 +272,13 @@ async function checkVoucherFavouriteStatus(
   const isFavorited = response.data.isFavorited
   const status = isFavorited ? 'Favorited' : 'Not favorited'
   const color = getStatusColor(isFavorited)
-  
+
   logInfo(`Voucher status: ${color}${status}${colors.reset}`)
-  
+
   if (isFavorited && response.data.favoritedAt) {
-    logInfo(`Favorited at: ${new Date(response.data.favoritedAt).toLocaleString()}`)
+    logInfo(
+      `Favorited at: ${new Date(response.data.favoritedAt).toLocaleString()}`,
+    )
   }
 
   return isFavorited
@@ -307,10 +311,12 @@ async function removeVoucherFromFavourites(
 async function listFavouriteVouchers(customerToken: string): Promise<void> {
   api.defaults.headers.common['Authorization'] = `Bearer ${customerToken}`
 
-  const response = await api.get('/favorites/vouchers?limit=10&include=voucher,business')
+  const response = await api.get(
+    '/favorites/vouchers?limit=10&include=voucher,business',
+  )
 
   const favourites = response.data.data || []
-  
+
   logSuccess(`Found ${favourites.length} favourite vouchers`)
 
   if (favourites.length > 0) {
@@ -321,10 +327,10 @@ async function listFavouriteVouchers(customerToken: string): Promise<void> {
       console.log(
         `\n${colors.bright}${index + 1}. ${item.voucher?.title?.en || item.voucherId}${colors.reset}`,
       )
-      console.log(`   Voucher ID: ${colors.dim}${item.voucherId}${colors.reset}`)
       console.log(
-        `   Added: ${new Date(item.createdAt).toLocaleDateString()}`,
+        `   Voucher ID: ${colors.dim}${item.voucherId}${colors.reset}`,
       )
+      console.log(`   Added: ${new Date(item.createdAt).toLocaleDateString()}`)
       if (item.voucher) {
         console.log(
           `   Discount: ${item.voucher.discountValue}${item.voucher.discountType === 'percentage' ? '%' : ' ' + item.voucher.currency}`,
@@ -355,7 +361,9 @@ async function batchAddFavourites(
       add: businessIds,
     })
 
-    logSuccess(`Batch added ${businessResponse.data.added} businesses to favourites`)
+    logSuccess(
+      `Batch added ${businessResponse.data.added} businesses to favourites`,
+    )
     if (businessResponse.data.errors?.length > 0) {
       logError(`Errors: ${businessResponse.data.errors.length}`)
     }
@@ -366,7 +374,9 @@ async function batchAddFavourites(
       add: voucherIds,
     })
 
-    logSuccess(`Batch added ${voucherResponse.data.added} vouchers to favourites`)
+    logSuccess(
+      `Batch added ${voucherResponse.data.added} vouchers to favourites`,
+    )
     if (voucherResponse.data.errors?.length > 0) {
       logError(`Errors: ${voucherResponse.data.errors.length}`)
     }
@@ -440,7 +450,10 @@ async function runCompleteFavouriteFlow() {
   logSection('Phase 2: Business Favourites Flow')
 
   logStep(6, 'Check Initial Business Favourite Status')
-  const businessInitialStatus = await checkBusinessFavouriteStatus(businessId, customerToken)
+  const businessInitialStatus = await checkBusinessFavouriteStatus(
+    businessId,
+    customerToken,
+  )
 
   if (businessInitialStatus) {
     logInfo('Business already in favourites, removing first...')
@@ -451,10 +464,15 @@ async function runCompleteFavouriteFlow() {
   await addBusinessToFavourites(businessId, customerToken)
 
   logStep(8, 'Verify Business is Favourited')
-  const businessFavoritedStatus = await checkBusinessFavouriteStatus(businessId, customerToken)
-  
+  const businessFavoritedStatus = await checkBusinessFavouriteStatus(
+    businessId,
+    customerToken,
+  )
+
   if (!businessFavoritedStatus) {
-    throw new Error('Business should be favourited but status shows not favourited')
+    throw new Error(
+      'Business should be favourited but status shows not favourited',
+    )
   }
 
   logStep(9, 'List Favourite Businesses')
@@ -464,17 +482,25 @@ async function runCompleteFavouriteFlow() {
   await removeBusinessFromFavourites(businessId, customerToken)
 
   logStep(11, 'Verify Business is Not Favourited')
-  const businessRemovedStatus = await checkBusinessFavouriteStatus(businessId, customerToken)
-  
+  const businessRemovedStatus = await checkBusinessFavouriteStatus(
+    businessId,
+    customerToken,
+  )
+
   if (businessRemovedStatus) {
-    throw new Error('Business should not be favourited but status shows favourited')
+    throw new Error(
+      'Business should not be favourited but status shows favourited',
+    )
   }
 
   // Phase 3: Voucher Favourites Flow
   logSection('Phase 3: Voucher Favourites Flow')
 
   logStep(12, 'Check Initial Voucher Favourite Status')
-  const voucherInitialStatus = await checkVoucherFavouriteStatus(voucherId, customerToken)
+  const voucherInitialStatus = await checkVoucherFavouriteStatus(
+    voucherId,
+    customerToken,
+  )
 
   if (voucherInitialStatus) {
     logInfo('Voucher already in favourites, removing first...')
@@ -485,10 +511,15 @@ async function runCompleteFavouriteFlow() {
   await addVoucherToFavourites(voucherId, customerToken)
 
   logStep(14, 'Verify Voucher is Favourited')
-  const voucherFavoritedStatus = await checkVoucherFavouriteStatus(voucherId, customerToken)
-  
+  const voucherFavoritedStatus = await checkVoucherFavouriteStatus(
+    voucherId,
+    customerToken,
+  )
+
   if (!voucherFavoritedStatus) {
-    throw new Error('Voucher should be favourited but status shows not favourited')
+    throw new Error(
+      'Voucher should be favourited but status shows not favourited',
+    )
   }
 
   logStep(15, 'List Favourite Vouchers')
@@ -498,10 +529,15 @@ async function runCompleteFavouriteFlow() {
   await removeVoucherFromFavourites(voucherId, customerToken)
 
   logStep(17, 'Verify Voucher is Not Favourited')
-  const voucherRemovedStatus = await checkVoucherFavouriteStatus(voucherId, customerToken)
-  
+  const voucherRemovedStatus = await checkVoucherFavouriteStatus(
+    voucherId,
+    customerToken,
+  )
+
   if (voucherRemovedStatus) {
-    throw new Error('Voucher should not be favourited but status shows favourited')
+    throw new Error(
+      'Voucher should not be favourited but status shows favourited',
+    )
   }
 
   // Phase 4: Batch Operations
@@ -512,20 +548,22 @@ async function runCompleteFavouriteFlow() {
   // Create another business and voucher for batch testing
   logInfo('Creating additional business...')
   api.defaults.headers.common['Authorization'] = `Bearer ${businessToken}`
-  
+
   const secondBusinessResponse = await api.post('/businesses/me', {
     businessName: `Second Test Business ${timestamp}`,
     businessDescription: 'Another test business for batch favourites',
     categoryId: selectedCategory.id,
   })
-  
+
   const secondBusinessId = secondBusinessResponse.data.id
-  
+
   // Verify and activate
   api.defaults.headers.common['Authorization'] = `Bearer ${adminToken}`
-  await api.post(`/admin/businesses/${secondBusinessId}/verify`, { verified: true })
+  await api.post(`/admin/businesses/${secondBusinessId}/verify`, {
+    verified: true,
+  })
   await api.post(`/admin/businesses/${secondBusinessId}/activate`, {})
-  
+
   logSuccess(`Second business created: ${secondBusinessId}`)
 
   // Create second voucher
@@ -558,7 +596,7 @@ async function runCompleteFavouriteFlow() {
 
   const secondVoucherId = secondVoucherResponse.data.id
   await api.post(`/admin/vouchers/${secondVoucherId}/publish`, {})
-  
+
   logSuccess(`Second voucher created: ${secondVoucherId}`)
 
   logStep(19, 'Batch Add Multiple Favourites')
@@ -575,24 +613,42 @@ async function runCompleteFavouriteFlow() {
   logStep(21, 'Batch Remove Favourites')
   api.defaults.headers.common['Authorization'] = `Bearer ${customerToken}`
 
-  const batchRemoveBusinessResponse = await api.post('/favorites/businesses/batch', {
-    remove: [businessId, secondBusinessId],
-  })
+  const batchRemoveBusinessResponse = await api.post(
+    '/favorites/businesses/batch',
+    {
+      remove: [businessId, secondBusinessId],
+    },
+  )
 
-  logSuccess(`Batch removed ${batchRemoveBusinessResponse.data.removed} businesses from favourites`)
+  logSuccess(
+    `Batch removed ${batchRemoveBusinessResponse.data.removed} businesses from favourites`,
+  )
 
-  const batchRemoveVoucherResponse = await api.post('/favorites/vouchers/batch', {
-    remove: [voucherId, secondVoucherId],
-  })
+  const batchRemoveVoucherResponse = await api.post(
+    '/favorites/vouchers/batch',
+    {
+      remove: [voucherId, secondVoucherId],
+    },
+  )
 
-  logSuccess(`Batch removed ${batchRemoveVoucherResponse.data.removed} vouchers from favourites`)
+  logSuccess(
+    `Batch removed ${batchRemoveVoucherResponse.data.removed} vouchers from favourites`,
+  )
 
   logStep(22, 'Verify All Items are Removed')
-  const finalBusinessStatus = await checkBusinessFavouriteStatus(businessId, customerToken)
-  const finalVoucherStatus = await checkVoucherFavouriteStatus(voucherId, customerToken)
+  const finalBusinessStatus = await checkBusinessFavouriteStatus(
+    businessId,
+    customerToken,
+  )
+  const finalVoucherStatus = await checkVoucherFavouriteStatus(
+    voucherId,
+    customerToken,
+  )
 
   if (finalBusinessStatus || finalVoucherStatus) {
-    throw new Error('Items should be removed from favourites but some are still favourited')
+    throw new Error(
+      'Items should be removed from favourites but some are still favourited',
+    )
   }
 
   // Summary

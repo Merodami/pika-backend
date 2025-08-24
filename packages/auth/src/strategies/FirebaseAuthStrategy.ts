@@ -1,12 +1,18 @@
 import { CommunicationServiceClient, logger } from '@pika/shared'
-import { UserRole, EmailTemplateKey } from '@pika/types'
+import { EmailTemplateKey, UserRole } from '@pika/types'
 
 import {
   FirebaseIdentityProvider,
   getProviderFromToken,
 } from '../infrastructure/providers/FirebaseIdentityProvider.js'
 import { JwtTokenService } from '../services/JwtTokenService.js'
-import { AuthResult, AuthStrategy, RefreshResult, LoginCredentials, ExternalAuthCredentials } from './AuthStrategy.js'
+import {
+  AuthResult,
+  AuthStrategy,
+  ExternalAuthCredentials,
+  LoginCredentials,
+  RefreshResult,
+} from './AuthStrategy.js'
 import {
   CreateUserData,
   UserService,
@@ -44,12 +50,19 @@ export class FirebaseAuthStrategy implements AuthStrategy {
   /**
    * Authenticate user with Firebase ID token
    */
-  async authenticate(credentials: LoginCredentials | ExternalAuthCredentials | FirebaseCredentials): Promise<AuthResult> {
+  async authenticate(
+    credentials:
+      | LoginCredentials
+      | ExternalAuthCredentials
+      | FirebaseCredentials,
+  ): Promise<AuthResult> {
     // Type guard to ensure we have Firebase credentials
     if (!('idToken' in credentials)) {
-      throw new Error('FirebaseAuthStrategy requires Firebase credentials with idToken')
+      throw new Error(
+        'FirebaseAuthStrategy requires Firebase credentials with idToken',
+      )
     }
-    
+
     const firebaseCredentials = credentials as FirebaseCredentials
     const startTime = Date.now()
 

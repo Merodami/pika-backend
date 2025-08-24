@@ -5,15 +5,9 @@
     "provider": {
       "description": "Social provider to unlink",
       "type": "string",
-      "enum": [
-        "google",
-        "facebook",
-        "apple"
-      ]
+      "enum": ["google", "facebook", "apple"]
     }
   },
-  "required": [
-    "provider"
-  ],
+  "required": ["provider"],
   "additionalProperties": false
 }

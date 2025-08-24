@@ -15,7 +15,11 @@ const SERVICE_ROUTES = [
     service: 'user',
     mount: '/internal/users',
   },
-  { prefix: '/api/v1/favorites', service: 'user', mount: '/users/me/favorites' },
+  {
+    prefix: '/api/v1/favorites',
+    service: 'user',
+    mount: '/users/me/favorites',
+  },
   {
     prefix: '/api/v1/payments/webhooks',
     service: 'payment',

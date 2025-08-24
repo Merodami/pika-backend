@@ -17,12 +17,14 @@ vi.unmock('@pika/shared')
 // Force Vitest to use the actual implementation of '@pika/api' for this test file.
 vi.mock('@pika/api', async () => {
   const actualApi = await vi.importActual('@pika/api')
+
   return actualApi // Return all actual exports
 })
 
 // Force Vitest to use the actual implementation of '@pika/shared' for this test file.
 vi.mock('@pika/shared', async () => {
   const actualShared = await vi.importActual('@pika/shared')
+
   return actualShared // Return all actual exports
 })
 
@@ -30,15 +32,15 @@ import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
   AuthenticatedRequestClient,
+  cleanupTestDatabase,
   CommunicationServiceClientMock,
   createE2EAuthHelper,
-  E2EAuthHelper,
-  cleanupTestDatabase,
   createTestDatabase,
+  E2EAuthHelper,
   type TestDatabaseResult,
 } from '@pika/tests'
 import { ErrorCode, UserRole, UserStatus } from '@pika/types'
-import { VoucherType, VoucherState } from '@prisma/client'
+import { VoucherState, VoucherType } from '@prisma/client'
 import { createUserServer } from '@user/server.js'
 import {
   createSharedUserTestData,
@@ -141,8 +143,10 @@ describe('User Service - Favorites Public API Integration Tests', () => {
     logger.debug('Creating shared test data...')
     sharedTestData = await createSharedUserTestData(testDb.prisma)
 
-    logger.debug('Creating test category, businesses and vouchers for favorites...')
-    
+    logger.debug(
+      'Creating test category, businesses and vouchers for favorites...',
+    )
+
     // Create a test category (don't set id, let database generate it, use UUID for createdBy)
     testCategory = await testDb.prisma.category.create({
       data: {
@@ -247,7 +251,9 @@ describe('User Service - Favorites Public API Integration Tests', () => {
       },
     })
 
-    logger.debug(`Created test data: businesses ${testBusiness1.id}, ${testBusiness2.id} and vouchers ${testVoucher1.id}, ${testVoucher2.id}`)
+    logger.debug(
+      `Created test data: businesses ${testBusiness1.id}, ${testBusiness2.id} and vouchers ${testVoucher1.id}, ${testVoucher2.id}`,
+    )
   }, 120000)
 
   beforeEach(async () => {
@@ -261,7 +267,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
       // Delete favorites data
       await testDb.prisma.favouriteBusiness.deleteMany({})
       await testDb.prisma.favouriteVoucher.deleteMany({})
-      
+
       // Reset favorite counts
       await testDb.prisma.business.updateMany({
         data: { favoriteCount: 0 },
@@ -315,7 +321,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
       it('should return 404 when trying to add non-existent business', async () => {
         const nonExistentId = uuid()
-        
+
         const response = await customerClient
           .post(`/users/me/favorites/businesses/${nonExistentId}`)
           .set('Accept', 'application/json')
@@ -376,8 +382,12 @@ describe('User Service - Favorites Public API Integration Tests', () => {
     describe('GET /users/me/favorites/businesses', () => {
       beforeEach(async () => {
         // Add multiple businesses to favorites
-        await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
-        await customerClient.post(`/users/me/favorites/businesses/${testBusiness2.id}`).expect(201)
+        await customerClient
+          .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+          .expect(201)
+        await customerClient
+          .post(`/users/me/favorites/businesses/${testBusiness2.id}`)
+          .expect(201)
       })
 
       it('should return paginated list of favorite businesses', async () => {
@@ -388,15 +398,16 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
         expect(response.body.data).toBeDefined()
         expect(Array.isArray(response.body.data)).toBe(true)
-        expect(response.body.data.length).toBe(2)
+        expect(response.body.data).toHaveLength(2)
         expect(response.body.pagination).toBeDefined()
         expect(response.body.pagination.total).toBe(2)
         expect(response.body.pagination.page).toBe(1)
         expect(response.body.pagination.hasNext).toBe(false)
         expect(response.body.pagination.hasPrev).toBe(false)
-        
+
         // Check that we have the right business IDs
         const businessIds = response.body.data.map((fav: any) => fav.businessId)
+
         expect(businessIds).toContain(testBusiness1.id)
         expect(businessIds).toContain(testBusiness2.id)
       })
@@ -408,7 +419,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
           .set('Accept', 'application/json')
           .expect(200)
 
-        expect(response.body.data.length).toBe(1)
+        expect(response.body.data).toHaveLength(1)
         expect(response.body.pagination.limit).toBe(1)
         expect(response.body.pagination.totalPages).toBe(2)
         expect(response.body.pagination.hasNext).toBe(true)
@@ -421,9 +432,13 @@ describe('User Service - Favorites Public API Integration Tests', () => {
           .set('Accept', 'application/json')
           .expect(200)
 
-        expect(response.body.data.length).toBe(2)
+        expect(response.body.data).toHaveLength(2)
+
         // Most recent should be first when sorted desc
-        const timestamps = response.body.data.map((fav: any) => new Date(fav.createdAt).getTime())
+        const timestamps = response.body.data.map((fav: any) =>
+          new Date(fav.createdAt).getTime(),
+        )
+
         expect(timestamps[0]).toBeGreaterThanOrEqual(timestamps[1])
       })
 
@@ -440,8 +455,12 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
       it('should return empty list when no favorites', async () => {
         // Remove all favorites first
-        await customerClient.delete(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(200)
-        await customerClient.delete(`/users/me/favorites/businesses/${testBusiness2.id}`).expect(200)
+        await customerClient
+          .delete(`/users/me/favorites/businesses/${testBusiness1.id}`)
+          .expect(200)
+        await customerClient
+          .delete(`/users/me/favorites/businesses/${testBusiness2.id}`)
+          .expect(200)
 
         const response = await customerClient
           .get('/users/me/favorites/businesses')
@@ -463,7 +482,9 @@ describe('User Service - Favorites Public API Integration Tests', () => {
     describe('GET /users/me/favorites/businesses/:id/status', () => {
       it('should return favorite status for favorited business', async () => {
         // Add business to favorites first
-        await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
+        await customerClient
+          .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+          .expect(201)
 
         const response = await customerClient
           .get(`/users/me/favorites/businesses/${testBusiness1.id}/status`)
@@ -526,7 +547,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
       it('should return 404 when trying to add non-existent voucher', async () => {
         const nonExistentId = uuid()
-        
+
         const response = await customerClient
           .post(`/users/me/favorites/vouchers/${nonExistentId}`)
           .set('Accept', 'application/json')
@@ -580,8 +601,12 @@ describe('User Service - Favorites Public API Integration Tests', () => {
     describe('GET /users/me/favorites/vouchers', () => {
       beforeEach(async () => {
         // Add multiple vouchers to favorites
-        await customerClient.post(`/users/me/favorites/vouchers/${testVoucher1.id}`).expect(201)
-        await customerClient.post(`/users/me/favorites/vouchers/${testVoucher2.id}`).expect(201)
+        await customerClient
+          .post(`/users/me/favorites/vouchers/${testVoucher1.id}`)
+          .expect(201)
+        await customerClient
+          .post(`/users/me/favorites/vouchers/${testVoucher2.id}`)
+          .expect(201)
       })
 
       it('should return paginated list of favorite vouchers', async () => {
@@ -592,12 +617,13 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
         expect(response.body.data).toBeDefined()
         expect(Array.isArray(response.body.data)).toBe(true)
-        expect(response.body.data.length).toBe(2)
+        expect(response.body.data).toHaveLength(2)
         expect(response.body.pagination).toBeDefined()
         expect(response.body.pagination.total).toBe(2)
-        
+
         // Check that we have the right voucher IDs
         const voucherIds = response.body.data.map((fav: any) => fav.voucherId)
+
         expect(voucherIds).toContain(testVoucher1.id)
         expect(voucherIds).toContain(testVoucher2.id)
       })
@@ -609,9 +635,13 @@ describe('User Service - Favorites Public API Integration Tests', () => {
           .set('Accept', 'application/json')
           .expect(200)
 
-        expect(response.body.data.length).toBe(2)
+        expect(response.body.data).toHaveLength(2)
+
         // Check that sorting is applied
-        const timestamps = response.body.data.map((fav: any) => new Date(fav.createdAt).getTime())
+        const timestamps = response.body.data.map((fav: any) =>
+          new Date(fav.createdAt).getTime(),
+        )
+
         expect(timestamps[0]).toBeLessThanOrEqual(timestamps[1])
       })
 
@@ -628,8 +658,12 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
       it('should return empty list when no favorites', async () => {
         // Remove all favorites first
-        await customerClient.delete(`/users/me/favorites/vouchers/${testVoucher1.id}`).expect(200)
-        await customerClient.delete(`/users/me/favorites/vouchers/${testVoucher2.id}`).expect(200)
+        await customerClient
+          .delete(`/users/me/favorites/vouchers/${testVoucher1.id}`)
+          .expect(200)
+        await customerClient
+          .delete(`/users/me/favorites/vouchers/${testVoucher2.id}`)
+          .expect(200)
 
         const response = await customerClient
           .get('/users/me/favorites/vouchers')
@@ -651,7 +685,9 @@ describe('User Service - Favorites Public API Integration Tests', () => {
     describe('GET /users/me/favorites/vouchers/:id/status', () => {
       it('should return favorite status for favorited voucher', async () => {
         // Add voucher to favorites first
-        await customerClient.post(`/users/me/favorites/vouchers/${testVoucher1.id}`).expect(201)
+        await customerClient
+          .post(`/users/me/favorites/vouchers/${testVoucher1.id}`)
+          .expect(201)
 
         const response = await customerClient
           .get(`/users/me/favorites/vouchers/${testVoucher1.id}/status`)
@@ -702,8 +738,12 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
       it('should remove multiple businesses from favorites', async () => {
         // Add businesses first
-        await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
-        await customerClient.post(`/users/me/favorites/businesses/${testBusiness2.id}`).expect(201)
+        await customerClient
+          .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+          .expect(201)
+        await customerClient
+          .post(`/users/me/favorites/businesses/${testBusiness2.id}`)
+          .expect(201)
 
         const requestData = {
           remove: [testBusiness1.id, testBusiness2.id],
@@ -722,7 +762,9 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
       it('should handle mixed add and remove operations', async () => {
         // Add one business first
-        await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
+        await customerClient
+          .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+          .expect(201)
 
         const requestData = {
           add: [testBusiness2.id],
@@ -753,7 +795,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
           .expect(200)
 
         expect(response.body.added).toBe(1) // Only the valid business was added
-        expect(response.body.errors.length).toBe(1)
+        expect(response.body.errors).toHaveLength(1)
         expect(response.body.errors[0].itemId).toBe(nonExistentId)
         expect(response.body.errors[0].operation).toBe('add')
       })
@@ -798,8 +840,12 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
       it('should remove multiple vouchers from favorites', async () => {
         // Add vouchers first
-        await customerClient.post(`/users/me/favorites/vouchers/${testVoucher1.id}`).expect(201)
-        await customerClient.post(`/users/me/favorites/vouchers/${testVoucher2.id}`).expect(201)
+        await customerClient
+          .post(`/users/me/favorites/vouchers/${testVoucher1.id}`)
+          .expect(201)
+        await customerClient
+          .post(`/users/me/favorites/vouchers/${testVoucher2.id}`)
+          .expect(201)
 
         const requestData = {
           remove: [testVoucher1.id, testVoucher2.id],
@@ -878,8 +924,10 @@ describe('User Service - Favorites Public API Integration Tests', () => {
   describe('Caching', () => {
     it('should cache favorite listings', async () => {
       // Add favorites
-      await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
-      
+      await customerClient
+        .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+        .expect(201)
+
       // First request
       const response1 = await customerClient
         .get('/users/me/favorites/businesses')
@@ -897,24 +945,28 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
     it('should invalidate cache when favorites are modified', async () => {
       // Add favorite
-      await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
+      await customerClient
+        .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+        .expect(201)
 
       // Get initial list
       const response1 = await customerClient
         .get('/users/me/favorites/businesses')
         .expect(200)
 
-      expect(response1.body.data.length).toBe(1)
+      expect(response1.body.data).toHaveLength(1)
 
       // Add another favorite (should invalidate cache)
-      await customerClient.post(`/users/me/favorites/businesses/${testBusiness2.id}`).expect(201)
+      await customerClient
+        .post(`/users/me/favorites/businesses/${testBusiness2.id}`)
+        .expect(201)
 
       // Get updated list
       const response2 = await customerClient
         .get('/users/me/favorites/businesses')
         .expect(200)
 
-      expect(response2.body.data.length).toBe(2)
+      expect(response2.body.data).toHaveLength(2)
     })
   })
 
@@ -922,17 +974,21 @@ describe('User Service - Favorites Public API Integration Tests', () => {
   describe('User Isolation', () => {
     it('should only show favorites for the authenticated user', async () => {
       // Add favorites for customer
-      await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
-      
+      await customerClient
+        .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+        .expect(201)
+
       // Add favorites for business user
-      await businessClient.post(`/users/me/favorites/businesses/${testBusiness2.id}`).expect(201)
+      await businessClient
+        .post(`/users/me/favorites/businesses/${testBusiness2.id}`)
+        .expect(201)
 
       // Customer should only see their own favorites
       const customerResponse = await customerClient
         .get('/users/me/favorites/businesses')
         .expect(200)
 
-      expect(customerResponse.body.data.length).toBe(1)
+      expect(customerResponse.body.data).toHaveLength(1)
       expect(customerResponse.body.data[0].businessId).toBe(testBusiness1.id)
 
       // Business user should only see their own favorites
@@ -940,20 +996,22 @@ describe('User Service - Favorites Public API Integration Tests', () => {
         .get('/users/me/favorites/businesses')
         .expect(200)
 
-      expect(businessResponse.body.data.length).toBe(1)
+      expect(businessResponse.body.data).toHaveLength(1)
       expect(businessResponse.body.data[0].businessId).toBe(testBusiness2.id)
     })
 
     it('should not allow users to manipulate other users favorites', async () => {
       // Add favorite for customer
-      await customerClient.post(`/users/me/favorites/businesses/${testBusiness1.id}`).expect(201)
+      await customerClient
+        .post(`/users/me/favorites/businesses/${testBusiness1.id}`)
+        .expect(201)
 
       // Business user should not be able to see customer's favorites
       const businessResponse = await businessClient
         .get('/users/me/favorites/businesses')
         .expect(200)
 
-      expect(businessResponse.body.data.length).toBe(0)
+      expect(businessResponse.body.data).toHaveLength(0)
     })
   })
 })

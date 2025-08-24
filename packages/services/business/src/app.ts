@@ -50,9 +50,10 @@ export async function startBusinessService() {
 
   // Initialize service clients for inter-service communication
   const userServiceClient = new UserServiceClient()
-  
+
   // Initialize storage service client for file uploads
   logger.info('Initializing storage service client for file uploads')
+
   const storageServiceClient = new StorageServiceClient()
 
   logger.info(`Business service starting on port: ${BUSINESS_SERVICE_PORT}`)

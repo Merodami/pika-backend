@@ -126,11 +126,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "id",
-    "businessId",
-    "createdAt",
-    "updatedAt"
-  ],
+  "required": ["id", "businessId", "createdAt", "updatedAt"],
   "additionalProperties": false
 }

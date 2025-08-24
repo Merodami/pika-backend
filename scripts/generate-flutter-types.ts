@@ -67,17 +67,23 @@ const SCHEMA_MODULES = {
   },
   communication: {
     notification: () =>
-      import('../packages/api/src/schemas/communication/public/notification.js'),
+      import(
+        '../packages/api/src/schemas/communication/public/notification.js'
+      ),
     email: () =>
       import('../packages/api/src/schemas/communication/public/email.js'),
     communicationLog: () =>
-      import('../packages/api/src/schemas/communication/public/communicationLog.js'),
+      import(
+        '../packages/api/src/schemas/communication/public/communicationLog.js'
+      ),
   },
   payment: {
     membership: () =>
       import('../packages/api/src/schemas/payment/public/membership.js'),
     customerMembership: () =>
-      import('../packages/api/src/schemas/payment/public/customerMembership.js'),
+      import(
+        '../packages/api/src/schemas/payment/public/customerMembership.js'
+      ),
     product: () =>
       import('../packages/api/src/schemas/payment/public/product.js'),
     promoCode: () =>
@@ -90,14 +96,15 @@ const SCHEMA_MODULES = {
       import('../packages/api/src/schemas/pdf/public/voucher-book.js'),
   },
   storage: {
-    file: () =>
-      import('../packages/api/src/schemas/storage/public/file.js'),
+    file: () => import('../packages/api/src/schemas/storage/public/file.js'),
   },
   subscription: {
     subscription: () =>
       import('../packages/api/src/schemas/subscription/public/subscription.js'),
     subscriptionPlan: () =>
-      import('../packages/api/src/schemas/subscription/public/subscriptionPlan.js'),
+      import(
+        '../packages/api/src/schemas/subscription/public/subscriptionPlan.js'
+      ),
   },
   support: {
     problem: () =>
@@ -107,9 +114,11 @@ const SCHEMA_MODULES = {
   },
   user: {
     profile: () => import('../packages/api/src/schemas/user/public/profile.js'),
-    favorites: () => import('../packages/api/src/schemas/user/public/favorites.js'),
+    favorites: () =>
+      import('../packages/api/src/schemas/user/public/favorites.js'),
     address: () => import('../packages/api/src/schemas/user/public/address.js'),
-    settings: () => import('../packages/api/src/schemas/user/public/settings.js'),
+    settings: () =>
+      import('../packages/api/src/schemas/user/public/settings.js'),
     paymentMethod: () =>
       import('../packages/api/src/schemas/user/public/paymentMethod.js'),
     verification: () =>

@@ -6,8 +6,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "email"
-  ],
+  "required": ["email"],
   "additionalProperties": false
 }

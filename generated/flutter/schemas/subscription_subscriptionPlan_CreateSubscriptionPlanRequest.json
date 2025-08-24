@@ -20,12 +20,7 @@
     },
     "interval": {
       "type": "string",
-      "enum": [
-        "day",
-        "week",
-        "month",
-        "year"
-      ]
+      "enum": ["day", "week", "month", "year"]
     },
     "intervalCount": {
       "default": 1,

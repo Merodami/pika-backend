@@ -15,13 +15,7 @@
     "priority": {
       "default": "medium",
       "type": "string",
-      "enum": [
-        "low",
-        "medium",
-        "high",
-        "urgent",
-        "critical"
-      ]
+      "enum": ["low", "medium", "high", "urgent", "critical"]
     },
     "type": {
       "default": "general",
@@ -43,12 +37,6 @@
       }
     }
   },
-  "required": [
-    "title",
-    "description",
-    "priority",
-    "type",
-    "files"
-  ],
+  "required": ["title", "description", "priority", "type", "files"],
   "additionalProperties": false
 }

@@ -1,5 +1,6 @@
-import { getServiceDefinitions } from '../../services/definitions.js'
 import { EMAIL_FROM } from '@pika/environment'
+
+import { getServiceDefinitions } from '../../services/definitions.js'
 import type { DeploymentConfig } from '../../types/index.js'
 
 export function getVercelConfig(): DeploymentConfig {

@@ -1,25 +1,25 @@
-import axios from 'axios'
+import { FACEBOOK_APP_ID, FACEBOOK_APP_SECRET } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
-import {
-  FACEBOOK_APP_ID,
-  FACEBOOK_APP_SECRET,
-} from '@pika/environment'
+import axios from 'axios'
 
 /**
  * Facebook OAuth 2.0 Client
  * Handles authorization code exchange and Graph API operations
  */
 export class FacebookOAuthClient {
-  private readonly tokenEndpoint = 'https://graph.facebook.com/v18.0/oauth/access_token'
+  private readonly tokenEndpoint =
+    'https://graph.facebook.com/v18.0/oauth/access_token'
   private readonly debugTokenEndpoint = 'https://graph.facebook.com/debug_token'
   private readonly userInfoEndpoint = 'https://graph.facebook.com/v18.0/me'
-  
+
   constructor(
     private readonly appId: string = FACEBOOK_APP_ID || '',
     private readonly appSecret: string = FACEBOOK_APP_SECRET || '',
   ) {
     if (!this.appId || !this.appSecret) {
-      logger.warn('Facebook OAuth client not configured. Set FACEBOOK_APP_ID and FACEBOOK_APP_SECRET')
+      logger.warn(
+        'Facebook OAuth client not configured. Set FACEBOOK_APP_ID and FACEBOOK_APP_SECRET',
+      )
     }
   }
 
@@ -37,7 +37,7 @@ export class FacebookOAuthClient {
   }> {
     if (!this.appId || !this.appSecret) {
       throw ErrorFactory.serviceUnavailable(
-        'Facebook OAuth not configured. Please set FACEBOOK_APP_ID and FACEBOOK_APP_SECRET environment variables.'
+        'Facebook OAuth not configured. Please set FACEBOOK_APP_ID and FACEBOOK_APP_SECRET environment variables.',
       )
     }
 
@@ -69,13 +69,14 @@ export class FacebookOAuthClient {
 
       if (error.response?.status === 400) {
         const errorData = error.response?.data?.error
+
         throw ErrorFactory.badRequest(
-          errorData?.message || 'Invalid authorization code'
+          errorData?.message || 'Invalid authorization code',
         )
       }
 
       throw ErrorFactory.serviceUnavailable(
-        'Failed to exchange Facebook authorization code'
+        'Failed to exchange Facebook authorization code',
       )
     }
   }
@@ -96,7 +97,8 @@ export class FacebookOAuthClient {
       const response = await axios.get(this.userInfoEndpoint, {
         params: {
           access_token: accessToken,
-          fields: 'id,email,name,first_name,last_name,picture.width(200).height(200)',
+          fields:
+            'id,email,name,first_name,last_name,picture.width(200).height(200)',
         },
       })
 
@@ -114,7 +116,9 @@ export class FacebookOAuthClient {
         error: error.response?.data || error.message,
       })
 
-      throw ErrorFactory.serviceUnavailable('Failed to get Facebook user information')
+      throw ErrorFactory.serviceUnavailable(
+        'Failed to get Facebook user information',
+      )
     }
   }
 
@@ -190,7 +194,9 @@ export class FacebookOAuthClient {
         error: error.response?.data || error.message,
       })
 
-      throw ErrorFactory.serviceUnavailable('Failed to exchange for long-lived token')
+      throw ErrorFactory.serviceUnavailable(
+        'Failed to exchange for long-lived token',
+      )
     }
   }
 
@@ -204,7 +210,7 @@ export class FacebookOAuthClient {
         `https://graph.facebook.com/v18.0/${userId}/permissions`,
         {
           params: { access_token: accessToken },
-        }
+        },
       )
     } catch (error: any) {
       logger.error('Facebook permissions revocation failed', {
@@ -213,7 +219,6 @@ export class FacebookOAuthClient {
       // Don't throw error for revocation failures
     }
   }
-
 }
 
 // Export singleton instance and class

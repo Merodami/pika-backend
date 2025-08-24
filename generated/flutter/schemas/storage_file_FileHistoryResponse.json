@@ -38,13 +38,7 @@
           },
           "fileType": {
             "type": "string",
-            "enum": [
-              "image",
-              "video",
-              "document",
-              "audio",
-              "other"
-            ]
+            "enum": ["image", "video", "document", "audio", "other"]
           },
           "status": {
             "type": "string",
@@ -59,11 +53,7 @@
           },
           "provider": {
             "type": "string",
-            "enum": [
-              "awsS3",
-              "local",
-              "minio"
-            ]
+            "enum": ["awsS3", "local", "minio"]
           },
           "bucketName": {
             "type": "string"
@@ -176,9 +166,6 @@
       "additionalProperties": false
     }
   },
-  "required": [
-    "data",
-    "pagination"
-  ],
+  "required": ["data", "pagination"],
   "additionalProperties": false
 }

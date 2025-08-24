@@ -17,9 +17,7 @@
                 "maxLength": 255
               }
             },
-            "required": [
-              "email"
-            ],
+            "required": ["email"],
             "additionalProperties": false
           }
         }
@@ -104,22 +102,14 @@
             "maximum": 9007199254740991
           }
         },
-        "required": [
-          "filename",
-          "content"
-        ],
+        "required": ["filename", "content"],
         "additionalProperties": false
       }
     },
     "priority": {
       "default": "normal",
       "type": "string",
-      "enum": [
-        "low",
-        "normal",
-        "high",
-        "urgent"
-      ]
+      "enum": ["low", "normal", "high", "urgent"]
     },
     "trackOpens": {
       "default": true,

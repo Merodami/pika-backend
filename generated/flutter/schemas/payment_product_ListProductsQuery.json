@@ -7,12 +7,7 @@
     },
     "type": {
       "type": "string",
-      "enum": [
-        "membership",
-        "merchandise",
-        "service",
-        "other"
-      ]
+      "enum": ["membership", "merchandise", "service", "other"]
     },
     "page": {
       "default": 1,
@@ -27,9 +22,6 @@
       "maximum": 100
     }
   },
-  "required": [
-    "page",
-    "limit"
-  ],
+  "required": ["page", "limit"],
   "additionalProperties": false
 }

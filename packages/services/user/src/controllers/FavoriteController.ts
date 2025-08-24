@@ -1,14 +1,9 @@
-import type { IFavoriteService } from '@user/services/FavoriteService.js'
 import { mapSortOrder, shared, userPublic } from '@pika/api'
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
-import {
-  getValidatedQuery,
-  paginatedResponse,
-  RequestContext,
-  validateResponse,
-} from '@pika/http'
-import { parseIncludeParam } from '@pika/shared'
+import { getValidatedQuery, RequestContext, validateResponse } from '@pika/http'
 import { FavoriteMapper } from '@pika/sdk'
+import { parseIncludeParam } from '@pika/shared'
+import type { IFavoriteService } from '@user/services/FavoriteService.js'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -50,11 +45,14 @@ export class FavoriteController {
       const userId = context.userId
       const { id: businessId } = req.params
 
-      const favorite = await this.favoriteService.addFavoriteBusiness(userId, businessId)
+      const favorite = await this.favoriteService.addFavoriteBusiness(
+        userId,
+        businessId,
+      )
 
       // Transform to DTO
       const response = FavoriteMapper.toAddFavoriteBusinessResponse(favorite)
-      
+
       // Validate response against Zod schema
       const validatedResponse = validateResponse(
         userPublic.AddFavoriteBusinessResponseSchema,
@@ -109,11 +107,16 @@ export class FavoriteController {
     try {
       const context = RequestContext.getContext(req)
       const userId = context.userId
-      const query = getValidatedQuery<userPublic.GetFavoriteBusinessesQuery>(req)
+      const query =
+        getValidatedQuery<userPublic.GetFavoriteBusinessesQuery>(req)
 
       // Parse includes properly
-      const parsedIncludes = query.include 
-        ? parseIncludeParam(query.include, ['business', 'category', 'businessDetails']) 
+      const parsedIncludes = query.include
+        ? parseIncludeParam(query.include, [
+            'business',
+            'category',
+            'businessDetails',
+          ])
         : {}
 
       // Map API query to service params
@@ -125,12 +128,22 @@ export class FavoriteController {
         includeDetails: Boolean(parsedIncludes.business),
       }
 
-      const result = await this.favoriteService.getFavoriteBusinesses(userId, params)
+      const result = await this.favoriteService.getFavoriteBusinesses(
+        userId,
+        params,
+      )
 
-      // Repository now returns correctly formatted data (following business service pattern)
+      // Use FavoriteMapper to properly transform favorites with business details
+      const mappedResult = {
+        data: result.data.map((favorite) =>
+          FavoriteMapper.toFavoriteBusinessItem(favorite),
+        ),
+        pagination: result.pagination,
+      }
+
       const validatedResponse = validateResponse(
         userPublic.GetFavoriteBusinessesResponseSchema,
-        result,
+        mappedResult,
         'FavoriteController.getFavoriteBusinesses',
       )
 
@@ -154,11 +167,14 @@ export class FavoriteController {
       const userId = context.userId
       const { id: businessId } = req.params
 
-      const status = await this.favoriteService.checkFavoriteBusiness(userId, businessId)
+      const status = await this.favoriteService.checkFavoriteBusiness(
+        userId,
+        businessId,
+      )
 
       // Transform to DTO
       const response = FavoriteMapper.toFavoriteStatusResponse(status)
-      
+
       // Validate response against Zod schema
       const validatedResponse = validateResponse(
         userPublic.FavoriteStatusResponseSchema,
@@ -185,11 +201,14 @@ export class FavoriteController {
       const context = RequestContext.getContext(req)
       const userId = context.userId
 
-      const result = await this.favoriteService.batchFavoriteBusinesses(userId, req.body)
+      const result = await this.favoriteService.batchFavoriteBusinesses(
+        userId,
+        req.body,
+      )
 
       // Transform to DTO
       const response = FavoriteMapper.toBatchFavoriteOperationResponse(result)
-      
+
       // Validate response against Zod schema
       const validatedResponse = validateResponse(
         userPublic.BatchFavoriteOperationResponseSchema,
@@ -219,11 +238,14 @@ export class FavoriteController {
       const userId = context.userId
       const { id: voucherId } = req.params
 
-      const favorite = await this.favoriteService.addFavoriteVoucher(userId, voucherId)
+      const favorite = await this.favoriteService.addFavoriteVoucher(
+        userId,
+        voucherId,
+      )
 
       // Transform to DTO
       const response = FavoriteMapper.toAddFavoriteVoucherResponse(favorite)
-      
+
       // Validate response against Zod schema
       const validatedResponse = validateResponse(
         userPublic.AddFavoriteVoucherResponseSchema,
@@ -281,8 +303,8 @@ export class FavoriteController {
       const query = getValidatedQuery<userPublic.GetFavoriteVouchersQuery>(req)
 
       // Parse includes properly
-      const parsedIncludes = query.include 
-        ? parseIncludeParam(query.include, ['voucher', 'business', 'category']) 
+      const parsedIncludes = query.include
+        ? parseIncludeParam(query.include, ['voucher', 'business', 'category'])
         : {}
 
       // Map API query to service params
@@ -294,12 +316,22 @@ export class FavoriteController {
         includeDetails: Boolean(parsedIncludes.voucher),
       }
 
-      const result = await this.favoriteService.getFavoriteVouchers(userId, params)
+      const result = await this.favoriteService.getFavoriteVouchers(
+        userId,
+        params,
+      )
 
-      // Repository now returns correctly formatted data (following business service pattern)
+      // Use FavoriteMapper to properly transform favorites with voucher details
+      const mappedResult = {
+        data: result.data.map((favorite) =>
+          FavoriteMapper.toFavoriteVoucherItem(favorite),
+        ),
+        pagination: result.pagination,
+      }
+
       const validatedResponse = validateResponse(
         userPublic.GetFavoriteVouchersResponseSchema,
-        result,
+        mappedResult,
         'FavoriteController.getFavoriteVouchers',
       )
 
@@ -323,11 +355,14 @@ export class FavoriteController {
       const userId = context.userId
       const { id: voucherId } = req.params
 
-      const status = await this.favoriteService.checkFavoriteVoucher(userId, voucherId)
+      const status = await this.favoriteService.checkFavoriteVoucher(
+        userId,
+        voucherId,
+      )
 
       // Transform to DTO
       const response = FavoriteMapper.toFavoriteStatusResponse(status)
-      
+
       // Validate response against Zod schema
       const validatedResponse = validateResponse(
         userPublic.FavoriteStatusResponseSchema,
@@ -354,11 +389,14 @@ export class FavoriteController {
       const context = RequestContext.getContext(req)
       const userId = context.userId
 
-      const result = await this.favoriteService.batchFavoriteVouchers(userId, req.body)
+      const result = await this.favoriteService.batchFavoriteVouchers(
+        userId,
+        req.body,
+      )
 
       // Transform to DTO
       const response = FavoriteMapper.toBatchFavoriteOperationResponse(result)
-      
+
       // Validate response against Zod schema
       const validatedResponse = validateResponse(
         userPublic.BatchFavoriteOperationResponseSchema,

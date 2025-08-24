@@ -13,6 +13,7 @@
 
 import type { PrismaClient } from '@prisma/client'
 import { UserRole, UserStatus } from '@prisma/client'
+import { get } from 'lodash-es'
 import { v4 as uuid } from 'uuid'
 
 export interface BusinessTestData {
@@ -143,10 +144,11 @@ export async function seedTestBusinesses(
     let isActive: boolean
     let isVerified: boolean
 
-    if (customData && customData[i]) {
+    const customConfig = get(customData, i)
+    if (customConfig) {
       // Use custom configuration if provided for this specific business
-      isActive = customData[i].active ?? true
-      isVerified = customData[i].verified ?? true
+      isActive = customConfig.active ?? true
+      isVerified = customConfig.verified ?? true
     } else {
       // Use original behavior: alternating pattern when generate flags are true
       isActive = generateInactive ? i % 2 !== 0 : true // When generateInactive=true, odd indices (1,3,5...) are inactive

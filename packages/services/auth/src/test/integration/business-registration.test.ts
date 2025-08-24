@@ -26,8 +26,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 describe('Business Owner Registration Flow', () => {
   let testDb: TestDatabaseResult
-  let app: Express
-  let request: supertest.SuperTest<supertest.Test>
 
   beforeAll(async () => {
     logger.debug('Setting up Business Owner Registration tests...')

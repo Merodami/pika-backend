@@ -296,6 +296,7 @@ export class FirebaseIdentityProvider implements IdentityProvider {
     if (!this.app) {
       throw new Error('Firebase Identity Provider not initialized')
     }
+
     return this.app.auth()
   }
 

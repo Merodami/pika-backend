@@ -51,7 +51,6 @@ describe('Auth Service Cache Validation Tests', () => {
 
   // Test tokens
   let customerAccessToken: string
-  let adminAccessToken: string
 
   beforeAll(async () => {
     logger.debug('Setting up Auth Service Cache Validation tests...')
@@ -214,7 +213,7 @@ describe('Auth Service Cache Validation Tests', () => {
     it('should handle concurrent userinfo requests without hanging', async () => {
       // This test ensures concurrent requests don't cause deadlocks or hanging
 
-      const promises = Array.from({ length: 5 }, (_, index) => {
+      const promises = Array.from({ length: 5 }, () => {
         return request
           .get('/auth/userinfo')
           .set('Authorization', `Bearer ${customerAccessToken}`)
@@ -227,7 +226,7 @@ describe('Auth Service Cache Validation Tests', () => {
       const elapsed = Date.now() - start
 
       // All requests should succeed
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
         expect(response.body).toBeDefined()
       })
@@ -235,7 +234,7 @@ describe('Auth Service Cache Validation Tests', () => {
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
 
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.body).toEqual(firstResponse)
       })
 

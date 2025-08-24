@@ -13,26 +13,11 @@
     "currency": {
       "default": "USD",
       "type": "string",
-      "enum": [
-        "PYG",
-        "USD",
-        "EUR",
-        "GBP",
-        "CAD",
-        "AUD",
-        "JPY",
-        "CNY",
-        "INR"
-      ]
+      "enum": ["PYG", "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "INR"]
     },
     "interval": {
       "type": "string",
-      "enum": [
-        "day",
-        "week",
-        "month",
-        "year"
-      ]
+      "enum": ["day", "week", "month", "year"]
     },
     "intervalCount": {
       "type": "integer",
@@ -40,10 +25,6 @@
       "maximum": 9007199254740991
     }
   },
-  "required": [
-    "productId",
-    "amount",
-    "currency"
-  ],
+  "required": ["productId", "amount", "currency"],
   "additionalProperties": false
 }

@@ -20,8 +20,6 @@ import {
   clearTestDatabase,
   createTestDatabase,
   type TestDatabaseResult,
-  createE2EAuthHelper,
-  E2EAuthHelper,
 } from '@pika/tests'
 import { UserRole, UserStatus } from '@prisma/client'
 import { Express } from 'express'
@@ -110,8 +108,9 @@ describe('Social Authentication Integration Tests', () => {
   describe('POST /auth/social/login - Firebase Emulator Integration', () => {
     it('should successfully create new user with Google social login', async () => {
       // Create a real Google test user in Firebase emulator
-      const { user: firebaseUser, idToken } = await firebaseTestClient.createGoogleTestUser()
-      
+      const { user: firebaseUser, idToken } =
+        await firebaseTestClient.createGoogleTestUser()
+
       logger.debug('Created Firebase test user', {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
@@ -130,7 +129,7 @@ describe('Social Authentication Integration Tests', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       }
-      
+
       // Setup the correct sequence of calls:
       // 1. First call in FirebaseAuthStrategy.authenticate -> getUserAuthDataByEmail returns null (new user)
       mockUserService.getUserAuthDataByEmail.mockResolvedValue(null)
@@ -142,20 +141,18 @@ describe('Social Authentication Integration Tests', () => {
       mockUserService.updateLastLogin.mockResolvedValue(undefined)
 
       // Make the request with real Firebase token
-      const response = await request
-        .post('/auth/social/login')
-        .send({
-          provider: 'google',
-          idToken: idToken,
-          deviceInfo: {
-            deviceId: 'device-123',
-            deviceType: 'ios',
-          },
-          marketingConsent: true,
-        })
+      const response = await request.post('/auth/social/login').send({
+        provider: 'google',
+        idToken: idToken,
+        deviceInfo: {
+          deviceId: 'device-123',
+          deviceType: 'ios',
+        },
+        marketingConsent: true,
+      })
 
       expect(response.status).toBe(200)
-      
+
       // Verify response structure
       expect(response.body).toMatchObject({
         user: {
@@ -189,7 +186,8 @@ describe('Social Authentication Integration Tests', () => {
       }
 
       // Create Firebase test user with same email
-      const { user: firebaseUser, idToken } = await firebaseTestClient.createFacebookTestUser(testEmail)
+      const { idToken } =
+        await firebaseTestClient.createFacebookTestUser(testEmail)
 
       // Mock UserService to return existing user
       mockUserService.getUserByEmail.mockResolvedValue(existingUser)
@@ -202,12 +200,10 @@ describe('Social Authentication Integration Tests', () => {
       })
       mockUserService.updateLastLogin.mockResolvedValue(undefined)
 
-      const response = await request
-        .post('/auth/social/login')
-        .send({
-          provider: 'facebook',
-          idToken: idToken,
-        })
+      const response = await request.post('/auth/social/login').send({
+        provider: 'facebook',
+        idToken: idToken,
+      })
 
       logger.debug('Link existing user response', {
         status: response.status,
@@ -227,12 +223,13 @@ describe('Social Authentication Integration Tests', () => {
 
     it('should handle Apple login', async () => {
       // Create a real Apple test user in Firebase emulator
-      const { user: firebaseUser, idToken } = await firebaseTestClient.createAppleTestUser()
+      const { user: firebaseUser, idToken } =
+        await firebaseTestClient.createAppleTestUser()
 
       // Mock UserService for new user
       mockUserService.getUserByEmail.mockResolvedValue(null)
       mockUserService.getUserAuthDataByEmail.mockResolvedValue(null)
-      
+
       const newAppleUser = {
         id: uuid(),
         email: firebaseUser.email,
@@ -244,17 +241,15 @@ describe('Social Authentication Integration Tests', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       }
-      
+
       mockUserService.createUser.mockResolvedValue(newAppleUser)
       mockUserService.getUserByEmail.mockResolvedValue(newAppleUser)
       mockUserService.updateLastLogin.mockResolvedValue(undefined)
 
-      const response = await request
-        .post('/auth/social/login')
-        .send({
-          provider: 'apple',
-          idToken: idToken,
-        })
+      const response = await request.post('/auth/social/login').send({
+        provider: 'apple',
+        idToken: idToken,
+      })
 
       expect(response.status).toBe(200)
       expect(response.body).toMatchObject({
@@ -267,12 +262,10 @@ describe('Social Authentication Integration Tests', () => {
     })
 
     it('should reject malformed tokens', async () => {
-      const response = await request
-        .post('/auth/social/login')
-        .send({
-          provider: 'google',
-          idToken: 'clearly.malformed.token',
-        })
+      const response = await request.post('/auth/social/login').send({
+        provider: 'google',
+        idToken: 'clearly.malformed.token',
+      })
 
       expect(response.status).toBeGreaterThanOrEqual(400)
       expect(response.body.error).toBeDefined()
@@ -280,32 +273,26 @@ describe('Social Authentication Integration Tests', () => {
 
     it('should validate request body properly', async () => {
       // Test missing provider
-      const response1 = await request
-        .post('/auth/social/login')
-        .send({
-          idToken: 'some-token',
-        })
+      const response1 = await request.post('/auth/social/login').send({
+        idToken: 'some-token',
+      })
 
       expect(response1.status).toBe(400)
       expect(response1.body.error?.code).toBe('validationError')
 
       // Test missing idToken
-      const response2 = await request
-        .post('/auth/social/login')
-        .send({
-          provider: 'google',
-        })
+      const response2 = await request.post('/auth/social/login').send({
+        provider: 'google',
+      })
 
       expect(response2.status).toBe(400)
       expect(response2.body.error?.code).toBe('validationError')
 
       // Test invalid provider
-      const response3 = await request
-        .post('/auth/social/login')
-        .send({
-          provider: 'invalid-provider',
-          idToken: 'some-token',
-        })
+      const response3 = await request.post('/auth/social/login').send({
+        provider: 'invalid-provider',
+        idToken: 'some-token',
+      })
 
       expect(response3.status).toBe(400)
       expect(response3.body.error?.code).toBe('validationError')
@@ -316,10 +303,10 @@ describe('Social Authentication Integration Tests', () => {
     it('should handle different providers correctly', async () => {
       // Test all three providers
       const providers = ['google', 'facebook', 'apple'] as const
-      
+
       for (const providerType of providers) {
         logger.info(`Testing ${providerType} provider`)
-        
+
         // Create test user for each provider
         const testResult = await (async () => {
           switch (providerType) {
@@ -335,7 +322,7 @@ describe('Social Authentication Integration Tests', () => {
         // Mock user service
         mockUserService.getUserByEmail.mockResolvedValue(null)
         mockUserService.getUserAuthDataByEmail.mockResolvedValue(null)
-        
+
         const newProviderUser = {
           id: uuid(),
           email: testResult.user.email,
@@ -347,17 +334,15 @@ describe('Social Authentication Integration Tests', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         }
-        
+
         mockUserService.createUser.mockResolvedValue(newProviderUser)
         mockUserService.getUserByEmail.mockResolvedValue(newProviderUser)
         mockUserService.updateLastLogin.mockResolvedValue(undefined)
 
-        const response = await request
-          .post('/auth/social/login')
-          .send({
-            provider: providerType,
-            idToken: testResult.idToken,
-          })
+        const response = await request.post('/auth/social/login').send({
+          provider: providerType,
+          idToken: testResult.idToken,
+        })
 
         expect(response.status).toBe(200)
         expect(response.body.user.email).toBe(testResult.user.email)
@@ -369,10 +354,10 @@ describe('Social Authentication Integration Tests', () => {
   describe('Token Structure Validation', () => {
     it('should verify Firebase custom tokens have correct structure', async () => {
       const { user, idToken } = await firebaseTestClient.createGoogleTestUser()
-      
+
       // Verify our test client can decode its own tokens
       const decoded = await firebaseTestClient.verifyToken(idToken)
-      
+
       expect(decoded.uid).toBe(user.uid)
       expect(decoded.firebase?.sign_in_provider).toBe('google')
       expect(decoded.firebase?.identities).toBeDefined()

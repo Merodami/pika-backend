@@ -1034,9 +1034,9 @@ describe('Business Service - Admin API Integration Tests', () => {
         },
       })
 
-      // Reset the registration
+      // Reset the registration using user ID
       const response = await adminClient
-        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .post(`/admin/businesses/users/${testUser.id}/registration/reset`)
         .send({
           reason: 'Test reset for integration testing',
           notifyUser: false,
@@ -1107,9 +1107,9 @@ describe('Business Service - Admin API Integration Tests', () => {
         },
       })
 
-      // Reset the registration
+      // Reset the registration using user ID
       const response = await adminClient
-        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .post(`/admin/businesses/users/${testUser.id}/registration/reset`)
         .send({
           reason: 'Resetting registration with associated business',
           notifyUser: true,
@@ -1137,11 +1137,11 @@ describe('Business Service - Admin API Integration Tests', () => {
       expect(resetRegistration?.registrationStatus).toBe('IN_PROGRESS')
     })
 
-    it('should return 404 for non-existent registration', async () => {
-      const fakeId = uuid()
+    it('should return 404 for non-existent user registration', async () => {
+      const fakeUserId = uuid()
 
       const response = await adminClient
-        .post(`/admin/businesses/registrations/${fakeId}/reset`)
+        .post(`/admin/businesses/users/${fakeUserId}/registration/reset`)
         .send({
           reason: 'Attempting to reset non-existent registration',
           notifyUser: false,
@@ -1177,7 +1177,7 @@ describe('Business Service - Admin API Integration Tests', () => {
 
       // Try to reset as customer - should be forbidden
       await customerClient
-        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .post(`/admin/businesses/users/${testUser.id}/registration/reset`)
         .send({
           reason: 'Customer trying to reset',
           notifyUser: false,
@@ -1187,7 +1187,7 @@ describe('Business Service - Admin API Integration Tests', () => {
 
       // Try to reset as business user - should be forbidden
       await businessClient
-        .post(`/admin/businesses/registrations/${registration.id}/reset`)
+        .post(`/admin/businesses/users/${testUser.id}/registration/reset`)
         .send({
           reason: 'Business user trying to reset',
           notifyUser: false,

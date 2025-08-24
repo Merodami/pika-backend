@@ -51,7 +51,10 @@ const publicRegistry = createRegistry({
       description: 'Local Development',
     },
     { url: 'https://api.thevoucherbook.com/v1', description: 'Production' },
-    { url: 'https://staging-api.thevoucherbook.com/v1', description: 'Staging' },
+    {
+      url: 'https://staging-api.thevoucherbook.com/v1',
+      description: 'Staging',
+    },
   ],
   tags: [
     {
@@ -197,8 +200,14 @@ const adminRegistry = createRegistry({
   version: '1.0.0',
   description: 'Administrative API for Pika platform management',
   servers: [
-    { url: 'https://admin-api.thevoucherbook.com/v1', description: 'Production' },
-    { url: 'https://staging-admin-api.thevoucherbook.com/v1', description: 'Staging' },
+    {
+      url: 'https://admin-api.thevoucherbook.com/v1',
+      description: 'Production',
+    },
+    {
+      url: 'https://staging-admin-api.thevoucherbook.com/v1',
+      description: 'Staging',
+    },
     { url: `http://${SERVICE_HOST}:9001/v1`, description: 'Local Development' },
   ],
   tags: [

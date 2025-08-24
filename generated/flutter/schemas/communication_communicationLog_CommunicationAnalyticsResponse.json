@@ -77,13 +77,7 @@
         "properties": {
           "channel": {
             "type": "string",
-            "enum": [
-              "email",
-              "sms",
-              "push",
-              "inApp",
-              "webhook"
-            ]
+            "enum": ["email", "sms", "push", "inApp", "webhook"]
           },
           "sent": {
             "type": "integer",
@@ -225,17 +219,10 @@
           }
         }
       },
-      "required": [
-        "total",
-        "byChannel"
-      ],
+      "required": ["total", "byChannel"],
       "additionalProperties": false
     }
   },
-  "required": [
-    "summary",
-    "byChannel",
-    "timeline"
-  ],
+  "required": ["summary", "byChannel", "timeline"],
   "additionalProperties": false
 }

@@ -131,7 +131,7 @@ export class BusinessRegistrationController {
       await this.service.startRegistration(userId)
 
       // Save step 1 data
-      const result = await this.service.saveStep(userId, {
+      await this.service.saveStep(userId, {
         stepNumber: 1,
         stepData: data,
         saveAsDraft: false,
@@ -168,7 +168,7 @@ export class BusinessRegistrationController {
       const data = req.body
 
       // Save step 2 data
-      const result = await this.service.saveStep(userId, {
+      await this.service.saveStep(userId, {
         stepNumber: 2,
         stepData: data,
         saveAsDraft: false,

@@ -36,21 +36,11 @@
           },
           "fromPlan": {
             "type": "string",
-            "enum": [
-              "basic",
-              "premium",
-              "enterprise",
-              "trial"
-            ]
+            "enum": ["basic", "premium", "enterprise", "trial"]
           },
           "toPlan": {
             "type": "string",
-            "enum": [
-              "basic",
-              "premium",
-              "enterprise",
-              "trial"
-            ]
+            "enum": ["basic", "premium", "enterprise", "trial"]
           },
           "reason": {
             "type": "string"
@@ -82,12 +72,7 @@
             }
           }
         },
-        "required": [
-          "id",
-          "membershipId",
-          "action",
-          "timestamp"
-        ],
+        "required": ["id", "membershipId", "action", "timestamp"],
         "additionalProperties": false
       }
     },
@@ -138,9 +123,6 @@
       "additionalProperties": false
     }
   },
-  "required": [
-    "data",
-    "pagination"
-  ],
+  "required": ["data", "pagination"],
   "additionalProperties": false
 }

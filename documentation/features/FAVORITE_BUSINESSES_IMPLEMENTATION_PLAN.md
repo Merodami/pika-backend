@@ -63,6 +63,7 @@ This document outlines the complete implementation plan for adding a "Favorites"
 **Important**: The favorites feature is being implemented as an isolated module within the User Service, designed for easy extraction into its own microservice in the future.
 
 #### Current Implementation (Phase 1 - Embedded Module)
+
 - **Location**: Hosted within User Service temporarily
 - **Structure**: Completely isolated components
   - `FavoriteController` - Dedicated controller for all favorite operations
@@ -70,12 +71,13 @@ This document outlines the complete implementation plan for adding a "Favorites"
   - `UserFavoriteRepository` - Data access layer for favorites
   - `FavoriteRoutes` - Isolated route definitions
   - `FavoriteMapper` - Dedicated data transformation
-- **Benefits**: 
+- **Benefits**:
   - Can be developed and tested independently
   - Minimal coupling with existing User Service code
   - Easy to extract when ready for separate deployment
 
 #### Future Architecture (Phase 2 - Microservice)
+
 ```
 favorites-service/
 ├── src/
@@ -444,8 +446,9 @@ export const FavoriteStatusResponse = openapi(
 #### ✅ **Complete Favorites Feature (47 Integration Tests Passing)**
 
 **Files Created:**
+
 - `packages/database/prisma/models/favourites.prisma` - Database models
-- `packages/database/prisma/migrations/20250823164643_add_favourite_table/` - DB migration  
+- `packages/database/prisma/migrations/20250823164643_add_favourite_table/` - DB migration
 - `packages/api/src/schemas/user/public/favorites.ts` - API schemas
 - `packages/sdk/src/mappers/FavoriteMapper.ts` - Data transformation
 - `packages/services/user/src/controllers/FavoriteController.ts` - HTTP controller
@@ -455,11 +458,13 @@ export const FavoriteStatusResponse = openapi(
 - `packages/services/user/src/test/integration/favorites.public.integration.test.ts` - Tests
 
 **Files Modified:**
+
 - `packages/sdk/src/mappers/VoucherMapper.ts` - Fixed categoryId handling for optional voucher categories
 - `packages/api/src/schemas/voucher/public/voucher.ts` - Made categoryId optional
 - `packages/api/src/schemas/voucher/admin/management.ts` - Made categoryId optional
 
 #### ✅ **Architecture Compliance**
+
 - **Clean Architecture**: Controller → Service → Repository pattern
 - **Business Service Pattern Compliance**: Followed exact patterns from 123-passing-tests business service
 - **Data Transformation**: Proper BusinessMapper/VoucherMapper integration
@@ -467,8 +472,9 @@ export const FavoriteStatusResponse = openapi(
 - **Include Functionality**: Following `parseIncludeParam` patterns from business service
 
 #### ✅ **API Endpoints Implemented & Tested**
+
 - `POST /users/me/favorites/businesses/:id` - Add business to favorites
-- `DELETE /users/me/favorites/businesses/:id` - Remove business from favorites  
+- `DELETE /users/me/favorites/businesses/:id` - Remove business from favorites
 - `GET /users/me/favorites/businesses` - List favorite businesses (with pagination, sorting, includes)
 - `GET /users/me/favorites/businesses/:id/status` - Check favorite status
 - `POST /users/me/favorites/vouchers/:id` - Add voucher to favorites
@@ -479,23 +485,26 @@ export const FavoriteStatusResponse = openapi(
 - `POST /users/me/favorites/vouchers/batch` - Batch operations
 
 #### ✅ **Database Design**
+
 - `favourites.favourite_businesses` table with proper indexes
-- `favourites.favourite_vouchers` table with proper indexes  
+- `favourites.favourite_vouchers` table with proper indexes
 - Cascade delete on user/business/voucher deletion
 - Unique constraints on (user_id, business_id) and (user_id, voucher_id)
 - Favorite count fields on businesses and vouchers tables
 
 #### ✅ **Testing Coverage**
+
 - **47 Integration Tests Passing** ✅
 - Authentication & authorization tests
 - Error handling tests (404, 409, 400, 401 responses)
-- Include functionality tests  
+- Include functionality tests
 - Pagination and sorting tests
 - Batch operations tests
 - Caching tests
 - User isolation tests
 
 #### ✅ **Key Technical Achievements**
+
 1. **Pattern Replication**: Successfully replicated the exact working patterns from business service
 2. **Data Transformation**: Proper mapper integration with BusinessMapper/VoucherMapper
 3. **Error Handling**: Comprehensive Prisma error handling with proper HTTP status codes
@@ -616,6 +625,7 @@ describe('Favorites API', () => {
 ## Migration Strategy to Microservice
 
 ### Prerequisites for Migration
+
 1. **Stable API**: Favorites API has been in production for 3+ months
 2. **Traffic Volume**: Favorites operations exceed 10K requests/hour
 3. **Team Readiness**: Dedicated team available for maintenance
@@ -624,6 +634,7 @@ describe('Favorites API', () => {
 ### Migration Steps
 
 #### Step 1: Code Extraction (1 day)
+
 ```bash
 # Copy isolated modules to new service
 cp -r packages/services/user/src/controllers/FavoriteController.ts favorites-service/src/controllers/
@@ -633,6 +644,7 @@ cp -r packages/services/user/src/routes/FavoriteRoutes.ts favorites-service/src/
 ```
 
 #### Step 2: Service Setup (2 days)
+
 - Create new NX project for favorites-service
 - Setup Express server configuration
 - Configure database connections to favourites schema
@@ -640,6 +652,7 @@ cp -r packages/services/user/src/routes/FavoriteRoutes.ts favorites-service/src/
 - Configure service-to-service authentication
 
 #### Step 3: API Gateway Updates (1 day)
+
 - Add favorites-service to service registry
 - Update routing rules:
   - `/users/me/favorites/*` → `favorites-service/users/:userId/favorites/*`
@@ -647,17 +660,20 @@ cp -r packages/services/user/src/routes/FavoriteRoutes.ts favorites-service/src/
 - Implement circuit breaker patterns
 
 #### Step 4: Gradual Migration (1 week)
+
 - Deploy favorites-service in shadow mode
 - Route 10% traffic to new service
 - Monitor performance and errors
 - Gradually increase to 100% over 1 week
 
 #### Step 5: Cleanup (1 day)
+
 - Remove favorite code from user service
 - Update documentation
 - Archive old code
 
 ### Rollback Strategy
+
 - Keep user service code for 30 days
 - API Gateway can instantly route back to user service
 - Database schema remains unchanged

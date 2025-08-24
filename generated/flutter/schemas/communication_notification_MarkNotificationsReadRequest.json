@@ -20,8 +20,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "all"
-  ],
+  "required": ["all"],
   "additionalProperties": false
 }

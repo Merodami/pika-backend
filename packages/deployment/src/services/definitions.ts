@@ -2,6 +2,7 @@ import { createAuthServer } from '@pika/auth-service'
 import { createBusinessServer } from '@pika/business'
 import { createCategoryServer } from '@pika/category'
 import { createCommunicationServer } from '@pika/communication'
+import { EMAIL_FROM, EMAIL_FROM_NAME } from '@pika/environment'
 import { createPaymentServer } from '@pika/payment'
 import { createPDFServer } from '@pika/pdf'
 import { createStorageServer } from '@pika/storage'
@@ -14,7 +15,6 @@ import {
 } from '@pika/translation'
 import { createUserServer } from '@pika/user'
 import { createVoucherServer } from '@pika/voucher-service'
-import { EMAIL_FROM, EMAIL_FROM_NAME } from '@pika/environment'
 
 import type { ServiceDefinition, ServiceDependencies } from '../types/index.js'
 

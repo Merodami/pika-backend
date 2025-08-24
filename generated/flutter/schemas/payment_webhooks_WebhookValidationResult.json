@@ -91,9 +91,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -135,10 +133,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -242,9 +237,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -286,10 +279,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -393,9 +383,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -437,10 +425,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -532,9 +517,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -576,10 +559,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -671,9 +651,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -715,10 +693,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -810,9 +785,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -854,10 +827,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -930,13 +900,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "draft",
-                        "open",
-                        "paid",
-                        "uncollectible",
-                        "void"
-                      ]
+                      "enum": ["draft", "open", "paid", "uncollectible", "void"]
                     },
                     "metadata": {
                       "default": {},
@@ -963,9 +927,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -1007,10 +969,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -1083,13 +1042,7 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "draft",
-                        "open",
-                        "paid",
-                        "uncollectible",
-                        "void"
-                      ]
+                      "enum": ["draft", "open", "paid", "uncollectible", "void"]
                     },
                     "metadata": {
                       "default": {},
@@ -1116,9 +1069,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -1160,10 +1111,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -1272,11 +1220,7 @@
                     },
                     "payment_status": {
                       "type": "string",
-                      "enum": [
-                        "paid",
-                        "unpaid",
-                        "no_payment_required"
-                      ]
+                      "enum": ["paid", "unpaid", "no_payment_required"]
                     }
                   },
                   "required": [
@@ -1293,9 +1237,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -1337,10 +1279,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -1449,11 +1388,7 @@
                     },
                     "payment_status": {
                       "type": "string",
-                      "enum": [
-                        "paid",
-                        "unpaid",
-                        "no_payment_required"
-                      ]
+                      "enum": ["paid", "unpaid", "no_payment_required"]
                     }
                   },
                   "required": [
@@ -1470,9 +1405,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "objectData"
-              ],
+              "required": ["objectData"],
               "additionalProperties": false
             },
             "created": {
@@ -1514,10 +1447,7 @@
                       ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "idempotency_key"
-                  ],
+                  "required": ["id", "idempotency_key"],
                   "additionalProperties": false
                 },
                 {
@@ -1543,8 +1473,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "valid"
-  ],
+  "required": ["valid"],
   "additionalProperties": false
 }

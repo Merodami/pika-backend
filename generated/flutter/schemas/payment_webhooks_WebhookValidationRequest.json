@@ -16,9 +16,6 @@
       "maximum": 9007199254740991
     }
   },
-  "required": [
-    "payload",
-    "signature"
-  ],
+  "required": ["payload", "signature"],
   "additionalProperties": false
 }

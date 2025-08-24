@@ -263,7 +263,7 @@ export class BusinessRegistrationService
       }
 
       // Update the step data
-      const updated = await this.registrationRepository.updateStep(
+      await this.registrationRepository.updateStep(
         registration.id,
         request.stepNumber,
         request.stepData,

@@ -1304,11 +1304,11 @@ function registerAdminRoutes(registry: ZodRegistry): void {
                 logo: {
                   type: 'string',
                   format: 'binary',
-                  description: 'Logo image file'
-                }
+                  description: 'Logo image file',
+                },
               },
-              required: ['logo']
-            }
+              required: ['logo'],
+            },
           },
         },
         required: true,

@@ -653,7 +653,10 @@ export class UserRepository implements IUserRepository {
 
       return UserMapper.fromDocument(userIdentity.user)
     } catch (error) {
-      logger.error('Failed to find user by Firebase UID', { error, firebaseUid })
+      logger.error('Failed to find user by Firebase UID', {
+        error,
+        firebaseUid,
+      })
 
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw ErrorFactory.databaseError(
@@ -715,10 +718,12 @@ export class UserRepository implements IUserRepository {
         where: { id: userId },
         data: {
           settings: {
-            ...((await this.prisma.user.findUnique({
-              where: { id: userId },
-              select: { settings: true },
-            }))?.settings as any),
+            ...((
+              await this.prisma.user.findUnique({
+                where: { id: userId },
+                select: { settings: true },
+              })
+            )?.settings as any),
             lastDevice: {
               ...deviceInfo,
               lastSeen: new Date(),
@@ -730,7 +735,11 @@ export class UserRepository implements IUserRepository {
 
       logger.info('Device info updated', { userId, deviceInfo })
     } catch (error) {
-      logger.error('Failed to update device info', { error, userId, deviceInfo })
+      logger.error('Failed to update device info', {
+        error,
+        userId,
+        deviceInfo,
+      })
 
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         throw ErrorFactory.databaseError(

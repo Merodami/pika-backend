@@ -6,7 +6,7 @@ import {
 } from '@pika/sdk'
 import { ErrorFactory } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
-import type { Prisma,PrismaClient } from '@prisma/client'
+import type { Prisma, PrismaClient } from '@prisma/client'
 
 // Domain types for favorites (following the business/category pattern)
 export interface FavoriteBusinessDomain {

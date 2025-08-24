@@ -27,9 +27,6 @@
       "additionalProperties": {}
     }
   },
-  "required": [
-    "success",
-    "nextStep"
-  ],
+  "required": ["success", "nextStep"],
   "additionalProperties": false
 }

@@ -9,9 +9,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "clientSecret",
-    "setupIntentId"
-  ],
+  "required": ["clientSecret", "setupIntentId"],
   "additionalProperties": false
 }

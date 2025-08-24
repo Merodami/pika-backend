@@ -9,8 +9,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "success"
-  ],
+  "required": ["success"],
   "additionalProperties": false
 }

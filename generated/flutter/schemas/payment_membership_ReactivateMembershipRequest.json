@@ -5,12 +5,7 @@
     "planType": {
       "description": "Change plan on reactivation",
       "type": "string",
-      "enum": [
-        "basic",
-        "premium",
-        "enterprise",
-        "trial"
-      ]
+      "enum": ["basic", "premium", "enterprise", "trial"]
     }
   },
   "additionalProperties": false

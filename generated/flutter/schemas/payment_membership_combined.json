@@ -18,17 +18,10 @@
         },
         "feedback": {
           "type": "string",
-          "enum": [
-            "tooExpensive",
-            "notUsing",
-            "missingFeatures",
-            "other"
-          ]
+          "enum": ["tooExpensive", "notUsing", "missingFeatures", "other"]
         }
       },
-      "required": [
-        "immediately"
-      ],
+      "required": ["immediately"],
       "additionalProperties": false
     },
     "CancelMembershipResponse": {
@@ -78,12 +71,7 @@
             },
             "planType": {
               "type": "string",
-              "enum": [
-                "basic",
-                "premium",
-                "enterprise",
-                "trial"
-              ]
+              "enum": ["basic", "premium", "enterprise", "trial"]
             },
             "lastPaymentDate": {
               "description": "ISO 8601 datetime with timezone",
@@ -190,20 +178,10 @@
         "planType": {
           "default": "basic",
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         }
       },
-      "required": [
-        "userId",
-        "active",
-        "subscriptionStatus",
-        "planType"
-      ],
+      "required": ["userId", "active", "subscriptionStatus", "planType"],
       "additionalProperties": false
     },
     "Membership": {
@@ -247,12 +225,7 @@
         },
         "planType": {
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         },
         "lastPaymentDate": {
           "description": "ISO 8601 datetime with timezone",
@@ -347,12 +320,7 @@
             },
             "planType": {
               "type": "string",
-              "enum": [
-                "basic",
-                "premium",
-                "enterprise",
-                "trial"
-              ]
+              "enum": ["basic", "premium", "enterprise", "trial"]
             },
             "lastPaymentDate": {
               "description": "ISO 8601 datetime with timezone",
@@ -463,10 +431,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "id",
-                  "name"
-                ],
+                "required": ["id", "name"],
                 "additionalProperties": false
               }
             }
@@ -492,12 +457,7 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "basic",
-                  "premium",
-                  "enterprise",
-                  "trial"
-                ]
+                "enum": ["basic", "premium", "enterprise", "trial"]
               },
               "name": {
                 "type": "string"
@@ -539,10 +499,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "availablePlans",
-        "comparePlans"
-      ],
+      "required": ["availablePlans", "comparePlans"],
       "additionalProperties": false
     },
     "MembershipHistoryEntry": {
@@ -576,21 +533,11 @@
         },
         "fromPlan": {
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         },
         "toPlan": {
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         },
         "reason": {
           "type": "string"
@@ -622,12 +569,7 @@
           }
         }
       },
-      "required": [
-        "id",
-        "membershipId",
-        "action",
-        "timestamp"
-      ],
+      "required": ["id", "membershipId", "action", "timestamp"],
       "additionalProperties": false
     },
     "MembershipHistoryResponse": {
@@ -668,21 +610,11 @@
               },
               "fromPlan": {
                 "type": "string",
-                "enum": [
-                  "basic",
-                  "premium",
-                  "enterprise",
-                  "trial"
-                ]
+                "enum": ["basic", "premium", "enterprise", "trial"]
               },
               "toPlan": {
                 "type": "string",
-                "enum": [
-                  "basic",
-                  "premium",
-                  "enterprise",
-                  "trial"
-                ]
+                "enum": ["basic", "premium", "enterprise", "trial"]
               },
               "reason": {
                 "type": "string"
@@ -714,12 +646,7 @@
                 }
               }
             },
-            "required": [
-              "id",
-              "membershipId",
-              "action",
-              "timestamp"
-            ],
+            "required": ["id", "membershipId", "action", "timestamp"],
             "additionalProperties": false
           }
         },
@@ -770,10 +697,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "MembershipIdParam": {
@@ -787,9 +711,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "MembershipWithPlan": {
@@ -833,12 +755,7 @@
         },
         "planType": {
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         },
         "lastPaymentDate": {
           "description": "ISO 8601 datetime with timezone",
@@ -949,10 +866,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "id",
-              "name"
-            ],
+            "required": ["id", "name"],
             "additionalProperties": false
           }
         }
@@ -978,12 +892,7 @@
         "planType": {
           "description": "Change plan on reactivation",
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         }
       },
       "additionalProperties": false
@@ -994,12 +903,7 @@
       "properties": {
         "planType": {
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         },
         "paymentMethodId": {
           "description": "Stripe payment method ID",
@@ -1009,10 +913,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "planType",
-        "paymentMethodId"
-      ],
+      "required": ["planType", "paymentMethodId"],
       "additionalProperties": false
     },
     "SubscribeToPlanResponse": {
@@ -1062,12 +963,7 @@
             },
             "planType": {
               "type": "string",
-              "enum": [
-                "basic",
-                "premium",
-                "enterprise",
-                "trial"
-              ]
+              "enum": ["basic", "premium", "enterprise", "trial"]
             },
             "lastPaymentDate": {
               "description": "ISO 8601 datetime with timezone",
@@ -1129,12 +1025,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "success",
-        "membership",
-        "subscriptionId",
-        "message"
-      ],
+      "required": ["success", "membership", "subscriptionId", "message"],
       "additionalProperties": false
     },
     "UpdateMembershipRequest": {
@@ -1164,12 +1055,7 @@
         },
         "planType": {
           "type": "string",
-          "enum": [
-            "basic",
-            "premium",
-            "enterprise",
-            "trial"
-          ]
+          "enum": ["basic", "premium", "enterprise", "trial"]
         },
         "lastPaymentDate": {
           "description": "ISO 8601 datetime with timezone",

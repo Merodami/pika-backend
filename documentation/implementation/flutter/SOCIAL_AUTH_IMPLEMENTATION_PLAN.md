@@ -107,6 +107,7 @@ This document outlines the comprehensive implementation strategy for adding mode
    - Configure Apple Sign-In capabilities
 
 3. **Update Auth Repository**
+
    ```dart
    class EnhancedAuthRepository implements AuthRepository {
      final FirebaseAuth _firebaseAuth;
@@ -208,6 +209,7 @@ This document outlines the comprehensive implementation strategy for adding mode
    ```
 
 2. **Authentication Screen Updates**
+
    ```dart
    class ModernAuthScreen extends ConsumerWidget {
      @override
@@ -338,6 +340,7 @@ class AccountLinkingService {
    ```
 
 2. **Session Management**
+
    ```dart
    class SecureSessionManager {
      static const _accessTokenDuration = Duration(minutes: 15);

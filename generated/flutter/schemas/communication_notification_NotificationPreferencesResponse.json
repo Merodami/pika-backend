@@ -17,10 +17,7 @@
           }
         }
       },
-      "required": [
-        "enabled",
-        "categories"
-      ],
+      "required": ["enabled", "categories"],
       "additionalProperties": false
     },
     "inApp": {
@@ -38,10 +35,7 @@
           }
         }
       },
-      "required": [
-        "enabled",
-        "categories"
-      ],
+      "required": ["enabled", "categories"],
       "additionalProperties": false
     },
     "sms": {
@@ -59,10 +53,7 @@
           }
         }
       },
-      "required": [
-        "enabled",
-        "categories"
-      ],
+      "required": ["enabled", "categories"],
       "additionalProperties": false
     },
     "push": {
@@ -83,10 +74,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "enabled",
-        "categories"
-      ],
+      "required": ["enabled", "categories"],
       "additionalProperties": false
     },
     "quietHours": {
@@ -108,18 +96,10 @@
           "type": "string"
         }
       },
-      "required": [
-        "enabled"
-      ],
+      "required": ["enabled"],
       "additionalProperties": false
     }
   },
-  "required": [
-    "email",
-    "inApp",
-    "sms",
-    "push",
-    "quietHours"
-  ],
+  "required": ["email", "inApp", "sms", "push", "quietHours"],
   "additionalProperties": false
 }

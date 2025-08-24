@@ -4,13 +4,7 @@
   "properties": {
     "channel": {
       "type": "string",
-      "enum": [
-        "email",
-        "sms",
-        "push",
-        "inApp",
-        "webhook"
-      ]
+      "enum": ["email", "sms", "push", "inApp", "webhook"]
     },
     "fromDate": {
       "description": "ISO 8601 datetime with timezone",
@@ -23,11 +17,7 @@
     "groupBy": {
       "default": "day",
       "type": "string",
-      "enum": [
-        "day",
-        "week",
-        "month"
-      ]
+      "enum": ["day", "week", "month"]
     },
     "userId": {
       "type": "string",
@@ -44,10 +34,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "fromDate",
-    "toDate",
-    "groupBy"
-  ],
+  "required": ["fromDate", "toDate", "groupBy"],
   "additionalProperties": false
 }

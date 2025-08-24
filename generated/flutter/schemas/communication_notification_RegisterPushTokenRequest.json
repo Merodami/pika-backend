@@ -8,13 +8,7 @@
     },
     "platform": {
       "type": "string",
-      "enum": [
-        "ios",
-        "android",
-        "web",
-        "desktop",
-        "other"
-      ]
+      "enum": ["ios", "android", "web", "desktop", "other"]
     },
     "deviceId": {
       "type": "string"
@@ -23,9 +17,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "token",
-    "platform"
-  ],
+  "required": ["token", "platform"],
   "additionalProperties": false
 }

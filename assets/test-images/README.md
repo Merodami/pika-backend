@@ -1,6 +1,7 @@
 # Test Images for VoucherBook Development
 
 ## Overview
+
 This directory contains test images for development and testing purposes. All images are sourced from Unsplash and are free to use.
 
 ## Directory Structure
@@ -22,6 +23,7 @@ assets/test-images/
 ## Image Categories
 
 ### Business Images (10 total)
+
 - `restaurant-1.jpg` - Restaurant interior
 - `cafe-2.jpg` - Coffee shop
 - `gym-3.jpg` - Fitness center
@@ -34,6 +36,7 @@ assets/test-images/
 - `cinema-10.jpg` - Movie theater
 
 ### Voucher Images (10 total)
+
 - `gift-card-1.jpg` - Gift card concept
 - `discount-2.jpg` - Discount/sale imagery
 - `sale-3.jpg` - Sale promotion
@@ -46,6 +49,7 @@ assets/test-images/
 - `special-10.jpg` - Special promotions
 
 ### User Avatar Images (5 total)
+
 - `avatar-1.jpg` - Professional woman
 - `avatar-2.jpg` - Professional man
 - `avatar-3.jpg` - Young woman
@@ -53,6 +57,7 @@ assets/test-images/
 - `avatar-5.jpg` - Diverse professional
 
 ### General Images (5 total)
+
 - `logo-1.jpg` - Brand/logo concept
 - `placeholder-2.jpg` - Generic placeholder
 - `background-3.jpg` - Abstract background
@@ -62,11 +67,13 @@ assets/test-images/
 ## Image Specifications
 
 ### Size Small (Thumbnails)
+
 - Dimensions: 400x300px (except user avatars which are 400x400px)
 - Use case: Thumbnail views, list items, cards
 - File size: Optimized for quick loading
 
 ### Size Medium (Previews)
+
 - Dimensions: 800x600px (except user avatars which are 800x800px)
 - Use case: Detail views, modals, larger displays
 - File size: Higher quality for better viewing
@@ -74,6 +81,7 @@ assets/test-images/
 ## Usage in Development
 
 These images can be used for:
+
 - Testing image upload functionality
 - Populating seed data with realistic images
 - UI/UX development with proper content
@@ -88,10 +96,10 @@ const businessImages = [
   'assets/test-images/size-small/business/restaurant-1.jpg',
   'assets/test-images/size-small/business/cafe-2.jpg',
   // ... more images
-];
+]
 
 // Example usage in tests
-const avatarPath = 'assets/test-images/size-small/users/avatar-1.jpg';
+const avatarPath = 'assets/test-images/size-small/users/avatar-1.jpg'
 ```
 
 ## Notes

@@ -35,11 +35,11 @@ import * as supportParameterSchemas from '@api/schemas/support/common/parameters
 import * as supportCommentSchemas from '@api/schemas/support/public/comment.js'
 import * as supportProblemSchemas from '@api/schemas/support/public/problem.js'
 import * as userEnumSchemas from '@api/schemas/user/common/enums.js'
+import * as userFavoritesSchemas from '@api/schemas/user/public/favorites.js'
 import * as userAddressSchemas from '@api/schemas/user/public/index.js'
 import * as userPaymentMethodSchemas from '@api/schemas/user/public/paymentMethod.js'
 import * as userProfileSchemas from '@api/schemas/user/public/profile.js'
 import * as userSettingsSchemas from '@api/schemas/user/public/settings.js'
-import * as userFavoritesSchemas from '@api/schemas/user/public/favorites.js'
 import * as voucherEnumSchemas from '@api/schemas/voucher/common/enums.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
 import * as voucherSchemas from '@api/schemas/voucher/public/voucher.js'
@@ -352,10 +352,7 @@ export function registerPublicAPI(registry: ZodRegistry): void {
     'GetLinkedAccountsResponse',
     authSocialSchemas.GetLinkedAccountsResponseSchema,
   )
-  registry.registerSchema(
-    'DeviceInfo',
-    authSocialSchemas.DeviceInfoSchema,
-  )
+  registry.registerSchema('DeviceInfo', authSocialSchemas.DeviceInfoSchema)
   registry.registerSchema(
     'LinkedAccountDetails',
     authSocialSchemas.LinkedAccountDetails,
@@ -924,11 +921,11 @@ function registerPublicRoutes(registry: ZodRegistry): void {
                 logo: {
                   type: 'string',
                   format: 'binary',
-                  description: 'Logo image file'
-                }
+                  description: 'Logo image file',
+                },
               },
-              required: ['logo']
-            }
+              required: ['logo'],
+            },
           },
         },
         required: true,
@@ -1932,7 +1929,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     path: '/auth/social/login',
     operationId: 'socialLogin',
     summary: 'Social authentication login',
-    description: 'Login using Firebase ID token from social provider (Google, Facebook, Apple)',
+    description:
+      'Login using Firebase ID token from social provider (Google, Facebook, Apple)',
     tags: ['Authentication'],
     request: {
       body: {
@@ -1969,7 +1967,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     path: '/auth/exchange-token',
     operationId: 'exchangeToken',
     summary: 'Exchange OAuth authorization code',
-    description: 'Exchange OAuth authorization code from provider for JWT tokens',
+    description:
+      'Exchange OAuth authorization code from provider for JWT tokens',
     tags: ['Authentication'],
     request: {
       body: {
@@ -2014,7 +2013,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     path: '/auth/social/link',
     operationId: 'linkSocialAccount',
     summary: 'Link social account to user',
-    description: 'Link a social provider account to existing authenticated user',
+    description:
+      'Link a social provider account to existing authenticated user',
     tags: ['Authentication'],
     security: [{ bearerAuth: [] }],
     request: {
@@ -2106,7 +2106,8 @@ function registerPublicRoutes(registry: ZodRegistry): void {
     path: '/auth/social/accounts',
     operationId: 'getLinkedAccounts',
     summary: 'Get user linked social accounts',
-    description: 'Get list of social provider accounts linked to authenticated user',
+    description:
+      'Get list of social provider accounts linked to authenticated user',
     tags: ['Authentication'],
     security: [{ bearerAuth: [] }],
     responses: {

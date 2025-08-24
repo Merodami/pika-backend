@@ -3,9 +3,12 @@
  * Creates real Firebase tokens for testing using Firebase emulator
  */
 
-import admin from 'firebase-admin'
+import {
+  FIREBASE_AUTH_EMULATOR_HOST,
+  FIREBASE_PROJECT_ID,
+} from '@pika/environment'
 import { logger } from '@pika/shared'
-import { FIREBASE_PROJECT_ID, FIREBASE_AUTH_EMULATOR_HOST } from '@pika/environment'
+import admin from 'firebase-admin'
 
 export interface FirebaseTestUser {
   uid: string
@@ -32,11 +35,14 @@ export class FirebaseTestClient {
       if (FIREBASE_AUTH_EMULATOR_HOST) {
         process.env.FIREBASE_AUTH_EMULATOR_HOST = FIREBASE_AUTH_EMULATOR_HOST
       }
-      
+
       // Initialize Firebase Admin SDK for emulator
-      this.app = admin.initializeApp({
-        projectId: FIREBASE_PROJECT_ID,
-      }, `test-app-${Date.now()}`)
+      this.app = admin.initializeApp(
+        {
+          projectId: FIREBASE_PROJECT_ID,
+        },
+        `test-app-${Date.now()}`,
+      )
 
       this.initialized = true
       logger.info('Firebase test client initialized with emulator', {
@@ -64,7 +70,7 @@ export class FirebaseTestClient {
 
     try {
       const auth = this.app.auth()
-      
+
       // Create user in Firebase Auth
       const userRecord = await auth.createUser({
         email: userData.email,
@@ -129,12 +135,16 @@ export class FirebaseTestClient {
         typ: 'JWT',
       }
 
-      const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url')
-      const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url')
-      
+      const encodedHeader = Buffer.from(JSON.stringify(header)).toString(
+        'base64url',
+      )
+      const encodedPayload = Buffer.from(JSON.stringify(payload)).toString(
+        'base64url',
+      )
+
       // For Firebase emulator, unsigned token format: header.payload.
       const unsignedToken = `${encodedHeader}.${encodedPayload}.`
-      
+
       logger.debug('Generated mock Firebase ID token for test user', {
         uid: testUser.uid,
         provider: testUser.provider,
@@ -156,13 +166,15 @@ export class FirebaseTestClient {
 
     try {
       const auth = this.app.auth()
-      
+
       // List all users and delete them
       const listUsers = await auth.listUsers()
-      const deletePromises = listUsers.users.map(user => auth.deleteUser(user.uid))
-      
+      const deletePromises = listUsers.users.map((user) =>
+        auth.deleteUser(user.uid),
+      )
+
       await Promise.all(deletePromises)
-      
+
       logger.info('Cleaned up Firebase test users')
     } catch (error) {
       logger.error('Failed to cleanup Firebase test users', error as Error)
@@ -247,12 +259,13 @@ export class FirebaseTestClient {
     try {
       // For unsigned ID tokens, decode the payload directly
       const parts = idToken.split('.')
+
       if (parts.length !== 3) {
         throw new Error('Invalid token format')
       }
 
       const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString())
-      
+
       logger.debug('ID token payload verified', {
         sub: payload.sub,
         email: payload.email,

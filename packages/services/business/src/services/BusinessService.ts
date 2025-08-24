@@ -1,9 +1,9 @@
+import type { IBusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
 import type {
   CreateBusinessData,
   IBusinessRepository,
   UpdateBusinessData,
 } from '@business/repositories/BusinessRepository.js'
-import type { IBusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
 import type { BusinessSearchParams } from '@business/types/search.js'
 import { DEFAULT_LANGUAGE, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, type ICacheService } from '@pika/redis'
@@ -693,12 +693,9 @@ export class BusinessService implements IBusinessService {
   ): Promise<string> {
     try {
       if (!this.storageService) {
-        throw ErrorFactory.badRequest(
-          'Storage service not configured',
-          {
-            source: 'BusinessService.uploadBusinessLogo',
-          },
-        )
+        throw ErrorFactory.badRequest('Storage service not configured', {
+          source: 'BusinessService.uploadBusinessLogo',
+        })
       }
 
       if (!this.businessDetailsRepository) {
@@ -712,6 +709,7 @@ export class BusinessService implements IBusinessService {
 
       // Validate that business exists
       const business = await this.businessRepository.findById(businessId)
+
       if (!business) {
         throw ErrorFactory.resourceNotFound('Business', businessId)
       }
@@ -734,8 +732,9 @@ export class BusinessService implements IBusinessService {
       )
 
       // Get or create business details if they don't exist
-      let businessDetails = await this.businessDetailsRepository.findByBusinessId(businessId)
-      
+      const businessDetails =
+        await this.businessDetailsRepository.findByBusinessId(businessId)
+
       if (businessDetails) {
         // Update existing business details with the new logo URL
         await this.businessDetailsRepository.update(businessId, {

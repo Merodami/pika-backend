@@ -12,12 +12,7 @@
     },
     "deviceType": {
       "type": "string",
-      "enum": [
-        "ios",
-        "android",
-        "web",
-        "desktop"
-      ]
+      "enum": ["ios", "android", "web", "desktop"]
     },
     "browserInfo": {
       "type": "object",

@@ -925,5 +925,4 @@ export class UserService implements IUserService {
       logger.warn('Failed to invalidate cache', { error })
     }
   }
-
 }

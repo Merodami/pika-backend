@@ -19,11 +19,7 @@
               "properties": {
                 "theme": {
                   "type": "string",
-                  "enum": [
-                    "light",
-                    "dark",
-                    "system"
-                  ]
+                  "enum": ["light", "dark", "system"]
                 },
                 "language": {
                   "type": "string",
@@ -35,18 +31,11 @@
                 },
                 "dateFormat": {
                   "type": "string",
-                  "enum": [
-                    "MM/DD/YYYY",
-                    "DD/MM/YYYY",
-                    "YYYY-MM-DD"
-                  ]
+                  "enum": ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]
                 },
                 "timeFormat": {
                   "type": "string",
-                  "enum": [
-                    "12h",
-                    "24h"
-                  ]
+                  "enum": ["12h", "24h"]
                 },
                 "currency": {
                   "type": "string",
@@ -153,11 +142,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "enabled",
-                    "securityAlerts",
-                    "orderUpdates"
-                  ],
+                  "required": ["enabled", "securityAlerts", "orderUpdates"],
                   "additionalProperties": false
                 },
                 "inApp": {
@@ -173,20 +158,11 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "enabled",
-                    "sound",
-                    "vibration"
-                  ],
+                  "required": ["enabled", "sound", "vibration"],
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "email",
-                "push",
-                "sms",
-                "inApp"
-              ],
+              "required": ["email", "push", "sms", "inApp"],
               "additionalProperties": false
             },
             "privacy": {
@@ -197,11 +173,7 @@
                   "properties": {
                     "visibility": {
                       "type": "string",
-                      "enum": [
-                        "public",
-                        "private",
-                        "friends"
-                      ]
+                      "enum": ["public", "private", "friends"]
                     },
                     "showEmail": {
                       "type": "boolean"
@@ -231,10 +203,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowDiscovery",
-                    "showInRecommendations"
-                  ],
+                  "required": ["allowDiscovery", "showInRecommendations"],
                   "additionalProperties": false
                 },
                 "analytics": {
@@ -247,10 +216,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowTracking",
-                    "shareUsageData"
-                  ],
+                  "required": ["allowTracking", "shareUsageData"],
                   "additionalProperties": false
                 },
                 "marketing": {
@@ -263,19 +229,11 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowPersonalization",
-                    "shareWithPartners"
-                  ],
+                  "required": ["allowPersonalization", "shareWithPartners"],
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "profile",
-                "search",
-                "analytics",
-                "marketing"
-              ],
+              "required": ["profile", "search", "analytics", "marketing"],
               "additionalProperties": false
             },
             "business": {
@@ -286,12 +244,7 @@
                   "properties": {
                     "defaultView": {
                       "type": "string",
-                      "enum": [
-                        "overview",
-                        "analytics",
-                        "vouchers",
-                        "customers"
-                      ]
+                      "enum": ["overview", "analytics", "vouchers", "customers"]
                     },
                     "autoRefresh": {
                       "type": "boolean"
@@ -302,11 +255,7 @@
                       "maximum": 60
                     }
                   },
-                  "required": [
-                    "defaultView",
-                    "autoRefresh",
-                    "refreshInterval"
-                  ],
+                  "required": ["defaultView", "autoRefresh", "refreshInterval"],
                   "additionalProperties": false
                 },
                 "vouchers": {
@@ -354,11 +303,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "dashboard",
-                "vouchers",
-                "notifications"
-              ],
+              "required": ["dashboard", "vouchers", "notifications"],
               "additionalProperties": false
             },
             "accessibility": {
@@ -404,9 +349,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "settings"
-      ],
+      "required": ["settings"],
       "additionalProperties": false
     },
     "PatchUserSettingsRequest": {
@@ -418,11 +361,7 @@
           "properties": {
             "theme": {
               "type": "string",
-              "enum": [
-                "light",
-                "dark",
-                "system"
-              ]
+              "enum": ["light", "dark", "system"]
             },
             "language": {
               "type": "string",
@@ -434,18 +373,11 @@
             },
             "dateFormat": {
               "type": "string",
-              "enum": [
-                "MM/DD/YYYY",
-                "DD/MM/YYYY",
-                "YYYY-MM-DD"
-              ]
+              "enum": ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]
             },
             "timeFormat": {
               "type": "string",
-              "enum": [
-                "12h",
-                "24h"
-              ]
+              "enum": ["12h", "24h"]
             },
             "currency": {
               "type": "string",
@@ -555,11 +487,7 @@
               "properties": {
                 "visibility": {
                   "type": "string",
-                  "enum": [
-                    "public",
-                    "private",
-                    "friends"
-                  ]
+                  "enum": ["public", "private", "friends"]
                 },
                 "showEmail": {
                   "type": "boolean"
@@ -620,12 +548,7 @@
               "properties": {
                 "defaultView": {
                   "type": "string",
-                  "enum": [
-                    "overview",
-                    "analytics",
-                    "vouchers",
-                    "customers"
-                  ]
+                  "enum": ["overview", "analytics", "vouchers", "customers"]
                 },
                 "autoRefresh": {
                   "type": "boolean"
@@ -714,11 +637,7 @@
               "properties": {
                 "theme": {
                   "type": "string",
-                  "enum": [
-                    "light",
-                    "dark",
-                    "system"
-                  ]
+                  "enum": ["light", "dark", "system"]
                 },
                 "language": {
                   "type": "string",
@@ -730,18 +649,11 @@
                 },
                 "dateFormat": {
                   "type": "string",
-                  "enum": [
-                    "MM/DD/YYYY",
-                    "DD/MM/YYYY",
-                    "YYYY-MM-DD"
-                  ]
+                  "enum": ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]
                 },
                 "timeFormat": {
                   "type": "string",
-                  "enum": [
-                    "12h",
-                    "24h"
-                  ]
+                  "enum": ["12h", "24h"]
                 },
                 "currency": {
                   "type": "string",
@@ -848,11 +760,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "enabled",
-                    "securityAlerts",
-                    "orderUpdates"
-                  ],
+                  "required": ["enabled", "securityAlerts", "orderUpdates"],
                   "additionalProperties": false
                 },
                 "inApp": {
@@ -868,20 +776,11 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "enabled",
-                    "sound",
-                    "vibration"
-                  ],
+                  "required": ["enabled", "sound", "vibration"],
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "email",
-                "push",
-                "sms",
-                "inApp"
-              ],
+              "required": ["email", "push", "sms", "inApp"],
               "additionalProperties": false
             },
             "privacy": {
@@ -892,11 +791,7 @@
                   "properties": {
                     "visibility": {
                       "type": "string",
-                      "enum": [
-                        "public",
-                        "private",
-                        "friends"
-                      ]
+                      "enum": ["public", "private", "friends"]
                     },
                     "showEmail": {
                       "type": "boolean"
@@ -926,10 +821,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowDiscovery",
-                    "showInRecommendations"
-                  ],
+                  "required": ["allowDiscovery", "showInRecommendations"],
                   "additionalProperties": false
                 },
                 "analytics": {
@@ -942,10 +834,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowTracking",
-                    "shareUsageData"
-                  ],
+                  "required": ["allowTracking", "shareUsageData"],
                   "additionalProperties": false
                 },
                 "marketing": {
@@ -958,19 +847,11 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowPersonalization",
-                    "shareWithPartners"
-                  ],
+                  "required": ["allowPersonalization", "shareWithPartners"],
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "profile",
-                "search",
-                "analytics",
-                "marketing"
-              ],
+              "required": ["profile", "search", "analytics", "marketing"],
               "additionalProperties": false
             },
             "business": {
@@ -981,12 +862,7 @@
                   "properties": {
                     "defaultView": {
                       "type": "string",
-                      "enum": [
-                        "overview",
-                        "analytics",
-                        "vouchers",
-                        "customers"
-                      ]
+                      "enum": ["overview", "analytics", "vouchers", "customers"]
                     },
                     "autoRefresh": {
                       "type": "boolean"
@@ -997,11 +873,7 @@
                       "maximum": 60
                     }
                   },
-                  "required": [
-                    "defaultView",
-                    "autoRefresh",
-                    "refreshInterval"
-                  ],
+                  "required": ["defaultView", "autoRefresh", "refreshInterval"],
                   "additionalProperties": false
                 },
                 "vouchers": {
@@ -1049,11 +921,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "dashboard",
-                "vouchers",
-                "notifications"
-              ],
+              "required": ["dashboard", "vouchers", "notifications"],
               "additionalProperties": false
             },
             "accessibility": {
@@ -1103,10 +971,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "settings",
-        "message"
-      ],
+      "required": ["settings", "message"],
       "additionalProperties": false
     },
     "UpdateUserSettingsRequest": {
@@ -1122,11 +987,7 @@
           "properties": {
             "theme": {
               "type": "string",
-              "enum": [
-                "light",
-                "dark",
-                "system"
-              ]
+              "enum": ["light", "dark", "system"]
             },
             "language": {
               "type": "string",
@@ -1138,18 +999,11 @@
             },
             "dateFormat": {
               "type": "string",
-              "enum": [
-                "MM/DD/YYYY",
-                "DD/MM/YYYY",
-                "YYYY-MM-DD"
-              ]
+              "enum": ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]
             },
             "timeFormat": {
               "type": "string",
-              "enum": [
-                "12h",
-                "24h"
-              ]
+              "enum": ["12h", "24h"]
             },
             "currency": {
               "type": "string",
@@ -1256,11 +1110,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "enabled",
-                "securityAlerts",
-                "orderUpdates"
-              ],
+              "required": ["enabled", "securityAlerts", "orderUpdates"],
               "additionalProperties": false
             },
             "inApp": {
@@ -1276,20 +1126,11 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "enabled",
-                "sound",
-                "vibration"
-              ],
+              "required": ["enabled", "sound", "vibration"],
               "additionalProperties": false
             }
           },
-          "required": [
-            "email",
-            "push",
-            "sms",
-            "inApp"
-          ],
+          "required": ["email", "push", "sms", "inApp"],
           "additionalProperties": false
         },
         "privacy": {
@@ -1300,11 +1141,7 @@
               "properties": {
                 "visibility": {
                   "type": "string",
-                  "enum": [
-                    "public",
-                    "private",
-                    "friends"
-                  ]
+                  "enum": ["public", "private", "friends"]
                 },
                 "showEmail": {
                   "type": "boolean"
@@ -1334,10 +1171,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "allowDiscovery",
-                "showInRecommendations"
-              ],
+              "required": ["allowDiscovery", "showInRecommendations"],
               "additionalProperties": false
             },
             "analytics": {
@@ -1350,10 +1184,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "allowTracking",
-                "shareUsageData"
-              ],
+              "required": ["allowTracking", "shareUsageData"],
               "additionalProperties": false
             },
             "marketing": {
@@ -1366,19 +1197,11 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "allowPersonalization",
-                "shareWithPartners"
-              ],
+              "required": ["allowPersonalization", "shareWithPartners"],
               "additionalProperties": false
             }
           },
-          "required": [
-            "profile",
-            "search",
-            "analytics",
-            "marketing"
-          ],
+          "required": ["profile", "search", "analytics", "marketing"],
           "additionalProperties": false
         },
         "business": {
@@ -1389,12 +1212,7 @@
               "properties": {
                 "defaultView": {
                   "type": "string",
-                  "enum": [
-                    "overview",
-                    "analytics",
-                    "vouchers",
-                    "customers"
-                  ]
+                  "enum": ["overview", "analytics", "vouchers", "customers"]
                 },
                 "autoRefresh": {
                   "type": "boolean"
@@ -1405,11 +1223,7 @@
                   "maximum": 60
                 }
               },
-              "required": [
-                "defaultView",
-                "autoRefresh",
-                "refreshInterval"
-              ],
+              "required": ["defaultView", "autoRefresh", "refreshInterval"],
               "additionalProperties": false
             },
             "vouchers": {
@@ -1457,11 +1271,7 @@
               "additionalProperties": false
             }
           },
-          "required": [
-            "dashboard",
-            "vouchers",
-            "notifications"
-          ],
+          "required": ["dashboard", "vouchers", "notifications"],
           "additionalProperties": false
         },
         "accessibility": {
@@ -1522,11 +1332,7 @@
               "properties": {
                 "theme": {
                   "type": "string",
-                  "enum": [
-                    "light",
-                    "dark",
-                    "system"
-                  ]
+                  "enum": ["light", "dark", "system"]
                 },
                 "language": {
                   "type": "string",
@@ -1538,18 +1344,11 @@
                 },
                 "dateFormat": {
                   "type": "string",
-                  "enum": [
-                    "MM/DD/YYYY",
-                    "DD/MM/YYYY",
-                    "YYYY-MM-DD"
-                  ]
+                  "enum": ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]
                 },
                 "timeFormat": {
                   "type": "string",
-                  "enum": [
-                    "12h",
-                    "24h"
-                  ]
+                  "enum": ["12h", "24h"]
                 },
                 "currency": {
                   "type": "string",
@@ -1656,11 +1455,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "enabled",
-                    "securityAlerts",
-                    "orderUpdates"
-                  ],
+                  "required": ["enabled", "securityAlerts", "orderUpdates"],
                   "additionalProperties": false
                 },
                 "inApp": {
@@ -1676,20 +1471,11 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "enabled",
-                    "sound",
-                    "vibration"
-                  ],
+                  "required": ["enabled", "sound", "vibration"],
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "email",
-                "push",
-                "sms",
-                "inApp"
-              ],
+              "required": ["email", "push", "sms", "inApp"],
               "additionalProperties": false
             },
             "privacy": {
@@ -1700,11 +1486,7 @@
                   "properties": {
                     "visibility": {
                       "type": "string",
-                      "enum": [
-                        "public",
-                        "private",
-                        "friends"
-                      ]
+                      "enum": ["public", "private", "friends"]
                     },
                     "showEmail": {
                       "type": "boolean"
@@ -1734,10 +1516,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowDiscovery",
-                    "showInRecommendations"
-                  ],
+                  "required": ["allowDiscovery", "showInRecommendations"],
                   "additionalProperties": false
                 },
                 "analytics": {
@@ -1750,10 +1529,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowTracking",
-                    "shareUsageData"
-                  ],
+                  "required": ["allowTracking", "shareUsageData"],
                   "additionalProperties": false
                 },
                 "marketing": {
@@ -1766,19 +1542,11 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "allowPersonalization",
-                    "shareWithPartners"
-                  ],
+                  "required": ["allowPersonalization", "shareWithPartners"],
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "profile",
-                "search",
-                "analytics",
-                "marketing"
-              ],
+              "required": ["profile", "search", "analytics", "marketing"],
               "additionalProperties": false
             },
             "business": {
@@ -1789,12 +1557,7 @@
                   "properties": {
                     "defaultView": {
                       "type": "string",
-                      "enum": [
-                        "overview",
-                        "analytics",
-                        "vouchers",
-                        "customers"
-                      ]
+                      "enum": ["overview", "analytics", "vouchers", "customers"]
                     },
                     "autoRefresh": {
                       "type": "boolean"
@@ -1805,11 +1568,7 @@
                       "maximum": 60
                     }
                   },
-                  "required": [
-                    "defaultView",
-                    "autoRefresh",
-                    "refreshInterval"
-                  ],
+                  "required": ["defaultView", "autoRefresh", "refreshInterval"],
                   "additionalProperties": false
                 },
                 "vouchers": {
@@ -1857,11 +1616,7 @@
                   "additionalProperties": false
                 }
               },
-              "required": [
-                "dashboard",
-                "vouchers",
-                "notifications"
-              ],
+              "required": ["dashboard", "vouchers", "notifications"],
               "additionalProperties": false
             },
             "accessibility": {
@@ -1911,10 +1666,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "settings",
-        "message"
-      ],
+      "required": ["settings", "message"],
       "additionalProperties": false
     },
     "UserSettings": {
@@ -1930,11 +1682,7 @@
           "properties": {
             "theme": {
               "type": "string",
-              "enum": [
-                "light",
-                "dark",
-                "system"
-              ]
+              "enum": ["light", "dark", "system"]
             },
             "language": {
               "type": "string",
@@ -1946,18 +1694,11 @@
             },
             "dateFormat": {
               "type": "string",
-              "enum": [
-                "MM/DD/YYYY",
-                "DD/MM/YYYY",
-                "YYYY-MM-DD"
-              ]
+              "enum": ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]
             },
             "timeFormat": {
               "type": "string",
-              "enum": [
-                "12h",
-                "24h"
-              ]
+              "enum": ["12h", "24h"]
             },
             "currency": {
               "type": "string",
@@ -2064,11 +1805,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "enabled",
-                "securityAlerts",
-                "orderUpdates"
-              ],
+              "required": ["enabled", "securityAlerts", "orderUpdates"],
               "additionalProperties": false
             },
             "inApp": {
@@ -2084,20 +1821,11 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "enabled",
-                "sound",
-                "vibration"
-              ],
+              "required": ["enabled", "sound", "vibration"],
               "additionalProperties": false
             }
           },
-          "required": [
-            "email",
-            "push",
-            "sms",
-            "inApp"
-          ],
+          "required": ["email", "push", "sms", "inApp"],
           "additionalProperties": false
         },
         "privacy": {
@@ -2108,11 +1836,7 @@
               "properties": {
                 "visibility": {
                   "type": "string",
-                  "enum": [
-                    "public",
-                    "private",
-                    "friends"
-                  ]
+                  "enum": ["public", "private", "friends"]
                 },
                 "showEmail": {
                   "type": "boolean"
@@ -2142,10 +1866,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "allowDiscovery",
-                "showInRecommendations"
-              ],
+              "required": ["allowDiscovery", "showInRecommendations"],
               "additionalProperties": false
             },
             "analytics": {
@@ -2158,10 +1879,7 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "allowTracking",
-                "shareUsageData"
-              ],
+              "required": ["allowTracking", "shareUsageData"],
               "additionalProperties": false
             },
             "marketing": {
@@ -2174,19 +1892,11 @@
                   "type": "boolean"
                 }
               },
-              "required": [
-                "allowPersonalization",
-                "shareWithPartners"
-              ],
+              "required": ["allowPersonalization", "shareWithPartners"],
               "additionalProperties": false
             }
           },
-          "required": [
-            "profile",
-            "search",
-            "analytics",
-            "marketing"
-          ],
+          "required": ["profile", "search", "analytics", "marketing"],
           "additionalProperties": false
         },
         "business": {
@@ -2197,12 +1907,7 @@
               "properties": {
                 "defaultView": {
                   "type": "string",
-                  "enum": [
-                    "overview",
-                    "analytics",
-                    "vouchers",
-                    "customers"
-                  ]
+                  "enum": ["overview", "analytics", "vouchers", "customers"]
                 },
                 "autoRefresh": {
                   "type": "boolean"
@@ -2213,11 +1918,7 @@
                   "maximum": 60
                 }
               },
-              "required": [
-                "defaultView",
-                "autoRefresh",
-                "refreshInterval"
-              ],
+              "required": ["defaultView", "autoRefresh", "refreshInterval"],
               "additionalProperties": false
             },
             "vouchers": {
@@ -2265,11 +1966,7 @@
               "additionalProperties": false
             }
           },
-          "required": [
-            "dashboard",
-            "vouchers",
-            "notifications"
-          ],
+          "required": ["dashboard", "vouchers", "notifications"],
           "additionalProperties": false
         },
         "accessibility": {

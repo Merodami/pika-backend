@@ -61,10 +61,7 @@
       "description": "Source of registration to determine user role",
       "default": "public",
       "type": "string",
-      "enum": [
-        "public",
-        "adminDashboard"
-      ]
+      "enum": ["public", "adminDashboard"]
     }
   },
   "required": [

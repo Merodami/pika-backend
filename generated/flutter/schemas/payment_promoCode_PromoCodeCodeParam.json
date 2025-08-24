@@ -8,8 +8,6 @@
       "maxLength": 50
     }
   },
-  "required": [
-    "code"
-  ],
+  "required": ["code"],
   "additionalProperties": false
 }

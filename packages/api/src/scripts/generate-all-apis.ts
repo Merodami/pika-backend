@@ -58,7 +58,10 @@ const publicRegistry = createRegistry({
       description: 'Local Development',
     },
     { url: 'https://api.thevoucherbook.com/v1', description: 'Production' },
-    { url: 'https://api.staging.thevoucherbook.com/v1', description: 'Staging' },
+    {
+      url: 'https://api.staging.thevoucherbook.com/v1',
+      description: 'Staging',
+    },
   ],
 })
 
@@ -76,7 +79,10 @@ const adminRegistry = createRegistry({
       description: 'Local Development',
     },
     { url: 'https://api.thevoucherbook.com/v1', description: 'Production' },
-    { url: 'https://api.staging.thevoucherbook.com/v1', description: 'Staging' },
+    {
+      url: 'https://api.staging.thevoucherbook.com/v1',
+      description: 'Staging',
+    },
   ],
 })
 

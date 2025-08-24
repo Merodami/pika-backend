@@ -16,26 +16,11 @@
     },
     "currency": {
       "type": "string",
-      "enum": [
-        "PYG",
-        "USD",
-        "EUR",
-        "GBP",
-        "CAD",
-        "AUD",
-        "JPY",
-        "CNY",
-        "INR"
-      ]
+      "enum": ["PYG", "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "INR"]
     },
     "interval": {
       "type": "string",
-      "enum": [
-        "day",
-        "week",
-        "month",
-        "year"
-      ]
+      "enum": ["day", "week", "month", "year"]
     },
     "intervalCount": {
       "type": "integer",

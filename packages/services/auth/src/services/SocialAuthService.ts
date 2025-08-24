@@ -1,15 +1,16 @@
 import { UserServiceClientAdapter } from '@auth-service/adapters/UserServiceClientAdapter.js'
 import {
   createFirebaseAuthStrategy,
+  FacebookOAuthClient,
   FirebaseAuthStrategy,
   FirebaseCredentials,
   FirebaseIdentityProvider,
   FirebaseIdentityProviderFactory,
-  JwtTokenService,
   GoogleOAuthClient,
-  FacebookOAuthClient,
+  JwtTokenService,
 } from '@pika/auth'
 import {
+  FIREBASE_AUTH_EMULATOR_HOST,
   isFirebaseConfigured,
   JWT_ACCESS_EXPIRY,
   JWT_ALGORITHM,
@@ -19,7 +20,6 @@ import {
   JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
   JWT_SECRET,
-  FIREBASE_AUTH_EMULATOR_HOST,
   NODE_ENV,
 } from '@pika/environment'
 import { type ICacheService } from '@pika/redis'
@@ -507,11 +507,13 @@ export class SocialAuthService implements ISocialAuthService {
       if (provider === 'google') {
         // Exchange Google authorization code for tokens
         const googleTokens = await this.exchangeGoogleCode(code, redirectUri)
+
         idToken = googleTokens.idToken
         providerAccessToken = googleTokens.accessToken
       } else if (provider === 'facebook') {
         // Exchange Facebook authorization code for tokens
         const fbTokens = await this.exchangeFacebookCode(code, redirectUri)
+
         idToken = fbTokens.idToken
         providerAccessToken = fbTokens.accessToken
       } else {
@@ -542,27 +544,29 @@ export class SocialAuthService implements ISocialAuthService {
     redirectUri: string,
   ): Promise<{ idToken: string; accessToken?: string }> {
     // Check if we're using Firebase emulator (development mode)
-    const isEmulator = FIREBASE_AUTH_EMULATOR_HOST || 
-                      NODE_ENV === 'development' || 
-                      NODE_ENV === 'test'
-    
+    const isEmulator =
+      FIREBASE_AUTH_EMULATOR_HOST ||
+      NODE_ENV === 'development' ||
+      NODE_ENV === 'test'
+
     if (isEmulator) {
       // In development/emulator mode, the code IS the ID token
       // Firebase emulator handles the OAuth flow internally
       logger.info('Using Firebase emulator - bypassing OAuth client')
+
       return {
         idToken: code, // The code from Firebase emulator is already an ID token
         accessToken: undefined,
       }
     }
-    
+
     // Production mode - use actual OAuth client
     const googleClient = new GoogleOAuthClient()
-    
+
     try {
       // Exchange authorization code for tokens
       const tokens = await googleClient.exchangeCodeForTokens(code, redirectUri)
-      
+
       // Google provides an ID token directly, which works with Firebase
       return {
         idToken: tokens.idToken,
@@ -582,46 +586,56 @@ export class SocialAuthService implements ISocialAuthService {
     redirectUri: string,
   ): Promise<{ idToken: string; accessToken?: string }> {
     // Check if we're using Firebase emulator (development mode)
-    const isEmulator = FIREBASE_AUTH_EMULATOR_HOST || 
-                      NODE_ENV === 'development' || 
-                      NODE_ENV === 'test'
-    
+    const isEmulator =
+      FIREBASE_AUTH_EMULATOR_HOST ||
+      NODE_ENV === 'development' ||
+      NODE_ENV === 'test'
+
     if (isEmulator) {
       // In development/emulator mode, the code IS the ID token
       // Firebase emulator handles the OAuth flow internally
-      logger.info('Using Firebase emulator for Facebook - bypassing OAuth client')
+      logger.info(
+        'Using Firebase emulator for Facebook - bypassing OAuth client',
+      )
+
       return {
         idToken: code, // The code from Firebase emulator is already an ID token
         accessToken: undefined,
       }
     }
-    
+
     // Production mode - use actual OAuth client
     const facebookClient = new FacebookOAuthClient()
-    
+
     try {
       // Exchange authorization code for access token
-      const tokens = await facebookClient.exchangeCodeForTokens(code, redirectUri)
-      
+      const tokens = await facebookClient.exchangeCodeForTokens(
+        code,
+        redirectUri,
+      )
+
       // Get user info from Facebook
       const userInfo = await facebookClient.getUserInfo(tokens.accessToken)
-      
-      // For Facebook, we need to handle this differently since Facebook 
+
+      // For Facebook, we need to handle this differently since Facebook
       // doesn't provide Firebase-compatible ID tokens directly
       if (!this.firebaseProvider) {
-        throw ErrorFactory.serviceUnavailable('Firebase provider not initialized')
+        throw ErrorFactory.serviceUnavailable(
+          'Firebase provider not initialized',
+        )
       }
-      
+
       const auth = this.firebaseProvider.getAuth()
-      
+
       // Check if user exists with this Facebook ID
       const facebookUid = `facebook:${userInfo.id}`
+
       let firebaseUser
-      
+
       try {
         // Try to get existing user by UID
         firebaseUser = await auth.getUser(facebookUid)
-      } catch (error: any) {
+      } catch {
         // User doesn't exist, try by email if available
         if (userInfo.email) {
           try {
@@ -634,13 +648,14 @@ export class SocialAuthService implements ISocialAuthService {
                 email: userInfo.email,
                 photoURL: userInfo.picture,
                 providerId: 'facebook.com',
-              }
+              },
             } as any)
           } catch {
             // Create new user with Facebook data
             firebaseUser = await auth.createUser({
               uid: facebookUid,
-              email: userInfo.email || `facebook_${userInfo.id}@placeholder.com`,
+              email:
+                userInfo.email || `facebook_${userInfo.id}@placeholder.com`,
               displayName: userInfo.name,
               photoURL: userInfo.picture,
               emailVerified: userInfo.emailVerified || false,
@@ -655,16 +670,16 @@ export class SocialAuthService implements ISocialAuthService {
           })
         }
       }
-      
+
       // Set custom claims for the user
       await auth.setCustomUserClaims(firebaseUser.uid, {
         provider: 'facebook',
         facebook_id: userInfo.id,
       })
-      
+
       // Create a custom token that can be used to sign in
       const customToken = await auth.createCustomToken(firebaseUser.uid)
-      
+
       // Important: The frontend needs to exchange this custom token for a Firebase ID token
       // by calling signInWithCustomToken(customToken) and then getting the ID token
       // For API consistency, we return the custom token as the ID token

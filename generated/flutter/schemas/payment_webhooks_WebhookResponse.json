@@ -13,8 +13,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "received"
-  ],
+  "required": ["received"],
   "additionalProperties": false
 }

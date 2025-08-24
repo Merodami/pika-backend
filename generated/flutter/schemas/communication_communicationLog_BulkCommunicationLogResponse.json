@@ -26,17 +26,11 @@
             "type": "string"
           }
         },
-        "required": [
-          "index",
-          "error"
-        ],
+        "required": ["index", "error"],
         "additionalProperties": false
       }
     }
   },
-  "required": [
-    "created",
-    "failed"
-  ],
+  "required": ["created", "failed"],
   "additionalProperties": false
 }

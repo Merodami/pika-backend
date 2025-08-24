@@ -21,10 +21,6 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "stepNumber",
-    "stepData",
-    "saveAsDraft"
-  ],
+  "required": ["stepNumber", "stepData", "saveAsDraft"],
   "additionalProperties": false
 }

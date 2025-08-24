@@ -37,12 +37,7 @@
           },
           "interval": {
             "type": "string",
-            "enum": [
-              "day",
-              "week",
-              "month",
-              "year"
-            ]
+            "enum": ["day", "week", "month", "year"]
           },
           "intervalCount": {
             "type": "integer",
@@ -130,9 +125,6 @@
       "additionalProperties": false
     }
   },
-  "required": [
-    "data",
-    "pagination"
-  ],
+  "required": ["data", "pagination"],
   "additionalProperties": false
 }

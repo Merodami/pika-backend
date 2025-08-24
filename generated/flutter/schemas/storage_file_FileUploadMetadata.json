@@ -21,8 +21,6 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "isPublic"
-  ],
+  "required": ["isPublic"],
   "additionalProperties": false
 }

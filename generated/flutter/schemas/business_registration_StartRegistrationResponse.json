@@ -13,9 +13,6 @@
       "maximum": 3
     }
   },
-  "required": [
-    "started",
-    "currentStep"
-  ],
+  "required": ["started", "currentStep"],
   "additionalProperties": false
 }

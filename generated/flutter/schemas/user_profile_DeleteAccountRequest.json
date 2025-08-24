@@ -18,9 +18,6 @@
       "const": true
     }
   },
-  "required": [
-    "password",
-    "confirmDeletion"
-  ],
+  "required": ["password", "confirmDeletion"],
   "additionalProperties": false
 }

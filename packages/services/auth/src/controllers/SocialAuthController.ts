@@ -1,7 +1,9 @@
 import { authPublic } from '@pika/api'
 import type { z } from 'zod'
 
-type GetLinkedAccountsResponse = z.infer<typeof authPublic.GetLinkedAccountsResponse>
+type GetLinkedAccountsResponse = z.infer<
+  typeof authPublic.GetLinkedAccountsResponse
+>
 type LinkAccountRequest = z.infer<typeof authPublic.LinkAccountRequest>
 type LinkAccountResponse = z.infer<typeof authPublic.LinkAccountResponse>
 type SocialLoginRequest = z.infer<typeof authPublic.SocialLoginRequest>

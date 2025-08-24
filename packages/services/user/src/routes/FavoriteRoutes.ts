@@ -1,6 +1,3 @@
-import { FavoriteController } from '@user/controllers/FavoriteController.js'
-import { UserFavoriteRepository } from '@user/repositories/UserFavoriteRepository.js'
-import { FavoriteService } from '@user/services/FavoriteService.js'
 import { shared, userPublic } from '@pika/api'
 import {
   requireAuth,
@@ -10,6 +7,9 @@ import {
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
 import type { PrismaClient } from '@prisma/client'
+import { FavoriteController } from '@user/controllers/FavoriteController.js'
+import { UserFavoriteRepository } from '@user/repositories/UserFavoriteRepository.js'
+import { FavoriteService } from '@user/services/FavoriteService.js'
 import { Router } from 'express'
 
 /**

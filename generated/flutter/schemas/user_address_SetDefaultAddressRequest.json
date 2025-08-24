@@ -11,17 +11,9 @@
     "type": {
       "description": "Set as default for specific type",
       "type": "string",
-      "enum": [
-        "home",
-        "work",
-        "billing",
-        "shipping",
-        "other"
-      ]
+      "enum": ["home", "work", "billing", "shipping", "other"]
     }
   },
-  "required": [
-    "addressId"
-  ],
+  "required": ["addressId"],
   "additionalProperties": false
 }

@@ -34,13 +34,7 @@
     },
     "type": {
       "type": "string",
-      "enum": [
-        "home",
-        "work",
-        "billing",
-        "shipping",
-        "other"
-      ]
+      "enum": ["home", "work", "billing", "shipping", "other"]
     },
     "label": {
       "type": "string",
@@ -73,10 +67,7 @@
           "maximum": 180
         }
       },
-      "required": [
-        "lat",
-        "lng"
-      ],
+      "required": ["lat", "lng"],
       "additionalProperties": false
     },
     "isVerified": {

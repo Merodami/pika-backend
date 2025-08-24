@@ -689,20 +689,26 @@ async function runVoucherCreationFlow() {
     log(
       `\n${colors.bright}=== Phase 4: Individual Voucher Reading ===${colors.reset}`,
     )
-    
+
     logStep(12, 'Test Reading Each Voucher Individually')
     for (const voucherId of createdVouchers) {
       try {
         const voucher = await getVoucherById(voucherId, adminToken)
-        logSuccess(`Successfully read voucher: ${voucher.title?.en || voucher.title}`)
+        logSuccess(
+          `Successfully read voucher: ${voucher.title?.en || voucher.title}`,
+        )
         logInfo(`  State: ${voucher.state}`)
-        logInfo(`  Discount: ${voucher.discountValue}${voucher.discountType === 'percentage' ? '%' : ' ' + voucher.currency}`)
-        logInfo(`  Redemptions: ${voucher.currentRedemptions}/${voucher.maxRedemptions}`)
+        logInfo(
+          `  Discount: ${voucher.discountValue}${voucher.discountType === 'percentage' ? '%' : ' ' + voucher.currency}`,
+        )
+        logInfo(
+          `  Redemptions: ${voucher.currentRedemptions}/${voucher.maxRedemptions}`,
+        )
       } catch (error: any) {
         logError(`Failed to read voucher ${voucherId}: ${error.message}`)
       }
     }
-    
+
     // Phase 5: Analytics and Monitoring
     log(
       `\n${colors.bright}=== Phase 5: Analytics & Monitoring ===${colors.reset}`,
@@ -753,7 +759,7 @@ async function runVoucherCreationFlow() {
         description: {
           en: 'This voucher is for testing state transitions',
           es: 'Este voucher es para probar transiciones de estado',
-          gn: 'Ko voucher ha\'e oñeha\'ã haguã estado jere',
+          gn: "Ko voucher ha'e oñeha'ã haguã estado jere",
         },
         termsAndConditions: {
           en: 'Test voucher only',
@@ -768,7 +774,7 @@ async function runVoucherCreationFlow() {
         maxRedemptions: 10,
         maxRedemptionsPerUser: 1,
       })
-      
+
       // Now we can suspend a draft voucher (which is allowed)
       await api.put(
         `/admin/vouchers/${draftVoucherId}/state`,
@@ -781,10 +787,9 @@ async function runVoucherCreationFlow() {
         },
       )
       logSuccess('Draft voucher state updated to suspended')
-      
+
       // Clean up the test voucher
       await deleteVoucher(draftVoucherId, adminToken)
-      
     } catch (error: any) {
       logError(
         `Failed to test voucher state transitions: ${error.response?.data?.message || error.message}`,
@@ -798,24 +803,26 @@ async function runVoucherCreationFlow() {
       log(`\n${colors.bright}=== Phase 7: Cleanup ===${colors.reset}`)
 
       logStep(17, 'Expire and Delete Test Vouchers')
-      
+
       for (const voucherId of createdVouchers) {
         try {
           // First check if voucher is already expired
           const voucher = await getVoucherById(voucherId, adminToken)
-          
+
           if (voucher.state !== 'expired') {
             // Expire the voucher first (required before deletion for published vouchers)
             logInfo(`Expiring voucher ${voucherId} before deletion...`)
             await expireVoucher(voucherId, adminToken)
           }
-          
+
           // Now try to delete - note that even expired vouchers might not be deletable
           // depending on business rules, so we'll handle that gracefully
           await deleteVoucher(voucherId, adminToken)
         } catch (error: any) {
           if (error.response?.status === 422) {
-            logInfo(`Voucher ${voucherId} cannot be deleted due to business rules - this is expected behavior`)
+            logInfo(
+              `Voucher ${voucherId} cannot be deleted due to business rules - this is expected behavior`,
+            )
           } else {
             logError(`Failed to process voucher ${voucherId}: ${error.message}`)
           }

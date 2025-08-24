@@ -15,18 +15,10 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": [
-          "google",
-          "facebook",
-          "apple"
-        ]
+        "enum": ["google", "facebook", "apple"]
       }
     }
   },
-  "required": [
-    "success",
-    "message",
-    "linkedAccounts"
-  ],
+  "required": ["success", "message", "linkedAccounts"],
   "additionalProperties": false
 }
