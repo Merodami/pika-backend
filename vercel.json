@@ -6,7 +6,6 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
-      "memory": 3008,
       "includeFiles": "packages/**/dist/**"
     }
   },
@@ -17,50 +16,6 @@
     },
     {
       "source": "/api/v1/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/auth/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/users/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/businesses/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/categories/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/payments/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/subscriptions/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/communications/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/support/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/storage/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/pdf/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/vouchers/:path*",
       "destination": "/api"
     }
   ],

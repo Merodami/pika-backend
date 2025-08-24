@@ -1,6 +1,6 @@
 services:
   postgres:
-    container_name: pika_postgres
+    container_name: thevoucherbook_postgres
     hostname: postgres
     image: postgis/postgis:17-3.5
     restart: unless-stopped
@@ -26,7 +26,7 @@ services:
       - backend
 
   redis:
-    container_name: pika_redis
+    container_name: thevoucherbook_redis
     hostname: redis
     image: redis:7.2-alpine
     platform: linux/arm64/v8
@@ -48,7 +48,7 @@ services:
       - backend
 
   stripe-mock:
-    container_name: pika_stripe_mock
+    container_name: thevoucherbook_stripe_mock
     hostname: stripe-mock
     image: stripe/stripe-mock:latest
     platform: linux/arm64/v8
@@ -64,7 +64,7 @@ services:
       - backend
 
   minio:
-    container_name: pika_minio
+    container_name: thevoucherbook_minio
     hostname: minio
     image: minio/minio:latest
     platform: linux/arm64/v8
@@ -101,15 +101,15 @@ services:
     entrypoint: >
       /bin/sh -c "
       mc alias set minio http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin};
-      mc mb -p minio/${AWS_S3_BUCKET:-pika-uploads} || true;
-      mc anonymous set public minio/${AWS_S3_BUCKET:-pika-uploads}/test-seed-images || true;
-      echo 'Bucket ${AWS_S3_BUCKET:-pika-uploads} ready and test-seed-images folder is public';
+      mc mb -p minio/${AWS_S3_BUCKET:-thevoucherbook-uploads} || true;
+      mc anonymous set public minio/${AWS_S3_BUCKET:-thevoucherbook-uploads}/test-seed-images || true;
+      echo 'Bucket ${AWS_S3_BUCKET:-thevoucherbook-uploads} ready and test-seed-images folder is public';
       "
     networks:
       - backend
 
   mailhog:
-    container_name: pika_mailhog
+    container_name: thevoucherbook_mailhog
     hostname: mailhog
     image: teawithfruit/mailhog:latest
     platform: linux/arm64/v8
@@ -130,7 +130,7 @@ services:
       - backend
 
   firebase-emulator:
-    container_name: pika_firebase_emulator
+    container_name: thevoucherbook_firebase_emulator
     hostname: firebase-emulator
     build:
       context: ./docker/firebase-emulator

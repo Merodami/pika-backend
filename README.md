@@ -1,4 +1,4 @@
-# 🏢 Pika Backend - Enterprise Microservices Platform
+# 🏢 The VoucherBook Backend - Enterprise Microservices Platform
 
 <div align="center">
   
@@ -49,7 +49,7 @@
 ```bash
 # 1. Clone and install dependencies
 git clone <repository-url>
-cd pika
+cd thevoucherbook-backend
 yarn install
 
 # 2. Copy environment configuration
@@ -147,7 +147,7 @@ yarn tsx tools/api-testing/generate-test-tokens.ts
 
 ## 🏗️ Architecture Overview
 
-Pika is built on **Clean Architecture** principles with a **microservices** design orchestrated through **NX monorepo**. The platform features enterprise-grade patterns including three-tier API design, comprehensive caching strategies, and production-ready deployment patterns.
+The VoucherBook is built on **Clean Architecture** principles with a **microservices** design orchestrated through **NX monorepo**. The platform features enterprise-grade patterns including three-tier API design, comprehensive caching strategies, and production-ready deployment patterns.
 
 ### 📦 Package Organization
 
