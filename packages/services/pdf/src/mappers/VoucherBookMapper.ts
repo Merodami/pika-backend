@@ -1,4 +1,5 @@
 import type { VoucherBookDomain } from '@pika/sdk'
+import { get, set } from 'lodash-es'
 
 import type { GeneratePDFResult } from '../services/VoucherBookService.js'
 import type { VoucherBookStatistics } from '../types/domain.js'
@@ -505,7 +506,10 @@ export class VoucherBookMapper {
   /**
    * Apply date validation updates
    */
-  private static applyDateValidationUpdates(dto: UpdateVoucherBookDTO, updates: any): void {
+  private static applyDateValidationUpdates(
+    dto: UpdateVoucherBookDTO,
+    updates: any,
+  ): void {
     // Validate year if changed
     if (dto.year !== undefined) {
       if (!VoucherBookMapper.validateYear(dto.year)) {
@@ -526,7 +530,10 @@ export class VoucherBookMapper {
   /**
    * Apply content validation updates
    */
-  private static applyContentValidationUpdates(dto: UpdateVoucherBookDTO, updates: any): void {
+  private static applyContentValidationUpdates(
+    dto: UpdateVoucherBookDTO,
+    updates: any,
+  ): void {
     // Validate totalPages if changed
     if (dto.totalPages !== undefined) {
       if (dto.totalPages < 1) {
@@ -539,15 +546,25 @@ export class VoucherBookMapper {
   /**
    * Apply other field updates
    */
-  private static applyOtherFieldUpdates(dto: UpdateVoucherBookDTO, updates: any): void {
+  private static applyOtherFieldUpdates(
+    dto: UpdateVoucherBookDTO,
+    updates: any,
+  ): void {
     const simpleFields = [
-      'title', 'edition', 'bookType', 'status', 
-      'coverImageUrl', 'backImageUrl', 'metadata'
+      'title',
+      'edition',
+      'bookType',
+      'status',
+      'coverImageUrl',
+      'backImageUrl',
+      'metadata',
     ] as const
-    
-    simpleFields.forEach(field => {
-      if (dto[field] !== undefined) {
-        updates[field] = dto[field]
+
+    simpleFields.forEach((field) => {
+      const value = get(dto, field)
+
+      if (value !== undefined) {
+        set(updates, field, value)
       }
     })
   }

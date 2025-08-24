@@ -634,8 +634,6 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
     })
 
     it('should enforce proper RBAC permissions', async () => {
-      const voucher = sharedTestData.activeVouchers[0]
-
       // Test admin-only endpoints with non-admin tokens (should get 403)
       const adminOnlyEndpoints = [
         { method: 'get', url: '/admin/vouchers/redemptions/history' },
@@ -686,12 +684,19 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
         .expect(200)
 
       if (response.body.data.length > 1) {
-        const dates = response.body.data.map((r: any) => new Date(r.redeemedAt))
+        const dates = response.body.data.map(
+          (r: { redeemedAt: string }) => new Date(r.redeemedAt),
+        )
 
         for (let i = 1; i < dates.length; i++) {
-          expect(dates[i - 1].getTime()).toBeGreaterThanOrEqual(
-            dates[i].getTime(),
-          )
+          const prevDate = dates.at(i - 1)
+          const currentDate = dates.at(i)
+
+          if (prevDate && currentDate) {
+            expect(prevDate.getTime()).toBeGreaterThanOrEqual(
+              currentDate.getTime(),
+            )
+          }
         }
       }
     })

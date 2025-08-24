@@ -45,7 +45,10 @@ export function createRedemptionAnalyticsRoutes(
   // Admin: can access any business, Business: can only access their own (permission check in controller)
   router.get(
     '/redemptions/business/:id/stats',
-    requirePermissions('redemption-analytics:read', 'redemption-analytics:read:own'),
+    requirePermissions(
+      'redemption-analytics:read',
+      'redemption-analytics:read:own',
+    ),
     validateParams(businessCommon.BusinessIdParam),
     validateQuery(voucherAdmin.RedemptionStatsQueryParams),
     controller.getBusinessRedemptionStats,
@@ -65,7 +68,10 @@ export function createRedemptionAnalyticsRoutes(
   // Admin: can access any voucher, Business: can only access their own vouchers (permission check in controller)
   router.get(
     '/:id/redemptions/history',
-    requirePermissions('redemption-reports:read', 'redemption-reports:read:own'),
+    requirePermissions(
+      'redemption-reports:read',
+      'redemption-reports:read:own',
+    ),
     validateParams(voucherCommon.VoucherIdParam),
     validateQuery(voucherAdmin.RedemptionHistoryQueryParams),
     controller.getVoucherRedemptionHistory,

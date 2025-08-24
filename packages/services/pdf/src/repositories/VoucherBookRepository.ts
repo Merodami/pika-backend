@@ -10,6 +10,7 @@ import type {
   VoucherBookType,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
+import { get } from 'lodash-es'
 
 /**
  * Voucher book repository interface
@@ -190,8 +191,20 @@ export class VoucherBookRepository implements IVoucherBookRepository {
   /**
    * Build where clause for voucher book search
    */
-  private buildWhereClause(params: VoucherBookSearchParams): Prisma.VoucherBookWhereInput {
-    const { search, bookType, status, year, month, createdBy, updatedBy, hasContent, hasPdf } = params
+  private buildWhereClause(
+    params: VoucherBookSearchParams,
+  ): Prisma.VoucherBookWhereInput {
+    const {
+      search,
+      bookType,
+      status,
+      year,
+      month,
+      createdBy,
+      updatedBy,
+      hasContent,
+      hasPdf,
+    } = params
     const where: Prisma.VoucherBookWhereInput = {}
 
     // Search filter
@@ -226,7 +239,7 @@ export class VoucherBookRepository implements IVoucherBookRepository {
    */
   private buildOrderByClause(
     sortBy: string = 'createdAt',
-    sortOrder: 'asc' | 'desc' = 'desc'
+    sortOrder: 'asc' | 'desc' = 'desc',
   ): Prisma.VoucherBookOrderByWithRelationInput {
     const sortFields: Record<string, string> = {
       title: 'title',
@@ -234,7 +247,8 @@ export class VoucherBookRepository implements IVoucherBookRepository {
       publishedAt: 'publishedAt',
     }
 
-    const field = sortFields[sortBy] || 'createdAt'
+    const field = get(sortFields, sortBy, 'createdAt')
+
     return { [field]: sortOrder }
   }
 

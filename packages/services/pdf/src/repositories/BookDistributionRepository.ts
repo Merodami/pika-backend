@@ -6,6 +6,7 @@ import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
+import { get } from 'lodash-es'
 
 export interface BusinessDistributionStats {
   businessName: string
@@ -252,8 +253,19 @@ export class BookDistributionRepository implements IBookDistributionRepository {
   /**
    * Build where clause for distribution search
    */
-  private buildWhereClause(params: BookDistributionSearchParams): Prisma.BookDistributionWhereInput {
-    const { bookId, businessId, locationId, status, distributionType, startDate, endDate, createdBy } = params
+  private buildWhereClause(
+    params: BookDistributionSearchParams,
+  ): Prisma.BookDistributionWhereInput {
+    const {
+      bookId,
+      businessId,
+      locationId,
+      status,
+      distributionType,
+      startDate,
+      endDate,
+      createdBy,
+    } = params
     const where: Prisma.BookDistributionWhereInput = {}
 
     // Simple field filters
@@ -279,7 +291,7 @@ export class BookDistributionRepository implements IBookDistributionRepository {
    */
   private buildOrderByClause(
     sortBy: string = 'createdAt',
-    sortOrder: 'asc' | 'desc' = 'desc'
+    sortOrder: 'asc' | 'desc' = 'desc',
   ): Prisma.BookDistributionOrderByWithRelationInput {
     const sortFields: Record<string, string> = {
       businessName: 'businessName',
@@ -289,7 +301,8 @@ export class BookDistributionRepository implements IBookDistributionRepository {
       deliveredAt: 'deliveredAt',
     }
 
-    const field = sortFields[sortBy] || 'createdAt'
+    const field = get(sortFields, sortBy, 'createdAt')
+
     return { [field]: sortOrder }
   }
 

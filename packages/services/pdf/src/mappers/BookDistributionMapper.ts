@@ -1,4 +1,5 @@
 import type { BookDistribution } from '@prisma/client'
+import { get, set } from 'lodash-es'
 
 /**
  * DTOs for BookDistribution - defined within the service following established pattern
@@ -326,9 +327,12 @@ export class BookDistributionMapper {
   /**
    * Validate and apply status update
    */
-  private static applyStatusUpdate(dto: UpdateBookDistributionDTO, updates: any): void {
+  private static applyStatusUpdate(
+    dto: UpdateBookDistributionDTO,
+    updates: any,
+  ): void {
     if (dto.status === undefined) return
-    
+
     if (!BookDistributionMapper.isValidStatus(dto.status)) {
       throw new Error(`Invalid status: ${dto.status}`)
     }
@@ -338,9 +342,12 @@ export class BookDistributionMapper {
   /**
    * Validate and apply quantity update
    */
-  private static applyQuantityUpdate(dto: UpdateBookDistributionDTO, updates: any): void {
+  private static applyQuantityUpdate(
+    dto: UpdateBookDistributionDTO,
+    updates: any,
+  ): void {
     if (dto.quantity === undefined) return
-    
+
     if (dto.quantity < 1) {
       throw new Error('Distribution quantity must be at least 1')
     }
@@ -350,29 +357,48 @@ export class BookDistributionMapper {
   /**
    * Apply contact and delivery information updates
    */
-  private static applyContactAndDeliveryUpdates(dto: UpdateBookDistributionDTO, updates: any): void {
-    const contactFields = ['contactName', 'contactEmail', 'contactPhone', 'deliveryAddress'] as const
-    const shippingFields = ['shippedAt', 'deliveredAt', 'trackingNumber', 'shippingCarrier'] as const
+  private static applyContactAndDeliveryUpdates(
+    dto: UpdateBookDistributionDTO,
+    updates: any,
+  ): void {
+    const contactFields = [
+      'contactName',
+      'contactEmail',
+      'contactPhone',
+      'deliveryAddress',
+    ] as const
+    const shippingFields = [
+      'shippedAt',
+      'deliveredAt',
+      'trackingNumber',
+      'shippingCarrier',
+    ] as const
     const otherFields = ['notes', 'metadata'] as const
-    
+
     // Apply contact fields
-    contactFields.forEach(field => {
-      if (dto[field] !== undefined) {
-        updates[field] = dto[field]
+    contactFields.forEach((field) => {
+      const value = get(dto, field)
+
+      if (value !== undefined) {
+        set(updates, field, value)
       }
     })
-    
+
     // Apply shipping fields
-    shippingFields.forEach(field => {
-      if (dto[field] !== undefined) {
-        updates[field] = dto[field]
+    shippingFields.forEach((field) => {
+      const value = get(dto, field)
+
+      if (value !== undefined) {
+        set(updates, field, value)
       }
     })
-    
+
     // Apply other fields
-    otherFields.forEach(field => {
-      if (dto[field] !== undefined) {
-        updates[field] = dto[field]
+    otherFields.forEach((field) => {
+      const value = get(dto, field)
+
+      if (value !== undefined) {
+        set(updates, field, value)
       }
     })
   }

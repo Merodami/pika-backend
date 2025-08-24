@@ -1,14 +1,12 @@
 import { businessCommon, userAdmin, voucherCommon } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
 } from '@pika/http'
-import { ErrorFactory, logger } from '@pika/shared'
+import { logger } from '@pika/shared'
 import { VoucherRedemptionMethod, VoucherRedemptionType } from '@pika/types'
 import type { NextFunction, Request, Response } from 'express'
-import { z } from 'zod'
 
 import type {
   RedemptionHistoryFilters,
@@ -16,27 +14,24 @@ import type {
 } from '../repositories/RedemptionAnalyticsRepository.js'
 import type { IRedemptionAnalyticsService } from '../services/RedemptionAnalyticsService.js'
 
-// Request/Response schemas for validation
-const RedemptionHistoryQuerySchema = z.object({
-  voucherId: z.string().uuid().optional(),
-  userId: z.string().uuid().optional(),
-  businessId: z.string().uuid().optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
-  redemptionType: z.nativeEnum(VoucherRedemptionType).optional(),
-  redemptionMethod: z.nativeEnum(VoucherRedemptionMethod).optional(),
-  page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().default(PAGINATION_DEFAULT_LIMIT),
-})
+// Query parameter types
+type RedemptionHistoryQuery = {
+  voucherId?: string
+  userId?: string
+  businessId?: string
+  startDate?: Date
+  endDate?: Date
+  redemptionType?: VoucherRedemptionType
+  redemptionMethod?: VoucherRedemptionMethod
+  page: number
+  limit: number
+}
 
-const RedemptionStatsQuerySchema = z.object({
-  businessId: z.string().uuid().optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
-})
-
-type RedemptionHistoryQuery = z.infer<typeof RedemptionHistoryQuerySchema>
-type RedemptionStatsQuery = z.infer<typeof RedemptionStatsQuerySchema>
+type RedemptionStatsQuery = {
+  businessId?: string
+  startDate?: Date
+  endDate?: Date
+}
 
 /**
  * Handles redemption analytics operations

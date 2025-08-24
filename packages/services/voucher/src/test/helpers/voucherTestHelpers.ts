@@ -51,7 +51,6 @@ export interface SharedVoucherTestData {
 export interface SeedVoucherOptions {
   businessId?: string
   includeCategories?: string[]
-  generateInactive?: boolean
   generateExpired?: boolean
   count?: number
 }
@@ -67,7 +66,6 @@ export async function createSharedVoucherTestData(
   const {
     businessId = uuid(),
     includeCategories = [],
-    generateInactive = true,
     generateExpired = true,
     count = 10,
   } = options

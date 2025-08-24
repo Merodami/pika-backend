@@ -5,6 +5,7 @@ import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 import { VoucherRedemptionMethod, VoucherRedemptionType } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
+import { get, has, set } from 'lodash-es'
 
 // Redemption logging data structure
 export interface VoucherRedemptionLogData {
@@ -120,47 +121,42 @@ export class RedemptionAnalyticsRepository
     voucher: any,
     redemptionData?: VoucherRedemptionLogData,
   ): Promise<void> {
-    try {
-      await this.prisma.voucherRedemption.create({
-        data: {
-          voucherId,
-          userId,
-          codeUsed: redemptionData?.codeUsed || '',
-          redeemedAt: new Date(),
-          metadata: {
-            businessId: redemptionData?.businessId || voucher?.businessId,
-            location: redemptionData?.location,
-            locationName: redemptionData?.locationName,
-            deviceInfo: redemptionData?.deviceInfo,
-            ipAddress: redemptionData?.ipAddress,
-            userAgent: redemptionData?.userAgent,
-            transactionId: redemptionData?.transactionId,
-            transactionAmount: redemptionData?.transactionAmount,
-            discountApplied:
-              redemptionData?.discountApplied ||
-              voucher?.discount ||
-              voucher?.value,
-            currency: voucher?.currency || 'PYG',
-            voucherTitle: voucher?.titleKey,
-            voucherType: voucher?.type,
-            redemptionType:
-              redemptionData?.redemptionType || VoucherRedemptionType.APP,
-            redemptionMethod:
-              redemptionData?.redemptionMethod ||
-              VoucherRedemptionMethod.MANUAL_CODE,
-          },
-        },
-      })
-
-      logger.info('Voucher redemption logged successfully', {
+    await this.prisma.voucherRedemption.create({
+      data: {
         voucherId,
         userId,
-        transactionId: redemptionData?.transactionId,
-      })
-    } catch (error) {
-      // Re-throw to be caught by the caller's .catch()
-      throw error
-    }
+        codeUsed: redemptionData?.codeUsed || '',
+        redeemedAt: new Date(),
+        metadata: {
+          businessId: redemptionData?.businessId || voucher?.businessId,
+          location: redemptionData?.location,
+          locationName: redemptionData?.locationName,
+          deviceInfo: redemptionData?.deviceInfo,
+          ipAddress: redemptionData?.ipAddress,
+          userAgent: redemptionData?.userAgent,
+          transactionId: redemptionData?.transactionId,
+          transactionAmount: redemptionData?.transactionAmount,
+          discountApplied:
+            redemptionData?.discountApplied ||
+            voucher?.discount ||
+            voucher?.value,
+          currency: voucher?.currency || 'PYG',
+          voucherTitle: voucher?.titleKey,
+          voucherType: voucher?.type,
+          redemptionType:
+            redemptionData?.redemptionType || VoucherRedemptionType.APP,
+          redemptionMethod:
+            redemptionData?.redemptionMethod ||
+            VoucherRedemptionMethod.MANUAL_CODE,
+        },
+      },
+    })
+
+    logger.info('Voucher redemption logged successfully', {
+      voucherId,
+      userId,
+      transactionId: redemptionData?.transactionId,
+    })
   }
 
   /**
@@ -321,24 +317,30 @@ export class RedemptionAnalyticsRepository
         }
 
         // Count by type
-        const type = metadata?.redemptionType || 'unknown'
+        const type = get(metadata, 'redemptionType', 'unknown')
 
-        byType[type] = (byType[type] || 0) + 1
+        set(byType, type, get(byType, type, 0) + 1)
 
         // Count by method
-        const method = metadata?.redemptionMethod || 'unknown'
+        const method = get(metadata, 'redemptionMethod', 'unknown')
 
-        byMethod[method] = (byMethod[method] || 0) + 1
+        set(byMethod, method, get(byMethod, method, 0) + 1)
 
         // Daily aggregation
         const date = redemption.redeemedAt.toISOString().split('T')[0]
 
-        if (!dailyMap[date]) {
-          dailyMap[date] = { count: 0, value: 0 }
+        if (!has(dailyMap, date)) {
+          set(dailyMap, date, { count: 0, value: 0 })
         }
-        dailyMap[date].count++
-        if (metadata?.discountApplied) {
-          dailyMap[date].value += Number(metadata.discountApplied)
+
+        const currentCount = get(dailyMap, `${date}.count`, 0) as number
+
+        set(dailyMap, `${date}.count`, currentCount + 1)
+        if (get(metadata, 'discountApplied')) {
+          const currentValue = get(dailyMap, `${date}.value`, 0) as number
+          const discountValue = Number(get(metadata, 'discountApplied', 0))
+
+          set(dailyMap, `${date}.value`, currentValue + discountValue)
         }
       })
 
@@ -366,10 +368,13 @@ export class RedemptionAnalyticsRepository
   async voucherExists(voucherId: string): Promise<boolean> {
     try {
       logger.debug('Checking voucher existence', { voucherId })
+
       const count = await this.prisma.voucher.count({
         where: { id: voucherId },
       })
+
       logger.debug('Voucher existence check result', { voucherId, count })
+
       return count > 0
     } catch (error) {
       logger.error('Failed to check voucher existence', { error, voucherId })

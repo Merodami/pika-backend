@@ -70,9 +70,6 @@ describe('User Service - Favorites Public API Integration Tests', () => {
   let customerClient: AuthenticatedRequestClient
   let businessClient: AuthenticatedRequestClient
 
-  // Shared test data
-  let sharedTestData: any
-
   // Test data for favorites
   let testBusiness1: any
   let testBusiness2: any
@@ -138,7 +135,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
     // Create shared test data once for all tests
     logger.debug('Creating shared test data...')
-    sharedTestData = await createSharedUserTestData(testDb.prisma)
+    await createSharedUserTestData(testDb.prisma)
 
     logger.debug(
       'Creating test category, businesses and vouchers for favorites...',
