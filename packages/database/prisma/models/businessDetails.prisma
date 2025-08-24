@@ -3,7 +3,7 @@
 // Keeps the main business table lean while storing detailed information
 
 model BusinessDetails {
-  id         String    @id @default(uuid()) @db.Uuid
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   businessId String    @unique @db.Uuid
   
   // Contact Information

@@ -8,8 +8,8 @@ model Language {
   direction String  @default("ltr")
   isDefault Boolean @default(false) @map("is_default")
   isActive  Boolean @default(true) @map("is_active")
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(3)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relations
   translations            Translation[]
@@ -20,7 +20,7 @@ model Language {
 }
 
 model Translation {
-  id           String   @id @default(cuid())
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   key          String
   value        String
   languageCode String   @map("language_code")
@@ -38,7 +38,7 @@ model Translation {
 }
 
 model UserLanguagePreference {
-  id           String   @id @default(cuid())
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String   @unique @map("user_id") @db.Uuid // Fixed: Must match User.id type (UUID)
   languageCode String   @map("language_code")
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
