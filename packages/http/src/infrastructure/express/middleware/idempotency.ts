@@ -20,15 +20,31 @@ declare global {
 /**
  * Convert Express route pattern to regex for matching
  * Handles patterns like /admin/businesses/:id/deactivate
+ * Uses predefined safe patterns to avoid security issues
  */
 function routePatternToRegex(pattern: string): RegExp {
-  // Escape special regex characters except for :
-  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  // Replace :param with regex to match any non-slash characters
-  const regexPattern = escaped.replace(/:([^/]+)/g, '([^/]+)')
+  // Validate input to prevent malicious patterns
+  if (!/^[a-zA-Z0-9/_:-]+$/.test(pattern)) {
+    throw new Error(`Invalid route pattern: ${pattern}`)
+  }
 
-  // Add anchors to match the full path
-  return new RegExp(`^${regexPattern}$`)
+  // Escape all special regex characters first
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  // Replace :param with a safe regex pattern for path segments
+  const regexPattern = escaped.replace(
+    /:([a-zA-Z][a-zA-Z0-9_]*)/g,
+    '([a-zA-Z0-9_-]+)',
+  )
+
+  // Add anchors to match the full path - use literal string construction
+  const safePattern = `^${regexPattern}$`
+
+  try {
+    return new RegExp(safePattern)
+  } catch (error) {
+    throw new Error(`Failed to create regex from pattern: ${pattern}`)
+  }
 }
 
 /**

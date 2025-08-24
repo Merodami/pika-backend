@@ -13,6 +13,10 @@ import { CustomerVoucherStatus, VoucherCodeType } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 import type { VoucherSearchParams } from '../types/index.js'
+import {
+  RedemptionAnalyticsRepository,
+  type VoucherRedemptionLogData,
+} from './RedemptionAnalyticsRepository.js'
 
 export interface IVoucherRepository {
   findAll(params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
@@ -43,6 +47,7 @@ export interface IVoucherRepository {
   redeemVoucher(
     voucherId: string,
     userId: string,
+    redemptionData?: VoucherRedemptionLogData,
   ): Promise<CustomerVoucherDomain>
   findCustomerVoucher(
     userId: string,
@@ -60,10 +65,14 @@ export interface IVoucherRepository {
 }
 
 export class VoucherRepository implements IVoucherRepository {
+  private redemptionAnalytics: RedemptionAnalyticsRepository
+
   constructor(
     private readonly prisma: PrismaClient,
     private readonly cache?: ICacheService,
-  ) {}
+  ) {
+    this.redemptionAnalytics = new RedemptionAnalyticsRepository(prisma, cache)
+  }
 
   async findAll(
     params: VoucherSearchParams = {},
@@ -584,6 +593,7 @@ export class VoucherRepository implements IVoucherRepository {
   async redeemVoucher(
     voucherId: string,
     userId: string,
+    redemptionData?: VoucherRedemptionLogData,
   ): Promise<CustomerVoucherDomain> {
     try {
       // Update customer voucher to redeemed status
@@ -605,6 +615,28 @@ export class VoucherRepository implements IVoucherRepository {
 
       // Increment the voucher's redemption count
       await this.incrementRedemptions(voucherId)
+
+      // Log redemption asynchronously - non-blocking
+      this.redemptionAnalytics
+        .logRedemption(
+          voucherId,
+          userId,
+          customerVoucher.voucher,
+          redemptionData,
+        )
+        .catch((error) => {
+          // Log error to APM/monitoring but don't block the user
+          logger.error('Failed to log voucher redemption', {
+            error,
+            voucherId,
+            userId,
+            redemptionData,
+            severity: 'warning',
+            alertType: 'redemption_logging_failed',
+          })
+          // Here you would send to your APM service (e.g., Sentry, DataDog, etc.)
+          // Example: Sentry.captureException(error, { tags: { type: 'redemption_log_failure' } })
+        })
 
       return VoucherMapper.mapCustomerVoucherFromDocument(
         this.convertPrismaCustomerVoucherToDocument(customerVoucher),

@@ -51,7 +51,6 @@ describe('Business Service Cache Validation Tests', () => {
   // Test clients (authenticated supertest clients)
   let customerClient: supertest.SuperTest<supertest.Test>
   let businessClient: supertest.SuperTest<supertest.Test>
-  let adminClient: supertest.SuperTest<supertest.Test>
 
   beforeAll(async () => {
     logger.debug('Setting up Business Service Cache Validation tests...')
@@ -97,7 +96,7 @@ describe('Business Service Cache Validation Tests', () => {
     // Get authenticated clients for different user types
     customerClient = await authHelper.getUserClient(testDb.prisma)
     businessClient = await authHelper.getBusinessClient(testDb.prisma)
-    adminClient = await authHelper.getAdminClient(testDb.prisma)
+    await authHelper.getAdminClient(testDb.prisma)
 
     // Create a business for the business owner client user so /businesses/me works
     // The business client user is created by authHelper but doesn't have a business yet
@@ -290,7 +289,7 @@ describe('Business Service Cache Validation Tests', () => {
    */
   describe('Concurrent Requests Tests', () => {
     it('should handle concurrent business list requests without hanging', async () => {
-      const promises = Array.from({ length: 5 }, (_, index) => {
+      const promises = Array.from({ length: 5 }, () => {
         return customerClient.get('/businesses?page=1&limit=5').timeout(3000) // Each request must complete within 3 seconds
       })
 
@@ -299,7 +298,7 @@ describe('Business Service Cache Validation Tests', () => {
       const elapsed = Date.now() - start
 
       // All requests should succeed
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
         expect(response.body.data).toBeDefined()
         expect(Array.isArray(response.body.data)).toBe(true)
@@ -308,7 +307,7 @@ describe('Business Service Cache Validation Tests', () => {
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
 
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.body).toEqual(firstResponse)
       })
 

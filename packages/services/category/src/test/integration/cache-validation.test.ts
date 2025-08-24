@@ -46,7 +46,6 @@ describe('Category Service Cache Validation Tests', () => {
 
   // Test clients (authenticated supertest clients)
   let customerClient: supertest.SuperTest<supertest.Test>
-  let adminClient: supertest.SuperTest<supertest.Test>
 
   beforeAll(async () => {
     logger.debug('Setting up Category Service Cache Validation tests...')
@@ -92,7 +91,7 @@ describe('Category Service Cache Validation Tests', () => {
 
     // Get authenticated clients for different user types
     customerClient = await authHelper.getUserClient(testDb.prisma)
-    adminClient = await authHelper.getAdminClient(testDb.prisma)
+    await authHelper.getAdminClient(testDb.prisma)
 
     logger.debug('Category Service Cache Validation setup complete')
   }, 120000)
@@ -238,7 +237,7 @@ describe('Category Service Cache Validation Tests', () => {
    */
   describe('Concurrent Requests Tests', () => {
     it('should handle concurrent category list requests without hanging', async () => {
-      const promises = Array.from({ length: 5 }, (_, index) => {
+      const promises = Array.from({ length: 5 }, () => {
         return customerClient.get('/categories?page=1&limit=5').timeout(3000) // Each request must complete within 3 seconds
       })
 
@@ -247,7 +246,7 @@ describe('Category Service Cache Validation Tests', () => {
       const elapsed = Date.now() - start
 
       // All requests should succeed
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
         expect(response.body.data).toBeDefined()
         expect(Array.isArray(response.body.data)).toBe(true)
@@ -256,7 +255,7 @@ describe('Category Service Cache Validation Tests', () => {
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
 
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.body).toEqual(firstResponse)
       })
 

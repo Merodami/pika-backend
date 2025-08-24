@@ -947,7 +947,7 @@ describe('User Service - Admin API Integration Tests', () => {
         })
 
         // Admin verification directly verifies by userId
-        const response = await adminClient
+        await adminClient
           .post('/admin/users/verify')
           .send({
             type: VerificationType.EMAIL,
@@ -1026,7 +1026,7 @@ describe('User Service - Admin API Integration Tests', () => {
         // Store verification code
         await cacheService.set(`phone-verification:${user.id}`, '123456', 300)
 
-        const response = await adminClient
+        await adminClient
           .post('/admin/users/verify')
           .send({
             type: VerificationType.PHONE,
@@ -1116,7 +1116,7 @@ describe('User Service - Admin API Integration Tests', () => {
           },
         })
 
-        const response = await adminClient
+        await adminClient
           .post('/admin/users/verify')
           .send({
             type: VerificationType.ACCOUNT_CONFIRMATION,
@@ -1193,7 +1193,7 @@ describe('User Service - Admin API Integration Tests', () => {
           (u) => u.role === 'customer',
         )!
 
-        const response = await adminClient
+        await adminClient
           .put(`/admin/users/${targetUser.id}/ban`)
           .send({
             reason: 'Violation of Terms of Service',

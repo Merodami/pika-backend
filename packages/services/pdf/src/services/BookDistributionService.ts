@@ -402,7 +402,7 @@ export class BookDistributionService implements IBookDistributionService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL * 2,
     prefix: CACHE_KEYS.DISTRIBUTION.STATS,
-    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+    keyGenerator: (prefix: string) => {
       return `${prefix}:all`
     },
   })

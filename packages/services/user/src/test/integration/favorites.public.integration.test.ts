@@ -42,10 +42,7 @@ import {
 import { ErrorCode, UserRole, UserStatus } from '@pika/types'
 import { VoucherState, VoucherType } from '@prisma/client'
 import { createUserServer } from '@user/server.js'
-import {
-  createSharedUserTestData,
-  type SharedUserTestData,
-} from '@user/test/helpers/userTestHelpers.js'
+import { createSharedUserTestData } from '@user/test/helpers/userTestHelpers.js'
 import { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -73,8 +70,8 @@ describe('User Service - Favorites Public API Integration Tests', () => {
   let customerClient: AuthenticatedRequestClient
   let businessClient: AuthenticatedRequestClient
 
-  // Shared test data created once
-  let sharedTestData: SharedUserTestData
+  // Shared test data
+  let sharedTestData: any
 
   // Test data for favorites
   let testBusiness1: any

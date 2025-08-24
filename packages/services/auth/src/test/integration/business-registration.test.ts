@@ -20,8 +20,6 @@ import {
   TestDatabaseResult,
 } from '@pika/tests'
 import { UserRole } from '@pika/types'
-import type { Express } from 'express'
-import supertest from 'supertest'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 describe('Business Owner Registration Flow', () => {

@@ -479,7 +479,7 @@ describe('Business Service - Public API Integration Tests', () => {
       })
 
       // Create 3 businesses
-      const businesses = await Promise.all([
+      await Promise.all([
         testDb.prisma.business.create({
           data: {
             userId: businessUserFromDb!.id,
@@ -520,8 +520,6 @@ describe('Business Service - Public API Integration Tests', () => {
         .get('/businesses/me?active=true')
         .set('Accept', 'application/json')
         .expect(200)
-
-      const activeCount = response.body.data.filter((b: any) => b.active).length
 
       expect(activeResponse.body.data.length).toBeGreaterThanOrEqual(2)
       expect(activeResponse.body.data.every((b: any) => b.active)).toBe(true)

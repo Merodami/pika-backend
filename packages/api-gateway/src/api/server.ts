@@ -28,53 +28,34 @@ import { setupProxyRoutes } from './routes/setupProxyRoutes.js'
 const isLocalDev = NODE_ENV === 'development'
 
 /**
- * Start the API Gateway server
+ * Configure development request logging
  */
-async function startGateway(): Promise<Express> {
-  const config = loadConfig()
+function setupRequestLogging(app: Express): void {
+  if (!isLocalDev) return
 
-  // Create server with standard configuration
-  const port = API_GATEWAY_PORT || 8000
-
-  // Create Express server with standard configuration
-  const app = await createExpressServer({
-    serviceName: 'api-gateway',
-    port,
-    healthChecks: [], // We'll handle health checks manually
-    rateLimit: {
-      max: config.rateLimit.max,
-      timeWindow: `${config.rateLimit.windowMs}ms`,
-    },
-    // Skip auth registration - we'll register it manually with custom config
-    skipAuthRegistration: true,
-  })
-
-  // Register custom health check handler BEFORE other routes
-  app.get('/api/v1/health', handleHealthCheck)
-  logger.info('Custom health check handler registered at /api/v1/health')
-
-  // Configure custom request logging
-  if (isLocalDev) {
-    app.use((req, res, next) => {
-      logger.info(
-        {
-          req: {
-            method: req.method,
-            url: req.url,
-            path: req.path,
-            originalUrl: req.originalUrl,
-            hostname: req.hostname,
-            remoteAddress: req.ip || req.socket?.remoteAddress || 'unknown',
-            remotePort: req.socket?.remotePort,
-          },
+  app.use((req, res, next) => {
+    logger.info(
+      {
+        req: {
+          method: req.method,
+          url: req.url,
+          path: req.path,
+          originalUrl: req.originalUrl,
+          hostname: req.hostname,
+          remoteAddress: req.ip || req.socket?.remoteAddress || 'unknown',
+          remotePort: req.socket?.remotePort,
         },
-        'incoming request',
-      )
-      next()
-    })
-  }
+      },
+      'incoming request',
+    )
+    next()
+  })
+}
 
-  // Validate JWT secret is properly configured
+/**
+ * Validate JWT secret configuration
+ */
+function validateJWTSecret(): void {
   if (!JWT_SECRET) {
     throw new Error(
       'JWT_SECRET environment variable is required for API Gateway authentication',
@@ -86,32 +67,39 @@ async function startGateway(): Promise<Express> {
       'JWT_SECRET must be at least 32 characters long for security',
     )
   }
+}
 
-  // Initialize Redis for session management and token blacklisting
-  let redisService: RedisService | undefined
+/**
+ * Initialize Redis service with fallback handling
+ */
+async function initializeRedis(): Promise<RedisService | undefined> {
+  if (CACHE_DISABLED) {
+    if (isLocalDev) {
+      logger.warn('Redis disabled - using in-memory token blacklist only', {
+        component: 'api-gateway',
+        fallback: 'in-memory',
+      })
+    }
+
+    return undefined
+  }
 
   try {
-    if (!CACHE_DISABLED) {
-      redisService = new RedisService()
-      await redisService.connect()
+    const redisService = new RedisService()
 
-      if (isLocalDev) {
-        logger.info(
-          'Redis connected for session management and token blacklisting',
-          {
-            component: 'api-gateway',
-            service: 'redis',
-          },
-        )
-      }
-    } else {
-      if (isLocalDev) {
-        logger.warn('Redis disabled - using in-memory token blacklist only', {
+    await redisService.connect()
+
+    if (isLocalDev) {
+      logger.info(
+        'Redis connected for session management and token blacklisting',
+        {
           component: 'api-gateway',
-          fallback: 'in-memory',
-        })
-      }
+          service: 'redis',
+        },
+      )
     }
+
+    return redisService
   } catch (error) {
     if (isLocalDev) {
       logger.warn(
@@ -123,8 +111,103 @@ async function startGateway(): Promise<Express> {
         },
       )
     }
-    redisService = undefined
+
+    return undefined
   }
+}
+
+/**
+ * Get excluded paths for authentication middleware
+ */
+function getAuthExcludePaths(): string[] {
+  return [
+    '/health',
+    '/favicon.ico',
+    '/api/v1/docs',
+    '/api/v1/docs/*',
+    '/api/v1/uploads/*',
+    '/openapi.json',
+    '/api/v1/openapi.json',
+    '/docs/openapi.json',
+    '/api/docs/openapi.json',
+    '/api/v1/public/openapi.json',
+    '/api/v1/admin/openapi.json',
+    '/api/v1/auth/token',
+    '/api/v1/auth/login',
+    '/api/v1/auth/register',
+    '/api/v1/auth/forgot-password',
+    '/api/v1/auth/reset-password',
+    '/api/v1/auth/verify-email/*',
+    '/api/v1/auth/resend-verification',
+    '/api/v1/auth/introspect',
+    '/api/v1/auth/revoke',
+    '/api/v1/auth/social/login',
+    '/api/v1/auth/exchange-token',
+  ]
+}
+
+/**
+ * Configure proxy routes based on environment
+ */
+function configureRoutes(app: Express): void {
+  if (process.env.EMBEDDED_MODE === 'true') {
+    logger.info('API Gateway running in embedded mode - proxy routes disabled')
+  } else {
+    setupProxyRoutes(app, isLocalDev)
+  }
+}
+
+/**
+ * Log configuration for development
+ */
+function logConfiguration(): void {
+  if (!isLocalDev) return
+
+  logger.info('Centralized authentication enabled at API Gateway level', {
+    component: 'api-gateway',
+    feature: 'auth',
+  })
+  logger.info('Public endpoints configured', {
+    component: 'api-gateway',
+    endpoints: [
+      '/health',
+      '/docs',
+      '/api/v1/auth/login',
+      '/api/v1/auth/register',
+      '/api/v1/auth/forgot-password',
+      '/api/v1/auth/reset-password',
+    ],
+  })
+}
+
+/**
+ * Start the API Gateway server
+ */
+async function startGateway(): Promise<Express> {
+  const config = loadConfig()
+  const port = API_GATEWAY_PORT || 8000
+
+  // Create Express server with standard configuration
+  const app = await createExpressServer({
+    serviceName: 'api-gateway',
+    port,
+    healthChecks: [],
+    rateLimit: {
+      max: config.rateLimit.max,
+      timeWindow: `${config.rateLimit.windowMs}ms`,
+    },
+    skipAuthRegistration: true,
+  })
+
+  // Register custom health check handler BEFORE other routes
+  app.get('/api/v1/health', handleHealthCheck)
+  logger.info('Custom health check handler registered at /api/v1/health')
+
+  // Configure middleware and services
+  setupRequestLogging(app)
+  validateJWTSecret()
+
+  const redisService = await initializeRedis()
 
   // Handle favicon.ico requests to prevent 404 errors
   app.get('/favicon.ico', (req, res) => {
@@ -132,65 +215,16 @@ async function startGateway(): Promise<Express> {
   })
 
   // Set up centralized authentication BEFORE proxy routes
-  // This validates tokens and adds user context headers for backend services
   app.use(
     authMiddleware({
       cacheService: redisService,
-      excludePaths: [
-        '/health',
-        '/favicon.ico',
-        '/api/v1/docs',
-        '/api/v1/docs/*', // Documentation routes
-        '/api/v1/uploads/*', // Static file uploads (avatars, etc.)
-        // OpenAPI JSON endpoints
-        '/openapi.json',
-        '/api/v1/openapi.json',
-        '/docs/openapi.json',
-        '/api/docs/openapi.json',
-        '/api/v1/public/openapi.json',
-        '/api/v1/admin/openapi.json',
-        // Public auth endpoints only
-        '/api/v1/auth/token',
-        '/api/v1/auth/login',
-        '/api/v1/auth/register',
-        '/api/v1/auth/forgot-password',
-        '/api/v1/auth/reset-password',
-        '/api/v1/auth/verify-email/*',
-        '/api/v1/auth/resend-verification',
-        '/api/v1/auth/introspect',
-        '/api/v1/auth/revoke',
-        '/api/v1/auth/social/login',
-        '/api/v1/auth/exchange-token',
-      ],
+      excludePaths: getAuthExcludePaths(),
     }),
   )
 
-  // Set up proxy routes OR embedded services based on mode
-  if (process.env.EMBEDDED_MODE === 'true') {
-    // Embedded mode is handled by createGatewayWithServices
-    logger.info('API Gateway running in embedded mode - proxy routes disabled')
-  } else {
-    // Normal proxy mode
-    setupProxyRoutes(app, isLocalDev)
-  }
-
-  if (isLocalDev) {
-    logger.info('Centralized authentication enabled at API Gateway level', {
-      component: 'api-gateway',
-      feature: 'auth',
-    })
-    logger.info('Public endpoints configured', {
-      component: 'api-gateway',
-      endpoints: [
-        '/health',
-        '/docs',
-        '/api/v1/auth/login',
-        '/api/v1/auth/register',
-        '/api/v1/auth/forgot-password',
-        '/api/v1/auth/reset-password',
-      ],
-    })
-  }
+  // Configure routing
+  configureRoutes(app)
+  logConfiguration()
 
   // Set up documentation routes (after authentication)
   const docsRouter = createDocsRouter()

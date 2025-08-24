@@ -13,7 +13,6 @@
 
 import type { PrismaClient } from '@prisma/client'
 import { UserRole, UserStatus } from '@prisma/client'
-import { get } from 'lodash-es'
 import { v4 as uuid } from 'uuid'
 
 export interface BusinessTestData {
@@ -144,7 +143,8 @@ export async function seedTestBusinesses(
     let isActive: boolean
     let isVerified: boolean
 
-    const customConfig = get(customData, i)
+    const customConfig = customData?.[i]
+
     if (customConfig) {
       // Use custom configuration if provided for this specific business
       isActive = customConfig.active ?? true

@@ -51,6 +51,7 @@ describe('Auth Service Cache Validation Tests', () => {
 
   // Test tokens
   let customerAccessToken: string
+  let adminAccessToken: string
 
   beforeAll(async () => {
     logger.debug('Setting up Auth Service Cache Validation tests...')

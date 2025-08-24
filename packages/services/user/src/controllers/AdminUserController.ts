@@ -168,7 +168,7 @@ export class AdminUserController {
   ): Promise<void> {
     try {
       const { id: userId } = req.params
-      const { status, reason, duration, notifyUser } = req.body
+      const { status } = req.body
 
       // Update user status
       const user = await this.userService.updateUser(userId, { status })

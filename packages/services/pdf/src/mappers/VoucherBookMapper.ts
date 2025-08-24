@@ -411,9 +411,11 @@ export class VoucherBookMapper {
   }
 
   /**
-   * Convert to public DTO (limited fields)
+   * Shared helper to create public DTO from voucher book data
    */
-  static toPublicDTO(voucherBook: VoucherBookDocument): PublicVoucherBookDTO {
+  private static createPublicDTO(
+    voucherBook: VoucherBookDocument | VoucherBookDomain,
+  ): PublicVoucherBookDTO {
     return {
       id: voucherBook.id,
       title: voucherBook.title,
@@ -432,26 +434,19 @@ export class VoucherBookMapper {
   }
 
   /**
+   * Convert to public DTO (limited fields)
+   */
+  static toPublicDTO(voucherBook: VoucherBookDocument): PublicVoucherBookDTO {
+    return VoucherBookMapper.createPublicDTO(voucherBook)
+  }
+
+  /**
    * Convert domain object to public DTO (limited fields)
    */
   static toPublicDTOFromDomain(
     voucherBook: VoucherBookDomain,
   ): PublicVoucherBookDTO {
-    return {
-      id: voucherBook.id,
-      title: voucherBook.title,
-      edition: voucherBook.edition || undefined,
-      bookType: voucherBook.bookType,
-      month: voucherBook.month,
-      year: voucherBook.year,
-      status: voucherBook.status,
-      totalPages: voucherBook.totalPages,
-      publishedAt: voucherBook.publishedAt?.toISOString() || null,
-      coverImageUrl: voucherBook.coverImageUrl,
-      pdfUrl: voucherBook.status === 'published' ? voucherBook.pdfUrl : null, // Only show PDF if published
-      createdAt: voucherBook.createdAt.toISOString(),
-      updatedAt: voucherBook.updatedAt.toISOString(),
-    }
+    return VoucherBookMapper.createPublicDTO(voucherBook)
   }
 
   /**
@@ -507,11 +502,10 @@ export class VoucherBookMapper {
   /**
    * Convert update DTO to database input
    */
-  static fromUpdateDTO(dto: UpdateVoucherBookDTO, updatedById: string): any {
-    const updates: any = {
-      updatedBy: updatedById,
-    }
-
+  /**
+   * Apply date validation updates
+   */
+  private static applyDateValidationUpdates(dto: UpdateVoucherBookDTO, updates: any): void {
     // Validate year if changed
     if (dto.year !== undefined) {
       if (!VoucherBookMapper.validateYear(dto.year)) {
@@ -527,7 +521,12 @@ export class VoucherBookMapper {
       }
       updates.month = dto.month
     }
+  }
 
+  /**
+   * Apply content validation updates
+   */
+  private static applyContentValidationUpdates(dto: UpdateVoucherBookDTO, updates: any): void {
     // Validate totalPages if changed
     if (dto.totalPages !== undefined) {
       if (dto.totalPages < 1) {
@@ -535,16 +534,33 @@ export class VoucherBookMapper {
       }
       updates.totalPages = dto.totalPages
     }
+  }
 
-    // Copy other fields if provided
-    if (dto.title !== undefined) updates.title = dto.title
-    if (dto.edition !== undefined) updates.edition = dto.edition
-    if (dto.bookType !== undefined) updates.bookType = dto.bookType
-    if (dto.status !== undefined) updates.status = dto.status
-    if (dto.coverImageUrl !== undefined)
-      updates.coverImageUrl = dto.coverImageUrl
-    if (dto.backImageUrl !== undefined) updates.backImageUrl = dto.backImageUrl
-    if (dto.metadata !== undefined) updates.metadata = dto.metadata
+  /**
+   * Apply other field updates
+   */
+  private static applyOtherFieldUpdates(dto: UpdateVoucherBookDTO, updates: any): void {
+    const simpleFields = [
+      'title', 'edition', 'bookType', 'status', 
+      'coverImageUrl', 'backImageUrl', 'metadata'
+    ] as const
+    
+    simpleFields.forEach(field => {
+      if (dto[field] !== undefined) {
+        updates[field] = dto[field]
+      }
+    })
+  }
+
+  static fromUpdateDTO(dto: UpdateVoucherBookDTO, updatedById: string): any {
+    const updates: any = {
+      updatedBy: updatedById,
+    }
+
+    // Apply all updates using helper methods
+    VoucherBookMapper.applyDateValidationUpdates(dto, updates)
+    VoucherBookMapper.applyContentValidationUpdates(dto, updates)
+    VoucherBookMapper.applyOtherFieldUpdates(dto, updates)
 
     return updates
   }

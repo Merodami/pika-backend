@@ -5,10 +5,7 @@ type BusinessRegistrationStatusResponse =
 type CompleteBusinessRegistrationResponse =
   businessPublic.CompleteBusinessRegistrationResponse
 type RegistrationProgressResponse = businessPublic.RegistrationProgressResponse
-import {
-  BUSINESS_REGISTRATION_STEPS,
-  BusinessRegistrationStatus,
-} from '@pika/types'
+import { BusinessRegistrationStatus } from '@pika/types'
 import type { BusinessRegistration } from '@prisma/client'
 
 /**

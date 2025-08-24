@@ -46,91 +46,60 @@ export function createValidationMiddleware(
 
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Validate each part of the request
-      const validatedData: Record<string, any> = {}
-      const errors: z.ZodError<any>[] = []
-
-      // Validate body
-      if (schema.body) {
-        try {
-          const parsed = await schema.body.parseAsync(req.body)
-
-          req.body = parsed
-          validatedData.body = parsed
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            errors.push(error)
-          }
-        }
+      const context: ValidationContext = {
+        validatedData: {},
+        errors: [],
       }
 
-      // Validate query
-      if (schema.query) {
-        try {
-          const parsed = await schema.query.parseAsync(req.query)
+      // Validate all request parts
+      const bodyResult = await validateRequestProperty(
+        schema.body,
+        req.body,
+        'body',
+        context,
+      )
 
-          req.query = parsed as any
-          validatedData.query = parsed
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            errors.push(error)
-          }
-        }
-      }
+      if (bodyResult !== undefined) req.body = bodyResult
 
-      // Validate params
-      if (schema.params) {
-        try {
-          const parsed = await schema.params.parseAsync(req.params)
+      const queryResult = await validateRequestProperty(
+        schema.query,
+        req.query,
+        'query',
+        context,
+      )
 
-          req.params = parsed as any
-          validatedData.params = parsed
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            errors.push(error)
-          }
-        }
-      }
+      if (queryResult !== undefined) req.query = queryResult as any
 
-      // Validate headers (only specified headers)
-      if (schema.headers) {
-        try {
-          const relevantHeaders = extractRelevantHeaders(
-            req.headers,
-            schema.headers,
-          )
-          const parsed = await schema.headers.parseAsync(relevantHeaders)
+      const paramsResult = await validateRequestProperty(
+        schema.params,
+        req.params,
+        'params',
+        context,
+      )
 
-          validatedData.headers = parsed
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            errors.push(error)
-          }
-        }
-      }
+      if (paramsResult !== undefined) req.params = paramsResult as any
 
-      // If there are any errors, handle them
-      if (errors.length > 0) {
-        const combinedError = combineZodErrors(errors)
+      const headersResult = await validateRequestProperty(
+        schema.headers,
+        req.headers,
+        'headers',
+        context,
+        (headers) => extractRelevantHeaders(headers, schema.headers!),
+      )
 
-        if (logErrors) {
-          logger.warn('Validation failed', {
-            path: req.path,
-            method: req.method,
-            errors: combinedError.issues,
-          })
-        }
-
-        if (errorHandler) {
-          return errorHandler(combinedError, req, res)
-        }
-
-        return handleValidationError(combinedError, req, res)
+      // Handle validation errors
+      if (context.errors.length > 0) {
+        return processValidationErrors(
+          context.errors,
+          req,
+          res,
+          errorHandler,
+          logErrors,
+        )
       }
 
       // Attach validated data to request for downstream use
-      ;(req as any).validated = validatedData
-
+      ;(req as any).validated = context.validatedData
       next()
     } catch (error) {
       // Handle unexpected errors
@@ -181,6 +150,39 @@ export const validate = {
 }
 
 /**
+ * Validate a single request property
+ */
+interface ValidationContext {
+  validatedData: Record<string, any>
+  errors: z.ZodError<any>[]
+}
+
+async function validateRequestProperty(
+  schema: z.ZodTypeAny | undefined,
+  data: any,
+  propertyName: string,
+  context: ValidationContext,
+  transform?: (data: any) => any,
+): Promise<any> {
+  if (!schema) return undefined
+
+  try {
+    const dataToValidate = transform ? transform(data) : data
+    const parsed = await schema.parseAsync(dataToValidate)
+
+    context.validatedData[propertyName] = parsed
+
+    return parsed
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      context.errors.push(error)
+    }
+
+    return undefined
+  }
+}
+
+/**
  * Extract only the headers that are defined in the schema
  */
 function extractRelevantHeaders(
@@ -202,6 +204,33 @@ function extractRelevantHeaders(
   }
 
   return relevantHeaders
+}
+
+/**
+ * Handle validation errors with custom or default error handler
+ */
+function processValidationErrors(
+  errors: z.ZodError<any>[],
+  req: Request,
+  res: Response,
+  errorHandler?: (error: z.ZodError<any>, req: Request, res: Response) => void,
+  logErrors = true,
+): void {
+  const combinedError = combineZodErrors(errors)
+
+  if (logErrors) {
+    logger.warn('Validation failed', {
+      path: req.path,
+      method: req.method,
+      errors: combinedError.issues,
+    })
+  }
+
+  if (errorHandler) {
+    errorHandler(combinedError, req, res)
+  } else {
+    handleValidationError(combinedError, req, res)
+  }
 }
 
 /**

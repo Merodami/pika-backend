@@ -1166,7 +1166,7 @@ describe('Business Service - Admin API Integration Tests', () => {
         },
       })
 
-      const registration = await testDb.prisma.businessRegistration.create({
+      await testDb.prisma.businessRegistration.create({
         data: {
           userId: testUser.id,
           currentStep: 2,

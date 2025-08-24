@@ -46,7 +46,6 @@ describe('User Service Cache Validation Tests', () => {
   let sharedTestData: SharedUserTestData
 
   // Test clients (authenticated supertest clients)
-  let customerClient: supertest.SuperTest<supertest.Test>
   let adminClient: supertest.SuperTest<supertest.Test>
 
   beforeAll(async () => {
@@ -87,7 +86,7 @@ describe('User Service Cache Validation Tests', () => {
     await authHelper.createAllTestUsers(testDb.prisma)
 
     // Get authenticated clients for different user types
-    customerClient = await authHelper.getUserClient(testDb.prisma)
+    await authHelper.getUserClient(testDb.prisma)
     adminClient = await authHelper.getAdminClient(testDb.prisma)
 
     logger.debug('User Service Cache Validation setup complete')
@@ -281,7 +280,7 @@ describe('User Service Cache Validation Tests', () => {
    */
   describe('Concurrent Requests Tests', () => {
     it('should handle concurrent user list requests without hanging', async () => {
-      const promises = Array.from({ length: 5 }, (_, index) => {
+      const promises = Array.from({ length: 5 }, () => {
         return adminClient.get('/admin/users?page=1&limit=3').timeout(3000) // Each request must complete within 3 seconds
       })
 
@@ -290,7 +289,7 @@ describe('User Service Cache Validation Tests', () => {
       const elapsed = Date.now() - start
 
       // All requests should succeed
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.status).toBe(200)
         expect(response.body.data).toBeDefined()
         expect(Array.isArray(response.body.data)).toBe(true)
@@ -299,7 +298,7 @@ describe('User Service Cache Validation Tests', () => {
       // All responses should be identical (cached)
       const firstResponse = responses[0].body
 
-      responses.forEach((response, index) => {
+      responses.forEach((response) => {
         expect(response.body).toEqual(firstResponse)
       })
 
@@ -484,10 +483,12 @@ describe('User Service Cache Validation Tests', () => {
 
     it('should handle malformed email in getUserByEmail without hanging', async () => {
       const start = Date.now()
-      const response = await adminClient
+
+      await adminClient
         .get('/admin/users/email/not-an-email')
         .timeout(2000)
         .expect(400) // Should return bad request for invalid email, not hang
+
       const elapsed = Date.now() - start
 
       expect(elapsed).toBeLessThan(1000)
@@ -510,7 +511,8 @@ describe('User Service Cache Validation Tests', () => {
 
       // Test email verification endpoint (may involve caching)
       const start = Date.now()
-      const response = await adminClient
+
+      await adminClient
         .post(`/admin/users/verify`)
         .send({
           type: 'email',
@@ -518,6 +520,7 @@ describe('User Service Cache Validation Tests', () => {
         })
         .timeout(3000)
         .expect(204) // Verification endpoints typically return 204 No Content
+
       const elapsed = Date.now() - start
 
       expect(elapsed).toBeLessThan(3000)

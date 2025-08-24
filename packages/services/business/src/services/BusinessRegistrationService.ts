@@ -548,12 +548,11 @@ export class BusinessRegistrationService
       }
 
       // Update the registration status (including rejection reason if applicable)
-      const updatedRegistration =
-        await this.registrationRepository.updateStatus(
-          registration.id,
-          status,
-          reason,
-        )
+      await this.registrationRepository.updateStatus(
+        registration.id,
+        status,
+        reason,
+      )
 
       logger.info('Registration status updated successfully', {
         registrationId: registration.id,
