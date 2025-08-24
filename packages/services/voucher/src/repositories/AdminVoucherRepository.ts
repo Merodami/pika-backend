@@ -4,6 +4,7 @@ import { type VoucherDomain, VoucherMapper } from '@pika/sdk'
 import { ErrorFactory, logger, toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes, VoucherState } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
+import { set } from 'lodash-es'
 
 import type {
   CreateVoucherData,
@@ -101,30 +102,7 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
 
   async update(id: string, data: UpdateVoucherData): Promise<VoucherDomain> {
     try {
-      const updateData: any = {
-        updatedAt: new Date(),
-      }
-
-      // Only include fields that are actually defined and valid for Prisma
-      if (data.categoryId !== undefined) updateData.categoryId = data.categoryId
-      if (data.titleKey !== undefined) updateData.titleKey = data.titleKey
-      if (data.descriptionKey !== undefined)
-        updateData.descriptionKey = data.descriptionKey
-      if (data.termsAndConditionsKey !== undefined)
-        updateData.termsAndConditionsKey = data.termsAndConditionsKey
-      if (data.type !== undefined) updateData.type = data.type
-      if (data.value !== undefined) updateData.value = data.value
-      if (data.discount !== undefined) updateData.discount = data.discount
-      if (data.currency !== undefined) updateData.currency = data.currency
-      if (data.validFrom !== undefined) updateData.validFrom = data.validFrom
-      if (data.validUntil !== undefined) updateData.validUntil = data.validUntil
-      if (data.maxRedemptions !== undefined)
-        updateData.maxRedemptions = data.maxRedemptions
-      if (data.maxRedemptionsPerUser !== undefined)
-        updateData.maxRedemptionsPerUser = data.maxRedemptionsPerUser
-      if (data.metadata !== undefined) updateData.metadata = data.metadata
-      if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl
-      if (data.state !== undefined) updateData.state = data.state
+      const updateData = this.buildUpdateData(data)
 
       const voucher = await this.prisma.voucher.update({
         where: { id },
@@ -523,5 +501,40 @@ export class AdminVoucherRepository implements IAdminVoucherRepository {
     return parsedIncludes && Object.keys(parsedIncludes).length > 0
       ? (toPrismaInclude(parsedIncludes) as Prisma.VoucherInclude)
       : undefined
+  }
+
+  private buildUpdateData(data: UpdateVoucherData): any {
+    const updateData: any = {
+      updatedAt: new Date(),
+    }
+
+    // Map of fields to update - only include defined values
+    const fieldMappings = [
+      'categoryId',
+      'titleKey',
+      'descriptionKey',
+      'termsAndConditionsKey',
+      'type',
+      'value',
+      'discount',
+      'currency',
+      'validFrom',
+      'validUntil',
+      'maxRedemptions',
+      'maxRedemptionsPerUser',
+      'metadata',
+      'imageUrl',
+      'state',
+    ]
+
+    fieldMappings.forEach((field) => {
+      const value = data[field as keyof UpdateVoucherData]
+
+      if (value !== undefined) {
+        set(updateData, field, value)
+      }
+    })
+
+    return updateData
   }
 }

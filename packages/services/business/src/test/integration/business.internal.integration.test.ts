@@ -268,7 +268,8 @@ describe('Business Service - Internal API Integration Tests', () => {
     it('should get all businesses by user ID with pagination', async () => {
       // Create multiple businesses for the same user
       const userId = uuid()
-      const { businesses } = await seedTestBusinesses(testDb.prisma, {
+
+      await seedTestBusinesses(testDb.prisma, {
         count: 3,
         userId, // Same user for all businesses
         sharedCategory: sharedTestData.activeCategory,
@@ -294,7 +295,8 @@ describe('Business Service - Internal API Integration Tests', () => {
     it('should apply active and verified filters', async () => {
       // Create businesses with different statuses for the same user
       const userId = uuid()
-      const { businesses } = await seedTestBusinesses(testDb.prisma, {
+
+      await seedTestBusinesses(testDb.prisma, {
         count: 4,
         userId,
         sharedCategory: sharedTestData.activeCategory,
@@ -329,7 +331,8 @@ describe('Business Service - Internal API Integration Tests', () => {
     it('should handle pagination parameters', async () => {
       // Create many businesses for the same user
       const userId = uuid()
-      const { businesses } = await seedTestBusinesses(testDb.prisma, {
+
+      await seedTestBusinesses(testDb.prisma, {
         count: 10,
         userId,
         sharedCategory: sharedTestData.activeCategory,

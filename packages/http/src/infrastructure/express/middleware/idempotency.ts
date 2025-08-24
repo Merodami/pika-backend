@@ -41,8 +41,9 @@ function routePatternToRegex(pattern: string): RegExp {
   const safePattern = `^${regexPattern}$`
 
   try {
+    // eslint-disable-next-line security/detect-non-literal-regexp -- Input is validated and escaped above
     return new RegExp(safePattern)
-  } catch (error) {
+  } catch {
     throw new Error(`Failed to create regex from pattern: ${pattern}`)
   }
 }

@@ -87,6 +87,8 @@ export function createValidationMiddleware(
         (headers) => extractRelevantHeaders(headers, schema.headers!),
       )
 
+      if (headersResult !== undefined) req.headers = headersResult as any
+
       // Handle validation errors
       if (context.errors.length > 0) {
         return processValidationErrors(

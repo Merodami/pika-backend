@@ -51,7 +51,6 @@ describe('Auth Service Cache Validation Tests', () => {
 
   // Test tokens
   let customerAccessToken: string
-  let adminAccessToken: string
 
   beforeAll(async () => {
     logger.debug('Setting up Auth Service Cache Validation tests...')
@@ -111,7 +110,7 @@ describe('Auth Service Cache Validation Tests', () => {
 
     customerAccessToken = customerLoginResponse.body.accessToken
 
-    const adminLoginResponse = await request
+    await request
       .post('/auth/token')
       .send({
         grantType: 'password',
@@ -119,8 +118,6 @@ describe('Auth Service Cache Validation Tests', () => {
         password: sharedTestData.testPassword || 'Password123!',
       })
       .expect(200)
-
-    adminAccessToken = adminLoginResponse.body.accessToken
 
     logger.debug('Auth Service Cache Validation setup complete')
   }, 120000)
