@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 /**
- * 🚀 Flutter Type Generator for Pika Backend
+ * 🚀 Flutter Type Generator for VoucherBook Backend
  *
  * This script generates type-safe Dart models from your Zod schemas using:
  * - Zod 4's native JSON Schema generation (z.toJSONSchema)

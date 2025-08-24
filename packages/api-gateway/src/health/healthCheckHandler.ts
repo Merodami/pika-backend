@@ -179,7 +179,7 @@ function generateHealthHTML(data: HealthCheckResponse): string {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pika Backend - Health Status</title>
+    <title>VoucherBook Backend - Health Status</title>
     <style>
         * {
             margin: 0;
@@ -390,7 +390,7 @@ function generateHealthHTML(data: HealthCheckResponse): string {
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">Pika Backend</div>
+            <div class="logo">VoucherBook Backend</div>
             <div class="subtitle">System Health Status</div>
         </div>
         

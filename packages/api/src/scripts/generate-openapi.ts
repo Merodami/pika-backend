@@ -42,9 +42,9 @@ const OUTPUT_DIR = join(__dirname, '../../generated/openapi')
 // ============= Public API Registry =============
 
 const publicRegistry = createRegistry({
-  title: 'Pika Public API',
+  title: 'The VoucherBook Public API',
   version: '1.0.0',
-  description: 'Public API for Pika mobile and web applications',
+  description: 'Public API for The VoucherBook mobile and web applications',
   servers: [
     {
       url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
@@ -196,9 +196,9 @@ publicRegistry.registerRoute(
 // ============= Admin API Registry =============
 
 const adminRegistry = createRegistry({
-  title: 'Pika Admin API',
+  title: 'The VoucherBook Admin API',
   version: '1.0.0',
-  description: 'Administrative API for Pika platform management',
+  description: 'Administrative API for The VoucherBook platform management',
   servers: [
     {
       url: 'https://admin-api.thevoucherbook.com/v1',
@@ -237,7 +237,7 @@ adminRegistry.registerSecurityScheme('bearerAuth', bearerAuth)
 // ============= Internal API Registry =============
 
 const internalRegistry = createRegistry({
-  title: 'Pika Internal API',
+  title: 'The VoucherBook Internal API',
   version: '1.0.0',
   description: 'Internal service-to-service API contracts',
   servers: [
@@ -296,7 +296,7 @@ function generateOpenAPIFiles() {
     const combinedSpec = {
       openapi: '3.1.0',
       info: {
-        title: 'Pika Combined API',
+        title: 'The VoucherBook Combined API',
         version: '1.0.0',
         description: 'Combined API specification for SDK generation',
       },

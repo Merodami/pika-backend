@@ -98,7 +98,7 @@ console.log('\n📦 Combining schemas for Dart generation...')
 
 const combinedSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
-  title: 'PikaAPITypes',
+  title: 'VoucherBookAPITypes',
   type: 'object',
   properties: allJsonSchemas,
 }
@@ -117,7 +117,7 @@ try {
       --src-lang schema \
       --lang dart \
       --out "${path.join(DART_OUTPUT_DIR, 'api_types.dart')}" \
-      --top-level PikaApiTypes
+      --top-level VoucherBookApiTypes
   `.trim()
 
   execSync(quicktypeCommand, { stdio: 'inherit' })

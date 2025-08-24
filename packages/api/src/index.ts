@@ -1,5 +1,5 @@
 /**
- * Pika API Schemas with Zod
+ * The VoucherBook API Schemas with Zod
  * Main entry point for all Zod schemas and utilities
  *
  * NOTE: Import z directly from 'zod' package to avoid circular dependencies

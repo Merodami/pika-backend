@@ -1,6 +1,8 @@
 import type { PrismaClient } from '@prisma/client'
 
 import { FIXED_DEV_IDS } from './fixed-ids.js'
+import type { ImageSeedingResult } from './image-seeder.js'
+import { getRandomUserAvatar } from './image-seeder.js'
 
 /**
  * User Seeder Module
@@ -20,10 +22,18 @@ const DEV_USER_DATA = {
   status: 'active' as const,
 } as const
 
-export async function seedUser(prisma: PrismaClient): Promise<void> {
+export async function seedUser(
+  prisma: PrismaClient,
+  images?: ImageSeedingResult
+): Promise<void> {
   console.log('👤 Seeding dev user...')
 
   try {
+    // Assign a user avatar if available
+    const avatarUrl = images && images.userAvatars.length > 0
+      ? getRandomUserAvatar(images.userAvatars)
+      : undefined
+
     const user = await prisma.user.upsert({
       where: { id: DEV_USER_DATA.id },
       update: {
@@ -34,8 +44,12 @@ export async function seedUser(prisma: PrismaClient): Promise<void> {
         phoneVerified: DEV_USER_DATA.phoneVerified,
         role: DEV_USER_DATA.role,
         status: DEV_USER_DATA.status,
+        avatarUrl,
       },
-      create: DEV_USER_DATA,
+      create: {
+        ...DEV_USER_DATA,
+        avatarUrl,
+      },
     })
 
     console.log(`✅ User created/updated: ${user.email}`)

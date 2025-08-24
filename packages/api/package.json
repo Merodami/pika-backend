@@ -1,7 +1,7 @@
 {
   "name": "@pika/api",
   "version": "1.1.1",
-  "description": "API schemas and validation for Pika platform",
+  "description": "API schemas and validation for The VoucherBook platform",
   "author": "Damian Meroni",
   "license": "AGPL-3.0-or-later",
   "type": "module",

@@ -31,22 +31,22 @@ async function generateAllSwaggerDocs() {
       {
         file: 'public-api.json',
         output: 'public-api-docs.html',
-        title: 'Pika Public API',
+        title: 'The VoucherBook Public API',
       },
       {
         file: 'admin-api.json',
         output: 'admin-api-docs.html',
-        title: 'Pika Admin API',
+        title: 'The VoucherBook Admin API',
       },
       {
         file: 'internal-api.json',
         output: 'internal-api-docs.html',
-        title: 'Pika Internal API',
+        title: 'The VoucherBook Internal API',
       },
       {
         file: 'all-apis.json',
         output: 'all-apis-docs.html',
-        title: 'Pika All APIs',
+        title: 'The VoucherBook All APIs',
       },
     ]
 
@@ -73,7 +73,7 @@ async function generateAllSwaggerDocs() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pika API Documentation - Zod</title>
+    <title>The VoucherBook API Documentation - Zod</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -148,7 +148,7 @@ async function generateAllSwaggerDocs() {
 </head>
 <body>
     <div class="container">
-        <h1>Pika API Documentation (Zod)</h1>
+        <h1>The VoucherBook API Documentation (Zod)</h1>
         
         <div class="api-grid">
             <div class="api-card">

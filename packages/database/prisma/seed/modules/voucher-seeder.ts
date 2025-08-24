@@ -3,6 +3,8 @@ import type { PrismaClient } from '@prisma/client'
 
 import { FIXED_DEV_IDS } from './fixed-ids.js'
 import type { SeedModule } from './types.js'
+import type { ImageSeedingResult } from './image-seeder.js'
+import { getRandomVoucherImage } from './image-seeder.js'
 
 /**
  * Voucher Seeder Module
@@ -349,7 +351,10 @@ const DEV_VOUCHERS_DATA = [
 /**
  * Seed vouchers with translations
  */
-async function seedVouchers(prisma: PrismaClient): Promise<void> {
+async function seedVouchers(
+  prisma: PrismaClient,
+  images?: ImageSeedingResult
+): Promise<void> {
   console.log('🎫 Seeding dev vouchers...')
 
   let vouchersCreated = 0
@@ -360,6 +365,11 @@ async function seedVouchers(prisma: PrismaClient): Promise<void> {
   try {
     for (const voucherData of DEV_VOUCHERS_DATA) {
       const { translations, ...voucher } = voucherData
+
+      // Assign a voucher image if available
+      const imageUrl = images && images.voucherImages.length > 0
+        ? getRandomVoucherImage(images.voucherImages)
+        : undefined
 
       // Create/update voucher
       await prisma.voucher.upsert({
@@ -377,8 +387,12 @@ async function seedVouchers(prisma: PrismaClient): Promise<void> {
           maxRedemptionsPerUser: voucher.maxRedemptionsPerUser,
           validFrom: voucher.validFrom,
           validUntil: voucher.validUntil,
+          imageUrl,
         },
-        create: voucher,
+        create: {
+          ...voucher,
+          imageUrl,
+        },
       })
 
       vouchersCreated++

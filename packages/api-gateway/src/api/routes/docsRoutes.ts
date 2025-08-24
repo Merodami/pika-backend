@@ -51,12 +51,6 @@ export function createDocsRouter(): Router {
 
   // Main documentation index
   router.get('/', async (req: Request, res: Response) => {
-    // Ensure trailing slash for proper relative link resolution
-    if (!req.originalUrl.endsWith('/')) {
-      res.redirect(301, req.originalUrl + '/')
-
-      return
-    }
     await serveDocFile('api-docs-index.html', res)
   })
 

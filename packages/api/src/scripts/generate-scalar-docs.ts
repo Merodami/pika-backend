@@ -49,22 +49,22 @@ async function generateScalarDocs() {
       {
         file: 'public-api.json',
         output: 'public-api-docs.html',
-        title: 'Pika Public API - Scalar',
+        title: 'The VoucherBook Public API - Scalar',
       },
       {
         file: 'admin-api.json',
         output: 'admin-api-docs.html',
-        title: 'Pika Admin API - Scalar',
+        title: 'The VoucherBook Admin API - Scalar',
       },
       {
         file: 'internal-api.json',
         output: 'internal-api-docs.html',
-        title: 'Pika Internal API - Scalar',
+        title: 'The VoucherBook Internal API - Scalar',
       },
       {
         file: 'all-apis.json',
         output: 'all-apis-docs.html',
-        title: 'Pika Complete API - Scalar',
+        title: 'The VoucherBook Complete API - Scalar',
       },
     ]
 
@@ -91,7 +91,7 @@ async function generateScalarDocs() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pika API Documentation</title>
+    <title>The VoucherBook API Documentation</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -386,8 +386,8 @@ async function generateScalarDocs() {
 <body>
     <div class="container">
         <div class="header">
-            <h1>Pika API Documentation</h1>
-            <p>Enterprise REST API documentation for the Pika fitness platform</p>
+            <h1>The VoucherBook API Documentation</h1>
+            <p>Enterprise REST API documentation for The VoucherBook platform</p>
         </div>
         
         <div class="api-grid">

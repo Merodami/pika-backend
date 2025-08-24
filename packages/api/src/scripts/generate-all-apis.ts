@@ -49,9 +49,9 @@ const OUTPUT_DIR = join(__dirname, '../../generated/openapi')
 
 // ============= Public API =============
 const publicRegistry = createRegistry({
-  title: 'Pika Public API',
+  title: 'The VoucherBook Public API',
   version: '1.0.0',
-  description: 'Public API for Pika mobile and web applications',
+  description: 'Public API for The VoucherBook mobile and web applications',
   servers: [
     {
       url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
@@ -70,9 +70,9 @@ registerPublicAPI(publicRegistry)
 
 // ============= Admin API =============
 const adminRegistry = createRegistry({
-  title: 'Pika Admin API',
+  title: 'The VoucherBook Admin API',
   version: '1.0.0',
-  description: 'Administrative API for Pika platform management',
+  description: 'Administrative API for The VoucherBook platform management',
   servers: [
     {
       url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
@@ -91,7 +91,7 @@ registerAdminAPI(adminRegistry)
 
 // ============= Internal API =============
 const internalRegistry = createRegistry({
-  title: 'Pika Internal API',
+  title: 'The VoucherBook Internal API',
   version: '1.0.0',
   description: 'Internal service-to-service communication API',
   servers: [
@@ -131,7 +131,7 @@ registerInternalAPI(internalRegistry)
 
 // ============= Combined API (All APIs) =============
 const allApisRegistry = createRegistry({
-  title: 'Pika Complete API',
+  title: 'The VoucherBook Complete API',
   version: '1.0.0',
   description:
     'Complete API documentation including public, admin, and internal endpoints',
@@ -216,7 +216,7 @@ const indexHtml = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pika API Documentation</title>
+    <title>The VoucherBook API Documentation</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -268,7 +268,7 @@ const indexHtml = `
     </style>
 </head>
 <body>
-    <h1>Pika API Documentation</h1>
+    <h1>The VoucherBook API Documentation</h1>
     
     <ul class="api-list">
         <li class="api-item">

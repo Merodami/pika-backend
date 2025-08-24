@@ -165,8 +165,9 @@ export async function cleanupModules(
   console.log(`📋 Requested modules: ${moduleNames.join(', ')}`)
 
   try {
-    // Cleanup in reverse order (to handle dependencies)
-    const cleanupOrder = [...moduleNames].reverse()
+    // Cleanup should be in reverse dependency order
+    // The moduleNames should already be in the correct cleanup order
+    const cleanupOrder = [...moduleNames]
 
     console.log(`🔗 Cleanup order: ${cleanupOrder.join(' → ')}`)
 
@@ -265,8 +266,9 @@ export async function resetDevData(
   console.log(`📋 Modules: ${modules.join(', ')}`)
 
   try {
-    // First cleanup in reverse order
-    await cleanupModules(prisma, [...modules].reverse(), { verbose })
+    // First cleanup in reverse dependency order (Vouchers -> Businesses -> User -> Categories)
+    const cleanupOrder = [...modules].reverse()
+    await cleanupModules(prisma, cleanupOrder, { verbose })
 
     console.log('\\n⏸️ Cleanup completed, starting fresh seed...')
 
@@ -295,7 +297,7 @@ export const QUICK_COMMANDS = {
    * Cleanup everything
    */
   cleanAll: (prisma: PrismaClient) =>
-    cleanupModules(prisma, ['Vouchers', 'Businesses', 'Categories', 'User']),
+    cleanupModules(prisma, ['Vouchers', 'Businesses', 'User', 'Categories']),
 
   /**
    * Reset everything
@@ -338,8 +340,8 @@ export const QUICK_COMMANDS = {
    * Cleanup everything including images
    */
   cleanAllWithImages: async (prisma: PrismaClient) => {
-    // Clean up modules first
-    await cleanupModules(prisma, ['Vouchers', 'Businesses', 'Categories', 'User'])
+    // Clean up modules first (in reverse dependency order)
+    await cleanupModules(prisma, ['Vouchers', 'Businesses', 'User', 'Categories'])
     
     // Then cleanup images
     await cleanupImages(prisma)
@@ -366,8 +368,8 @@ export async function seedWithImages(
       console.log(`\n🔧 ${module.name}: ${module.description}`)
 
       // Call seed function with images parameter for compatible modules
-      if (moduleName === 'Businesses') {
-        // Business module supports images
+      if (moduleName === 'User' || moduleName === 'Businesses' || moduleName === 'Vouchers') {
+        // User, Business and Voucher modules support images
         await module.seed(prisma, images)
       } else {
         // Regular modules
