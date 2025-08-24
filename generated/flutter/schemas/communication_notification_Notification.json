@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "userId": {
+      "description": "User ID who receives the notification",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["email", "inApp", "sms", "push"]
+    },
+    "status": {
+      "default": "pending",
+      "type": "string",
+      "enum": ["pending", "sent", "delivered", "failed", "read"]
+    },
+    "priority": {
+      "default": "normal",
+      "type": "string",
+      "enum": ["low", "normal", "high", "urgent"]
+    },
+    "title": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "description": {
+      "type": "string"
+    },
+    "isGlobal": {
+      "description": "Whether this is a global notification",
+      "default": false,
+      "type": "boolean"
+    },
+    "isRead": {
+      "description": "Whether the notification has been read",
+      "default": false,
+      "type": "boolean"
+    },
+    "readAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "metadata": {
+      "description": "Additional metadata for the notification",
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "category": {
+      "description": "Notification category for filtering",
+      "type": "string"
+    },
+    "actionUrl": {
+      "description": "URL to navigate when notification is clicked",
+      "type": "string",
+      "format": "uri"
+    },
+    "imageUrl": {
+      "description": "Notification image",
+      "type": "string",
+      "format": "uri"
+    },
+    "expiresAt": {
+      "description": "When the notification expires",
+      "type": "string"
+    },
+    "createdAt": {
+      "description": "When the record was created",
+      "type": "string"
+    },
+    "updatedAt": {
+      "description": "When the record was last updated",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "status",
+    "priority",
+    "isGlobal",
+    "isRead",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

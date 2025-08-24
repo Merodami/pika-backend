@@ -2,8 +2,7 @@ services:
   postgres:
     container_name: pika_postgres
     hostname: postgres
-    image: imresamu/postgis:17-3.5
-    platform: linux/arm64/v8
+    image: postgis/postgis:17-3.5
     restart: unless-stopped
     env_file:
       - .env
@@ -103,7 +102,8 @@ services:
       /bin/sh -c "
       mc alias set minio http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin};
       mc mb -p minio/${AWS_S3_BUCKET:-pika-uploads} || true;
-      echo 'Bucket ${AWS_S3_BUCKET:-pika-uploads} ready';
+      mc anonymous set public minio/${AWS_S3_BUCKET:-pika-uploads}/test-seed-images || true;
+      echo 'Bucket ${AWS_S3_BUCKET:-pika-uploads} ready and test-seed-images folder is public';
       "
     networks:
       - backend
@@ -126,6 +126,34 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - backend
+
+  firebase-emulator:
+    container_name: pika_firebase_emulator
+    hostname: firebase-emulator
+    build:
+      context: ./docker/firebase-emulator
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - '4000:4000' # Firebase UI
+      - '9099:9099' # Firebase Auth emulator
+      - '5001:5001' # Functions emulator
+      - '8080:8080' # Firestore emulator
+      - '8085:8085' # Firebase database emulator
+      - '9002:9000' # Firebase hosting emulator (changed to avoid MinIO conflict)
+    environment:
+      - FIREBASE_PROJECT=demo-test
+      - GOOGLE_APPLICATION_CREDENTIALS=/firebase/service-account.json
+    volumes:
+      - ./docker/firebase-emulator:/firebase
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:4000 || exit 1']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
       - backend
 

@@ -1,0 +1,435 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Business_registrationTypes",
+  "type": "object",
+  "properties": {
+    "BusinessRegistrationStatusResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "needsRegistration": {
+          "description": "Whether user needs to complete registration",
+          "type": "boolean"
+        },
+        "currentStep": {
+          "description": "Current registration step number",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "registrationStatus": {
+          "description": "Current registration status",
+          "type": "string",
+          "enum": ["in_progress", "submitted", "approved", "rejected"]
+        },
+        "canAccessDashboard": {
+          "description": "Whether user can access dashboard",
+          "type": "boolean"
+        },
+        "registrationId": {
+          "description": "Registration ID if exists",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "businessId": {
+          "description": "Business ID if created",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+        }
+      },
+      "required": [
+        "needsRegistration",
+        "currentStep",
+        "registrationStatus",
+        "canAccessDashboard",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "BusinessRegistrationStep1Request": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "businessName": {
+          "description": "Business name",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "businessType": {
+          "description": "Type of business",
+          "type": "string",
+          "enum": [
+            "retail",
+            "service",
+            "restaurant",
+            "healthcare",
+            "fitness",
+            "education",
+            "entertainment",
+            "other"
+          ]
+        },
+        "categoryId": {
+          "description": "Category ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "primaryLanguage": {
+          "description": "Primary language code",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 2,
+          "pattern": "^[a-z]{2}$"
+        }
+      },
+      "required": [
+        "businessName",
+        "businessType",
+        "categoryId",
+        "primaryLanguage"
+      ],
+      "additionalProperties": false
+    },
+    "BusinessRegistrationStep2Request": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Business description",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "address": {
+          "description": "Business address",
+          "type": "object",
+          "properties": {
+            "street": {
+              "description": "Street address",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            "city": {
+              "description": "City",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "state": {
+              "description": "State/Province",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            },
+            "postalCode": {
+              "description": "Postal code",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 20
+            },
+            "country": {
+              "description": "Country code (ISO 3166-1 alpha-2)",
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2
+            }
+          },
+          "required": ["street", "city", "state", "postalCode", "country"],
+          "additionalProperties": false
+        },
+        "phone": {
+          "description": "Business phone number",
+          "type": "string",
+          "pattern": "^\\+[1-9]\\d{1,14}$"
+        },
+        "website": {
+          "description": "Business website URL",
+          "type": "string",
+          "maxLength": 2048,
+          "format": "uri"
+        },
+        "email": {
+          "description": "Business contact email",
+          "type": "string"
+        }
+      },
+      "required": ["description", "address", "phone"],
+      "additionalProperties": false
+    },
+    "BusinessRegistrationStep3Request": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "operatingHours": {
+          "description": "Operating hours",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "socialMedia": {
+          "description": "Social media links",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "additionalInfo": {
+          "description": "Additional information",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "additionalProperties": false
+    },
+    "CompleteBusinessRegistrationRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "confirmAllDataAccurate": {
+          "description": "Confirm all data is accurate",
+          "type": "boolean",
+          "const": true
+        },
+        "agreedToTerms": {
+          "description": "Agree to terms and conditions",
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": ["confirmAllDataAccurate", "agreedToTerms"],
+      "additionalProperties": false
+    },
+    "CompleteBusinessRegistrationResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "businessId": {
+          "description": "Newly created business ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "registrationStatus": {
+          "description": "Registration status",
+          "type": "string",
+          "const": "submitted"
+        },
+        "message": {
+          "description": "Success message",
+          "type": "string"
+        },
+        "estimatedReviewTime": {
+          "description": "Estimated review time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "businessId",
+        "registrationStatus",
+        "message",
+        "estimatedReviewTime"
+      ],
+      "additionalProperties": false
+    },
+    "RegistrationDetailQueryParams": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "include": {
+          "description": "Comma-separated relations: user,business",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "RegistrationProgressResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Registration ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "description": "User ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "currentStep": {
+          "description": "Current step number",
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "stepsCompleted": {
+          "description": "List of completed step numbers",
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "step1Data": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "step2Data": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "step3Data": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "registrationStatus": {
+          "description": "Current registration status",
+          "type": "string",
+          "enum": ["in_progress", "submitted", "approved", "rejected"]
+        },
+        "businessId": {
+          "description": "Business ID if created",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "currentStep",
+        "stepsCompleted",
+        "registrationStatus",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "StartRegistrationResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "started": {
+          "description": "Whether registration was started or already existed",
+          "type": "boolean"
+        },
+        "currentStep": {
+          "description": "Current step number",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        }
+      },
+      "required": ["started", "currentStep"],
+      "additionalProperties": false
+    },
+    "SubmitRegistrationStepRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "stepNumber": {
+          "description": "Step number to submit",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "stepData": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "saveAsDraft": {
+          "description": "Save as draft without validation",
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["stepNumber", "stepData", "saveAsDraft"],
+      "additionalProperties": false
+    },
+    "SubmitRegistrationStepResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "success": {
+          "description": "Whether step was saved successfully",
+          "type": "boolean"
+        },
+        "nextStep": {
+          "description": "Next step number or null if complete",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "savedData": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        }
+      },
+      "required": ["success", "nextStep"],
+      "additionalProperties": false
+    }
+  }
+}

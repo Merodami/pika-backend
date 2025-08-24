@@ -1,3 +1,5 @@
+import { EMAIL_FROM } from '@pika/environment'
+
 import { getServiceDefinitions } from '../../services/definitions.js'
 import type { DeploymentConfig } from '../../types/index.js'
 
@@ -34,7 +36,7 @@ export function getVercelConfig(): DeploymentConfig {
       email: {
         provider: 'resend',
         apiKey: process.env.RESEND_API_KEY,
-        from: process.env.EMAIL_FROM || 'noreply@pika.com',
+        from: EMAIL_FROM,
       },
     },
     gateway: {

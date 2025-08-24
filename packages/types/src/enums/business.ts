@@ -37,3 +37,35 @@ export enum BusinessSize {
   LARGE = 'large',
   ENTERPRISE = 'enterprise',
 }
+
+/**
+ * Business registration status
+ */
+export enum BusinessRegistrationStatus {
+  IN_PROGRESS = 'in_progress',
+  SUBMITTED = 'submitted',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
+/**
+ * Business registration steps
+ */
+export enum BusinessRegistrationStep {
+  BASIC_INFO = 'basic_info',
+  DETAILS = 'details',
+  ADDITIONAL_INFO = 'additional_info', // Operating hours, social media, etc.
+  COMPLETED = 'completed',
+}
+
+/**
+ * Business registration current step numbers
+ */
+export const BUSINESS_REGISTRATION_STEPS = {
+  BASIC_INFO: 1,
+  DETAILS: 2,
+  ADDITIONAL_INFO: 3, // Step 3 for additional business information
+} as const
+
+export type BusinessRegistrationStepNumber =
+  (typeof BUSINESS_REGISTRATION_STEPS)[keyof typeof BUSINESS_REGISTRATION_STEPS]

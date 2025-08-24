@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "immediately": {
+      "description": "Cancel immediately vs at period end",
+      "default": false,
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "feedback": {
+      "type": "string",
+      "enum": ["tooExpensive", "notUsing", "missingFeatures", "other"]
+    }
+  },
+  "required": ["immediately"],
+  "additionalProperties": false
+}

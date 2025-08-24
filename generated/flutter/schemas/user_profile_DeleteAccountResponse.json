@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "message": {
+      "default": "Account deletion scheduled. You will receive a confirmation email.",
+      "type": "string"
+    },
+    "deletionDate": {
+      "description": "When the account will be permanently deleted",
+      "type": "string"
+    }
+  },
+  "required": ["message", "deletionDate"],
+  "additionalProperties": false
+}

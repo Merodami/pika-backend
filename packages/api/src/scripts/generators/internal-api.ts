@@ -5,7 +5,6 @@ import * as internalBusinessSchemas from '@api/schemas/business/internal/service
 import * as categoryParameters from '@api/schemas/category/common/parameters.js'
 import * as internalCategorySchemas from '@api/schemas/category/internal/service.js'
 import * as internalCommunicationSchemas from '@api/schemas/communication/internal/service.js'
-import * as internalDiscoverySchemas from '@api/schemas/discovery/internal/service.js'
 import { DeviceInfoSchema } from '@api/schemas/shared/device.js'
 import { ErrorResponse } from '@api/schemas/shared/errors.js'
 import {
@@ -17,7 +16,6 @@ import { MessageResponse } from '@api/schemas/shared/responses.js'
 import * as storageParameters from '@api/schemas/storage/common/parameters.js'
 import * as internalStorageSchemas from '@api/schemas/storage/internal/service.js'
 import * as internalSubscriptionSchemas from '@api/schemas/subscription/internal/service.js'
-import * as healthSchemas from '@api/schemas/system/public/health.js'
 import * as internalUserSchemas from '@api/schemas/user/internal/service.js'
 import * as internalVoucherSchemas from '@api/schemas/voucher/internal/service.js'
 import * as voucherParameters from '@api/schemas/voucher/public/parameters.js'
@@ -35,9 +33,6 @@ export function registerInternalAPI(registry: ZodRegistry): void {
 
   // Register shared device schemas
   registry.registerSchema('DeviceInfo', DeviceInfoSchema)
-
-  // ============= Health & Discovery Schemas =============
-  registry.registerSchema('ServiceHealth', healthSchemas.ServiceHealth)
 
   // ============= Business Service Schemas =============
   registry.registerSchema(
@@ -222,39 +217,6 @@ export function registerInternalAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'VoucherPathParams',
     voucherParameters.VoucherPathParams,
-  )
-
-  registry.registerSchema(
-    'ServiceRegistryQuery',
-    internalDiscoverySchemas.ServiceRegistryQuery,
-  )
-  registry.registerSchema(
-    'ServiceRegistryResponse',
-    internalDiscoverySchemas.ServiceRegistryResponse,
-  )
-  registry.registerSchema(
-    'RegisterServiceRequest',
-    internalDiscoverySchemas.RegisterServiceRequest,
-  )
-  registry.registerSchema(
-    'RegisterServiceResponse',
-    internalDiscoverySchemas.RegisterServiceResponse,
-  )
-  registry.registerSchema(
-    'ServiceEndpointsResponse',
-    internalDiscoverySchemas.ServiceEndpointsResponse,
-  )
-  registry.registerSchema(
-    'DeregisterServiceRequest',
-    internalDiscoverySchemas.DeregisterServiceRequest,
-  )
-  registry.registerSchema(
-    'DeregisterServiceResponse',
-    internalDiscoverySchemas.DeregisterServiceResponse,
-  )
-  registry.registerSchema(
-    'ServiceConfigResponse',
-    internalDiscoverySchemas.ServiceConfigResponse,
   )
 
   // ============= Auth Service Schemas =============
@@ -1160,197 +1122,6 @@ function registerInternalRoutes(registry: ZodRegistry): void {
         content: {
           'application/json': {
             schema: internalVoucherSchemas.ValidateVoucherResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Health check route
-  registry.registerRoute({
-    method: 'get',
-    path: '/health',
-    operationId: 'getInternalServiceHealth',
-    summary: 'Service health check',
-    tags: ['Health'],
-    security: [{ 'x-api-key': [] }],
-    responses: {
-      200: {
-        description: 'Service is healthy',
-        content: {
-          'application/json': {
-            schema: healthSchemas.ServiceHealth,
-          },
-        },
-      },
-    },
-  })
-
-  // Service Registry route
-  registry.registerRoute({
-    method: 'get',
-    path: '/services/registry',
-    operationId: 'getInternalServiceRegistry',
-    summary: 'Get service registry',
-    tags: ['Service Discovery'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      query: internalDiscoverySchemas.ServiceRegistryQuery,
-    },
-    responses: {
-      200: {
-        description: 'Service registry',
-        content: {
-          'application/json': {
-            schema: internalDiscoverySchemas.ServiceRegistryResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Register service route
-  registry.registerRoute({
-    method: 'post',
-    path: '/services/register',
-    operationId: 'registerInternalService',
-    summary: 'Register service instance',
-    tags: ['Service Discovery'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: internalDiscoverySchemas.RegisterServiceRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      201: {
-        description: 'Service registered',
-        content: {
-          'application/json': {
-            schema: internalDiscoverySchemas.RegisterServiceResponse,
-          },
-        },
-      },
-      400: {
-        description: 'Invalid registration data',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Deregister service route
-  registry.registerRoute({
-    method: 'delete',
-    path: '/services/{instanceId}/deregister',
-    operationId: 'deregisterInternalService',
-    summary: 'Deregister service instance',
-    tags: ['Service Discovery'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        instanceId: z.string().uuid(),
-      }),
-      body: {
-        content: {
-          'application/json': {
-            schema: internalDiscoverySchemas.DeregisterServiceRequest,
-          },
-        },
-      },
-    },
-    responses: {
-      200: {
-        description: 'Service deregistered',
-        content: {
-          'application/json': {
-            schema: internalDiscoverySchemas.DeregisterServiceResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Service instance not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Get service endpoints route
-  registry.registerRoute({
-    method: 'get',
-    path: '/services/{serviceName}/endpoints',
-    operationId: 'getInternalServiceEndpoints',
-    summary: 'Get service endpoints',
-    tags: ['Service Discovery'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        serviceName: z.string(),
-      }),
-      query: z.object({
-        environment: internalDiscoverySchemas.EnvironmentTypeSchema.optional(),
-        healthyOnly: z.boolean().default(true),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'Service endpoints',
-        content: {
-          'application/json': {
-            schema: internalDiscoverySchemas.ServiceEndpointsResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Service not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
-          },
-        },
-      },
-    },
-  })
-
-  // Get service configuration route
-  registry.registerRoute({
-    method: 'get',
-    path: '/config/{serviceName}',
-    operationId: 'getInternalServiceConfig',
-    summary: 'Get service configuration',
-    tags: ['Service Discovery'],
-    security: [{ 'x-api-key': [] }],
-    request: {
-      params: z.object({
-        serviceName: z.string(),
-      }),
-      query: internalDiscoverySchemas.ServiceConfigRequest,
-    },
-    responses: {
-      200: {
-        description: 'Service configuration',
-        content: {
-          'application/json': {
-            schema: internalDiscoverySchemas.ServiceConfigResponse,
-          },
-        },
-      },
-      404: {
-        description: 'Service configuration not found',
-        content: {
-          'application/json': {
-            schema: ErrorResponse,
           },
         },
       },

@@ -9,6 +9,7 @@ import { vi } from 'vitest'
 // --- START MOCKING CONFIGURATION ---
 vi.unmock('@pika/http')
 vi.unmock('@pika/shared')
+vi.unmock('@pika/translation')
 
 vi.mock('@pika/api', async () => {
   const actualApi =
@@ -39,7 +40,7 @@ import {
   InternalAPITestHelper,
   type TestDatabaseResult,
 } from '@pika/tests'
-import { MockCacheService } from '@pika/tests'
+import { MockCacheService, MockTranslationClient } from '@pika/tests'
 import { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -55,6 +56,7 @@ describe('Internal Category Integration Tests', () => {
   let internalClient: any
 
   const mockCacheService = new MockCacheService()
+  const mockTranslationClient = new MockTranslationClient()
 
   beforeAll(async () => {
     testDb = await createTestDatabase({
@@ -72,6 +74,7 @@ describe('Internal Category Integration Tests', () => {
     const serverResult = await createCategoryServer({
       prisma: testDb.prisma,
       cacheService: mockCacheService as any,
+      translationClient: mockTranslationClient as any,
     })
 
     app = serverResult.app
@@ -127,7 +130,7 @@ describe('Internal Category Integration Tests', () => {
           .expect(200)
 
         expect(response.body.id).toBe(parentCategory.id)
-        expect(response.body.nameKey).toBe(parentCategory.nameKey)
+        expect(response.body.name).toBe(parentCategory.nameKey) // API returns resolved name
       })
 
       it('should return 404 for non-existent category', async () => {

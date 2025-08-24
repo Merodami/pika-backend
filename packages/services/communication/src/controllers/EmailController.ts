@@ -4,14 +4,12 @@ import type {
   SendEmailInput,
 } from '@communication/services/EmailService.js'
 import { communicationCommon, communicationPublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { CommunicationLogMapper } from '@pika/sdk'
 import { logger } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
@@ -161,11 +159,6 @@ export class EmailController implements IEmailController {
    * GET /email/history
    * Get email communication history
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'email-history',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getEmailHistory(
     request: Request, // Standard pattern - don't use Query params on Request
     response: Response<communicationPublic.CommunicationLogListResponse>,

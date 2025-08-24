@@ -1,0 +1,37 @@
+/// Favourite Businesses
+model FavouriteBusiness {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  businessId String    @map("business_id") @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  // Relations
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, businessId], name: "unique_user_business_favorite")
+  @@index([userId])
+  @@index([businessId])
+  @@index([createdAt(sort: Desc)])
+  @@map("favourite_businesses")
+  @@schema("favourites")
+}
+
+/// Favourite Vouchers
+model FavouriteVoucher {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  voucherId  String    @map("voucher_id") @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  // Relations
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voucher    Voucher   @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, voucherId], name: "unique_user_voucher_favorite")
+  @@index([userId])
+  @@index([voucherId])
+  @@index([createdAt(sort: Desc)])
+  @@map("favourite_vouchers")
+  @@schema("favourites")
+}

@@ -2,8 +2,9 @@ import { logger } from '@pika/shared'
 import type { Application, NextFunction, Request, Response } from 'express'
 
 /**
- * Service route mapping for embedded mode
+ * Service route mapping for embedded mode (Vercel deployment)
  * Maps API paths to service mount points
+ * NOTE: This is NOT used for local development - see setupProxyRoutes.ts instead
  */
 const SERVICE_ROUTES = [
   { prefix: '/api/v1/auth', service: 'auth', mount: '/auth' },
@@ -14,32 +15,11 @@ const SERVICE_ROUTES = [
     service: 'user',
     mount: '/internal/users',
   },
-  { prefix: '/api/v1/gyms', service: 'gym', mount: '/gyms' },
-  { prefix: '/api/v1/admin/gyms', service: 'gym', mount: '/admin/gyms' },
-  { prefix: '/api/v1/stuff', service: 'gym', mount: '/stuff' },
-  { prefix: '/api/v1/admin/stuff', service: 'gym', mount: '/admin/stuff' },
-  { prefix: '/api/v1/inductions', service: 'gym', mount: '/inductions' },
-  { prefix: '/api/v1/favorites', service: 'gym', mount: '/favorites' },
-  { prefix: '/api/v1/sessions', service: 'session', mount: '/sessions' },
   {
-    prefix: '/api/v1/admin/sessions',
-    service: 'session',
-    mount: '/admin/sessions',
+    prefix: '/api/v1/favorites',
+    service: 'user',
+    mount: '/users/me/favorites',
   },
-  { prefix: '/api/v1/reviews', service: 'session', mount: '/reviews' },
-  {
-    prefix: '/api/v1/waiting-list',
-    service: 'session',
-    mount: '/waiting-list',
-  },
-  { prefix: '/api/v1/credits', service: 'payment', mount: '/credits' },
-  {
-    prefix: '/api/v1/credit-packs',
-    service: 'payment',
-    mount: '/credit-packs',
-  },
-  { prefix: '/api/v1/promo-codes', service: 'payment', mount: '/promo-codes' },
-  { prefix: '/api/v1/memberships', service: 'payment', mount: '/memberships' },
   {
     prefix: '/api/v1/payments/webhooks',
     service: 'payment',

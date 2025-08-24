@@ -5,20 +5,20 @@
   "description": "API testing tools and utilities",
   "type": "module",
   "scripts": {
-    "generate:tokens": "tsx generate-test-tokens.ts",
+    "generate:tokens": "echo 'This command has been replaced. Use npm run generate:test-tokens from the root directory instead.'",
     "show:tokens": "tsx show-test-tokens.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
     "@pika/environment": "workspace:^",
     "@pika/types": "workspace:^",
-    "@prisma/client": "^6.12.0",
+    "@prisma/client": "^6.14.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2"
   }
 }

@@ -1,13 +1,12 @@
 import { CategoryMapper } from '@category/mappers/CategoryMapper.js'
 import type { ICategoryService } from '@category/types/interfaces.js'
 import { categoryCommon, categoryInternal } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import type { NextFunction, Request, Response } from 'express'
 
 /**
@@ -28,11 +27,6 @@ export class InternalCategoryController {
    * GET /internal/categories/:id
    * Get category by ID (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:category',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryById(
     req: Request<categoryCommon.CategoryIdParam>,
     res: Response<categoryInternal.InternalCategoryData>,
@@ -41,7 +35,8 @@ export class InternalCategoryController {
     try {
       const { id } = req.params
 
-      const category = await this.categoryService.getCategoryById(id)
+      const language = getRequestLanguage(req)
+      const category = await this.categoryService.getCategoryById(id, language)
 
       // Return minimal data for internal use
       const response = CategoryMapper.toInternalDTO(category)
@@ -63,11 +58,6 @@ export class InternalCategoryController {
    * POST /internal/categories/bulk
    * Get multiple categories by IDs (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories:bulk',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoriesByIds(
     req: Request<{}, {}, categoryInternal.BulkCategoryRequest>,
     res: Response<categoryInternal.BulkCategoryResponse>,
@@ -76,7 +66,11 @@ export class InternalCategoryController {
     try {
       const { categoryIds } = req.body
 
-      const result = await this.categoryService.getCategoriesByIds(categoryIds)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getCategoriesByIds(
+        categoryIds,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -111,8 +105,11 @@ export class InternalCategoryController {
               categoryId,
             ): Promise<categoryInternal.CategoryValidationResult> => {
               try {
-                const category =
-                  await this.categoryService.getCategoryById(categoryId)
+                const language = getRequestLanguage(req)
+                const category = await this.categoryService.getCategoryById(
+                  categoryId,
+                  language,
+                )
 
                 return {
                   categoryId,
@@ -157,11 +154,6 @@ export class InternalCategoryController {
    * GET /internal/categories/active
    * Get all active categories (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories:active',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getActiveCategoriesOnly(
     req: Request,
     res: Response<categoryInternal.InternalCategoryListResponse>,
@@ -176,7 +168,11 @@ export class InternalCategoryController {
         sortOrder: 'asc' as const,
       }
 
-      const result = await this.categoryService.getAllCategories(params)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getAllCategories(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -196,11 +192,6 @@ export class InternalCategoryController {
    * GET /internal/categories
    * Get all categories (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getAllCategories(
     req: Request,
     res: Response<categoryInternal.InternalCategoryListResponse>,
@@ -218,7 +209,11 @@ export class InternalCategoryController {
         sortOrder: 'asc' as const,
       }
 
-      const result = await this.categoryService.getAllCategories(params)
+      const language = getRequestLanguage(req)
+      const result = await this.categoryService.getAllCategories(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
       const response = paginatedResponse(result, CategoryMapper.toInternalDTO)
@@ -238,18 +233,17 @@ export class InternalCategoryController {
    * GET /internal/categories/hierarchy
    * Get category hierarchy (internal service use)
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'internal:categories:hierarchy',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCategoryHierarchy(
     req: Request,
     res: Response<categoryInternal.InternalCategoryHierarchyResponse>,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const categories = await this.categoryService.getCategoryHierarchy()
+      const language = getRequestLanguage(req)
+      const categories = await this.categoryService.getCategoryHierarchy(
+        undefined,
+        language,
+      )
 
       // Transform to DTOs
       const response = {

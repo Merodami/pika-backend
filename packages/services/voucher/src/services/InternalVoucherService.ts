@@ -852,7 +852,7 @@ export class InternalVoucherService implements IInternalVoucherService {
             validTo: voucher.expiresAt, // Use expiresAt instead of validTo
             businessName: '', // Would need to be populated from business service
             businessLogo: undefined,
-            category: voucher.categoryId, // Would need category name from category service
+            category: voucher.categoryId || '', // Would need category name from category service
           }
 
           vouchersForBook.push(voucherForBook)

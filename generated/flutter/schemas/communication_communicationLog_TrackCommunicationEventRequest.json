@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "messageId": {
+      "type": "string"
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "delivered",
+        "opened",
+        "clicked",
+        "bounced",
+        "complained",
+        "unsubscribed"
+      ]
+    },
+    "timestamp": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "url": {
+      "description": "For click events",
+      "type": "string",
+      "format": "uri"
+    },
+    "userAgent": {
+      "type": "string"
+    },
+    "ipAddress": {
+      "type": "string"
+    },
+    "errorCode": {
+      "type": "string"
+    },
+    "errorMessage": {
+      "type": "string"
+    },
+    "bounceType": {
+      "type": "string",
+      "enum": ["soft", "hard"]
+    }
+  },
+  "required": ["messageId", "event", "timestamp"],
+  "additionalProperties": false
+}

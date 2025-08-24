@@ -1,30 +1,46 @@
+import type { IBusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
 import type {
   CreateBusinessData,
   IBusinessRepository,
   UpdateBusinessData,
 } from '@business/repositories/BusinessRepository.js'
 import type { BusinessSearchParams } from '@business/types/search.js'
-import { DEFAULT_LANGUAGE } from '@pika/environment'
-import type { ICacheService } from '@pika/redis'
+import { DEFAULT_LANGUAGE, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { Cache, type ICacheService } from '@pika/redis'
 import type { BusinessDomain } from '@pika/sdk'
-import { ErrorFactory, logger } from '@pika/shared'
-import type { TranslationClient } from '@pika/translation'
-import type { PaginatedResult, ParsedIncludes } from '@pika/types'
+import {
+  ErrorFactory,
+  FileUpload,
+  logger,
+  StorageServiceClient,
+  UserServiceClient,
+  ValidationError,
+} from '@pika/shared'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
+import type { LanguageCode, PaginatedResult, ParsedIncludes } from '@pika/types'
 import { v4 as uuid } from 'uuid'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IBusinessService {
   getAllBusinesses(
     params: BusinessSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<BusinessDomain>>
   getBusinessById(
     id: string,
     includes?: ParsedIncludes,
+    language?: LanguageCode,
   ): Promise<BusinessDomain>
   getBusinessByUserId(
     userId: string,
     includes?: ParsedIncludes,
+    language?: LanguageCode,
   ): Promise<BusinessDomain>
-  createBusiness(data: CreateBusinessRequest): Promise<BusinessDomain>
+  createBusiness(
+    data: CreateBusinessRequest,
+    language?: LanguageCode,
+  ): Promise<BusinessDomain>
   updateBusiness(
     id: string,
     data: UpdateBusinessRequest,
@@ -39,6 +55,7 @@ export interface IBusinessService {
     approvedBy: string,
     reason?: string,
   ): Promise<BusinessDomain>
+  uploadBusinessLogo(businessId: string, file: FileUpload): Promise<string>
 }
 
 export interface CreateBusinessRequest {
@@ -66,19 +83,72 @@ export class BusinessService implements IBusinessService {
   constructor(
     private readonly businessRepository: IBusinessRepository,
     private readonly translationService: TranslationClient,
+    private readonly userServiceClient?: UserServiceClient,
     private readonly cacheService?: ICacheService,
+    private readonly translationResolver?: TranslationResolver,
+    private readonly businessDetailsRepository?: IBusinessDetailsRepository,
+    private readonly storageService?: StorageServiceClient,
   ) {}
+
+  /**
+   * Helper method to invalidate all cache entries related to a business
+   */
+  private async invalidateBusinessCache(
+    businessId: string,
+    userId?: string,
+  ): Promise<void> {
+    if (!this.cacheService) return
+
+    const keysToInvalidate = [
+      // Invalidate specific business cache
+      `${CACHE_KEYS.BUSINESS.SINGLE}:${businessId}`,
+    ]
+
+    if (userId) {
+      // Invalidate user-specific caches
+      keysToInvalidate.push(`${CACHE_KEYS.BUSINESS.USER}:${userId}`)
+    }
+
+    // Delete all keys
+    // Note: We can't invalidate pattern-based keys with basic ICacheService
+    // This means list caches won't be invalidated automatically
+    // Consider implementing a more sophisticated cache invalidation strategy
+    await Promise.all(
+      keysToInvalidate.map((key) => this.cacheService!.del(key)),
+    )
+  }
 
   /**
    * Retrieve all businesses with filters and pagination
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.BUSINESS.LIST,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const [params, language] = args
+
+      return `${prefix}:${JSON.stringify(params)}:${language || 'default'}`
+    },
+    condition: (result) => result && result.data && Array.isArray(result.data),
+  })
   async getAllBusinesses(
     params: BusinessSearchParams,
+    language?: LanguageCode,
   ): Promise<PaginatedResult<BusinessDomain>> {
     try {
       logger.debug('Fetching businesses with params:', params)
 
       const result = await this.businessRepository.findAll(params)
+
+      // Resolve translations if language is provided and resolver is available
+      if (language && this.translationResolver) {
+        const resolvedData = await this.translationResolver.resolveArray(
+          result.data,
+          language,
+        )
+
+        return { data: resolvedData, pagination: result.pagination }
+      }
 
       logger.debug(`Found ${result.data.length} businesses`)
 
@@ -94,9 +164,20 @@ export class BusinessService implements IBusinessService {
   /**
    * Retrieve a business by ID
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.BUSINESS.SINGLE,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const [id, includes, language] = args
+      const key = includes ? `${id}:${JSON.stringify(includes)}` : id
+
+      return `${prefix}:${key}:${language || 'default'}`
+    },
+  })
   async getBusinessById(
     id: string,
     includes?: ParsedIncludes,
+    language?: LanguageCode,
   ): Promise<BusinessDomain> {
     try {
       logger.debug(`Fetching business by ID: ${id}`)
@@ -107,6 +188,16 @@ export class BusinessService implements IBusinessService {
         throw ErrorFactory.resourceNotFound('Business', id, {
           source: 'BusinessService.getBusinessById',
         })
+      }
+
+      // Resolve translations if language is provided and resolver is available
+      if (language && this.translationResolver) {
+        const resolved = await this.translationResolver.resolve(
+          business,
+          language,
+        )
+
+        return resolved
       }
 
       return business
@@ -121,9 +212,20 @@ export class BusinessService implements IBusinessService {
   /**
    * Retrieve a business by user ID
    */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.BUSINESS.USER,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const [userId, includes] = args
+      const key = includes ? `${userId}:${JSON.stringify(includes)}` : userId
+
+      return `${prefix}:${key}`
+    },
+  })
   async getBusinessByUserId(
     userId: string,
     includes?: ParsedIncludes,
+    language?: LanguageCode,
   ): Promise<BusinessDomain> {
     try {
       logger.debug(`Fetching business by user ID: ${userId}`)
@@ -139,6 +241,16 @@ export class BusinessService implements IBusinessService {
         })
       }
 
+      // Resolve translations if language is provided and resolver is available
+      if (language && this.translationResolver) {
+        const resolved = await this.translationResolver.resolve(
+          business,
+          language,
+        )
+
+        return resolved
+      }
+
       return business
     } catch (error) {
       logger.error(`Error fetching business for user ${userId}:`, error)
@@ -151,25 +263,17 @@ export class BusinessService implements IBusinessService {
   /**
    * Create a new business
    */
-  async createBusiness(data: CreateBusinessRequest): Promise<BusinessDomain> {
+  async createBusiness(
+    data: CreateBusinessRequest,
+    language?: LanguageCode,
+  ): Promise<BusinessDomain> {
     try {
       logger.debug(`Creating business for user: ${data.userId}`)
 
-      // Check if business already exists for this user
-      const existingBusiness = await this.businessRepository.findByUserId(
-        data.userId,
-      )
-
-      if (existingBusiness) {
-        throw ErrorFactory.resourceConflict(
-          'Business',
-          'Business already exists for this user',
-          {
-            source: 'BusinessService.createBusiness',
-            metadata: { userId: data.userId },
-          },
-        )
-      }
+      // Check if this is the user's first business
+      const existingBusinessesCount =
+        await this.businessRepository.countByUserId(data.userId)
+      const isFirstBusiness = existingBusinessesCount === 0
 
       // Generate translation keys for business name and description
       const businessNameKey = `business.name.${uuid()}`
@@ -205,7 +309,44 @@ export class BusinessService implements IBusinessService {
 
       const business = await this.businessRepository.create(createData)
 
+      // If this is the user's first business, set it as primaryBusinessId
+      if (isFirstBusiness && this.userServiceClient) {
+        try {
+          await this.userServiceClient.updateUserPrimaryBusiness({
+            userId: data.userId,
+            primaryBusinessId: business.id,
+          })
+          logger.info(
+            `Set business ${business.id} as primary for user ${data.userId}`,
+          )
+        } catch (error) {
+          logger.error(
+            `Failed to set primary business for user ${data.userId}:`,
+            error,
+          )
+          // Don't throw here - business creation succeeded, but primary business setting failed
+          // This could be handled by a background job or retry mechanism in production
+        }
+      } else if (isFirstBusiness && !this.userServiceClient) {
+        logger.warn(
+          `Cannot set primary business ${business.id} for user ${data.userId} - UserServiceClient not available`,
+        )
+      }
+
+      // Invalidate cache after creation
+      await this.invalidateBusinessCache(business.id, business.userId)
+
       logger.debug(`Business created successfully: ${business.id}`)
+
+      // Resolve translations if language is provided (following category pattern)
+      if (language && this.translationResolver) {
+        const resolved = await this.translationResolver.resolve(
+          business,
+          language,
+        )
+
+        return resolved
+      }
 
       return business
     } catch (error) {
@@ -294,10 +435,7 @@ export class BusinessService implements IBusinessService {
       const business = await this.businessRepository.update(id, updateData)
 
       // Invalidate related cache entries
-      if (this.cacheService) {
-        await this.cacheService.del(`business:${id}`)
-        await this.cacheService.del(`business:user:${business.userId}`)
-      }
+      await this.invalidateBusinessCache(id, business.userId)
 
       logger.debug(`Business updated successfully: ${id}`)
 
@@ -326,13 +464,87 @@ export class BusinessService implements IBusinessService {
         })
       }
 
+      // Check business rule: Cannot delete primary business if it's the only business
+      const userBusinessCount = await this.businessRepository.countByUserId(
+        business.userId,
+      )
+
+      if (userBusinessCount === 1 && this.userServiceClient) {
+        // Get user to check if this is their primary business
+        try {
+          const user = await this.userServiceClient.getUser(business.userId)
+
+          if (user && user.primaryBusinessId === id) {
+            throw ErrorFactory.validationError(
+              {
+                business: [
+                  'Cannot delete the primary business when it is the only business for this user',
+                ],
+              },
+              {
+                source: 'BusinessService.deleteBusiness',
+                userId: business.userId,
+              },
+            )
+          }
+        } catch (error: any) {
+          // Re-throw validation errors, but catch service errors
+          if (error instanceof ValidationError) {
+            throw error
+          }
+          // If we can't get user info due to service error, log error but don't prevent deletion
+          logger.warn(
+            `Could not verify primary business status for user ${business.userId}:`,
+            error,
+          )
+        }
+      } else if (userBusinessCount === 1 && !this.userServiceClient) {
+        logger.warn(
+          `Cannot verify primary business status for user ${business.userId} - UserServiceClient not available`,
+        )
+      }
+
       await this.businessRepository.delete(id)
 
-      // Invalidate cache
-      if (this.cacheService) {
-        await this.cacheService.del(`business:${id}`)
-        await this.cacheService.del(`business:user:${business.userId}`)
+      // If this was the primary business and user has other businesses,
+      // we should set another business as primary
+      if (userBusinessCount > 1 && this.userServiceClient) {
+        try {
+          const user = await this.userServiceClient.getUser(business.userId)
+
+          if (user && user.primaryBusinessId === id) {
+            // Find another business for this user to set as primary
+            const remainingBusinesses = await this.businessRepository.findAll({
+              userId: business.userId,
+              page: 1,
+              limit: 1,
+            })
+
+            if (remainingBusinesses.data.length > 0) {
+              await this.userServiceClient.updateUserPrimaryBusiness({
+                userId: business.userId,
+                primaryBusinessId: remainingBusinesses.data[0].id,
+              })
+              logger.info(
+                `Updated primary business to ${remainingBusinesses.data[0].id} for user ${business.userId} after deleting ${id}`,
+              )
+            }
+          }
+        } catch (error) {
+          logger.error(
+            `Failed to update primary business after deletion for user ${business.userId}:`,
+            error,
+          )
+          // Don't throw here - business deletion succeeded
+        }
+      } else if (userBusinessCount > 1 && !this.userServiceClient) {
+        logger.warn(
+          `Cannot reassign primary business for user ${business.userId} - UserServiceClient not available`,
+        )
       }
+
+      // Invalidate cache
+      await this.invalidateBusinessCache(id, business.userId)
 
       logger.debug(`Business deleted successfully: ${id}`)
     } catch (error) {
@@ -461,10 +673,7 @@ export class BusinessService implements IBusinessService {
       })
 
       // Clear cache for this business
-      if (this.cacheService) {
-        await this.cacheService.del(`business:${id}`)
-        await this.cacheService.del(`admin:business:${id}`)
-      }
+      await this.invalidateBusinessCache(id, business.userId)
 
       return business
     } catch (error) {
@@ -472,6 +681,85 @@ export class BusinessService implements IBusinessService {
       throw ErrorFactory.fromError(error, 'Error approving business', {
         source: 'BusinessService.approveBusiness',
       })
+    }
+  }
+
+  /**
+   * Upload business logo and update business details
+   */
+  async uploadBusinessLogo(
+    businessId: string,
+    file: FileUpload,
+  ): Promise<string> {
+    try {
+      if (!this.storageService) {
+        throw ErrorFactory.badRequest('Storage service not configured', {
+          source: 'BusinessService.uploadBusinessLogo',
+        })
+      }
+
+      if (!this.businessDetailsRepository) {
+        throw ErrorFactory.badRequest(
+          'Business details repository not configured',
+          {
+            source: 'BusinessService.uploadBusinessLogo',
+          },
+        )
+      }
+
+      // Validate that business exists
+      const business = await this.businessRepository.findById(businessId)
+
+      if (!business) {
+        throw ErrorFactory.resourceNotFound('Business', businessId)
+      }
+
+      // Validate file type (images only)
+      if (!file.mimetype.startsWith('image/')) {
+        throw ErrorFactory.badRequest('Only image files are allowed')
+      }
+
+      // Upload file with business context for service-to-service call
+      const uploadResult = await this.storageService.saveFile(
+        file,
+        `businesses/${businessId}/logo`,
+        {
+          context: {
+            businessId,
+            operation: 'logo-upload',
+          },
+        },
+      )
+
+      // Get or create business details if they don't exist
+      const businessDetails =
+        await this.businessDetailsRepository.findByBusinessId(businessId)
+
+      if (businessDetails) {
+        // Update existing business details with the new logo URL
+        await this.businessDetailsRepository.update(businessId, {
+          logoUrl: uploadResult.url,
+        })
+      } else {
+        // Create business details with logo URL
+        await this.businessDetailsRepository.create({
+          businessId,
+          logoUrl: uploadResult.url,
+        })
+      }
+
+      // Invalidate business cache
+      await this.invalidateBusinessCache(businessId, business.userId)
+
+      logger.info('Business logo uploaded successfully', {
+        businessId,
+        logoUrl: uploadResult.url,
+      })
+
+      return uploadResult.url
+    } catch (error) {
+      logger.error('Failed to upload business logo', { error, businessId })
+      throw ErrorFactory.fromError(error)
     }
   }
 }

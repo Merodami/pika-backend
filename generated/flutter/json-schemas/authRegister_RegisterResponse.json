@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "message": {
+      "default": "Registration successful. Please check your email to verify your account.",
+      "type": "string"
+    },
+    "userId": {
+      "description": "Newly created user ID",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+    },
+    "emailSent": {
+      "description": "Whether verification email was sent successfully",
+      "type": "boolean"
+    }
+  },
+  "required": ["message", "userId", "emailSent"],
+  "additionalProperties": false
+}

@@ -239,3 +239,33 @@ export enum BatchOperationType {
  * Type definition for batch operation type
  */
 export type BatchOperationTypeType = `${BatchOperationType}`
+
+/**
+ * Voucher redemption types
+ * Used to track where/how vouchers are redeemed
+ */
+export enum VoucherRedemptionType {
+  IN_STORE = 'in_store',
+  ONLINE = 'online',
+  APP = 'app',
+}
+
+/**
+ * Type definition for voucher redemption type
+ */
+export type VoucherRedemptionTypeType = `${VoucherRedemptionType}`
+
+/**
+ * Voucher redemption methods
+ * Used to track the method used for redemption
+ */
+export enum VoucherRedemptionMethod {
+  QR_SCAN = 'qr_scan',
+  MANUAL_CODE = 'manual_code',
+  AUTOMATIC = 'automatic',
+}
+
+/**
+ * Type definition for voucher redemption method
+ */
+export type VoucherRedemptionMethodType = `${VoucherRedemptionMethod}`

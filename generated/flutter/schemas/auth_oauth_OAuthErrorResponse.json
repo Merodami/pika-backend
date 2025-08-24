@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "error": {
+      "type": "string",
+      "enum": [
+        "invalidRequest",
+        "invalidClient",
+        "invalidGrant",
+        "unauthorizedClient",
+        "unsupportedGrantType",
+        "invalidScope",
+        "serverError",
+        "temporarilyUnavailable"
+      ]
+    },
+    "errorDescription": {
+      "description": "Human-readable error description",
+      "type": "string"
+    },
+    "errorUri": {
+      "description": "URI with error information",
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": ["error"],
+  "additionalProperties": false
+}

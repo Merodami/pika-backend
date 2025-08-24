@@ -15,6 +15,7 @@ import { createByIdQuerySchema } from '../../shared/query.js'
 import { paginatedResponse } from '../../shared/responses.js'
 import { PublicUserProfile } from '../../user/public/profile.js'
 import { BUSINESS_RELATIONS, BusinessSortBy } from '../common/enums.js'
+import { BusinessDetailsResponse } from './businessDetails.js'
 
 /**
  * Public business schemas
@@ -28,18 +29,22 @@ import { BUSINESS_RELATIONS, BusinessSortBy } from '../common/enums.js'
 export const BusinessResponse = withTimestamps({
   id: UUID,
   userId: UserId.describe('User who owns this business'),
-  businessNameKey: z
+  businessName: z
     .string()
-    .max(FIELD_LENGTH.SLUG_MAX)
-    .describe('Translation key for business name'),
-  businessDescriptionKey: z
+    .max(FIELD_LENGTH.NAME_LONG_MAX)
+    .describe('Business name in requested language'),
+  businessDescription: z
     .string()
-    .max(FIELD_LENGTH.SLUG_MAX)
+    .max(FIELD_LENGTH.DESCRIPTION_EXTRA_LONG_MAX)
     .optional()
-    .describe('Translation key for business description'),
+    .describe('Business description in requested language'),
   categoryId: UUID.describe('Category this business belongs to'),
   verified: z.boolean().default(false).describe('Whether business is verified'),
   active: z.boolean().default(true).describe('Whether business is active'),
+  approved: z
+    .boolean()
+    .default(false)
+    .describe('Whether business is approved by admin'),
   avgRating: z
     .number()
     .min(NUMERIC_CONSTRAINTS.RATING_MIN)
@@ -52,6 +57,9 @@ export const BusinessResponse = withTimestamps({
   ),
   category: CategoryResponse.optional().describe(
     'Category information when ?include=category',
+  ),
+  businessDetails: BusinessDetailsResponse.optional().describe(
+    'Detailed contact and location information when ?include=businessDetails',
   ),
 })
 
@@ -213,7 +221,7 @@ export type CreateMyBusinessRequest = z.infer<typeof CreateMyBusinessRequest>
  */
 export const CreateMyBusinessResponse = z.object({
   id: UUID.describe('Newly created business ID'),
-  businessNameKey: z.string().describe('Translation key for business name'),
+  businessName: z.string().describe('Business name'),
   approved: z.boolean().default(false).describe('Business approval status'),
   message: z
     .string()

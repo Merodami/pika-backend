@@ -34,6 +34,7 @@ model Voucher {
   // Analytics counters (denormalized for performance)
   scanCount              Int                 @default(0) @map("scan_count")
   claimCount             Int                 @default(0) @map("claim_count")
+  favoriteCount          Int                 @default(0) @map("favorite_count") // Number of users who favorited this voucher
   
   // Additional metadata and settings
   metadata               Json?               // Additional voucher metadata
@@ -52,6 +53,7 @@ model Voucher {
   scans                  VoucherScan[]
   customerVouchers       CustomerVoucher[]
   fraudCases             FraudCase[]
+  favoritedBy            FavouriteVoucher[]  // Users who favorited this voucher
   
   @@index([businessId])
   @@index([categoryId])
@@ -63,12 +65,13 @@ model Voucher {
   @@index([updatedAt])
   @@index([deletedAt])
   @@index([qrCode])
+  @@index([favoriteCount(sort: Desc)])
   @@index([state, businessId]) // For business voucher filtering
   @@index([state, validUntil]) // For expiry checking
   @@index([businessId, createdAt]) // For business voucher listing
   @@index([categoryId, state]) // For category filtering
   @@map("vouchers")
-  @@schema("business")
+  @@schema("voucher")
 }
 
 /// Voucher codes for different redemption methods (QR, short codes, static codes)
@@ -92,7 +95,7 @@ model VoucherCode {
   @@index([voucherId, type]) // For finding codes by voucher and type
   @@index([voucherId, isActive]) // For finding active codes
   @@map("voucher_codes")
-  @@schema("business")
+  @@schema("voucher")
 }
 
 /// Voucher redemption tracking for analytics and fraud prevention
@@ -123,7 +126,7 @@ model VoucherRedemption {
   @@index([voucherId, redeemedAt]) // For voucher redemption analytics
   @@index([userId, redeemedAt]) // For user redemption history
   @@map("voucher_redemptions")
-  @@schema("business")
+  @@schema("voucher")
 }
 
 /// Customer voucher wallet - claimed vouchers before redemption
@@ -158,7 +161,7 @@ model CustomerVoucher {
   @@index([voucherId, status]) // For voucher claim analytics
   @@index([customerId, claimedAt]) // For customer voucher history
   @@map("customer_vouchers")
-  @@schema("business")
+  @@schema("voucher")
 }
 
 /// Voucher scan tracking for comprehensive analytics

@@ -9,7 +9,7 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import type { TranslationClient } from '@pika/translation'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -20,12 +20,19 @@ export function createInternalBusinessRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
   translationClient: TranslationClient,
+  translationResolver?: TranslationResolver,
 ): Router {
   const router = Router()
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
-  const service = new BusinessService(repository, translationClient, cache)
+  const service = new BusinessService(
+    repository,
+    translationClient,
+    undefined, // userServiceClient not needed for internal routes
+    cache,
+    translationResolver,
+  )
   const controller = new InternalBusinessController(service)
 
   // All routes require internal authentication
@@ -39,12 +46,20 @@ export function createInternalBusinessRoutes(
     controller.getBusinessById,
   )
 
-  // GET /internal/businesses/user/:id - Get business by user ID
+  // GET /internal/businesses/user/:id - Get business by user ID (single business)
   router.get(
     '/user/:id',
     validateParams(shared.UserIdParam),
     validateQuery(businessInternal.GetBusinessRequest),
     controller.getBusinessByUserId,
+  )
+
+  // GET /internal/businesses/user/:id/all - Get all businesses by user ID (paginated)
+  router.get(
+    '/user/:id/all',
+    validateParams(shared.UserIdParam),
+    validateQuery(businessInternal.GetBusinessesByUserRequest),
+    controller.getBusinessesByUserId,
   )
 
   // POST /internal/businesses/batch - Get multiple businesses by IDs

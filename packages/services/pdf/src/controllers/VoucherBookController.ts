@@ -1,11 +1,10 @@
 import { pdfCommon, pdfPublic } from '@pika/api'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { ErrorFactory } from '@pika/shared'
 import type { NextFunction, Request, Response } from 'express'
 
@@ -27,12 +26,6 @@ export class VoucherBookController {
    * GET /voucher-books
    * Get all published voucher books with pagination
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'public:voucher-books',
-    keyGenerator: httpRequestKeyGenerator,
-    condition: (result) => result && result.data && Array.isArray(result.data),
-  })
   async getAllVoucherBooks(
     req: Request,
     res: Response<pdfPublic.VoucherBookListResponse>,
@@ -76,11 +69,6 @@ export class VoucherBookController {
    * GET /voucher-books/:id
    * Get published voucher book by ID
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'public:voucher-book',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getVoucherBookById(
     req: Request<pdfCommon.VoucherBookIdParam>,
     res: Response<pdfPublic.VoucherBookResponse>,

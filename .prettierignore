@@ -34,5 +34,4 @@ previous-architecture/**
 ai/**
 pika/**
 pika-old/**
-frontend/flutter-app/**
 scripts/vercel-test.ts

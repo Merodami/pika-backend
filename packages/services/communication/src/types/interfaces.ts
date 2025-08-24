@@ -56,8 +56,8 @@ export interface CommunicationMetadata {
 export interface NotificationMetadata {
   emailId?: string
   templateId?: string
-  sessionId?: string
-  gymId?: string
+  voucherId?: string
+  businessId?: string
   [key: string]: any
 }
 

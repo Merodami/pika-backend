@@ -1,0 +1,318 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Auth_oauthTypes",
+  "type": "object",
+  "properties": {
+    "IntrospectRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "token": {
+          "description": "Token to validate",
+          "type": "string",
+          "minLength": 1
+        },
+        "tokenTypeHint": {
+          "type": "string",
+          "enum": ["accessToken", "refreshToken"]
+        }
+      },
+      "required": ["token"],
+      "additionalProperties": false
+    },
+    "IntrospectResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "active": {
+          "description": "Whether token is active",
+          "type": "boolean"
+        },
+        "scope": {
+          "description": "Token scopes",
+          "type": "string"
+        },
+        "username": {
+          "description": "User email",
+          "type": "string"
+        },
+        "tokenType": {
+          "type": "string",
+          "const": "Bearer"
+        },
+        "exp": {
+          "description": "Expiration time (Unix timestamp)",
+          "type": "number"
+        },
+        "iat": {
+          "description": "Issued at (Unix timestamp)",
+          "type": "number"
+        },
+        "sub": {
+          "description": "Subject (user ID)",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "description": "User ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userEmail": {
+          "description": "User email",
+          "type": "string"
+        },
+        "userRole": {
+          "type": "string",
+          "enum": ["admin", "customer", "business"]
+        }
+      },
+      "required": ["active"],
+      "additionalProperties": false
+    },
+    "OAuthErrorResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string",
+          "enum": [
+            "invalidRequest",
+            "invalidClient",
+            "invalidGrant",
+            "unauthorizedClient",
+            "unsupportedGrantType",
+            "invalidScope",
+            "serverError",
+            "temporarilyUnavailable"
+          ]
+        },
+        "errorDescription": {
+          "description": "Human-readable error description",
+          "type": "string"
+        },
+        "errorUri": {
+          "description": "URI with error information",
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "RevokeTokenRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "token": {
+          "description": "Token to revoke",
+          "type": "string",
+          "minLength": 1
+        },
+        "tokenTypeHint": {
+          "type": "string",
+          "enum": ["accessToken", "refreshToken"]
+        },
+        "allDevices": {
+          "description": "Revoke all tokens for user",
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["token", "allDevices"],
+      "additionalProperties": false
+    },
+    "RevokeTokenResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "success": {
+          "default": true,
+          "type": "boolean"
+        },
+        "message": {
+          "default": "Token revoked successfully",
+          "type": "string"
+        },
+        "revokedCount": {
+          "description": "Number of tokens revoked",
+          "type": "number"
+        }
+      },
+      "required": ["success", "message"],
+      "additionalProperties": false
+    },
+    "TokenRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "grantType": {
+              "type": "string",
+              "const": "password"
+            },
+            "username": {
+              "description": "User email address"
+            },
+            "password": {
+              "description": "User password",
+              "type": "string",
+              "minLength": 8
+            },
+            "scope": {
+              "description": "Requested permissions",
+              "type": "string"
+            }
+          },
+          "required": ["grantType", "username", "password"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "grantType": {
+              "type": "string",
+              "const": "refreshToken"
+            },
+            "refreshToken": {
+              "description": "Valid refresh token",
+              "type": "string",
+              "minLength": 1
+            },
+            "scope": {
+              "description": "Requested permissions (subset of original)",
+              "type": "string"
+            }
+          },
+          "required": ["grantType", "refreshToken"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "TokenResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "description": "JWT access token",
+          "type": "string",
+          "minLength": 1
+        },
+        "tokenType": {
+          "description": "Token type",
+          "type": "string",
+          "const": "Bearer"
+        },
+        "expiresIn": {
+          "description": "Token lifetime in seconds",
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "refreshToken": {
+          "description": "JWT refresh token",
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "description": "Granted permissions",
+          "type": "string"
+        },
+        "user": {
+          "description": "User information for password grant",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "email": {
+              "type": "string"
+            },
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            },
+            "profilePicture": {
+              "type": "string",
+              "format": "uri"
+            },
+            "role": {
+              "type": "string",
+              "enum": ["admin", "customer", "business"]
+            }
+          },
+          "required": ["id", "email", "firstName", "lastName", "role"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["accessToken", "tokenType", "expiresIn"],
+      "additionalProperties": false
+    },
+    "UserInfoResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "User ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "email": {
+          "type": "string"
+        },
+        "emailVerified": {
+          "type": "boolean"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "fullName": {
+          "description": "Combined first and last name",
+          "type": "string"
+        },
+        "profilePicture": {
+          "type": "string",
+          "format": "uri"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "customer", "business"]
+        },
+        "permissions": {
+          "description": "User permissions",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locale": {
+          "description": "User locale",
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+        }
+      },
+      "required": ["id", "email", "firstName", "lastName", "role"],
+      "additionalProperties": false
+    }
+  }
+}

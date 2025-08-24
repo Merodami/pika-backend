@@ -1,12 +1,10 @@
 import { storageCommon, storagePublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { FileStorageLogMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { IStorageService } from '@storage/services/StorageService.js'
@@ -277,11 +275,6 @@ export class FileController implements IFileController {
    * GET /files/history
    * Get file upload history
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'file-history',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getFileHistory(
     request: Request,
     res: Response<storagePublic.FileHistoryResponse>,

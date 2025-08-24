@@ -22,15 +22,11 @@ import { CATEGORY_RELATIONS } from '../common/enums.js'
  */
 const BaseCategoryResponse = withTimestamps({
   id: UUID,
-  nameKey: z
+  name: z.string().describe('Category name in requested language'),
+  description: z
     .string()
-    .max(FIELD_LENGTH.SLUG_MAX)
-    .describe('Translation key for category name'),
-  descriptionKey: z
-    .string()
-    .max(FIELD_LENGTH.SLUG_MAX)
     .optional()
-    .describe('Translation key for category description'),
+    .describe('Category description in requested language'),
   icon: z
     .string()
     .max(FIELD_LENGTH.ICON_MAX)
@@ -57,7 +53,7 @@ const BaseCategoryResponse = withTimestamps({
 /**
  * Base category response (OpenAPI documented)
  */
-const BaseCategoryResponseSchema = BaseCategoryResponse.openapi(
+export const BaseCategoryResponseSchema = BaseCategoryResponse.openapi(
   'BaseCategoryResponse',
   {
     description: 'Category information',

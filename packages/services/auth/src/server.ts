@@ -1,6 +1,7 @@
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import type { ICacheService } from '@pika/redis'
+import { type ICacheService, setCacheService } from '@pika/redis'
 import {
+  BusinessServiceClient,
   CommunicationServiceClient,
   logger,
   UserServiceClient,
@@ -13,9 +14,13 @@ export interface ServerConfig {
   cacheService: ICacheService
   userServiceClient: UserServiceClient
   communicationClient?: CommunicationServiceClient
+  businessServiceClient?: BusinessServiceClient
 }
 
 export async function createAuthServer(config: ServerConfig) {
+  // Set up global cache service for decorators
+  setCacheService(config.cacheService)
+
   const app = await createExpressServer({
     serviceName: 'auth-service',
     port: config.port,
@@ -31,6 +36,8 @@ export async function createAuthServer(config: ServerConfig) {
         '/auth/resend-verification',
         '/auth/introspect',
         '/auth/revoke',
+        '/auth/social/login', // Social login is public - no auth required
+        '/auth/exchange-token', // OAuth code exchange is public
         '/health',
         '/metrics',
       ],
@@ -74,6 +81,7 @@ export async function createAuthServer(config: ServerConfig) {
     config.cacheService,
     config.userServiceClient,
     config.communicationClient,
+    config.businessServiceClient,
   )
 
   app.use('/auth', authRouter)

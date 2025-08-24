@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "provider": {
+      "description": "Social provider to unlink",
+      "type": "string",
+      "enum": ["google", "facebook", "apple"]
+    }
+  },
+  "required": ["provider"],
+  "additionalProperties": false
+}

@@ -2,6 +2,7 @@ import { AUTH_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import {
+  BusinessServiceClient,
   CommunicationServiceClient,
   logger,
   UserServiceClient,
@@ -13,6 +14,7 @@ export async function startService(): Promise<void> {
   let cacheService: ICacheService | undefined
   let userServiceClient: UserServiceClient | undefined
   let communicationClient: CommunicationServiceClient | undefined
+  let businessServiceClient: BusinessServiceClient | undefined
 
   try {
     // Initialize dependencies
@@ -21,12 +23,14 @@ export async function startService(): Promise<void> {
     // Initialize service clients
     userServiceClient = new UserServiceClient()
     communicationClient = new CommunicationServiceClient()
+    businessServiceClient = new BusinessServiceClient()
 
     const app = await createAuthServer({
       port: AUTH_SERVICE_PORT,
       cacheService,
       userServiceClient,
       communicationClient,
+      businessServiceClient,
     })
 
     // Start the server

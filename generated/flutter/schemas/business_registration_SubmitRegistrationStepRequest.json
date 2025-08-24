@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "stepNumber": {
+      "description": "Step number to submit",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "stepData": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {}
+    },
+    "saveAsDraft": {
+      "description": "Save as draft without validation",
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "required": ["stepNumber", "stepData", "saveAsDraft"],
+  "additionalProperties": false
+}

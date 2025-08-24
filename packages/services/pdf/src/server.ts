@@ -1,6 +1,6 @@
 import { PDF_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import type { ICacheService } from '@pika/redis'
+import { type ICacheService, setCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import type { PrismaClient } from '@prisma/client'
 
@@ -24,6 +24,9 @@ export interface ServerConfig {
 
 export async function createPDFServer(config: ServerConfig) {
   const { prisma, cacheService, voucherServiceClient } = config
+
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
 
   // Create Express app with standard configuration
   const app = await createExpressServer({

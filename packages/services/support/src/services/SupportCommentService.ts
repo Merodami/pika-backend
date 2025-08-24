@@ -1,4 +1,5 @@
-import type { ICacheService } from '@pika/redis'
+import { REDIS_DEFAULT_TTL } from '@pika/environment'
+import { Cache, type ICacheService } from '@pika/redis'
 import type {
   CreateSupportCommentDTO,
   SupportCommentDomain,
@@ -8,6 +9,7 @@ import { SupportCommentMapper } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult } from '@pika/types'
 
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 import type {
   CommentSearchParams,
   CreateSupportCommentInput,
@@ -38,6 +40,15 @@ export class SupportCommentService implements ISupportCommentService {
     private readonly cache: ICacheService,
   ) {}
 
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL,
+    prefix: CACHE_KEYS.COMMENT.BY_PROBLEM,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+
+      return `${prefix}:${params.problemId}:public:${JSON.stringify({ page: params.page, limit: params.limit })}`
+    },
+  })
   async getCommentsByProblemId(
     params: CommentSearchParams,
   ): Promise<PaginatedResult<SupportCommentDomain>> {

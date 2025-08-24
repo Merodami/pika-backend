@@ -40,6 +40,7 @@ export interface UserService {
   invalidatePasswordResetToken(token: string): Promise<void>
   createEmailVerificationToken(userId: string): Promise<string>
   validateEmailVerificationToken(token: string): Promise<string | null>
+  hasActiveBusinesses?(userId: string): Promise<boolean>
 }
 
 export interface UserServiceUser {
@@ -156,8 +157,25 @@ export class LocalAuthStrategy implements AuthStrategy {
       // 5. Update last login time
       await this.userService.updateLastLogin(user.id, new Date())
 
-      // 6. Generate tokens
-      const tokens = await this.tokenService.generateTokens(user)
+      // 6. Check if business user has active businesses
+      let enrichedUser = user as any
+
+      if (
+        user.role === UserRole.BUSINESS &&
+        this.userService.hasActiveBusinesses
+      ) {
+        const hasActiveBusinesses = await this.userService.hasActiveBusinesses(
+          user.id,
+        )
+
+        enrichedUser = {
+          ...user,
+          hasActiveBusinesses,
+        }
+      }
+
+      // 7. Generate tokens with enriched user data
+      const tokens = await this.tokenService.generateTokens(enrichedUser)
 
       // 7. Return successful authentication
       logger.info('Local authentication successful', {
@@ -414,32 +432,46 @@ export class LocalAuthStrategy implements AuthStrategy {
   }
 
   /**
-   * Validate registration data
+   * Validate email requirements
    */
-  private async validateRegistrationData(
+  private validateEmailRequirement(
     data: RegistrationData,
-  ): Promise<void> {
-    const errors: string[] = []
-
-    // Email validation
+    errors: string[],
+  ): void {
     if (!data.email || !this.isValidEmail(data.email)) {
       errors.push('Valid email is required')
     }
+  }
 
-    // Password validation using password service
+  /**
+   * Validate password requirements
+   */
+  private validatePasswordRequirement(
+    data: RegistrationData,
+    errors: string[],
+  ): void {
     if (!data.password) {
       errors.push('Password is required')
-    } else {
-      const passwordValidation = this.passwordService.validatePasswordStrength(
-        data.password,
-      )
 
-      if (!passwordValidation.isValid) {
-        errors.push(...passwordValidation.errors)
-      }
+      return
     }
 
-    // Name validation
+    const passwordValidation = this.passwordService.validatePasswordStrength(
+      data.password,
+    )
+
+    if (!passwordValidation.isValid) {
+      errors.push(...passwordValidation.errors)
+    }
+  }
+
+  /**
+   * Validate name requirements
+   */
+  private validateNameRequirements(
+    data: RegistrationData,
+    errors: string[],
+  ): void {
     if (!data.firstName || data.firstName.trim().length === 0) {
       errors.push('First name is required')
     }
@@ -447,39 +479,76 @@ export class LocalAuthStrategy implements AuthStrategy {
     if (!data.lastName || data.lastName.trim().length === 0) {
       errors.push('Last name is required')
     }
+  }
 
-    // Role validation
+  /**
+   * Validate role requirements
+   */
+  private validateRoleRequirement(
+    data: RegistrationData,
+    errors: string[],
+  ): void {
     if (!data.role || !Object.values(UserRole).includes(data.role)) {
       errors.push('Valid user role is required')
     }
+  }
 
-    // Role-specific validation removed as PROFESSIONAL role no longer exists
+  /**
+   * Validate date of birth requirements
+   */
+  private validateDateOfBirth(data: RegistrationData, errors: string[]): void {
+    if (!data.dateOfBirth) return
+
+    const dateOfBirth = new Date(data.dateOfBirth)
+
+    if (isNaN(dateOfBirth.getTime())) {
+      errors.push('Invalid date of birth format')
+
+      return
+    }
+
+    // Check if user is at least 13 years old (COPPA compliance)
+    const minAge = new Date()
+
+    minAge.setFullYear(minAge.getFullYear() - 13)
+
+    if (dateOfBirth > minAge) {
+      errors.push('Users must be at least 13 years old')
+    }
+  }
+
+  /**
+   * Validate optional fields
+   */
+  private validateOptionalFields(
+    data: RegistrationData,
+    errors: string[],
+  ): void {
+    // Phone number validation (if provided)
+    if (data.phoneNumber && !this.isValidPhoneNumber(data.phoneNumber)) {
+      errors.push('Invalid phone number format')
+    }
+  }
+
+  /**
+   * Validate registration data
+   */
+  private async validateRegistrationData(
+    data: RegistrationData,
+  ): Promise<void> {
+    const errors: string[] = []
+
+    // Run all validations
+    this.validateEmailRequirement(data, errors)
+    this.validatePasswordRequirement(data, errors)
+    this.validateNameRequirements(data, errors)
+    this.validateRoleRequirement(data, errors)
+    this.validateDateOfBirth(data, errors)
+    this.validateOptionalFields(data, errors)
 
     // Legal compliance validation
     if (!data.acceptTerms) {
       errors.push('You must accept the terms and conditions')
-    }
-
-    // Date of birth validation (if provided)
-    if (data.dateOfBirth) {
-      const dateOfBirth = new Date(data.dateOfBirth)
-
-      if (isNaN(dateOfBirth.getTime())) {
-        errors.push('Invalid date of birth format')
-      } else {
-        // Check if user is at least 13 years old (COPPA compliance)
-        const minAge = new Date()
-
-        minAge.setFullYear(minAge.getFullYear() - 13)
-        if (dateOfBirth > minAge) {
-          errors.push('Users must be at least 13 years old')
-        }
-      }
-    }
-
-    // Phone number validation (if provided)
-    if (data.phoneNumber && !this.isValidPhoneNumber(data.phoneNumber)) {
-      errors.push('Invalid phone number format')
     }
 
     if (errors.length > 0) {

@@ -85,4 +85,4 @@ export function getPaginationParams(pagination: PaginationMetadata): {
 }
 
 // Export for backward compatibility
-export const paginationHook = paginationMiddleware
+export const paginationHook: RequestHandler = paginationMiddleware

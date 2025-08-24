@@ -95,4 +95,9 @@ export const publicRoutes: ServiceConfig[] = [
     prefix: '/api/v1/vouchers',
     upstream: VOUCHER_API_URL,
   },
+  {
+    name: 'favorites',
+    prefix: '/api/v1/favorites',
+    upstream: USER_API_URL,
+  },
 ]

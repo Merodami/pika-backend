@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "businessId": {
+      "description": "Newly created business ID",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "registrationStatus": {
+      "description": "Registration status",
+      "type": "string",
+      "const": "submitted"
+    },
+    "message": {
+      "description": "Success message",
+      "type": "string"
+    },
+    "estimatedReviewTime": {
+      "description": "Estimated review time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "businessId",
+    "registrationStatus",
+    "message",
+    "estimatedReviewTime"
+  ],
+  "additionalProperties": false
+}

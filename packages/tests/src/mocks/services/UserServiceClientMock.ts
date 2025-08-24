@@ -49,6 +49,7 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
   invalidatePasswordResetToken = vi.fn()
   createEmailVerificationToken = vi.fn()
   validateEmailVerificationToken = vi.fn()
+  updateUserPrimaryBusiness = vi.fn()
 
   /**
    * Configure mock for successful authentication
@@ -65,6 +66,7 @@ export class UserServiceClientMock implements Partial<UserServiceClient> {
     this.getUserByEmail.mockResolvedValue(user)
     this.getUser.mockResolvedValue(user)
     this.updateLastLogin.mockResolvedValue(undefined)
+    this.updateUserPrimaryBusiness.mockResolvedValue(undefined)
 
     return this
   }

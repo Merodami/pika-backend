@@ -10,6 +10,7 @@ import type {
   VoucherBookType,
 } from '@prisma/client'
 import { Prisma } from '@prisma/client'
+import { get } from 'lodash-es'
 
 /**
  * Voucher book repository interface
@@ -188,6 +189,70 @@ export class VoucherBookRepository implements IVoucherBookRepository {
   }
 
   /**
+   * Build where clause for voucher book search
+   */
+  private buildWhereClause(
+    params: VoucherBookSearchParams,
+  ): Prisma.VoucherBookWhereInput {
+    const {
+      search,
+      bookType,
+      status,
+      year,
+      month,
+      createdBy,
+      updatedBy,
+      hasContent,
+      hasPdf,
+    } = params
+    const where: Prisma.VoucherBookWhereInput = {}
+
+    // Search filter
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { edition: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+
+    // Simple field filters
+    if (bookType) where.bookType = bookType
+    if (status) where.status = status
+    if (year) where.year = year
+    if (month) where.month = month
+    if (createdBy) where.createdBy = createdBy
+    if (updatedBy) where.updatedBy = updatedBy
+
+    // Content and PDF existence filters
+    if (hasContent !== undefined) {
+      where.pages = hasContent ? { some: {} } : { none: {} }
+    }
+    if (hasPdf !== undefined) {
+      where.pdfUrl = hasPdf ? { not: null } : null
+    }
+
+    return where
+  }
+
+  /**
+   * Build order by clause for voucher book search
+   */
+  private buildOrderByClause(
+    sortBy: string = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc',
+  ): Prisma.VoucherBookOrderByWithRelationInput {
+    const sortFields: Record<string, string> = {
+      title: 'title',
+      year: 'year',
+      publishedAt: 'publishedAt',
+    }
+
+    const field = get(sortFields, sortBy, 'createdAt')
+
+    return { [field]: sortOrder }
+  }
+
+  /**
    * Find all voucher books with pagination, filtering, and optional relations
    */
   async findAll(
@@ -197,15 +262,6 @@ export class VoucherBookRepository implements IVoucherBookRepository {
       const {
         page = 1,
         limit = 20,
-        search,
-        bookType,
-        status,
-        year,
-        month,
-        createdBy,
-        updatedBy,
-        hasContent,
-        hasPdf,
         sortBy = 'createdAt',
         sortOrder = 'desc',
         parsedIncludes,
@@ -219,68 +275,9 @@ export class VoucherBookRepository implements IVoucherBookRepository {
           ? (toPrismaInclude(parsedIncludes) as Prisma.VoucherBookInclude)
           : undefined
 
-      // Build where clause
-      const where: Prisma.VoucherBookWhereInput = {}
-
-      if (search) {
-        where.OR = [
-          { title: { contains: search, mode: 'insensitive' } },
-          { edition: { contains: search, mode: 'insensitive' } },
-        ]
-      }
-
-      if (bookType) {
-        where.bookType = bookType
-      }
-
-      if (status) {
-        where.status = status
-      }
-
-      if (year) {
-        where.year = year
-      }
-
-      if (month) {
-        where.month = month
-      }
-
-      if (createdBy) {
-        where.createdBy = createdBy
-      }
-
-      if (updatedBy) {
-        where.updatedBy = updatedBy
-      }
-
-      if (hasContent !== undefined) {
-        if (hasContent) {
-          where.pages = { some: {} }
-        } else {
-          where.pages = { none: {} }
-        }
-      }
-
-      if (hasPdf !== undefined) {
-        if (hasPdf) {
-          where.pdfUrl = { not: null }
-        } else {
-          where.pdfUrl = null
-        }
-      }
-
-      // Build order by clause
-      const orderBy: Prisma.VoucherBookOrderByWithRelationInput = {}
-
-      if (sortBy === 'title') {
-        orderBy.title = sortOrder
-      } else if (sortBy === 'year') {
-        orderBy.year = sortOrder
-      } else if (sortBy === 'publishedAt') {
-        orderBy.publishedAt = sortOrder
-      } else {
-        orderBy.createdAt = sortOrder
-      }
+      // Build clauses using helper methods
+      const where = this.buildWhereClause(params)
+      const orderBy = this.buildOrderByClause(sortBy, sortOrder)
 
       const [voucherBooks, total] = await Promise.all([
         this.prisma.voucherBook.findMany({

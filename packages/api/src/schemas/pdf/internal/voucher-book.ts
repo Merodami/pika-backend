@@ -69,7 +69,10 @@ export const InternalVoucherBookResponse = openapi(
       .optional()
       .describe('PDF generation timestamp'),
     metadata: z
-      .record(z.string(), z.any())
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
       .optional()
       .describe('Book metadata'),
     createdBy: UserId.describe('Creator user ID'),
@@ -198,7 +201,10 @@ export const InternalBookWithRelationsResponse = openapi(
           pageNumber: z.number().int().min(1).describe('Page number'),
           layoutType: PageLayoutTypeSchema,
           metadata: z
-            .record(z.string(), z.any())
+            .record(
+              z.string(),
+              z.union([z.string(), z.number(), z.boolean(), z.null()]),
+            )
             .optional()
             .describe('Page metadata'),
           placements: z
@@ -236,7 +242,10 @@ export const InternalBookWithRelationsResponse = openapi(
                   .describe('Title'),
                 description: z.string().optional().describe('Description'),
                 metadata: z
-                  .record(z.string(), z.any())
+                  .record(
+                    z.string(),
+                    z.union([z.string(), z.number(), z.boolean(), z.null()]),
+                  )
                   .optional()
                   .describe('Placement metadata'),
                 createdBy: UserId.describe('Creator user ID'),

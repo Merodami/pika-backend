@@ -1,4 +1,5 @@
 import type { BookDistribution } from '@prisma/client'
+import { get, set } from 'lodash-es'
 
 /**
  * DTOs for BookDistribution - defined within the service following established pattern
@@ -324,6 +325,85 @@ export class BookDistributionMapper {
   }
 
   /**
+   * Validate and apply status update
+   */
+  private static applyStatusUpdate(
+    dto: UpdateBookDistributionDTO,
+    updates: any,
+  ): void {
+    if (dto.status === undefined) return
+
+    if (!BookDistributionMapper.isValidStatus(dto.status)) {
+      throw new Error(`Invalid status: ${dto.status}`)
+    }
+    updates.status = dto.status
+  }
+
+  /**
+   * Validate and apply quantity update
+   */
+  private static applyQuantityUpdate(
+    dto: UpdateBookDistributionDTO,
+    updates: any,
+  ): void {
+    if (dto.quantity === undefined) return
+
+    if (dto.quantity < 1) {
+      throw new Error('Distribution quantity must be at least 1')
+    }
+    updates.quantity = dto.quantity
+  }
+
+  /**
+   * Apply contact and delivery information updates
+   */
+  private static applyContactAndDeliveryUpdates(
+    dto: UpdateBookDistributionDTO,
+    updates: any,
+  ): void {
+    const contactFields = [
+      'contactName',
+      'contactEmail',
+      'contactPhone',
+      'deliveryAddress',
+    ] as const
+    const shippingFields = [
+      'shippedAt',
+      'deliveredAt',
+      'trackingNumber',
+      'shippingCarrier',
+    ] as const
+    const otherFields = ['notes', 'metadata'] as const
+
+    // Apply contact fields
+    contactFields.forEach((field) => {
+      const value = get(dto, field)
+
+      if (value !== undefined) {
+        set(updates, field, value)
+      }
+    })
+
+    // Apply shipping fields
+    shippingFields.forEach((field) => {
+      const value = get(dto, field)
+
+      if (value !== undefined) {
+        set(updates, field, value)
+      }
+    })
+
+    // Apply other fields
+    otherFields.forEach((field) => {
+      const value = get(dto, field)
+
+      if (value !== undefined) {
+        set(updates, field, value)
+      }
+    })
+  }
+
+  /**
    * Convert update DTO to database input
    */
   static fromUpdateDTO(
@@ -335,36 +415,10 @@ export class BookDistributionMapper {
       updatedAt: new Date(),
     }
 
-    // Validate status if changed
-    if (dto.status !== undefined) {
-      if (!BookDistributionMapper.isValidStatus(dto.status)) {
-        throw new Error(`Invalid status: ${dto.status}`)
-      }
-      updates.status = dto.status
-    }
-
-    // Validate quantity if changed
-    if (dto.quantity !== undefined) {
-      if (dto.quantity < 1) {
-        throw new Error('Distribution quantity must be at least 1')
-      }
-      updates.quantity = dto.quantity
-    }
-
-    // Copy other fields if provided
-    if (dto.contactName !== undefined) updates.contactName = dto.contactName
-    if (dto.contactEmail !== undefined) updates.contactEmail = dto.contactEmail
-    if (dto.contactPhone !== undefined) updates.contactPhone = dto.contactPhone
-    if (dto.deliveryAddress !== undefined)
-      updates.deliveryAddress = dto.deliveryAddress
-    if (dto.shippedAt !== undefined) updates.shippedAt = dto.shippedAt
-    if (dto.deliveredAt !== undefined) updates.deliveredAt = dto.deliveredAt
-    if (dto.trackingNumber !== undefined)
-      updates.trackingNumber = dto.trackingNumber
-    if (dto.shippingCarrier !== undefined)
-      updates.shippingCarrier = dto.shippingCarrier
-    if (dto.notes !== undefined) updates.notes = dto.notes
-    if (dto.metadata !== undefined) updates.metadata = dto.metadata
+    // Apply all updates using helper methods
+    BookDistributionMapper.applyStatusUpdate(dto, updates)
+    BookDistributionMapper.applyQuantityUpdate(dto, updates)
+    BookDistributionMapper.applyContactAndDeliveryUpdates(dto, updates)
 
     return updates
   }

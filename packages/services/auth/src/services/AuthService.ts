@@ -14,13 +14,16 @@ import {
   JWT_REFRESH_EXPIRY,
   JWT_SECRET,
 } from '@pika/environment'
-import type { ICacheService } from '@pika/redis'
+import { Cache, type ICacheService } from '@pika/redis'
 import {
+  BusinessServiceClient,
   CommunicationServiceClient,
   ErrorFactory,
   UserServiceClient,
 } from '@pika/shared'
 import { UserRole } from '@pika/types'
+
+import { CACHE_KEYS } from '../constants/cache-keys.js'
 
 export interface IAuthService {
   login(email: string, password: string): Promise<LoginResult>
@@ -100,9 +103,13 @@ export class AuthService implements IAuthService {
     private readonly cacheService: ICacheService,
     private readonly userServiceClient: UserServiceClient,
     private readonly communicationClient?: CommunicationServiceClient,
+    private readonly businessServiceClient?: BusinessServiceClient,
   ) {
     // Create adapter to connect user service client with auth strategy
-    this.userServiceAdapter = new UserServiceClientAdapter(userServiceClient)
+    this.userServiceAdapter = new UserServiceClientAdapter(
+      userServiceClient,
+      businessServiceClient,
+    )
 
     // Create local auth strategy (in future, this could be Cognito strategy)
     this.authStrategy = createLocalAuthStrategy(
@@ -345,6 +352,15 @@ export class AuthService implements IAuthService {
   /**
    * Get user information by ID
    */
+  @Cache({
+    ttl: 300, // 5 minutes for user info
+    prefix: CACHE_KEYS.USER_INFO.BY_ID,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const userId = args[0]
+
+      return `${prefix}:${userId}`
+    },
+  })
   async getUserInfo(userId: string): Promise<any> {
     try {
       const user = await this.userServiceClient.getUser(userId)

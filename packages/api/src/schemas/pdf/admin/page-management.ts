@@ -31,7 +31,10 @@ export const AdminVoucherBookPageResponse = openapi(
     pageNumber: z.number().int().min(1).describe('Page number within the book'),
     layoutType: PageLayoutTypeSchema,
     metadata: z
-      .record(z.string(), z.any())
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
       .optional()
       .describe('Page-specific metadata'),
     // Admin-specific fields
@@ -71,7 +74,10 @@ export const UpsertPageRequest = openapi(
     pageNumber: z.number().int().min(1).describe('Page number within the book'),
     layoutType: PageLayoutTypeSchema,
     metadata: z
-      .record(z.string(), z.any())
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
       .optional()
       .describe('Page-specific metadata'),
   }),
@@ -122,7 +128,10 @@ export const AdminAdPlacementResponse = openapi(
       .describe('Content title'),
     description: z.string().optional().describe('Content description'),
     metadata: z
-      .record(z.string(), z.any())
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
       .optional()
       .describe('Placement metadata'),
     createdBy: UserId.describe('User who created the placement'),
@@ -185,7 +194,10 @@ export const CreateAdPlacementRequest = openapi(
       .describe('Content title'),
     description: z.string().optional().describe('Content description'),
     metadata: z
-      .record(z.string(), z.any())
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
       .optional()
       .describe('Placement metadata'),
   }),
@@ -227,7 +239,10 @@ export const UpdateAdPlacementRequest = openapi(
       .describe('Content title'),
     description: z.string().optional().describe('Content description'),
     metadata: z
-      .record(z.string(), z.any())
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
       .optional()
       .describe('Placement metadata'),
     isActive: z.boolean().optional().describe('Whether placement is active'),
@@ -320,7 +335,10 @@ export const BulkPlacementOperationRequest = openapi(
       'Operation to perform',
     ),
     options: z
-      .record(z.string(), z.any())
+      .record(
+        z.string(),
+        z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      )
       .optional()
       .describe('Operation-specific options'),
   }),

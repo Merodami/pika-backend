@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "email": {
+      "type": "string"
+    },
+    "firstName": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "lastName": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "name": {
+      "description": "Computed full name (firstName + lastName)",
+      "type": "string"
+    },
+    "phoneNumber": {
+      "description": "Phone number in E.164 format",
+      "type": "string",
+      "pattern": "^\\+[1-9]\\d{1,14}$"
+    },
+    "avatarUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "dateOfBirth": {
+      "description": "Date in YYYY-MM-DD format",
+      "type": "string"
+    },
+    "preferredLanguage": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2,
+      "pattern": "^[a-z]{2}$"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["admin", "customer", "business"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "banned", "unconfirmed"]
+    },
+    "emailVerified": {
+      "type": "boolean"
+    },
+    "phoneVerified": {
+      "type": "boolean"
+    },
+    "primaryBusinessId": {
+      "description": "Primary business for business users",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "createdAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "updatedAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    },
+    "lastLoginAt": {
+      "description": "ISO 8601 datetime with timezone",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "email",
+    "firstName",
+    "lastName",
+    "name",
+    "role",
+    "status",
+    "emailVerified",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

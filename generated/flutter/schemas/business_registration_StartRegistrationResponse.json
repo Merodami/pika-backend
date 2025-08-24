@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "started": {
+      "description": "Whether registration was started or already existed",
+      "type": "boolean"
+    },
+    "currentStep": {
+      "description": "Current step number",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    }
+  },
+  "required": ["started", "currentStep"],
+  "additionalProperties": false
+}

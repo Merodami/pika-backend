@@ -3,7 +3,9 @@
  */
 
 export * from './address.js'
+export * from './favorites.js'
 export * from './parameters.js'
 export * from './profile.js'
 export * from './queries.js'
+export * from './settings.js'
 export * from './verification.js'

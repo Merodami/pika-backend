@@ -57,8 +57,11 @@ const publicRegistry = createRegistry({
       url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
       description: 'Local Development',
     },
-    { url: 'https://api.pika.com/v1', description: 'Production' },
-    { url: 'https://api.staging.pikaom/v1', description: 'Staging' },
+    { url: 'https://api.thevoucherbook.com/v1', description: 'Production' },
+    {
+      url: 'https://api.staging.thevoucherbook.com/v1',
+      description: 'Staging',
+    },
   ],
 })
 
@@ -75,8 +78,11 @@ const adminRegistry = createRegistry({
       url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
       description: 'Local Development',
     },
-    { url: 'https://api.pikaom/v1', description: 'Production' },
-    { url: 'https://api.staging.pikaom/v1', description: 'Staging' },
+    { url: 'https://api.thevoucherbook.com/v1', description: 'Production' },
+    {
+      url: 'https://api.staging.thevoucherbook.com/v1',
+      description: 'Staging',
+    },
   ],
 })
 

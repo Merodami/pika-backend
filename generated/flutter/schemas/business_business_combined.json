@@ -1,0 +1,1520 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Business_businessTypes",
+  "type": "object",
+  "properties": {
+    "BusinessDetailQueryParams": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "include": {
+          "description": "Comma-separated relations: user,category,businessDetails",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "BusinessListResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Paginated response",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Page items",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "userId": {
+                "description": "User who owns this business",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "businessName": {
+                "description": "Business name in requested language",
+                "type": "string",
+                "maxLength": 200
+              },
+              "businessDescription": {
+                "description": "Business description in requested language",
+                "type": "string",
+                "maxLength": 2000
+              },
+              "categoryId": {
+                "description": "Category this business belongs to",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "verified": {
+                "description": "Whether business is verified",
+                "default": false,
+                "type": "boolean"
+              },
+              "active": {
+                "description": "Whether business is active",
+                "default": true,
+                "type": "boolean"
+              },
+              "approved": {
+                "description": "Whether business is approved by admin",
+                "default": false,
+                "type": "boolean"
+              },
+              "avgRating": {
+                "description": "Average rating of the business",
+                "default": 0,
+                "type": "number",
+                "minimum": 0,
+                "maximum": 5
+              },
+              "user": {
+                "description": "Business owner profile when ?include=user",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "maxLength": 50
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "maxLength": 50
+                  },
+                  "avatarUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "createdAt": {
+                    "description": "ISO 8601 datetime with timezone",
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "firstName", "lastName", "createdAt"],
+                "additionalProperties": false
+              },
+              "category": {
+                "description": "Category information when ?include=category",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "name": {
+                    "description": "Category name in requested language",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Category description in requested language",
+                    "type": "string"
+                  },
+                  "icon": {
+                    "description": "Category icon identifier",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "parentId": {
+                    "description": "Parent category ID for hierarchical structure",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "isActive": {
+                    "description": "Whether category is active",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "sortOrder": {
+                    "description": "Sort order for display",
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "slug": {
+                    "description": "URL-friendly category identifier",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "level": {
+                    "description": "Hierarchy level (1 for root, 2+ for children)",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "path": {
+                    "description": "Hierarchical path using parent IDs",
+                    "type": "string"
+                  },
+                  "createdBy": {
+                    "description": "User who created the category",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "updatedBy": {
+                    "description": "User who last updated the category",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "createdAt": {
+                    "description": "When the record was created",
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "description": "When the record was last updated",
+                    "type": "string"
+                  },
+                  "children": {
+                    "description": "Child categories for hierarchical display",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "Universally Unique Identifier",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "name": {
+                          "description": "Category name in requested language",
+                          "type": "string"
+                        },
+                        "description": {
+                          "description": "Category description in requested language",
+                          "type": "string"
+                        },
+                        "icon": {
+                          "description": "Category icon identifier",
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "parentId": {
+                          "description": "Parent category ID for hierarchical structure",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "isActive": {
+                          "description": "Whether category is active",
+                          "default": true,
+                          "type": "boolean"
+                        },
+                        "sortOrder": {
+                          "description": "Sort order for display",
+                          "default": 0,
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "slug": {
+                          "description": "URL-friendly category identifier",
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "level": {
+                          "description": "Hierarchy level (1 for root, 2+ for children)",
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "path": {
+                          "description": "Hierarchical path using parent IDs",
+                          "type": "string"
+                        },
+                        "createdBy": {
+                          "description": "User who created the category",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "updatedBy": {
+                          "description": "User who last updated the category",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "createdAt": {
+                          "description": "When the record was created",
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "description": "When the record was last updated",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "isActive",
+                        "sortOrder",
+                        "slug",
+                        "level",
+                        "path",
+                        "createdBy",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "isActive",
+                  "sortOrder",
+                  "slug",
+                  "level",
+                  "path",
+                  "createdBy",
+                  "createdAt",
+                  "updatedAt"
+                ],
+                "additionalProperties": false
+              },
+              "businessDetails": {
+                "description": "Detailed contact and location information when ?include=businessDetails",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "businessId": {
+                    "description": "Business ID this details belong to",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "phone": {
+                    "description": "Business phone number",
+                    "type": "string",
+                    "maxLength": 20
+                  },
+                  "email": {
+                    "description": "Business email address",
+                    "type": "string",
+                    "maxLength": 255,
+                    "format": "email",
+                    "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "website": {
+                    "description": "Business website URL",
+                    "type": "string",
+                    "maxLength": 255,
+                    "format": "uri"
+                  },
+                  "logoUrl": {
+                    "description": "Business logo image URL",
+                    "type": "string",
+                    "maxLength": 512,
+                    "format": "uri"
+                  },
+                  "street": {
+                    "description": "Street address",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "city": {
+                    "description": "City",
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "state": {
+                    "description": "State or province",
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "postalCode": {
+                    "description": "Postal/ZIP code",
+                    "type": "string",
+                    "maxLength": 20
+                  },
+                  "country": {
+                    "description": "Country code (ISO 3166-1 alpha-2)",
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 2
+                  },
+                  "operatingHours": {
+                    "description": "Operating hours schedule (JSON)",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "open": {
+                          "type": "string"
+                        },
+                        "close": {
+                          "type": "string"
+                        },
+                        "closed": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "socialMedia": {
+                    "description": "Social media links (JSON)",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "additionalInfo": {
+                    "description": "Additional business information (JSON)",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  },
+                  "createdAt": {
+                    "description": "When the record was created",
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "description": "When the record was last updated",
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "businessId", "createdAt", "updatedAt"],
+                "additionalProperties": false
+              },
+              "createdAt": {
+                "description": "When the record was created",
+                "type": "string"
+              },
+              "updatedAt": {
+                "description": "When the record was last updated",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "userId",
+              "businessName",
+              "categoryId",
+              "verified",
+              "active",
+              "approved",
+              "avgRating",
+              "createdAt",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "description": "Current page number",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Items per page",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "total": {
+              "description": "Total number of items",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalPages": {
+              "description": "Total number of pages",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasNext": {
+              "description": "Whether there is a next page",
+              "type": "boolean"
+            },
+            "hasPrev": {
+              "description": "Whether there is a previous page",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "page",
+            "limit",
+            "total",
+            "totalPages",
+            "hasNext",
+            "hasPrev"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["data", "pagination"],
+      "additionalProperties": false
+    },
+    "BusinessPathParams": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Business ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+    "BusinessQueryParams": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "Page number",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "description": "Items per page",
+          "default": 20,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        },
+        "sortBy": {
+          "default": "businessName",
+          "type": "string",
+          "enum": [
+            "businessName",
+            "avgRating",
+            "verified",
+            "active",
+            "createdAt",
+            "updatedAt"
+          ]
+        },
+        "sortOrder": {
+          "description": "Sort order",
+          "default": "desc",
+          "type": "string",
+          "enum": ["asc", "desc"]
+        },
+        "search": {
+          "description": "Search query",
+          "type": "string"
+        },
+        "categoryId": {
+          "description": "Filter by category",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "verified": {
+          "description": "Filter by verification status",
+          "type": "boolean"
+        },
+        "active": {
+          "description": "Filter by active status",
+          "type": "boolean"
+        },
+        "minRating": {
+          "description": "Minimum rating filter",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        }
+      },
+      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "additionalProperties": false
+    },
+    "BusinessResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "userId": {
+          "description": "User who owns this business",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "businessName": {
+          "description": "Business name in requested language",
+          "type": "string",
+          "maxLength": 200
+        },
+        "businessDescription": {
+          "description": "Business description in requested language",
+          "type": "string",
+          "maxLength": 2000
+        },
+        "categoryId": {
+          "description": "Category this business belongs to",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "verified": {
+          "description": "Whether business is verified",
+          "default": false,
+          "type": "boolean"
+        },
+        "active": {
+          "description": "Whether business is active",
+          "default": true,
+          "type": "boolean"
+        },
+        "approved": {
+          "description": "Whether business is approved by admin",
+          "default": false,
+          "type": "boolean"
+        },
+        "avgRating": {
+          "description": "Average rating of the business",
+          "default": 0,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "user": {
+          "description": "Business owner profile when ?include=user",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "firstName": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "lastName": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "avatarUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "createdAt": {
+              "description": "ISO 8601 datetime with timezone",
+              "type": "string"
+            }
+          },
+          "required": ["id", "firstName", "lastName", "createdAt"],
+          "additionalProperties": false
+        },
+        "category": {
+          "description": "Category information when ?include=category",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Universally Unique Identifier",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "name": {
+              "description": "Category name in requested language",
+              "type": "string"
+            },
+            "description": {
+              "description": "Category description in requested language",
+              "type": "string"
+            },
+            "icon": {
+              "description": "Category icon identifier",
+              "type": "string",
+              "maxLength": 255
+            },
+            "parentId": {
+              "description": "Parent category ID for hierarchical structure",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "isActive": {
+              "description": "Whether category is active",
+              "default": true,
+              "type": "boolean"
+            },
+            "sortOrder": {
+              "description": "Sort order for display",
+              "default": 0,
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "slug": {
+              "description": "URL-friendly category identifier",
+              "type": "string",
+              "maxLength": 255
+            },
+            "level": {
+              "description": "Hierarchy level (1 for root, 2+ for children)",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "path": {
+              "description": "Hierarchical path using parent IDs",
+              "type": "string"
+            },
+            "createdBy": {
+              "description": "User who created the category",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "updatedBy": {
+              "description": "User who last updated the category",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "createdAt": {
+              "description": "When the record was created",
+              "type": "string"
+            },
+            "updatedAt": {
+              "description": "When the record was last updated",
+              "type": "string"
+            },
+            "children": {
+              "description": "Child categories for hierarchical display",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "name": {
+                    "description": "Category name in requested language",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Category description in requested language",
+                    "type": "string"
+                  },
+                  "icon": {
+                    "description": "Category icon identifier",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "parentId": {
+                    "description": "Parent category ID for hierarchical structure",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "isActive": {
+                    "description": "Whether category is active",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "sortOrder": {
+                    "description": "Sort order for display",
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "slug": {
+                    "description": "URL-friendly category identifier",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "level": {
+                    "description": "Hierarchy level (1 for root, 2+ for children)",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "path": {
+                    "description": "Hierarchical path using parent IDs",
+                    "type": "string"
+                  },
+                  "createdBy": {
+                    "description": "User who created the category",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "updatedBy": {
+                    "description": "User who last updated the category",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "createdAt": {
+                    "description": "When the record was created",
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "description": "When the record was last updated",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "isActive",
+                  "sortOrder",
+                  "slug",
+                  "level",
+                  "path",
+                  "createdBy",
+                  "createdAt",
+                  "updatedAt"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "isActive",
+            "sortOrder",
+            "slug",
+            "level",
+            "path",
+            "createdBy",
+            "createdAt",
+            "updatedAt"
+          ],
+          "additionalProperties": false
+        },
+        "businessDetails": {
+          "description": "Detailed contact and location information when ?include=businessDetails",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Universally Unique Identifier",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "businessId": {
+              "description": "Business ID this details belong to",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "phone": {
+              "description": "Business phone number",
+              "type": "string",
+              "maxLength": 20
+            },
+            "email": {
+              "description": "Business email address",
+              "type": "string",
+              "maxLength": 255,
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+            },
+            "website": {
+              "description": "Business website URL",
+              "type": "string",
+              "maxLength": 255,
+              "format": "uri"
+            },
+            "logoUrl": {
+              "description": "Business logo image URL",
+              "type": "string",
+              "maxLength": 512,
+              "format": "uri"
+            },
+            "street": {
+              "description": "Street address",
+              "type": "string",
+              "maxLength": 255
+            },
+            "city": {
+              "description": "City",
+              "type": "string",
+              "maxLength": 100
+            },
+            "state": {
+              "description": "State or province",
+              "type": "string",
+              "maxLength": 100
+            },
+            "postalCode": {
+              "description": "Postal/ZIP code",
+              "type": "string",
+              "maxLength": 20
+            },
+            "country": {
+              "description": "Country code (ISO 3166-1 alpha-2)",
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2
+            },
+            "operatingHours": {
+              "description": "Operating hours schedule (JSON)",
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "open": {
+                    "type": "string"
+                  },
+                  "close": {
+                    "type": "string"
+                  },
+                  "closed": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "socialMedia": {
+              "description": "Social media links (JSON)",
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "additionalInfo": {
+              "description": "Additional business information (JSON)",
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              }
+            },
+            "createdAt": {
+              "description": "When the record was created",
+              "type": "string"
+            },
+            "updatedAt": {
+              "description": "When the record was last updated",
+              "type": "string"
+            }
+          },
+          "required": ["id", "businessId", "createdAt", "updatedAt"],
+          "additionalProperties": false
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "businessName",
+        "categoryId",
+        "verified",
+        "active",
+        "approved",
+        "avgRating",
+        "createdAt",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "BusinessesByCategoryResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "categoryId": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "businesses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Universally Unique Identifier",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "userId": {
+                "description": "User who owns this business",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "businessName": {
+                "description": "Business name in requested language",
+                "type": "string",
+                "maxLength": 200
+              },
+              "businessDescription": {
+                "description": "Business description in requested language",
+                "type": "string",
+                "maxLength": 2000
+              },
+              "categoryId": {
+                "description": "Category this business belongs to",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "verified": {
+                "description": "Whether business is verified",
+                "default": false,
+                "type": "boolean"
+              },
+              "active": {
+                "description": "Whether business is active",
+                "default": true,
+                "type": "boolean"
+              },
+              "approved": {
+                "description": "Whether business is approved by admin",
+                "default": false,
+                "type": "boolean"
+              },
+              "avgRating": {
+                "description": "Average rating of the business",
+                "default": 0,
+                "type": "number",
+                "minimum": 0,
+                "maximum": 5
+              },
+              "user": {
+                "description": "Business owner profile when ?include=user",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "maxLength": 50
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "maxLength": 50
+                  },
+                  "avatarUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "createdAt": {
+                    "description": "ISO 8601 datetime with timezone",
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "firstName", "lastName", "createdAt"],
+                "additionalProperties": false
+              },
+              "category": {
+                "description": "Category information when ?include=category",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "name": {
+                    "description": "Category name in requested language",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Category description in requested language",
+                    "type": "string"
+                  },
+                  "icon": {
+                    "description": "Category icon identifier",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "parentId": {
+                    "description": "Parent category ID for hierarchical structure",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "isActive": {
+                    "description": "Whether category is active",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "sortOrder": {
+                    "description": "Sort order for display",
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "slug": {
+                    "description": "URL-friendly category identifier",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "level": {
+                    "description": "Hierarchy level (1 for root, 2+ for children)",
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "path": {
+                    "description": "Hierarchical path using parent IDs",
+                    "type": "string"
+                  },
+                  "createdBy": {
+                    "description": "User who created the category",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "updatedBy": {
+                    "description": "User who last updated the category",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "createdAt": {
+                    "description": "When the record was created",
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "description": "When the record was last updated",
+                    "type": "string"
+                  },
+                  "children": {
+                    "description": "Child categories for hierarchical display",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "Universally Unique Identifier",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "name": {
+                          "description": "Category name in requested language",
+                          "type": "string"
+                        },
+                        "description": {
+                          "description": "Category description in requested language",
+                          "type": "string"
+                        },
+                        "icon": {
+                          "description": "Category icon identifier",
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "parentId": {
+                          "description": "Parent category ID for hierarchical structure",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "isActive": {
+                          "description": "Whether category is active",
+                          "default": true,
+                          "type": "boolean"
+                        },
+                        "sortOrder": {
+                          "description": "Sort order for display",
+                          "default": 0,
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "slug": {
+                          "description": "URL-friendly category identifier",
+                          "type": "string",
+                          "maxLength": 255
+                        },
+                        "level": {
+                          "description": "Hierarchy level (1 for root, 2+ for children)",
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "path": {
+                          "description": "Hierarchical path using parent IDs",
+                          "type": "string"
+                        },
+                        "createdBy": {
+                          "description": "User who created the category",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "updatedBy": {
+                          "description": "User who last updated the category",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "createdAt": {
+                          "description": "When the record was created",
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "description": "When the record was last updated",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "isActive",
+                        "sortOrder",
+                        "slug",
+                        "level",
+                        "path",
+                        "createdBy",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "isActive",
+                  "sortOrder",
+                  "slug",
+                  "level",
+                  "path",
+                  "createdBy",
+                  "createdAt",
+                  "updatedAt"
+                ],
+                "additionalProperties": false
+              },
+              "businessDetails": {
+                "description": "Detailed contact and location information when ?include=businessDetails",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "businessId": {
+                    "description": "Business ID this details belong to",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "phone": {
+                    "description": "Business phone number",
+                    "type": "string",
+                    "maxLength": 20
+                  },
+                  "email": {
+                    "description": "Business email address",
+                    "type": "string",
+                    "maxLength": 255,
+                    "format": "email",
+                    "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "website": {
+                    "description": "Business website URL",
+                    "type": "string",
+                    "maxLength": 255,
+                    "format": "uri"
+                  },
+                  "logoUrl": {
+                    "description": "Business logo image URL",
+                    "type": "string",
+                    "maxLength": 512,
+                    "format": "uri"
+                  },
+                  "street": {
+                    "description": "Street address",
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "city": {
+                    "description": "City",
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "state": {
+                    "description": "State or province",
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "postalCode": {
+                    "description": "Postal/ZIP code",
+                    "type": "string",
+                    "maxLength": 20
+                  },
+                  "country": {
+                    "description": "Country code (ISO 3166-1 alpha-2)",
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 2
+                  },
+                  "operatingHours": {
+                    "description": "Operating hours schedule (JSON)",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "open": {
+                          "type": "string"
+                        },
+                        "close": {
+                          "type": "string"
+                        },
+                        "closed": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "socialMedia": {
+                    "description": "Social media links (JSON)",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "additionalInfo": {
+                    "description": "Additional business information (JSON)",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  },
+                  "createdAt": {
+                    "description": "When the record was created",
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "description": "When the record was last updated",
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "businessId", "createdAt", "updatedAt"],
+                "additionalProperties": false
+              },
+              "createdAt": {
+                "description": "When the record was created",
+                "type": "string"
+              },
+              "updatedAt": {
+                "description": "When the record was last updated",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "userId",
+              "businessName",
+              "categoryId",
+              "verified",
+              "active",
+              "approved",
+              "avgRating",
+              "createdAt",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["categoryId", "categoryName", "businesses", "totalCount"],
+      "additionalProperties": false
+    },
+    "CreateMyBusinessRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "businessName": {
+          "description": "Business name",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "businessDescription": {
+          "description": "Business description",
+          "type": "string",
+          "maxLength": 500
+        },
+        "categoryId": {
+          "description": "Category ID (can be assigned later by admin)",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        }
+      },
+      "required": ["businessName"],
+      "additionalProperties": false
+    },
+    "CreateMyBusinessResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Newly created business ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "businessName": {
+          "description": "Business name",
+          "type": "string"
+        },
+        "approved": {
+          "description": "Business approval status",
+          "default": false,
+          "type": "boolean"
+        },
+        "message": {
+          "default": "Business created successfully. Awaiting admin approval.",
+          "type": "string"
+        }
+      },
+      "required": ["id", "businessName", "approved", "message"],
+      "additionalProperties": false
+    },
+    "UpdateMyBusinessRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "businessName": {
+          "description": "Business name",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "businessDescription": {
+          "description": "Business description",
+          "type": "string",
+          "maxLength": 500
+        },
+        "categoryId": {
+          "description": "Category ID",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

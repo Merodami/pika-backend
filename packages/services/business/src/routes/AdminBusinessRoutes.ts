@@ -1,8 +1,12 @@
 import { AdminBusinessController } from '@business/controllers/AdminBusinessController.js'
+import { BusinessDetailsRepository } from '@business/repositories/BusinessDetailsRepository.js'
+import { BusinessRegistrationRepository } from '@business/repositories/BusinessRegistrationRepository.js'
 import { BusinessRepository } from '@business/repositories/BusinessRepository.js'
+import { BusinessRegistrationService } from '@business/services/BusinessRegistrationService.js'
 import { BusinessService } from '@business/services/BusinessService.js'
-import { businessAdmin, businessCommon } from '@pika/api'
+import { businessAdmin, businessCommon, userAdmin } from '@pika/api'
 import {
+  createAvatarUploadMiddleware,
   requireAuth,
   requirePermissions,
   validateBody,
@@ -10,7 +14,8 @@ import {
   validateQuery,
 } from '@pika/http'
 import type { ICacheService } from '@pika/redis'
-import type { TranslationClient } from '@pika/translation'
+import type { StorageServiceClient, UserServiceClient } from '@pika/shared'
+import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
@@ -21,13 +26,41 @@ export function createAdminBusinessRoutes(
   prisma: PrismaClient,
   cache: ICacheService,
   translationClient: TranslationClient,
+  userServiceClient: UserServiceClient,
+  translationResolver?: TranslationResolver,
+  storageServiceClient?: StorageServiceClient,
 ): Router {
   const router = Router()
 
   // Initialize dependencies
   const repository = new BusinessRepository(prisma, cache)
-  const service = new BusinessService(repository, translationClient, cache)
-  const controller = new AdminBusinessController(service)
+  const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
+  const service = new BusinessService(
+    repository,
+    translationClient,
+    userServiceClient,
+    cache,
+    translationResolver,
+    businessDetailsRepository,
+    storageServiceClient,
+  )
+
+  // Initialize registration service dependencies
+  const registrationRepository = new BusinessRegistrationRepository(
+    prisma,
+    cache,
+  )
+  const registrationService = new BusinessRegistrationService(
+    registrationRepository,
+    repository,
+    businessDetailsRepository,
+    userServiceClient,
+  )
+
+  const controller = new AdminBusinessController(service, registrationService)
+
+  // Configure upload middleware for logo uploads
+  const upload = createAvatarUploadMiddleware() // Reuse avatar upload middleware for business logos
 
   // All routes require authentication
   router.use(requireAuth())
@@ -115,6 +148,24 @@ export function createAdminBusinessRoutes(
     validateParams(businessCommon.BusinessIdParam),
     validateBody(businessAdmin.AdminBusinessApprovalRequest),
     controller.approveBusiness,
+  )
+
+  // POST /admin/businesses/users/:id/registration/reset - Reset business registration by user ID
+  router.post(
+    '/users/:id/registration/reset',
+    requirePermissions('admin:businesses'),
+    validateParams(userAdmin.UserIdParam),
+    validateBody(businessAdmin.AdminResetBusinessRegistrationRequest),
+    controller.resetBusinessRegistration,
+  )
+
+  // POST /admin/businesses/:id/logo - Admin uploads logo for any business
+  router.post(
+    '/:id/logo',
+    requirePermissions('admin:businesses'),
+    validateParams(businessCommon.BusinessIdParam),
+    upload.single('logo'),
+    controller.uploadBusinessLogo,
   )
 
   return router

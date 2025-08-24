@@ -70,7 +70,10 @@ export const AdminVoucherBookResponse = withTimestamps({
     .optional()
     .describe('When the PDF was generated'),
   metadata: z
-    .record(z.string(), z.any())
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
     .optional()
     .describe('Additional book metadata'),
   createdBy: UserId.describe('User who created the book'),
@@ -144,7 +147,10 @@ export const AdminCreateVoucherBookRequest = z.object({
     .optional()
     .describe('URL of the back cover image'),
   metadata: z
-    .record(z.string(), z.any())
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
     .optional()
     .describe('Additional book metadata'),
 })
@@ -200,7 +206,10 @@ export const AdminUpdateVoucherBookRequest = z.object({
     .optional()
     .describe('URL of the back cover image'),
   metadata: z
-    .record(z.string(), z.any())
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
     .optional()
     .describe('Additional book metadata'),
 })
@@ -417,7 +426,10 @@ export const AdminBulkVoucherBookOperationRequest = z.object({
     'Operation to perform',
   ),
   options: z
-    .record(z.string(), z.any())
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
     .optional()
     .describe('Operation-specific options'),
 })

@@ -1,0 +1,1683 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User_favoritesTypes",
+  "type": "object",
+  "properties": {
+    "AddFavoriteBusinessResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "message": {
+          "default": "Business added to favorites",
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Favorite record ID",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "businessId": {
+              "description": "Business ID",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "createdAt": {
+              "description": "When the business was favorited",
+              "type": "string"
+            },
+            "business": {
+              "description": "Full business details when ?include=business",
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "Universally Unique Identifier",
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "userId": {
+                  "description": "User who owns this business",
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "businessName": {
+                  "description": "Business name in requested language",
+                  "type": "string",
+                  "maxLength": 200
+                },
+                "businessDescription": {
+                  "description": "Business description in requested language",
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "categoryId": {
+                  "description": "Category this business belongs to",
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "verified": {
+                  "description": "Whether business is verified",
+                  "default": false,
+                  "type": "boolean"
+                },
+                "active": {
+                  "description": "Whether business is active",
+                  "default": true,
+                  "type": "boolean"
+                },
+                "approved": {
+                  "description": "Whether business is approved by admin",
+                  "default": false,
+                  "type": "boolean"
+                },
+                "avgRating": {
+                  "description": "Average rating of the business",
+                  "default": 0,
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 5
+                },
+                "user": {
+                  "description": "Business owner profile when ?include=user",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "firstName": {
+                      "type": "string",
+                      "maxLength": 50
+                    },
+                    "lastName": {
+                      "type": "string",
+                      "maxLength": 50
+                    },
+                    "avatarUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "createdAt": {
+                      "description": "ISO 8601 datetime with timezone",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["id", "firstName", "lastName", "createdAt"],
+                  "additionalProperties": false
+                },
+                "category": {
+                  "description": "Category information when ?include=category",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Universally Unique Identifier",
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "name": {
+                      "description": "Category name in requested language",
+                      "type": "string"
+                    },
+                    "description": {
+                      "description": "Category description in requested language",
+                      "type": "string"
+                    },
+                    "icon": {
+                      "description": "Category icon identifier",
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    "parentId": {
+                      "description": "Parent category ID for hierarchical structure",
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "isActive": {
+                      "description": "Whether category is active",
+                      "default": true,
+                      "type": "boolean"
+                    },
+                    "sortOrder": {
+                      "description": "Sort order for display",
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "slug": {
+                      "description": "URL-friendly category identifier",
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    "level": {
+                      "description": "Hierarchy level (1 for root, 2+ for children)",
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "path": {
+                      "description": "Hierarchical path using parent IDs",
+                      "type": "string"
+                    },
+                    "createdBy": {
+                      "description": "User who created the category",
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "updatedBy": {
+                      "description": "User who last updated the category",
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "createdAt": {
+                      "description": "When the record was created",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "When the record was last updated",
+                      "type": "string"
+                    },
+                    "children": {
+                      "description": "Child categories for hierarchical display",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "description": "Universally Unique Identifier",
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "name": {
+                            "description": "Category name in requested language",
+                            "type": "string"
+                          },
+                          "description": {
+                            "description": "Category description in requested language",
+                            "type": "string"
+                          },
+                          "icon": {
+                            "description": "Category icon identifier",
+                            "type": "string",
+                            "maxLength": 255
+                          },
+                          "parentId": {
+                            "description": "Parent category ID for hierarchical structure",
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "isActive": {
+                            "description": "Whether category is active",
+                            "default": true,
+                            "type": "boolean"
+                          },
+                          "sortOrder": {
+                            "description": "Sort order for display",
+                            "default": 0,
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "slug": {
+                            "description": "URL-friendly category identifier",
+                            "type": "string",
+                            "maxLength": 255
+                          },
+                          "level": {
+                            "description": "Hierarchy level (1 for root, 2+ for children)",
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "path": {
+                            "description": "Hierarchical path using parent IDs",
+                            "type": "string"
+                          },
+                          "createdBy": {
+                            "description": "User who created the category",
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "updatedBy": {
+                            "description": "User who last updated the category",
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "createdAt": {
+                            "description": "When the record was created",
+                            "type": "string"
+                          },
+                          "updatedAt": {
+                            "description": "When the record was last updated",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "isActive",
+                          "sortOrder",
+                          "slug",
+                          "level",
+                          "path",
+                          "createdBy",
+                          "createdAt",
+                          "updatedAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "isActive",
+                    "sortOrder",
+                    "slug",
+                    "level",
+                    "path",
+                    "createdBy",
+                    "createdAt",
+                    "updatedAt"
+                  ],
+                  "additionalProperties": false
+                },
+                "businessDetails": {
+                  "description": "Detailed contact and location information when ?include=businessDetails",
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Universally Unique Identifier",
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "businessId": {
+                      "description": "Business ID this details belong to",
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "phone": {
+                      "description": "Business phone number",
+                      "type": "string",
+                      "maxLength": 20
+                    },
+                    "email": {
+                      "description": "Business email address",
+                      "type": "string",
+                      "maxLength": 255,
+                      "format": "email",
+                      "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                    },
+                    "website": {
+                      "description": "Business website URL",
+                      "type": "string",
+                      "maxLength": 255,
+                      "format": "uri"
+                    },
+                    "logoUrl": {
+                      "description": "Business logo image URL",
+                      "type": "string",
+                      "maxLength": 512,
+                      "format": "uri"
+                    },
+                    "street": {
+                      "description": "Street address",
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    "city": {
+                      "description": "City",
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "state": {
+                      "description": "State or province",
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "postalCode": {
+                      "description": "Postal/ZIP code",
+                      "type": "string",
+                      "maxLength": 20
+                    },
+                    "country": {
+                      "description": "Country code (ISO 3166-1 alpha-2)",
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 2
+                    },
+                    "operatingHours": {
+                      "description": "Operating hours schedule (JSON)",
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "open": {
+                            "type": "string"
+                          },
+                          "close": {
+                            "type": "string"
+                          },
+                          "closed": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "socialMedia": {
+                      "description": "Social media links (JSON)",
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "additionalInfo": {
+                      "description": "Additional business information (JSON)",
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": {
+                      "description": "When the record was created",
+                      "type": "string"
+                    },
+                    "updatedAt": {
+                      "description": "When the record was last updated",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["id", "businessId", "createdAt", "updatedAt"],
+                  "additionalProperties": false
+                },
+                "createdAt": {
+                  "description": "When the record was created",
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "description": "When the record was last updated",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "userId",
+                "businessName",
+                "categoryId",
+                "verified",
+                "active",
+                "approved",
+                "avgRating",
+                "createdAt",
+                "updatedAt"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": ["id", "businessId", "createdAt"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["message", "data"],
+      "additionalProperties": false
+    },
+    "AddFavoriteVoucherResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "message": {
+          "default": "Voucher added to favorites",
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Favorite record ID",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "voucherId": {
+              "description": "Voucher ID",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "createdAt": {
+              "description": "When the voucher was favorited",
+              "type": "string"
+            },
+            "voucher": {
+              "description": "Full voucher details when ?include=voucher",
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "Universally Unique Identifier",
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "businessId": {
+                  "description": "Universally Unique Identifier",
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "categoryId": {
+                  "description": "Universally Unique Identifier",
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "draft",
+                    "published",
+                    "claimed",
+                    "redeemed",
+                    "expired",
+                    "suspended"
+                  ]
+                },
+                "title": {
+                  "description": "Multilingual voucher title",
+                  "type": "string"
+                },
+                "description": {
+                  "description": "Multilingual voucher description",
+                  "type": "string"
+                },
+                "terms": {
+                  "description": "Multilingual voucher terms",
+                  "type": "string"
+                },
+                "discountType": {
+                  "type": "string",
+                  "enum": ["fixed", "percentage"]
+                },
+                "discountValue": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "currency": {
+                  "default": "PYG",
+                  "type": "string"
+                },
+                "location": {
+                  "description": "GeoJSON Point or Polygon",
+                  "anyOf": [
+                    {},
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "imageUrl": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "validFrom": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                },
+                "maxRedemptions": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "maxRedemptionsPerUser": {
+                  "default": 1,
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "currentRedemptions": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "metadata": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "codes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "description": "Universally Unique Identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": ["qr", "short", "static"]
+                      },
+                      "isActive": {
+                        "type": "boolean"
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {}
+                      }
+                    },
+                    "required": ["id", "code", "type", "isActive"],
+                    "additionalProperties": false
+                  }
+                },
+                "createdAt": {
+                  "description": "When the record was created",
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                },
+                "updatedAt": {
+                  "description": "When the record was last updated",
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                }
+              },
+              "required": [
+                "id",
+                "businessId",
+                "state",
+                "title",
+                "description",
+                "terms",
+                "discountType",
+                "discountValue",
+                "currency",
+                "location",
+                "validFrom",
+                "expiresAt",
+                "maxRedemptionsPerUser",
+                "currentRedemptions",
+                "createdAt",
+                "updatedAt"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": ["id", "voucherId", "createdAt"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["message", "data"],
+      "additionalProperties": false
+    },
+    "BatchFavoriteBusinessesRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "add": {
+          "description": "Business IDs to add to favorites (max 50)",
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "remove": {
+          "description": "Business IDs to remove from favorites (max 50)",
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "BatchFavoriteOperationResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "added": {
+          "description": "Number of items added",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "removed": {
+          "description": "Number of items removed",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "errors": {
+          "description": "List of errors if any operations failed",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "itemId": {
+                "description": "ID of the item that failed",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "operation": {
+                "description": "Operation that failed",
+                "type": "string",
+                "enum": ["add", "remove"]
+              },
+              "error": {
+                "description": "Error message",
+                "type": "string"
+              }
+            },
+            "required": ["itemId", "operation", "error"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["added", "removed", "errors"],
+      "additionalProperties": false
+    },
+    "BatchFavoriteVouchersRequest": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "add": {
+          "description": "Voucher IDs to add to favorites (max 50)",
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "remove": {
+          "description": "Voucher IDs to remove from favorites (max 50)",
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "FavoriteStatusResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "isFavorited": {
+          "description": "Whether the item is favorited",
+          "type": "boolean"
+        },
+        "favoritedAt": {
+          "description": "When the item was favorited (if favorited)",
+          "type": "string"
+        }
+      },
+      "required": ["isFavorited"],
+      "additionalProperties": false
+    },
+    "GetFavoriteBusinessesQuery": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "Page number",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "description": "Items per page",
+          "default": 20,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        },
+        "sortBy": {
+          "description": "Field to sort by",
+          "default": "createdAt",
+          "type": "string",
+          "enum": ["createdAt", "businessName"]
+        },
+        "sortOrder": {
+          "description": "Sort order",
+          "default": "desc",
+          "type": "string",
+          "enum": ["asc", "desc"]
+        },
+        "search": {
+          "description": "Search query",
+          "type": "string"
+        },
+        "include": {
+          "description": "Include related data: business,category,businessDetails",
+          "type": "string"
+        }
+      },
+      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "additionalProperties": false
+    },
+    "GetFavoriteBusinessesResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Paginated list of favorite businesses",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Page items",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Favorite record ID",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "businessId": {
+                "description": "Business ID",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "createdAt": {
+                "description": "When the business was favorited",
+                "type": "string"
+              },
+              "business": {
+                "description": "Full business details when ?include=business",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "userId": {
+                    "description": "User who owns this business",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "businessName": {
+                    "description": "Business name in requested language",
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "businessDescription": {
+                    "description": "Business description in requested language",
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  "categoryId": {
+                    "description": "Category this business belongs to",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "verified": {
+                    "description": "Whether business is verified",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "active": {
+                    "description": "Whether business is active",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "approved": {
+                    "description": "Whether business is approved by admin",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "avgRating": {
+                    "description": "Average rating of the business",
+                    "default": 0,
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 5
+                  },
+                  "user": {
+                    "description": "Business owner profile when ?include=user",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "firstName": {
+                        "type": "string",
+                        "maxLength": 50
+                      },
+                      "lastName": {
+                        "type": "string",
+                        "maxLength": 50
+                      },
+                      "avatarUrl": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "createdAt": {
+                        "description": "ISO 8601 datetime with timezone",
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "firstName", "lastName", "createdAt"],
+                    "additionalProperties": false
+                  },
+                  "category": {
+                    "description": "Category information when ?include=category",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "description": "Universally Unique Identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "name": {
+                        "description": "Category name in requested language",
+                        "type": "string"
+                      },
+                      "description": {
+                        "description": "Category description in requested language",
+                        "type": "string"
+                      },
+                      "icon": {
+                        "description": "Category icon identifier",
+                        "type": "string",
+                        "maxLength": 255
+                      },
+                      "parentId": {
+                        "description": "Parent category ID for hierarchical structure",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "isActive": {
+                        "description": "Whether category is active",
+                        "default": true,
+                        "type": "boolean"
+                      },
+                      "sortOrder": {
+                        "description": "Sort order for display",
+                        "default": 0,
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "slug": {
+                        "description": "URL-friendly category identifier",
+                        "type": "string",
+                        "maxLength": 255
+                      },
+                      "level": {
+                        "description": "Hierarchy level (1 for root, 2+ for children)",
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "path": {
+                        "description": "Hierarchical path using parent IDs",
+                        "type": "string"
+                      },
+                      "createdBy": {
+                        "description": "User who created the category",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "updatedBy": {
+                        "description": "User who last updated the category",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "createdAt": {
+                        "description": "When the record was created",
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "description": "When the record was last updated",
+                        "type": "string"
+                      },
+                      "children": {
+                        "description": "Child categories for hierarchical display",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "description": "Universally Unique Identifier",
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            "name": {
+                              "description": "Category name in requested language",
+                              "type": "string"
+                            },
+                            "description": {
+                              "description": "Category description in requested language",
+                              "type": "string"
+                            },
+                            "icon": {
+                              "description": "Category icon identifier",
+                              "type": "string",
+                              "maxLength": 255
+                            },
+                            "parentId": {
+                              "description": "Parent category ID for hierarchical structure",
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            "isActive": {
+                              "description": "Whether category is active",
+                              "default": true,
+                              "type": "boolean"
+                            },
+                            "sortOrder": {
+                              "description": "Sort order for display",
+                              "default": 0,
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "slug": {
+                              "description": "URL-friendly category identifier",
+                              "type": "string",
+                              "maxLength": 255
+                            },
+                            "level": {
+                              "description": "Hierarchy level (1 for root, 2+ for children)",
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "path": {
+                              "description": "Hierarchical path using parent IDs",
+                              "type": "string"
+                            },
+                            "createdBy": {
+                              "description": "User who created the category",
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            "updatedBy": {
+                              "description": "User who last updated the category",
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            "createdAt": {
+                              "description": "When the record was created",
+                              "type": "string"
+                            },
+                            "updatedAt": {
+                              "description": "When the record was last updated",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "isActive",
+                            "sortOrder",
+                            "slug",
+                            "level",
+                            "path",
+                            "createdBy",
+                            "createdAt",
+                            "updatedAt"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "isActive",
+                      "sortOrder",
+                      "slug",
+                      "level",
+                      "path",
+                      "createdBy",
+                      "createdAt",
+                      "updatedAt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "businessDetails": {
+                    "description": "Detailed contact and location information when ?include=businessDetails",
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "description": "Universally Unique Identifier",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "businessId": {
+                        "description": "Business ID this details belong to",
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "phone": {
+                        "description": "Business phone number",
+                        "type": "string",
+                        "maxLength": 20
+                      },
+                      "email": {
+                        "description": "Business email address",
+                        "type": "string",
+                        "maxLength": 255,
+                        "format": "email",
+                        "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                      },
+                      "website": {
+                        "description": "Business website URL",
+                        "type": "string",
+                        "maxLength": 255,
+                        "format": "uri"
+                      },
+                      "logoUrl": {
+                        "description": "Business logo image URL",
+                        "type": "string",
+                        "maxLength": 512,
+                        "format": "uri"
+                      },
+                      "street": {
+                        "description": "Street address",
+                        "type": "string",
+                        "maxLength": 255
+                      },
+                      "city": {
+                        "description": "City",
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "state": {
+                        "description": "State or province",
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "postalCode": {
+                        "description": "Postal/ZIP code",
+                        "type": "string",
+                        "maxLength": 20
+                      },
+                      "country": {
+                        "description": "Country code (ISO 3166-1 alpha-2)",
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 2
+                      },
+                      "operatingHours": {
+                        "description": "Operating hours schedule (JSON)",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "open": {
+                              "type": "string"
+                            },
+                            "close": {
+                              "type": "string"
+                            },
+                            "closed": {
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "socialMedia": {
+                        "description": "Social media links (JSON)",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      },
+                      "additionalInfo": {
+                        "description": "Additional business information (JSON)",
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        }
+                      },
+                      "createdAt": {
+                        "description": "When the record was created",
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "description": "When the record was last updated",
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "businessId", "createdAt", "updatedAt"],
+                    "additionalProperties": false
+                  },
+                  "createdAt": {
+                    "description": "When the record was created",
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "description": "When the record was last updated",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "userId",
+                  "businessName",
+                  "categoryId",
+                  "verified",
+                  "active",
+                  "approved",
+                  "avgRating",
+                  "createdAt",
+                  "updatedAt"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": ["id", "businessId", "createdAt"],
+            "additionalProperties": false
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "description": "Current page number",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Items per page",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "total": {
+              "description": "Total number of items",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalPages": {
+              "description": "Total number of pages",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasNext": {
+              "description": "Whether there is a next page",
+              "type": "boolean"
+            },
+            "hasPrev": {
+              "description": "Whether there is a previous page",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "page",
+            "limit",
+            "total",
+            "totalPages",
+            "hasNext",
+            "hasPrev"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["data", "pagination"],
+      "additionalProperties": false
+    },
+    "GetFavoriteVouchersQuery": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "page": {
+          "description": "Page number",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "description": "Items per page",
+          "default": 20,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 100
+        },
+        "sortBy": {
+          "description": "Field to sort by",
+          "default": "createdAt",
+          "type": "string",
+          "enum": ["createdAt", "voucherTitle", "expiryDate"]
+        },
+        "sortOrder": {
+          "description": "Sort order",
+          "default": "desc",
+          "type": "string",
+          "enum": ["asc", "desc"]
+        },
+        "search": {
+          "description": "Search query",
+          "type": "string"
+        },
+        "include": {
+          "description": "Include related data: voucher,business,category",
+          "type": "string"
+        }
+      },
+      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "additionalProperties": false
+    },
+    "GetFavoriteVouchersResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "description": "Paginated list of favorite vouchers",
+      "type": "object",
+      "properties": {
+        "data": {
+          "description": "Page items",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "Favorite record ID",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "voucherId": {
+                "description": "Voucher ID",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "createdAt": {
+                "description": "When the voucher was favorited",
+                "type": "string"
+              },
+              "voucher": {
+                "description": "Full voucher details when ?include=voucher",
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "businessId": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "categoryId": {
+                    "description": "Universally Unique Identifier",
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "draft",
+                      "published",
+                      "claimed",
+                      "redeemed",
+                      "expired",
+                      "suspended"
+                    ]
+                  },
+                  "title": {
+                    "description": "Multilingual voucher title",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Multilingual voucher description",
+                    "type": "string"
+                  },
+                  "terms": {
+                    "description": "Multilingual voucher terms",
+                    "type": "string"
+                  },
+                  "discountType": {
+                    "type": "string",
+                    "enum": ["fixed", "percentage"]
+                  },
+                  "discountValue": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "currency": {
+                    "default": "PYG",
+                    "type": "string"
+                  },
+                  "location": {
+                    "description": "GeoJSON Point or Polygon",
+                    "anyOf": [
+                      {},
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "imageUrl": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "validFrom": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                  },
+                  "maxRedemptions": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "maxRedemptionsPerUser": {
+                    "default": 1,
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "currentRedemptions": {
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "metadata": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {}
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "description": "Universally Unique Identifier",
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "code": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": ["qr", "short", "static"]
+                        },
+                        "isActive": {
+                          "type": "boolean"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string"
+                          },
+                          "additionalProperties": {}
+                        }
+                      },
+                      "required": ["id", "code", "type", "isActive"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "createdAt": {
+                    "description": "When the record was created",
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  },
+                  "updatedAt": {
+                    "description": "When the record was last updated",
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                  }
+                },
+                "required": [
+                  "id",
+                  "businessId",
+                  "state",
+                  "title",
+                  "description",
+                  "terms",
+                  "discountType",
+                  "discountValue",
+                  "currency",
+                  "location",
+                  "validFrom",
+                  "expiresAt",
+                  "maxRedemptionsPerUser",
+                  "currentRedemptions",
+                  "createdAt",
+                  "updatedAt"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": ["id", "voucherId", "createdAt"],
+            "additionalProperties": false
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "description": "Current page number",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "limit": {
+              "description": "Items per page",
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "total": {
+              "description": "Total number of items",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "totalPages": {
+              "description": "Total number of pages",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "hasNext": {
+              "description": "Whether there is a next page",
+              "type": "boolean"
+            },
+            "hasPrev": {
+              "description": "Whether there is a previous page",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "page",
+            "limit",
+            "total",
+            "totalPages",
+            "hasNext",
+            "hasPrev"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": ["data", "pagination"],
+      "additionalProperties": false
+    },
+    "RemoveFavoriteResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "message": {
+          "description": "Success message",
+          "type": "string"
+        }
+      },
+      "required": ["message"],
+      "additionalProperties": false
+    }
+  }
+}

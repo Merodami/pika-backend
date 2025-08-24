@@ -1,8 +1,13 @@
 import { CATEGORY_SERVICE_PORT } from '@pika/environment'
-import { createExpressServer, errorMiddleware } from '@pika/http'
-import type { ICacheService } from '@pika/redis'
+import {
+  createExpressServer,
+  createLanguageMiddleware,
+  errorMiddleware,
+} from '@pika/http'
+import { type ICacheService, setCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import type { TranslationClient } from '@pika/translation'
+import { createTranslationResolver } from '@pika/translation'
 import type { PrismaClient } from '@prisma/client'
 
 import { AdminCategoryController } from './controllers/AdminCategoryController.js'
@@ -21,7 +26,10 @@ export interface ServerConfig {
 }
 
 export async function createCategoryServer(config: ServerConfig) {
-  const { prisma, cacheService } = config
+  const { prisma, cacheService, translationClient } = config
+
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
 
   // Create Express app with standard configuration
   const app = await createExpressServer({
@@ -82,9 +90,17 @@ export async function createCategoryServer(config: ServerConfig) {
     },
   })
 
+  // Add language detection middleware
+  app.use(createLanguageMiddleware(translationClient.service))
+
   // Initialize dependencies with dependency injection
   const categoryRepository = new CategoryRepository(prisma, cacheService)
-  const categoryService = new CategoryService(categoryRepository, cacheService)
+  const translationResolver = createTranslationResolver(translationClient)
+  const categoryService = new CategoryService(
+    categoryRepository,
+    cacheService,
+    translationResolver,
+  )
 
   // Initialize controllers
   const categoryController = new CategoryController(categoryService)

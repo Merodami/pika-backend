@@ -6,6 +6,7 @@ import { toPrismaInclude } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Prisma } from '@prisma/client'
+import { get } from 'lodash-es'
 
 export interface BusinessDistributionStats {
   businessName: string
@@ -250,6 +251,62 @@ export class BookDistributionRepository implements IBookDistributionRepository {
   }
 
   /**
+   * Build where clause for distribution search
+   */
+  private buildWhereClause(
+    params: BookDistributionSearchParams,
+  ): Prisma.BookDistributionWhereInput {
+    const {
+      bookId,
+      businessId,
+      locationId,
+      status,
+      distributionType,
+      startDate,
+      endDate,
+      createdBy,
+    } = params
+    const where: Prisma.BookDistributionWhereInput = {}
+
+    // Simple field filters
+    if (bookId) where.bookId = bookId
+    if (businessId) where.businessId = businessId
+    if (locationId) where.locationId = locationId
+    if (status) where.status = status
+    if (distributionType) where.distributionType = distributionType
+    if (createdBy) where.createdBy = createdBy
+
+    // Date range filter
+    if (startDate || endDate) {
+      where.createdAt = {}
+      if (startDate) where.createdAt.gte = startDate
+      if (endDate) where.createdAt.lte = endDate
+    }
+
+    return where
+  }
+
+  /**
+   * Build order by clause for distribution search
+   */
+  private buildOrderByClause(
+    sortBy: string = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc',
+  ): Prisma.BookDistributionOrderByWithRelationInput {
+    const sortFields: Record<string, string> = {
+      businessName: 'businessName',
+      quantity: 'quantity',
+      status: 'status',
+      shippedAt: 'shippedAt',
+      deliveredAt: 'deliveredAt',
+    }
+
+    const field = get(sortFields, sortBy, 'createdAt')
+
+    return { [field]: sortOrder }
+  }
+
+  /**
    * Find all book distributions with pagination, filtering, and optional relations
    */
   async findAll(
@@ -259,14 +316,6 @@ export class BookDistributionRepository implements IBookDistributionRepository {
       const {
         page = 1,
         limit = 20,
-        bookId,
-        businessId,
-        locationId,
-        status,
-        distributionType,
-        startDate,
-        endDate,
-        createdBy,
         sortBy = 'createdAt',
         sortOrder = 'desc',
         parsedIncludes,
@@ -280,59 +329,9 @@ export class BookDistributionRepository implements IBookDistributionRepository {
           ? (toPrismaInclude(parsedIncludes) as Prisma.BookDistributionInclude)
           : undefined
 
-      // Build where clause
-      const where: Prisma.BookDistributionWhereInput = {}
-
-      if (bookId) {
-        where.bookId = bookId
-      }
-
-      if (businessId) {
-        where.businessId = businessId
-      }
-
-      if (locationId) {
-        where.locationId = locationId
-      }
-
-      if (status) {
-        where.status = status
-      }
-
-      if (distributionType) {
-        where.distributionType = distributionType
-      }
-
-      if (startDate || endDate) {
-        where.createdAt = {}
-        if (startDate) {
-          where.createdAt.gte = startDate
-        }
-        if (endDate) {
-          where.createdAt.lte = endDate
-        }
-      }
-
-      if (createdBy) {
-        where.createdBy = createdBy
-      }
-
-      // Build order by clause
-      const orderBy: Prisma.BookDistributionOrderByWithRelationInput = {}
-
-      if (sortBy === 'businessName') {
-        orderBy.businessName = sortOrder
-      } else if (sortBy === 'quantity') {
-        orderBy.quantity = sortOrder
-      } else if (sortBy === 'status') {
-        orderBy.status = sortOrder
-      } else if (sortBy === 'shippedAt') {
-        orderBy.shippedAt = sortOrder
-      } else if (sortBy === 'deliveredAt') {
-        orderBy.deliveredAt = sortOrder
-      } else {
-        orderBy.createdAt = sortOrder
-      }
+      // Build clauses using helper methods
+      const where = this.buildWhereClause(params)
+      const orderBy = this.buildOrderByClause(sortBy, sortOrder)
 
       const [distributions, total] = await Promise.all([
         this.prisma.bookDistribution.findMany({

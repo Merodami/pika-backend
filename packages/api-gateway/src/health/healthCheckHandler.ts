@@ -1,4 +1,3 @@
-import { systemPublic } from '@pika/api'
 import {
   AUTH_API_URL,
   COMMUNICATION_API_URL,
@@ -24,6 +23,45 @@ interface ServiceHealthCheck {
   url: string
 }
 
+interface ServiceHealth {
+  status: HealthStatus
+  url: string
+  responseTime: number
+}
+
+interface DatabaseHealth extends ServiceHealth {
+  resources?: string[]
+  host?: string
+  port?: number
+  ttl?: number
+}
+
+type DatabasesHealth = Record<string, DatabaseHealth>
+type ServicesHealth = Record<string, ServiceHealth>
+
+interface MemoryUsage {
+  rss: number
+  heapUsed: number
+  heapTotal: number
+  external: number
+  memoryThreshold?: number
+}
+
+interface HealthCheckResponse {
+  status: HealthStatus
+  timestamp: string
+  services: ServicesHealth
+  databases: DatabasesHealth
+  performance: {
+    memory: MemoryUsage
+    uptime: number
+    aggregateResponseTime: number
+  }
+  version?: string
+  uptime?: number
+  memoryUsage?: MemoryUsage
+}
+
 const services: ServiceHealthCheck[] = [
   { name: 'auth', url: AUTH_API_URL },
   { name: 'user', url: USER_API_URL },
@@ -40,7 +78,7 @@ const services: ServiceHealthCheck[] = [
 
 async function checkService(
   service: ServiceHealthCheck,
-): Promise<systemPublic.ServiceHealth> {
+): Promise<ServiceHealth> {
   const startTime = Date.now()
 
   try {
@@ -63,7 +101,7 @@ async function checkService(
   }
 }
 
-async function checkDatabase(): Promise<systemPublic.DatabasesHealth> {
+async function checkDatabase(): Promise<DatabasesHealth> {
   // API Gateway doesn't directly access databases - this shows infrastructure status
   // Response times are simulated to show realistic variance
   return {
@@ -75,6 +113,7 @@ async function checkDatabase(): Promise<systemPublic.DatabasesHealth> {
     },
     redis: {
       status: HealthStatus.HEALTHY,
+      url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
       host: REDIS_HOST,
       port: REDIS_PORT,
       ttl: REDIS_DEFAULT_TTL,
@@ -83,7 +122,7 @@ async function checkDatabase(): Promise<systemPublic.DatabasesHealth> {
   }
 }
 
-function getMemoryUsage(): systemPublic.MemoryUsage {
+function getMemoryUsage(): MemoryUsage {
   const memUsage = process.memoryUsage()
 
   return {
@@ -97,17 +136,17 @@ function getMemoryUsage(): systemPublic.MemoryUsage {
 
 const startTime = Date.now()
 
-function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
-  const statusColors: Record<systemPublic.HealthStatus, string> = {
-    healthy: '#10b981',
-    degraded: '#f59e0b',
-    unhealthy: '#ef4444',
+function generateHealthHTML(data: HealthCheckResponse): string {
+  const statusColors: Record<HealthStatus, string> = {
+    [HealthStatus.HEALTHY]: '#10b981',
+    [HealthStatus.DEGRADED]: '#f59e0b',
+    [HealthStatus.UNHEALTHY]: '#ef4444',
   }
 
-  const statusIcons: Record<systemPublic.HealthStatus, string> = {
-    healthy: '✓',
-    degraded: '!',
-    unhealthy: '✗',
+  const statusIcons: Record<HealthStatus, string> = {
+    [HealthStatus.HEALTHY]: '✓',
+    [HealthStatus.DEGRADED]: '!',
+    [HealthStatus.UNHEALTHY]: '✗',
   }
 
   const formatBytes = (bytes: number) => {
@@ -364,8 +403,8 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
                 </div>
             </div>
             <div class="metadata">
-                <div>Version: ${data.version}</div>
-                <div>Uptime: ${formatUptime(data.uptime)}</div>
+                <div>Version: ${data.version || 'unknown'}</div>
+                <div>Uptime: ${formatUptime(data.uptime || 0)}</div>
                 <div>${new Date(data.timestamp).toLocaleString()}</div>
             </div>
         </div>
@@ -411,7 +450,7 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
                 </div>
                 <div class="metric">
                     <span class="metric-label">Resources</span>
-                    <span class="metric-value">${data.databases.pgsql.resources.length} tables</span>
+                    <span class="metric-value">${data.databases.pgsql.resources?.length || 0} tables</span>
                 </div>
             </div>
             
@@ -440,19 +479,19 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
                 <h3 class="card-title">Memory Usage</h3>
                 <div class="memory-grid">
                     <div class="memory-item">
-                        <div class="memory-value">${formatBytes(data.memoryUsage.heapUsed)}</div>
+                        <div class="memory-value">${formatBytes(data.memoryUsage?.heapUsed || 0)}</div>
                         <div class="memory-label">Heap Used</div>
                     </div>
                     <div class="memory-item">
-                        <div class="memory-value">${formatBytes(data.memoryUsage.heapTotal)}</div>
+                        <div class="memory-value">${formatBytes(data.memoryUsage?.heapTotal || 0)}</div>
                         <div class="memory-label">Heap Total</div>
                     </div>
                     <div class="memory-item">
-                        <div class="memory-value">${formatBytes(data.memoryUsage.rss)}</div>
+                        <div class="memory-value">${formatBytes(data.memoryUsage?.rss || 0)}</div>
                         <div class="memory-label">RSS</div>
                     </div>
                     <div class="memory-item">
-                        <div class="memory-value">${formatBytes(data.memoryUsage.external)}</div>
+                        <div class="memory-value">${formatBytes(data.memoryUsage?.external || 0)}</div>
                         <div class="memory-label">External</div>
                     </div>
                 </div>
@@ -463,7 +502,7 @@ function generateHealthHTML(data: systemPublic.HealthCheckResponse): string {
 </html>`
 }
 
-async function checkEmbeddedService(): Promise<systemPublic.ServiceHealth> {
+async function checkEmbeddedService(): Promise<ServiceHealth> {
   const serviceCheckStartTime = Date.now()
 
   try {
@@ -487,7 +526,7 @@ async function checkEmbeddedService(): Promise<systemPublic.ServiceHealth> {
 
 export async function handleHealthCheck(req: Request, res: Response) {
   try {
-    let servicesHealth: systemPublic.ServicesHealth
+    let servicesHealth: ServicesHealth
 
     // In embedded mode, measure actual service response times
     if (process.env.EMBEDDED_MODE === 'true') {
@@ -513,7 +552,7 @@ export async function handleHealthCheck(req: Request, res: Response) {
       )
 
       // Build services object
-      servicesHealth = {} as systemPublic.ServicesHealth
+      servicesHealth = {} as ServicesHealth
       serviceChecks.forEach(({ name, result }) => {
         ;(servicesHealth as any)[name] = result
       })
@@ -527,7 +566,7 @@ export async function handleHealthCheck(req: Request, res: Response) {
       )
 
       // Build services object with proper typing
-      servicesHealth = {} as systemPublic.ServicesHealth
+      servicesHealth = {} as ServicesHealth
       serviceChecks.forEach(({ name, result }) => {
         ;(servicesHealth as any)[name] = result
       })
@@ -545,7 +584,7 @@ export async function handleHealthCheck(req: Request, res: Response) {
       (s) => s.status === HealthStatus.UNHEALTHY,
     )
 
-    let status: systemPublic.HealthStatus
+    let status: HealthStatus
 
     if (allUnhealthy) {
       status = HealthStatus.UNHEALTHY
@@ -555,15 +594,31 @@ export async function handleHealthCheck(req: Request, res: Response) {
       status = HealthStatus.HEALTHY
     }
 
+    // Calculate aggregate response time
+    const aggregateResponseTime = Math.floor(
+      Object.values(servicesHealth).reduce(
+        (sum, service) => sum + service.responseTime,
+        0,
+      ) / Object.keys(servicesHealth).length,
+    )
+
+    const memoryUsage = getMemoryUsage()
+    const uptime = Math.floor((Date.now() - startTime) / 1000)
+
     // Build response matching the schema
-    const response: systemPublic.HealthCheckResponse = {
+    const response: HealthCheckResponse = {
       status,
       timestamp: new Date().toISOString(),
       version: '1.0.0',
-      uptime: Math.floor((Date.now() - startTime) / 1000),
-      memoryUsage: getMemoryUsage(),
+      uptime,
+      memoryUsage,
       services: servicesHealth,
       databases,
+      performance: {
+        memory: memoryUsage,
+        uptime,
+        aggregateResponseTime,
+      },
     }
 
     // Return appropriate status code

@@ -3,11 +3,12 @@ import '@pika/environment'
 
 import { USER_SERVICE_NAME, USER_SERVICE_PORT } from '@pika/environment'
 import { createExpressServer, errorMiddleware } from '@pika/http'
-import { ICacheService } from '@pika/redis'
+import { ICacheService, setCacheService } from '@pika/redis'
 import { FileStoragePort, logger } from '@pika/shared'
 import { PrismaClient } from '@prisma/client'
 
 import { createAdminUserRouter } from './routes/AdminUserRoutes.js'
+import { createFavoriteRoutes } from './routes/FavoriteRoutes.js'
 import { createInternalUserRouter } from './routes/InternalUserRoutes.js'
 import { createUserRouter } from './routes/UserRoutes.js'
 
@@ -26,6 +27,9 @@ export async function createUserServer({
   fileStorage: FileStoragePort
   communicationClient?: any
 }) {
+  // Set up global cache service for decorators
+  setCacheService(cacheService)
+
   logger.info(`Configuring User service for port: ${USER_SERVICE_PORT}`)
 
   // Create Express server
@@ -92,6 +96,13 @@ export async function createUserServer({
   )
 
   app.use('/users', userRouter)
+
+  // Register favorite routes
+  const favoriteRouter = createFavoriteRoutes(prisma, cacheService)
+
+  app.use('/users/me/favorites', favoriteRouter)
+  // Also mount at /favorites for direct API gateway access
+  app.use('/favorites', favoriteRouter)
 
   // Register admin routes
   const adminRouter = createAdminUserRouter(

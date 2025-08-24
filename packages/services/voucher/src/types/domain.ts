@@ -17,10 +17,17 @@ export interface VoucherRedeemData {
   code: string
   userId: string
   location?: any
+  locationName?: string
   businessId?: string
   userAgent?: string
   ipAddress?: string
   sessionId?: string
+  deviceInfo?: string
+  transactionId?: string
+  transactionAmount?: number
+  redemptionType?: string
+  redemptionMethod?: string
+  codeUsed?: string
   notificationPreferences?: {
     sendConfirmation: boolean
   }

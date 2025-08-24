@@ -162,6 +162,8 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
         sessionId: undefined, // Will be added when session management is implemented
         issuedAt: payload.iat ? new Date(payload.iat * 1000) : undefined,
         expiresAt: payload.exp ? new Date(payload.exp * 1000) : undefined,
+        // Include business-specific claims if present
+        hasActiveBusinesses: (payload as any).hasActiveBusinesses,
       }
 
       // Attach user context to request

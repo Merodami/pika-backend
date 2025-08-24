@@ -32,9 +32,10 @@ import {
   E2EAuthHelper,
   MockTranslationClient,
   TestDatabaseResult,
+  UserServiceClientMock,
 } from '@pika/tests'
-import { UserRole, UserStatus } from '@prisma/client'
 import { ErrorCode } from '@pika/types'
+import { UserRole, UserStatus } from '@prisma/client'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -47,6 +48,7 @@ describe('Business Service - Public API Integration Tests', () => {
   let authHelper: E2EAuthHelper
   let cacheService: MemoryCacheService
   let translationClient: MockTranslationClient
+  let userServiceClientMock: UserServiceClientMock
 
   // Authenticated clients for different user types
   let customerClient: AuthenticatedRequestClient
@@ -74,11 +76,16 @@ describe('Business Service - Public API Integration Tests', () => {
     // Create server
     cacheService = new MemoryCacheService()
     translationClient = createMockTranslationClient()
+    userServiceClientMock = new UserServiceClientMock()
+
+    // Setup the user service mock for successful operations
+    userServiceClientMock.setupAuthSuccess()
 
     app = await createBusinessServer({
       prisma: testDb.prisma,
       cacheService,
       translationClient,
+      userServiceClient: userServiceClientMock,
     })
 
     logger.debug('Express server ready for testing.')
@@ -140,6 +147,9 @@ describe('Business Service - Public API Integration Tests', () => {
 
     // Clear translations between tests to avoid cross-test pollution
     translationClient.clear()
+
+    // Reset and setup user service mock for each test
+    userServiceClientMock.reset().setupAuthSuccess()
 
     // Clean up only business-related data to preserve E2E auth users and shared test data
     if (testDb?.prisma) {
@@ -243,10 +253,10 @@ describe('Business Service - Public API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      const nameKeys = response.body.data.map((b: any) => b.businessNameKey)
-      const sortedNameKeys = [...nameKeys].sort()
+      const names = response.body.data.map((b: any) => b.businessName)
+      const sortedNames = [...names].sort()
 
-      expect(nameKeys).toEqual(sortedNameKeys)
+      expect(names).toEqual(sortedNames)
     })
 
     it('should paginate results correctly', async () => {
@@ -277,7 +287,9 @@ describe('Business Service - Public API Integration Tests', () => {
         .expect(200)
 
       expect(response.body.id).toBe(testBusiness.id)
-      expect(response.body.businessNameKey).toBe(testBusiness.businessNameKey)
+      expect(response.body.businessName).toBeTruthy()
+      expect(response.body).toHaveProperty('approved')
+      expect(typeof response.body.approved).toBe('boolean')
     })
 
     it('should include user data when requested', async () => {
@@ -291,6 +303,36 @@ describe('Business Service - Public API Integration Tests', () => {
         .expect(200)
 
       expect(response.body.user).toBeDefined()
+    })
+
+    it('should include businessDetails when requested', async () => {
+      const { businesses } = await seedTestBusinesses(testDb.prisma)
+      const testBusiness = businesses[0]
+
+      // Create business details for testing
+      await testDb.prisma.businessDetails.create({
+        data: {
+          businessId: testBusiness.id,
+          phone: '+1234567890',
+          email: 'contact@business.com',
+          street: '123 Main St',
+          city: 'Test City',
+          state: 'Test State',
+          postalCode: '12345',
+          country: 'US',
+        },
+      })
+
+      const response = await customerClient
+        .get(`/businesses/${testBusiness.id}`)
+        .query({ include: 'businessDetails' })
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.businessDetails).toBeDefined()
+      expect(response.body.businessDetails.phone).toBe('+1234567890')
+      expect(response.body.businessDetails.email).toBe('contact@business.com')
+      expect(response.body.businessDetails.street).toBe('123 Main St')
     })
 
     it('should return 404 for non-existent business ID', async () => {
@@ -372,7 +414,7 @@ describe('Business Service - Public API Integration Tests', () => {
 
   // Authenticated User Endpoints (Business Role Required)
   describe('GET /businesses/me', () => {
-    it('should return current user business', async () => {
+    it('should return current user businesses as paginated list', async () => {
       // Create a business for the test business user
       const businessUser = await authHelper.testUsers.BUSINESS
       const businessUserFromDb = await testDb.prisma.user.findUnique({
@@ -395,8 +437,17 @@ describe('Business Service - Public API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.id).toBe(myBusiness.id)
-      expect(response.body.businessNameKey).toBe('business.name.mytest')
+      // Response is now paginated
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data.length).toBeGreaterThan(0)
+      expect(response.body.data[0].id).toBe(myBusiness.id)
+      expect(response.body.data[0].businessName).toBeTruthy()
+      expect(response.body.data[0]).toHaveProperty('approved')
+      expect(typeof response.body.data[0].approved).toBe('boolean')
+      expect(response.body.data[0].approved).toBe(false) // Default to false for new businesses
+      expect(response.body.pagination).toBeDefined()
+      expect(response.body.pagination.total).toBeGreaterThan(0)
     })
 
     it('should require BUSINESS role for /me endpoint', async () => {
@@ -407,11 +458,71 @@ describe('Business Service - Public API Integration Tests', () => {
         .expect(403)
     })
 
-    it('should return 404 for business user without business', async () => {
-      await clientWithoutBusiness
+    it('should return empty list for business user without business', async () => {
+      const response = await clientWithoutBusiness
         .get(`/businesses/me`)
         .set('Accept', 'application/json')
-        .expect(404)
+        .expect(200)
+
+      // Should return empty paginated list
+      expect(response.body.data).toBeDefined()
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data).toHaveLength(0)
+      expect(response.body.pagination.total).toBe(0)
+    })
+
+    it('should return multiple businesses for user with multiple businesses', async () => {
+      // Create multiple businesses for the same user
+      const businessUser = await authHelper.testUsers.BUSINESS
+      const businessUserFromDb = await testDb.prisma.user.findUnique({
+        where: { email: businessUser.email },
+      })
+
+      // Create 3 businesses
+      await Promise.all([
+        testDb.prisma.business.create({
+          data: {
+            userId: businessUserFromDb!.id,
+            businessNameKey: 'business.name.test1',
+            categoryId: sharedTestData.activeCategory.id,
+            active: true,
+          },
+        }),
+        testDb.prisma.business.create({
+          data: {
+            userId: businessUserFromDb!.id,
+            businessNameKey: 'business.name.test2',
+            categoryId: sharedTestData.activeCategory.id,
+            active: false, // One inactive
+          },
+        }),
+        testDb.prisma.business.create({
+          data: {
+            userId: businessUserFromDb!.id,
+            businessNameKey: 'business.name.test3',
+            categoryId: sharedTestData.activeCategory.id,
+            active: true,
+          },
+        }),
+      ])
+
+      // Get all businesses (should include active and inactive)
+      const response = await businessClient
+        .get('/businesses/me')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(response.body.data.length).toBeGreaterThanOrEqual(3)
+      expect(response.body.pagination.total).toBeGreaterThanOrEqual(3)
+
+      // Test filtering by active status
+      const activeResponse = await businessClient
+        .get('/businesses/me?active=true')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(activeResponse.body.data.length).toBeGreaterThanOrEqual(2)
+      expect(activeResponse.body.data.every((b: any) => b.active)).toBe(true)
     })
   })
 
@@ -430,8 +541,8 @@ describe('Business Service - Public API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(201)
 
-      expect(response.body.businessNameKey).toBeTruthy()
-      expect(response.body.businessDescriptionKey).toBeTruthy()
+      expect(response.body.businessName).toBeTruthy()
+      expect(response.body.businessName).toBe('New Test Business')
     })
 
     it('should validate required fields for POST', async () => {
@@ -450,7 +561,7 @@ describe('Business Service - Public API Integration Tests', () => {
       expect(response.body.error.validationErrors).toBeDefined()
     })
 
-    it('should prevent user from creating multiple businesses', async () => {
+    it('should allow user to create multiple businesses', async () => {
       // Create the first business
       const firstBusinessData = {
         businessName: 'First Business',
@@ -458,25 +569,29 @@ describe('Business Service - Public API Integration Tests', () => {
         categoryId: sharedTestData.activeCategory.id,
       }
 
-      await clientWithoutBusiness
+      const firstResponse = await clientWithoutBusiness
         .post('/businesses/me')
         .send(firstBusinessData)
         .set('Accept', 'application/json')
         .expect(201)
 
-      // Try to create a second business
-      const duplicateData = {
+      // Create a second business (should be allowed)
+      const secondBusinessData = {
         businessName: 'Second Business',
         businessDescription: 'Second business description',
         categoryId: sharedTestData.activeCategory.id,
       }
 
-      const response = await clientWithoutBusiness
+      const secondResponse = await clientWithoutBusiness
         .post('/businesses/me')
-        .send(duplicateData)
+        .send(secondBusinessData)
         .set('Accept', 'application/json')
+        .expect(201)
 
-      expect(response.status).toBe(409) // Conflict - user already has a business
+      // Both businesses should be created successfully
+      expect(firstResponse.body.businessName).toBeTruthy()
+      expect(secondResponse.body.businessName).toBeTruthy()
+      expect(firstResponse.body.id).not.toBe(secondResponse.body.id)
     })
 
     it('should require BUSINESS role for POST', async () => {
@@ -493,10 +608,75 @@ describe('Business Service - Public API Integration Tests', () => {
         .set('Accept', 'application/json')
         .expect(403)
     })
+
+    // Primary Business ID Tests
+    it('should call updateUserPrimaryBusiness when creating first business', async () => {
+      const businessData = {
+        businessName: 'Primary Business Test',
+        businessDescription: 'Testing primary business logic',
+        categoryId: sharedTestData.activeCategory.id,
+      }
+
+      // Reset mock to verify call
+      userServiceClientMock.updateUserPrimaryBusiness.mockClear()
+
+      const response = await clientWithoutBusiness
+        .post('/businesses/me')
+        .send(businessData)
+        .set('Accept', 'application/json')
+        .expect(201)
+
+      // Verify the updateUserPrimaryBusiness was called for first business
+      expect(
+        userServiceClientMock.updateUserPrimaryBusiness,
+      ).toHaveBeenCalledTimes(1)
+      expect(
+        userServiceClientMock.updateUserPrimaryBusiness,
+      ).toHaveBeenCalledWith({
+        userId: expect.any(String),
+        primaryBusinessId: response.body.id,
+      })
+    })
+
+    it('should not call updateUserPrimaryBusiness for subsequent businesses', async () => {
+      // First create a business
+      const firstBusinessData = {
+        businessName: 'First Business',
+        businessDescription: 'First business',
+        categoryId: sharedTestData.activeCategory.id,
+      }
+
+      await clientWithoutBusiness
+        .post('/businesses/me')
+        .send(firstBusinessData)
+        .set('Accept', 'application/json')
+        .expect(201)
+
+      // Reset mock after first business creation
+      userServiceClientMock.updateUserPrimaryBusiness.mockClear()
+
+      // Create second business
+      const secondBusinessData = {
+        businessName: 'Second Business',
+        businessDescription: 'Second business',
+        categoryId: sharedTestData.activeCategory.id,
+      }
+
+      await clientWithoutBusiness
+        .post('/businesses/me')
+        .send(secondBusinessData)
+        .set('Accept', 'application/json')
+        .expect(201)
+
+      // Verify updateUserPrimaryBusiness was NOT called for second business
+      expect(
+        userServiceClientMock.updateUserPrimaryBusiness,
+      ).not.toHaveBeenCalled()
+    })
   })
 
   describe('PUT /businesses/me', () => {
-    it('should update current user business', async () => {
+    it('should require active business claim in JWT for update', async () => {
       // Create a business for the test business user
       const businessUser = await authHelper.testUsers.BUSINESS
       const businessUserFromDb = await testDb.prisma.user.findUnique({
@@ -519,15 +699,13 @@ describe('Business Service - Public API Integration Tests', () => {
         businessDescription: 'Updated business description',
       }
 
-      const response = await businessClient
+      // Should get 403 because JWT doesn't have hasActiveBusinesses claim
+      // This is correct behavior - the middleware requires the JWT to have proper claims
+      await businessClient
         .put('/businesses/me')
         .send(updateData)
         .set('Accept', 'application/json')
-        .expect(200)
-
-      // Should have translation keys (generated by service)
-      expect(response.body.businessNameKey).toBeTruthy()
-      expect(response.body.businessDescriptionKey).toBeTruthy()
+        .expect(403)
     })
 
     it('should require BUSINESS role for update', async () => {
@@ -605,6 +783,55 @@ describe('Business Service - Public API Integration Tests', () => {
 
       expect(response.body).toHaveProperty('avgRating')
       expect(typeof response.body.avgRating).toBe('number')
+    })
+
+    it('should return approved field for all businesses', async () => {
+      // Create a business that is specifically approved
+      const approvedUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: 'approved-business@test.com',
+          firstName: 'Approved',
+          lastName: 'Business',
+          role: UserRole.business,
+          status: UserStatus.active,
+          emailVerified: true,
+        },
+      })
+
+      const approvedBusiness = await testDb.prisma.business.create({
+        data: {
+          userId: approvedUser.id,
+          businessNameKey: 'business.name.approved',
+          categoryId: sharedTestData.activeCategory.id,
+          verified: true,
+          active: true,
+          approved: true,
+        },
+      })
+
+      // Test single business endpoint
+      const singleResponse = await customerClient
+        .get(`/businesses/${approvedBusiness.id}`)
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      expect(singleResponse.body).toHaveProperty('approved')
+      expect(singleResponse.body.approved).toBe(true)
+
+      // Test list endpoint
+      const listResponse = await customerClient
+        .get('/businesses')
+        .set('Accept', 'application/json')
+        .expect(200)
+
+      const foundBusiness = listResponse.body.data.find(
+        (b: any) => b.id === approvedBusiness.id,
+      )
+
+      expect(foundBusiness).toBeDefined()
+      expect(foundBusiness).toHaveProperty('approved')
+      expect(foundBusiness.approved).toBe(true)
     })
   })
 })

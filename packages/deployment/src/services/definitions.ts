@@ -2,6 +2,7 @@ import { createAuthServer } from '@pika/auth-service'
 import { createBusinessServer } from '@pika/business'
 import { createCategoryServer } from '@pika/category'
 import { createCommunicationServer } from '@pika/communication'
+import { EMAIL_FROM, EMAIL_FROM_NAME } from '@pika/environment'
 import { createPaymentServer } from '@pika/payment'
 import { createPDFServer } from '@pika/pdf'
 import { createStorageServer } from '@pika/storage'
@@ -136,8 +137,8 @@ export function getServiceDefinitions(): ServiceDefinition[] {
           cacheService: deps.cache,
           emailConfig: {
             region: 'us-east-1',
-            fromEmail: process.env.EMAIL_FROM || 'noreply@pika.com',
-            fromName: 'Pika',
+            fromEmail: EMAIL_FROM,
+            fromName: EMAIL_FROM_NAME,
           },
         })
 

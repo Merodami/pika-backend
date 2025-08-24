@@ -1,12 +1,10 @@
 import { supportCommon, supportPublic } from '@pika/api'
-import { REDIS_DEFAULT_TTL } from '@pika/environment'
 import {
   getValidatedQuery,
   paginatedResponse,
   RequestContext,
   validateResponse,
 } from '@pika/http'
-import { Cache, httpRequestKeyGenerator } from '@pika/redis'
 import { SupportCommentMapper } from '@pika/sdk'
 import type { ISupportCommentService } from '@support/services/SupportCommentService.js'
 import type { NextFunction, Request, Response } from 'express'
@@ -28,11 +26,6 @@ export class SupportCommentController {
    * GET /support-comments/problem/:problemId
    * Get comments for a support ticket
    */
-  @Cache({
-    ttl: REDIS_DEFAULT_TTL,
-    prefix: 'problem-comments',
-    keyGenerator: httpRequestKeyGenerator,
-  })
   async getCommentsByProblemId(
     request: Request<supportCommon.ProblemIdForCommentsParam>,
     response: Response,

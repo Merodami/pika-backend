@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "logs": {
+      "minItems": 1,
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": ["email", "sms", "push", "inApp", "webhook"]
+          },
+          "direction": {
+            "default": "outbound",
+            "type": "string",
+            "enum": ["inbound", "outbound"]
+          },
+          "status": {
+            "default": "pending",
+            "type": "string",
+            "enum": [
+              "pending",
+              "queued",
+              "sent",
+              "delivered",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "recipient": {
+            "type": "string"
+          },
+          "sender": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "templateId": {
+            "description": "Universally Unique Identifier",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "templateName": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "messageId": {
+            "type": "string"
+          },
+          "conversationId": {
+            "type": "string"
+          },
+          "referenceId": {
+            "type": "string"
+          },
+          "referenceType": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["channel", "direction", "status"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["logs"],
+  "additionalProperties": false
+}

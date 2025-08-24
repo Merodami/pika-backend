@@ -269,7 +269,12 @@ export const MembershipHistoryEntry = z.object({
   toPlan: PlanType.optional(),
   reason: z.string().optional(),
   timestamp: DateTime,
-  metadata: z.record(z.string(), z.any()).optional(),
+  metadata: z
+    .record(
+      z.string(),
+      z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    )
+    .optional(),
 })
 
 export type MembershipHistoryEntry = z.infer<typeof MembershipHistoryEntry>

@@ -37,7 +37,7 @@ export interface VoucherCodeDTO {
 export interface VoucherDTO {
   id: string
   businessId: string
-  categoryId: string
+  categoryId?: string
   state: VoucherStateType
   title: string // Localized by TranslationService before sending to client
   description: string // Localized by TranslationService before sending to client
@@ -63,7 +63,7 @@ export interface VoucherDTO {
 // Internal types that represent the data after Zod transformation
 export interface CreateVoucherRequestData {
   businessId: string
-  categoryId: string
+  categoryId?: string
   title: Record<string, string>
   description: Record<string, string>
   termsAndConditions: Record<string, string>
@@ -80,6 +80,7 @@ export interface CreateVoucherRequestData {
 }
 
 export interface UpdateVoucherRequestData {
+  categoryId?: string
   title?: Record<string, string>
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>
@@ -110,7 +111,7 @@ export interface BulkVoucherUpdateData {
 
 export interface CreateVoucherDTO {
   businessId: string
-  categoryId: string
+  categoryId?: string
   title: Record<string, string> // Multilingual content: { es: "...", en: "..." }
   description: Record<string, string>
   termsAndConditions: Record<string, string>

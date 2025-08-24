@@ -13,6 +13,7 @@ export enum EmailTemplateKey {
   PASSWORD_RESET = 'passwordReset',
   PASSWORD_RESET_CONFIRMATION = 'passwordResetConfirmation',
   WELCOME = 'welcome',
+  WELCOME_SOCIAL = 'welcomeSocial',
 
   // Booking templates
   BOOKING_CONFIRMATION = 'bookingConfirmation',
@@ -60,6 +61,10 @@ export interface WelcomeVariables extends BaseTemplateVariables {
   // No additional variables required
 }
 
+export interface WelcomeSocialVariables extends BaseTemplateVariables {
+  provider?: string // OAuth provider name (Google, Facebook, etc.)
+}
+
 export interface BookingConfirmationVariables extends BaseTemplateVariables {
   sessionType: string
   trainerName: string
@@ -84,5 +89,6 @@ export type TemplateVariables =
   | EmailVerificationVariables
   | PasswordResetVariables
   | WelcomeVariables
+  | WelcomeSocialVariables
   | BookingConfirmationVariables
   | PaymentVariables

@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "page": {
+      "description": "Page number",
+      "default": 1,
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "limit": {
+      "description": "Items per page",
+      "default": 20,
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 100
+    },
+    "sortBy": {
+      "default": "createdAt",
+      "type": "string",
+      "enum": ["createdAt", "sentAt", "deliveredAt"]
+    },
+    "sortOrder": {
+      "description": "Sort order",
+      "default": "desc",
+      "type": "string",
+      "enum": ["asc", "desc"]
+    },
+    "search": {
+      "description": "Search query",
+      "type": "string"
+    },
+    "fromDate": {
+      "description": "Start date (ISO 8601)",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "toDate": {
+      "description": "End date (ISO 8601)",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+    },
+    "channel": {
+      "type": "string",
+      "enum": ["email", "sms", "push", "inApp", "webhook"]
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["inbound", "outbound"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "queued", "sent", "delivered", "failed", "cancelled"]
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "recipient": {
+      "type": "string"
+    },
+    "templateId": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "conversationId": {
+      "type": "string"
+    },
+    "referenceId": {
+      "type": "string"
+    },
+    "referenceType": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hasOpened": {
+      "type": "boolean"
+    },
+    "hasClicked": {
+      "type": "boolean"
+    },
+    "hasFailed": {
+      "type": "boolean"
+    }
+  },
+  "required": ["page", "limit", "sortBy", "sortOrder"],
+  "additionalProperties": false
+}

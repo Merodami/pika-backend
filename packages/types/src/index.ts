@@ -8,6 +8,7 @@ export * from './enums/index.js'
 export * from './errorCodes.js'
 export * from './geolocation/index.js'
 export * from './types.js'
+export * from './userSettings.js'
 export * from './utils.js'
 
 // Export common primitives

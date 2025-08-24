@@ -1,0 +1,204 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "planId": {
+      "description": "Universally Unique Identifier",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "planType": {
+      "description": "Plan type (for backward compatibility)",
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "canceled",
+        "incomplete",
+        "incompleteExpired",
+        "pastDue",
+        "trialing",
+        "unpaid"
+      ]
+    },
+    "billingInterval": {
+      "description": "Billing interval (for backward compatibility)",
+      "type": "string"
+    },
+    "currentPeriodStart": {
+      "description": "Current billing period start date",
+      "type": "string"
+    },
+    "currentPeriodEnd": {
+      "description": "Current billing period end date",
+      "type": "string"
+    },
+    "trialEnd": {
+      "description": "Trial end date",
+      "type": "string"
+    },
+    "cancelAtPeriodEnd": {
+      "description": "Whether to cancel at period end",
+      "default": false,
+      "type": "boolean"
+    },
+    "stripeCustomerId": {
+      "description": "Stripe customer ID",
+      "type": "string"
+    },
+    "stripeSubscriptionId": {
+      "description": "Stripe subscription ID",
+      "type": "string"
+    },
+    "stripePriceId": {
+      "description": "Stripe price ID",
+      "type": "string"
+    },
+    "startDate": {
+      "description": "Subscription start date",
+      "type": "string"
+    },
+    "endDate": {
+      "description": "Subscription end date",
+      "type": "string"
+    },
+    "lastProcessedAt": {
+      "description": "Last credit processing date",
+      "type": "string"
+    },
+    "cancelledAt": {
+      "description": "Cancellation date",
+      "type": "string"
+    },
+    "createdAt": {
+      "description": "When the record was created",
+      "type": "string"
+    },
+    "updatedAt": {
+      "description": "When the record was last updated",
+      "type": "string"
+    },
+    "plan": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Universally Unique Identifier",
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        },
+        "name": {
+          "description": "Name of the subscription plan",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the subscription plan",
+          "type": "string"
+        },
+        "price": {
+          "description": "Price per billing period",
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "description": "Currency code (e.g., usd, gbp)",
+          "default": "USD",
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3
+        },
+        "interval": {
+          "type": "string",
+          "enum": ["day", "week", "month", "year"]
+        },
+        "intervalCount": {
+          "description": "Number of intervals between billings",
+          "default": 1,
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "trialPeriodDays": {
+          "description": "Number of trial days",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "features": {
+          "description": "Array of feature descriptions",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "description": "Additional configuration",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {}
+        },
+        "stripeProductId": {
+          "description": "Stripe product ID",
+          "type": "string"
+        },
+        "stripePriceId": {
+          "description": "Stripe price ID",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "When the record was created",
+          "type": "string"
+        },
+        "updatedAt": {
+          "description": "When the record was last updated",
+          "type": "string"
+        },
+        "isActive": {
+          "description": "Whether the record is active",
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "price",
+        "currency",
+        "interval",
+        "intervalCount",
+        "features",
+        "createdAt",
+        "updatedAt",
+        "isActive"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "id",
+    "userId",
+    "planType",
+    "status",
+    "billingInterval",
+    "cancelAtPeriodEnd",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false
+}

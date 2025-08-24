@@ -11,8 +11,13 @@ import type { ParsedIncludes } from '@pika/types'
 import type { PaginatedResult, VoucherState } from '@pika/types'
 import { CustomerVoucherStatus, VoucherCodeType } from '@pika/types'
 import { Prisma, PrismaClient } from '@prisma/client'
+import { set } from 'lodash-es'
 
 import type { VoucherSearchParams } from '../types/index.js'
+import {
+  RedemptionAnalyticsRepository,
+  type VoucherRedemptionLogData,
+} from './RedemptionAnalyticsRepository.js'
 
 export interface IVoucherRepository {
   findAll(params: VoucherSearchParams): Promise<PaginatedResult<VoucherDomain>>
@@ -43,6 +48,7 @@ export interface IVoucherRepository {
   redeemVoucher(
     voucherId: string,
     userId: string,
+    redemptionData?: VoucherRedemptionLogData,
   ): Promise<CustomerVoucherDomain>
   findCustomerVoucher(
     userId: string,
@@ -60,27 +66,20 @@ export interface IVoucherRepository {
 }
 
 export class VoucherRepository implements IVoucherRepository {
+  private redemptionAnalytics: RedemptionAnalyticsRepository
+
   constructor(
     private readonly prisma: PrismaClient,
     private readonly cache?: ICacheService,
-  ) {}
+  ) {
+    this.redemptionAnalytics = new RedemptionAnalyticsRepository(prisma, cache)
+  }
 
   async findAll(
     params: VoucherSearchParams = {},
   ): Promise<PaginatedResult<VoucherDomain>> {
     try {
       const {
-        businessId,
-        type,
-        state,
-        search,
-        minValue,
-        maxValue,
-        minDiscount,
-        maxDiscount,
-        validFrom,
-        validUntil,
-        maxRedemptions,
         page = 1,
         limit = PAGINATION_DEFAULT_LIMIT,
         sortBy = 'createdAt',
@@ -88,60 +87,7 @@ export class VoucherRepository implements IVoucherRepository {
         parsedIncludes,
       } = params
 
-      const where: any = {
-        deletedAt: null,
-      }
-
-      // General search across multiple fields
-      if (search) {
-        where.OR = [
-          { titleKey: { contains: search, mode: 'insensitive' } },
-          { qrCode: { contains: search, mode: 'insensitive' } },
-        ]
-      }
-
-      if (businessId) {
-        where.businessId = businessId
-      }
-
-      if (type) {
-        where.type = type
-      }
-
-      if (state) {
-        if (Array.isArray(state)) {
-          where.state = { in: state }
-        } else {
-          where.state = state
-        }
-      }
-
-      // Value filters
-      if (minValue !== undefined || maxValue !== undefined) {
-        where.value = {}
-        if (minValue !== undefined) where.value.gte = minValue
-        if (maxValue !== undefined) where.value.lte = maxValue
-      }
-
-      // Discount filters
-      if (minDiscount !== undefined || maxDiscount !== undefined) {
-        where.discount = {}
-        if (minDiscount !== undefined) where.discount.gte = minDiscount
-        if (maxDiscount !== undefined) where.discount.lte = maxDiscount
-      }
-
-      // Date filters
-      if (validFrom) {
-        where.validFrom = { lte: validFrom }
-      }
-
-      if (validUntil) {
-        where.validUntil = { gte: validUntil }
-      }
-
-      if (maxRedemptions !== undefined) {
-        where.maxRedemptions = { gte: maxRedemptions }
-      }
+      const where = this.buildWhereClause(params)
 
       const orderBy = this.buildOrderBy(sortBy, sortOrder)
       const include = this.buildInclude(parsedIncludes)
@@ -584,6 +530,7 @@ export class VoucherRepository implements IVoucherRepository {
   async redeemVoucher(
     voucherId: string,
     userId: string,
+    redemptionData?: VoucherRedemptionLogData,
   ): Promise<CustomerVoucherDomain> {
     try {
       // Update customer voucher to redeemed status
@@ -605,6 +552,28 @@ export class VoucherRepository implements IVoucherRepository {
 
       // Increment the voucher's redemption count
       await this.incrementRedemptions(voucherId)
+
+      // Log redemption asynchronously - non-blocking
+      this.redemptionAnalytics
+        .logRedemption(
+          voucherId,
+          userId,
+          customerVoucher.voucher,
+          redemptionData,
+        )
+        .catch((error) => {
+          // Log error to APM/monitoring but don't block the user
+          logger.error('Failed to log voucher redemption', {
+            error,
+            voucherId,
+            userId,
+            redemptionData,
+            severity: 'warning',
+            alertType: 'redemption_logging_failed',
+          })
+          // Here you would send to your APM service (e.g., Sentry, DataDog, etc.)
+          // Example: Sentry.captureException(error, { tags: { type: 'redemption_log_failure' } })
+        })
 
       return VoucherMapper.mapCustomerVoucherFromDocument(
         this.convertPrismaCustomerVoucherToDocument(customerVoucher),
@@ -747,6 +716,64 @@ export class VoucherRepository implements IVoucherRepository {
       createdAt: prismaCustomerVoucher.createdAt,
       updatedAt: prismaCustomerVoucher.updatedAt,
       voucher: prismaCustomerVoucher.voucher || undefined,
+    }
+  }
+
+  private buildWhereClause(params: VoucherSearchParams): any {
+    const {
+      businessId,
+      type,
+      state,
+      search,
+      minValue,
+      maxValue,
+      minDiscount,
+      maxDiscount,
+      validFrom,
+      validUntil,
+      maxRedemptions,
+    } = params
+
+    const where: any = { deletedAt: null }
+
+    // Basic filters
+    if (businessId) where.businessId = businessId
+    if (type) where.type = type
+    if (search) {
+      where.OR = [
+        { titleKey: { contains: search, mode: 'insensitive' } },
+        { qrCode: { contains: search, mode: 'insensitive' } },
+      ]
+    }
+
+    // State filter (array or single value)
+    if (state) {
+      where.state = Array.isArray(state) ? { in: state } : state
+    }
+
+    // Range filters
+    this.addRangeFilter(where, 'value', minValue, maxValue)
+    this.addRangeFilter(where, 'discount', minDiscount, maxDiscount)
+
+    // Date filters
+    if (validFrom) where.validFrom = { lte: validFrom }
+    if (validUntil) where.validUntil = { gte: validUntil }
+    if (maxRedemptions !== undefined)
+      where.maxRedemptions = { gte: maxRedemptions }
+
+    return where
+  }
+
+  private addRangeFilter(
+    where: any,
+    field: string,
+    min?: number,
+    max?: number,
+  ): void {
+    if (min !== undefined || max !== undefined) {
+      set(where, field, {})
+      if (min !== undefined) set(where, `${field}.gte`, min)
+      if (max !== undefined) set(where, `${field}.lte`, max)
     }
   }
 }

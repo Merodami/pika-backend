@@ -21,10 +21,10 @@ export const SMTP_PASSWORD = getEnvVariable(
 export const EMAIL_FROM = getEnvVariable(
   'EMAIL_FROM',
   String,
-  'noreply@pika.com',
+  'noreply@thevoucherbook.com',
 )
 export const EMAIL_FROM_NAME = getEnvVariable(
   'EMAIL_FROM_NAME',
   String,
-  'Pika Gym Platform',
+  'The VoucherBook',
 )

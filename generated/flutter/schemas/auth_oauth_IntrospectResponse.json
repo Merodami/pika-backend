@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "active": {
+      "description": "Whether token is active",
+      "type": "boolean"
+    },
+    "scope": {
+      "description": "Token scopes",
+      "type": "string"
+    },
+    "username": {
+      "description": "User email",
+      "type": "string"
+    },
+    "tokenType": {
+      "type": "string",
+      "const": "Bearer"
+    },
+    "exp": {
+      "description": "Expiration time (Unix timestamp)",
+      "type": "number"
+    },
+    "iat": {
+      "description": "Issued at (Unix timestamp)",
+      "type": "number"
+    },
+    "sub": {
+      "description": "Subject (user ID)",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "userId": {
+      "description": "User ID",
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "userEmail": {
+      "description": "User email",
+      "type": "string"
+    },
+    "userRole": {
+      "type": "string",
+      "enum": ["admin", "customer", "business"]
+    }
+  },
+  "required": ["active"],
+  "additionalProperties": false
+}
