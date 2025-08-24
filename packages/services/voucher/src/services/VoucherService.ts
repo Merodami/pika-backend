@@ -21,6 +21,8 @@ import type { TranslationClient, TranslationResolver } from '@pika/translation'
 import {
   type LanguageCode,
   type PaginatedResult,
+  VoucherRedemptionMethod,
+  VoucherRedemptionType,
   VoucherScanSource,
   VoucherScanType,
   VoucherState,
@@ -488,10 +490,31 @@ export class VoucherService implements IVoucherService {
         )
       }
 
+      // Prepare redemption log data
+      const redemptionLogData = {
+        businessId: voucher.businessId,
+        location: data.location,
+        locationName: data.locationName,
+        deviceInfo: data.deviceInfo ? { platform: data.deviceInfo } : undefined,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+        transactionId: data.transactionId,
+        transactionAmount: data.transactionAmount,
+        discountApplied: voucher.discountValue || 0,
+        redemptionType:
+          (data.redemptionType as VoucherRedemptionType) ||
+          VoucherRedemptionType.APP,
+        redemptionMethod:
+          (data.redemptionMethod as VoucherRedemptionMethod) ||
+          VoucherRedemptionMethod.MANUAL_CODE,
+        codeUsed: data.codeUsed,
+      }
+
       // Redeem the voucher in customer voucher table
       const redeemedCustomerVoucher = await this.repository.redeemVoucher(
         voucherId,
         userId,
+        redemptionLogData,
       )
 
       // Invalidate cache

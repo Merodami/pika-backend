@@ -98,6 +98,8 @@ export function mapRoleToPermissions(role: UserRole): string[] {
         // Reports and analytics
         'reports:read',
         'analytics:read',
+        'redemption-analytics:read',
+        'redemption-reports:read',
         // Admin specific
         'admin:dashboard',
         'admin:settings',
@@ -146,6 +148,8 @@ export function mapRoleToPermissions(role: UserRole): string[] {
         // Basic analytics for their business
         'analytics:read:own',
         'reports:read:own',
+        'redemption-analytics:read:own',
+        'redemption-reports:read:own',
         // Redemption management (own)
         'redemptions:read:own',
         'redemptions:write:own',

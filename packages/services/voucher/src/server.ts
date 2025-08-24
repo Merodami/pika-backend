@@ -10,6 +10,7 @@ import { PrismaClient } from '@prisma/client'
 
 import { createAdminVoucherRoutes } from './routes/AdminVoucherRoutes.js'
 import { createInternalVoucherRoutes } from './routes/InternalVoucherRoutes.js'
+import { createRedemptionAnalyticsRoutes } from './routes/RedemptionAnalyticsRoutes.js'
 import { createVoucherRoutes } from './routes/VoucherRoutes.js'
 
 /**
@@ -120,6 +121,14 @@ export async function createVoucherServer({
   )
 
   app.use('/admin/vouchers', adminRouter)
+
+  // Register redemption analytics routes
+  const redemptionAnalyticsRouter = createRedemptionAnalyticsRoutes(
+    prisma,
+    cacheService,
+  )
+
+  app.use('/admin/vouchers', redemptionAnalyticsRouter)
 
   // Register internal routes
   const internalRouter = createInternalVoucherRoutes(
