@@ -85,7 +85,6 @@ async function generateAdminSQL() {
   const adminPassword = generateSecurePassword()
   const hashedPassword = await bcrypt.hash(adminPassword, 12)
   const userId = crypto.randomUUID()
-  const authId = crypto.randomUUID()
   const timestamp = new Date().toISOString()
 
   // Generate a unique phone number for testing (optional)
@@ -101,76 +100,58 @@ async function generateAdminSQL() {
 -- Email: ${adminEmail}
 -- ============================================
 
--- IMPORTANT: Run these queries in order on your production database
+-- IMPORTANT: Run this query on your production database
 -- Keep the credentials secure and delete this file after use
 
 BEGIN;
 
--- 1. Create the user record (all fields validated as per schema)
+-- Create the admin user record
+-- Password is stored directly in the users table (bcrypt hashed)
 INSERT INTO users.users (
   id,
   email,
-  phone_number,
+  email_verified,
+  password,
   first_name,
   last_name,
-  avatar_url,
-  date_of_birth,
-  gender,
-  status,
-  email_verified,
+  phone_number,
   phone_verified,
-  is_active,
-  primary_business_id,
+  avatar_url,
+  role,
+  status,
+  last_login_at,
   created_at,
   updated_at,
-  deleted_at
+  deleted_at,
+  date_of_birth,
+  stripe_user_id,
+  preferred_language,
+  primary_business_id,
+  settings
 ) VALUES (
   '${userId}'::uuid,
   '${adminEmail}',
-  '${phoneNumber}',
+  true,  -- email_verified (admin users are pre-verified)
+  '${hashedPassword}',  -- bcrypt hashed password
   '${firstName}',
   '${lastName}',
-  NULL,
-  NULL,
-  NULL,
-  '${UserStatus.ACTIVE}',
-  true,  -- email_verified
-  true,  -- phone_verified
-  true,  -- is_active
+  '${phoneNumber}',
+  false,  -- phone_verified (not verified by default)
+  NULL,  -- avatar_url
+  '${UserRole.ADMIN}',  -- role: admin
+  '${UserStatus.ACTIVE}',  -- status: active
+  NOW(),  -- last_login_at
+  NOW(),  -- created_at
+  NOW(),  -- updated_at
+  NULL,  -- deleted_at
+  NULL,  -- date_of_birth
+  NULL,  -- stripe_user_id
+  'en',  -- preferred_language
   NULL,  -- primary_business_id
-  NOW(),
-  NOW(),
-  NULL
+  '{}'::jsonb  -- settings (empty JSON object)
 );
 
--- 2. Create the authentication record (all fields validated)
-INSERT INTO identity.user_auth (
-  id,
-  user_id,
-  email,
-  password_hash,
-  role,
-  is_email_verified,
-  is_phone_verified,
-  is_active,
-  last_login,
-  created_at,
-  updated_at
-) VALUES (
-  '${authId}'::uuid,
-  '${userId}'::uuid,
-  '${adminEmail}',
-  '${hashedPassword}',
-  '${UserRole.ADMIN}',
-  true,  -- is_email_verified
-  true,  -- is_phone_verified
-  true,  -- is_active
-  NOW(),
-  NOW(),
-  NOW()
-);
-
--- 3. Create user settings with default preferences
+-- Optional: Create user settings with default preferences
 INSERT INTO users.user_settings (
   id,
   user_id,
@@ -190,14 +171,14 @@ INSERT INTO users.user_settings (
   'light',
   true,
   true,
-  true,
-  false,
-  false,
+  false,  -- push_notifications off
+  false,  -- sms_notifications off
+  false,  -- marketing_emails off
   NOW(),
   NOW()
 );
 
--- 4. Optional: Set user language preference
+-- Optional: Set user language preference
 INSERT INTO i18n.user_language_preferences (
   id,
   user_id,
@@ -220,17 +201,17 @@ COMMIT;
 -- Run this to verify the admin user was created:
 
 SELECT 
-  u.id,
-  u.email,
-  u.first_name,
-  u.last_name,
-  ua.role,
-  u.status,
-  u.email_verified,
-  u.created_at
-FROM users.users u
-JOIN identity.user_auth ua ON u.id = ua.user_id
-WHERE u.email = '${adminEmail}';
+  id,
+  email,
+  first_name,
+  last_name,
+  role,
+  status,
+  email_verified,
+  password IS NOT NULL as has_password,
+  created_at
+FROM users.users
+WHERE email = '${adminEmail}';
 `.trim()
 
   // Create filename based on email (sanitized)
@@ -271,7 +252,6 @@ IMPORTANT SECURITY NOTES:
 5. Enable 2FA as soon as possible
 
 User ID: ${userId}
-Auth ID: ${authId}
 ========================================
 `.trim()
 

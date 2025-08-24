@@ -23,9 +23,17 @@ export function createDocsRouter(): Router {
     res: Response,
   ): Promise<void> => {
     try {
-      // Look for docs in the @pika/api package dist folder
-      const apiPackagePath = join(__dirname, '../../../../api/dist')
-      const docPath = join(apiPackagePath, filename)
+      // Look for docs in the api-gateway dist folder first (copied by generate:docs)
+      // This ensures Vercel deployment works correctly
+      const localDocsPath = join(__dirname, '../../../dist/docs', filename)
+      const fallbackPath = join(__dirname, '../../../../api/dist', filename)
+      
+      let docPath: string
+      if (existsSync(localDocsPath)) {
+        docPath = localDocsPath
+      } else {
+        docPath = fallbackPath
+      }
 
       if (!existsSync(docPath)) {
         res.status(404).json({
@@ -113,11 +121,16 @@ export function createDocsRouter(): Router {
     }
 
     try {
-      const apiPackagePath = join(
-        __dirname,
-        '../../../../api/generated/openapi',
-      )
-      const specPath = join(apiPackagePath, `${apiName}.json`)
+      // Look for OpenAPI specs in api-gateway dist folder first
+      const localSpecPath = join(__dirname, '../../../dist/docs/openapi', `${apiName}.json`)
+      const fallbackSpecPath = join(__dirname, '../../../../api/generated/openapi', `${apiName}.json`)
+      
+      let specPath: string
+      if (existsSync(localSpecPath)) {
+        specPath = localSpecPath
+      } else {
+        specPath = fallbackSpecPath
+      }
 
       if (!existsSync(specPath)) {
         res.status(404).json({

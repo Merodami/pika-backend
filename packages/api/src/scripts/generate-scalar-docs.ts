@@ -468,6 +468,39 @@ async function generateScalarDocs() {
     writeFileSync(join(OUTPUT_DIR, 'api-docs-index.html'), indexHtml)
     console.log('✅ Generated modern api-docs-index.html')
 
+    // Copy documentation files to api-gateway for easy access in Vercel
+    const API_GATEWAY_DOCS_DIR = join(__dirname, '../../../api-gateway/dist/docs')
+    console.log('\n📋 Copying documentation to api-gateway for Vercel deployment...')
+    
+    // Create the api-gateway docs directory
+    mkdirSync(API_GATEWAY_DOCS_DIR, { recursive: true })
+    
+    // Copy only public API documentation files for production deployment
+    const docFiles = [
+      'public-api-docs.html',
+      'api-docs-index.html'
+    ]
+    
+    for (const file of docFiles) {
+      const sourcePath = join(OUTPUT_DIR, file)
+      const destPath = join(API_GATEWAY_DOCS_DIR, file)
+      const content = readFileSync(sourcePath, 'utf8')
+      writeFileSync(destPath, content)
+      console.log(`  📄 Copied ${file}`)
+    }
+    
+    // Also copy only public API OpenAPI JSON spec
+    const OPENAPI_DEST_DIR = join(API_GATEWAY_DOCS_DIR, 'openapi')
+    mkdirSync(OPENAPI_DEST_DIR, { recursive: true })
+    
+    // Only copy public API spec for production
+    const publicApiFile = 'public-api.json'
+    const sourcePath = join(OPENAPI_DIR, publicApiFile)
+    const destPath = join(OPENAPI_DEST_DIR, publicApiFile)
+    const content = readFileSync(sourcePath, 'utf8')
+    writeFileSync(destPath, content)
+    console.log(`  📋 Copied ${publicApiFile}`)
+
     console.log('\n🎉 Scalar documentation generated successfully!')
     console.log('\nView your beautiful API docs:')
     console.log('  📖 Index: yarn open:docs:all')

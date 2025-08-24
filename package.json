@@ -85,6 +85,7 @@
     "db:generate-test-dump": "dotenv -e .env -- sh ./packages/tests/src/scripts/generate_test_init_sql.sh",
     "clear": "find . -name \"node_modules\" -type d -prune -exec rm -rf '{}' + && find . -name \"dist\" -type d -prune -exec rm -rf '{}' +",
     "user:create": "nx run @pika/auth:generate-user",
+    "user:create-sql": "tsx scripts/generate-admin-sql.ts",
     "generate:test-tokens": "tsx scripts/generate-long-lived-token.ts",
     "show:test-tokens": "cd tools/api-testing && yarn show:tokens",
     "generate": "yarn generate:api && yarn generate:docs",
