@@ -19,11 +19,8 @@ import {
   JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
   JWT_SECRET,
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  FACEBOOK_APP_ID,
-  FACEBOOK_APP_SECRET,
   FIREBASE_AUTH_EMULATOR_HOST,
+  NODE_ENV,
 } from '@pika/environment'
 import { type ICacheService } from '@pika/redis'
 import {

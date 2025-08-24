@@ -100,6 +100,8 @@ export async function createUserServer({
   // Register favorite routes
   const favoriteRouter = createFavoriteRoutes(prisma, cacheService)
   app.use('/users/me/favorites', favoriteRouter)
+  // Also mount at /favorites for direct API gateway access
+  app.use('/favorites', favoriteRouter)
 
   // Register admin routes
   const adminRouter = createAdminUserRouter(
