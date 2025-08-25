@@ -20,7 +20,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "rm -rf dist && tsc -p tsconfig.json",
+        "command": "rm -rf dist && tsc -p tsconfig.json && cp -r src/docs dist/docs 2>/dev/null || echo 'No docs folder to copy'",
         "cwd": "{projectRoot}"
       },
       "outputs": ["{projectRoot}/dist"]
