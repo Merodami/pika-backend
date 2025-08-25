@@ -223,14 +223,13 @@ async function startGateway(): Promise<Express> {
     }),
   )
 
+  // Set up documentation routes BEFORE proxy routes to avoid conflicts
+  const docsRouter = createDocsRouter()
+  app.use('/api/v1/docs', docsRouter)
+
   // Configure routing
   configureRoutes(app)
   logConfiguration()
-
-  // Set up documentation routes (after authentication)
-  const docsRouter = createDocsRouter()
-
-  app.use('/api/v1/docs', docsRouter)
   
   // Direct public API docs access
   app.get('/api/v1/public-api-docs.html', (req, res) => {

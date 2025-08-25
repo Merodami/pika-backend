@@ -151,33 +151,6 @@ INSERT INTO users.users (
   '{}'::jsonb  -- settings (empty JSON object)
 );
 
--- Optional: Create user settings with default preferences
-INSERT INTO users.user_settings (
-  id,
-  user_id,
-  language,
-  theme,
-  notifications_enabled,
-  email_notifications,
-  push_notifications,
-  sms_notifications,
-  marketing_emails,
-  created_at,
-  updated_at
-) VALUES (
-  gen_random_uuid(),
-  '${userId}'::uuid,
-  'en',
-  'light',
-  true,
-  true,
-  false,  -- push_notifications off
-  false,  -- sms_notifications off
-  false,  -- marketing_emails off
-  NOW(),
-  NOW()
-);
-
 -- Optional: Set user language preference
 INSERT INTO i18n.user_language_preferences (
   id,
