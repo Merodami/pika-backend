@@ -10,94 +10,158 @@ const SERVICE_ROUTES = [
   // =================================
   // PUBLIC ROUTES (/api/v1/*)
   // =================================
-  
+
   // Auth service - public routes
   { prefix: '/api/v1/auth', service: 'auth', mount: '/auth' },
-  
+
   // User service - public routes
   { prefix: '/api/v1/users', service: 'user', mount: '/users' },
-  { prefix: '/api/v1/favorites', service: 'user', mount: '/users/me/favorites' },
-  
+  {
+    prefix: '/api/v1/favorites',
+    service: 'user',
+    mount: '/users/me/favorites',
+  },
+
   // Business service - public routes
   { prefix: '/api/v1/businesses', service: 'business', mount: '/businesses' },
-  
+
   // Category service - public routes
   { prefix: '/api/v1/categories', service: 'category', mount: '/categories' },
-  
+
   // Payment service - public routes
   { prefix: '/api/v1/payments', service: 'payment', mount: '/payments' },
-  { prefix: '/api/v1/payments/webhooks', service: 'payment', mount: '/webhooks' },
+  {
+    prefix: '/api/v1/payments/webhooks',
+    service: 'payment',
+    mount: '/webhooks',
+  },
   { prefix: '/api/v1/products', service: 'payment', mount: '/' },
-  
+
   // Subscription service - public routes
-  { prefix: '/api/v1/subscriptions', service: 'subscription', mount: '/subscriptions' },
+  {
+    prefix: '/api/v1/subscriptions',
+    service: 'subscription',
+    mount: '/subscriptions',
+  },
   { prefix: '/api/v1/plans', service: 'subscription', mount: '/plans' },
-  
+
   // Communication service - public routes
-  { prefix: '/api/v1/communications', service: 'communication', mount: '/communications' },
-  
+  {
+    prefix: '/api/v1/communications',
+    service: 'communication',
+    mount: '/communications',
+  },
+
   // Support service - public routes
   { prefix: '/api/v1/support', service: 'support', mount: '/support' },
-  
+
   // Storage service - public routes
   { prefix: '/api/v1/storage', service: 'storage', mount: '/storage' },
   { prefix: '/api/v1/files', service: 'storage', mount: '/files' },
-  
+
   // PDF service - public routes
   { prefix: '/api/v1/pdf', service: 'pdf', mount: '/pdf' },
-  
+
   // Voucher service - public routes
   { prefix: '/api/v1/vouchers', service: 'voucher', mount: '/vouchers' },
-  
+
   // =================================
   // ADMIN ROUTES (/api/v1/admin/*)
   // =================================
-  
+
   // User service - admin routes
   { prefix: '/api/v1/admin/users', service: 'user', mount: '/admin/users' },
-  
+
   // Business service - admin routes
-  { prefix: '/api/v1/admin/businesses', service: 'business', mount: '/admin/businesses' },
-  
+  {
+    prefix: '/api/v1/admin/businesses',
+    service: 'business',
+    mount: '/admin/businesses',
+  },
+
   // Category service - admin routes
-  { prefix: '/api/v1/admin/categories', service: 'category', mount: '/admin/categories' },
-  
+  {
+    prefix: '/api/v1/admin/categories',
+    service: 'category',
+    mount: '/admin/categories',
+  },
+
   // Payment service - admin routes
-  { prefix: '/api/v1/admin/payments', service: 'payment', mount: '/admin/payments' },
-  
+  {
+    prefix: '/api/v1/admin/payments',
+    service: 'payment',
+    mount: '/admin/payments',
+  },
+
   // Subscription service - admin routes
-  { prefix: '/api/v1/admin/subscriptions', service: 'subscription', mount: '/admin/subscriptions' },
-  
+  {
+    prefix: '/api/v1/admin/subscriptions',
+    service: 'subscription',
+    mount: '/admin/subscriptions',
+  },
+
   // Communication service - admin routes
-  { prefix: '/api/v1/admin/communications', service: 'communication', mount: '/admin/communications' },
-  
+  {
+    prefix: '/api/v1/admin/communications',
+    service: 'communication',
+    mount: '/admin/communications',
+  },
+
   // Support service - admin routes
-  { prefix: '/api/v1/admin/support', service: 'support', mount: '/admin/support' },
-  
+  {
+    prefix: '/api/v1/admin/support',
+    service: 'support',
+    mount: '/admin/support',
+  },
+
   // Storage service - admin routes
   { prefix: '/api/v1/admin/files', service: 'storage', mount: '/admin/files' },
-  
+
   // Voucher service - admin routes
-  { prefix: '/api/v1/admin/vouchers', service: 'voucher', mount: '/admin/vouchers' },
-  
+  {
+    prefix: '/api/v1/admin/vouchers',
+    service: 'voucher',
+    mount: '/admin/vouchers',
+  },
+
   // =================================
   // INTERNAL ROUTES (/api/v1/internal/*)
   // =================================
-  
+
   // User service - internal routes
-  { prefix: '/api/v1/internal/users', service: 'user', mount: '/internal/users' },
-  
+  {
+    prefix: '/api/v1/internal/users',
+    service: 'user',
+    mount: '/internal/users',
+  },
+
   // Business service - internal routes
-  { prefix: '/api/v1/internal/businesses', service: 'business', mount: '/internal/businesses' },
-  
+  {
+    prefix: '/api/v1/internal/businesses',
+    service: 'business',
+    mount: '/internal/businesses',
+  },
+
   // Category service - internal routes
-  { prefix: '/api/v1/internal/categories', service: 'category', mount: '/internal/categories' },
-  
+  {
+    prefix: '/api/v1/internal/categories',
+    service: 'category',
+    mount: '/internal/categories',
+  },
+
   // Subscription service - internal routes
-  { prefix: '/api/v1/internal/subscriptions', service: 'subscription', mount: '/internal/subscriptions' },
-  
+  {
+    prefix: '/api/v1/internal/subscriptions',
+    service: 'subscription',
+    mount: '/internal/subscriptions',
+  },
+
   // Communication service - internal routes
-  { prefix: '/api/v1/internal/communications', service: 'communication', mount: '/internal/communications' },
+  {
+    prefix: '/api/v1/internal/communications',
+    service: 'communication',
+    mount: '/internal/communications',
+  },
 ]
 
 /**
