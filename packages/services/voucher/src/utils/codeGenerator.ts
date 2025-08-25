@@ -1,3 +1,4 @@
+import { prepareRSAKey } from '@pika/crypto'
 import {
   VOUCHER_CODE_ALPHABET,
   VOUCHER_JWT_ALGORITHM,
@@ -67,7 +68,12 @@ function generateQRToken(voucherId: string): string {
   }
 
   try {
-    return jwt.sign(payload, VOUCHER_JWT_PRIVATE_KEY, {
+    // Prepare the key for RS256/RS384/RS512 algorithms
+    const signingKey = VOUCHER_JWT_ALGORITHM.startsWith('RS')
+      ? prepareRSAKey(VOUCHER_JWT_PRIVATE_KEY, 'PRIVATE')
+      : VOUCHER_JWT_PRIVATE_KEY
+
+    return jwt.sign(payload, signingKey, {
       algorithm: VOUCHER_JWT_ALGORITHM as jwt.Algorithm,
       expiresIn: '365d', // Vouchers have their own expiration logic
     })
@@ -298,7 +304,12 @@ export function validateVoucherCode(
  */
 export function decodeQRToken(token: string): { voucherId: string } | null {
   try {
-    const decoded = jwt.verify(token, VOUCHER_JWT_PRIVATE_KEY, {
+    // Prepare the key for RS256/RS384/RS512 algorithms
+    const verifyKey = VOUCHER_JWT_ALGORITHM.startsWith('RS')
+      ? prepareRSAKey(VOUCHER_JWT_PRIVATE_KEY, 'PRIVATE')
+      : VOUCHER_JWT_PRIVATE_KEY
+
+    const decoded = jwt.verify(token, verifyKey, {
       algorithms: [VOUCHER_JWT_ALGORITHM as jwt.Algorithm],
     }) as any
 

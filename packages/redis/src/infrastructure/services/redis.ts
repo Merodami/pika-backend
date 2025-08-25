@@ -61,6 +61,7 @@ export class RedisService implements ICacheService {
             times * redisConfig.retryDelay,
             redisConfig.maxRetryDelay,
           )
+
           return delay
         },
       })
@@ -76,6 +77,7 @@ export class RedisService implements ICacheService {
             times * redisConfig.retryDelay,
             redisConfig.maxRetryDelay,
           )
+
           return delay
         },
       })

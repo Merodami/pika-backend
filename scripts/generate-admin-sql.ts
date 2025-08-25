@@ -7,17 +7,27 @@ import fs from 'fs'
 import path from 'path'
 import dotenv from 'dotenv'
 
-// Load production environment variables
-dotenv.config({ path: '.env.production' })
-
-// Get email from command line argument
+// Parse command line arguments
 const args = process.argv.slice(2)
-const emailArg = args[0]
+const emailArg = args.find((arg) => !arg.startsWith('--'))
+const envFileArg =
+  args.find((arg) => arg.startsWith('--env='))?.split('=')[1] ||
+  '.env.production'
+
+// Load environment variables from specified file
+dotenv.config({ path: envFileArg })
+
+console.log(`📁 Using environment file: ${envFileArg}`)
 
 if (!emailArg) {
   console.error('❌ Please provide an email address as an argument')
-  console.error('Usage: tsx scripts/generate-admin-sql.ts <email>')
+  console.error(
+    'Usage: tsx scripts/generate-admin-sql.ts <email> [--env=path/to/env]',
+  )
   console.error('Example: tsx scripts/generate-admin-sql.ts admin@example.com')
+  console.error(
+    'Example: tsx scripts/generate-admin-sql.ts admin@example.com --env=.env.vercel.preview',
+  )
   process.exit(1)
 }
 

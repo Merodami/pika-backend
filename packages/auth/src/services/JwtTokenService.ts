@@ -1,3 +1,4 @@
+import { prepareRSAKey } from '@pika/crypto'
 import {
   JWT_ACCESS_TOKEN_EXPIRY,
   JWT_ALGORITHM,
@@ -563,7 +564,7 @@ export class JwtTokenService {
       return this.jwtSecret
     }
 
-    return this.jwtPrivateKey
+    return prepareRSAKey(this.jwtPrivateKey, 'PRIVATE')
   }
 
   /**
@@ -574,7 +575,7 @@ export class JwtTokenService {
       return this.jwtSecret
     }
 
-    return this.jwtPublicKey
+    return prepareRSAKey(this.jwtPublicKey, 'PUBLIC')
   }
 
   /**
