@@ -24,7 +24,7 @@ import {
   SUPPORT_SERVICE_PORT,
   USER_SERVICE_PORT,
 } from '@pika/environment'
-import { mkdirSync, writeFileSync } from 'fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 import { z } from 'zod'
@@ -313,3 +313,28 @@ const indexHtml = `
 
 writeFileSync(join(OUTPUT_DIR, 'index.html'), indexHtml)
 console.log(`   📄 ${join(OUTPUT_DIR, 'index.html')}`)
+
+// Copy JSON files to api-gateway src for build-time inclusion (Vercel deployment)
+const API_GATEWAY_SRC_DOCS_DIR = join(
+  __dirname,
+  '../../../api-gateway/src/docs/openapi',
+)
+
+console.log(
+  '\n📋 Copying OpenAPI JSON to api-gateway src for build-time inclusion...',
+)
+
+// Create the api-gateway src docs/openapi directory
+mkdirSync(API_GATEWAY_SRC_DOCS_DIR, { recursive: true })
+
+// Copy all OpenAPI JSON files for serving
+const jsonFiles = ['public-api.json', 'admin-api.json', 'internal-api.json', 'all-apis.json']
+
+for (const file of jsonFiles) {
+  const sourcePath = join(OUTPUT_DIR, file)
+  const destPath = join(API_GATEWAY_SRC_DOCS_DIR, file)
+  const content = readFileSync(sourcePath, 'utf8')
+
+  writeFileSync(destPath, content)
+  console.log(`  📄 Copied ${file} to api-gateway/src/docs/openapi`)
+}

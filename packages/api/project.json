@@ -31,34 +31,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "open:docs": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "open dist/api-docs-index.html",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "open-docs-all": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "open dist/all-apis-docs.html",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "open-docs-zod": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "open dist/openapi-zod.html",
-        "cwd": "{projectRoot}"
-      }
-    },
-    "compare-docs": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "open compare-docs.html",
-        "cwd": "{projectRoot}"
-      }
-    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {

@@ -55,7 +55,6 @@
     "copy:openapi": "mkdir -p dist && cp generated/openapi/all-apis.json dist/openapi.json",
     "prebuild": "yarn generate:openapi",
     "generate:openapi": "tsx src/scripts/generate-all-apis.ts",
-    "generate:docs": "tsx src/scripts/generate-scalar-docs.ts",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "test": "vitest run src/**/*.test.ts",
     "lint": "eslint src --ext .ts",

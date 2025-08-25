@@ -223,54 +223,22 @@ async function startGateway(): Promise<Express> {
     }),
   )
 
-  // Set up documentation routes BEFORE proxy routes to avoid conflicts
+  // Set up OpenAPI JSON routes only
   const docsRouter = createDocsRouter()
   app.use('/api/v1/docs', docsRouter)
 
   // Configure routing
   configureRoutes(app)
   logConfiguration()
-  
-  // Direct public API docs access
-  app.get('/api/v1/public-api-docs.html', (req, res) => {
-    res.redirect('/api/v1/docs/public')
-  })
-
-  // Set up common OpenAPI JSON endpoints (public APIs only)
-  app.get('/openapi.json', (req, res) => {
-    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
-  })
-
-  app.get('/api/v1/openapi.json', (req, res) => {
-    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
-  })
-
-  app.get('/docs/openapi.json', (req, res) => {
-    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
-  })
-
-  app.get('/api/docs/openapi.json', (req, res) => {
-    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
-  })
-
-  // Specific API documentation endpoints
-  app.get('/api/v1/public/openapi.json', (req, res) => {
-    res.redirect(301, '/api/v1/docs/openapi/public-api.json')
-  })
-
-  app.get('/api/v1/admin/openapi.json', (req, res) => {
-    res.redirect(301, '/api/v1/docs/openapi/admin-api.json')
-  })
 
   if (isLocalDev) {
-    logger.info('API documentation available at /api/v1/docs', {
+    logger.info('OpenAPI JSON available', {
       component: 'api-gateway',
       endpoints: [
-        '/api/v1/docs - Documentation index',
-        '/api/v1/docs/public - Public API docs',
-        '/api/v1/docs/admin - Admin API docs',
-        '/api/v1/docs/internal - Internal API docs',
-        '/api/v1/docs/all - Complete API docs',
+        '/api/v1/docs/public-api.json - Public API spec',
+        '/api/v1/docs/admin-api.json - Admin API spec',
+        '/api/v1/docs/internal-api.json - Internal API spec',
+        '/api/v1/docs/all-apis.json - All APIs spec',
       ],
     })
   }
