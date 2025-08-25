@@ -148,8 +148,8 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
   }
 
   private async initializeInfrastructure(): Promise<void> {
-    // Run migrations on first startup if needed
-    await this.runMigrationsIfNeeded()
+    // Don't run migrations at runtime in serverless - they should only run during build
+    // await this.runMigrationsIfNeeded()
 
     // Initialize Prisma
     const databaseUrl = this.config.infrastructure.database.url

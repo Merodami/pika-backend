@@ -4,6 +4,8 @@ import '@pika/environment'
 import {
   API_GATEWAY_PORT,
   CACHE_DISABLED,
+  IS_SERVERLESS,
+  IS_EMBEDDED,
   JWT_SECRET,
   NODE_ENV,
 } from '@pika/environment'
@@ -151,7 +153,7 @@ function getAuthExcludePaths(): string[] {
  * Configure proxy routes based on environment
  */
 function configureRoutes(app: Express): void {
-  if (process.env.EMBEDDED_MODE === 'true') {
+  if (IS_EMBEDDED) {
     logger.info('API Gateway running in embedded mode - proxy routes disabled')
   } else {
     setupProxyRoutes(app, isLocalDev)
@@ -252,25 +254,27 @@ async function startGateway(): Promise<Express> {
   // Register error middleware AFTER all routes (Express requirement)
   app.use(errorMiddleware(app.locals.errorMiddlewareConfig || {}))
 
-  // Start the server
-  await startServer(app, port, {
-    onShutdown: async () => {
-      logger.info('API Gateway shutdown complete', {
-        component: 'api-gateway',
-        event: 'shutdown',
-      })
-    },
-    onUnhandledRejection: (reason) => {
-      logger.error(
-        'Unhandled Promise Rejection in API Gateway',
-        reason as Error,
-        {
+  // Only start the server if not in serverless mode
+  if (!IS_SERVERLESS) {
+    await startServer(app, port, {
+      onShutdown: async () => {
+        logger.info('API Gateway shutdown complete', {
           component: 'api-gateway',
-          event: 'unhandled-rejection',
-        },
-      )
-    },
-  })
+          event: 'shutdown',
+        })
+      },
+      onUnhandledRejection: (reason) => {
+        logger.error(
+          'Unhandled Promise Rejection in API Gateway',
+          reason as Error,
+          {
+            component: 'api-gateway',
+            event: 'unhandled-rejection',
+          },
+        )
+      },
+    })
+  }
 
   return app
 }
@@ -294,10 +298,8 @@ if (isLocalDev) {
 export async function createGatewayWithServices(
   services: Map<string, Application>,
 ): Promise<Express> {
-  // Set embedded mode
-  process.env.EMBEDDED_MODE = 'true'
-
-  // Create the gateway app with all standard features
+  // Create the gateway app with all standard features but skip server start
+  // This function is only called in embedded/serverless deployments
   const app = await startGateway()
 
   // Mount services directly instead of proxying

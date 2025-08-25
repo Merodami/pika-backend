@@ -19,3 +19,12 @@ export const VALIDATE_RESPONSES = getEnvVariable(
   parseBoolean,
   NODE_ENV !== 'production',
 )
+
+// Deployment mode: 'local' | 'serverless' | 'monolith'
+// - local: Separate services on different ports (development)
+// - serverless: Embedded services in serverless environment (Vercel, Lambda)
+// - monolith: Embedded services on traditional server
+export const DEPLOYMENT_MODE = getEnvVariable('DEPLOYMENT_MODE', parseString, 'local')
+export const IS_SERVERLESS = DEPLOYMENT_MODE === 'serverless'
+export const IS_LOCAL = DEPLOYMENT_MODE === 'local'
+export const IS_EMBEDDED = DEPLOYMENT_MODE === 'serverless' || DEPLOYMENT_MODE === 'monolith'
