@@ -125,6 +125,7 @@ function getAuthExcludePaths(): string[] {
     '/favicon.ico',
     '/api/v1/docs',
     '/api/v1/docs/*',
+    '/api/v1/public-api-docs.html',
     '/api/v1/uploads/*',
     '/openapi.json',
     '/api/v1/openapi.json',
@@ -230,6 +231,11 @@ async function startGateway(): Promise<Express> {
   const docsRouter = createDocsRouter()
 
   app.use('/api/v1/docs', docsRouter)
+  
+  // Direct public API docs access
+  app.get('/api/v1/public-api-docs.html', (req, res) => {
+    res.redirect('/api/v1/docs/public')
+  })
 
   // Set up common OpenAPI JSON endpoints (public APIs only)
   app.get('/openapi.json', (req, res) => {

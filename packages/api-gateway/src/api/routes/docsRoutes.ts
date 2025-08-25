@@ -50,6 +50,14 @@ export function createDocsRouter(): Router {
 
   // Main documentation index
   router.get('/', async (req: Request, res: Response) => {
+    // In production and staging (non-localhost), redirect directly to public API docs
+    const isLocal = req.hostname === 'localhost' || req.hostname === '127.0.0.1' || req.hostname.includes('.local')
+    
+    if (!isLocal) {
+      return res.redirect('/api/v1/docs/public')
+    }
+    
+    // In local development only, show the full index
     await serveDocFile('api-docs-index.html', res)
   })
 
