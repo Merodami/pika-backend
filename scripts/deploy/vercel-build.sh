@@ -81,7 +81,6 @@ npx nx run-many \
 # 4. Generate API documentation
 echo "📚 Step 4: Generating API documentation..."
 yarn generate:openapi
-yarn generate:docs
 
 # 5. Build remaining packages
 echo "🔨 Step 5: Building all remaining packages..."
