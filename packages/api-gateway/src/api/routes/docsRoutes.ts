@@ -20,15 +20,16 @@ export function createDocsRouter(): Router {
   // Serve OpenAPI JSON files at /api/v1/docs/[api].json
   router.get('/:api.json', async (req: Request, res: Response) => {
     const apiName = req.params.api
-    
+
     // In production, only allow public-api
     // In development, allow all APIs
-    const validApis = isProduction 
-      ? ['public-api'] 
+    const validApis = isProduction
+      ? ['public-api']
       : ['public-api', 'admin-api', 'internal-api', 'all-apis']
 
     if (!validApis.includes(apiName)) {
       res.status(404).json({ error: 'Invalid API specification' })
+
       return
     }
 
@@ -45,6 +46,7 @@ export function createDocsRouter(): Router {
           error: 'OpenAPI specification not found',
           message: 'Please run "yarn generate:openapi" in the api package',
         })
+
         return
       }
 

@@ -2,6 +2,7 @@ import {
   CACHE_DISABLED,
   REDIS_DEFAULT_TTL,
   REDIS_HOST,
+  REDIS_PASSWORD,
   REDIS_PORT,
 } from '@pika/environment'
 
@@ -36,6 +37,7 @@ export async function initializeCache(): Promise<ICacheService> {
   const redisService = new RedisService({
     host: REDIS_HOST,
     port: REDIS_PORT,
+    password: REDIS_PASSWORD,
     defaultTTL: REDIS_DEFAULT_TTL,
   })
 

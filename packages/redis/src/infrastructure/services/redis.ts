@@ -48,20 +48,38 @@ export class RedisService implements ICacheService {
 
     const redisConfig = this.config.getConfig()
 
-    this.client = new Redis({
-      host: config?.host || redisConfig.host,
-      port: config?.port || redisConfig.port,
-      password: config?.password || REDIS_PASSWORD || undefined,
-      lazyConnect: false,
-      retryStrategy: (times: number) => {
-        const delay = Math.min(
-          times * redisConfig.retryDelay,
-          redisConfig.maxRetryDelay,
-        )
+    // Check if we have a REDIS_URL (for cloud providers like Upstash)
+    const redisUrl = process.env.REDIS_URL
 
-        return delay
-      },
-    })
+    if (redisUrl) {
+      // Use the full Redis URL which includes TLS and auth
+      this.client = new Redis(redisUrl, {
+        lazyConnect: false,
+        maxRetriesPerRequest: 3,
+        retryStrategy: (times: number) => {
+          const delay = Math.min(
+            times * redisConfig.retryDelay,
+            redisConfig.maxRetryDelay,
+          )
+          return delay
+        },
+      })
+    } else {
+      // Use individual host/port/password configuration
+      this.client = new Redis({
+        host: config?.host || redisConfig.host,
+        port: config?.port || redisConfig.port,
+        password: config?.password || REDIS_PASSWORD || undefined,
+        lazyConnect: false,
+        retryStrategy: (times: number) => {
+          const delay = Math.min(
+            times * redisConfig.retryDelay,
+            redisConfig.maxRetryDelay,
+          )
+          return delay
+        },
+      })
+    }
 
     this.defaultTTL = config?.defaultTTL || redisConfig.defaultTTL
     this.metrics = {

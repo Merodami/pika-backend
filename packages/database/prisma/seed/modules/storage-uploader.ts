@@ -28,6 +28,7 @@ export class StorageUploader {
   private config: MinIOConfig
   private minioClient: any = null
   private isDevMode: boolean
+  private initPromise: Promise<void> | null = null
 
   constructor() {
     this.config = {
@@ -43,7 +44,7 @@ export class StorageUploader {
     this.isDevMode = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
     
     if (this.isDevMode) {
-      this.initializeMinIOClient()
+      this.initPromise = this.initializeMinIOClient()
     }
   }
 
@@ -97,6 +98,11 @@ export class StorageUploader {
     const url = `http://${this.config.endpoint}:${this.config.port}/${this.config.bucketName}/${objectKey}`
 
     try {
+      // Wait for MinIO client initialization if in dev mode
+      if (this.isDevMode && this.initPromise) {
+        await this.initPromise
+      }
+      
       if (this.isDevMode && this.minioClient) {
         // Real MinIO upload in dev/test environments
         await this.minioClient.putObject(

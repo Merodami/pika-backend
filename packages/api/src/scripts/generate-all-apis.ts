@@ -328,7 +328,12 @@ console.log(
 mkdirSync(API_GATEWAY_SRC_DOCS_DIR, { recursive: true })
 
 // Copy all OpenAPI JSON files for serving
-const jsonFiles = ['public-api.json', 'admin-api.json', 'internal-api.json', 'all-apis.json']
+const jsonFiles = [
+  'public-api.json',
+  'admin-api.json',
+  'internal-api.json',
+  'all-apis.json',
+]
 
 for (const file of jsonFiles) {
   const sourcePath = join(OUTPUT_DIR, file)

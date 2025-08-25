@@ -4,8 +4,8 @@ import '@pika/environment'
 import {
   API_GATEWAY_PORT,
   CACHE_DISABLED,
-  IS_SERVERLESS,
   IS_EMBEDDED,
+  IS_SERVERLESS,
   JWT_SECRET,
   NODE_ENV,
 } from '@pika/environment'
@@ -227,6 +227,7 @@ async function startGateway(): Promise<Express> {
 
   // Set up OpenAPI JSON routes only
   const docsRouter = createDocsRouter()
+
   app.use('/api/v1/docs', docsRouter)
 
   // Configure routing
