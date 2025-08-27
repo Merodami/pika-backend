@@ -813,8 +813,8 @@ export class VoucherRepository implements IVoucherRepository {
         ORDER BY count DESC, last_searched DESC
         LIMIT ${limit}
       `
-      
-      return results.map(row => row.query)
+
+      return results.map((row) => row.query)
     } catch (error) {
       logger.warn('Failed to get popular searches', { error, limit })
       return []

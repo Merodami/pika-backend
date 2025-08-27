@@ -13,7 +13,9 @@ import { z } from 'zod'
 
 import { openapi } from '../../common/utils/openapi.js'
 import { createZodEnum } from '../../common/utils/zodEnum.js'
+import { SearchParams } from './pagination.js'
 import { DateTime } from './primitives.js'
+import { paginatedResponse } from './responses.js'
 
 /**
  * Industry Standard Analytics API
@@ -37,19 +39,26 @@ export const PrioritySchema = createZodEnum(Priority)
 
 /**
  * Generic analytics query (raw Zod) - Industry Standard Pattern
+ * Extends SearchParams for consistency with rest of platform
  */
-export const AnalyticsQuery = z.object({
+export const AnalyticsQuery = SearchParams.extend({
+  // Core analytics parameters
   entity: AnalyticsEntitySchema.describe('What to analyze'),
-  metrics: z.array(AnalyticsMetricSchema).describe('What metrics to calculate'),
-  dimensions: z.array(AnalyticsDimensionSchema).optional().describe('How to group/slice data'),
-  filters: z.record(z.string(), z.any()).optional().describe('Data filters'),
+  metrics: z.array(AnalyticsMetricSchema).min(1).describe('Metrics to calculate'),
+  dimensions: z.array(AnalyticsDimensionSchema).optional().describe('Dimensions for grouping'),
+  
+  // Flexible filtering
+  filters: z.record(z.string(), z.any()).optional().describe('Entity-specific filters'),
   dateRange: z.object({
     start: z.coerce.date(),
     end: z.coerce.date(),
   }).optional().describe('Date range filter'),
+  
+  // Analytics-specific options
   granularity: TimeGranularitySchema.default(TimeGranularity.DAY).describe('Time granularity'),
-  limit: z.number().max(1000).default(100).describe('Result limit'),
   compareWith: z.enum(['previous_period', 'same_period_last_year']).optional().describe('Comparison period'),
+  includeProjections: z.boolean().default(false).describe('Include future projections'),
+  format: z.enum(['summary', 'detailed', 'export']).default('summary').describe('Response format'),
 })
 
 /**
@@ -63,15 +72,15 @@ export type AnalyticsQuery = z.infer<typeof AnalyticsQuery>
 
 /**
  * Report request (raw Zod) - Stripe/Mixpanel Pattern
+ * Simpler pre-configured reports
  */
 export const ReportRequest = z.object({
-  reportType: z.enum(['overview', 'growth', 'performance', 'engagement', 'health']).describe('Report type'),
+  reportType: ReportTypeSchema.describe('Report type'),
   entity: AnalyticsEntitySchema.describe('Entity to report on'),
   timeframe: z.string().default('30d').describe('Time period (7d, 30d, 90d, 1y)'),
-  segments: z.array(z.string()).optional().describe('User/business segments to include'),
-  breakdown: TimeGranularitySchema.optional().describe('Time breakdown'),
+  filters: z.record(z.string(), z.any()).optional().describe('Report filters'),
   includeComparison: z.boolean().default(true).describe('Include period comparison'),
-  includeForecasting: z.boolean().default(false).describe('Include predictions'),
+  format: ExportFormatSchema.default(ExportFormat.JSON).describe('Output format'),
 })
 
 /**
@@ -92,7 +101,7 @@ export const MetricValue = z.object({
   current: z.number().describe('Current value'),
   previous: z.number().optional().describe('Previous period value'),
   change: z.number().optional().describe('Percentage change'),
-  trend: z.enum(['up', 'down', 'stable']).optional().describe('Trend direction'),
+  trend: TrendDirectionSchema.optional().describe('Trend direction'),
 })
 
 export const MetricValueSchema = MetricValue.openapi('MetricValue', {
@@ -134,20 +143,51 @@ export const TimeSeriesSchema = TimeSeries.openapi('TimeSeries', {
 export type TimeSeries = z.infer<typeof TimeSeries>
 
 /**
- * Analytics response (raw Zod) - Industry Standard
+ * Analytics result item for paginated responses (raw Zod)
  */
-export const AnalyticsResponse = z.object({
-  query: AnalyticsQuery.describe('Original query parameters'),
-  results: z.object({
-    metrics: z.record(z.string(), MetricValue).describe('Calculated metrics'),
-    dimensions: z.record(z.string(), z.array(DataPoint)).describe('Dimensional breakdowns'),
-    timeSeries: z.array(TimeSeries).optional().describe('Time-based data'),
-  }),
+export const AnalyticsResultItem = z.object({
+  entity: z.string().describe('Entity identifier'),
+  metrics: z.record(z.string(), z.number()).describe('Metric values'),
+  dimensions: z.record(z.string(), z.string()).optional().describe('Dimension values'),
+  metadata: z.record(z.string(), z.any()).optional().describe('Additional metadata'),
+})
+
+export const AnalyticsResultItemSchema = AnalyticsResultItem.openapi('AnalyticsResultItem', {
+  description: 'Individual analytics result item',
+})
+
+export type AnalyticsResultItem = z.infer<typeof AnalyticsResultItem>
+
+/**
+ * Analytics response (raw Zod) - Industry Standard
+ * Uses standard pagination for consistency
+ */
+export const AnalyticsResponse = paginatedResponse(AnalyticsResultItem).extend({
+  // Summary metrics (not paginated)
+  summary: z.object({
+    totals: z.record(z.string(), MetricValue).describe('Summary totals'),
+    averages: z.record(z.string(), z.number()).optional().describe('Average values'),
+    comparisons: z.record(z.string(), MetricValue).optional().describe('Period comparisons'),
+  }).optional(),
+  
+  // Aggregated views (not paginated)
+  aggregations: z.object({
+    byDimension: z.record(z.string(), z.array(DataPoint)).optional().describe('Aggregated by dimension'),
+    timeSeries: z.array(TimeSeries).optional().describe('Time series data'),
+  }).optional(),
+  
+  // Query metadata
   metadata: z.object({
+    query: z.object({
+      entity: z.string(),
+      dateRange: z.object({
+        start: DateTime,
+        end: DateTime,
+      }).optional(),
+    }),
     generatedAt: DateTime,
     processingTime: z.number().describe('Query processing time (ms)'),
     dataFreshness: DateTime.describe('When data was last updated'),
-    totalRows: z.number().describe('Total data points analyzed'),
   }),
 })
 
@@ -164,7 +204,7 @@ export const ReportResponse = z.object({
   reportType: z.string().describe('Report type'),
   summary: z.record(z.string(), MetricValue).describe('Key metrics summary'),
   charts: z.array(z.object({
-    type: z.enum(['line', 'bar', 'pie', 'table']).describe('Chart type'),
+    type: ChartTypeSchema.describe('Chart type'),
     title: z.string().describe('Chart title'),
     data: z.array(DataPoint).describe('Chart data'),
   })).describe('Chart data for visualization'),

@@ -48,7 +48,12 @@ export async function createVoucherServer({
     port: VOUCHER_SERVICE_PORT,
     cacheService,
     authOptions: {
-      excludePaths: ['/health', '/metrics', '/internal/*'],
+      excludePaths: [
+        '/health',
+        '/metrics',
+        '/internal/*',
+        '/vouchers/search/popular',
+      ],
     },
     idempotencyOptions: {
       enabled: true,

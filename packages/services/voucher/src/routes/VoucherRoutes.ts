@@ -85,10 +85,7 @@ export async function createVoucherRoutes(
   )
 
   // GET /vouchers/search/popular - Get popular search terms (must be before /:id)
-  router.get(
-    '/search/popular',
-    controller.getPopularSearches,
-  )
+  router.get('/search/popular', controller.getPopularSearches)
 
   // GET /vouchers/by-code/:code - Get voucher by any code type (must be before /:id)
   // SECURITY NOTE: No authentication required - vouchers can be viewed by anyone with the code

@@ -263,6 +263,10 @@ DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_business_id_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_business_id_idx;
+DROP INDEX IF EXISTS analytics.search_queries_query_key;
+DROP INDEX IF EXISTS analytics.search_queries_query_idx;
+DROP INDEX IF EXISTS analytics.search_queries_last_searched_idx;
+DROP INDEX IF EXISTS analytics.search_queries_count_idx;
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_pkey;
@@ -297,6 +301,7 @@ ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS busines
 ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS business_registration_pkey;
 ALTER TABLE IF EXISTS ONLY business.business_details DROP CONSTRAINT IF EXISTS business_details_pkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_pkey;
+ALTER TABLE IF EXISTS ONLY analytics.search_queries DROP CONSTRAINT IF EXISTS search_queries_pkey;
 DROP TABLE IF EXISTS voucher.vouchers;
 DROP TABLE IF EXISTS voucher.voucher_redemptions;
 DROP TABLE IF EXISTS voucher.voucher_codes;
@@ -331,6 +336,7 @@ DROP TABLE IF EXISTS business.businesses;
 DROP TABLE IF EXISTS business.business_registration;
 DROP TABLE IF EXISTS business.business_details;
 DROP TABLE IF EXISTS analytics.voucher_scans;
+DROP TABLE IF EXISTS analytics.search_queries;
 DROP TYPE IF EXISTS voucher."VoucherType";
 DROP TYPE IF EXISTS voucher."VoucherState";
 DROP TYPE IF EXISTS voucher."VoucherCodeType";
@@ -427,6 +433,13 @@ CREATE SCHEMA files;
 --
 
 CREATE SCHEMA i18n;
+
+
+--
+-- Name: SCHEMA i18n; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA i18n IS 'Internationalization schema for The VoucherBook platform backend services';
 
 
 --
@@ -913,6 +926,20 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: search_queries; Type: TABLE; Schema: analytics; Owner: -
+--
+
+CREATE TABLE analytics.search_queries (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    query character varying(255) NOT NULL,
+    count integer DEFAULT 1 NOT NULL,
+    last_searched timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: voucher_scans; Type: TABLE; Schema: analytics; Owner: -
 --
 
@@ -936,7 +963,7 @@ CREATE TABLE analytics.voucher_scans (
 --
 
 CREATE TABLE business.business_details (
-    id uuid NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     "businessId" uuid NOT NULL,
     phone character varying(20),
     email character varying(255),
@@ -960,7 +987,7 @@ CREATE TABLE business.business_details (
 --
 
 CREATE TABLE business.business_registration (
-    id uuid NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     "userId" uuid NOT NULL,
     "businessId" uuid,
     "currentStep" integer DEFAULT 1 NOT NULL,
@@ -1181,8 +1208,8 @@ CREATE TABLE i18n.languages (
     direction text DEFAULT 'ltr'::text NOT NULL,
     is_default boolean DEFAULT false NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
-    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(3) without time zone NOT NULL
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -1191,14 +1218,14 @@ CREATE TABLE i18n.languages (
 --
 
 CREATE TABLE i18n.translations (
-    id text NOT NULL,
     key text NOT NULL,
     value text NOT NULL,
     language_code text NOT NULL,
     context text,
     service text,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(3) without time zone NOT NULL
+    updated_at timestamp(3) without time zone NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL
 );
 
 
@@ -1207,11 +1234,11 @@ CREATE TABLE i18n.translations (
 --
 
 CREATE TABLE i18n.user_language_preferences (
-    id text NOT NULL,
     user_id uuid NOT NULL,
     language_code text NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(3) without time zone NOT NULL
+    updated_at timestamp(3) without time zone NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL
 );
 
 
@@ -1607,6 +1634,14 @@ CREATE TABLE voucher.vouchers (
 
 
 --
+-- Name: search_queries search_queries_pkey; Type: CONSTRAINT; Schema: analytics; Owner: -
+--
+
+ALTER TABLE ONLY analytics.search_queries
+    ADD CONSTRAINT search_queries_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: voucher_scans voucher_scans_pkey; Type: CONSTRAINT; Schema: analytics; Owner: -
 --
 
@@ -1876,6 +1911,34 @@ ALTER TABLE ONLY voucher.voucher_redemptions
 
 ALTER TABLE ONLY voucher.vouchers
     ADD CONSTRAINT vouchers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: search_queries_count_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX search_queries_count_idx ON analytics.search_queries USING btree (count DESC);
+
+
+--
+-- Name: search_queries_last_searched_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX search_queries_last_searched_idx ON analytics.search_queries USING btree (last_searched);
+
+
+--
+-- Name: search_queries_query_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX search_queries_query_idx ON analytics.search_queries USING btree (query);
+
+
+--
+-- Name: search_queries_query_key; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE UNIQUE INDEX search_queries_query_key ON analytics.search_queries USING btree (query);
 
 
 --

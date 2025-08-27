@@ -1,4 +1,8 @@
-import { PAGINATION_DEFAULT_LIMIT, POPULAR_SEARCHES_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import {
+  PAGINATION_DEFAULT_LIMIT,
+  POPULAR_SEARCHES_LIMIT,
+  REDIS_DEFAULT_TTL,
+} from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
 import type {
   UserVoucherData,
@@ -127,9 +131,9 @@ export class VoucherService implements IVoucherService {
       // Track search query if present (fire and forget - don't block the main request)
       if (params.search && params.search.trim().length > 0) {
         this.trackSearchQuery(params.search.trim()).catch((error) => {
-          logger.warn('Failed to track search query', { 
-            error, 
-            query: params.search 
+          logger.warn('Failed to track search query', {
+            error,
+            query: params.search,
           })
         })
       }
@@ -804,7 +808,7 @@ export class VoucherService implements IVoucherService {
     try {
       // Normalize the query (lowercase, trim)
       const normalizedQuery = query.toLowerCase().trim()
-      
+
       // Skip very short queries or common stop words
       if (normalizedQuery.length < 2) {
         return
@@ -812,10 +816,9 @@ export class VoucherService implements IVoucherService {
 
       // Use repository method to upsert search query
       await this.repository.upsertSearchQuery(normalizedQuery)
-      
+
       // Invalidate popular searches cache to get fresh results
       await this.cache.del(`${CACHE_KEYS.VOUCHER.POPULAR_SEARCHES}:`)
-      
     } catch (error) {
       // Don't throw - this is fire-and-forget analytics
       logger.warn('Failed to track search query', { error, query })
@@ -833,14 +836,15 @@ export class VoucherService implements IVoucherService {
   async getPopularSearches(): Promise<string[]> {
     try {
       // Get popular searches from database using environment-configured limit
-      const popularQueries = await this.repository.getPopularSearches(POPULAR_SEARCHES_LIMIT)
-      
+      const popularQueries = await this.repository.getPopularSearches(
+        POPULAR_SEARCHES_LIMIT,
+      )
+
       // Return database results or empty array
       return popularQueries || []
-      
     } catch (error) {
       logger.warn('Failed to get popular searches from database', { error })
-      
+
       // Return empty array in case of any database issues
       return []
     }

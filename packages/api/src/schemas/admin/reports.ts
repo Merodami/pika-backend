@@ -1,6 +1,7 @@
+import { Priority } from '@pika/types'
 import { z } from 'zod'
 
-import { openapi } from '../../common/utils/openapi.js'
+import { createZodEnum } from '../../common/utils/zodEnum.js'
 import { 
   AnalyticsQuery,
   AnalyticsQuerySchema,
@@ -15,73 +16,52 @@ import {
   ReportResponse,
   ReportResponseSchema,
 } from '../shared/analytics.js'
-import { UUID } from '../shared/primitives.js'
+import { createIncludeParam } from '../shared/query.js'
 
 /**
  * Admin Analytics & Reporting API Schemas
- * Industry-standard flexible analytics endpoints
- * Based on Google Analytics, Stripe, and Mixpanel patterns
+ * Simplified, flexible analytics endpoints - ONE endpoint handles everything
  */
+
+const PrioritySchema = createZodEnum(Priority)
+
+// Relations that can be included in analytics responses
+const ANALYTICS_RELATIONS = [
+  'details',        // Detailed breakdown
+  'comparisons',    // Period comparisons
+  'projections',    // Future projections
+  'segments',       // User/business segments
+] as const
 
 // ============= Analytics Query Endpoint =============
 
 /**
- * Analytics query parameters with admin-specific filters (raw Zod)
+ * Admin analytics query - extends base with admin features (raw Zod)
  */
-export const AdminAnalyticsQueryParams = AnalyticsQuery.extend({
-  // Admin-specific filters
-  includeDeleted: z.boolean().default(false).describe('Include soft-deleted entities'),
-  adminView: z.boolean().default(true).describe('Use admin-level data access'),
-  userId: z.string().optional().describe('Filter by specific user'),
-  businessId: z.string().optional().describe('Filter by specific business'),
-})
+export const AdminAnalyticsQuery = AnalyticsQuery.extend({
+  // Admin-specific options
+  includeInactive: z.boolean().default(false).describe('Include inactive/deleted entities'),
+  includeSystemMetrics: z.boolean().default(false).describe('Include system performance metrics'),
+}).merge(createIncludeParam(ANALYTICS_RELATIONS))
 
 /**
- * Analytics query parameters with admin-specific filters (OpenAPI documented)
+ * Admin analytics query (OpenAPI documented)
  */
-export const AdminAnalyticsQueryParamsSchema = AdminAnalyticsQueryParams.openapi(
-  'AdminAnalyticsQueryParams',
+export const AdminAnalyticsQuerySchema = AdminAnalyticsQuery.openapi(
+  'AdminAnalyticsQuery',
   {
-    description: 'Admin analytics query with additional administrative filters',
+    description: 'Admin analytics query with full access',
   },
 )
 
-export type AdminAnalyticsQueryParams = z.infer<typeof AdminAnalyticsQueryParams>
-
-/**
- * Analytics query request body (raw Zod)
- */
-export const AnalyticsQueryRequest = AdminAnalyticsQueryParams
-
-/**
- * Analytics query request body (OpenAPI documented)
- */
-export const AnalyticsQueryRequestSchema = AnalyticsQueryRequest.openapi(
-  'AnalyticsQueryRequest',
-  {
-    description: 'Request body for analytics query endpoint',
-  },
-)
-
-export type AnalyticsQueryRequest = z.infer<typeof AnalyticsQueryRequest>
+export type AdminAnalyticsQuery = z.infer<typeof AdminAnalyticsQuery>
 
 // ============= Reports Endpoint =============
 
 /**
- * Available report types for admin (raw Zod)
+ * Admin report types (use ReportType from @pika/types)
  */
-export const AdminReportType = z.enum([
-  'overview',           // Platform overview
-  'growth',            // Growth analysis  
-  'performance',       // Performance metrics
-  'engagement',        // User engagement
-  'health',           // Platform health
-  'revenue',          // Revenue analysis
-  'retention',        // User retention
-  'conversion',       // Conversion funnels
-  'segmentation',     // User/business segments
-  'forecasting',      // Predictive analytics
-])
+export const AdminReportType = ReportTypeSchema
 
 /**
  * Available report types for admin (OpenAPI documented)
@@ -90,14 +70,14 @@ export const AdminReportTypeSchema = AdminReportType.openapi('AdminReportType', 
   description: 'Available report types for admin users',
 })
 
-export type AdminReportType = z.infer<typeof AdminReportType>
+export type AdminReportType = ReportType
 
 /**
  * Admin report request with additional parameters (raw Zod)
  */
 export const AdminReportRequest = ReportRequest.extend({
   reportId: z.string().optional().describe('Specific report configuration ID'),
-  exportFormat: z.enum(['json', 'csv', 'pdf']).default('json').describe('Export format'),
+  exportFormat: ExportFormatSchema.default(ExportFormat.JSON).describe('Export format'),
   includeRawData: z.boolean().default(false).describe('Include raw data for analysis'),
   notifications: z.object({
     email: z.string().email().optional().describe('Email for report delivery'),
@@ -229,7 +209,7 @@ export type InsightsResponse = z.infer<typeof InsightsResponse>
  */
 export const ReportExportRequest = z.object({
   reportType: AdminReportType.describe('Report type to export'),
-  format: z.enum(['csv', 'xlsx', 'pdf', 'json']).describe('Export format'),
+  format: ExportFormatSchema.describe('Export format'),
   filters: z.record(z.string(), z.any()).optional().describe('Report filters'),
   schedule: z.object({
     frequency: z.enum(['once', 'daily', 'weekly', 'monthly']).describe('Export frequency'),

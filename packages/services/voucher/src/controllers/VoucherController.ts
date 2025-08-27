@@ -462,7 +462,7 @@ export class VoucherController {
       const responseData = {
         searches: popularSearches,
       }
-      
+
       const validatedResponse = validateResponse(
         voucherPublic.PopularSearchesResponseSchema,
         responseData,
