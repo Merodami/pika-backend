@@ -16,10 +16,7 @@ import {
   JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
-  JWT_PRIVATE_KEY,
-  JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
-  JWT_SECRET,
   NODE_ENV,
 } from '@pika/environment'
 import { type ICacheService } from '@pika/redis'
@@ -129,15 +126,12 @@ export class SocialAuthService implements ISocialAuthService {
 
     // Create JWT token service
     this.jwtTokenService = new JwtTokenService(
-      JWT_SECRET,
       JWT_ACCESS_EXPIRY,
       JWT_REFRESH_EXPIRY,
       JWT_ISSUER,
       JWT_AUDIENCE,
       this.cacheService,
       JWT_ALGORITHM as any,
-      JWT_PRIVATE_KEY,
-      JWT_PUBLIC_KEY,
     )
 
     // Initialize Firebase if configured

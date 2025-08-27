@@ -296,7 +296,7 @@ describe('OAuth 2.0 Endpoints Integration Tests', () => {
 
     it('should return inactive for expired token', async () => {
       // Create an expired token using authHelper
-      const expiredToken = authHelper.generateTestToken({
+      const expiredToken = await authHelper.generateTestToken({
         userId: '123e4567-e89b-12d3-a456-426614174001',
         email: 'test@example.com',
         role: 'USER',

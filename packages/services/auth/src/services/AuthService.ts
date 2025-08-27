@@ -1,19 +1,10 @@
 import { UserServiceClientAdapter } from '@auth-service/adapters/UserServiceClientAdapter.js'
 import {
   AuthStrategy,
+  createJwtTokenService,
   createLocalAuthStrategy,
   JwtTokenService,
 } from '@pika/auth'
-import {
-  JWT_ACCESS_EXPIRY,
-  JWT_ALGORITHM,
-  JWT_AUDIENCE,
-  JWT_ISSUER,
-  JWT_PRIVATE_KEY,
-  JWT_PUBLIC_KEY,
-  JWT_REFRESH_EXPIRY,
-  JWT_SECRET,
-} from '@pika/environment'
 import { Cache, type ICacheService } from '@pika/redis'
 import {
   BusinessServiceClient,
@@ -99,11 +90,12 @@ export class AuthService implements IAuthService {
   private readonly userServiceAdapter: UserServiceClientAdapter
   private readonly jwtTokenService: JwtTokenService
 
-  constructor(
+  private constructor(
     private readonly cacheService: ICacheService,
     private readonly userServiceClient: UserServiceClient,
     private readonly communicationClient?: CommunicationServiceClient,
     private readonly businessServiceClient?: BusinessServiceClient,
+    jwtTokenService?: JwtTokenService,
   ) {
     // Create adapter to connect user service client with auth strategy
     this.userServiceAdapter = new UserServiceClientAdapter(
@@ -118,17 +110,31 @@ export class AuthService implements IAuthService {
       this.communicationClient,
     )
 
-    // Create JWT token service for OAuth endpoints
-    this.jwtTokenService = new JwtTokenService(
-      JWT_SECRET,
-      JWT_ACCESS_EXPIRY,
-      JWT_REFRESH_EXPIRY,
-      JWT_ISSUER,
-      JWT_AUDIENCE,
-      this.cacheService,
-      JWT_ALGORITHM as any,
-      JWT_PRIVATE_KEY,
-      JWT_PUBLIC_KEY,
+    // JWT token service is injected (created asynchronously)
+    if (!jwtTokenService) {
+      throw new Error('JwtTokenService is required for AuthService')
+    }
+    this.jwtTokenService = jwtTokenService
+  }
+
+  /**
+   * Factory method to create AuthService with async JWT initialization
+   */
+  static async create(
+    cacheService: ICacheService,
+    userServiceClient: UserServiceClient,
+    communicationClient?: CommunicationServiceClient,
+    businessServiceClient?: BusinessServiceClient,
+  ): Promise<AuthService> {
+    // Create JWT token service using async factory
+    const jwtTokenService = await createJwtTokenService(cacheService)
+
+    return new AuthService(
+      cacheService,
+      userServiceClient,
+      communicationClient,
+      businessServiceClient,
+      jwtTokenService,
     )
   }
 

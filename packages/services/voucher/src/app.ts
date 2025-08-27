@@ -1,5 +1,10 @@
 // Import the necessary dependencies
-import { REDIS_PASSWORD, VOUCHER_SERVICE_PORT } from '@pika/environment'
+import { keyManager } from '@pika/crypto'
+import {
+  IS_EMBEDDED,
+  REDIS_PASSWORD,
+  VOUCHER_SERVICE_PORT,
+} from '@pika/environment'
 import { startServer } from '@pika/http'
 import { initializeCache, RedisConfigService } from '@pika/redis'
 import { FileStoragePort, logger, StorageServiceClient } from '@pika/shared'
@@ -68,6 +73,19 @@ export async function startVoucherService() {
   logger.info(
     `Unified Voucher service starting on port: ${VOUCHER_SERVICE_PORT}`,
   )
+
+  // Initialize KeyManager for voucher JWT operations
+  // In embedded mode (Vercel), KeyManager is initialized by deployment adapter
+  if (!IS_EMBEDDED) {
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.info('KeyManager initialized successfully')
+    }
+  } else {
+    logger.info(
+      'Running in embedded mode, KeyManager should be initialized by deployment adapter',
+    )
+  }
 
   // Create Express server using the extracted function
   const app = await createVoucherServer({

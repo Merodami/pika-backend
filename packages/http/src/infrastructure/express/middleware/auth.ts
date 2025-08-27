@@ -6,10 +6,7 @@ import {
   JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
-  JWT_PRIVATE_KEY,
-  JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
-  JWT_SECRET,
   NODE_ENV,
   SKIP_AUTH,
 } from '@pika/environment'
@@ -33,15 +30,12 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
   // Initialize JWT service from @pika/auth (single source of truth)
   // Always use environment configuration - no overrides
   const jwtService = new JwtTokenService(
-    JWT_SECRET,
     JWT_ACCESS_EXPIRY,
     JWT_REFRESH_EXPIRY,
     JWT_ISSUER,
     JWT_AUDIENCE,
     options.cacheService, // Optional Redis service for token blacklisting
     JWT_ALGORITHM as jwt.Algorithm,
-    JWT_PRIVATE_KEY,
-    JWT_PUBLIC_KEY,
   )
 
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -118,8 +112,6 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
       if (NODE_ENV === 'test') {
         logger.debug('JWT verification attempt', {
           algorithm: JWT_ALGORITHM,
-          hasPrivateKey: !!JWT_PRIVATE_KEY,
-          hasPublicKey: !!JWT_PUBLIC_KEY,
           tokenPrefix: token.substring(0, 50),
         })
       }
@@ -135,7 +127,6 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
           correlationId: req.correlationId,
           error: validation.error,
           algorithm: JWT_ALGORITHM,
-          hasKeys: { private: !!JWT_PRIVATE_KEY, public: !!JWT_PUBLIC_KEY },
         })
 
         throw new NotAuthenticatedError(

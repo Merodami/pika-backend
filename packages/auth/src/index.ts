@@ -7,7 +7,10 @@ export type {
   TokenPayload as JwtTokenPayload,
   User as JwtUser,
 } from './services/JwtTokenService.js'
-export { JwtTokenService } from './services/JwtTokenService.js'
+export {
+  createJwtTokenService,
+  JwtTokenService,
+} from './services/JwtTokenService.js'
 export * from './services/PasswordSecurityService.js'
 // RS256JwtTokenService not implemented yet
 

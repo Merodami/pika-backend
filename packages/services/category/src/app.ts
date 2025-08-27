@@ -1,4 +1,9 @@
-import { CATEGORY_SERVICE_PORT, REDIS_PASSWORD } from '@pika/environment'
+import { keyManager } from '@pika/crypto'
+import {
+  CATEGORY_SERVICE_PORT,
+  IS_EMBEDDED,
+  REDIS_PASSWORD,
+} from '@pika/environment'
 import { startServer } from '@pika/http'
 import {
   type ICacheService,
@@ -32,6 +37,14 @@ export async function startCategoryService(): Promise<void> {
   let translationRedis: any | undefined
 
   try {
+    // Initialize KeyManager first (required for JWT operations)
+    if (!IS_EMBEDDED) {
+      if (!keyManager.isInitialized()) {
+        await keyManager.initialize()
+        logger.info('KeyManager initialized successfully')
+      }
+    }
+
     // Initialize dependencies
     prisma = await initializeDatabase()
     cacheService = await initializeCache()

@@ -1,5 +1,10 @@
 // Import the necessary dependencies
-import { BUSINESS_SERVICE_PORT, REDIS_PASSWORD } from '@pika/environment'
+import { keyManager } from '@pika/crypto'
+import {
+  BUSINESS_SERVICE_PORT,
+  IS_EMBEDDED,
+  REDIS_PASSWORD,
+} from '@pika/environment'
 import { startServer } from '@pika/http'
 import { initializeCache, RedisConfigService } from '@pika/redis'
 import { logger, StorageServiceClient, UserServiceClient } from '@pika/shared'
@@ -31,6 +36,14 @@ export async function initializeDatabase() {
  * Initialize and start the Business service
  */
 export async function startBusinessService() {
+  // Initialize KeyManager first (required for JWT operations)
+  if (!IS_EMBEDDED) {
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.info('KeyManager initialized successfully')
+    }
+  }
+
   // Connect to services
   const prisma = await initializeDatabase()
   const cacheService = await initializeCache()

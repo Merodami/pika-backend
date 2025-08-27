@@ -1,4 +1,5 @@
 import { createGatewayWithServices } from '@pika/api-gateway'
+import { keyManager } from '@pika/crypto'
 import { CACHE_DISABLED } from '@pika/environment'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import { logger } from '@pika/shared'
@@ -24,6 +25,13 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
 
   async initialize(): Promise<void> {
     logger.info('Initializing Vercel deployment adapter')
+
+    // Initialize KeyManager ONCE for all embedded services
+    // This must happen before any service initialization
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.info('KeyManager initialized for embedded deployment')
+    }
 
     // Initialize infrastructure
     await this.initializeInfrastructure()

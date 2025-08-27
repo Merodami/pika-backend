@@ -1,10 +1,7 @@
-import { p256 } from '@noble/curves/p256'
-import { p384 } from '@noble/curves/p384'
-import { p521 } from '@noble/curves/p521'
-import { secp256k1 } from '@noble/curves/secp256k1'
-import { sha256 } from '@noble/hashes/sha256'
-import { sha384, sha512 } from '@noble/hashes/sha512'
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
+import { p256, p384, p521 } from '@noble/curves/nist.js'
+import { secp256k1 } from '@noble/curves/secp256k1.js'
+import { sha256, sha384, sha512 } from '@noble/hashes/sha2.js'
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js'
 
 import { CryptoErrorFactory } from '../errors/CryptoError.js'
 import type {
@@ -55,7 +52,7 @@ export class ECDSAService {
    */
   async generateKeyPair(): Promise<ECDSAKeyPair> {
     try {
-      const privateKeyBytes = this.curveImpl.utils.randomPrivateKey()
+      const privateKeyBytes = this.curveImpl.utils.randomSecretKey()
       const publicKeyBytes = this.curveImpl.getPublicKey(privateKeyBytes)
 
       return {
@@ -93,14 +90,16 @@ export class ECDSAService {
       const messageHash = this.hashFn(messageBytes)
 
       // Sign with deterministic k (RFC 6979)
-      const signature = this.curveImpl.sign(messageHash, privateKeyBytes)
+      const signatureBytes = this.curveImpl.sign(messageHash, privateKeyBytes)
 
-      // Ensure low-s form for malleability protection
-      const normalizedSig = signature.normalizeS()
+      // Extract r and s from the signature bytes (r || s format)
+      const halfLen = this.getByteLength()
+      const r = signatureBytes.slice(0, halfLen)
+      const s = signatureBytes.slice(halfLen, halfLen * 2)
 
       return {
-        r: normalizedSig.r.toString(16).padStart(this.getByteLength() * 2, '0'),
-        s: normalizedSig.s.toString(16).padStart(this.getByteLength() * 2, '0'),
+        r: bytesToHex(r),
+        s: bytesToHex(s),
         curve: this.curve,
         format: 'ieee-p1363',
       }
@@ -142,14 +141,17 @@ export class ECDSAService {
       // Hash the message
       const messageHash = this.hashFn(messageBytes)
 
-      // Reconstruct signature object
-      const sig = {
-        r: BigInt('0x' + signature.r),
-        s: BigInt('0x' + signature.s),
-      }
+      // Reconstruct signature bytes from r and s
+      const rBytes = hexToBytes(
+        signature.r.padStart(this.getByteLength() * 2, '0'),
+      )
+      const sBytes = hexToBytes(
+        signature.s.padStart(this.getByteLength() * 2, '0'),
+      )
+      const sigBytes = new Uint8Array([...rBytes, ...sBytes])
 
       // Verify
-      return this.curveImpl.verify(sig, messageHash, publicKeyBytes)
+      return this.curveImpl.verify(sigBytes, messageHash, publicKeyBytes)
     } catch {
       // Invalid signatures should return false, not throw
       return false
@@ -373,7 +375,8 @@ export class ECDSAService {
       // Check if it's within the valid range
       const keyBigInt = BigInt('0x' + bytesToHex(key))
 
-      if (keyBigInt === 0n || keyBigInt >= this.curveImpl.CURVE.n) {
+      // Check if it's within the valid range using Fn.ORDER
+      if (keyBigInt === 0n || keyBigInt >= this.curveImpl.Point.Fn.ORDER) {
         return false
       }
 
@@ -388,8 +391,13 @@ export class ECDSAService {
    */
   private isValidPublicKey(key: Uint8Array): boolean {
     try {
-      // Try to parse the point
-      this.curveImpl.ProjectivePoint.fromHex(key)
+      // Use the built-in validation if available
+      if (this.curveImpl.utils && this.curveImpl.utils.isValidPublicKey) {
+        return this.curveImpl.utils.isValidPublicKey(key)
+      }
+
+      // Fallback: try to parse the point
+      this.curveImpl.Point.fromHex(key)
 
       return true
     } catch {
@@ -402,9 +410,15 @@ export class ECDSAService {
    */
   private isValidSignatureComponent(component: string): boolean {
     try {
+      // Check it's a valid hex string of the right length
+      if (component.length !== this.getByteLength() * 2) {
+        return false
+      }
+
       const value = BigInt('0x' + component)
 
-      return value > 0n && value < this.curveImpl.CURVE.n
+      // Basic check that it's not zero
+      return value > 0n
     } catch {
       return false
     }

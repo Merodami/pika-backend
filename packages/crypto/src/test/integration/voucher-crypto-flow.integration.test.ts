@@ -3,7 +3,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
   CodeGenerationUtils,
   ECDSAService,
-  KeyManager,
   OfflineCodeValidator,
   ShortCodeService,
   VoucherQRService,
@@ -48,14 +47,6 @@ describe('Voucher Crypto Integration Flow', () => {
       validationKey: keyPair.publicKey,
       allowedClockSkew: 300,
     })
-
-    new KeyManager(
-      {
-        redisPrefix: 'test:keys',
-        defaultTTL: 86400,
-      },
-      mockRedisClient,
-    )
   })
 
   afterAll(() => {

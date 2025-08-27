@@ -191,7 +191,6 @@ async function testAuthFlow() {
     try {
       const { JwtTokenService } = await import('@pika/auth')
       const {
-        JWT_SECRET,
         JWT_ACCESS_EXPIRY,
         JWT_REFRESH_EXPIRY,
         JWT_ISSUER,
@@ -199,7 +198,6 @@ async function testAuthFlow() {
       } = await import('@pika/environment')
 
       const jwtService = new JwtTokenService(
-        JWT_SECRET,
         JWT_ACCESS_EXPIRY,
         JWT_REFRESH_EXPIRY,
         JWT_ISSUER,

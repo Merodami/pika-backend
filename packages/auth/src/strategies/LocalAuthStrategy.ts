@@ -6,10 +6,7 @@ import {
   JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
-  JWT_PRIVATE_KEY,
-  JWT_PUBLIC_KEY,
   JWT_REFRESH_EXPIRY,
-  JWT_SECRET,
 } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { CommunicationServiceClient, logger } from '@pika/shared'
@@ -919,20 +916,13 @@ export function createLocalAuthStrategy(
 ): LocalAuthStrategy {
   const passwordService = new PasswordSecurityService()
 
-  if (!JWT_SECRET) {
-    throw new Error('JWT_SECRET environment variable is required')
-  }
-
   const tokenService = new JwtTokenService(
-    JWT_SECRET,
     JWT_ACCESS_EXPIRY,
     JWT_REFRESH_EXPIRY,
     JWT_ISSUER,
     JWT_AUDIENCE,
     cacheService,
     JWT_ALGORITHM as any,
-    JWT_PRIVATE_KEY,
-    JWT_PUBLIC_KEY,
   )
 
   return new LocalAuthStrategy(

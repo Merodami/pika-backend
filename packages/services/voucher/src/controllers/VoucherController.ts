@@ -35,6 +35,7 @@ export class VoucherController {
     this.getUserVouchers = this.getUserVouchers.bind(this)
     this.getBusinessVouchers = this.getBusinessVouchers.bind(this)
     this.getVoucherByCode = this.getVoucherByCode.bind(this)
+    this.getPopularSearches = this.getPopularSearches.bind(this)
   }
 
   /**
@@ -438,6 +439,34 @@ export class VoucherController {
         voucherPublic.VoucherResponse,
         responseData,
         'VoucherController.getVoucherByCode',
+      )
+
+      res.json(validatedResponse)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * GET /vouchers/search/popular
+   * Get popular search terms
+   */
+  async getPopularSearches(
+    req: Request,
+    res: Response<voucherPublic.PopularSearchesResponse>,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const popularSearches = await this.voucherService.getPopularSearches()
+
+      const responseData = {
+        searches: popularSearches,
+      }
+      
+      const validatedResponse = validateResponse(
+        voucherPublic.PopularSearchesResponseSchema,
+        responseData,
+        'VoucherController.getPopularSearches',
       )
 
       res.json(validatedResponse)

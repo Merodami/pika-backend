@@ -1,35 +1,23 @@
-import { JWT_ALGORITHM, JWT_PRIVATE_KEY, JWT_SECRET } from '@pika/environment'
+import { keyManager } from '@pika/crypto'
+import { JWT_ALGORITHM } from '@pika/environment'
 import { UserStatus } from '@pika/types'
 import jwt from 'jsonwebtoken'
 
 /**
- * Get the appropriate signing key based on algorithm
+ * Ensure KeyManager is initialized and get the signing key
  */
-function getSigningKey(algorithm: jwt.Algorithm): string | Buffer {
-  if (algorithm.startsWith('HS')) {
-    if (!JWT_SECRET) {
-      throw new Error(
-        'JWT_SECRET environment variable is required for HMAC algorithms',
-      )
-    }
-
-    return JWT_SECRET
-  } else if (algorithm.startsWith('RS') || algorithm.startsWith('ES')) {
-    if (!JWT_PRIVATE_KEY) {
-      throw new Error(
-        'JWT_PRIVATE_KEY environment variable is required for RSA/ECDSA algorithms',
-      )
-    }
-
-    return JWT_PRIVATE_KEY
+async function ensureKeyManagerAndGetSigningKey(): Promise<string> {
+  if (!keyManager.isInitialized()) {
+    await keyManager.initialize()
   }
-  throw new Error(`Unsupported algorithm: ${algorithm}`)
+
+  return keyManager.getJWTPrivateKeyPEM()
 }
 
 /**
  * Generate a test access token for integration tests
  */
-export function generateAccessToken(
+export async function generateAccessToken(
   payload: {
     userId: string
     email: string
@@ -38,10 +26,10 @@ export function generateAccessToken(
     status?: UserStatus
   },
   expiresInSeconds: number = 900,
-): string {
+): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
-  const algorithm = (JWT_ALGORITHM || 'HS256') as jwt.Algorithm
-  const signingKey = getSigningKey(algorithm)
+  const algorithm = (JWT_ALGORITHM || 'RS256') as jwt.Algorithm
+  const signingKey = await ensureKeyManagerAndGetSigningKey()
 
   return jwt.sign(
     {
@@ -63,7 +51,7 @@ export function generateAccessToken(
 /**
  * Generate a test refresh token for integration tests
  */
-export function generateRefreshToken(
+export async function generateRefreshToken(
   payload: {
     userId: string
     email: string
@@ -71,11 +59,11 @@ export function generateRefreshToken(
     status?: UserStatus
   },
   expiresInDays: number = 7,
-): string {
+): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const expiresInSeconds = expiresInDays * 24 * 60 * 60
-  const algorithm = (JWT_ALGORITHM || 'HS256') as jwt.Algorithm
-  const signingKey = getSigningKey(algorithm)
+  const algorithm = (JWT_ALGORITHM || 'RS256') as jwt.Algorithm
+  const signingKey = await ensureKeyManagerAndGetSigningKey()
 
   return jwt.sign(
     {

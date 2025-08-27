@@ -1,3 +1,4 @@
+import { keyManager } from '@pika/crypto'
 import {
   AWS_ACCESS_KEY_ID,
   AWS_REGION,
@@ -5,6 +6,7 @@ import {
   COMMUNICATION_SERVICE_PORT,
   EMAIL_FROM,
   EMAIL_FROM_NAME,
+  IS_EMBEDDED,
 } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { type ICacheService, initializeCache } from '@pika/redis'
@@ -32,6 +34,14 @@ export async function startService(): Promise<void> {
   let cacheService: ICacheService | undefined
 
   try {
+    // Initialize KeyManager first (required for JWT operations)
+    if (!IS_EMBEDDED) {
+      if (!keyManager.isInitialized()) {
+        await keyManager.initialize()
+        logger.info('KeyManager initialized successfully')
+      }
+    }
+
     // Initialize dependencies
     prisma = await initializeDatabase()
     cacheService = await initializeCache()

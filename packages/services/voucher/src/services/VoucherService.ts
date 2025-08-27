@@ -1,4 +1,4 @@
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT, POPULAR_SEARCHES_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
 import { Cache, ICacheService } from '@pika/redis'
 import type {
   UserVoucherData,
@@ -99,6 +99,7 @@ export interface IVoucherService {
     code: string,
     language?: LanguageCode,
   ): Promise<VoucherDomain>
+  getPopularSearches(): Promise<string[]>
 }
 
 export class VoucherService implements IVoucherService {
@@ -123,6 +124,16 @@ export class VoucherService implements IVoucherService {
     language?: LanguageCode,
   ): Promise<PaginatedResult<VoucherDomain>> {
     try {
+      // Track search query if present (fire and forget - don't block the main request)
+      if (params.search && params.search.trim().length > 0) {
+        this.trackSearchQuery(params.search.trim()).catch((error) => {
+          logger.warn('Failed to track search query', { 
+            error, 
+            query: params.search 
+          })
+        })
+      }
+
       const result = await this.repository.findAll(params)
 
       // Resolve translations if language is provided - one line!
@@ -784,6 +795,56 @@ export class VoucherService implements IVoucherService {
    * - REDEEMED → EXPIRED
    * - EXPIRED → (none)
    */
+
+  /**
+   * Track a search query for popular searches analytics
+   * This method uses upsert to increment existing queries or create new ones
+   */
+  private async trackSearchQuery(query: string): Promise<void> {
+    try {
+      // Normalize the query (lowercase, trim)
+      const normalizedQuery = query.toLowerCase().trim()
+      
+      // Skip very short queries or common stop words
+      if (normalizedQuery.length < 2) {
+        return
+      }
+
+      // Use repository method to upsert search query
+      await this.repository.upsertSearchQuery(normalizedQuery)
+      
+      // Invalidate popular searches cache to get fresh results
+      await this.cache.del(`${CACHE_KEYS.VOUCHER.POPULAR_SEARCHES}:`)
+      
+    } catch (error) {
+      // Don't throw - this is fire-and-forget analytics
+      logger.warn('Failed to track search query', { error, query })
+    }
+  }
+
+  /**
+   * Get popular search terms from database
+   * Returns empty array if no data or errors occur
+   */
+  @Cache({
+    ttl: REDIS_DEFAULT_TTL * 6, // Cache for 6 hours since this is relatively static
+    prefix: CACHE_KEYS.VOUCHER.POPULAR_SEARCHES,
+  })
+  async getPopularSearches(): Promise<string[]> {
+    try {
+      // Get popular searches from database using environment-configured limit
+      const popularQueries = await this.repository.getPopularSearches(POPULAR_SEARCHES_LIMIT)
+      
+      // Return database results or empty array
+      return popularQueries || []
+      
+    } catch (error) {
+      logger.warn('Failed to get popular searches from database', { error })
+      
+      // Return empty array in case of any database issues
+      return []
+    }
+  }
 
   private async invalidateCache(voucherId?: string): Promise<void> {
     try {

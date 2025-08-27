@@ -1,5 +1,6 @@
 // Import the necessary dependencies
-import { USER_SERVICE_PORT } from '@pika/environment'
+import { keyManager } from '@pika/crypto'
+import { IS_EMBEDDED, USER_SERVICE_PORT } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { initializeCache } from '@pika/redis'
 import { FileStoragePort, logger, StorageServiceClient } from '@pika/shared'
@@ -40,6 +41,14 @@ function initializeFileStorage(): FileStoragePort {
  * This combines both read and write capabilities
  */
 export async function startUserService() {
+  // Initialize KeyManager first (required for JWT operations)
+  if (!IS_EMBEDDED) {
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.info('KeyManager initialized successfully')
+    }
+  }
+
   // Connect to services
   const prisma = await initializeDatabase()
   const cacheService = await initializeCache()

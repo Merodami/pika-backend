@@ -283,3 +283,20 @@ model FraudCaseHistory {
   @@map("fraud_case_history")
   @@schema("security")
 }
+
+/// Search queries tracking for popular searches analytics
+model SearchQuery {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  query         String   @db.VarChar(255) // The search term entered by users
+  count         Int      @default(1) // Number of times this query was searched
+  lastSearched  DateTime @default(now()) @map("last_searched") @db.Timestamptz(6)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
+  
+  @@unique([query]) // Ensure each query term is unique
+  @@index([count(sort: Desc)]) // For retrieving popular searches
+  @@index([lastSearched]) // For recent searches
+  @@index([query]) // For query lookup and updates
+  @@map("search_queries")
+  @@schema("analytics")
+}

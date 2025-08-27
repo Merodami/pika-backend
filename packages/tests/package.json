@@ -11,7 +11,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@pika/crypto": "workspace:^",
     "@pika/database": "workspace:^",
+    "@pika/environment": "workspace:^",
     "@pika/shared": "workspace:^",
     "@pika/types": "workspace:^",
     "@types/supertest": "^6.0.3",

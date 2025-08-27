@@ -22,11 +22,18 @@
 export function prepareRSAKey(key: string, type: 'PRIVATE' | 'PUBLIC'): string {
   if (!key) return ''
 
-  // Check if it's base64 encoded (no PEM headers and no newlines)
-  if (!key.includes('-----BEGIN') && !key.includes('\n')) {
+  // Handle escaped newlines (from environment variables)
+  let processedKey = key
+
+  if (processedKey.includes('\\n') && !processedKey.includes('\n')) {
+    processedKey = processedKey.replace(/\\n/g, '\n')
+  }
+
+  // Check if it's base64 encoded (no PEM headers and no actual newlines)
+  if (!processedKey.includes('-----BEGIN') && !processedKey.includes('\n')) {
     try {
       // Attempt to decode from base64
-      const decoded = Buffer.from(key, 'base64').toString('utf-8')
+      const decoded = Buffer.from(processedKey, 'base64').toString('utf-8')
 
       // If decoded has PEM headers, it was base64 encoded PEM
       if (decoded.includes('-----BEGIN')) {
@@ -39,12 +46,12 @@ export function prepareRSAKey(key: string, type: 'PRIVATE' | 'PUBLIC'): string {
   }
 
   // If already has proper PEM format with line breaks, return as is
-  if (key.includes('-----BEGIN') && key.includes('\n')) {
-    return key
+  if (processedKey.includes('-----BEGIN') && processedKey.includes('\n')) {
+    return processedKey
   }
 
   // Format single-line PEM key with proper line breaks
-  return formatPEMKey(key, type)
+  return formatPEMKey(processedKey, type)
 }
 
 /**

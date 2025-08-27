@@ -1,11 +1,5 @@
-import {
-  JWT_ALGORITHM,
-  JWT_AUDIENCE,
-  JWT_ISSUER,
-  JWT_PRIVATE_KEY,
-  JWT_PUBLIC_KEY,
-  JWT_SECRET,
-} from '@pika/environment'
+import { keyManager } from '@pika/crypto'
+import { JWT_ALGORITHM, JWT_AUDIENCE, JWT_ISSUER } from '@pika/environment'
 import { logger } from '@pika/shared'
 import { UserRole, UserStatus } from '@pika/types'
 import type { Express } from 'express'
@@ -182,27 +176,24 @@ export class E2EAuthHelper {
    * Generate a valid JWT token for testing
    * Can be called with either userType/userId or custom user data
    */
-  generateTestToken(
+  async generateTestToken(
     userTypeOrData:
       | keyof typeof this.testUsers
       | { userId: string; email: string; role: string },
     userId?: string,
-  ): string {
+  ): Promise<string> {
     const algorithm = JWT_ALGORITHM as jwt.Algorithm
 
     // Validate required configuration based on algorithm
-    if (algorithm.startsWith('HS')) {
-      if (!JWT_SECRET) {
-        throw new Error(
-          'JWT_SECRET environment variable is required for HMAC algorithms',
-        )
-      }
-    } else if (algorithm.startsWith('RS') || algorithm.startsWith('ES')) {
-      if (!JWT_PRIVATE_KEY || !JWT_PUBLIC_KEY) {
-        throw new Error(
-          'JWT_PRIVATE_KEY and JWT_PUBLIC_KEY environment variables are required for RSA/ECDSA algorithms',
-        )
-      }
+    if (algorithm !== 'RS256') {
+      throw new Error(
+        `Unsupported algorithm: ${algorithm}. Only RS256 is supported.`,
+      )
+    }
+
+    // Ensure KeyManager is initialized
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
     }
 
     let payload: any
@@ -234,15 +225,8 @@ export class E2EAuthHelper {
     // Import jwt here to avoid circular dependencies
     const jwt = require('jsonwebtoken')
 
-    // Select appropriate signing key based on algorithm
-    let signingKey: string
-
-    if (algorithm.startsWith('HS')) {
-      signingKey = JWT_SECRET
-    } else {
-      // For RSA/ECDSA algorithms, use the key from environment (already unescaped)
-      signingKey = JWT_PRIVATE_KEY
-    }
+    // Get signing key from KeyManager
+    const signingKey = keyManager.getJWTPrivateKeyPEM()
 
     return jwt.sign(payload, signingKey, {
       algorithm,
@@ -283,7 +267,7 @@ export class E2EAuthHelper {
       }
 
       // Generate valid JWT token
-      const accessToken = this.generateTestToken(userType, userId)
+      const accessToken = await this.generateTestToken(userType, userId)
 
       // Calculate expiration (1 hour from now)
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000)

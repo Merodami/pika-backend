@@ -1,12 +1,12 @@
 // Load environment variables first
 import '@pika/environment'
 
+import { keyManager } from '@pika/crypto'
 import {
   API_GATEWAY_PORT,
   CACHE_DISABLED,
   IS_EMBEDDED,
   IS_SERVERLESS,
-  JWT_SECRET,
   NODE_ENV,
 } from '@pika/environment'
 import {
@@ -52,23 +52,6 @@ function setupRequestLogging(app: Express): void {
     )
     next()
   })
-}
-
-/**
- * Validate JWT secret configuration
- */
-function validateJWTSecret(): void {
-  if (!JWT_SECRET) {
-    throw new Error(
-      'JWT_SECRET environment variable is required for API Gateway authentication',
-    )
-  }
-
-  if (JWT_SECRET.length < 32) {
-    throw new Error(
-      'JWT_SECRET must be at least 32 characters long for security',
-    )
-  }
 }
 
 /**
@@ -187,6 +170,15 @@ function logConfiguration(): void {
  * Start the API Gateway server
  */
 async function startGateway(): Promise<Express> {
+  // Initialize KeyManager first (required for JWT operations)
+  // In embedded mode (Vercel), KeyManager is initialized by deployment adapter
+  if (!IS_EMBEDDED) {
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.info('KeyManager initialized successfully')
+    }
+  }
+
   const config = loadConfig()
   const port = API_GATEWAY_PORT || 8000
 
@@ -208,7 +200,6 @@ async function startGateway(): Promise<Express> {
 
   // Configure middleware and services
   setupRequestLogging(app)
-  validateJWTSecret()
 
   const redisService = await initializeRedis()
 

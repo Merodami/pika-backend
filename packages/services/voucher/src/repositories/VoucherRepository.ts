@@ -63,6 +63,8 @@ export interface IVoucherRepository {
   findByShortCode(shortCode: string): Promise<VoucherDomain | null>
   findByStaticCode(staticCode: string): Promise<VoucherDomain | null>
   findByAnyCode(code: string): Promise<VoucherDomain | null>
+  upsertSearchQuery(query: string): Promise<void>
+  getPopularSearches(limit: number): Promise<string[]>
 }
 
 export class VoucherRepository implements IVoucherRepository {
@@ -774,6 +776,48 @@ export class VoucherRepository implements IVoucherRepository {
       set(where, field, {})
       if (min !== undefined) set(where, `${field}.gte`, min)
       if (max !== undefined) set(where, `${field}.lte`, max)
+    }
+  }
+
+  /**
+   * Upsert a search query for popular searches tracking
+   * Uses raw SQL for efficient upsert operation
+   */
+  async upsertSearchQuery(query: string): Promise<void> {
+    try {
+      // Use raw SQL for upsert since Prisma's upsert is not ideal for this use case
+      await this.prisma.$executeRaw`
+        INSERT INTO analytics.search_queries (query, count, last_searched, created_at, updated_at)
+        VALUES (${query}, 1, NOW(), NOW(), NOW())
+        ON CONFLICT (query) 
+        DO UPDATE SET 
+          count = analytics.search_queries.count + 1,
+          last_searched = NOW(),
+          updated_at = NOW()
+      `
+    } catch (error) {
+      logger.warn('Failed to upsert search query', { error, query })
+      // Don't throw - this is analytics, shouldn't break main functionality
+    }
+  }
+
+  /**
+   * Get popular search terms ordered by count
+   * Returns the query strings only
+   */
+  async getPopularSearches(limit: number): Promise<string[]> {
+    try {
+      const results = await this.prisma.$queryRaw<Array<{ query: string }>>`
+        SELECT query
+        FROM analytics.search_queries
+        ORDER BY count DESC, last_searched DESC
+        LIMIT ${limit}
+      `
+      
+      return results.map(row => row.query)
+    } catch (error) {
+      logger.warn('Failed to get popular searches', { error, limit })
+      return []
     }
   }
 }

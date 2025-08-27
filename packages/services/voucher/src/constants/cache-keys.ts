@@ -17,6 +17,7 @@ export const CACHE_KEYS = {
     AVAILABLE: 'service:vouchers:available',
     FEATURED: 'service:vouchers:featured',
     POPULAR: 'service:vouchers:popular',
+    POPULAR_SEARCHES: 'service:vouchers:popular-searches',
     VALIDATED: 'service:voucher:validated',
   },
 

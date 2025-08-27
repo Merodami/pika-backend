@@ -1,8 +1,7 @@
-import { prepareRSAKey } from '@pika/crypto'
+import { keyManager } from '@pika/crypto'
 import {
   VOUCHER_CODE_ALPHABET,
   VOUCHER_JWT_ALGORITHM,
-  VOUCHER_JWT_PRIVATE_KEY,
   VOUCHER_SHORT_CODE_LENGTH,
 } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
@@ -68,10 +67,12 @@ function generateQRToken(voucherId: string): string {
   }
 
   try {
-    // Prepare the key for RS256/RS384/RS512 algorithms
-    const signingKey = VOUCHER_JWT_ALGORITHM.startsWith('RS')
-      ? prepareRSAKey(VOUCHER_JWT_PRIVATE_KEY, 'PRIVATE')
-      : VOUCHER_JWT_PRIVATE_KEY
+    // Get signing key from KeyManager (PEM format for jsonwebtoken)
+    const signingKey = keyManager.getVoucherJWTPrivateKeyPEM()
+
+    if (!signingKey) {
+      throw new Error('Voucher JWT private key not configured')
+    }
 
     return jwt.sign(payload, signingKey, {
       algorithm: VOUCHER_JWT_ALGORITHM as jwt.Algorithm,
@@ -304,10 +305,12 @@ export function validateVoucherCode(
  */
 export function decodeQRToken(token: string): { voucherId: string } | null {
   try {
-    // Prepare the key for RS256/RS384/RS512 algorithms
-    const verifyKey = VOUCHER_JWT_ALGORITHM.startsWith('RS')
-      ? prepareRSAKey(VOUCHER_JWT_PRIVATE_KEY, 'PRIVATE')
-      : VOUCHER_JWT_PRIVATE_KEY
+    // Get verification key from KeyManager (PEM format for jsonwebtoken)
+    const verifyKey = keyManager.getVoucherJWTPublicKeyPEM()
+
+    if (!verifyKey) {
+      throw new Error('Voucher JWT public key not configured')
+    }
 
     const decoded = jwt.verify(token, verifyKey, {
       algorithms: [VOUCHER_JWT_ALGORITHM as jwt.Algorithm],
