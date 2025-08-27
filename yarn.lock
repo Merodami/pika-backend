@@ -5805,7 +5805,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@pika/tests@workspace:packages/tests"
   dependencies:
+    "@pika/crypto": "workspace:^"
     "@pika/database": "workspace:^"
+    "@pika/environment": "workspace:^"
     "@pika/shared": "workspace:^"
     "@pika/types": "workspace:^"
     "@types/supertest": "npm:^6.0.3"
