@@ -75,7 +75,11 @@
     },
     "payment_status": {
       "type": "string",
-      "enum": ["paid", "unpaid", "no_payment_required"]
+      "enum": [
+        "paid",
+        "unpaid",
+        "no_payment_required"
+      ]
     }
   },
   "required": [

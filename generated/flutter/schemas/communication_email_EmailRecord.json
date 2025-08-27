@@ -40,7 +40,12 @@
     },
     "priority": {
       "type": "string",
-      "enum": ["low", "normal", "high", "urgent"]
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "urgent"
+      ]
     },
     "templateId": {
       "type": "string"
@@ -94,7 +99,10 @@
     },
     "bounceType": {
       "type": "string",
-      "enum": ["soft", "hard"]
+      "enum": [
+        "soft",
+        "hard"
+      ]
     },
     "metadata": {
       "type": "object",

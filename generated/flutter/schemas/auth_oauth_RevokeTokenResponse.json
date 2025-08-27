@@ -15,6 +15,9 @@
       "type": "number"
     }
   },
-  "required": ["success", "message"],
+  "required": [
+    "success",
+    "message"
+  ],
   "additionalProperties": false
 }

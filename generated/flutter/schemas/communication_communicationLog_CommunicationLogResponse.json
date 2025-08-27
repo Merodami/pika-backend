@@ -10,15 +10,31 @@
     },
     "channel": {
       "type": "string",
-      "enum": ["email", "sms", "push", "inApp", "webhook"]
+      "enum": [
+        "email",
+        "sms",
+        "push",
+        "inApp",
+        "webhook"
+      ]
     },
     "direction": {
       "type": "string",
-      "enum": ["inbound", "outbound"]
+      "enum": [
+        "inbound",
+        "outbound"
+      ]
     },
     "status": {
       "type": "string",
-      "enum": ["pending", "queued", "sent", "delivered", "failed", "cancelled"]
+      "enum": [
+        "pending",
+        "queued",
+        "sent",
+        "delivered",
+        "failed",
+        "cancelled"
+      ]
     },
     "userId": {
       "type": "string",
@@ -93,7 +109,10 @@
     },
     "bounceType": {
       "type": "string",
-      "enum": ["soft", "hard"]
+      "enum": [
+        "soft",
+        "hard"
+      ]
     },
     "openCount": {
       "default": 0,

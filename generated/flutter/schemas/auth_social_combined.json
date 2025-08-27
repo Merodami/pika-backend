@@ -17,7 +17,12 @@
         },
         "deviceType": {
           "type": "string",
-          "enum": ["ios", "android", "web", "desktop"]
+          "enum": [
+            "ios",
+            "android",
+            "web",
+            "desktop"
+          ]
         },
         "browserInfo": {
           "type": "object",
@@ -75,7 +80,11 @@
         "provider": {
           "description": "OAuth provider (google or facebook)",
           "type": "string",
-          "enum": ["google", "facebook", "apple"]
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
         },
         "redirectUri": {
           "description": "Redirect URI used in OAuth flow",
@@ -87,7 +96,11 @@
           "type": "string"
         }
       },
-      "required": ["code", "provider", "redirectUri"],
+      "required": [
+        "code",
+        "provider",
+        "redirectUri"
+      ],
       "additionalProperties": false
     },
     "ExchangeTokenResponse": {
@@ -118,10 +131,20 @@
             },
             "role": {
               "type": "string",
-              "enum": ["admin", "customer", "business"]
+              "enum": [
+                "admin",
+                "customer",
+                "business"
+              ]
             }
           },
-          "required": ["id", "email", "firstName", "lastName", "role"],
+          "required": [
+            "id",
+            "email",
+            "firstName",
+            "lastName",
+            "role"
+          ],
           "additionalProperties": false
         },
         "accessToken": {
@@ -154,7 +177,11 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["google", "facebook", "apple"]
+            "enum": [
+              "google",
+              "facebook",
+              "apple"
+            ]
           }
         }
       },
@@ -180,7 +207,11 @@
             "properties": {
               "provider": {
                 "type": "string",
-                "enum": ["google", "facebook", "apple"]
+                "enum": [
+                  "google",
+                  "facebook",
+                  "apple"
+                ]
               },
               "email": {
                 "type": "string"
@@ -198,12 +229,17 @@
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
               }
             },
-            "required": ["provider", "linkedAt"],
+            "required": [
+              "provider",
+              "linkedAt"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["linkedAccounts"],
+      "required": [
+        "linkedAccounts"
+      ],
       "additionalProperties": false
     },
     "LinkAccountRequest": {
@@ -213,7 +249,11 @@
         "provider": {
           "description": "Social provider to link",
           "type": "string",
-          "enum": ["google", "facebook", "apple"]
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
         },
         "idToken": {
           "description": "Firebase ID token from provider",
@@ -226,7 +266,11 @@
           "type": "boolean"
         }
       },
-      "required": ["provider", "idToken", "replace"],
+      "required": [
+        "provider",
+        "idToken",
+        "replace"
+      ],
       "additionalProperties": false
     },
     "LinkAccountResponse": {
@@ -246,11 +290,19 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["google", "facebook", "apple"]
+            "enum": [
+              "google",
+              "facebook",
+              "apple"
+            ]
           }
         }
       },
-      "required": ["success", "message", "linkedAccounts"],
+      "required": [
+        "success",
+        "message",
+        "linkedAccounts"
+      ],
       "additionalProperties": false
     },
     "LinkedAccountDetails": {
@@ -259,7 +311,11 @@
       "properties": {
         "provider": {
           "type": "string",
-          "enum": ["google", "facebook", "apple"]
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
         },
         "email": {
           "type": "string"
@@ -277,7 +333,10 @@
           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
         }
       },
-      "required": ["provider", "linkedAt"],
+      "required": [
+        "provider",
+        "linkedAt"
+      ],
       "additionalProperties": false
     },
     "SocialLoginRequest": {
@@ -287,7 +346,11 @@
         "provider": {
           "description": "Social auth provider",
           "type": "string",
-          "enum": ["google", "facebook", "apple"]
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
         },
         "idToken": {
           "description": "Firebase ID token from social provider",
@@ -312,7 +375,12 @@
             },
             "deviceType": {
               "type": "string",
-              "enum": ["ios", "android", "web", "desktop"]
+              "enum": [
+                "ios",
+                "android",
+                "web",
+                "desktop"
+              ]
             },
             "browserInfo": {
               "type": "object",
@@ -364,7 +432,11 @@
           "type": "boolean"
         }
       },
-      "required": ["provider", "idToken", "marketingConsent"],
+      "required": [
+        "provider",
+        "idToken",
+        "marketingConsent"
+      ],
       "additionalProperties": false
     },
     "SocialLoginResponse": {
@@ -395,10 +467,20 @@
             },
             "role": {
               "type": "string",
-              "enum": ["admin", "customer", "business"]
+              "enum": [
+                "admin",
+                "customer",
+                "business"
+              ]
             }
           },
-          "required": ["id", "email", "firstName", "lastName", "role"],
+          "required": [
+            "id",
+            "email",
+            "firstName",
+            "lastName",
+            "role"
+          ],
           "additionalProperties": false
         },
         "accessToken": {
@@ -431,7 +513,11 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["google", "facebook", "apple"]
+            "enum": [
+              "google",
+              "facebook",
+              "apple"
+            ]
           }
         }
       },
@@ -452,10 +538,16 @@
         "provider": {
           "description": "Social provider to unlink",
           "type": "string",
-          "enum": ["google", "facebook", "apple"]
+          "enum": [
+            "google",
+            "facebook",
+            "apple"
+          ]
         }
       },
-      "required": ["provider"],
+      "required": [
+        "provider"
+      ],
       "additionalProperties": false
     },
     "UnlinkAccountResponse": {
@@ -475,11 +567,19 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["google", "facebook", "apple"]
+            "enum": [
+              "google",
+              "facebook",
+              "apple"
+            ]
           }
         }
       },
-      "required": ["success", "message", "linkedAccounts"],
+      "required": [
+        "success",
+        "message",
+        "linkedAccounts"
+      ],
       "additionalProperties": false
     }
   }

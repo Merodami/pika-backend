@@ -110,7 +110,12 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "firstName", "lastName", "createdAt"],
+                  "required": [
+                    "id",
+                    "firstName",
+                    "lastName",
+                    "createdAt"
+                  ],
                   "additionalProperties": false
                 },
                 "category": {
@@ -426,7 +431,12 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "businessId", "createdAt", "updatedAt"],
+                  "required": [
+                    "id",
+                    "businessId",
+                    "createdAt",
+                    "updatedAt"
+                  ],
                   "additionalProperties": false
                 },
                 "createdAt": {
@@ -453,11 +463,18 @@
               "additionalProperties": false
             }
           },
-          "required": ["id", "businessId", "createdAt"],
+          "required": [
+            "id",
+            "businessId",
+            "createdAt"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["message", "data"],
+      "required": [
+        "message",
+        "data"
+      ],
       "additionalProperties": false
     },
     "AddFavoriteVoucherResponse": {
@@ -534,7 +551,10 @@
                 },
                 "discountType": {
                   "type": "string",
-                  "enum": ["fixed", "percentage"]
+                  "enum": [
+                    "fixed",
+                    "percentage"
+                  ]
                 },
                 "discountValue": {
                   "type": "number",
@@ -628,7 +648,11 @@
                       },
                       "type": {
                         "type": "string",
-                        "enum": ["qr", "short", "static"]
+                        "enum": [
+                          "qr",
+                          "short",
+                          "static"
+                        ]
                       },
                       "isActive": {
                         "type": "boolean"
@@ -641,7 +665,12 @@
                         "additionalProperties": {}
                       }
                     },
-                    "required": ["id", "code", "type", "isActive"],
+                    "required": [
+                      "id",
+                      "code",
+                      "type",
+                      "isActive"
+                    ],
                     "additionalProperties": false
                   }
                 },
@@ -679,11 +708,18 @@
               "additionalProperties": false
             }
           },
-          "required": ["id", "voucherId", "createdAt"],
+          "required": [
+            "id",
+            "voucherId",
+            "createdAt"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["message", "data"],
+      "required": [
+        "message",
+        "data"
+      ],
       "additionalProperties": false
     },
     "BatchFavoriteBusinessesRequest": {
@@ -746,19 +782,30 @@
               "operation": {
                 "description": "Operation that failed",
                 "type": "string",
-                "enum": ["add", "remove"]
+                "enum": [
+                  "add",
+                  "remove"
+                ]
               },
               "error": {
                 "description": "Error message",
                 "type": "string"
               }
             },
-            "required": ["itemId", "operation", "error"],
+            "required": [
+              "itemId",
+              "operation",
+              "error"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["added", "removed", "errors"],
+      "required": [
+        "added",
+        "removed",
+        "errors"
+      ],
       "additionalProperties": false
     },
     "BatchFavoriteVouchersRequest": {
@@ -803,7 +850,9 @@
           "type": "string"
         }
       },
-      "required": ["isFavorited"],
+      "required": [
+        "isFavorited"
+      ],
       "additionalProperties": false
     },
     "GetFavoriteBusinessesQuery": {
@@ -828,13 +877,19 @@
           "description": "Field to sort by",
           "default": "createdAt",
           "type": "string",
-          "enum": ["createdAt", "businessName"]
+          "enum": [
+            "createdAt",
+            "businessName"
+          ]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search query",
@@ -845,7 +900,12 @@
           "type": "string"
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "GetFavoriteBusinessesResponse": {
@@ -955,7 +1015,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "firstName", "lastName", "createdAt"],
+                    "required": [
+                      "id",
+                      "firstName",
+                      "lastName",
+                      "createdAt"
+                    ],
                     "additionalProperties": false
                   },
                   "category": {
@@ -1271,7 +1336,12 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "businessId", "createdAt", "updatedAt"],
+                    "required": [
+                      "id",
+                      "businessId",
+                      "createdAt",
+                      "updatedAt"
+                    ],
                     "additionalProperties": false
                   },
                   "createdAt": {
@@ -1298,7 +1368,11 @@
                 "additionalProperties": false
               }
             },
-            "required": ["id", "businessId", "createdAt"],
+            "required": [
+              "id",
+              "businessId",
+              "createdAt"
+            ],
             "additionalProperties": false
           }
         },
@@ -1349,7 +1423,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "GetFavoriteVouchersQuery": {
@@ -1374,13 +1451,20 @@
           "description": "Field to sort by",
           "default": "createdAt",
           "type": "string",
-          "enum": ["createdAt", "voucherTitle", "expiryDate"]
+          "enum": [
+            "createdAt",
+            "voucherTitle",
+            "expiryDate"
+          ]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search query",
@@ -1391,7 +1475,12 @@
           "type": "string"
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "GetFavoriteVouchersResponse": {
@@ -1468,7 +1557,10 @@
                   },
                   "discountType": {
                     "type": "string",
-                    "enum": ["fixed", "percentage"]
+                    "enum": [
+                      "fixed",
+                      "percentage"
+                    ]
                   },
                   "discountValue": {
                     "type": "number",
@@ -1562,7 +1654,11 @@
                         },
                         "type": {
                           "type": "string",
-                          "enum": ["qr", "short", "static"]
+                          "enum": [
+                            "qr",
+                            "short",
+                            "static"
+                          ]
                         },
                         "isActive": {
                           "type": "boolean"
@@ -1575,7 +1671,12 @@
                           "additionalProperties": {}
                         }
                       },
-                      "required": ["id", "code", "type", "isActive"],
+                      "required": [
+                        "id",
+                        "code",
+                        "type",
+                        "isActive"
+                      ],
                       "additionalProperties": false
                     }
                   },
@@ -1613,7 +1714,11 @@
                 "additionalProperties": false
               }
             },
-            "required": ["id", "voucherId", "createdAt"],
+            "required": [
+              "id",
+              "voucherId",
+              "createdAt"
+            ],
             "additionalProperties": false
           }
         },
@@ -1664,7 +1769,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "RemoveFavoriteResponse": {
@@ -1676,7 +1784,9 @@
           "type": "string"
         }
       },
-      "required": ["message"],
+      "required": [
+        "message"
+      ],
       "additionalProperties": false
     }
   }

@@ -11,12 +11,21 @@
         "properties": {
           "channel": {
             "type": "string",
-            "enum": ["email", "sms", "push", "inApp", "webhook"]
+            "enum": [
+              "email",
+              "sms",
+              "push",
+              "inApp",
+              "webhook"
+            ]
           },
           "direction": {
             "default": "outbound",
             "type": "string",
-            "enum": ["inbound", "outbound"]
+            "enum": [
+              "inbound",
+              "outbound"
+            ]
           },
           "status": {
             "default": "pending",
@@ -86,11 +95,17 @@
             }
           }
         },
-        "required": ["channel", "direction", "status"],
+        "required": [
+          "channel",
+          "direction",
+          "status"
+        ],
         "additionalProperties": false
       }
     }
   },
-  "required": ["logs"],
+  "required": [
+    "logs"
+  ],
   "additionalProperties": false
 }

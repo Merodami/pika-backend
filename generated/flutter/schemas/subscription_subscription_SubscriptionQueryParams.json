@@ -19,13 +19,22 @@
     "sortBy": {
       "default": "createdAt",
       "type": "string",
-      "enum": ["createdAt", "updatedAt", "startDate", "endDate", "status"]
+      "enum": [
+        "createdAt",
+        "updatedAt",
+        "startDate",
+        "endDate",
+        "status"
+      ]
     },
     "sortOrder": {
       "description": "Sort order",
       "default": "desc",
       "type": "string",
-      "enum": ["asc", "desc"]
+      "enum": [
+        "asc",
+        "desc"
+      ]
     },
     "search": {
       "description": "Search query",
@@ -58,6 +67,11 @@
       "type": "boolean"
     }
   },
-  "required": ["page", "limit", "sortBy", "sortOrder"],
+  "required": [
+    "page",
+    "limit",
+    "sortBy",
+    "sortOrder"
+  ],
   "additionalProperties": false
 }

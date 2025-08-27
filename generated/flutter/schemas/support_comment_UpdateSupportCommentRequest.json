@@ -8,6 +8,8 @@
       "maxLength": 5000
     }
   },
-  "required": ["content"],
+  "required": [
+    "content"
+  ],
   "additionalProperties": false
 }

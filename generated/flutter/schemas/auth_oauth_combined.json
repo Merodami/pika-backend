@@ -14,10 +14,15 @@
         },
         "tokenTypeHint": {
           "type": "string",
-          "enum": ["accessToken", "refreshToken"]
+          "enum": [
+            "accessToken",
+            "refreshToken"
+          ]
         }
       },
-      "required": ["token"],
+      "required": [
+        "token"
+      ],
       "additionalProperties": false
     },
     "IntrospectResponse": {
@@ -66,10 +71,16 @@
         },
         "userRole": {
           "type": "string",
-          "enum": ["admin", "customer", "business"]
+          "enum": [
+            "admin",
+            "customer",
+            "business"
+          ]
         }
       },
-      "required": ["active"],
+      "required": [
+        "active"
+      ],
       "additionalProperties": false
     },
     "OAuthErrorResponse": {
@@ -99,7 +110,9 @@
           "format": "uri"
         }
       },
-      "required": ["error"],
+      "required": [
+        "error"
+      ],
       "additionalProperties": false
     },
     "RevokeTokenRequest": {
@@ -113,7 +126,10 @@
         },
         "tokenTypeHint": {
           "type": "string",
-          "enum": ["accessToken", "refreshToken"]
+          "enum": [
+            "accessToken",
+            "refreshToken"
+          ]
         },
         "allDevices": {
           "description": "Revoke all tokens for user",
@@ -121,7 +137,10 @@
           "type": "boolean"
         }
       },
-      "required": ["token", "allDevices"],
+      "required": [
+        "token",
+        "allDevices"
+      ],
       "additionalProperties": false
     },
     "RevokeTokenResponse": {
@@ -141,7 +160,10 @@
           "type": "number"
         }
       },
-      "required": ["success", "message"],
+      "required": [
+        "success",
+        "message"
+      ],
       "additionalProperties": false
     },
     "TokenRequest": {
@@ -167,7 +189,11 @@
               "type": "string"
             }
           },
-          "required": ["grantType", "username", "password"],
+          "required": [
+            "grantType",
+            "username",
+            "password"
+          ],
           "additionalProperties": false
         },
         {
@@ -187,7 +213,10 @@
               "type": "string"
             }
           },
-          "required": ["grantType", "refreshToken"],
+          "required": [
+            "grantType",
+            "refreshToken"
+          ],
           "additionalProperties": false
         }
       ]
@@ -245,14 +274,28 @@
             },
             "role": {
               "type": "string",
-              "enum": ["admin", "customer", "business"]
+              "enum": [
+                "admin",
+                "customer",
+                "business"
+              ]
             }
           },
-          "required": ["id", "email", "firstName", "lastName", "role"],
+          "required": [
+            "id",
+            "email",
+            "firstName",
+            "lastName",
+            "role"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["accessToken", "tokenType", "expiresIn"],
+      "required": [
+        "accessToken",
+        "tokenType",
+        "expiresIn"
+      ],
       "additionalProperties": false
     },
     "UserInfoResponse": {
@@ -287,7 +330,11 @@
         },
         "role": {
           "type": "string",
-          "enum": ["admin", "customer", "business"]
+          "enum": [
+            "admin",
+            "customer",
+            "business"
+          ]
         },
         "permissions": {
           "description": "User permissions",
@@ -311,7 +358,13 @@
           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
         }
       },
-      "required": ["id", "email", "firstName", "lastName", "role"],
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "role"
+      ],
       "additionalProperties": false
     }
   }

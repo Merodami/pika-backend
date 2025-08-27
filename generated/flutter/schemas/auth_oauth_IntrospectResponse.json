@@ -44,9 +44,15 @@
     },
     "userRole": {
       "type": "string",
-      "enum": ["admin", "customer", "business"]
+      "enum": [
+        "admin",
+        "customer",
+        "business"
+      ]
     }
   },
-  "required": ["active"],
+  "required": [
+    "active"
+  ],
   "additionalProperties": false
 }

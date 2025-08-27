@@ -28,6 +28,10 @@
       }
     }
   },
-  "required": ["subscriptionId", "periodStart", "periodEnd"],
+  "required": [
+    "subscriptionId",
+    "periodStart",
+    "periodEnd"
+  ],
   "additionalProperties": false
 }

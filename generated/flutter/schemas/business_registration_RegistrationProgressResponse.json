@@ -53,7 +53,12 @@
     "registrationStatus": {
       "description": "Current registration status",
       "type": "string",
-      "enum": ["in_progress", "submitted", "approved", "rejected"]
+      "enum": [
+        "in_progress",
+        "submitted",
+        "approved",
+        "rejected"
+      ]
     },
     "businessId": {
       "description": "Business ID if created",

@@ -39,13 +39,23 @@
           "type": "string"
         }
       },
-      "required": ["id", "promoCodeId", "userId", "usedAt"],
+      "required": [
+        "id",
+        "promoCodeId",
+        "userId",
+        "usedAt"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["success", "discount", "usage", "message"],
+  "required": [
+    "success",
+    "discount",
+    "usage",
+    "message"
+  ],
   "additionalProperties": false
 }

@@ -16,6 +16,8 @@
       "type": "string"
     }
   },
-  "required": ["cancelAtPeriodEnd"],
+  "required": [
+    "cancelAtPeriodEnd"
+  ],
   "additionalProperties": false
 }

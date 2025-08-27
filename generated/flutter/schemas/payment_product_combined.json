@@ -32,7 +32,12 @@
         },
         "interval": {
           "type": "string",
-          "enum": ["day", "week", "month", "year"]
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
         },
         "intervalCount": {
           "type": "integer",
@@ -40,7 +45,11 @@
           "maximum": 9007199254740991
         }
       },
-      "required": ["productId", "amount", "currency"],
+      "required": [
+        "productId",
+        "amount",
+        "currency"
+      ],
       "additionalProperties": false
     },
     "CreateProductRequest": {
@@ -66,7 +75,9 @@
           }
         }
       },
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "additionalProperties": false
     },
     "ListPricesQuery": {
@@ -106,7 +117,10 @@
           "maximum": 100
         }
       },
-      "required": ["page", "limit"],
+      "required": [
+        "page",
+        "limit"
+      ],
       "additionalProperties": false
     },
     "ListProductsQuery": {
@@ -118,7 +132,12 @@
         },
         "type": {
           "type": "string",
-          "enum": ["membership", "merchandise", "service", "other"]
+          "enum": [
+            "membership",
+            "merchandise",
+            "service",
+            "other"
+          ]
         },
         "page": {
           "default": 1,
@@ -133,7 +152,10 @@
           "maximum": 100
         }
       },
-      "required": ["page", "limit"],
+      "required": [
+        "page",
+        "limit"
+      ],
       "additionalProperties": false
     },
     "Price": {
@@ -168,7 +190,12 @@
         },
         "interval": {
           "type": "string",
-          "enum": ["day", "week", "month", "year"]
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ]
         },
         "intervalCount": {
           "type": "integer",
@@ -216,7 +243,9 @@
           "type": "string"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "PriceListResponse": {
@@ -258,7 +287,12 @@
               },
               "interval": {
                 "type": "string",
-                "enum": ["day", "week", "month", "year"]
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "year"
+                ]
               },
               "intervalCount": {
                 "type": "integer",
@@ -346,7 +380,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "Product": {
@@ -381,7 +418,12 @@
         },
         "type": {
           "type": "string",
-          "enum": ["membership", "merchandise", "service", "other"]
+          "enum": [
+            "membership",
+            "merchandise",
+            "service",
+            "other"
+          ]
         },
         "createdAt": {
           "description": "When the record was created",
@@ -392,7 +434,13 @@
           "type": "string"
         }
       },
-      "required": ["id", "name", "active", "createdAt", "updatedAt"],
+      "required": [
+        "id",
+        "name",
+        "active",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "ProductIdParam": {
@@ -403,7 +451,9 @@
           "type": "string"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "ProductListResponse": {
@@ -445,7 +495,12 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["membership", "merchandise", "service", "other"]
+                "enum": [
+                  "membership",
+                  "merchandise",
+                  "service",
+                  "other"
+                ]
               },
               "createdAt": {
                 "description": "When the record was created",
@@ -456,7 +511,13 @@
                 "type": "string"
               }
             },
-            "required": ["id", "name", "active", "createdAt", "updatedAt"],
+            "required": [
+              "id",
+              "name",
+              "active",
+              "createdAt",
+              "updatedAt"
+            ],
             "additionalProperties": false
           }
         },
@@ -507,7 +568,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "UpdateProductRequest": {

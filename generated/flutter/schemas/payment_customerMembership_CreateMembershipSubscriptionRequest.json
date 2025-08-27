@@ -32,6 +32,9 @@
       }
     }
   },
-  "required": ["priceId", "paymentMethodId"],
+  "required": [
+    "priceId",
+    "paymentMethodId"
+  ],
   "additionalProperties": false
 }

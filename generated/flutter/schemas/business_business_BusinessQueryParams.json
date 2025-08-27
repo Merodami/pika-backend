@@ -32,7 +32,10 @@
       "description": "Sort order",
       "default": "desc",
       "type": "string",
-      "enum": ["asc", "desc"]
+      "enum": [
+        "asc",
+        "desc"
+      ]
     },
     "search": {
       "description": "Search query",
@@ -59,6 +62,11 @@
       "maximum": 5
     }
   },
-  "required": ["page", "limit", "sortBy", "sortOrder"],
+  "required": [
+    "page",
+    "limit",
+    "sortBy",
+    "sortOrder"
+  ],
   "additionalProperties": false
 }

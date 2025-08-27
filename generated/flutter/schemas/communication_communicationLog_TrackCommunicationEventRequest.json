@@ -40,9 +40,16 @@
     },
     "bounceType": {
       "type": "string",
-      "enum": ["soft", "hard"]
+      "enum": [
+        "soft",
+        "hard"
+      ]
     }
   },
-  "required": ["messageId", "event", "timestamp"],
+  "required": [
+    "messageId",
+    "event",
+    "timestamp"
+  ],
   "additionalProperties": false
 }

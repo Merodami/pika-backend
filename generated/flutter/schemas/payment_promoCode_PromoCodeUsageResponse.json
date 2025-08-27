@@ -35,7 +35,12 @@
             "type": "string"
           }
         },
-        "required": ["id", "promoCodeId", "userId", "usedAt"],
+        "required": [
+          "id",
+          "promoCodeId",
+          "userId",
+          "usedAt"
+        ],
         "additionalProperties": false
       }
     },
@@ -86,6 +91,9 @@
       "additionalProperties": false
     }
   },
-  "required": ["data", "pagination"],
+  "required": [
+    "data",
+    "pagination"
+  ],
   "additionalProperties": false
 }

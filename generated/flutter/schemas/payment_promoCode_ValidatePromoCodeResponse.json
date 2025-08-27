@@ -27,6 +27,9 @@
       "maximum": 9007199254740991
     }
   },
-  "required": ["valid", "code"],
+  "required": [
+    "valid",
+    "code"
+  ],
   "additionalProperties": false
 }

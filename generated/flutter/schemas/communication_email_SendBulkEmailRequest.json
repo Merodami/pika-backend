@@ -32,7 +32,9 @@
             "additionalProperties": {}
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "additionalProperties": false
       }
     },
@@ -54,7 +56,12 @@
     "priority": {
       "default": "normal",
       "type": "string",
-      "enum": ["low", "normal", "high", "urgent"]
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "urgent"
+      ]
     },
     "trackOpens": {
       "default": true,

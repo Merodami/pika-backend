@@ -10,7 +10,17 @@
     },
     "currency": {
       "type": "string",
-      "enum": ["PYG", "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "INR"]
+      "enum": [
+        "PYG",
+        "USD",
+        "EUR",
+        "GBP",
+        "CAD",
+        "AUD",
+        "JPY",
+        "CNY",
+        "INR"
+      ]
     },
     "page": {
       "default": 1,
@@ -25,6 +35,9 @@
       "maximum": 100
     }
   },
-  "required": ["page", "limit"],
+  "required": [
+    "page",
+    "limit"
+  ],
   "additionalProperties": false
 }

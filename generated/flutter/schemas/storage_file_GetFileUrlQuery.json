@@ -10,6 +10,8 @@
       "maximum": 86400
     }
   },
-  "required": ["expiresIn"],
+  "required": [
+    "expiresIn"
+  ],
   "additionalProperties": false
 }

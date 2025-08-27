@@ -25,7 +25,12 @@
         },
         "type": {
           "type": "string",
-          "enum": ["email", "inApp", "sms", "push"]
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
         },
         "title": {
           "type": "string",
@@ -37,7 +42,12 @@
         "priority": {
           "default": "normal",
           "type": "string",
-          "enum": ["low", "normal", "high", "urgent"]
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
         },
         "category": {
           "type": "string"
@@ -62,10 +72,16 @@
           "type": "string"
         }
       },
-      "required": ["description", "priority"],
+      "required": [
+        "description",
+        "priority"
+      ],
       "additionalProperties": false
     }
   },
-  "required": ["isGlobal", "notification"],
+  "required": [
+    "isGlobal",
+    "notification"
+  ],
   "additionalProperties": false
 }

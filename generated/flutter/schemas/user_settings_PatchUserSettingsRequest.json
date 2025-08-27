@@ -7,7 +7,11 @@
       "properties": {
         "theme": {
           "type": "string",
-          "enum": ["light", "dark", "system"]
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ]
         },
         "language": {
           "type": "string",
@@ -19,11 +23,18 @@
         },
         "dateFormat": {
           "type": "string",
-          "enum": ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"]
+          "enum": [
+            "MM/DD/YYYY",
+            "DD/MM/YYYY",
+            "YYYY-MM-DD"
+          ]
         },
         "timeFormat": {
           "type": "string",
-          "enum": ["12h", "24h"]
+          "enum": [
+            "12h",
+            "24h"
+          ]
         },
         "currency": {
           "type": "string",
@@ -133,7 +144,11 @@
           "properties": {
             "visibility": {
               "type": "string",
-              "enum": ["public", "private", "friends"]
+              "enum": [
+                "public",
+                "private",
+                "friends"
+              ]
             },
             "showEmail": {
               "type": "boolean"
@@ -194,7 +209,12 @@
           "properties": {
             "defaultView": {
               "type": "string",
-              "enum": ["overview", "analytics", "vouchers", "customers"]
+              "enum": [
+                "overview",
+                "analytics",
+                "vouchers",
+                "customers"
+              ]
             },
             "autoRefresh": {
               "type": "boolean"

@@ -1,21 +1,24 @@
-import { Priority } from '@pika/types'
+import { ExportFormat, Priority } from '@pika/types'
 import { z } from 'zod'
 
 import { createZodEnum } from '../../common/utils/zodEnum.js'
 import { 
   AnalyticsQuery,
   AnalyticsQuerySchema,
+  AnalyticsReportTypeSchema,
   AnalyticsResponse,
   AnalyticsResponseSchema,
   DashboardConfig,
   DashboardConfigSchema,
   DashboardResponse,
   DashboardResponseSchema,
+  ExportFormatSchema,
   ReportRequest,
   ReportRequestSchema,
   ReportResponse,
   ReportResponseSchema,
 } from '../shared/analytics.js'
+import { UUID } from '../shared/primitives.js'
 import { createIncludeParam } from '../shared/query.js'
 
 /**
@@ -59,9 +62,9 @@ export type AdminAnalyticsQuery = z.infer<typeof AdminAnalyticsQuery>
 // ============= Reports Endpoint =============
 
 /**
- * Admin report types (use ReportType from @pika/types)
+ * Admin report types (use AnalyticsReportType from shared analytics)
  */
-export const AdminReportType = ReportTypeSchema
+export const AdminReportType = AnalyticsReportTypeSchema
 
 /**
  * Available report types for admin (OpenAPI documented)
@@ -70,7 +73,7 @@ export const AdminReportTypeSchema = AdminReportType.openapi('AdminReportType', 
   description: 'Available report types for admin users',
 })
 
-export type AdminReportType = ReportType
+export type AdminReportType = z.infer<typeof AdminReportType>
 
 /**
  * Admin report request with additional parameters (raw Zod)
@@ -289,7 +292,7 @@ export type AdminDashboardResponse = z.infer<typeof AdminDashboardResponse>
 
 export const adminReportSchemas = {
   // Request Schemas
-  AnalyticsQueryRequestSchema,
+  AdminAnalyticsQuerySchema,
   AdminReportRequestSchema,
   DashboardConfigUpdateRequestSchema,
   InsightsRequestSchema,
@@ -310,8 +313,7 @@ export const adminReportSchemas = {
 }
 
 export type AdminReportTypes = {
-  AdminAnalyticsQueryParams: AdminAnalyticsQueryParams
-  AnalyticsQueryRequest: AnalyticsQueryRequest
+  AdminAnalyticsQuery: AdminAnalyticsQuery
   AdminReportType: AdminReportType
   AdminReportRequest: AdminReportRequest
   DashboardQueryParams: DashboardQueryParams

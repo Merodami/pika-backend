@@ -11,6 +11,8 @@
       "type": "string"
     }
   },
-  "required": ["isFavorited"],
+  "required": [
+    "isFavorited"
+  ],
   "additionalProperties": false
 }

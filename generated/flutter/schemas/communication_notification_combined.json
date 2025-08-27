@@ -30,7 +30,12 @@
             },
             "type": {
               "type": "string",
-              "enum": ["email", "inApp", "sms", "push"]
+              "enum": [
+                "email",
+                "inApp",
+                "sms",
+                "push"
+              ]
             },
             "title": {
               "type": "string",
@@ -42,7 +47,12 @@
             "priority": {
               "default": "normal",
               "type": "string",
-              "enum": ["low", "normal", "high", "urgent"]
+              "enum": [
+                "low",
+                "normal",
+                "high",
+                "urgent"
+              ]
             },
             "category": {
               "type": "string"
@@ -67,11 +77,17 @@
               "type": "string"
             }
           },
-          "required": ["description", "priority"],
+          "required": [
+            "description",
+            "priority"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["isGlobal", "notification"],
+      "required": [
+        "isGlobal",
+        "notification"
+      ],
       "additionalProperties": false
     },
     "CreateNotificationRequest": {
@@ -89,7 +105,12 @@
         },
         "type": {
           "type": "string",
-          "enum": ["email", "inApp", "sms", "push"]
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
         },
         "title": {
           "type": "string",
@@ -105,7 +126,12 @@
         "priority": {
           "default": "normal",
           "type": "string",
-          "enum": ["low", "normal", "high", "urgent"]
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
         },
         "category": {
           "type": "string"
@@ -130,7 +156,11 @@
           "type": "string"
         }
       },
-      "required": ["description", "isGlobal", "priority"],
+      "required": [
+        "description",
+        "isGlobal",
+        "priority"
+      ],
       "additionalProperties": false
     },
     "DeleteNotificationResponse": {
@@ -142,7 +172,9 @@
           "type": "string"
         }
       },
-      "required": ["message"],
+      "required": [
+        "message"
+      ],
       "additionalProperties": false
     },
     "MarkAllAsReadResponse": {
@@ -156,7 +188,9 @@
           "maximum": 9007199254740991
         }
       },
-      "required": ["updated"],
+      "required": [
+        "updated"
+      ],
       "additionalProperties": false
     },
     "MarkNotificationsReadRequest": {
@@ -181,7 +215,9 @@
           "type": "string"
         }
       },
-      "required": ["all"],
+      "required": [
+        "all"
+      ],
       "additionalProperties": false
     },
     "Notification": {
@@ -202,17 +238,33 @@
         },
         "type": {
           "type": "string",
-          "enum": ["email", "inApp", "sms", "push"]
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
         },
         "status": {
           "default": "pending",
           "type": "string",
-          "enum": ["pending", "sent", "delivered", "failed", "read"]
+          "enum": [
+            "pending",
+            "sent",
+            "delivered",
+            "failed",
+            "read"
+          ]
         },
         "priority": {
           "default": "normal",
           "type": "string",
-          "enum": ["low", "normal", "high", "urgent"]
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
         },
         "title": {
           "type": "string",
@@ -306,17 +358,33 @@
               },
               "type": {
                 "type": "string",
-                "enum": ["email", "inApp", "sms", "push"]
+                "enum": [
+                  "email",
+                  "inApp",
+                  "sms",
+                  "push"
+                ]
               },
               "status": {
                 "default": "pending",
                 "type": "string",
-                "enum": ["pending", "sent", "delivered", "failed", "read"]
+                "enum": [
+                  "pending",
+                  "sent",
+                  "delivered",
+                  "failed",
+                  "read"
+                ]
               },
               "priority": {
                 "default": "normal",
                 "type": "string",
-                "enum": ["low", "normal", "high", "urgent"]
+                "enum": [
+                  "low",
+                  "normal",
+                  "high",
+                  "urgent"
+                ]
               },
               "title": {
                 "type": "string",
@@ -433,7 +501,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "NotificationPreferencesResponse": {
@@ -455,7 +526,10 @@
               }
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "inApp": {
@@ -473,7 +547,10 @@
               }
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "sms": {
@@ -491,7 +568,10 @@
               }
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "push": {
@@ -512,7 +592,10 @@
               "type": "string"
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "quietHours": {
@@ -534,11 +617,19 @@
               "type": "string"
             }
           },
-          "required": ["enabled"],
+          "required": [
+            "enabled"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["email", "inApp", "sms", "push", "quietHours"],
+      "required": [
+        "email",
+        "inApp",
+        "sms",
+        "push",
+        "quietHours"
+      ],
       "additionalProperties": false
     },
     "NotificationResponse": {
@@ -559,17 +650,33 @@
         },
         "type": {
           "type": "string",
-          "enum": ["email", "inApp", "sms", "push"]
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
         },
         "status": {
           "default": "pending",
           "type": "string",
-          "enum": ["pending", "sent", "delivered", "failed", "read"]
+          "enum": [
+            "pending",
+            "sent",
+            "delivered",
+            "failed",
+            "read"
+          ]
         },
         "priority": {
           "default": "normal",
           "type": "string",
-          "enum": ["low", "normal", "high", "urgent"]
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
         },
         "title": {
           "type": "string",
@@ -659,13 +766,20 @@
         "sortBy": {
           "default": "createdAt",
           "type": "string",
-          "enum": ["createdAt", "priority", "expiresAt"]
+          "enum": [
+            "createdAt",
+            "priority",
+            "expiresAt"
+          ]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search query",
@@ -673,15 +787,31 @@
         },
         "type": {
           "type": "string",
-          "enum": ["email", "inApp", "sms", "push"]
+          "enum": [
+            "email",
+            "inApp",
+            "sms",
+            "push"
+          ]
         },
         "status": {
           "type": "string",
-          "enum": ["pending", "sent", "delivered", "failed", "read"]
+          "enum": [
+            "pending",
+            "sent",
+            "delivered",
+            "failed",
+            "read"
+          ]
         },
         "priority": {
           "type": "string",
-          "enum": ["low", "normal", "high", "urgent"]
+          "enum": [
+            "low",
+            "normal",
+            "high",
+            "urgent"
+          ]
         },
         "isRead": {
           "type": "boolean"
@@ -701,7 +831,12 @@
           "type": "string"
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "RegisterPushTokenRequest": {
@@ -714,7 +849,13 @@
         },
         "platform": {
           "type": "string",
-          "enum": ["ios", "android", "web", "desktop", "other"]
+          "enum": [
+            "ios",
+            "android",
+            "web",
+            "desktop",
+            "other"
+          ]
         },
         "deviceId": {
           "type": "string"
@@ -723,7 +864,10 @@
           "type": "string"
         }
       },
-      "required": ["token", "platform"],
+      "required": [
+        "token",
+        "platform"
+      ],
       "additionalProperties": false
     },
     "UnregisterPushTokenRequest": {
@@ -735,7 +879,9 @@
           "minLength": 1
         }
       },
-      "required": ["token"],
+      "required": [
+        "token"
+      ],
       "additionalProperties": false
     },
     "UpdateNotificationPreferencesRequest": {
@@ -757,7 +903,10 @@
               }
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "inApp": {
@@ -775,7 +924,10 @@
               }
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "sms": {
@@ -793,7 +945,10 @@
               }
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "push": {
@@ -814,7 +969,10 @@
               "type": "string"
             }
           },
-          "required": ["enabled", "categories"],
+          "required": [
+            "enabled",
+            "categories"
+          ],
           "additionalProperties": false
         },
         "quietHours": {
@@ -836,7 +994,9 @@
               "type": "string"
             }
           },
-          "required": ["enabled"],
+          "required": [
+            "enabled"
+          ],
           "additionalProperties": false
         }
       },

@@ -14,7 +14,9 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "PdfDownloadResponse": {
@@ -48,7 +50,12 @@
           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
         }
       },
-      "required": ["url", "filename", "contentType", "generatedAt"],
+      "required": [
+        "url",
+        "filename",
+        "contentType",
+        "generatedAt"
+      ],
       "additionalProperties": false
     },
     "VoucherBookDetailResponse": {
@@ -106,7 +113,9 @@
             "status": {
               "description": "Only published books visible to public",
               "type": "string",
-              "enum": ["published"]
+              "enum": [
+                "published"
+              ]
             },
             "totalPages": {
               "description": "Total number of pages",
@@ -185,7 +194,9 @@
           "additionalProperties": false
         }
       },
-      "required": ["data"],
+      "required": [
+        "data"
+      ],
       "additionalProperties": false
     },
     "VoucherBookListResponse": {
@@ -247,7 +258,9 @@
               "status": {
                 "description": "Only published books visible to public",
                 "type": "string",
-                "enum": ["published"]
+                "enum": [
+                  "published"
+                ]
               },
               "totalPages": {
                 "description": "Total number of pages",
@@ -373,7 +386,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "VoucherBookPathParams": {
@@ -387,7 +403,9 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "VoucherBookQueryParams": {
@@ -425,7 +443,10 @@
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search in title and edition",
@@ -454,7 +475,12 @@
           "maximum": 12
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "VoucherBookResponse": {
@@ -509,7 +535,9 @@
         "status": {
           "description": "Only published books visible to public",
           "type": "string",
-          "enum": ["published"]
+          "enum": [
+            "published"
+          ]
         },
         "totalPages": {
           "description": "Total number of pages",

@@ -72,12 +72,21 @@
                     "maximum": 180
                   }
                 },
-                "required": ["lat", "lng"],
+                "required": [
+                  "lat",
+                  "lng"
+                ],
                 "additionalProperties": false
               },
               "type": {
                 "type": "string",
-                "enum": ["home", "work", "billing", "shipping", "other"]
+                "enum": [
+                  "home",
+                  "work",
+                  "billing",
+                  "shipping",
+                  "other"
+                ]
               },
               "label": {
                 "description": "Custom label",
@@ -156,7 +165,13 @@
           "type": "boolean"
         }
       },
-      "required": ["data", "total", "page", "limit", "hasMore"],
+      "required": [
+        "data",
+        "total",
+        "page",
+        "limit",
+        "hasMore"
+      ],
       "additionalProperties": false
     },
     "AddressResponse": {
@@ -223,12 +238,21 @@
               "maximum": 180
             }
           },
-          "required": ["lat", "lng"],
+          "required": [
+            "lat",
+            "lng"
+          ],
           "additionalProperties": false
         },
         "type": {
           "type": "string",
-          "enum": ["home", "work", "billing", "shipping", "other"]
+          "enum": [
+            "home",
+            "work",
+            "billing",
+            "shipping",
+            "other"
+          ]
         },
         "label": {
           "description": "Custom label",
@@ -290,7 +314,13 @@
     "AddressType": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "string",
-      "enum": ["home", "work", "billing", "shipping", "other"]
+      "enum": [
+        "home",
+        "work",
+        "billing",
+        "shipping",
+        "other"
+      ]
     },
     "AddressValidationResponse": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -351,11 +381,20 @@
                   "maximum": 180
                 }
               },
-              "required": ["lat", "lng"],
+              "required": [
+                "lat",
+                "lng"
+              ],
               "additionalProperties": false
             }
           },
-          "required": ["street", "city", "state", "postalCode", "country"],
+          "required": [
+            "street",
+            "city",
+            "state",
+            "postalCode",
+            "country"
+          ],
           "additionalProperties": false
         },
         "confidence": {
@@ -378,7 +417,11 @@
                 "type": "string"
               }
             },
-            "required": ["field", "original", "suggested"],
+            "required": [
+              "field",
+              "original",
+              "suggested"
+            ],
             "additionalProperties": false
           }
         },
@@ -398,7 +441,10 @@
               "maximum": 180
             }
           },
-          "required": ["lat", "lng"],
+          "required": [
+            "lat",
+            "lng"
+          ],
           "additionalProperties": false
         },
         "warnings": {
@@ -408,7 +454,9 @@
           }
         }
       },
-      "required": ["isValid"],
+      "required": [
+        "isValid"
+      ],
       "additionalProperties": false
     },
     "CreateAddressRequest": {
@@ -447,7 +495,13 @@
         },
         "type": {
           "type": "string",
-          "enum": ["home", "work", "billing", "shipping", "other"]
+          "enum": [
+            "home",
+            "work",
+            "billing",
+            "shipping",
+            "other"
+          ]
         },
         "label": {
           "type": "string",
@@ -480,11 +534,21 @@
               "maximum": 180
             }
           },
-          "required": ["lat", "lng"],
+          "required": [
+            "lat",
+            "lng"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["street", "city", "state", "postalCode", "country", "type"],
+      "required": [
+        "street",
+        "city",
+        "state",
+        "postalCode",
+        "country",
+        "type"
+      ],
       "additionalProperties": false
     },
     "SetDefaultAddressRequest": {
@@ -500,10 +564,18 @@
         "type": {
           "description": "Set as default for specific type",
           "type": "string",
-          "enum": ["home", "work", "billing", "shipping", "other"]
+          "enum": [
+            "home",
+            "work",
+            "billing",
+            "shipping",
+            "other"
+          ]
         }
       },
-      "required": ["addressId"],
+      "required": [
+        "addressId"
+      ],
       "additionalProperties": false
     },
     "UpdateAddressRequest": {
@@ -542,7 +614,13 @@
         },
         "type": {
           "type": "string",
-          "enum": ["home", "work", "billing", "shipping", "other"]
+          "enum": [
+            "home",
+            "work",
+            "billing",
+            "shipping",
+            "other"
+          ]
         },
         "label": {
           "type": "string",
@@ -575,7 +653,10 @@
               "maximum": 180
             }
           },
-          "required": ["lat", "lng"],
+          "required": [
+            "lat",
+            "lng"
+          ],
           "additionalProperties": false
         },
         "isVerified": {
@@ -648,12 +729,21 @@
               "maximum": 180
             }
           },
-          "required": ["lat", "lng"],
+          "required": [
+            "lat",
+            "lng"
+          ],
           "additionalProperties": false
         },
         "type": {
           "type": "string",
-          "enum": ["home", "work", "billing", "shipping", "other"]
+          "enum": [
+            "home",
+            "work",
+            "billing",
+            "shipping",
+            "other"
+          ]
         },
         "label": {
           "description": "Custom label",
@@ -781,12 +871,21 @@
                     "maximum": 180
                   }
                 },
-                "required": ["lat", "lng"],
+                "required": [
+                  "lat",
+                  "lng"
+                ],
                 "additionalProperties": false
               },
               "type": {
                 "type": "string",
-                "enum": ["home", "work", "billing", "shipping", "other"]
+                "enum": [
+                  "home",
+                  "work",
+                  "billing",
+                  "shipping",
+                  "other"
+                ]
               },
               "label": {
                 "description": "Custom label",
@@ -859,7 +958,9 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": ["addresses"],
+      "required": [
+        "addresses"
+      ],
       "additionalProperties": false
     },
     "ValidateAddressRequest": {
@@ -896,7 +997,13 @@
           "maxLength": 2
         }
       },
-      "required": ["street", "city", "state", "postalCode", "country"],
+      "required": [
+        "street",
+        "city",
+        "state",
+        "postalCode",
+        "country"
+      ],
       "additionalProperties": false
     }
   }

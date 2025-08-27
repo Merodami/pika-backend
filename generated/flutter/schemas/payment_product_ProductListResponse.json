@@ -37,7 +37,12 @@
           },
           "type": {
             "type": "string",
-            "enum": ["membership", "merchandise", "service", "other"]
+            "enum": [
+              "membership",
+              "merchandise",
+              "service",
+              "other"
+            ]
           },
           "createdAt": {
             "description": "When the record was created",
@@ -48,7 +53,13 @@
             "type": "string"
           }
         },
-        "required": ["id", "name", "active", "createdAt", "updatedAt"],
+        "required": [
+          "id",
+          "name",
+          "active",
+          "createdAt",
+          "updatedAt"
+        ],
         "additionalProperties": false
       }
     },
@@ -99,6 +110,9 @@
       "additionalProperties": false
     }
   },
-  "required": ["data", "pagination"],
+  "required": [
+    "data",
+    "pagination"
+  ],
   "additionalProperties": false
 }

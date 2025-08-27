@@ -13,9 +13,16 @@
     },
     "feedback": {
       "type": "string",
-      "enum": ["tooExpensive", "notUsing", "missingFeatures", "other"]
+      "enum": [
+        "tooExpensive",
+        "notUsing",
+        "missingFeatures",
+        "other"
+      ]
     }
   },
-  "required": ["immediately"],
+  "required": [
+    "immediately"
+  ],
   "additionalProperties": false
 }

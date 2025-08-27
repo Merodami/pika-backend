@@ -4,7 +4,12 @@
   "properties": {
     "planType": {
       "type": "string",
-      "enum": ["basic", "premium", "enterprise", "trial"]
+      "enum": [
+        "basic",
+        "premium",
+        "enterprise",
+        "trial"
+      ]
     },
     "paymentMethodId": {
       "description": "Stripe payment method ID",
@@ -14,6 +19,9 @@
       "type": "string"
     }
   },
-  "required": ["planType", "paymentMethodId"],
+  "required": [
+    "planType",
+    "paymentMethodId"
+  ],
   "additionalProperties": false
 }

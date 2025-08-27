@@ -1,5 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "string",
-  "enum": ["home", "work", "billing", "shipping", "other"]
+  "enum": [
+    "home",
+    "work",
+    "billing",
+    "shipping",
+    "other"
+  ]
 }

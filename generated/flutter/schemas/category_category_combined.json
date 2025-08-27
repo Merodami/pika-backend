@@ -208,7 +208,9 @@
           }
         }
       },
-      "required": ["data"],
+      "required": [
+        "data"
+      ],
       "additionalProperties": false
     },
     "CategoryListResponse": {
@@ -451,7 +453,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "CategoryPathParams": {
@@ -465,7 +470,9 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "CategoryPathResponse": {
@@ -660,7 +667,9 @@
           }
         }
       },
-      "required": ["data"],
+      "required": [
+        "data"
+      ],
       "additionalProperties": false
     },
     "CategoryQueryParams": {
@@ -684,13 +693,21 @@
         "sortBy": {
           "default": "sortOrder",
           "type": "string",
-          "enum": ["name", "sortOrder", "createdAt", "updatedAt"]
+          "enum": [
+            "name",
+            "sortOrder",
+            "createdAt",
+            "updatedAt"
+          ]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search query",
@@ -711,7 +728,12 @@
           "type": "string"
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "CategoryResponse": {

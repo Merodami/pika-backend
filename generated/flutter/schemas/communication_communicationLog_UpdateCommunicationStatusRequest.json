@@ -4,7 +4,14 @@
   "properties": {
     "status": {
       "type": "string",
-      "enum": ["pending", "queued", "sent", "delivered", "failed", "cancelled"]
+      "enum": [
+        "pending",
+        "queued",
+        "sent",
+        "delivered",
+        "failed",
+        "cancelled"
+      ]
     },
     "deliveredAt": {
       "description": "ISO 8601 datetime with timezone",
@@ -30,7 +37,10 @@
     },
     "bounceType": {
       "type": "string",
-      "enum": ["soft", "hard"]
+      "enum": [
+        "soft",
+        "hard"
+      ]
     },
     "metadata": {
       "type": "object",
@@ -40,6 +50,8 @@
       "additionalProperties": {}
     }
   },
-  "required": ["status"],
+  "required": [
+    "status"
+  ],
   "additionalProperties": false
 }

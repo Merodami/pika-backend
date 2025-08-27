@@ -26,10 +26,20 @@
         },
         "role": {
           "type": "string",
-          "enum": ["admin", "customer", "business"]
+          "enum": [
+            "admin",
+            "customer",
+            "business"
+          ]
         }
       },
-      "required": ["id", "email", "firstName", "lastName", "role"],
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "role"
+      ],
       "additionalProperties": false
     },
     "accessToken": {
@@ -62,7 +72,11 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["google", "facebook", "apple"]
+        "enum": [
+          "google",
+          "facebook",
+          "apple"
+        ]
       }
     }
   },

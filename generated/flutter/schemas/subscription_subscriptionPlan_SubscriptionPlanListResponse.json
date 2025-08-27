@@ -37,7 +37,12 @@
           },
           "interval": {
             "type": "string",
-            "enum": ["day", "week", "month", "year"]
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ]
           },
           "intervalCount": {
             "description": "Number of intervals between billings",
@@ -151,6 +156,9 @@
       "additionalProperties": false
     }
   },
-  "required": ["data", "pagination"],
+  "required": [
+    "data",
+    "pagination"
+  ],
   "additionalProperties": false
 }

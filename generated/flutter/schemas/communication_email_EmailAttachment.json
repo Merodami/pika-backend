@@ -22,6 +22,9 @@
       "maximum": 9007199254740991
     }
   },
-  "required": ["filename", "content"],
+  "required": [
+    "filename",
+    "content"
+  ],
   "additionalProperties": false
 }

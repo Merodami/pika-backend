@@ -5,7 +5,11 @@
     "provider": {
       "description": "Social auth provider",
       "type": "string",
-      "enum": ["google", "facebook", "apple"]
+      "enum": [
+        "google",
+        "facebook",
+        "apple"
+      ]
     },
     "idToken": {
       "description": "Firebase ID token from social provider",
@@ -30,7 +34,12 @@
         },
         "deviceType": {
           "type": "string",
-          "enum": ["ios", "android", "web", "desktop"]
+          "enum": [
+            "ios",
+            "android",
+            "web",
+            "desktop"
+          ]
         },
         "browserInfo": {
           "type": "object",
@@ -82,6 +91,10 @@
       "type": "boolean"
     }
   },
-  "required": ["provider", "idToken", "marketingConsent"],
+  "required": [
+    "provider",
+    "idToken",
+    "marketingConsent"
+  ],
   "additionalProperties": false
 }

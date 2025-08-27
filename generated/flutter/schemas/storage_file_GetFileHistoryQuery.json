@@ -37,14 +37,28 @@
     "sortBy": {
       "default": "uploadedAt",
       "type": "string",
-      "enum": ["uploadedAt", "fileSize", "fileName", "createdAt", "updatedAt"]
+      "enum": [
+        "uploadedAt",
+        "fileSize",
+        "fileName",
+        "createdAt",
+        "updatedAt"
+      ]
     },
     "sortOrder": {
       "default": "desc",
       "type": "string",
-      "enum": ["asc", "desc"]
+      "enum": [
+        "asc",
+        "desc"
+      ]
     }
   },
-  "required": ["page", "limit", "sortBy", "sortOrder"],
+  "required": [
+    "page",
+    "limit",
+    "sortBy",
+    "sortOrder"
+  ],
   "additionalProperties": false
 }

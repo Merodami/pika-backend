@@ -23,7 +23,13 @@
           },
           "type": {
             "type": "string",
-            "enum": ["card", "bankAccount", "applePay", "googlePay", "wallet"]
+            "enum": [
+              "card",
+              "bankAccount",
+              "applePay",
+              "googlePay",
+              "wallet"
+            ]
           },
           "isDefault": {
             "default": false,
@@ -70,10 +76,20 @@
               },
               "funding": {
                 "type": "string",
-                "enum": ["credit", "debit", "prepaid", "unknown"]
+                "enum": [
+                  "credit",
+                  "debit",
+                  "prepaid",
+                  "unknown"
+                ]
               }
             },
-            "required": ["brand", "last4", "expMonth", "expYear"],
+            "required": [
+              "brand",
+              "last4",
+              "expMonth",
+              "expYear"
+            ],
             "additionalProperties": false
           },
           "bankAccount": {
@@ -92,7 +108,10 @@
               },
               "accountHolderType": {
                 "type": "string",
-                "enum": ["individual", "company"]
+                "enum": [
+                  "individual",
+                  "company"
+                ]
               },
               "country": {
                 "type": "string",
@@ -119,7 +138,11 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["applePay", "googlePay", "samsungPay"]
+                "enum": [
+                  "applePay",
+                  "googlePay",
+                  "samsungPay"
+                ]
               },
               "dynamicLast4": {
                 "type": "string",
@@ -127,7 +150,9 @@
                 "maxLength": 4
               }
             },
-            "required": ["type"],
+            "required": [
+              "type"
+            ],
             "additionalProperties": false
           },
           "billingAddress": {
@@ -209,6 +234,9 @@
       "type": "boolean"
     }
   },
-  "required": ["paymentMethods", "hasValidPaymentMethod"],
+  "required": [
+    "paymentMethods",
+    "hasValidPaymentMethod"
+  ],
   "additionalProperties": false
 }

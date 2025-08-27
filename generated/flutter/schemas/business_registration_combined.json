@@ -20,7 +20,12 @@
         "registrationStatus": {
           "description": "Current registration status",
           "type": "string",
-          "enum": ["in_progress", "submitted", "approved", "rejected"]
+          "enum": [
+            "in_progress",
+            "submitted",
+            "approved",
+            "rejected"
+          ]
         },
         "canAccessDashboard": {
           "description": "Whether user can access dashboard",
@@ -152,7 +157,13 @@
               "maxLength": 2
             }
           },
-          "required": ["street", "city", "state", "postalCode", "country"],
+          "required": [
+            "street",
+            "city",
+            "state",
+            "postalCode",
+            "country"
+          ],
           "additionalProperties": false
         },
         "phone": {
@@ -171,7 +182,11 @@
           "type": "string"
         }
       },
-      "required": ["description", "address", "phone"],
+      "required": [
+        "description",
+        "address",
+        "phone"
+      ],
       "additionalProperties": false
     },
     "BusinessRegistrationStep3Request": {
@@ -222,7 +237,10 @@
           "const": true
         }
       },
-      "required": ["confirmAllDataAccurate", "agreedToTerms"],
+      "required": [
+        "confirmAllDataAccurate",
+        "agreedToTerms"
+      ],
       "additionalProperties": false
     },
     "CompleteBusinessRegistrationResponse": {
@@ -323,7 +341,12 @@
         "registrationStatus": {
           "description": "Current registration status",
           "type": "string",
-          "enum": ["in_progress", "submitted", "approved", "rejected"]
+          "enum": [
+            "in_progress",
+            "submitted",
+            "approved",
+            "rejected"
+          ]
         },
         "businessId": {
           "description": "Business ID if created",
@@ -370,7 +393,10 @@
           "maximum": 3
         }
       },
-      "required": ["started", "currentStep"],
+      "required": [
+        "started",
+        "currentStep"
+      ],
       "additionalProperties": false
     },
     "SubmitRegistrationStepRequest": {
@@ -396,7 +422,11 @@
           "type": "boolean"
         }
       },
-      "required": ["stepNumber", "stepData", "saveAsDraft"],
+      "required": [
+        "stepNumber",
+        "stepData",
+        "saveAsDraft"
+      ],
       "additionalProperties": false
     },
     "SubmitRegistrationStepResponse": {
@@ -428,7 +458,10 @@
           "additionalProperties": {}
         }
       },
-      "required": ["success", "nextStep"],
+      "required": [
+        "success",
+        "nextStep"
+      ],
       "additionalProperties": false
     }
   }

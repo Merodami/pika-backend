@@ -7,7 +7,11 @@
       "properties": {
         "code": {
           "type": "string",
-          "enum": ["invalidSignature", "processingError", "unknownEventType"]
+          "enum": [
+            "invalidSignature",
+            "processingError",
+            "unknownEventType"
+          ]
         },
         "message": {
           "type": "string"
@@ -20,10 +24,16 @@
           "type": "string"
         }
       },
-      "required": ["code", "message", "timestamp"],
+      "required": [
+        "code",
+        "message",
+        "timestamp"
+      ],
       "additionalProperties": false
     }
   },
-  "required": ["error"],
+  "required": [
+    "error"
+  ],
   "additionalProperties": false
 }

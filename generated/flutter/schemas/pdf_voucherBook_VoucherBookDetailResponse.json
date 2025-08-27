@@ -53,7 +53,9 @@
         "status": {
           "description": "Only published books visible to public",
           "type": "string",
-          "enum": ["published"]
+          "enum": [
+            "published"
+          ]
         },
         "totalPages": {
           "description": "Total number of pages",
@@ -132,6 +134,8 @@
       "additionalProperties": false
     }
   },
-  "required": ["data"],
+  "required": [
+    "data"
+  ],
   "additionalProperties": false
 }

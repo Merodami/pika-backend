@@ -88,7 +88,12 @@
             "type": "string"
           }
         },
-        "required": ["id", "promoCodeId", "userId", "usedAt"],
+        "required": [
+          "id",
+          "promoCodeId",
+          "userId",
+          "usedAt"
+        ],
         "additionalProperties": false
       }
     },

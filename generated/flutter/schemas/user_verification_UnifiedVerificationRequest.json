@@ -4,7 +4,11 @@
   "properties": {
     "type": {
       "type": "string",
-      "enum": ["email", "phone", "accountConfirmation"]
+      "enum": [
+        "email",
+        "phone",
+        "accountConfirmation"
+      ]
     },
     "token": {
       "type": "string"
@@ -28,6 +32,8 @@
       "type": "string"
     }
   },
-  "required": ["type"],
+  "required": [
+    "type"
+  ],
   "additionalProperties": false
 }

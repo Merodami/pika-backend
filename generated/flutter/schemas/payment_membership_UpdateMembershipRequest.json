@@ -25,7 +25,12 @@
     },
     "planType": {
       "type": "string",
-      "enum": ["basic", "premium", "enterprise", "trial"]
+      "enum": [
+        "basic",
+        "premium",
+        "enterprise",
+        "trial"
+      ]
     },
     "lastPaymentDate": {
       "description": "ISO 8601 datetime with timezone",

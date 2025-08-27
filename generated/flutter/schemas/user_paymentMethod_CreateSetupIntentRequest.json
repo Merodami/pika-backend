@@ -3,7 +3,9 @@
   "type": "object",
   "properties": {
     "paymentMethodTypes": {
-      "default": ["card"],
+      "default": [
+        "card"
+      ],
       "type": "array",
       "items": {
         "type": "string"
@@ -12,9 +14,15 @@
     "usage": {
       "default": "off_session",
       "type": "string",
-      "enum": ["on_session", "off_session"]
+      "enum": [
+        "on_session",
+        "off_session"
+      ]
     }
   },
-  "required": ["paymentMethodTypes", "usage"],
+  "required": [
+    "paymentMethodTypes",
+    "usage"
+  ],
   "additionalProperties": false
 }

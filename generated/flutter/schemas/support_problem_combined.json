@@ -20,7 +20,13 @@
         "priority": {
           "default": "medium",
           "type": "string",
-          "enum": ["low", "medium", "high", "urgent", "critical"]
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "urgent",
+            "critical"
+          ]
         },
         "type": {
           "default": "general",
@@ -42,7 +48,13 @@
           }
         }
       },
-      "required": ["title", "description", "priority", "type", "files"],
+      "required": [
+        "title",
+        "description",
+        "priority",
+        "type",
+        "files"
+      ],
       "additionalProperties": false
     },
     "SupportProblemListResponse": {
@@ -90,7 +102,13 @@
               },
               "priority": {
                 "type": "string",
-                "enum": ["low", "medium", "high", "urgent", "critical"]
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "urgent",
+                  "critical"
+                ]
               },
               "type": {
                 "type": "string",
@@ -190,7 +208,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "SupportProblemResponse": {
@@ -231,7 +252,13 @@
         },
         "priority": {
           "type": "string",
-          "enum": ["low", "medium", "high", "urgent", "critical"]
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "urgent",
+            "critical"
+          ]
         },
         "type": {
           "type": "string",
@@ -304,13 +331,21 @@
         "sortBy": {
           "default": "createdAt",
           "type": "string",
-          "enum": ["createdAt", "updatedAt", "priority", "status"]
+          "enum": [
+            "createdAt",
+            "updatedAt",
+            "priority",
+            "status"
+          ]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         },
         "search": {
           "description": "Search query",
@@ -330,7 +365,13 @@
         },
         "priority": {
           "type": "string",
-          "enum": ["low", "medium", "high", "urgent", "critical"]
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "urgent",
+            "critical"
+          ]
         },
         "type": {
           "type": "string",
@@ -344,7 +385,12 @@
           ]
         }
       },
-      "required": ["page", "limit", "sortBy", "sortOrder"],
+      "required": [
+        "page",
+        "limit",
+        "sortBy",
+        "sortOrder"
+      ],
       "additionalProperties": false
     },
     "UpdateSupportProblemRequest": {
@@ -363,7 +409,13 @@
         },
         "priority": {
           "type": "string",
-          "enum": ["low", "medium", "high", "urgent", "critical"]
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "urgent",
+            "critical"
+          ]
         },
         "type": {
           "type": "string",

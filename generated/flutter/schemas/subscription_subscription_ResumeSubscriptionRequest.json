@@ -8,6 +8,8 @@
       "type": "boolean"
     }
   },
-  "required": ["resumeImmediately"],
+  "required": [
+    "resumeImmediately"
+  ],
   "additionalProperties": false
 }

@@ -31,7 +31,10 @@
     },
     "bounceType": {
       "type": "string",
-      "enum": ["soft", "hard"]
+      "enum": [
+        "soft",
+        "hard"
+      ]
     },
     "failureReason": {
       "type": "string"
@@ -44,6 +47,11 @@
       "type": "string"
     }
   },
-  "required": ["messageId", "event", "timestamp", "recipient"],
+  "required": [
+    "messageId",
+    "event",
+    "timestamp",
+    "recipient"
+  ],
   "additionalProperties": false
 }

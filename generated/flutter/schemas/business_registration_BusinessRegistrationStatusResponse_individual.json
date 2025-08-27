@@ -15,7 +15,12 @@
     "registrationStatus": {
       "description": "Current registration status",
       "type": "string",
-      "enum": ["in_progress", "submitted", "approved", "rejected"]
+      "enum": [
+        "in_progress",
+        "submitted",
+        "approved",
+        "rejected"
+      ]
     },
     "canAccessDashboard": {
       "description": "Whether user can access dashboard",

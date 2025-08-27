@@ -8,6 +8,8 @@
       "format": "uri"
     }
   },
-  "required": ["logoUrl"],
+  "required": [
+    "logoUrl"
+  ],
   "additionalProperties": false
 }

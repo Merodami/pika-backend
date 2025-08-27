@@ -23,17 +23,33 @@
           },
           "type": {
             "type": "string",
-            "enum": ["email", "inApp", "sms", "push"]
+            "enum": [
+              "email",
+              "inApp",
+              "sms",
+              "push"
+            ]
           },
           "status": {
             "default": "pending",
             "type": "string",
-            "enum": ["pending", "sent", "delivered", "failed", "read"]
+            "enum": [
+              "pending",
+              "sent",
+              "delivered",
+              "failed",
+              "read"
+            ]
           },
           "priority": {
             "default": "normal",
             "type": "string",
-            "enum": ["low", "normal", "high", "urgent"]
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ]
           },
           "title": {
             "type": "string",
@@ -150,6 +166,9 @@
       "additionalProperties": false
     }
   },
-  "required": ["data", "pagination"],
+  "required": [
+    "data",
+    "pagination"
+  ],
   "additionalProperties": false
 }

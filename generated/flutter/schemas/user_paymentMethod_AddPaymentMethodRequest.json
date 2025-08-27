@@ -32,10 +32,18 @@
           "maxLength": 2
         }
       },
-      "required": ["line1", "city", "state", "postalCode", "country"],
+      "required": [
+        "line1",
+        "city",
+        "state",
+        "postalCode",
+        "country"
+      ],
       "additionalProperties": false
     }
   },
-  "required": ["stripePaymentMethodId"],
+  "required": [
+    "stripePaymentMethodId"
+  ],
   "additionalProperties": false
 }

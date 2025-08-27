@@ -16,7 +16,9 @@
           "type": "string"
         }
       },
-      "required": ["code"],
+      "required": [
+        "code"
+      ],
       "additionalProperties": false
     },
     "ApplyPromoCodeResponse": {
@@ -60,14 +62,24 @@
               "type": "string"
             }
           },
-          "required": ["id", "promoCodeId", "userId", "usedAt"],
+          "required": [
+            "id",
+            "promoCodeId",
+            "userId",
+            "usedAt"
+          ],
           "additionalProperties": false
         },
         "message": {
           "type": "string"
         }
       },
-      "required": ["success", "discount", "usage", "message"],
+      "required": [
+        "success",
+        "discount",
+        "usage",
+        "message"
+      ],
       "additionalProperties": false
     },
     "PromoCode": {
@@ -154,7 +166,9 @@
           "maxLength": 50
         }
       },
-      "required": ["code"],
+      "required": [
+        "code"
+      ],
       "additionalProperties": false
     },
     "PromoCodeIdParam": {
@@ -168,7 +182,9 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "PromoCodeUsage": {
@@ -201,7 +217,12 @@
           "type": "string"
         }
       },
-      "required": ["id", "promoCodeId", "userId", "usedAt"],
+      "required": [
+        "id",
+        "promoCodeId",
+        "userId",
+        "usedAt"
+      ],
       "additionalProperties": false
     },
     "PromoCodeUsageParams": {
@@ -240,7 +261,11 @@
           "maximum": 50
         }
       },
-      "required": ["promoCodeId", "page", "limit"],
+      "required": [
+        "promoCodeId",
+        "page",
+        "limit"
+      ],
       "additionalProperties": false
     },
     "PromoCodeUsageResponse": {
@@ -280,7 +305,12 @@
                 "type": "string"
               }
             },
-            "required": ["id", "promoCodeId", "userId", "usedAt"],
+            "required": [
+              "id",
+              "promoCodeId",
+              "userId",
+              "usedAt"
+            ],
             "additionalProperties": false
           }
         },
@@ -331,7 +361,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "PromoCodeUserParams": {
@@ -349,7 +382,10 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": ["code", "userId"],
+      "required": [
+        "code",
+        "userId"
+      ],
       "additionalProperties": false
     },
     "PromoCodeWithUsages": {
@@ -442,7 +478,12 @@
                 "type": "string"
               }
             },
-            "required": ["id", "promoCodeId", "userId", "usedAt"],
+            "required": [
+              "id",
+              "promoCodeId",
+              "userId",
+              "usedAt"
+            ],
             "additionalProperties": false
           }
         },
@@ -603,7 +644,10 @@
           "additionalProperties": false
         }
       },
-      "required": ["data", "pagination"],
+      "required": [
+        "data",
+        "pagination"
+      ],
       "additionalProperties": false
     },
     "PublicCreatePromoCodeRequest": {
@@ -721,15 +765,27 @@
         },
         "sort": {
           "type": "string",
-          "enum": ["code", "discount", "expirationDate", "createdAt"]
+          "enum": [
+            "code",
+            "discount",
+            "expirationDate",
+            "createdAt"
+          ]
         },
         "order": {
           "default": "desc",
           "type": "string",
-          "enum": ["asc", "desc"]
+          "enum": [
+            "asc",
+            "desc"
+          ]
         }
       },
-      "required": ["page", "limit", "order"],
+      "required": [
+        "page",
+        "limit",
+        "order"
+      ],
       "additionalProperties": false
     },
     "ValidatePromoCodeRequest": {
@@ -748,7 +804,9 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": ["code"],
+      "required": [
+        "code"
+      ],
       "additionalProperties": false
     },
     "ValidatePromoCodeResponse": {
@@ -780,7 +838,10 @@
           "maximum": 9007199254740991
         }
       },
-      "required": ["valid", "code"],
+      "required": [
+        "valid",
+        "code"
+      ],
       "additionalProperties": false
     }
   }

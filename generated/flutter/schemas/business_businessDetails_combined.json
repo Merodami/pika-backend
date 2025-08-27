@@ -131,7 +131,12 @@
           "type": "string"
         }
       },
-      "required": ["id", "businessId", "createdAt", "updatedAt"],
+      "required": [
+        "id",
+        "businessId",
+        "createdAt",
+        "updatedAt"
+      ],
       "additionalProperties": false
     },
     "UpdateBusinessDetailsRequest": {
@@ -242,7 +247,9 @@
           "format": "uri"
         }
       },
-      "required": ["logoUrl"],
+      "required": [
+        "logoUrl"
+      ],
       "additionalProperties": false
     }
   }

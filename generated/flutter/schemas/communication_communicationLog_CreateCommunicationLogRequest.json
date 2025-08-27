@@ -4,17 +4,33 @@
   "properties": {
     "channel": {
       "type": "string",
-      "enum": ["email", "sms", "push", "inApp", "webhook"]
+      "enum": [
+        "email",
+        "sms",
+        "push",
+        "inApp",
+        "webhook"
+      ]
     },
     "direction": {
       "default": "outbound",
       "type": "string",
-      "enum": ["inbound", "outbound"]
+      "enum": [
+        "inbound",
+        "outbound"
+      ]
     },
     "status": {
       "default": "pending",
       "type": "string",
-      "enum": ["pending", "queued", "sent", "delivered", "failed", "cancelled"]
+      "enum": [
+        "pending",
+        "queued",
+        "sent",
+        "delivered",
+        "failed",
+        "cancelled"
+      ]
     },
     "userId": {
       "type": "string",
@@ -72,6 +88,10 @@
       }
     }
   },
-  "required": ["channel", "direction", "status"],
+  "required": [
+    "channel",
+    "direction",
+    "status"
+  ],
   "additionalProperties": false
 }

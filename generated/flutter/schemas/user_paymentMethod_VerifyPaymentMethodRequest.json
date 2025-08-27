@@ -20,6 +20,8 @@
       "format": "uri"
     }
   },
-  "required": ["paymentMethodId"],
+  "required": [
+    "paymentMethodId"
+  ],
   "additionalProperties": false
 }

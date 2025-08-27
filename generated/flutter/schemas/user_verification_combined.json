@@ -9,7 +9,11 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["email", "phone", "accountConfirmation"]
+          "enum": [
+            "email",
+            "phone",
+            "accountConfirmation"
+          ]
         },
         "userId": {
           "type": "string",
@@ -25,7 +29,9 @@
           "type": "string"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "additionalProperties": false
     },
     "UnifiedVerificationRequest": {
@@ -34,7 +40,11 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["email", "phone", "accountConfirmation"]
+          "enum": [
+            "email",
+            "phone",
+            "accountConfirmation"
+          ]
         },
         "token": {
           "type": "string"
@@ -58,7 +68,9 @@
           "type": "string"
         }
       },
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "additionalProperties": false
     },
     "UnifiedVerificationResponse": {
@@ -72,7 +84,9 @@
           "type": "string"
         }
       },
-      "required": ["success"],
+      "required": [
+        "success"
+      ],
       "additionalProperties": false
     }
   }

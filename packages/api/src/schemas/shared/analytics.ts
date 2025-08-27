@@ -2,10 +2,10 @@ import {
   AnalyticsEntity,
   AnalyticsDimension,
   AnalyticsMetric,
+  AnalyticsReportType,
   ChartType,
   ExportFormat,
   Priority,
-  ReportType,
   TimeGranularity,
   TrendDirection,
 } from '@pika/types'
@@ -31,7 +31,7 @@ export const AnalyticsDimensionSchema = createZodEnum(AnalyticsDimension)
 export const TimeGranularitySchema = createZodEnum(TimeGranularity)
 export const ChartTypeSchema = createZodEnum(ChartType)
 export const TrendDirectionSchema = createZodEnum(TrendDirection)
-export const ReportTypeSchema = createZodEnum(ReportType)
+export const AnalyticsReportTypeSchema = createZodEnum(AnalyticsReportType)
 export const ExportFormatSchema = createZodEnum(ExportFormat)
 export const PrioritySchema = createZodEnum(Priority)
 
@@ -75,7 +75,7 @@ export type AnalyticsQuery = z.infer<typeof AnalyticsQuery>
  * Simpler pre-configured reports
  */
 export const ReportRequest = z.object({
-  reportType: ReportTypeSchema.describe('Report type'),
+  reportType: AnalyticsReportTypeSchema.describe('Report type'),
   entity: AnalyticsEntitySchema.describe('Entity to report on'),
   timeframe: z.string().default('30d').describe('Time period (7d, 30d, 90d, 1y)'),
   filters: z.record(z.string(), z.any()).optional().describe('Report filters'),

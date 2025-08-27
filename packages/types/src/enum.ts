@@ -427,10 +427,11 @@ export enum TimeGranularity {
 export type TimeGranularityType = `${TimeGranularity}`
 
 /**
- * Report types available in the admin analytics system
- * Used for pre-configured report templates
+ * Analytics report types available in the admin analytics system
+ * Used for pre-configured analytics report templates
+ * Different from payment-specific ReportType
  */
-export enum ReportType {
+export enum AnalyticsReportType {
   OVERVIEW = 'overview',
   GROWTH = 'growth',
   PERFORMANCE = 'performance',
@@ -444,9 +445,9 @@ export enum ReportType {
 }
 
 /**
- * Type definition for report type - use this for type annotations
+ * Type definition for analytics report type - use this for type annotations
  */
-export type ReportTypeType = `${ReportType}`
+export type AnalyticsReportTypeType = `${AnalyticsReportType}`
 
 /**
  * Chart types for data visualization
@@ -501,19 +502,3 @@ export enum ExportFormat {
  */
 export type ExportFormatType = `${ExportFormat}`
 
-/**
- * Priority levels for insights and recommendations
- * Used for prioritizing actionable items from analytics
- */
-export enum Priority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  URGENT = 'urgent',
-  CRITICAL = 'critical',
-}
-
-/**
- * Type definition for priority - use this for type annotations
- */
-export type PriorityType = `${Priority}`

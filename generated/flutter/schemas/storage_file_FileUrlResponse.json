@@ -23,6 +23,12 @@
       "type": "string"
     }
   },
-  "required": ["url", "expiresAt", "fileId", "fileName", "mimeType"],
+  "required": [
+    "url",
+    "expiresAt",
+    "fileId",
+    "fileName",
+    "mimeType"
+  ],
   "additionalProperties": false
 }
