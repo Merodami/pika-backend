@@ -14,9 +14,6 @@
       "maxLength": 5000
     }
   },
-  "required": [
-    "problemId",
-    "content"
-  ],
+  "required": ["problemId", "content"],
   "additionalProperties": false
 }

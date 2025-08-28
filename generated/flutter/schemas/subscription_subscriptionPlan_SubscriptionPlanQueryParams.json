@@ -19,21 +19,13 @@
     "sortBy": {
       "default": "name",
       "type": "string",
-      "enum": [
-        "name",
-        "price",
-        "createdAt",
-        "updatedAt"
-      ]
+      "enum": ["name", "price", "createdAt", "updatedAt"]
     },
     "sortOrder": {
       "description": "Sort order",
       "default": "desc",
       "type": "string",
-      "enum": [
-        "asc",
-        "desc"
-      ]
+      "enum": ["asc", "desc"]
     },
     "search": {
       "description": "Search query",
@@ -44,28 +36,13 @@
     },
     "interval": {
       "type": "string",
-      "enum": [
-        "day",
-        "week",
-        "month",
-        "year"
-      ]
+      "enum": ["day", "week", "month", "year"]
     },
     "planType": {
       "type": "string",
-      "enum": [
-        "basic",
-        "premium",
-        "enterprise",
-        "trial"
-      ]
+      "enum": ["basic", "premium", "enterprise", "trial"]
     }
   },
-  "required": [
-    "page",
-    "limit",
-    "sortBy",
-    "sortOrder"
-  ],
+  "required": ["page", "limit", "sortBy", "sortOrder"],
   "additionalProperties": false
 }

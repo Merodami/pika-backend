@@ -19,6 +19,7 @@ vi.unmock('@pika/shared')
 vi.unmock('@pika/translation')
 
 import { createBusinessServer } from '@business/server.js'
+import { keyManager } from '@pika/crypto'
 import {
   createSharedBusinessTestData,
   type SharedBusinessTestData,
@@ -54,6 +55,12 @@ describe('Business Service Cache Validation Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Business Service Cache Validation tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Create test database
     testDb = await createTestDatabase({

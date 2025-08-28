@@ -23,8 +23,6 @@
       "additionalProperties": {}
     }
   },
-  "required": [
-    "planId"
-  ],
+  "required": ["planId"],
   "additionalProperties": false
 }

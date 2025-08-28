@@ -32,19 +32,11 @@
             "maximum": 9007199254740991
           }
         },
-        "required": [
-          "description",
-          "amount"
-        ],
+        "required": ["description", "amount"],
         "additionalProperties": false
       }
     }
   },
-  "required": [
-    "amountDue",
-    "currency",
-    "dueDate",
-    "lineItems"
-  ],
+  "required": ["amountDue", "currency", "dueDate", "lineItems"],
   "additionalProperties": false
 }

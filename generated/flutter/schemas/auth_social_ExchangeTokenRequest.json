@@ -10,11 +10,7 @@
     "provider": {
       "description": "OAuth provider (google or facebook)",
       "type": "string",
-      "enum": [
-        "google",
-        "facebook",
-        "apple"
-      ]
+      "enum": ["google", "facebook", "apple"]
     },
     "redirectUri": {
       "description": "Redirect URI used in OAuth flow",
@@ -26,10 +22,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "code",
-    "provider",
-    "redirectUri"
-  ],
+  "required": ["code", "provider", "redirectUri"],
   "additionalProperties": false
 }

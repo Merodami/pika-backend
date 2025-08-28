@@ -6,19 +6,19 @@ This directory contains automatically generated Dart types from your Zod schemas
 
 - **30** Dart files
 - **0** classes
-- **0** enums  
+- **0** enums
 - **579** serialization methods
 
 ## 📁 Structure
 
 \`\`\`
 lib/generated/api/
-├── auth_login.dart          # Authentication login types
-├── auth_register.dart       # Authentication registration types
-├── business_business.dart   # Business management types
-├── category_category.dart   # Category types
-├── user_profile.dart        # User profile types
-└── voucher_voucher.dart     # Voucher types
+├── auth_login.dart # Authentication login types
+├── auth_register.dart # Authentication registration types
+├── business_business.dart # Business management types
+├── category_category.dart # Category types
+├── user_profile.dart # User profile types
+└── voucher_voucher.dart # Voucher types
 \`\`\`
 
 ## 🚀 Usage in Flutter
@@ -36,9 +36,12 @@ print(authResponse.accessToken);
 To regenerate these types after updating your Zod schemas:
 
 \`\`\`bash
+
 # From the backend directory
+
 yarn generate:flutter-types
 \`\`\`
 
 ---
-*Generated automatically from Zod schemas using native z.toJSONSchema() and QuickType*
+
+_Generated automatically from Zod schemas using native z.toJSONSchema() and QuickType_

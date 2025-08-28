@@ -13,9 +13,6 @@
       "const": true
     }
   },
-  "required": [
-    "confirmAllDataAccurate",
-    "agreedToTerms"
-  ],
+  "required": ["confirmAllDataAccurate", "agreedToTerms"],
   "additionalProperties": false
 }

@@ -17,10 +17,6 @@
       "maxLength": 200
     }
   },
-  "required": [
-    "userId",
-    "email",
-    "name"
-  ],
+  "required": ["userId", "email", "name"],
   "additionalProperties": false
 }

@@ -29,29 +29,18 @@
           "operation": {
             "description": "Operation that failed",
             "type": "string",
-            "enum": [
-              "add",
-              "remove"
-            ]
+            "enum": ["add", "remove"]
           },
           "error": {
             "description": "Error message",
             "type": "string"
           }
         },
-        "required": [
-          "itemId",
-          "operation",
-          "error"
-        ],
+        "required": ["itemId", "operation", "error"],
         "additionalProperties": false
       }
     }
   },
-  "required": [
-    "added",
-    "removed",
-    "errors"
-  ],
+  "required": ["added", "removed", "errors"],
   "additionalProperties": false
 }

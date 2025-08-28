@@ -19,7 +19,7 @@ The feature follows a clean architecture pattern with automatic search query tra
 User Search → VoucherService → Track Query (Async) → SearchQuery Table
                 ↓
          Search Results
-                
+
 Popular API → VoucherService → Get Top Queries → Return Popular Terms
 ```
 
@@ -27,16 +27,17 @@ Popular API → VoucherService → Get Top Queries → Return Popular Terms
 
 **Table**: `analytics.search_queries`
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | UUID | Primary key |
-| query | VARCHAR(255) | Normalized search term (lowercase, trimmed) |
-| count | INTEGER | Number of times searched |
-| last_searched | TIMESTAMPTZ | Last search timestamp |
-| created_at | TIMESTAMPTZ | First search timestamp |
-| updated_at | TIMESTAMPTZ | Last update timestamp |
+| Column        | Type         | Description                                 |
+| ------------- | ------------ | ------------------------------------------- |
+| id            | UUID         | Primary key                                 |
+| query         | VARCHAR(255) | Normalized search term (lowercase, trimmed) |
+| count         | INTEGER      | Number of times searched                    |
+| last_searched | TIMESTAMPTZ  | Last search timestamp                       |
+| created_at    | TIMESTAMPTZ  | First search timestamp                      |
+| updated_at    | TIMESTAMPTZ  | Last update timestamp                       |
 
 **Indexes**:
+
 - Unique constraint on `query`
 - Index on `count DESC` for popular queries retrieval
 - Index on `last_searched` for recent queries
@@ -51,18 +52,10 @@ Returns the most popular search terms.
 **Authentication**: None (public endpoint)
 
 **Response**:
+
 ```json
 {
-  "searches": [
-    "concerts",
-    "restaurants",
-    "cinema",
-    "rooftops",
-    "exhibitions",
-    "tango shows",
-    "food tours",
-    "candlelight"
-  ]
+  "searches": ["concerts", "restaurants", "cinema", "rooftops", "exhibitions", "tango shows", "food tours", "candlelight"]
 }
 ```
 
@@ -70,9 +63,9 @@ Returns the most popular search terms.
 
 ### Configuration
 
-| Environment Variable | Default | Description |
-|---------------------|---------|-------------|
-| POPULAR_SEARCHES_LIMIT | 8 | Maximum number of popular searches to return |
+| Environment Variable   | Default | Description                                  |
+| ---------------------- | ------- | -------------------------------------------- |
+| POPULAR_SEARCHES_LIMIT | 8       | Maximum number of popular searches to return |
 
 ### Implementation Details
 
@@ -131,6 +124,7 @@ packages/
 ### Testing
 
 Comprehensive integration tests covering:
+
 - Empty state handling
 - Search query tracking and counting
 - Query normalization (case, whitespace)
@@ -170,6 +164,7 @@ All tests passing as of implementation date.
 ### Monitoring
 
 Key metrics to track:
+
 - Number of unique search terms
 - Search frequency distribution
 - Cache hit rate
@@ -179,6 +174,7 @@ Key metrics to track:
 ### Rollback Plan
 
 If issues arise:
+
 1. Disable tracking by removing the tracking call in VoucherService
 2. Return empty array from popular searches endpoint
 3. No database migration rollback needed (additive change)

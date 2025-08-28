@@ -53,13 +53,7 @@
               },
               "fileType": {
                 "type": "string",
-                "enum": [
-                  "image",
-                  "video",
-                  "document",
-                  "audio",
-                  "other"
-                ]
+                "enum": ["image", "video", "document", "audio", "other"]
               },
               "status": {
                 "type": "string",
@@ -74,11 +68,7 @@
               },
               "provider": {
                 "type": "string",
-                "enum": [
-                  "awsS3",
-                  "local",
-                  "minio"
-                ]
+                "enum": ["awsS3", "local", "minio"]
               },
               "url": {
                 "description": "Presigned URL if applicable",
@@ -146,10 +136,7 @@
                 "type": "string"
               }
             },
-            "required": [
-              "fileName",
-              "error"
-            ],
+            "required": ["fileName", "error"],
             "additionalProperties": false
           }
         },
@@ -164,12 +151,7 @@
           "maximum": 9007199254740991
         }
       },
-      "required": [
-        "successful",
-        "failed",
-        "totalUploaded",
-        "totalFailed"
-      ],
+      "required": ["successful", "failed", "totalUploaded", "totalFailed"],
       "additionalProperties": false
     },
     "FileHistoryResponse": {
@@ -212,13 +194,7 @@
               },
               "fileType": {
                 "type": "string",
-                "enum": [
-                  "image",
-                  "video",
-                  "document",
-                  "audio",
-                  "other"
-                ]
+                "enum": ["image", "video", "document", "audio", "other"]
               },
               "status": {
                 "type": "string",
@@ -233,11 +209,7 @@
               },
               "provider": {
                 "type": "string",
-                "enum": [
-                  "awsS3",
-                  "local",
-                  "minio"
-                ]
+                "enum": ["awsS3", "local", "minio"]
               },
               "bucketName": {
                 "type": "string"
@@ -356,10 +328,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "FileStorageLog": {
@@ -395,13 +364,7 @@
         },
         "fileType": {
           "type": "string",
-          "enum": [
-            "image",
-            "video",
-            "document",
-            "audio",
-            "other"
-          ]
+          "enum": ["image", "video", "document", "audio", "other"]
         },
         "status": {
           "type": "string",
@@ -416,11 +379,7 @@
         },
         "provider": {
           "type": "string",
-          "enum": [
-            "awsS3",
-            "local",
-            "minio"
-          ]
+          "enum": ["awsS3", "local", "minio"]
         },
         "bucketName": {
           "type": "string"
@@ -514,9 +473,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "isPublic"
-      ],
+      "required": ["isPublic"],
       "additionalProperties": false
     },
     "FileUploadRequest": {
@@ -568,13 +525,7 @@
         },
         "fileType": {
           "type": "string",
-          "enum": [
-            "image",
-            "video",
-            "document",
-            "audio",
-            "other"
-          ]
+          "enum": ["image", "video", "document", "audio", "other"]
         },
         "status": {
           "type": "string",
@@ -589,11 +540,7 @@
         },
         "provider": {
           "type": "string",
-          "enum": [
-            "awsS3",
-            "local",
-            "minio"
-          ]
+          "enum": ["awsS3", "local", "minio"]
         },
         "url": {
           "description": "Presigned URL if applicable",
@@ -673,13 +620,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "url",
-        "expiresAt",
-        "fileId",
-        "fileName",
-        "mimeType"
-      ],
+      "required": ["url", "expiresAt", "fileId", "fileName", "mimeType"],
       "additionalProperties": false
     },
     "GetFileHistoryQuery": {
@@ -732,18 +673,10 @@
         "sortOrder": {
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "GetFileUrlQuery": {
@@ -758,9 +691,7 @@
           "maximum": 86400
         }
       },
-      "required": [
-        "expiresIn"
-      ],
+      "required": ["expiresIn"],
       "additionalProperties": false
     }
   }

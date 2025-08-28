@@ -33,13 +33,7 @@
           },
           "fileType": {
             "type": "string",
-            "enum": [
-              "image",
-              "video",
-              "document",
-              "audio",
-              "other"
-            ]
+            "enum": ["image", "video", "document", "audio", "other"]
           },
           "status": {
             "type": "string",
@@ -54,11 +48,7 @@
           },
           "provider": {
             "type": "string",
-            "enum": [
-              "awsS3",
-              "local",
-              "minio"
-            ]
+            "enum": ["awsS3", "local", "minio"]
           },
           "url": {
             "description": "Presigned URL if applicable",
@@ -126,10 +116,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "fileName",
-          "error"
-        ],
+        "required": ["fileName", "error"],
         "additionalProperties": false
       }
     },
@@ -144,11 +131,6 @@
       "maximum": 9007199254740991
     }
   },
-  "required": [
-    "successful",
-    "failed",
-    "totalUploaded",
-    "totalFailed"
-  ],
+  "required": ["successful", "failed", "totalUploaded", "totalFailed"],
   "additionalProperties": false
 }

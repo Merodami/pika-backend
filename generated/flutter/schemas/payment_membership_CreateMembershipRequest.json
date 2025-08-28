@@ -33,19 +33,9 @@
     "planType": {
       "default": "basic",
       "type": "string",
-      "enum": [
-        "basic",
-        "premium",
-        "enterprise",
-        "trial"
-      ]
+      "enum": ["basic", "premium", "enterprise", "trial"]
     }
   },
-  "required": [
-    "userId",
-    "active",
-    "subscriptionStatus",
-    "planType"
-  ],
+  "required": ["userId", "active", "subscriptionStatus", "planType"],
   "additionalProperties": false
 }

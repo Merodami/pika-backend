@@ -19,10 +19,6 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "newPlanId",
-    "prorate",
-    "changeImmediately"
-  ],
+  "required": ["newPlanId", "prorate", "changeImmediately"],
   "additionalProperties": false
 }

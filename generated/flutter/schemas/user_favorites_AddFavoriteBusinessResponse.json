@@ -105,12 +105,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id",
-                "firstName",
-                "lastName",
-                "createdAt"
-              ],
+              "required": ["id", "firstName", "lastName", "createdAt"],
               "additionalProperties": false
             },
             "category": {
@@ -426,12 +421,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "id",
-                "businessId",
-                "createdAt",
-                "updatedAt"
-              ],
+              "required": ["id", "businessId", "createdAt", "updatedAt"],
               "additionalProperties": false
             },
             "createdAt": {
@@ -458,17 +448,10 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "id",
-        "businessId",
-        "createdAt"
-      ],
+      "required": ["id", "businessId", "createdAt"],
       "additionalProperties": false
     }
   },
-  "required": [
-    "message",
-    "data"
-  ],
+  "required": ["message", "data"],
   "additionalProperties": false
 }

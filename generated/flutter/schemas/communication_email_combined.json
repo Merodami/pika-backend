@@ -30,9 +30,7 @@
           "additionalProperties": {}
         }
       },
-      "required": [
-        "email"
-      ],
+      "required": ["email"],
       "additionalProperties": false
     },
     "EmailAttachment": {
@@ -59,10 +57,7 @@
           "maximum": 9007199254740991
         }
       },
-      "required": [
-        "filename",
-        "content"
-      ],
+      "required": ["filename", "content"],
       "additionalProperties": false
     },
     "EmailEventData": {
@@ -98,10 +93,7 @@
         },
         "bounceType": {
           "type": "string",
-          "enum": [
-            "soft",
-            "hard"
-          ]
+          "enum": ["soft", "hard"]
         },
         "failureReason": {
           "type": "string"
@@ -114,12 +106,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "messageId",
-        "event",
-        "timestamp",
-        "recipient"
-      ],
+      "required": ["messageId", "event", "timestamp", "recipient"],
       "additionalProperties": false
     },
     "EmailHistoryResponse": {
@@ -171,12 +158,7 @@
               },
               "priority": {
                 "type": "string",
-                "enum": [
-                  "low",
-                  "normal",
-                  "high",
-                  "urgent"
-                ]
+                "enum": ["low", "normal", "high", "urgent"]
               },
               "templateId": {
                 "type": "string"
@@ -230,10 +212,7 @@
               },
               "bounceType": {
                 "type": "string",
-                "enum": [
-                  "soft",
-                  "hard"
-                ]
+                "enum": ["soft", "hard"]
               },
               "metadata": {
                 "type": "object",
@@ -316,10 +295,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "EmailRecipient": {
@@ -334,9 +310,7 @@
           "maxLength": 255
         }
       },
-      "required": [
-        "email"
-      ],
+      "required": ["email"],
       "additionalProperties": false
     },
     "EmailRecord": {
@@ -381,12 +355,7 @@
         },
         "priority": {
           "type": "string",
-          "enum": [
-            "low",
-            "normal",
-            "high",
-            "urgent"
-          ]
+          "enum": ["low", "normal", "high", "urgent"]
         },
         "templateId": {
           "type": "string"
@@ -440,10 +409,7 @@
         },
         "bounceType": {
           "type": "string",
-          "enum": [
-            "soft",
-            "hard"
-          ]
+          "enum": ["soft", "hard"]
         },
         "metadata": {
           "type": "object",
@@ -499,21 +465,13 @@
         "sortBy": {
           "default": "createdAt",
           "type": "string",
-          "enum": [
-            "createdAt",
-            "sentAt",
-            "deliveredAt",
-            "subject"
-          ]
+          "enum": ["createdAt", "sentAt", "deliveredAt", "subject"]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -559,12 +517,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "ProcessEmailEventRequest": {
@@ -600,10 +553,7 @@
         },
         "bounceType": {
           "type": "string",
-          "enum": [
-            "soft",
-            "hard"
-          ]
+          "enum": ["soft", "hard"]
         },
         "failureReason": {
           "type": "string"
@@ -616,12 +566,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "messageId",
-        "event",
-        "timestamp",
-        "recipient"
-      ],
+      "required": ["messageId", "event", "timestamp", "recipient"],
       "additionalProperties": false
     },
     "SendBulkEmailRequest": {
@@ -658,9 +603,7 @@
                 "additionalProperties": {}
               }
             },
-            "required": [
-              "email"
-            ],
+            "required": ["email"],
             "additionalProperties": false
           }
         },
@@ -682,12 +625,7 @@
         "priority": {
           "default": "normal",
           "type": "string",
-          "enum": [
-            "low",
-            "normal",
-            "high",
-            "urgent"
-          ]
+          "enum": ["low", "normal", "high", "urgent"]
         },
         "trackOpens": {
           "default": true,
@@ -759,20 +697,11 @@
               },
               "channel": {
                 "type": "string",
-                "enum": [
-                  "email",
-                  "sms",
-                  "push",
-                  "inApp",
-                  "webhook"
-                ]
+                "enum": ["email", "sms", "push", "inApp", "webhook"]
               },
               "direction": {
                 "type": "string",
-                "enum": [
-                  "inbound",
-                  "outbound"
-                ]
+                "enum": ["inbound", "outbound"]
               },
               "status": {
                 "type": "string",
@@ -858,10 +787,7 @@
               },
               "bounceType": {
                 "type": "string",
-                "enum": [
-                  "soft",
-                  "hard"
-                ]
+                "enum": ["soft", "hard"]
               },
               "openCount": {
                 "default": 0,
@@ -922,12 +848,7 @@
           }
         }
       },
-      "required": [
-        "sent",
-        "failed",
-        "total",
-        "logs"
-      ],
+      "required": ["sent", "failed", "total", "logs"],
       "additionalProperties": false
     },
     "SendEmailRequest": {
@@ -949,9 +870,7 @@
                     "maxLength": 255
                   }
                 },
-                "required": [
-                  "email"
-                ],
+                "required": ["email"],
                 "additionalProperties": false
               }
             }
@@ -1036,22 +955,14 @@
                 "maximum": 9007199254740991
               }
             },
-            "required": [
-              "filename",
-              "content"
-            ],
+            "required": ["filename", "content"],
             "additionalProperties": false
           }
         },
         "priority": {
           "default": "normal",
           "type": "string",
-          "enum": [
-            "low",
-            "normal",
-            "high",
-            "urgent"
-          ]
+          "enum": ["low", "normal", "high", "urgent"]
         },
         "trackOpens": {
           "default": true,
@@ -1123,10 +1034,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "messageId",
-        "status"
-      ],
+      "required": ["messageId", "status"],
       "additionalProperties": false
     }
   }

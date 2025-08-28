@@ -9,10 +9,7 @@
     },
     "tokenTypeHint": {
       "type": "string",
-      "enum": [
-        "accessToken",
-        "refreshToken"
-      ]
+      "enum": ["accessToken", "refreshToken"]
     },
     "allDevices": {
       "description": "Revoke all tokens for user",
@@ -20,9 +17,6 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "token",
-    "allDevices"
-  ],
+  "required": ["token", "allDevices"],
   "additionalProperties": false
 }

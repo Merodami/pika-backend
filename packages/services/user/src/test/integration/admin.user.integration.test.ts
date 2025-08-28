@@ -28,6 +28,7 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -100,6 +101,12 @@ describe('User Service - Admin API Integration Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up User Service admin integration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({

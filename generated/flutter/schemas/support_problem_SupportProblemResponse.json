@@ -36,13 +36,7 @@
     },
     "priority": {
       "type": "string",
-      "enum": [
-        "low",
-        "medium",
-        "high",
-        "urgent",
-        "critical"
-      ]
+      "enum": ["low", "medium", "high", "urgent", "critical"]
     },
     "type": {
       "type": "string",

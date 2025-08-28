@@ -27,9 +27,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "messageId",
-    "status"
-  ],
+  "required": ["messageId", "status"],
   "additionalProperties": false
 }

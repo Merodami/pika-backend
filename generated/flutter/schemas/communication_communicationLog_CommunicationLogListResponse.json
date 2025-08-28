@@ -17,20 +17,11 @@
           },
           "channel": {
             "type": "string",
-            "enum": [
-              "email",
-              "sms",
-              "push",
-              "inApp",
-              "webhook"
-            ]
+            "enum": ["email", "sms", "push", "inApp", "webhook"]
           },
           "direction": {
             "type": "string",
-            "enum": [
-              "inbound",
-              "outbound"
-            ]
+            "enum": ["inbound", "outbound"]
           },
           "status": {
             "type": "string",
@@ -116,10 +107,7 @@
           },
           "bounceType": {
             "type": "string",
-            "enum": [
-              "soft",
-              "hard"
-            ]
+            "enum": ["soft", "hard"]
           },
           "openCount": {
             "default": 0,
@@ -226,9 +214,6 @@
       "additionalProperties": false
     }
   },
-  "required": [
-    "data",
-    "pagination"
-  ],
+  "required": ["data", "pagination"],
   "additionalProperties": false
 }

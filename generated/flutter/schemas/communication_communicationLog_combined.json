@@ -31,18 +31,12 @@
                 "type": "string"
               }
             },
-            "required": [
-              "index",
-              "error"
-            ],
+            "required": ["index", "error"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "created",
-        "failed"
-      ],
+      "required": ["created", "failed"],
       "additionalProperties": false
     },
     "BulkCreateCommunicationLogsRequest": {
@@ -58,21 +52,12 @@
             "properties": {
               "channel": {
                 "type": "string",
-                "enum": [
-                  "email",
-                  "sms",
-                  "push",
-                  "inApp",
-                  "webhook"
-                ]
+                "enum": ["email", "sms", "push", "inApp", "webhook"]
               },
               "direction": {
                 "default": "outbound",
                 "type": "string",
-                "enum": [
-                  "inbound",
-                  "outbound"
-                ]
+                "enum": ["inbound", "outbound"]
               },
               "status": {
                 "default": "pending",
@@ -142,18 +127,12 @@
                 }
               }
             },
-            "required": [
-              "channel",
-              "direction",
-              "status"
-            ],
+            "required": ["channel", "direction", "status"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "logs"
-      ],
+      "required": ["logs"],
       "additionalProperties": false
     },
     "CommunicationAnalyticsRequest": {
@@ -162,13 +141,7 @@
       "properties": {
         "channel": {
           "type": "string",
-          "enum": [
-            "email",
-            "sms",
-            "push",
-            "inApp",
-            "webhook"
-          ]
+          "enum": ["email", "sms", "push", "inApp", "webhook"]
         },
         "fromDate": {
           "description": "ISO 8601 datetime with timezone",
@@ -181,11 +154,7 @@
         "groupBy": {
           "default": "day",
           "type": "string",
-          "enum": [
-            "day",
-            "week",
-            "month"
-          ]
+          "enum": ["day", "week", "month"]
         },
         "userId": {
           "type": "string",
@@ -202,11 +171,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "fromDate",
-        "toDate",
-        "groupBy"
-      ],
+      "required": ["fromDate", "toDate", "groupBy"],
       "additionalProperties": false
     },
     "CommunicationAnalyticsResponse": {
@@ -288,13 +253,7 @@
             "properties": {
               "channel": {
                 "type": "string",
-                "enum": [
-                  "email",
-                  "sms",
-                  "push",
-                  "inApp",
-                  "webhook"
-                ]
+                "enum": ["email", "sms", "push", "inApp", "webhook"]
               },
               "sent": {
                 "type": "integer",
@@ -436,18 +395,11 @@
               }
             }
           },
-          "required": [
-            "total",
-            "byChannel"
-          ],
+          "required": ["total", "byChannel"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "summary",
-        "byChannel",
-        "timeline"
-      ],
+      "required": ["summary", "byChannel", "timeline"],
       "additionalProperties": false
     },
     "CommunicationLog": {
@@ -462,20 +414,11 @@
         },
         "channel": {
           "type": "string",
-          "enum": [
-            "email",
-            "sms",
-            "push",
-            "inApp",
-            "webhook"
-          ]
+          "enum": ["email", "sms", "push", "inApp", "webhook"]
         },
         "direction": {
           "type": "string",
-          "enum": [
-            "inbound",
-            "outbound"
-          ]
+          "enum": ["inbound", "outbound"]
         },
         "status": {
           "type": "string",
@@ -561,10 +504,7 @@
         },
         "bounceType": {
           "type": "string",
-          "enum": [
-            "soft",
-            "hard"
-          ]
+          "enum": ["soft", "hard"]
         },
         "openCount": {
           "default": 0,
@@ -642,20 +582,11 @@
               },
               "channel": {
                 "type": "string",
-                "enum": [
-                  "email",
-                  "sms",
-                  "push",
-                  "inApp",
-                  "webhook"
-                ]
+                "enum": ["email", "sms", "push", "inApp", "webhook"]
               },
               "direction": {
                 "type": "string",
-                "enum": [
-                  "inbound",
-                  "outbound"
-                ]
+                "enum": ["inbound", "outbound"]
               },
               "status": {
                 "type": "string",
@@ -741,10 +672,7 @@
               },
               "bounceType": {
                 "type": "string",
-                "enum": [
-                  "soft",
-                  "hard"
-                ]
+                "enum": ["soft", "hard"]
               },
               "openCount": {
                 "default": 0,
@@ -851,10 +779,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "CommunicationLogResponse": {
@@ -869,20 +794,11 @@
         },
         "channel": {
           "type": "string",
-          "enum": [
-            "email",
-            "sms",
-            "push",
-            "inApp",
-            "webhook"
-          ]
+          "enum": ["email", "sms", "push", "inApp", "webhook"]
         },
         "direction": {
           "type": "string",
-          "enum": [
-            "inbound",
-            "outbound"
-          ]
+          "enum": ["inbound", "outbound"]
         },
         "status": {
           "type": "string",
@@ -968,10 +884,7 @@
         },
         "bounceType": {
           "type": "string",
-          "enum": [
-            "soft",
-            "hard"
-          ]
+          "enum": ["soft", "hard"]
         },
         "openCount": {
           "default": 0,
@@ -1051,20 +964,13 @@
         "sortBy": {
           "default": "createdAt",
           "type": "string",
-          "enum": [
-            "createdAt",
-            "sentAt",
-            "deliveredAt"
-          ]
+          "enum": ["createdAt", "sentAt", "deliveredAt"]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -1084,20 +990,11 @@
         },
         "channel": {
           "type": "string",
-          "enum": [
-            "email",
-            "sms",
-            "push",
-            "inApp",
-            "webhook"
-          ]
+          "enum": ["email", "sms", "push", "inApp", "webhook"]
         },
         "direction": {
           "type": "string",
-          "enum": [
-            "inbound",
-            "outbound"
-          ]
+          "enum": ["inbound", "outbound"]
         },
         "status": {
           "type": "string",
@@ -1152,12 +1049,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "CreateCommunicationLogRequest": {
@@ -1166,21 +1058,12 @@
       "properties": {
         "channel": {
           "type": "string",
-          "enum": [
-            "email",
-            "sms",
-            "push",
-            "inApp",
-            "webhook"
-          ]
+          "enum": ["email", "sms", "push", "inApp", "webhook"]
         },
         "direction": {
           "default": "outbound",
           "type": "string",
-          "enum": [
-            "inbound",
-            "outbound"
-          ]
+          "enum": ["inbound", "outbound"]
         },
         "status": {
           "default": "pending",
@@ -1250,11 +1133,7 @@
           }
         }
       },
-      "required": [
-        "channel",
-        "direction",
-        "status"
-      ],
+      "required": ["channel", "direction", "status"],
       "additionalProperties": false
     },
     "TrackCommunicationEventRequest": {
@@ -1299,17 +1178,10 @@
         },
         "bounceType": {
           "type": "string",
-          "enum": [
-            "soft",
-            "hard"
-          ]
+          "enum": ["soft", "hard"]
         }
       },
-      "required": [
-        "messageId",
-        "event",
-        "timestamp"
-      ],
+      "required": ["messageId", "event", "timestamp"],
       "additionalProperties": false
     },
     "UpdateCommunicationStatusRequest": {
@@ -1351,10 +1223,7 @@
         },
         "bounceType": {
           "type": "string",
-          "enum": [
-            "soft",
-            "hard"
-          ]
+          "enum": ["soft", "hard"]
         },
         "metadata": {
           "type": "object",
@@ -1364,9 +1233,7 @@
           "additionalProperties": {}
         }
       },
-      "required": [
-        "status"
-      ],
+      "required": ["status"],
       "additionalProperties": false
     }
   }

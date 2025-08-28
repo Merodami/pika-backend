@@ -39,13 +39,7 @@
     },
     "status": {
       "type": "string",
-      "enum": [
-        "draft",
-        "open",
-        "paid",
-        "uncollectible",
-        "void"
-      ]
+      "enum": ["draft", "open", "paid", "uncollectible", "void"]
     },
     "metadata": {
       "default": {},

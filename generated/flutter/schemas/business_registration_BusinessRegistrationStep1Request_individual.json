@@ -36,11 +36,6 @@
       "pattern": "^[a-z]{2}$"
     }
   },
-  "required": [
-    "businessName",
-    "businessType",
-    "categoryId",
-    "primaryLanguage"
-  ],
+  "required": ["businessName", "businessType", "categoryId", "primaryLanguage"],
   "additionalProperties": false
 }

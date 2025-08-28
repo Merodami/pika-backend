@@ -20,19 +20,13 @@
       "description": "Field to sort by",
       "default": "createdAt",
       "type": "string",
-      "enum": [
-        "createdAt",
-        "businessName"
-      ]
+      "enum": ["createdAt", "businessName"]
     },
     "sortOrder": {
       "description": "Sort order",
       "default": "desc",
       "type": "string",
-      "enum": [
-        "asc",
-        "desc"
-      ]
+      "enum": ["asc", "desc"]
     },
     "search": {
       "description": "Search query",
@@ -43,11 +37,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "page",
-    "limit",
-    "sortBy",
-    "sortOrder"
-  ],
+  "required": ["page", "limit", "sortBy", "sortOrder"],
   "additionalProperties": false
 }

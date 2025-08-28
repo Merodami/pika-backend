@@ -13,6 +13,7 @@ vi.unmock('@pika/shared')
 
 import { createAuthServer } from '@auth-service/server.js'
 import { FirebaseTestClient } from '@auth-service/test/utils/firebase-test-client.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -47,6 +48,12 @@ describe('Social Authentication Integration Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Social Auth integration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Create test database
     testDb = await createTestDatabase()

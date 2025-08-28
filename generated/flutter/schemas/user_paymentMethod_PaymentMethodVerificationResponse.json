@@ -4,11 +4,7 @@
   "properties": {
     "status": {
       "type": "string",
-      "enum": [
-        "succeeded",
-        "requiresAction",
-        "failed"
-      ]
+      "enum": ["succeeded", "requiresAction", "failed"]
     },
     "clientSecret": {
       "description": "Client secret for frontend verification",
@@ -29,15 +25,10 @@
           "type": "string"
         }
       },
-      "required": [
-        "code",
-        "message"
-      ],
+      "required": ["code", "message"],
       "additionalProperties": false
     }
   },
-  "required": [
-    "status"
-  ],
+  "required": ["status"],
   "additionalProperties": false
 }

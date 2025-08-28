@@ -10,8 +10,6 @@
       }
     }
   },
-  "required": [
-    "searches"
-  ],
+  "required": ["searches"],
   "additionalProperties": false
 }

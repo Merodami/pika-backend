@@ -101,12 +101,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "id",
-                  "firstName",
-                  "lastName",
-                  "createdAt"
-                ],
+                "required": ["id", "firstName", "lastName", "createdAt"],
                 "additionalProperties": false
               },
               "category": {
@@ -422,12 +417,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "id",
-                  "businessId",
-                  "createdAt",
-                  "updatedAt"
-                ],
+                "required": ["id", "businessId", "createdAt", "updatedAt"],
                 "additionalProperties": false
               },
               "createdAt": {
@@ -501,10 +491,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "BusinessPathParams": {
@@ -518,9 +505,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "BusinessQueryParams": {
@@ -557,10 +542,7 @@
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -587,12 +569,7 @@
           "maximum": 5
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "BusinessResponse": {
@@ -675,12 +652,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id",
-            "firstName",
-            "lastName",
-            "createdAt"
-          ],
+          "required": ["id", "firstName", "lastName", "createdAt"],
           "additionalProperties": false
         },
         "category": {
@@ -996,12 +968,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "id",
-            "businessId",
-            "createdAt",
-            "updatedAt"
-          ],
+          "required": ["id", "businessId", "createdAt", "updatedAt"],
           "additionalProperties": false
         },
         "createdAt": {
@@ -1121,12 +1088,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "id",
-                  "firstName",
-                  "lastName",
-                  "createdAt"
-                ],
+                "required": ["id", "firstName", "lastName", "createdAt"],
                 "additionalProperties": false
               },
               "category": {
@@ -1442,12 +1404,7 @@
                     "type": "string"
                   }
                 },
-                "required": [
-                  "id",
-                  "businessId",
-                  "createdAt",
-                  "updatedAt"
-                ],
+                "required": ["id", "businessId", "createdAt", "updatedAt"],
                 "additionalProperties": false
               },
               "createdAt": {
@@ -1480,12 +1437,7 @@
           "maximum": 9007199254740991
         }
       },
-      "required": [
-        "categoryId",
-        "categoryName",
-        "businesses",
-        "totalCount"
-      ],
+      "required": ["categoryId", "categoryName", "businesses", "totalCount"],
       "additionalProperties": false
     },
     "CreateMyBusinessRequest": {
@@ -1510,9 +1462,7 @@
           "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
         }
       },
-      "required": [
-        "businessName"
-      ],
+      "required": ["businessName"],
       "additionalProperties": false
     },
     "CreateMyBusinessResponse": {
@@ -1539,12 +1489,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "id",
-        "businessName",
-        "approved",
-        "message"
-      ],
+      "required": ["id", "businessName", "approved", "message"],
       "additionalProperties": false
     },
     "UpdateMyBusinessRequest": {

@@ -32,11 +32,7 @@
     },
     "purpose": {
       "type": "string",
-      "enum": [
-        "credits",
-        "subscription",
-        "sessionPayment"
-      ]
+      "enum": ["credits", "subscription", "sessionPayment"]
     }
   },
   "additionalProperties": false

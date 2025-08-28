@@ -15,9 +15,7 @@
           }
         }
       },
-      "required": [
-        "searches"
-      ],
+      "required": ["searches"],
       "additionalProperties": false
     },
     "UserVoucherResponse": {
@@ -70,10 +68,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -167,11 +162,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -184,12 +175,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -233,12 +219,7 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "available",
-            "claimed",
-            "redeemed",
-            "expired"
-          ]
+          "enum": ["available", "claimed", "redeemed", "expired"]
         },
         "redeemedAt": {
           "anyOf": [
@@ -253,11 +234,7 @@
           ]
         }
       },
-      "required": [
-        "voucher",
-        "claimedAt",
-        "status"
-      ],
+      "required": ["voucher", "claimedAt", "status"],
       "additionalProperties": false
     },
     "UserVouchersListResponse": {
@@ -317,10 +294,7 @@
                   },
                   "discountType": {
                     "type": "string",
-                    "enum": [
-                      "fixed",
-                      "percentage"
-                    ]
+                    "enum": ["fixed", "percentage"]
                   },
                   "discountValue": {
                     "type": "number",
@@ -414,11 +388,7 @@
                         },
                         "type": {
                           "type": "string",
-                          "enum": [
-                            "qr",
-                            "short",
-                            "static"
-                          ]
+                          "enum": ["qr", "short", "static"]
                         },
                         "isActive": {
                           "type": "boolean"
@@ -431,12 +401,7 @@
                           "additionalProperties": {}
                         }
                       },
-                      "required": [
-                        "id",
-                        "code",
-                        "type",
-                        "isActive"
-                      ],
+                      "required": ["id", "code", "type", "isActive"],
                       "additionalProperties": false
                     }
                   },
@@ -480,12 +445,7 @@
               },
               "status": {
                 "type": "string",
-                "enum": [
-                  "available",
-                  "claimed",
-                  "redeemed",
-                  "expired"
-                ]
+                "enum": ["available", "claimed", "redeemed", "expired"]
               },
               "redeemedAt": {
                 "anyOf": [
@@ -500,11 +460,7 @@
                 ]
               }
             },
-            "required": [
-              "voucher",
-              "claimedAt",
-              "status"
-            ],
+            "required": ["voucher", "claimedAt", "status"],
             "additionalProperties": false
           }
         },
@@ -555,10 +511,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "VoucherClaimRequest": {
@@ -579,10 +532,7 @@
               "maximum": 30
             }
           },
-          "required": [
-            "enableReminders",
-            "reminderDaysBefore"
-          ],
+          "required": ["enableReminders", "reminderDaysBefore"],
           "additionalProperties": false
         }
       },
@@ -644,10 +594,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -741,11 +688,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -758,12 +701,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -847,11 +785,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "qr",
-            "short",
-            "static"
-          ]
+          "enum": ["qr", "short", "static"]
         },
         "isActive": {
           "type": "boolean"
@@ -864,12 +798,7 @@
           "additionalProperties": {}
         }
       },
-      "required": [
-        "id",
-        "code",
-        "type",
-        "isActive"
-      ],
+      "required": ["id", "code", "type", "isActive"],
       "additionalProperties": false
     },
     "VoucherListResponse": {
@@ -926,10 +855,7 @@
               },
               "discountType": {
                 "type": "string",
-                "enum": [
-                  "fixed",
-                  "percentage"
-                ]
+                "enum": ["fixed", "percentage"]
               },
               "discountValue": {
                 "type": "number",
@@ -1023,11 +949,7 @@
                     },
                     "type": {
                       "type": "string",
-                      "enum": [
-                        "qr",
-                        "short",
-                        "static"
-                      ]
+                      "enum": ["qr", "short", "static"]
                     },
                     "isActive": {
                       "type": "boolean"
@@ -1040,12 +962,7 @@
                       "additionalProperties": {}
                     }
                   },
-                  "required": [
-                    "id",
-                    "code",
-                    "type",
-                    "isActive"
-                  ],
+                  "required": ["id", "code", "type", "isActive"],
                   "additionalProperties": false
                 }
               },
@@ -1130,10 +1047,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "VoucherQueryParams": {
@@ -1169,10 +1083,7 @@
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -1205,10 +1116,7 @@
         "discountType": {
           "description": "Filter by discount type",
           "type": "string",
-          "enum": [
-            "fixed",
-            "percentage"
-          ]
+          "enum": ["fixed", "percentage"]
         },
         "minDiscount": {
           "description": "Minimum discount value",
@@ -1292,12 +1200,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "VoucherRedeemRequest": {
@@ -1324,16 +1227,11 @@
               "maximum": 180
             }
           },
-          "required": [
-            "lat",
-            "lng"
-          ],
+          "required": ["lat", "lng"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "code"
-      ],
+      "required": ["code"],
       "additionalProperties": false
     },
     "VoucherRedeemResponse": {
@@ -1404,10 +1302,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -1501,11 +1396,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -1518,12 +1409,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -1617,10 +1503,7 @@
         },
         "discountType": {
           "type": "string",
-          "enum": [
-            "fixed",
-            "percentage"
-          ]
+          "enum": ["fixed", "percentage"]
         },
         "discountValue": {
           "type": "number",
@@ -1714,11 +1597,7 @@
               },
               "type": {
                 "type": "string",
-                "enum": [
-                  "qr",
-                  "short",
-                  "static"
-                ]
+                "enum": ["qr", "short", "static"]
               },
               "isActive": {
                 "type": "boolean"
@@ -1731,12 +1610,7 @@
                 "additionalProperties": {}
               }
             },
-            "required": [
-              "id",
-              "code",
-              "type",
-              "isActive"
-            ],
+            "required": ["id", "code", "type", "isActive"],
             "additionalProperties": false
           }
         },
@@ -1779,12 +1653,7 @@
       "properties": {
         "scanSource": {
           "type": "string",
-          "enum": [
-            "camera",
-            "gallery",
-            "link",
-            "share"
-          ]
+          "enum": ["camera", "gallery", "link", "share"]
         },
         "location": {
           "type": "object",
@@ -1802,10 +1671,7 @@
               "maximum": 180
             }
           },
-          "required": [
-            "lat",
-            "lng"
-          ],
+          "required": ["lat", "lng"],
           "additionalProperties": false
         },
         "deviceInfo": {
@@ -1816,13 +1682,7 @@
             },
             "platform": {
               "type": "string",
-              "enum": [
-                "ios",
-                "android",
-                "web",
-                "desktop",
-                "other"
-              ]
+              "enum": ["ios", "android", "web", "desktop", "other"]
             },
             "appVersion": {
               "type": "string"
@@ -1886,10 +1746,7 @@
             },
             "discountType": {
               "type": "string",
-              "enum": [
-                "fixed",
-                "percentage"
-              ]
+              "enum": ["fixed", "percentage"]
             },
             "discountValue": {
               "type": "number",
@@ -1983,11 +1840,7 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": [
-                      "qr",
-                      "short",
-                      "static"
-                    ]
+                    "enum": ["qr", "short", "static"]
                   },
                   "isActive": {
                     "type": "boolean"
@@ -2000,12 +1853,7 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": [
-                  "id",
-                  "code",
-                  "type",
-                  "isActive"
-                ],
+                "required": ["id", "code", "type", "isActive"],
                 "additionalProperties": false
               }
             },
@@ -2084,29 +1932,16 @@
                     "maximum": 180
                   }
                 },
-                "required": [
-                  "lat",
-                  "lng"
-                ],
+                "required": ["lat", "lng"],
                 "additionalProperties": false
               }
             },
-            "required": [
-              "name",
-              "address",
-              "distance",
-              "coordinates"
-            ],
+            "required": ["name", "address", "distance", "coordinates"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "voucher",
-        "scanId",
-        "canClaim",
-        "alreadyClaimed"
-      ],
+      "required": ["voucher", "scanId", "canClaim", "alreadyClaimed"],
       "additionalProperties": false
     }
   }

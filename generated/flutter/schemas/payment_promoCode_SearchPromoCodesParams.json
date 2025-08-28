@@ -30,26 +30,14 @@
     },
     "sort": {
       "type": "string",
-      "enum": [
-        "code",
-        "discount",
-        "expirationDate",
-        "createdAt"
-      ]
+      "enum": ["code", "discount", "expirationDate", "createdAt"]
     },
     "order": {
       "default": "desc",
       "type": "string",
-      "enum": [
-        "asc",
-        "desc"
-      ]
+      "enum": ["asc", "desc"]
     }
   },
-  "required": [
-    "page",
-    "limit",
-    "order"
-  ],
+  "required": ["page", "limit", "order"],
   "additionalProperties": false
 }

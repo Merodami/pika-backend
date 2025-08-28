@@ -19,20 +19,13 @@
     "sortBy": {
       "default": "createdAt",
       "type": "string",
-      "enum": [
-        "createdAt",
-        "sentAt",
-        "deliveredAt"
-      ]
+      "enum": ["createdAt", "sentAt", "deliveredAt"]
     },
     "sortOrder": {
       "description": "Sort order",
       "default": "desc",
       "type": "string",
-      "enum": [
-        "asc",
-        "desc"
-      ]
+      "enum": ["asc", "desc"]
     },
     "search": {
       "description": "Search query",
@@ -52,31 +45,15 @@
     },
     "channel": {
       "type": "string",
-      "enum": [
-        "email",
-        "sms",
-        "push",
-        "inApp",
-        "webhook"
-      ]
+      "enum": ["email", "sms", "push", "inApp", "webhook"]
     },
     "direction": {
       "type": "string",
-      "enum": [
-        "inbound",
-        "outbound"
-      ]
+      "enum": ["inbound", "outbound"]
     },
     "status": {
       "type": "string",
-      "enum": [
-        "pending",
-        "queued",
-        "sent",
-        "delivered",
-        "failed",
-        "cancelled"
-      ]
+      "enum": ["pending", "queued", "sent", "delivered", "failed", "cancelled"]
     },
     "userId": {
       "type": "string",
@@ -120,11 +97,6 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "page",
-    "limit",
-    "sortBy",
-    "sortOrder"
-  ],
+  "required": ["page", "limit", "sortBy", "sortOrder"],
   "additionalProperties": false
 }

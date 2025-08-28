@@ -22,11 +22,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "id",
-    "businessName",
-    "approved",
-    "message"
-  ],
+  "required": ["id", "businessName", "approved", "message"],
   "additionalProperties": false
 }

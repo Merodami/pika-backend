@@ -9,14 +9,9 @@
     },
     "tokenTypeHint": {
       "type": "string",
-      "enum": [
-        "accessToken",
-        "refreshToken"
-      ]
+      "enum": ["accessToken", "refreshToken"]
     }
   },
-  "required": [
-    "token"
-  ],
+  "required": ["token"],
   "additionalProperties": false
 }

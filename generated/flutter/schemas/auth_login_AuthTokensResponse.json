@@ -24,11 +24,6 @@
       "maximum": 9007199254740991
     }
   },
-  "required": [
-    "accessToken",
-    "refreshToken",
-    "tokenType",
-    "expiresIn"
-  ],
+  "required": ["accessToken", "refreshToken", "tokenType", "expiresIn"],
   "additionalProperties": false
 }

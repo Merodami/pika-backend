@@ -16,6 +16,7 @@ vi.unmock('@pika/translation')
 vi.unmock('@pika/shared') // Unmock shared to use real error classes with real middleware
 
 import { createBusinessServer } from '@business/server.js'
+import { keyManager } from '@pika/crypto'
 import {
   createSharedBusinessTestData,
   seedTestBusinesses,
@@ -62,6 +63,12 @@ describe('Business Service - Admin API Integration Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Business Service Admin API integration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({

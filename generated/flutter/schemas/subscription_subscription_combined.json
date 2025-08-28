@@ -21,9 +21,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "cancelAtPeriodEnd"
-      ],
+      "required": ["cancelAtPeriodEnd"],
       "additionalProperties": false
     },
     "ChangeSubscriptionPlanRequest": {
@@ -47,11 +45,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "newPlanId",
-        "prorate",
-        "changeImmediately"
-      ],
+      "required": ["newPlanId", "prorate", "changeImmediately"],
       "additionalProperties": false
     },
     "CreateSubscriptionRequest": {
@@ -79,9 +73,7 @@
           "additionalProperties": {}
         }
       },
-      "required": [
-        "planId"
-      ],
+      "required": ["planId"],
       "additionalProperties": false
     },
     "ResumeSubscriptionRequest": {
@@ -94,9 +86,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "resumeImmediately"
-      ],
+      "required": ["resumeImmediately"],
       "additionalProperties": false
     },
     "Subscription": {
@@ -338,12 +328,7 @@
                   },
                   "interval": {
                     "type": "string",
-                    "enum": [
-                      "day",
-                      "week",
-                      "month",
-                      "year"
-                    ]
+                    "enum": ["day", "week", "month", "year"]
                   },
                   "intervalCount": {
                     "description": "Number of intervals between billings",
@@ -470,10 +455,7 @@
           "additionalProperties": false
         }
       },
-      "required": [
-        "data",
-        "pagination"
-      ],
+      "required": ["data", "pagination"],
       "additionalProperties": false
     },
     "SubscriptionQueryParams": {
@@ -497,22 +479,13 @@
         "sortBy": {
           "default": "createdAt",
           "type": "string",
-          "enum": [
-            "createdAt",
-            "updatedAt",
-            "startDate",
-            "endDate",
-            "status"
-          ]
+          "enum": ["createdAt", "updatedAt", "startDate", "endDate", "status"]
         },
         "sortOrder": {
           "description": "Sort order",
           "default": "desc",
           "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
+          "enum": ["asc", "desc"]
         },
         "search": {
           "description": "Search query",
@@ -545,12 +518,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "page",
-        "limit",
-        "sortBy",
-        "sortOrder"
-      ],
+      "required": ["page", "limit", "sortBy", "sortOrder"],
       "additionalProperties": false
     },
     "SubscriptionResponse": {
@@ -678,12 +646,7 @@
             },
             "interval": {
               "type": "string",
-              "enum": [
-                "day",
-                "week",
-                "month",
-                "year"
-              ]
+              "enum": ["day", "week", "month", "year"]
             },
             "intervalCount": {
               "description": "Number of intervals between billings",
@@ -792,11 +755,7 @@
           }
         }
       },
-      "required": [
-        "subscriptionId",
-        "periodStart",
-        "periodEnd"
-      ],
+      "required": ["subscriptionId", "periodStart", "periodEnd"],
       "additionalProperties": false
     },
     "SubscriptionWithPlan": {
@@ -924,12 +883,7 @@
             },
             "interval": {
               "type": "string",
-              "enum": [
-                "day",
-                "week",
-                "month",
-                "year"
-              ]
+              "enum": ["day", "week", "month", "year"]
             },
             "intervalCount": {
               "description": "Number of intervals between billings",
@@ -1042,20 +996,12 @@
                 "maximum": 9007199254740991
               }
             },
-            "required": [
-              "description",
-              "amount"
-            ],
+            "required": ["description", "amount"],
             "additionalProperties": false
           }
         }
       },
-      "required": [
-        "amountDue",
-        "currency",
-        "dueDate",
-        "lineItems"
-      ],
+      "required": ["amountDue", "currency", "dueDate", "lineItems"],
       "additionalProperties": false
     },
     "UpdateSubscriptionRequest": {

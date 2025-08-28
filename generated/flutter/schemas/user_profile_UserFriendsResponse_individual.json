@@ -29,12 +29,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "firstName",
-          "lastName",
-          "createdAt"
-        ],
+        "required": ["id", "firstName", "lastName", "createdAt"],
         "additionalProperties": false
       }
     },
@@ -44,9 +39,6 @@
       "maximum": 9007199254740991
     }
   },
-  "required": [
-    "friends",
-    "totalCount"
-  ],
+  "required": ["friends", "totalCount"],
   "additionalProperties": false
 }

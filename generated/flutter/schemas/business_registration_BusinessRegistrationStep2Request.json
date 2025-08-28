@@ -43,13 +43,7 @@
           "maxLength": 2
         }
       },
-      "required": [
-        "street",
-        "city",
-        "state",
-        "postalCode",
-        "country"
-      ],
+      "required": ["street", "city", "state", "postalCode", "country"],
       "additionalProperties": false
     },
     "phone": {
@@ -68,10 +62,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "description",
-    "address",
-    "phone"
-  ],
+  "required": ["description", "address", "phone"],
   "additionalProperties": false
 }

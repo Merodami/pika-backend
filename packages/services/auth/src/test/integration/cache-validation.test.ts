@@ -18,6 +18,7 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
 import { createAuthServer } from '@auth-service/server.js'
+import { keyManager } from '@pika/crypto'
 import {
   createSharedAuthTestData,
   type SharedAuthTestData,
@@ -54,6 +55,12 @@ describe('Auth Service Cache Validation Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Auth Service Cache Validation tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Create test database
     testDb = await createTestDatabase({

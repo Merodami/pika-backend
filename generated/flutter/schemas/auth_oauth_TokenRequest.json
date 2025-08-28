@@ -21,11 +21,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "grantType",
-        "username",
-        "password"
-      ],
+      "required": ["grantType", "username", "password"],
       "additionalProperties": false
     },
     {
@@ -45,10 +41,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "grantType",
-        "refreshToken"
-      ],
+      "required": ["grantType", "refreshToken"],
       "additionalProperties": false
     }
   ]

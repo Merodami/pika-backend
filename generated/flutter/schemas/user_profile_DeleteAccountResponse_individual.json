@@ -11,9 +11,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "message",
-    "deletionDate"
-  ],
+  "required": ["message", "deletionDate"],
   "additionalProperties": false
 }
