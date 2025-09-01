@@ -14,6 +14,7 @@ import {
   ListObjectsV2Command,
   S3Client,
 } from '@aws-sdk/client-s3'
+import { keyManager } from '@pika/crypto'
 import {
   AWS_ACCESS_KEY_ID,
   AWS_S3_ENDPOINT,
@@ -69,6 +70,11 @@ describe('Storage Service with MinIO Integration Tests', () => {
   }
 
   beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
     // Initialize S3 client for MinIO
     s3Client = new S3Client(minioConfig)
 

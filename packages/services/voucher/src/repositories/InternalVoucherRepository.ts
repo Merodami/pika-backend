@@ -207,7 +207,7 @@ export class InternalVoucherRepository implements IInternalVoucherRepository {
           voucherId: data.voucherId,
           userId: data.userId,
           scanType: data.scanType,
-          scanSource: data.scanSource,
+          scanSource: data.scanSource as any, // Type assertion needed for Prisma enum
           businessId: data.businessId,
           deviceInfo: data.deviceInfo
             ? JSON.stringify(data.deviceInfo)

@@ -253,14 +253,4 @@ export const VOUCHER_SHORT_CODE_LENGTH = getEnvVariable(
   8,
 )
 
-export const VOUCHER_JWT_ALGORITHM = getEnvVariable(
-  'VOUCHER_JWT_ALGORITHM',
-  String,
-  'RS256',
-)
-
-export const VOUCHER_JWT_PRIVATE_KEY = getEnvVariable(
-  'VOUCHER_JWT_PRIVATE_KEY',
-  (value: string) => value.replace(/\\n/g, '\n'),
-  '',
-)
+// Voucher JWT variables removed - migrated to URL-based validation codes

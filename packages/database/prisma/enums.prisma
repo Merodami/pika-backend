@@ -183,9 +183,17 @@ enum VoucherType {
 }
 
 enum VoucherCodeType {
-  qr            // QR code (JWT-based)
+  qr            // QR code (JWT-based) - DEPRECATED
   short         // Short alphanumeric code
   static        // Static code (reusable)
+
+  @@schema("voucher")
+}
+
+enum VoucherValidationCodeType {
+  scan          // Short-lived code for QR scanning (5 min)
+  print         // Long-lived code for printed materials (1 year)
+  digital       // Medium-lived code for digital sharing (24 hours)
 
   @@schema("voucher")
 }

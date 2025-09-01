@@ -19,6 +19,8 @@ SET row_security = off;
 
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_category_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_business_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_used_by_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_voucher_id_fkey;
@@ -88,6 +90,12 @@ DROP INDEX IF EXISTS voucher.vouchers_category_id_state_idx;
 DROP INDEX IF EXISTS voucher.vouchers_category_id_idx;
 DROP INDEX IF EXISTS voucher.vouchers_business_id_idx;
 DROP INDEX IF EXISTS voucher.vouchers_business_id_created_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_voucher_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_voucher_id_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_type_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_code_key;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_code_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_user_id_key;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_redeemed_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_idx;
@@ -268,6 +276,7 @@ DROP INDEX IF EXISTS analytics.search_queries_query_idx;
 DROP INDEX IF EXISTS analytics.search_queries_last_searched_idx;
 DROP INDEX IF EXISTS analytics.search_queries_count_idx;
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_pkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_pkey;
@@ -303,6 +312,7 @@ ALTER TABLE IF EXISTS ONLY business.business_details DROP CONSTRAINT IF EXISTS b
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_pkey;
 ALTER TABLE IF EXISTS ONLY analytics.search_queries DROP CONSTRAINT IF EXISTS search_queries_pkey;
 DROP TABLE IF EXISTS voucher.vouchers;
+DROP TABLE IF EXISTS voucher.voucher_validation_codes;
 DROP TABLE IF EXISTS voucher.voucher_redemptions;
 DROP TABLE IF EXISTS voucher.voucher_codes;
 DROP TABLE IF EXISTS voucher.customer_vouchers;
@@ -337,6 +347,7 @@ DROP TABLE IF EXISTS business.business_registration;
 DROP TABLE IF EXISTS business.business_details;
 DROP TABLE IF EXISTS analytics.voucher_scans;
 DROP TABLE IF EXISTS analytics.search_queries;
+DROP TYPE IF EXISTS voucher."VoucherValidationCodeType";
 DROP TYPE IF EXISTS voucher."VoucherType";
 DROP TYPE IF EXISTS voucher."VoucherState";
 DROP TYPE IF EXISTS voucher."VoucherCodeType";
@@ -921,6 +932,17 @@ CREATE TYPE voucher."VoucherType" AS ENUM (
 );
 
 
+--
+-- Name: VoucherValidationCodeType; Type: TYPE; Schema: voucher; Owner: -
+--
+
+CREATE TYPE voucher."VoucherValidationCodeType" AS ENUM (
+    'scan',
+    'print',
+    'digital'
+);
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -954,7 +976,10 @@ CREATE TABLE analytics.voucher_scans (
     business_id uuid,
     scanned_at timestamp(6) with time zone NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    metadata jsonb
+    metadata jsonb,
+    campaign character varying(100),
+    deep_link_mode character varying(20),
+    validation_code character varying(20)
 );
 
 
@@ -1600,6 +1625,23 @@ CREATE TABLE voucher.voucher_redemptions (
 
 
 --
+-- Name: voucher_validation_codes; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.voucher_validation_codes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    voucher_id uuid NOT NULL,
+    code character varying(20) NOT NULL,
+    type voucher."VoucherValidationCodeType" NOT NULL,
+    expires_at timestamp(6) with time zone NOT NULL,
+    used_at timestamp(6) with time zone,
+    used_by uuid,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    metadata jsonb DEFAULT '{}'::jsonb
+);
+
+
+--
 -- Name: vouchers; Type: TABLE; Schema: voucher; Owner: -
 --
 
@@ -1903,6 +1945,14 @@ ALTER TABLE ONLY voucher.voucher_codes
 
 ALTER TABLE ONLY voucher.voucher_redemptions
     ADD CONSTRAINT voucher_redemptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: voucher_validation_codes voucher_validation_codes_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_validation_codes
+    ADD CONSTRAINT voucher_validation_codes_pkey PRIMARY KEY (id);
 
 
 --
@@ -3167,6 +3217,48 @@ CREATE UNIQUE INDEX voucher_redemptions_voucher_id_user_id_key ON voucher.vouche
 
 
 --
+-- Name: voucher_validation_codes_code_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_code_idx ON voucher.voucher_validation_codes USING btree (code);
+
+
+--
+-- Name: voucher_validation_codes_code_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_validation_codes_code_key ON voucher.voucher_validation_codes USING btree (code);
+
+
+--
+-- Name: voucher_validation_codes_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_expires_at_idx ON voucher.voucher_validation_codes USING btree (expires_at);
+
+
+--
+-- Name: voucher_validation_codes_type_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_type_idx ON voucher.voucher_validation_codes USING btree (type);
+
+
+--
+-- Name: voucher_validation_codes_voucher_id_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_voucher_id_expires_at_idx ON voucher.voucher_validation_codes USING btree (voucher_id, expires_at);
+
+
+--
+-- Name: voucher_validation_codes_voucher_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_voucher_id_idx ON voucher.voucher_validation_codes USING btree (voucher_id);
+
+
+--
 -- Name: vouchers_business_id_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
@@ -3700,6 +3792,22 @@ ALTER TABLE ONLY voucher.voucher_redemptions
 
 ALTER TABLE ONLY voucher.voucher_redemptions
     ADD CONSTRAINT voucher_redemptions_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: voucher_validation_codes voucher_validation_codes_used_by_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_validation_codes
+    ADD CONSTRAINT voucher_validation_codes_used_by_fkey FOREIGN KEY (used_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: voucher_validation_codes voucher_validation_codes_voucher_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_validation_codes
+    ADD CONSTRAINT voucher_validation_codes_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

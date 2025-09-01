@@ -49,6 +49,7 @@ model Voucher {
   business               Business            @relation(fields: [businessId], references: [id])
   category               Category?           @relation(fields: [categoryId], references: [id])
   codes                  VoucherCode[]
+  validationCodes        VoucherValidationCode[] // New URL-based validation codes
   redemptions            VoucherRedemption[]
   scans                  VoucherScan[]
   customerVouchers       CustomerVoucher[]
@@ -95,6 +96,37 @@ model VoucherCode {
   @@index([voucherId, type]) // For finding codes by voucher and type
   @@index([voucherId, isActive]) // For finding active codes
   @@map("voucher_codes")
+  @@schema("voucher")
+}
+
+/// Voucher validation codes for URL-based QR codes and deep linking
+model VoucherValidationCode {
+  id         String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  voucherId  String                  @map("voucher_id") @db.Uuid
+  code       String                  @unique @db.VarChar(20) // Format: XXXX-XXXX
+  type       VoucherValidationCodeType @map("type") // SCAN, PRINT, DIGITAL
+  expiresAt  DateTime                @map("expires_at") @db.Timestamptz(6)
+  
+  // Usage tracking
+  usedAt     DateTime?               @map("used_at") @db.Timestamptz(6)
+  usedBy     String?                 @map("used_by") @db.Uuid
+  
+  // Additional context metadata (campaign, source, batch, etc.)
+  metadata   Json?                   @default("{}") @db.JsonB
+  
+  // Audit timestamps
+  createdAt  DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  // Relations
+  voucher    Voucher                 @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  user       User?                   @relation(fields: [usedBy], references: [id])
+  
+  @@index([code])
+  @@index([voucherId])
+  @@index([expiresAt])
+  @@index([voucherId, expiresAt])
+  @@index([type])
+  @@map("voucher_validation_codes")
   @@schema("voucher")
 }
 
@@ -178,6 +210,11 @@ model VoucherScan {
   // Device and technical information
   deviceInfo  Json              @default("{}") @map("device_info") // Platform, version, model, etc.
   
+  // Deep linking and validation tracking
+  validationCode String?        @map("validation_code") @db.VarChar(20) // The validation code used for URL-based QR
+  deepLinkMode   String?        @map("deep_link_mode") @db.VarChar(20) // 'url', 'hybrid'
+  campaign       String?        @map("campaign") @db.VarChar(100) // Marketing campaign identifier
+  
   // Business context (if scan happened at business location)
   businessId  String?           @map("business_id") @db.Uuid // Business where scan happened (may differ from voucher business)
   
@@ -186,7 +223,7 @@ model VoucherScan {
   createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   
   // Additional context metadata
-  metadata    Json?             // IP address, user agent, referrer, etc.
+  metadata    Json?             // IP address, user agent, referrer, utm params, etc.
 
   // Relations
   voucher     Voucher   @relation(fields: [voucherId], references: [id], onDelete: Cascade)

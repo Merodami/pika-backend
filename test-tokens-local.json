@@ -1,0 +1,28 @@
+{
+  "generated": "2025-08-29T14:58:18.761Z",
+  "expires": "2026-08-29T14:58:18.761Z",
+  "environment": "local",
+  "tokens": [
+    {
+      "label": "Admin User",
+      "email": "admin@example.com",
+      "userId": "aecc1b8e-2940-4758-be47-b8a3acb95dcc",
+      "role": "admin",
+      "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZWNjMWI4ZS0yOTQwLTQ3NTgtYmU0Ny1iOGEzYWNiOTVkY2MiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiYWN0aXZlIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc1NjQ3OTQ5OCwiZXhwIjoxNzg4MDE1NDk4LCJzdWIiOiJhZWNjMWI4ZS0yOTQwLTQ3NTgtYmU0Ny1iOGEzYWNiOTVkY2MiLCJqdGkiOiJhZWNjMWI4ZS0yOTQwLTQ3NTgtYmU0Ny1iOGEzYWNiOTVkY2MtMTc1NjQ3OTQ5OC15ZWFyLWxvbmctYWNjZXNzIiwiYXVkIjoidGhlX3ZvdWNoZXJib29rX2FwcCIsImlzcyI6InRoZXZvdWNoZXJib29rLWFwaSJ9.mqbtQfV8ZunJ2JaJJjeYiH2i9cE7Gzhnv5zxgMRfnDcjdzyjlZ7TcAPIhRWl0FtUshwp1CWpPAZISlIlQNPdCSX69tOdKZ0QErKdbId1oAJ4zCkqo9l_38ptshhxBbej5QPRwgTEtHZ-755F1a62W_tAx8E0QupChMSIkwsjm1wsyOa3bmQWCcATE-FJ2SQoRNVJb60lZG_CM47sN2KOFEYK192Fde1RReNE_n7mgY6nNndjx6v7O9jdFmIMjj1qMUaC5n4vBZXOXpvwkhwNVnDH8FySwzI9x7fv7kaIWrZViZKGFtREZtW3ZiwkI0WFVc8wryUDfz0KmkvAX0uyEA"
+    },
+    {
+      "label": "Customer User",
+      "email": "customer@example.com",
+      "userId": "3b9aefe6-1c9c-450c-a4e7-429bb7f44fd0",
+      "role": "customer",
+      "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzYjlhZWZlNi0xYzljLTQ1MGMtYTRlNy00MjliYjdmNDRmZDAiLCJlbWFpbCI6ImN1c3RvbWVyQGV4YW1wbGUuY29tIiwicm9sZSI6ImN1c3RvbWVyIiwic3RhdHVzIjoiYWN0aXZlIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc1NjQ3OTQ5OCwiZXhwIjoxNzg4MDE1NDk4LCJzdWIiOiIzYjlhZWZlNi0xYzljLTQ1MGMtYTRlNy00MjliYjdmNDRmZDAiLCJqdGkiOiIzYjlhZWZlNi0xYzljLTQ1MGMtYTRlNy00MjliYjdmNDRmZDAtMTc1NjQ3OTQ5OC15ZWFyLWxvbmctYWNjZXNzIiwiYXVkIjoidGhlX3ZvdWNoZXJib29rX2FwcCIsImlzcyI6InRoZXZvdWNoZXJib29rLWFwaSJ9.jE3pwQ7kwCyH2pYJ8rJFibKjXJOB_O27mFkN0Sbgcvx7ulOaw0JHUZEtXStzxOMChOsRB7N_3-mqRusuDoVXGAb7I02q0agbcUmPqKRFZcC5vfmARDCXHOyWl5LAPOkZHbt4OzIX5gid8KslimDpxP2iTdOH8bB1lQalnIKTLiirbF5URd67LYuGmG0XLdXojZzudDSxBlXmpaNPD3PnRiQ-llYuMkn3TUB6O5pjAbIic34aAEBE6fFHZCg3_EtKaU6oNGoyv032XoMydWfe7rlB4OUAghq4jvvivZ9xpUXxQSjKaOjkwoXR8WoTyPEGYmN47OFsP9LDClseLDYq_w"
+    },
+    {
+      "label": "Business User",
+      "email": "business@example.com",
+      "userId": "224c4a3a-6372-4442-89f5-ad9fb85513d2",
+      "role": "business",
+      "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyMjRjNGEzYS02MzcyLTQ0NDItODlmNS1hZDlmYjg1NTEzZDIiLCJlbWFpbCI6ImJ1c2luZXNzQGV4YW1wbGUuY29tIiwicm9sZSI6ImJ1c2luZXNzIiwic3RhdHVzIjoiYWN0aXZlIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc1NjQ3OTQ5OCwiZXhwIjoxNzg4MDE1NDk4LCJzdWIiOiIyMjRjNGEzYS02MzcyLTQ0NDItODlmNS1hZDlmYjg1NTEzZDIiLCJqdGkiOiIyMjRjNGEzYS02MzcyLTQ0NDItODlmNS1hZDlmYjg1NTEzZDItMTc1NjQ3OTQ5OC15ZWFyLWxvbmctYWNjZXNzIiwiYXVkIjoidGhlX3ZvdWNoZXJib29rX2FwcCIsImlzcyI6InRoZXZvdWNoZXJib29rLWFwaSJ9.pwIDeohRkhzfJQnkj14tddJykgghBUcJGk5RKZ6Jy1ok5lPa8mdBCiap7lbSGl2KjFG3zVpBTp5R6WYg0o2Rt1GdpCCvV6g1cK6HAZm6_C57uLcebNGQOvUQbzfYTyIjXopokbc5kkhuC3jBh0WfAwF4dOVGGHtGrTxmT4cdDMPfGklwiXDDP_E8rtjSqy2vRwdD-vFyUHTk-LMxxad3rZi_wttzyZsklASpa2kFY7KLigAV38zPPcv6J7wWo56qKfsHhC6_osw1a_j5RUTdfnjAcXfyWbUYrlwdRDHz_yM0N4tp8ClGVO_JmCIZpVczkziE7zdMA9_OsBMzCnlmyw"
+    }
+  ]
+}

@@ -19,11 +19,11 @@ vi.unmock('@pika/shared')
 vi.unmock('@pika/translation')
 
 import { createBusinessServer } from '@business/server.js'
-import { keyManager } from '@pika/crypto'
 import {
   createSharedBusinessTestData,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import { MockTranslationClient } from '@pika/tests'

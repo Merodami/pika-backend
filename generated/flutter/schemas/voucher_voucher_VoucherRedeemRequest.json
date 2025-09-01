@@ -6,6 +6,9 @@
       "type": "string",
       "minLength": 1
     },
+    "userId": {
+      "type": "string"
+    },
     "location": {
       "type": "object",
       "properties": {

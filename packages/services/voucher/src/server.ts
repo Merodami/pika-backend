@@ -53,6 +53,9 @@ export async function createVoucherServer({
         '/metrics',
         '/internal/*',
         '/vouchers/search/popular',
+        '/vouchers/by-code/*', // Public voucher retrieval by code
+        '/vouchers/*/validate', // Validation endpoint (code serves as auth)
+        '/vouchers/*/redeem', // Redemption endpoint (code serves as auth)
       ],
     },
     idempotencyOptions: {

@@ -55,8 +55,32 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
       const pathExcluded = isExcludedPath(req.path, excludePaths)
       const originalUrlExcluded = isExcludedPath(req.originalUrl, excludePaths)
 
+      // Debug logging for validation endpoints and test environment
+      if (
+        req.path.includes('/validate') ||
+        req.path.includes('/redeem') ||
+        NODE_ENV === 'test'
+      ) {
+        console.log('Auth middleware check:', {
+          path: req.path,
+          originalUrl: req.originalUrl,
+          pathExcluded,
+          originalUrlExcluded,
+          excludePaths,
+          NODE_ENV,
+          SKIP_AUTH,
+        })
+      }
+
       if (pathExcluded || originalUrlExcluded) {
         addSecurityHeaders(res)
+
+        if (NODE_ENV === 'test' && req.path.includes('/validate')) {
+          console.log(
+            'AUTH MIDDLEWARE: Path excluded, skipping auth for:',
+            req.path,
+          )
+        }
 
         return next()
       }
@@ -190,11 +214,39 @@ export function authMiddleware(options: ApiTokenOptions): RequestHandler {
  */
 function isExcludedPath(url: string, excludePaths: string[]): boolean {
   return excludePaths.some((pattern) => {
-    const exactMatch = pattern === url
-    const wildcardMatch =
-      pattern.endsWith('*') && url.startsWith(pattern.slice(0, -1))
+    // Exact match
+    if (pattern === url) {
+      if (url.includes('/validate'))
+        console.log(`Exact match: ${pattern} === ${url}`)
 
-    return exactMatch || wildcardMatch
+      return true
+    }
+
+    // Simple wildcard at the end
+    if (pattern.endsWith('*') && url.startsWith(pattern.slice(0, -1))) {
+      if (url.includes('/validate'))
+        console.log(`Wildcard match: ${pattern} matches ${url}`)
+
+      return true
+    }
+
+    // Support for path patterns like /vouchers/*/validate
+    // Convert pattern to regex: /vouchers/*/validate -> /vouchers/.*/validate
+    if (pattern.includes('*/')) {
+      const regexPattern = pattern.replace(/\*/g, '[^/]+')
+      const regex = new RegExp(`^${regexPattern}$`)
+      const matches = regex.test(url)
+
+      if (url.includes('/validate')) {
+        console.log(
+          `Pattern match test: ${pattern} -> ${regexPattern} -> ${regex} matches ${url}? ${matches}`,
+        )
+      }
+
+      return matches
+    }
+
+    return false
   })
 }
 

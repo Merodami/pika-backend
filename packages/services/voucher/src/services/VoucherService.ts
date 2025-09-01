@@ -13,6 +13,7 @@ import type {
 } from '@pika/sdk'
 import { type VoucherDomain } from '@pika/sdk'
 import {
+  BaseError,
   BusinessServiceClient,
   CommunicationServiceClient,
   ErrorFactory,
@@ -121,7 +122,12 @@ export class VoucherService implements IVoucherService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.VOUCHER.LIST,
-    keyGenerator: (params) => JSON.stringify(params),
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const params = args[0]
+      const language = args[1]
+
+      return `${prefix}:${JSON.stringify(params)}:${language || 'default'}`
+    },
   })
   async getAllVouchers(
     params: VoucherSearchParams,
@@ -160,8 +166,13 @@ export class VoucherService implements IVoucherService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.VOUCHER.SINGLE,
-    keyGenerator: (id, parsedIncludes) =>
-      `${id}:${JSON.stringify(parsedIncludes || {})}`,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const id = args[0]
+      const parsedIncludes = args[1]
+      const language = args[2]
+
+      return `${prefix}:${id}:${JSON.stringify(parsedIncludes || {})}:${language || 'default'}`
+    },
   })
   async getVoucherById(
     id: string,
@@ -188,6 +199,10 @@ export class VoucherService implements IVoucherService {
       return voucher
     } catch (error) {
       logger.error('Failed to get voucher by id', { error, id, language })
+      // If it's already a BaseError (like ResourceNotFoundError), re-throw it
+      if (error instanceof BaseError) {
+        throw error
+      }
       throw ErrorFactory.fromError(error)
     }
   }
@@ -195,10 +210,11 @@ export class VoucherService implements IVoucherService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.VOUCHER.BY_BUSINESS,
-    keyGenerator: (params) => {
-      const searchParams = params as unknown as VoucherSearchParams
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const searchParams = args[0] as VoucherSearchParams
+      const language = args[1]
 
-      return `${searchParams.businessId}:${JSON.stringify(searchParams)}`
+      return `${prefix}:${searchParams.businessId}:${JSON.stringify(searchParams)}:${language || 'default'}`
     },
   })
   async getVouchersByBusinessId(
@@ -244,7 +260,12 @@ export class VoucherService implements IVoucherService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.VOUCHER.USER_VOUCHERS,
-    keyGenerator: (userId, params) => `${userId}:${JSON.stringify(params)}`,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const userId = args[0]
+      const params = args[1]
+
+      return `${prefix}:${userId}:${JSON.stringify(params)}`
+    },
   })
   async getVouchersByUserId(
     userId: string,
@@ -676,10 +697,11 @@ export class VoucherService implements IVoucherService {
     language?: LanguageCode,
   ): Promise<VoucherDomain> {
     try {
-      const voucher = await this.repository.findByQRCode(qrCode)
+      // Use findByAnyCode which handles validation codes, short codes, etc.
+      const voucher = await this.repository.findByAnyCode(qrCode)
 
       if (!voucher) {
-        throw ErrorFactory.resourceNotFound('Voucher', `QR code: ${qrCode}`)
+        throw ErrorFactory.resourceNotFound('Voucher', `Code: ${qrCode}`)
       }
 
       // Resolve translations if language is provided - one line!
@@ -761,7 +783,12 @@ export class VoucherService implements IVoucherService {
   @Cache({
     ttl: REDIS_DEFAULT_TTL,
     prefix: CACHE_KEYS.VOUCHER.BY_CODE,
-    keyGenerator: (code) => code,
+    keyGenerator: (prefix: string, methodName: string, args: any[]) => {
+      const code = args[0]
+      const language = args[1]
+
+      return `${prefix}:${code}:${language || 'default'}`
+    },
   })
   async getVoucherByAnyCode(
     code: string,

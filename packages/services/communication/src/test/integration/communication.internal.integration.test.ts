@@ -38,6 +38,7 @@ import {
   createSharedCommunicationTestData,
   type SharedCommunicationTestData,
 } from '@communication/test/helpers/communicationTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { SERVICE_API_KEY } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
@@ -66,6 +67,12 @@ describe('Communication Service - Internal API Integration Tests', () => {
     logger.debug(
       'Setting up Communication Service Internal API integration tests...',
     )
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     testDb = await createTestDatabase({
       databaseName: 'test_communication_internal_db',

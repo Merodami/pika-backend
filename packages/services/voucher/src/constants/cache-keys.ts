@@ -46,6 +46,13 @@ export const CACHE_KEYS = {
     ACTIVE: 'service:internal:vouchers:active',
     VALIDATION: 'service:internal:voucher:validation',
   },
+
+  // Validation code cache keys
+  VALIDATION: {
+    CODE: 'service:validation:code', // Individual validation codes
+    ATTEMPTS: 'service:validation:attempts', // Rate limiting tracking
+    USED: 'service:validation:used', // Used codes tracking
+  },
 } as const
 
 /**
@@ -64,4 +71,9 @@ export const generateCacheKey = {
     `${CACHE_KEYS.REDEMPTION.USER}:${userId}`,
   redemptionsByVoucher: (voucherId: string) =>
     `${CACHE_KEYS.REDEMPTION.VOUCHER}:${voucherId}`,
+  // Validation code keys
+  validationCode: (code: string) => `${CACHE_KEYS.VALIDATION.CODE}:${code}`,
+  validationAttempts: (identifier: string) =>
+    `${CACHE_KEYS.VALIDATION.ATTEMPTS}:${identifier}`,
+  validationUsed: (code: string) => `${CACHE_KEYS.VALIDATION.USED}:${code}`,
 }

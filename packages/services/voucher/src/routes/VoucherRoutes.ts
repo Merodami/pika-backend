@@ -17,9 +17,13 @@ import type { PrismaClient } from '@prisma/client'
 import { Router } from 'express'
 
 import { VoucherController } from '../controllers/VoucherController.js'
+import { VoucherValidationController } from '../controllers/VoucherValidationController.js'
 import { InternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
 import { VoucherRepository } from '../repositories/VoucherRepository.js'
+import { VoucherValidationRepository } from '../repositories/VoucherValidationRepository.js'
 import { InternalVoucherService } from '../services/InternalVoucherService.js'
+import { VoucherDeepLinkService } from '../services/VoucherDeepLinkService.js'
+import { VoucherDeepLinkValidationService } from '../services/VoucherDeepLinkValidationService.js'
 import { VoucherService } from '../services/VoucherService.js'
 
 /**
@@ -37,13 +41,24 @@ export async function createVoucherRoutes(
 ): Promise<Router> {
   const router = Router()
 
-  // Initialize dependencies
+  // Initialize repositories
   const repository = new VoucherRepository(prisma, cache)
   const internalRepository = new InternalVoucherRepository(prisma, cache)
+  const validationRepository = new VoucherValidationRepository(prisma, cache)
+
+  // Initialize validation and deep link services first (needed by InternalVoucherService)
+  const validationService = new VoucherDeepLinkValidationService(
+    validationRepository,
+    repository,
+    cache,
+  )
+
+  // Initialize services
   const internalService = new InternalVoucherService(
     internalRepository,
     repository, // InternalService needs public repository for some operations
     cache,
+    validationService,
   )
   const service = new VoucherService(
     repository,
@@ -55,7 +70,16 @@ export async function createVoucherRoutes(
     userServiceClient,
     businessServiceClient,
   )
+  const deepLinkService = new VoucherDeepLinkService()
+
+  // Initialize controllers
   const controller = new VoucherController(service)
+
+  const validationController = new VoucherValidationController(
+    service,
+    validationService,
+    deepLinkService,
+  )
 
   // Public routes (JWT auth required - available to all authenticated users)
   // GET /vouchers - List all published vouchers
@@ -94,7 +118,7 @@ export async function createVoucherRoutes(
     '/by-code/:code',
     validateParams(voucherCommon.VoucherCodeParam),
     validateQuery(voucherPublic.GetVoucherByIdQuery),
-    controller.getVoucherByCode,
+    validationController.getVoucherByCode,
   )
 
   // GET /vouchers/:id - Get voucher by ID (must be after all specific routes)
@@ -132,6 +156,24 @@ export async function createVoucherRoutes(
     validateParams(voucherCommon.VoucherIdParam),
     validateBody(voucherPublic.VoucherRedeemRequest),
     controller.redeemVoucher,
+  )
+
+  // POST /vouchers/:id/validate - Validate voucher with URL-based code
+  // SECURITY NOTE: No authentication required - validation code serves as auth
+  router.post(
+    '/:id/validate',
+    validateParams(voucherCommon.VoucherIdParam),
+    validateBody(voucherPublic.VoucherValidateRequest),
+    validationController.validateVoucher,
+  )
+
+  // GET /vouchers/:id/deep-link - Generate deep link for QR code
+  router.get(
+    '/:id/deep-link',
+    requireAuth(),
+    validateParams(voucherCommon.VoucherIdParam),
+    validateQuery(voucherPublic.GenerateDeepLinkRequest),
+    validationController.generateDeepLink,
   )
 
   return router

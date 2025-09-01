@@ -32,6 +32,7 @@ import {
   createSharedCategoryTestData,
   type SharedCategoryTestData,
 } from '@category/test/helpers/categoryTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { logger } from '@pika/shared'
 import {
   AuthenticatedRequestClient,
@@ -64,6 +65,12 @@ describe('Admin Category Integration Tests', () => {
   const mockTranslationClient = new MockTranslationClient()
 
   beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
+
     testDb = await createTestDatabase({
       databaseName: 'test_category_admin_db',
       useInitSql: true,

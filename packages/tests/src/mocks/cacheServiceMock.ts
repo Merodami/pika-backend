@@ -70,6 +70,28 @@ export class MockCacheService implements ICacheService {
 
     return true
   }
+  async increment(key: string, ttl?: number): Promise<number> {
+    const item = this.cache.get(key)
+
+    let newValue: number
+
+    if (item) {
+      // Increment existing value
+      newValue = (typeof item.value === 'number' ? item.value : 0) + 1
+      item.value = newValue
+    } else {
+      // Create new counter with value 1
+      newValue = 1
+
+      const expiresAt = ttl
+        ? Date.now() + ttl * 1000
+        : Date.now() + this.defaultTTL * 1000
+
+      this.cache.set(key, { value: newValue, expiresAt })
+    }
+
+    return newValue
+  }
   async del(key: string): Promise<boolean> {
     return this.cache.delete(key)
   }

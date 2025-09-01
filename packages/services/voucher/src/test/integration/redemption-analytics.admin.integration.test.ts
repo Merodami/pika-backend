@@ -15,6 +15,7 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/translation')
 vi.unmock('@pika/shared') // Unmock shared to use real error classes with real middleware
 
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -84,6 +85,12 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
     logger.debug(
       'Setting up Redemption Analytics Service Admin API integration tests...',
     )
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({

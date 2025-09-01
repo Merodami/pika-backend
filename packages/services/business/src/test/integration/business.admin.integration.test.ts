@@ -16,12 +16,12 @@ vi.unmock('@pika/translation')
 vi.unmock('@pika/shared') // Unmock shared to use real error classes with real middleware
 
 import { createBusinessServer } from '@business/server.js'
-import { keyManager } from '@pika/crypto'
 import {
   createSharedBusinessTestData,
   seedTestBusinesses,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {

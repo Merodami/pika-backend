@@ -261,6 +261,7 @@ export type VoucherClaimResponse = z.infer<typeof VoucherClaimResponse>
  */
 export const VoucherRedeemRequest = z.object({
   code: z.string().min(FIELD_LENGTH.CODE_MIN),
+  userId: z.string().optional(), // Optional in request, but required by service
   location: Coordinates.optional(),
 })
 

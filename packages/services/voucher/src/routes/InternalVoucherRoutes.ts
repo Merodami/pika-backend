@@ -8,7 +8,9 @@ import { Router } from 'express'
 import { InternalVoucherController } from '../controllers/InternalVoucherController.js'
 import { InternalVoucherRepository } from '../repositories/InternalVoucherRepository.js'
 import { VoucherRepository } from '../repositories/VoucherRepository.js'
+import { VoucherValidationRepository } from '../repositories/VoucherValidationRepository.js'
 import { InternalVoucherService } from '../services/InternalVoucherService.js'
+import { VoucherDeepLinkValidationService } from '../services/VoucherDeepLinkValidationService.js'
 
 /**
  * Creates internal voucher routes for service-to-service communication
@@ -23,10 +25,20 @@ export function createInternalVoucherRoutes(
   // Initialize dependencies
   const publicRepository = new VoucherRepository(prisma, cache)
   const internalRepository = new InternalVoucherRepository(prisma, cache)
+  const validationRepository = new VoucherValidationRepository(prisma, cache)
+
+  // Initialize validation service for URL-based QR codes
+  const validationService = new VoucherDeepLinkValidationService(
+    validationRepository,
+    publicRepository,
+    cache,
+  )
+
   const service = new InternalVoucherService(
     internalRepository,
     publicRepository, // InternalService needs public repository for some operations
     cache,
+    validationService,
   )
   const controller = new InternalVoucherController(service)
 

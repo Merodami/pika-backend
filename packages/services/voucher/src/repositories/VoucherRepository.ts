@@ -14,6 +14,10 @@ import { Prisma, PrismaClient } from '@prisma/client'
 import { set } from 'lodash-es'
 
 import type { VoucherSearchParams } from '../types/index.js'
+import type {
+  CreateValidationCodeData,
+  ValidationCodeRecord,
+} from '../types/validation.js'
 import {
   RedemptionAnalyticsRepository,
   type VoucherRedemptionLogData,
@@ -59,12 +63,16 @@ export interface IVoucherRepository {
     status?: string,
   ): Promise<PaginatedResult<CustomerVoucherDomain>>
   // Code-based voucher lookup methods (critical for QR scanning)
-  findByQRCode(qrCode: string): Promise<VoucherDomain | null>
   findByShortCode(shortCode: string): Promise<VoucherDomain | null>
   findByStaticCode(staticCode: string): Promise<VoucherDomain | null>
   findByAnyCode(code: string): Promise<VoucherDomain | null>
   upsertSearchQuery(query: string): Promise<void>
   getPopularSearches(limit: number): Promise<string[]>
+  // Validation code methods for URL-based QR
+  createValidationCode(data: CreateValidationCodeData): Promise<void>
+  findValidationCode(code: string): Promise<ValidationCodeRecord | null>
+  markValidationCodeUsed(code: string, userId: string): Promise<void>
+  deleteExpiredValidationCodes(): Promise<number>
 }
 
 export class VoucherRepository implements IVoucherRepository {
@@ -396,27 +404,6 @@ export class VoucherRepository implements IVoucherRepository {
       : undefined
   }
 
-  async findByQRCode(qrCode: string): Promise<VoucherDomain | null> {
-    try {
-      const voucher = await this.prisma.voucher.findFirst({
-        where: {
-          qrCode,
-          deletedAt: null,
-        },
-        include: this.buildInclude(),
-      })
-
-      if (!voucher) {
-        return null
-      }
-
-      return VoucherMapper.fromDocument(voucher)
-    } catch (error) {
-      logger.error('Failed to find voucher by QR code', { error, qrCode })
-      throw ErrorFactory.fromError(error)
-    }
-  }
-
   async findByShortCode(shortCode: string): Promise<VoucherDomain | null> {
     try {
       const voucher = await this.prisma.voucher.findFirst({
@@ -482,16 +469,21 @@ export class VoucherRepository implements IVoucherRepository {
   async findByAnyCode(code: string): Promise<VoucherDomain | null> {
     try {
       // Try all code types in order of likelihood
-      // 1. QR code (most common for scanning)
-      let voucher = await this.findByQRCode(code)
+      // 1. Validation code (URL-based QR - NEW PRIMARY METHOD)
+      const validationCode = await this.findValidationCode(code)
+
+      if (validationCode && validationCode.voucherId) {
+        const voucher = await this.findById(validationCode.voucherId)
+
+        if (voucher) return voucher
+      }
+
+      // 2. Short code (human-readable codes - KEEP)
+      let voucher = await this.findByShortCode(code)
 
       if (voucher) return voucher
 
-      // 2. Short code (human-readable codes)
-      voucher = await this.findByShortCode(code)
-      if (voucher) return voucher
-
-      // 3. Static code (campaign codes)
+      // 3. Static code (campaign codes - KEEP)
       voucher = await this.findByStaticCode(code)
       if (voucher) return voucher
 
@@ -817,7 +809,167 @@ export class VoucherRepository implements IVoucherRepository {
       return results.map((row) => row.query)
     } catch (error) {
       logger.warn('Failed to get popular searches', { error, limit })
+
       return []
+    }
+  }
+
+  // ============= Validation Code Methods (URL-based QR) =============
+
+  /**
+   * Create a new validation code for URL-based QR
+   */
+  async createValidationCode(data: CreateValidationCodeData): Promise<void> {
+    try {
+      await this.prisma.voucherValidationCode.create({
+        data: {
+          voucherId: data.voucherId,
+          code: data.code,
+          type: data.type as any, // Prisma enum conversion
+          expiresAt: data.expiresAt,
+        },
+      })
+
+      logger.debug('Created validation code', {
+        voucherId: data.voucherId,
+        code: data.code,
+        type: data.type,
+      })
+    } catch (error) {
+      logger.error('Failed to create validation code', { error, data })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw ErrorFactory.uniqueConstraintViolation(
+            'ValidationCode',
+            'code',
+            data.code,
+          )
+        }
+        throw ErrorFactory.databaseError(
+          'createValidationCode',
+          'Failed to create validation code',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Find a validation code by code string
+   */
+  async findValidationCode(code: string): Promise<ValidationCodeRecord | null> {
+    try {
+      const validationCode = await this.prisma.voucherValidationCode.findUnique(
+        {
+          where: { code },
+          include: {
+            voucher: false, // Don't include voucher here, fetch separately if needed
+          },
+        },
+      )
+
+      if (!validationCode) {
+        return null
+      }
+
+      // Map to ValidationCodeRecord type
+      return {
+        id: validationCode.id,
+        voucherId: validationCode.voucherId,
+        code: validationCode.code,
+        type: validationCode.type as any, // Convert Prisma enum
+        expiresAt: validationCode.expiresAt,
+        usedAt: validationCode.usedAt,
+        usedBy: validationCode.usedBy,
+        createdAt: validationCode.createdAt,
+      }
+    } catch (error) {
+      logger.error('Failed to find validation code', { error, code })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'findValidationCode',
+          'Failed to find validation code',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Mark a validation code as used
+   */
+  async markValidationCodeUsed(code: string, userId: string): Promise<void> {
+    try {
+      await this.prisma.voucherValidationCode.update({
+        where: { code },
+        data: {
+          usedAt: new Date(),
+          usedBy: userId,
+        },
+      })
+
+      logger.debug('Marked validation code as used', {
+        code,
+        userId,
+      })
+    } catch (error) {
+      logger.error('Failed to mark validation code as used', {
+        error,
+        code,
+        userId,
+      })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw ErrorFactory.resourceNotFound('ValidationCode', code)
+        }
+        throw ErrorFactory.databaseError(
+          'markValidationCodeUsed',
+          'Failed to mark validation code as used',
+          error,
+        )
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Delete expired validation codes
+   */
+  async deleteExpiredValidationCodes(): Promise<number> {
+    try {
+      const result = await this.prisma.voucherValidationCode.deleteMany({
+        where: {
+          expiresAt: {
+            lt: new Date(),
+          },
+        },
+      })
+
+      logger.info('Deleted expired validation codes', {
+        count: result.count,
+      })
+
+      return result.count
+    } catch (error) {
+      logger.error('Failed to delete expired validation codes', { error })
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        throw ErrorFactory.databaseError(
+          'deleteExpiredValidationCodes',
+          'Failed to delete expired validation codes',
+          error,
+        )
+      }
+
+      throw error
     }
   }
 }

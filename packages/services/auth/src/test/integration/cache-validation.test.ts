@@ -18,13 +18,13 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
 import { createAuthServer } from '@auth-service/server.js'
-import { keyManager } from '@pika/crypto'
 import {
   createSharedAuthTestData,
   type SharedAuthTestData,
 } from '@auth-service/test/helpers/authTestHelpers.js'
 import { CommunicationServiceClientMock } from '@auth-service/test/mocks/CommunicationServiceClientMock.js'
 import { UserServiceClientMock } from '@auth-service/test/mocks/UserServiceClientMock.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {

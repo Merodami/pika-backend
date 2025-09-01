@@ -5,10 +5,12 @@
 
 import type {
   CustomerVoucherStatus,
+  VoucherAnalyticsGroupBy,
   VoucherCodeType,
+  VoucherDiscountType,
   VoucherScanSource,
   VoucherScanType,
-  VoucherStateType,
+  VoucherState,
 } from '@pika/types'
 
 // ============= Voucher DTO =============
@@ -38,11 +40,11 @@ export interface VoucherDTO {
   id: string
   businessId: string
   categoryId?: string
-  state: VoucherStateType
+  state: VoucherState
   title: string // Localized by TranslationService before sending to client
   description: string // Localized by TranslationService before sending to client
   terms: string // Localized by TranslationService before sending to client
-  discountType: 'percentage' | 'fixed'
+  discountType: VoucherDiscountType
   discountValue: number
   currency: string
   location: VoucherLocationDTO | null
@@ -67,7 +69,7 @@ export interface CreateVoucherRequestData {
   title: Record<string, string>
   description: Record<string, string>
   termsAndConditions: Record<string, string>
-  discountType: 'percentage' | 'fixed'
+  discountType: VoucherDiscountType
   discountValue: number
   currency: string
   location?: GeoJSONPoint | null
@@ -84,7 +86,7 @@ export interface UpdateVoucherRequestData {
   title?: Record<string, string>
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>
-  discountType?: 'percentage' | 'fixed'
+  discountType?: VoucherDiscountType
   discountValue?: number
   currency?: string
   location?: GeoJSONPoint | null
@@ -97,13 +99,7 @@ export interface UpdateVoucherRequestData {
 }
 
 export interface BulkVoucherUpdateData {
-  state?:
-    | 'draft'
-    | 'published'
-    | 'claimed'
-    | 'redeemed'
-    | 'expired'
-    | 'suspended'
+  state?: VoucherState
   expiresAt?: Date // Zod transforms to Date
   maxRedemptions?: number | null
   maxRedemptionsPerUser?: number
@@ -115,7 +111,7 @@ export interface CreateVoucherDTO {
   title: Record<string, string> // Multilingual content: { es: "...", en: "..." }
   description: Record<string, string>
   termsAndConditions: Record<string, string>
-  discountType: 'percentage' | 'fixed'
+  discountType: VoucherDiscountType
   discountValue: number
   currency: string
   location?: VoucherLocationDTO | GeoJSONPoint | null
@@ -131,7 +127,7 @@ export interface UpdateVoucherDTO {
   title?: Record<string, string> // Multilingual content: { es: "...", en: "..." }
   description?: Record<string, string>
   termsAndConditions?: Record<string, string>
-  discountType?: 'percentage' | 'fixed'
+  discountType?: VoucherDiscountType
   discountValue?: number
   currency?: string
   location?: VoucherLocationDTO | GeoJSONPoint | null
@@ -222,7 +218,7 @@ export interface CustomerVoucherDTO {
 // ============= State Management DTOs =============
 
 export interface VoucherStateUpdateDTO {
-  state: string
+  state: VoucherState
   metadata?: Record<string, any>
 }
 
@@ -291,7 +287,7 @@ export interface VoucherAnalyticsRequestDTO {
   voucherId: string
   startDate?: string
   endDate?: string
-  groupBy?: 'day' | 'week' | 'month'
+  groupBy?: VoucherAnalyticsGroupBy
 }
 
 // ============= List Response DTOs =============

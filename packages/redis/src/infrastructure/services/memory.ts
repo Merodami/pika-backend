@@ -138,6 +138,33 @@ export class MemoryCacheService implements ICacheService {
   }
 
   /**
+   * Increments a counter in the memory cache
+   * @param key - The key to increment
+   * @param ttl - Time to live in seconds for new keys (optional)
+   * @returns The new value after incrementing
+   */
+  async increment(key: string, ttl?: number): Promise<number> {
+    const item = this.cache.get(key)
+
+    let newValue: number
+
+    if (item) {
+      // Increment existing value
+      newValue = (typeof item.value === 'number' ? item.value : 0) + 1
+      item.value = newValue
+    } else {
+      // Create new counter with value 1
+      newValue = 1
+
+      const expiresAt = ttl ? Date.now() + ttl * 1000 : 0
+
+      this.cache.set(key, { value: newValue, expiresAt })
+    }
+
+    return newValue
+  }
+
+  /**
    * Deletes a key from the memory cache
    * @param key - The key to delete
    * @returns True if the key was deleted

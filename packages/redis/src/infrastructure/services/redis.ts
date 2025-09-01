@@ -365,6 +365,41 @@ export class RedisService implements ICacheService {
   }
 
   /**
+   * Increments a counter in Redis
+   * @param key - The key to increment
+   * @param ttl - Time to live in seconds for new keys (optional)
+   * @returns The new value after incrementing
+   */
+  public async increment(key: string, ttl?: number): Promise<number> {
+    const startTime = Date.now()
+
+    try {
+      logger.debug(`Incrementing counter for key: ${key}`)
+
+      // Use Redis INCR command for atomic increment
+      const newValue = await this.client.incr(key)
+
+      // Set TTL if provided and this is a new key (value is 1)
+      if (ttl && newValue === 1) {
+        await this.client.expire(key, ttl)
+      }
+
+      this.metrics.operations.set++
+      this.updateLatency(Date.now() - startTime)
+
+      logger.debug(
+        `Counter incremented for key: ${key}, new value: ${newValue}`,
+      )
+
+      return newValue
+    } catch (error) {
+      this.metrics.errors++
+      logger.error(`Error incrementing counter for key "${key}":`, error)
+      throw error
+    }
+  }
+
+  /**
    * Deletes a key from Redis
    * @param key - The key to delete
    * @returns True if the key was deleted

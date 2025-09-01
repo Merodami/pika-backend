@@ -64,6 +64,14 @@ export interface ICacheService {
   updateTTL(key: string, ttl: number): Promise<boolean>
 
   /**
+   * Increments a counter in the cache
+   * @param key - The key to increment
+   * @param ttl - Time to live in seconds for new keys (optional)
+   * @returns The new value after incrementing
+   */
+  increment(key: string, ttl?: number): Promise<number>
+
+  /**
    * Deletes a key from the cache
    * @param key - The key to delete
    * @returns True if the key was deleted

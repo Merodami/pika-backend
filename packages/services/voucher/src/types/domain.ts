@@ -199,6 +199,7 @@ export interface BatchTokenGenerationRequest {
     providerId: string
   }>
   batchId?: string
+  ttl?: number
 }
 
 // ============= Voucher Book Types =============

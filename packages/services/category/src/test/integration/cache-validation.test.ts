@@ -20,6 +20,7 @@ vi.unmock('@pika/translation')
 
 import { createCategoryServer } from '@category/server.js'
 import { createSharedCategoryTestData } from '@category/test/helpers/categoryTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -49,6 +50,12 @@ describe('Category Service Cache Validation Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Category Service Cache Validation tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Create test database
     testDb = await createTestDatabase({

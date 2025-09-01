@@ -249,7 +249,18 @@
       },
       "VoucherScanSource": {
         "type": "string",
-        "enum": ["camera", "gallery", "link", "share"],
+        "enum": [
+          "camera",
+          "gallery",
+          "link",
+          "share",
+          "qr",
+          "print",
+          "digital",
+          "web",
+          "email",
+          "social"
+        ],
         "description": "Source of the voucher scan",
         "example": "camera"
       },
@@ -4017,7 +4028,18 @@
         "properties": {
           "scanSource": {
             "type": "string",
-            "enum": ["camera", "gallery", "link", "share"]
+            "enum": [
+              "camera",
+              "gallery",
+              "link",
+              "share",
+              "qr",
+              "print",
+              "digital",
+              "web",
+              "email",
+              "social"
+            ]
           },
           "location": {
             "type": "object",
@@ -4415,6 +4437,9 @@
           "code": {
             "type": "string",
             "minLength": 1
+          },
+          "userId": {
+            "type": "string"
           },
           "location": {
             "type": "object",

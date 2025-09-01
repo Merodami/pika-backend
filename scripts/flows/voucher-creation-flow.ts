@@ -709,15 +709,173 @@ async function runVoucherCreationFlow() {
       }
     }
 
-    // Phase 5: Analytics and Monitoring
+    // Phase 5: QR Code & Validation Testing
     log(
-      `\n${colors.bright}=== Phase 5: Analytics & Monitoring ===${colors.reset}`,
+      `\n${colors.bright}=== Phase 5: QR Code & Validation Testing ===${colors.reset}`,
     )
 
-    logStep(13, 'Get Voucher Analytics')
+    logStep(13, 'Generate Deep Link with Validation Code')
+
+    // Test with the first created voucher (which should be published by now)
+    const testVoucherId = percentageVoucher
+
+    // Generate deep link with validation code
+    try {
+      const response = await api.get(
+        `/vouchers/${testVoucherId}/deep-link?mode=universal_link&type=scan`,
+        {
+          headers: { Authorization: `Bearer ${adminToken}` },
+        },
+      )
+      const deepLinkResponse = response.data
+
+      logSuccess(`Generated deep link for voucher ${testVoucherId}`)
+      log(
+        `${colors.dim}Deep link URL: ${deepLinkResponse.universalLink}${colors.reset}`,
+      )
+      log(
+        `${colors.dim}QR Payload: ${deepLinkResponse.qrPayload}${colors.reset}`,
+      )
+      log(
+        `${colors.dim}Validation code: ${deepLinkResponse.validationCode}${colors.reset}`,
+      )
+
+      // Use the validation code from the response
+      const validationCode = deepLinkResponse.validationCode
+
+      logStep(14, 'Test Validation Code Endpoint (No Auth Required)')
+
+      // Test getting voucher by validation code without authentication
+      try {
+        const voucherResponse = await api.get(
+          `/vouchers/by-code/${validationCode}`,
+          // No auth header - testing public access
+        )
+        const voucherByCode = voucherResponse.data
+
+        logSuccess(
+          `Retrieved voucher using validation code without authentication`,
+        )
+        log(`${colors.dim}Voucher title: ${voucherByCode.title}${colors.reset}`)
+        log(`${colors.dim}Voucher state: ${voucherByCode.state}${colors.reset}`)
+        log(
+          `${colors.dim}Can be redeemed: ${voucherByCode.isActive && !voucherByCode.isExpired}${colors.reset}`,
+        )
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          logWarning('Validation code expired or not found')
+        } else {
+          throw error
+        }
+      }
+
+      logStep(15, 'Test Voucher Validation Endpoint')
+
+      // Test validation endpoint with the code
+      const validationResp = await api.post(
+        `/vouchers/${testVoucherId}/validate`,
+        {
+          code: validationCode,
+          location: { lat: -25.2637, lng: -57.5759 }, // Asunción coordinates
+        },
+        // No auth header required for validation
+      )
+      const validationResponse = validationResp.data
+
+      logSuccess(`Voucher validation successful`)
+      log(`${colors.dim}Valid: ${validationResponse.valid}${colors.reset}`)
+      log(
+        `${colors.dim}Can redeem: ${validationResponse.canRedeem}${colors.reset}`,
+      )
+      log(
+        `${colors.dim}Message: ${validationResponse.message || 'Voucher is valid'}${colors.reset}`,
+      )
+
+      logStep(16, 'Simulate Customer Flow - Claim Voucher')
+
+      // Login as customer to test claiming
+      const customerAuthResponse = await api.post('/auth/token', {
+        grantType: 'password',
+        username: 'customer@example.com',
+        password: 'CustomerPassword123!',
+      })
+      const customerToken = customerAuthResponse.data.accessToken
+      const customerId = customerAuthResponse.data.user.id
+
+      // Customer claims the voucher
+      try {
+        const claimResp = await api.post(
+          `/vouchers/${testVoucherId}/claim`,
+          {
+            notificationPreferences: {
+              enableReminders: true,
+              reminderDaysBefore: 3,
+            },
+          },
+          {
+            headers: { Authorization: `Bearer ${customerToken}` },
+          },
+        )
+        const claimResponse = claimResp.data
+
+        logSuccess(`Customer claimed voucher successfully`)
+        log(
+          `${colors.dim}Customer voucher ID: ${claimResponse.customerVoucherId}${colors.reset}`,
+        )
+      } catch (error: any) {
+        if (error.response?.status === 409) {
+          logInfo('Voucher already claimed by this customer')
+        } else if (error.response?.status === 400) {
+          logInfo('Cannot claim - voucher rules prevent claiming')
+        } else {
+          throw error
+        }
+      }
+
+      logStep(17, 'Test Redemption Flow')
+
+      // Test redemption with the customer's claimed voucher
+      try {
+        const redeemResp = await api.post(
+          `/vouchers/${testVoucherId}/redeem`,
+          {
+            code: validationCode,
+            userId: customerId,
+            location: { lat: -25.2637, lng: -57.5759 },
+          },
+          // No auth required for redemption endpoint
+        )
+        const redeemResponse = redeemResp.data
+
+        logSuccess(`Voucher redeemed successfully`)
+        log(
+          `${colors.dim}Redemption ID: ${redeemResponse.redemptionId}${colors.reset}`,
+        )
+        log(`${colors.dim}Success: ${redeemResponse.success}${colors.reset}`)
+      } catch (error: any) {
+        if (error.response?.status === 400) {
+          logInfo(`Redemption failed: ${error.response.data.message}`)
+          log(
+            `${colors.dim}This is expected if voucher was already redeemed or user hasn't claimed it${colors.reset}`,
+          )
+        } else {
+          throw error
+        }
+      }
+    } catch (error: any) {
+      logError(`QR Code validation testing failed: ${error.message}`)
+      // Don't fail the entire flow for this phase
+    }
+
+    // Phase 6: Analytics and Monitoring
+    log(
+      `\n${colors.bright}=== Phase 6: Analytics & Monitoring ===${colors.reset}`,
+    )
+
+    logStep(18, 'Get Voucher Analytics')
     await getVoucherAnalytics(percentageVoucher, adminToken)
 
-    logStep(14, 'Get Business Voucher Statistics')
+    logStep(19, 'Get Business Voucher Statistics')
     try {
       const response = await api.get(
         `/admin/vouchers/business/${businessDetails.id}/stats`,
@@ -736,15 +894,15 @@ async function runVoucherCreationFlow() {
       )
     }
 
-    // Phase 6: Voucher Lifecycle Management
+    // Phase 7: Voucher Lifecycle Management
     log(
-      `\n${colors.bright}=== Phase 6: Voucher Lifecycle Management ===${colors.reset}`,
+      `\n${colors.bright}=== Phase 7: Voucher Lifecycle Management ===${colors.reset}`,
     )
 
-    logStep(15, 'Expire Test Voucher')
+    logStep(20, 'Expire Test Voucher')
     await expireVoucher(freeServiceVoucher, adminToken)
 
-    logStep(16, 'Test Voucher State Transitions')
+    logStep(21, 'Test Voucher State Transitions')
     try {
       // First, create a new draft voucher to test state transitions
       logInfo('Creating a draft voucher for state transition testing...')
@@ -800,9 +958,9 @@ async function runVoucherCreationFlow() {
     const shouldCleanup = process.env.CLEANUP_VOUCHERS !== 'false'
 
     if (shouldCleanup) {
-      log(`\n${colors.bright}=== Phase 7: Cleanup ===${colors.reset}`)
+      log(`\n${colors.bright}=== Phase 8: Cleanup ===${colors.reset}`)
 
-      logStep(17, 'Expire and Delete Test Vouchers')
+      logStep(22, 'Expire and Delete Test Vouchers')
 
       for (const voucherId of createdVouchers) {
         try {

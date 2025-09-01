@@ -2,20 +2,14 @@ import { ExportFormat, Priority } from '@pika/types'
 import { z } from 'zod'
 
 import { createZodEnum } from '../../common/utils/zodEnum.js'
-import { 
+import {
   AnalyticsQuery,
-  AnalyticsQuerySchema,
   AnalyticsReportTypeSchema,
-  AnalyticsResponse,
   AnalyticsResponseSchema,
   DashboardConfig,
-  DashboardConfigSchema,
-  DashboardResponse,
   DashboardResponseSchema,
   ExportFormatSchema,
   ReportRequest,
-  ReportRequestSchema,
-  ReportResponse,
   ReportResponseSchema,
 } from '../shared/analytics.js'
 import { UUID } from '../shared/primitives.js'
@@ -30,10 +24,10 @@ const PrioritySchema = createZodEnum(Priority)
 
 // Relations that can be included in analytics responses
 const ANALYTICS_RELATIONS = [
-  'details',        // Detailed breakdown
-  'comparisons',    // Period comparisons
-  'projections',    // Future projections
-  'segments',       // User/business segments
+  'details', // Detailed breakdown
+  'comparisons', // Period comparisons
+  'projections', // Future projections
+  'segments', // User/business segments
 ] as const
 
 // ============= Analytics Query Endpoint =============
@@ -43,8 +37,14 @@ const ANALYTICS_RELATIONS = [
  */
 export const AdminAnalyticsQuery = AnalyticsQuery.extend({
   // Admin-specific options
-  includeInactive: z.boolean().default(false).describe('Include inactive/deleted entities'),
-  includeSystemMetrics: z.boolean().default(false).describe('Include system performance metrics'),
+  includeInactive: z
+    .boolean()
+    .default(false)
+    .describe('Include inactive/deleted entities'),
+  includeSystemMetrics: z
+    .boolean()
+    .default(false)
+    .describe('Include system performance metrics'),
 }).merge(createIncludeParam(ANALYTICS_RELATIONS))
 
 /**
@@ -69,9 +69,12 @@ export const AdminReportType = AnalyticsReportTypeSchema
 /**
  * Available report types for admin (OpenAPI documented)
  */
-export const AdminReportTypeSchema = AdminReportType.openapi('AdminReportType', {
-  description: 'Available report types for admin users',
-})
+export const AdminReportTypeSchema = AdminReportType.openapi(
+  'AdminReportType',
+  {
+    description: 'Available report types for admin users',
+  },
+)
 
 export type AdminReportType = z.infer<typeof AdminReportType>
 
@@ -80,12 +83,28 @@ export type AdminReportType = z.infer<typeof AdminReportType>
  */
 export const AdminReportRequest = ReportRequest.extend({
   reportId: z.string().optional().describe('Specific report configuration ID'),
-  exportFormat: ExportFormatSchema.default(ExportFormat.JSON).describe('Export format'),
-  includeRawData: z.boolean().default(false).describe('Include raw data for analysis'),
-  notifications: z.object({
-    email: z.string().email().optional().describe('Email for report delivery'),
-    webhook: z.string().url().optional().describe('Webhook URL for completion'),
-  }).optional().describe('Notification preferences'),
+  exportFormat: ExportFormatSchema.default(ExportFormat.JSON).describe(
+    'Export format',
+  ),
+  includeRawData: z
+    .boolean()
+    .default(false)
+    .describe('Include raw data for analysis'),
+  notifications: z
+    .object({
+      email: z
+        .string()
+        .email()
+        .optional()
+        .describe('Email for report delivery'),
+      webhook: z
+        .string()
+        .url()
+        .optional()
+        .describe('Webhook URL for completion'),
+    })
+    .optional()
+    .describe('Notification preferences'),
 })
 
 /**
@@ -106,8 +125,14 @@ export type AdminReportRequest = z.infer<typeof AdminReportRequest>
  * Dashboard query parameters (raw Zod)
  */
 export const DashboardQueryParams = z.object({
-  layout: z.enum(['default', 'compact', 'detailed']).default('default').describe('Dashboard layout'),
-  widgets: z.array(z.string()).optional().describe('Specific widget IDs to include'),
+  layout: z
+    .enum(['default', 'compact', 'detailed'])
+    .default('default')
+    .describe('Dashboard layout'),
+  widgets: z
+    .array(z.string())
+    .optional()
+    .describe('Specific widget IDs to include'),
   refresh: z.boolean().default(false).describe('Force refresh widget data'),
 })
 
@@ -132,16 +157,16 @@ export const DashboardConfigUpdateRequest = DashboardConfig.extend({
 })
 
 /**
- * Dashboard configuration update request (OpenAPI documented)  
+ * Dashboard configuration update request (OpenAPI documented)
  */
-export const DashboardConfigUpdateRequestSchema = DashboardConfigUpdateRequest.openapi(
-  'DashboardConfigUpdateRequest',
-  {
+export const DashboardConfigUpdateRequestSchema =
+  DashboardConfigUpdateRequest.openapi('DashboardConfigUpdateRequest', {
     description: 'Request to update dashboard configuration',
-  },
-)
+  })
 
-export type DashboardConfigUpdateRequest = z.infer<typeof DashboardConfigUpdateRequest>
+export type DashboardConfigUpdateRequest = z.infer<
+  typeof DashboardConfigUpdateRequest
+>
 
 // ============= Insights & Recommendations =============
 
@@ -149,19 +174,35 @@ export type DashboardConfigUpdateRequest = z.infer<typeof DashboardConfigUpdateR
  * Analytics insights request (raw Zod)
  */
 export const InsightsRequest = z.object({
-  entity: z.enum(['users', 'businesses', 'vouchers', 'payments']).describe('Entity to analyze'),
+  entity: z
+    .enum(['users', 'businesses', 'vouchers', 'payments'])
+    .describe('Entity to analyze'),
   timeframe: z.string().default('30d').describe('Analysis timeframe'),
-  includeRecommendations: z.boolean().default(true).describe('Include actionable recommendations'),
-  includeAnomalies: z.boolean().default(true).describe('Include anomaly detection'),
-  minConfidence: z.number().min(0).max(1).default(0.7).describe('Minimum confidence threshold'),
+  includeRecommendations: z
+    .boolean()
+    .default(true)
+    .describe('Include actionable recommendations'),
+  includeAnomalies: z
+    .boolean()
+    .default(true)
+    .describe('Include anomaly detection'),
+  minConfidence: z
+    .number()
+    .min(0)
+    .max(1)
+    .default(0.7)
+    .describe('Minimum confidence threshold'),
 })
 
 /**
  * Analytics insights request (OpenAPI documented)
  */
-export const InsightsRequestSchema = InsightsRequest.openapi('InsightsRequest', {
-  description: 'Request for AI-generated analytics insights',
-})
+export const InsightsRequestSchema = InsightsRequest.openapi(
+  'InsightsRequest',
+  {
+    description: 'Request for AI-generated analytics insights',
+  },
+)
 
 export type InsightsRequest = z.infer<typeof InsightsRequest>
 
@@ -169,22 +210,41 @@ export type InsightsRequest = z.infer<typeof InsightsRequest>
  * Analytics insights response (raw Zod)
  */
 export const InsightsResponse = z.object({
-  insights: z.array(z.object({
-    type: z.enum(['trend', 'anomaly', 'opportunity', 'risk']).describe('Insight type'),
-    title: z.string().describe('Insight title'),
-    description: z.string().describe('Detailed description'),
-    confidence: z.number().min(0).max(1).describe('Confidence score'),
-    impact: z.enum(['low', 'medium', 'high', 'critical']).describe('Business impact'),
-    data: z.record(z.string(), z.any()).optional().describe('Supporting data'),
-  })).describe('Generated insights'),
-  recommendations: z.array(z.object({
-    title: z.string().describe('Recommendation title'),
-    description: z.string().describe('Detailed recommendation'),
-    priority: z.enum(['low', 'medium', 'high', 'urgent']).describe('Action priority'),
-    estimatedImpact: z.string().describe('Expected business impact'),
-    effort: z.enum(['low', 'medium', 'high']).describe('Implementation effort'),
-    timeline: z.string().describe('Recommended timeline'),
-  })).describe('Actionable recommendations'),
+  insights: z
+    .array(
+      z.object({
+        type: z
+          .enum(['trend', 'anomaly', 'opportunity', 'risk'])
+          .describe('Insight type'),
+        title: z.string().describe('Insight title'),
+        description: z.string().describe('Detailed description'),
+        confidence: z.number().min(0).max(1).describe('Confidence score'),
+        impact: z
+          .enum(['low', 'medium', 'high', 'critical'])
+          .describe('Business impact'),
+        data: z
+          .record(z.string(), z.any())
+          .optional()
+          .describe('Supporting data'),
+      }),
+    )
+    .describe('Generated insights'),
+  recommendations: z
+    .array(
+      z.object({
+        title: z.string().describe('Recommendation title'),
+        description: z.string().describe('Detailed recommendation'),
+        priority: z
+          .enum(['low', 'medium', 'high', 'urgent'])
+          .describe('Action priority'),
+        estimatedImpact: z.string().describe('Expected business impact'),
+        effort: z
+          .enum(['low', 'medium', 'high'])
+          .describe('Implementation effort'),
+        timeline: z.string().describe('Recommended timeline'),
+      }),
+    )
+    .describe('Actionable recommendations'),
   metadata: z.object({
     generatedAt: z.string().datetime(),
     analysisTimeframe: z.object({
@@ -199,9 +259,12 @@ export const InsightsResponse = z.object({
 /**
  * Analytics insights response (OpenAPI documented)
  */
-export const InsightsResponseSchema = InsightsResponse.openapi('InsightsResponse', {
-  description: 'AI-generated analytics insights and recommendations',
-})
+export const InsightsResponseSchema = InsightsResponse.openapi(
+  'InsightsResponse',
+  {
+    description: 'AI-generated analytics insights and recommendations',
+  },
+)
 
 export type InsightsResponse = z.infer<typeof InsightsResponse>
 
@@ -214,17 +277,40 @@ export const ReportExportRequest = z.object({
   reportType: AdminReportType.describe('Report type to export'),
   format: ExportFormatSchema.describe('Export format'),
   filters: z.record(z.string(), z.any()).optional().describe('Report filters'),
-  schedule: z.object({
-    frequency: z.enum(['once', 'daily', 'weekly', 'monthly']).describe('Export frequency'),
-    time: z.string().optional().describe('Scheduled time (HH:MM)'),
-    dayOfWeek: z.number().int().min(0).max(6).optional().describe('Day of week (0=Sunday)'),
-    dayOfMonth: z.number().int().min(1).max(31).optional().describe('Day of month'),
-  }).optional().describe('Export schedule'),
-  delivery: z.object({
-    email: z.string().email().optional().describe('Email delivery'),
-    webhook: z.string().url().optional().describe('Webhook delivery'),
-    storage: z.enum(['s3', 'gcs', 'azure']).optional().describe('Cloud storage'),
-  }).optional().describe('Delivery options'),
+  schedule: z
+    .object({
+      frequency: z
+        .enum(['once', 'daily', 'weekly', 'monthly'])
+        .describe('Export frequency'),
+      time: z.string().optional().describe('Scheduled time (HH:MM)'),
+      dayOfWeek: z
+        .number()
+        .int()
+        .min(0)
+        .max(6)
+        .optional()
+        .describe('Day of week (0=Sunday)'),
+      dayOfMonth: z
+        .number()
+        .int()
+        .min(1)
+        .max(31)
+        .optional()
+        .describe('Day of month'),
+    })
+    .optional()
+    .describe('Export schedule'),
+  delivery: z
+    .object({
+      email: z.string().email().optional().describe('Email delivery'),
+      webhook: z.string().url().optional().describe('Webhook delivery'),
+      storage: z
+        .enum(['s3', 'gcs', 'azure'])
+        .optional()
+        .describe('Cloud storage'),
+    })
+    .optional()
+    .describe('Delivery options'),
 })
 
 /**
@@ -244,13 +330,27 @@ export type ReportExportRequest = z.infer<typeof ReportExportRequest>
  */
 export const ExportStatusResponse = z.object({
   exportId: UUID.describe('Export job identifier'),
-  status: z.enum(['pending', 'processing', 'completed', 'failed']).describe('Export status'),
+  status: z
+    .enum(['pending', 'processing', 'completed', 'failed'])
+    .describe('Export status'),
   progress: z.number().min(0).max(100).describe('Progress percentage'),
-  downloadUrl: z.string().url().optional().describe('Download URL when completed'),
+  downloadUrl: z
+    .string()
+    .url()
+    .optional()
+    .describe('Download URL when completed'),
   error: z.string().optional().describe('Error message if failed'),
   createdAt: z.string().datetime().describe('Export creation time'),
-  completedAt: z.string().datetime().optional().describe('Export completion time'),
-  expiresAt: z.string().datetime().optional().describe('Download URL expiration'),
+  completedAt: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('Export completion time'),
+  expiresAt: z
+    .string()
+    .datetime()
+    .optional()
+    .describe('Download URL expiration'),
 })
 
 /**
@@ -275,7 +375,7 @@ export const AdminAnalyticsResponse = AnalyticsResponseSchema
 export type AdminAnalyticsResponse = z.infer<typeof AdminAnalyticsResponse>
 
 /**
- * Standard report response  
+ * Standard report response
  */
 export const AdminReportResponse = ReportResponseSchema
 
@@ -297,17 +397,17 @@ export const adminReportSchemas = {
   DashboardConfigUpdateRequestSchema,
   InsightsRequestSchema,
   ReportExportRequestSchema,
-  
+
   // Query Parameter Schemas
   DashboardQueryParamsSchema,
-  
+
   // Response Schemas
   AdminAnalyticsResponse,
   AdminReportResponse,
   AdminDashboardResponse,
   InsightsResponseSchema,
   ExportStatusResponseSchema,
-  
+
   // Enum Schemas
   AdminReportTypeSchema,
 }

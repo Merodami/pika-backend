@@ -1,6 +1,8 @@
+import { keyManager } from '@pika/crypto'
 import { ICacheService } from '@pika/redis'
+import { MockCacheService } from '@pika/tests'
 import { UserRole, UserStatus } from '@pika/types'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { JwtTokenService, User } from '../../../services/JwtTokenService.js'
 
@@ -9,20 +11,21 @@ describe('JwtTokenService Redis Integration', () => {
   let mockCacheService: ICacheService
   let mockUser: User
 
-  beforeEach(() => {
-    // Mock cache service
-    mockCacheService = {
-      connect: vi.fn(),
-      disconnect: vi.fn(),
-      get: vi.fn(),
-      set: vi.fn().mockResolvedValue(true),
-      exists: vi.fn().mockResolvedValue(false),
-      getTTL: vi.fn(),
-      updateTTL: vi.fn(),
-      del: vi.fn().mockResolvedValue(true),
-      delPattern: vi.fn().mockResolvedValue(5),
-      clearAll: vi.fn(),
+  beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
     }
+  })
+
+  beforeEach(() => {
+    // Use MockCacheService with spies
+    mockCacheService = new MockCacheService()
+    vi.spyOn(mockCacheService, 'set')
+    vi.spyOn(mockCacheService, 'get')
+    vi.spyOn(mockCacheService, 'exists')
+    vi.spyOn(mockCacheService, 'del')
+    vi.spyOn(mockCacheService, 'delPattern')
 
     mockUser = {
       id: 'user-123',
@@ -33,7 +36,6 @@ describe('JwtTokenService Redis Integration', () => {
     }
 
     tokenService = new JwtTokenService(
-      'test-secret-key-32-characters-long-for-testing',
       '15m',
       '7d',
       'pika-test',

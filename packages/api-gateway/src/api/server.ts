@@ -129,6 +129,10 @@ function getAuthExcludePaths(): string[] {
     '/api/v1/auth/revoke',
     '/api/v1/auth/social/login',
     '/api/v1/auth/exchange-token',
+    // Voucher validation endpoints (no auth required for QR scanning)
+    '/api/v1/vouchers/by-code/*',
+    '/api/v1/vouchers/*/validate',
+    '/api/v1/vouchers/*/redeem',
   ]
 }
 

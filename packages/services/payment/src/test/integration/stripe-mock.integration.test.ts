@@ -1,4 +1,5 @@
 import { StripeService } from '@payment/services/StripeService.js'
+import { keyManager } from '@pika/crypto'
 import { StripeMockHelper } from '@pika/tests'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -6,6 +7,11 @@ describe('Stripe Mock Integration', () => {
   let stripeService: StripeService
 
   beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+    }
+
     // Wait for stripe-mock to be ready
     const isReady = await StripeMockHelper.waitForStripeMock()
 

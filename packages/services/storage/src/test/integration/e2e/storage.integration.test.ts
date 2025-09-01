@@ -22,6 +22,7 @@ vi.mock('@pika/shared', async () => {
   return actualShared // Return all actual exports
 })
 
+import { keyManager } from '@pika/crypto'
 import {
   AWS_S3_ACCESS_KEY_ID,
   AWS_S3_BUCKET,
@@ -56,6 +57,12 @@ describe('Storage API Integration Tests', () => {
   const mockCacheService = new MemoryCacheService(3600)
 
   beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
+
     // Use unified test database helper
     testDb = await createTestDatabase({
       databaseName: 'test_storage_db',

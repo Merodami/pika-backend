@@ -271,11 +271,13 @@ describe('JwtTokenService', () => {
     it('should not accept tokens without required claims', async () => {
       // Create a malformed token manually (missing required fields)
       const jwt = require('jsonwebtoken')
-      const malformedToken = jwt.sign(
-        { userId: 'test' },
-        process.env.JWT_PRIVATE_KEY,
-        { algorithm: 'RS256' },
-      ) // Missing required fields
+
+      // Get the private key from KeyManager
+      const privateKey = keyManager.getJWTPrivateKeyPEM()
+
+      const malformedToken = jwt.sign({ userId: 'test' }, privateKey, {
+        algorithm: 'RS256',
+      }) // Missing required fields
 
       const result = await jwtService.verifyToken(malformedToken, 'access')
 
@@ -284,6 +286,9 @@ describe('JwtTokenService', () => {
 
     it('should validate token structure strictly', async () => {
       const jwt = require('jsonwebtoken')
+
+      // Get the private key from KeyManager
+      const privateKey = keyManager.getJWTPrivateKeyPEM()
 
       // Token with extra/suspicious fields
       const suspiciousToken = jwt.sign(
@@ -298,7 +303,7 @@ describe('JwtTokenService', () => {
           permissions: ['*'],
           malicious: true,
         },
-        process.env.JWT_PRIVATE_KEY,
+        privateKey,
         { algorithm: 'RS256' },
       )
 
@@ -336,6 +341,9 @@ describe('JwtTokenService', () => {
     it('should reject tokens with future issued-at time', async () => {
       const jwt = require('jsonwebtoken')
 
+      // Get the private key from KeyManager
+      const privateKey = keyManager.getJWTPrivateKeyPEM()
+
       // Create token with future iat
       const futureTime = Math.floor(Date.now() / 1000) + 3600 // 1 hour in future
       const futureToken = jwt.sign(
@@ -347,7 +355,7 @@ describe('JwtTokenService', () => {
           type: 'access',
           iat: futureTime,
         },
-        process.env.JWT_PRIVATE_KEY,
+        privateKey,
         { algorithm: 'RS256' },
       )
 

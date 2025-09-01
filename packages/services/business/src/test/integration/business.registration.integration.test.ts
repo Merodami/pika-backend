@@ -130,7 +130,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       isActive: () => businessOwnerUser.status === 'active',
     })
 
-    const businessOwnerToken = authHelper.generateTestToken({
+    const businessOwnerToken = await authHelper.generateTestToken({
       userId: businessOwnerUser.id,
       email: businessOwnerUser.email,
       role: businessOwnerUser.role,

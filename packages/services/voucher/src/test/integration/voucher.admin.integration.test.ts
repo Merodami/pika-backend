@@ -1399,7 +1399,8 @@ describe('Voucher Service - Admin API Integration Tests', () => {
         const concertEntries = response.body.searches.filter(
           (s: string) => s === 'concerts',
         )
-        expect(concertEntries.length).toBe(1)
+
+        expect(concertEntries).toHaveLength(1)
       })
 
       it('should handle database errors gracefully', async () => {

@@ -1724,7 +1724,18 @@
       },
       "VoucherScanSource": {
         "type": "string",
-        "enum": ["camera", "gallery", "link", "share"],
+        "enum": [
+          "camera",
+          "gallery",
+          "link",
+          "share",
+          "qr",
+          "print",
+          "digital",
+          "web",
+          "email",
+          "social"
+        ],
         "description": "Source of the voucher scan",
         "example": "camera"
       },
