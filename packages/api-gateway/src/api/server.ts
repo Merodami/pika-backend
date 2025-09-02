@@ -16,11 +16,15 @@ import {
   startServer,
 } from '@pika/http'
 import { RedisService } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { logger, UserServiceClient } from '@pika/shared'
 import type { Application, Express } from 'express'
 
 import { loadConfig } from '../config/gateway.js'
 import { handleHealthCheck } from '../health/healthCheckHandler.js'
+import {
+  userContextMiddleware,
+  UserContextStrategy,
+} from '../middleware/userContext/index.js'
 import { createValidationRouter } from '../middleware/routeValidation.js'
 import { createDocsRouter } from './routes/docsRoutes.js'
 import { setupEmbeddedServices } from './routes/setupEmbeddedServices.js'
@@ -157,6 +161,12 @@ function logConfiguration(): void {
     component: 'api-gateway',
     feature: 'auth',
   })
+  logger.info('User context enrichment enabled', {
+    component: 'api-gateway',
+    feature: 'user-context',
+    strategy: IS_EMBEDDED ? 'DIRECT' : 'ENRICH',
+    cacheTTL: 300,
+  })
   logger.info('Public endpoints configured', {
     component: 'api-gateway',
     endpoints: [
@@ -217,6 +227,22 @@ async function startGateway(): Promise<Express> {
     authMiddleware({
       cacheService: redisService,
       excludePaths: getAuthExcludePaths(),
+    }),
+  )
+
+  // Set up user context middleware after authentication
+  // This enriches requests with user profile data for downstream services
+  const userServiceClient = new UserServiceClient()
+  app.use(
+    userContextMiddleware({
+      strategy: IS_EMBEDDED
+        ? UserContextStrategy.DIRECT
+        : UserContextStrategy.ENRICH,
+      userServiceClient,
+      cacheService: redisService,
+      cacheTTL: 300, // 5 minutes
+      fallbackToJWT: true,
+      enableMetrics: isLocalDev,
     }),
   )
 

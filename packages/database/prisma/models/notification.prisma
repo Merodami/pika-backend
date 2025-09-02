@@ -14,10 +14,17 @@ model Notification {
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Indexes
+  // Notification delivery and management indexes
   @@index([userId, isRead])
   @@index([userId, createdAt])
   @@index([type])
+  
+  // Performance optimizations for notification queries
+  @@index([userId, isRead, createdAt(sort: Desc)]) // Unread notifications feed
+  @@index([type, userId, createdAt]) // Type-filtered notifications
+  @@index([readAt]) // Read tracking analytics
+  @@index([createdAt(sort: Desc)]) // Recent notifications
+  @@index([userId, type, isRead]) // User notification preferences
 
   @@map("notifications")
   @@schema("support")

@@ -13,6 +13,10 @@ model FavouriteBusiness {
   @@index([userId])
   @@index([businessId])
   @@index([createdAt(sort: Desc)])
+  
+  // Favorite analytics optimizations
+  @@index([userId, createdAt(sort: Desc)]) // User's recent favorites
+  @@index([businessId, createdAt(sort: Desc)]) // Business popularity timeline
   @@map("favourite_businesses")
   @@schema("favourites")
 }
@@ -32,6 +36,10 @@ model FavouriteVoucher {
   @@index([userId])
   @@index([voucherId])
   @@index([createdAt(sort: Desc)])
+  
+  // Voucher favorite analytics
+  @@index([userId, createdAt(sort: Desc)]) // User's favorite vouchers timeline
+  @@index([voucherId, createdAt(sort: Desc)]) // Voucher popularity tracking
   @@map("favourite_vouchers")
   @@schema("favourites")
 }

@@ -20,12 +20,21 @@ model CommunicationLog {
   // Relations
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  // Indexes
+  // Communication tracking indexes
   @@index([userId])
   @@index([type, status])
   @@index([recipient])
   @@index([createdAt])
   @@index([templateId])
+  
+  // Email delivery and analytics optimizations
+  @@index([status, createdAt]) // Delivery status monitoring
+  @@index([userId, type, status]) // User communication history
+  @@index([status, sentAt]) // Send queue management
+  @@index([provider, status]) // Provider performance tracking
+  @@index([failedAt, status]) // Failed message retry queue
+  @@index([templateId, status, createdAt]) // Template usage analytics
+  @@index([type, createdAt]) // Communication type metrics
 
   @@map("communication_logs")
   @@schema("support")

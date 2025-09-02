@@ -181,111 +181,111 @@ grep -r "VoucherCodeType.QR\|type.*qr" packages/
 _Last Updated: December 2024_
 _Status: Ready for Phase 2 (Testing & Verification)_
 
-Modified files: modified: .env.local
-modified: .env.test
-deleted: BUSINESS_REGISTRATION_VALIDATION_REPORT.md
-modified: documentation/implementation/backend/QR_CODE_DEEP_LINKING_ARCHITECTURE.md
-modified: documentation/implementation/backend/QR_CODE_DIRECT_MIGRATION_PLAN.md
-modified: documentation/implementation/backend/QR_MIGRATION_CLEANUP_CHECKLIST.md
-modified: generated/flutter/schemas/voucher_voucher_VoucherRedeemRequest.json
-modified: generated/flutter/schemas/voucher_voucher_VoucherScanRequest.json
-modified: generated/flutter/schemas/voucher_voucher_combined.json
-modified: package.json
-modified: packages/api-gateway/src/api/server.ts
-modified: packages/api-gateway/src/docs/openapi/admin-api.json
-modified: packages/api-gateway/src/docs/openapi/all-apis.json
-modified: packages/api-gateway/src/docs/openapi/internal-api.json
-modified: packages/api-gateway/src/docs/openapi/public-api.json
-modified: packages/api/src/schemas/admin/reports.ts
-modified: packages/api/src/schemas/shared/analytics.ts
-modified: packages/api/src/schemas/voucher/common/enums.ts
-modified: packages/api/src/schemas/voucher/public/index.ts
-modified: packages/api/src/schemas/voucher/public/voucher.ts
-modified: packages/auth/src/test/integration/services/JwtTokenService.redis.test.ts
-modified: packages/auth/src/test/integration/strategies/LocalAuthStrategy.test.ts
-modified: packages/auth/src/test/unit/services/JwtTokenService.test.ts
-deleted: packages/crypto/src/qr/VoucherQRService.ts
-modified: packages/crypto/src/qr/index.ts
-deleted: packages/crypto/src/test/integration/voucher-crypto-flow.integration.test.ts
-modified: packages/database/prisma/enums.prisma
-modified: packages/database/prisma/models/user.prisma
-modified: packages/database/prisma/models/voucher.prisma
-modified: packages/environment/src/constants/index.ts
-modified: packages/environment/src/constants/service.ts
-modified: packages/http/src/infrastructure/express/middleware/auth.ts
-modified: packages/redis/src/domain/repositories/ICacheService.ts
-modified: packages/redis/src/infrastructure/services/memory.ts
-modified: packages/redis/src/infrastructure/services/redis.ts
-modified: packages/sdk/src/dto/voucher.dto.ts
-modified: packages/sdk/src/mappers/VoucherMapper.ts
-modified: packages/services/auth/src/test/integration/cache-validation.test.ts
-modified: packages/services/business/src/test/integration/business.admin.integration.test.ts
-modified: packages/services/business/src/test/integration/business.internal.integration.test.ts
-modified: packages/services/business/src/test/integration/business.public.integration.test.ts
-modified: packages/services/business/src/test/integration/business.registration.integration.test.ts
-modified: packages/services/business/src/test/integration/cache-validation.test.ts
-modified: packages/services/category/src/test/integration/admin/category.admin.test.ts
-modified: packages/services/category/src/test/integration/cache-validation.test.ts
-modified: packages/services/category/src/test/integration/internal/category.internal.test.ts
-modified: packages/services/category/src/test/integration/public/category.public.test.ts
-modified: packages/services/communication/src/test/integration/communication.admin.integration.test.ts
-modified: packages/services/communication/src/test/integration/communication.internal.integration.test.ts
-modified: packages/services/communication/src/test/integration/communication.public.integration.test.ts
-modified: packages/services/payment/src/test/integration/stripe-mock.integration.test.ts
-modified: packages/services/pdf/test/integration/admin.pdf.integration.test.ts
-modified: packages/services/pdf/test/integration/pdf.integration.test.ts
-modified: packages/services/storage/src/test/integration/e2e/storage-minio.integration.test.ts
-modified: packages/services/storage/src/test/integration/e2e/storage-s3.integration.test.ts
-modified: packages/services/storage/src/test/integration/e2e/storage.integration.test.ts
-modified: packages/services/support/src/test/integration/e2e/admin.support.integration.test.ts
-modified: packages/services/support/src/test/integration/e2e/support.integration.test.ts
-modified: packages/services/voucher/src/constants/cache-keys.ts
-modified: packages/services/voucher/src/controllers/VoucherController.ts
-modified: packages/services/voucher/src/repositories/InternalVoucherRepository.ts
-modified: packages/services/voucher/src/repositories/VoucherRepository.ts
-modified: packages/services/voucher/src/routes/InternalVoucherRoutes.ts
-modified: packages/services/voucher/src/routes/VoucherRoutes.ts
-modified: packages/services/voucher/src/server.ts
-modified: packages/services/voucher/src/services/InternalVoucherService.ts
-deleted: packages/services/voucher/src/services/VoucherSecurityService.ts
-modified: packages/services/voucher/src/services/VoucherService.ts
-modified: packages/services/voucher/src/test/helpers/voucherTestHelpers.ts
-modified: packages/services/voucher/src/test/integration/redemption-analytics.admin.integration.test.ts
-modified: packages/services/voucher/src/test/integration/voucher.admin.integration.test.ts
-modified: packages/services/voucher/src/types/domain.ts
-modified: packages/services/voucher/src/types/index.ts
-modified: packages/services/voucher/src/utils/codeGenerator.ts
-modified: packages/tests/src/mocks/cacheServiceMock.ts
-modified: packages/tests/src/utils/dump/init.sql
-modified: packages/types/src/enum.ts
-modified: packages/types/src/enums/voucher.ts
-modified: packages/types/src/utils.ts
-modified: scripts/flows/voucher-creation-flow.ts
-modified: yarn.lock
+Modified files: modified:
 
-Untracked files:
-(use "git add <file>..." to include in what will be committed)
-DEEP_LINKING_QR_STRATEGY.md
-DOMAINS.md
-FLUTTER_QR_COMPLETE_ROADMAP.md
-FLUTTER_QR_IMPLEMENTATION_PLAN.md
-QR_SCAN_USER_FLOWS.md
-REPORT_ANALYTICS_PLAN.md
-documentation/business/COMPREHENSIVE_VOUCHER_FLOWS.md
-documentation/business/VOUCHER_FLOWS_COMPREHENSIVE.md
-documentation/business/VOUCHER_FLOWS_VISUAL.md
-packages/api/src/schemas/voucher/public/validation.ts
-packages/database/prisma/migrations/20250828010720_add_validation_codes_for_url_qr/
-packages/database/prisma/migrations/20250828183355_add_metadata_to_voucher_scan/
-packages/environment/src/constants/deepLinks.ts
-packages/services/voucher/src/controllers/VoucherValidationController.ts
-packages/services/voucher/src/repositories/VoucherValidationRepository.ts
-packages/services/voucher/src/routes/VoucherValidationRoutes.ts
-packages/services/voucher/src/services/VoucherDeepLinkService.ts
-packages/services/voucher/src/services/VoucherDeepLinkValidationService.ts
-packages/services/voucher/src/services/VoucherValidationService.ts
-packages/services/voucher/src/test/integration/voucher-validation.integration.test.ts
-packages/services/voucher/src/types/validation.ts
-scripts/flows/test-qr-validation-flow.ts
-scripts/test-qr-validation-flow.ts
-test-tokens-local.json
+    modified:   .env.local
+    modified:   .env.test
+    deleted:    BUSINESS_REGISTRATION_VALIDATION_REPORT.md
+    new file:   DEEP_LINKING_QR_STRATEGY.md
+    new file:   DOMAINS.md
+    new file:   FLUTTER_QR_COMPLETE_ROADMAP.md
+    new file:   FLUTTER_QR_IMPLEMENTATION_PLAN.md
+    renamed:    documentation/implementation/backend/QR_CODE_DEEP_LINKING_ARCHITECTURE.md -> QR_CODE_DEEP_LINKING_ARCHITECTURE.md
+    renamed:    documentation/implementation/backend/QR_CODE_DIRECT_MIGRATION_PLAN.md -> QR_CODE_DIRECT_MIGRATION_PLAN.md
+    new file:   QR_MIGRATION_CLEANUP_CHECKLIST.md
+    new file:   QR_SCAN_USER_FLOWS.md
+    new file:   REPORT_ANALYTICS_PLAN.md
+    new file:   documentation/business/COMPREHENSIVE_VOUCHER_FLOWS.md
+    new file:   documentation/business/VOUCHER_FLOWS_COMPREHENSIVE.md
+    new file:   documentation/business/VOUCHER_FLOWS_VISUAL.md
+    deleted:    documentation/implementation/backend/QR_MIGRATION_CLEANUP_CHECKLIST.md
+    modified:   generated/flutter/schemas/voucher_voucher_VoucherRedeemRequest.json
+    modified:   generated/flutter/schemas/voucher_voucher_VoucherScanRequest.json
+    modified:   generated/flutter/schemas/voucher_voucher_combined.json
+    modified:   package.json
+    modified:   packages/api-gateway/src/api/server.ts
+    modified:   packages/api-gateway/src/docs/openapi/admin-api.json
+    modified:   packages/api-gateway/src/docs/openapi/all-apis.json
+    modified:   packages/api-gateway/src/docs/openapi/internal-api.json
+    modified:   packages/api-gateway/src/docs/openapi/public-api.json
+    modified:   packages/api/src/schemas/admin/reports.ts
+    modified:   packages/api/src/schemas/shared/analytics.ts
+    modified:   packages/api/src/schemas/voucher/common/enums.ts
+    modified:   packages/api/src/schemas/voucher/public/index.ts
+    new file:   packages/api/src/schemas/voucher/public/validation.ts
+    modified:   packages/api/src/schemas/voucher/public/voucher.ts
+    modified:   packages/auth/src/test/integration/services/JwtTokenService.redis.test.ts
+    modified:   packages/auth/src/test/integration/strategies/LocalAuthStrategy.test.ts
+    modified:   packages/auth/src/test/unit/services/JwtTokenService.test.ts
+    deleted:    packages/crypto/src/qr/VoucherQRService.ts
+    modified:   packages/crypto/src/qr/index.ts
+    deleted:    packages/crypto/src/test/integration/voucher-crypto-flow.integration.test.ts
+    modified:   packages/database/prisma/enums.prisma
+    new file:   packages/database/prisma/migrations/20250828010720_add_validation_codes_for_url_qr/migration.sql
+    new file:   packages/database/prisma/migrations/20250828183355_add_metadata_to_voucher_scan/migration.sql
+    modified:   packages/database/prisma/models/user.prisma
+    modified:   packages/database/prisma/models/voucher.prisma
+    new file:   packages/environment/src/constants/deepLinks.ts
+    modified:   packages/environment/src/constants/index.ts
+    modified:   packages/environment/src/constants/service.ts
+    modified:   packages/http/src/infrastructure/express/middleware/auth.ts
+    modified:   packages/redis/src/domain/repositories/ICacheService.ts
+    modified:   packages/redis/src/infrastructure/services/memory.ts
+    modified:   packages/redis/src/infrastructure/services/redis.ts
+    modified:   packages/sdk/src/dto/voucher.dto.ts
+    modified:   packages/sdk/src/mappers/VoucherMapper.ts
+    modified:   packages/services/auth/src/test/integration/cache-validation.test.ts
+    modified:   packages/services/business/src/test/integration/business.admin.integration.test.ts
+    modified:   packages/services/business/src/test/integration/business.internal.integration.test.ts
+    modified:   packages/services/business/src/test/integration/business.public.integration.test.ts
+    modified:   packages/services/business/src/test/integration/business.registration.integration.test.ts
+    modified:   packages/services/business/src/test/integration/cache-validation.test.ts
+    modified:   packages/services/category/src/test/integration/admin/category.admin.test.ts
+    modified:   packages/services/category/src/test/integration/cache-validation.test.ts
+    modified:   packages/services/category/src/test/integration/internal/category.internal.test.ts
+    modified:   packages/services/category/src/test/integration/public/category.public.test.ts
+    modified:   packages/services/communication/src/test/integration/communication.admin.integration.test.ts
+    modified:   packages/services/communication/src/test/integration/communication.internal.integration.test.ts
+    modified:   packages/services/communication/src/test/integration/communication.public.integration.test.ts
+    modified:   packages/services/payment/src/test/integration/stripe-mock.integration.test.ts
+    modified:   packages/services/pdf/test/integration/admin.pdf.integration.test.ts
+    modified:   packages/services/pdf/test/integration/pdf.integration.test.ts
+    modified:   packages/services/storage/src/test/integration/e2e/storage-minio.integration.test.ts
+    modified:   packages/services/storage/src/test/integration/e2e/storage-s3.integration.test.ts
+    modified:   packages/services/storage/src/test/integration/e2e/storage.integration.test.ts
+    modified:   packages/services/support/src/test/integration/e2e/admin.support.integration.test.ts
+    modified:   packages/services/support/src/test/integration/e2e/support.integration.test.ts
+    modified:   packages/services/voucher/src/constants/cache-keys.ts
+    modified:   packages/services/voucher/src/controllers/VoucherController.ts
+    new file:   packages/services/voucher/src/controllers/VoucherValidationController.ts
+    modified:   packages/services/voucher/src/repositories/InternalVoucherRepository.ts
+    modified:   packages/services/voucher/src/repositories/VoucherRepository.ts
+    new file:   packages/services/voucher/src/repositories/VoucherValidationRepository.ts
+    modified:   packages/services/voucher/src/routes/InternalVoucherRoutes.ts
+    modified:   packages/services/voucher/src/routes/VoucherRoutes.ts
+    new file:   packages/services/voucher/src/routes/VoucherValidationRoutes.ts
+    modified:   packages/services/voucher/src/server.ts
+    modified:   packages/services/voucher/src/services/InternalVoucherService.ts
+    new file:   packages/services/voucher/src/services/VoucherDeepLinkService.ts
+    new file:   packages/services/voucher/src/services/VoucherDeepLinkValidationService.ts
+    deleted:    packages/services/voucher/src/services/VoucherSecurityService.ts
+    modified:   packages/services/voucher/src/services/VoucherService.ts
+    new file:   packages/services/voucher/src/services/VoucherValidationService.ts
+    modified:   packages/services/voucher/src/test/helpers/voucherTestHelpers.ts
+    modified:   packages/services/voucher/src/test/integration/redemption-analytics.admin.integration.test.ts
+    new file:   packages/services/voucher/src/test/integration/voucher-validation.integration.test.ts
+    modified:   packages/services/voucher/src/test/integration/voucher.admin.integration.test.ts
+    modified:   packages/services/voucher/src/types/domain.ts
+    modified:   packages/services/voucher/src/types/index.ts
+    new file:   packages/services/voucher/src/types/validation.ts
+    modified:   packages/services/voucher/src/utils/codeGenerator.ts
+    modified:   packages/tests/src/mocks/cacheServiceMock.ts
+    modified:   packages/tests/src/utils/dump/init.sql
+    modified:   packages/types/src/enum.ts
+    modified:   packages/types/src/enums/voucher.ts
+    modified:   packages/types/src/utils.ts
+    new file:   scripts/flows/test-qr-validation-flow.ts
+    modified:   scripts/flows/voucher-creation-flow.ts
+    new file:   scripts/test-qr-validation-flow.ts
+    new file:   test-tokens-local.json
+    modified:   yarn.lock

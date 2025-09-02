@@ -56,6 +56,7 @@ model Voucher {
   fraudCases             FraudCase[]
   favoritedBy            FavouriteVoucher[]  // Users who favorited this voucher
   
+  // Core voucher indexes
   @@index([businessId])
   @@index([categoryId])
   @@index([state])
@@ -71,6 +72,22 @@ model Voucher {
   @@index([state, validUntil]) // For expiry checking
   @@index([businessId, createdAt]) // For business voucher listing
   @@index([categoryId, state]) // For category filtering
+  
+  // Advanced discovery and filtering
+  @@index([state, categoryId, validUntil]) // Active vouchers by category
+  @@index([state, type, validUntil]) // Type-based filtering
+  @@index([businessId, state, validUntil]) // Business active vouchers
+  @@index([state, validFrom, validUntil]) // Validity window queries
+  
+  // Analytics and performance
+  @@index([scanCount(sort: Desc), state]) // Most scanned vouchers
+  @@index([claimCount(sort: Desc), state]) // Most claimed vouchers
+  @@index([redemptionsCount, maxRedemptions]) // Redemption limit tracking
+  @@index([type, discount]) // Discount-based queries
+  @@index([currency, type]) // Currency-specific vouchers
+  
+  // Geospatial optimization (if using location features)
+  @@index([state, deletedAt, validUntil]) // Complex validity checks
   @@map("vouchers")
   @@schema("voucher")
 }
@@ -89,12 +106,15 @@ model VoucherCode {
   // Relations
   voucher    Voucher         @relation(fields: [voucherId], references: [id], onDelete: Cascade)
   
+  // Voucher code management indexes
   @@index([voucherId])
   @@index([type])
   @@index([isActive])
   @@index([code]) // Already unique, but good for lookups
   @@index([voucherId, type]) // For finding codes by voucher and type
   @@index([voucherId, isActive]) // For finding active codes
+  @@index([type, isActive]) // Active codes by type
+  @@index([createdAt]) // Code generation tracking
   @@map("voucher_codes")
   @@schema("voucher")
 }
@@ -121,11 +141,15 @@ model VoucherValidationCode {
   voucher    Voucher                 @relation(fields: [voucherId], references: [id], onDelete: Cascade)
   user       User?                   @relation(fields: [usedBy], references: [id])
   
+  // Validation code performance indexes
   @@index([code])
   @@index([voucherId])
   @@index([expiresAt])
   @@index([voucherId, expiresAt])
   @@index([type])
+  @@index([type, expiresAt]) // Type-based expiry checks
+  @@index([usedAt, usedBy]) // Usage tracking
+  @@index([voucherId, type, expiresAt]) // Complex validation queries
   @@map("voucher_validation_codes")
   @@schema("voucher")
 }
@@ -150,6 +174,7 @@ model VoucherRedemption {
   user       User      @relation(fields: [userId], references: [id])
   fraudCase  FraudCase?
 
+  // Redemption tracking indexes
   @@unique([voucherId, userId]) // One redemption per user per voucher
   @@index([voucherId])
   @@index([userId])
@@ -157,6 +182,8 @@ model VoucherRedemption {
   @@index([codeUsed])
   @@index([voucherId, redeemedAt]) // For voucher redemption analytics
   @@index([userId, redeemedAt]) // For user redemption history
+  @@index([redeemedAt(sort: Desc)], map: "recent_redemptions_idx") // Recent redemptions
+  @@index([createdAt]) // Redemption timeline
   @@map("voucher_redemptions")
   @@schema("voucher")
 }
@@ -183,6 +210,7 @@ model CustomerVoucher {
   customer                User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   voucher                 Voucher   @relation(fields: [voucherId], references: [id], onDelete: Cascade)
 
+  // Customer wallet optimization indexes
   @@unique([customerId, voucherId]) // One claim per customer per voucher
   @@index([customerId])
   @@index([voucherId])
@@ -192,6 +220,8 @@ model CustomerVoucher {
   @@index([customerId, status]) // For customer wallet filtering
   @@index([voucherId, status]) // For voucher claim analytics
   @@index([customerId, claimedAt]) // For customer voucher history
+  @@index([customerId, status, claimedAt]) // Advanced wallet queries
+  @@index([status, redeemedAt]) // Redemption status tracking
   @@map("customer_vouchers")
   @@schema("voucher")
 }
@@ -230,6 +260,7 @@ model VoucherScan {
   user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   business    Business? @relation(fields: [businessId], references: [id], onDelete: SetNull)
   
+  // Scan analytics comprehensive indexes
   @@index([voucherId])
   @@index([userId])
   @@index([businessId])
@@ -241,6 +272,10 @@ model VoucherScan {
   @@index([businessId, scannedAt]) // For business scan analytics
   @@index([voucherId, scanType]) // For scan type analytics
   @@index([scanSource, scannedAt]) // For scan source analytics
+  @@index([scanType, scanSource, scannedAt]) // Complex scan analytics
+  @@index([validationCode]) // Deep link tracking
+  @@index([campaign, scannedAt]) // Campaign performance
+  @@index([businessId, scanType, scannedAt]) // Business scan patterns
   @@map("voucher_scans")
   @@schema("analytics")
 }
