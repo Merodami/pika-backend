@@ -165,6 +165,20 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
 
     logger.debug('E2E authentication setup complete')
 
+    // Create admin user for category creation
+    const categoryAdminId = uuid()
+    await testDb.prisma.user.create({
+      data: {
+        id: categoryAdminId,
+        email: `category-admin-${categoryAdminId.substring(0, 8)}@test.com`,
+        firstName: 'Category',
+        lastName: 'Admin',
+        role: 'admin',
+        status: 'active',
+        emailVerified: true,
+      },
+    })
+
     // Create test categories
     testCategory1 = await testDb.prisma.category.create({
       data: {
@@ -175,7 +189,7 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
         path: '/test1',
         isActive: true,
         sortOrder: 1,
-        createdBy: uuid(),
+        createdBy: categoryAdminId,
       },
     })
 
@@ -188,7 +202,7 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
         path: '/test2',
         isActive: true,
         sortOrder: 2,
-        createdBy: uuid(),
+        createdBy: categoryAdminId,
       },
     })
 

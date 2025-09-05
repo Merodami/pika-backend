@@ -53,7 +53,10 @@
             "description": "Longitude"
           }
         },
-        "required": ["lat", "lng"],
+        "required": [
+          "lat",
+          "lng"
+        ],
         "description": "Geographic coordinates with latitude and longitude",
         "example": {
           "lat": -25.2637,
@@ -65,7 +68,9 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": ["Point"]
+            "enum": [
+              "Point"
+            ]
           },
           "coordinates": {
             "type": "array",
@@ -84,24 +89,36 @@
             "description": "[longitude, latitude] - GeoJSON standard"
           }
         },
-        "required": ["type", "coordinates"],
+        "required": [
+          "type",
+          "coordinates"
+        ],
         "description": "Geographic point in GeoJSON format (PostGIS compatible)",
         "example": {
           "type": "Point",
-          "coordinates": [-57.5759, -25.2637]
+          "coordinates": [
+            -57.5759,
+            -25.2637
+          ]
         }
       },
       "GeoSearchParams": {
         "type": "object",
         "properties": {
           "lat": {
-            "type": ["number", "null"],
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": -90,
             "maximum": 90,
             "description": "Search center latitude"
           },
           "lng": {
-            "type": ["number", "null"],
+            "type": [
+              "number",
+              "null"
+            ],
             "minimum": -180,
             "maximum": 180,
             "description": "Search center longitude"
@@ -127,7 +144,13 @@
           },
           "platform": {
             "type": "string",
-            "enum": ["ios", "android", "web", "desktop", "other"]
+            "enum": [
+              "ios",
+              "android",
+              "web",
+              "desktop",
+              "other"
+            ]
           },
           "appVersion": {
             "type": "string"
@@ -224,7 +247,9 @@
             "description": "Comma-separated relations: user,category,businessDetails"
           }
         },
-        "required": ["businessIds"],
+        "required": [
+          "businessIds"
+        ],
         "description": "Get multiple businesses by IDs"
       },
       "BulkBusinessResponse": {
@@ -288,7 +313,9 @@
             }
           }
         },
-        "required": ["businesses"],
+        "required": [
+          "businesses"
+        ],
         "description": "Businesses data with not found IDs"
       },
       "ValidateBusinessRequest": {
@@ -313,7 +340,9 @@
             "default": false
           }
         },
-        "required": ["businessIds"],
+        "required": [
+          "businessIds"
+        ],
         "description": "Validate businesses exist and optionally check if active/verified"
       },
       "ValidateBusinessResponse": {
@@ -341,11 +370,17 @@
                   "type": "string"
                 }
               },
-              "required": ["id", "reason"]
+              "required": [
+                "id",
+                "reason"
+              ]
             }
           }
         },
-        "required": ["valid", "invalid"],
+        "required": [
+          "valid",
+          "invalid"
+        ],
         "description": "Validation results for businesses"
       },
       "GetBusinessesByUserRequest": {
@@ -370,7 +405,10 @@
           },
           "sortOrder": {
             "type": "string",
-            "enum": ["asc", "desc"],
+            "enum": [
+              "asc",
+              "desc"
+            ],
             "default": "desc",
             "description": "Sort order"
           },
@@ -491,7 +529,10 @@
             "$ref": "#/components/schemas/PaginationMetadata"
           }
         },
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "description": "Paginated response"
       },
       "GetBusinessRequest": {
@@ -526,7 +567,10 @@
           },
           "sortOrder": {
             "type": "string",
-            "enum": ["asc", "desc"],
+            "enum": [
+              "asc",
+              "desc"
+            ],
             "default": "desc",
             "description": "Sort order"
           },
@@ -604,7 +648,10 @@
             "$ref": "#/components/schemas/PaginationMetadata"
           }
         },
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "description": "Paginated response"
       },
       "CheckBusinessExistsRequest": {
@@ -616,7 +663,9 @@
             "description": "Universally Unique Identifier"
           }
         },
-        "required": ["businessId"],
+        "required": [
+          "businessId"
+        ],
         "description": "Check if business exists and is active"
       },
       "CheckBusinessExistsResponse": {
@@ -678,7 +727,9 @@
             "description": "Internal business data for services"
           }
         },
-        "required": ["exists"],
+        "required": [
+          "exists"
+        ],
         "description": "Business existence check result"
       },
       "BusinessIdParam": {
@@ -690,7 +741,9 @@
             "description": "Universally Unique Identifier"
           }
         },
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "description": "Business ID path parameter"
       },
       "InternalCategoryData": {
@@ -722,7 +775,12 @@
             "type": "integer"
           }
         },
-        "required": ["id", "name", "isActive", "sortOrder"],
+        "required": [
+          "id",
+          "name",
+          "isActive",
+          "sortOrder"
+        ],
         "description": "Internal category data for services"
       },
       "InternalCategoryQueryParams": {
@@ -747,7 +805,9 @@
             "maxItems": 100
           }
         },
-        "required": ["categoryIds"],
+        "required": [
+          "categoryIds"
+        ],
         "description": "Get multiple categories by IDs"
       },
       "BulkCategoryResponse": {
@@ -784,7 +844,12 @@
                   "type": "integer"
                 }
               },
-              "required": ["id", "name", "isActive", "sortOrder"],
+              "required": [
+                "id",
+                "name",
+                "isActive",
+                "sortOrder"
+              ],
               "description": "Internal category data for services"
             },
             "description": "Page items"
@@ -793,7 +858,10 @@
             "$ref": "#/components/schemas/PaginationMetadata"
           }
         },
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "description": "Paginated response"
       },
       "ValidateCategoryRequest": {
@@ -814,7 +882,9 @@
             "default": true
           }
         },
-        "required": ["categoryIds"],
+        "required": [
+          "categoryIds"
+        ],
         "description": "Validate categories exist and optionally check if active"
       },
       "ValidateCategoryResponse": {
@@ -844,12 +914,20 @@
                   "type": "boolean"
                 }
               },
-              "required": ["categoryId", "exists", "isActive", "valid"]
+              "required": [
+                "categoryId",
+                "exists",
+                "isActive",
+                "valid"
+              ]
             },
             "description": "Individual validation results"
           }
         },
-        "required": ["valid", "results"],
+        "required": [
+          "valid",
+          "results"
+        ],
         "description": "Validation results for categories"
       },
       "CategoryValidationResult": {
@@ -870,7 +948,12 @@
             "type": "boolean"
           }
         },
-        "required": ["categoryId", "exists", "isActive", "valid"]
+        "required": [
+          "categoryId",
+          "exists",
+          "isActive",
+          "valid"
+        ]
       },
       "InternalCategoryHierarchyResponse": {
         "type": "object",
@@ -906,12 +989,19 @@
                   "type": "integer"
                 }
               },
-              "required": ["id", "name", "isActive", "sortOrder"],
+              "required": [
+                "id",
+                "name",
+                "isActive",
+                "sortOrder"
+              ],
               "description": "Internal category data for services"
             }
           }
         },
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "description": "Category hierarchy for internal use"
       },
       "CheckCategoryExistsRequest": {
@@ -923,7 +1013,9 @@
             "description": "Universally Unique Identifier"
           }
         },
-        "required": ["categoryId"],
+        "required": [
+          "categoryId"
+        ],
         "description": "Check if category exists and is active"
       },
       "CheckCategoryExistsResponse": {
@@ -964,11 +1056,18 @@
                 "type": "integer"
               }
             },
-            "required": ["id", "name", "isActive", "sortOrder"],
+            "required": [
+              "id",
+              "name",
+              "isActive",
+              "sortOrder"
+            ],
             "description": "Internal category data for services"
           }
         },
-        "required": ["exists"],
+        "required": [
+          "exists"
+        ],
         "description": "Category existence check result"
       },
       "InternalCategoryListResponse": {
@@ -1005,7 +1104,12 @@
                   "type": "integer"
                 }
               },
-              "required": ["id", "name", "isActive", "sortOrder"],
+              "required": [
+                "id",
+                "name",
+                "isActive",
+                "sortOrder"
+              ],
               "description": "Internal category data for services"
             },
             "description": "Page items"
@@ -1014,7 +1118,10 @@
             "$ref": "#/components/schemas/PaginationMetadata"
           }
         },
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "description": "Paginated response"
       },
       "CategoryIdParam": {
@@ -1026,7 +1133,9 @@
             "description": "Category ID"
           }
         },
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "description": "Category ID path parameter"
       },
       "StorageServiceHealthCheck": {
@@ -1034,11 +1143,17 @@
         "properties": {
           "service": {
             "type": "string",
-            "enum": ["storage"]
+            "enum": [
+              "storage"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["healthy", "degraded", "unhealthy"],
+            "enum": [
+              "healthy",
+              "degraded",
+              "unhealthy"
+            ],
             "description": "System health status",
             "example": "healthy"
           },
@@ -1051,19 +1166,31 @@
             "properties": {
               "awsS3": {
                 "type": "string",
-                "enum": ["healthy", "degraded", "unhealthy"],
+                "enum": [
+                  "healthy",
+                  "degraded",
+                  "unhealthy"
+                ],
                 "description": "System health status",
                 "example": "healthy"
               },
               "local": {
                 "type": "string",
-                "enum": ["healthy", "degraded", "unhealthy"],
+                "enum": [
+                  "healthy",
+                  "degraded",
+                  "unhealthy"
+                ],
                 "description": "System health status",
                 "example": "healthy"
               },
               "minio": {
                 "type": "string",
-                "enum": ["healthy", "degraded", "unhealthy"],
+                "enum": [
+                  "healthy",
+                  "degraded",
+                  "unhealthy"
+                ],
                 "description": "System health status",
                 "example": "healthy"
               }
@@ -1116,13 +1243,23 @@
           },
           "fileType": {
             "type": "string",
-            "enum": ["image", "video", "document", "audio", "other"],
+            "enum": [
+              "image",
+              "video",
+              "document",
+              "audio",
+              "other"
+            ],
             "description": "File type category",
             "example": "image"
           },
           "provider": {
             "type": "string",
-            "enum": ["awsS3", "local", "minio"],
+            "enum": [
+              "awsS3",
+              "local",
+              "minio"
+            ],
             "description": "Supported storage provider",
             "example": "awsS3"
           },
@@ -1181,7 +1318,13 @@
           },
           "fileType": {
             "type": "string",
-            "enum": ["image", "video", "document", "audio", "other"],
+            "enum": [
+              "image",
+              "video",
+              "document",
+              "audio",
+              "other"
+            ],
             "description": "File type category",
             "example": "image"
           },
@@ -1200,7 +1343,11 @@
           },
           "provider": {
             "type": "string",
-            "enum": ["awsS3", "local", "minio"],
+            "enum": [
+              "awsS3",
+              "local",
+              "minio"
+            ],
             "description": "Supported storage provider",
             "example": "awsS3"
           },
@@ -1273,7 +1420,9 @@
             "type": "string"
           }
         },
-        "required": ["fileIds"],
+        "required": [
+          "fileIds"
+        ],
         "description": "Internal bulk delete files request"
       },
       "InternalBulkDeleteResponse": {
@@ -1301,7 +1450,10 @@
                   "type": "string"
                 }
               },
-              "required": ["fileId", "error"]
+              "required": [
+                "fileId",
+                "error"
+              ]
             }
           },
           "totalDeleted": {
@@ -1313,7 +1465,12 @@
             "minimum": 0
           }
         },
-        "required": ["deleted", "failed", "totalDeleted", "totalFailed"],
+        "required": [
+          "deleted",
+          "failed",
+          "totalDeleted",
+          "totalFailed"
+        ],
         "description": "Internal bulk delete response"
       },
       "GetUserFilesRequest": {
@@ -1325,7 +1482,13 @@
           },
           "fileType": {
             "type": "string",
-            "enum": ["image", "video", "document", "audio", "other"],
+            "enum": [
+              "image",
+              "video",
+              "document",
+              "audio",
+              "other"
+            ],
             "description": "File type category",
             "example": "image"
           },
@@ -1354,7 +1517,9 @@
             "default": 0
           }
         },
-        "required": ["userId"],
+        "required": [
+          "userId"
+        ],
         "description": "Get files for a specific user"
       },
       "UserFileSummaryResponse": {
@@ -1460,12 +1625,21 @@
           },
           "fileType": {
             "type": "string",
-            "enum": ["image", "video", "document", "audio", "other"],
+            "enum": [
+              "image",
+              "video",
+              "document",
+              "audio",
+              "other"
+            ],
             "description": "File type category",
             "example": "image"
           }
         },
-        "required": ["userId", "fileSize"],
+        "required": [
+          "userId",
+          "fileSize"
+        ],
         "description": "Check if user can upload file within quota"
       },
       "UserQuotaResponse": {
@@ -1526,7 +1700,11 @@
           },
           "targetProvider": {
             "type": "string",
-            "enum": ["awsS3", "local", "minio"],
+            "enum": [
+              "awsS3",
+              "local",
+              "minio"
+            ],
             "description": "Supported storage provider",
             "example": "awsS3"
           },
@@ -1541,7 +1719,10 @@
             "default": true
           }
         },
-        "required": ["fileId", "targetProvider"],
+        "required": [
+          "fileId",
+          "targetProvider"
+        ],
         "description": "Migrate file between storage providers"
       },
       "MigrateFileResponse": {
@@ -1554,13 +1735,21 @@
           },
           "oldProvider": {
             "type": "string",
-            "enum": ["awsS3", "local", "minio"],
+            "enum": [
+              "awsS3",
+              "local",
+              "minio"
+            ],
             "description": "Supported storage provider",
             "example": "awsS3"
           },
           "newProvider": {
             "type": "string",
-            "enum": ["awsS3", "local", "minio"],
+            "enum": [
+              "awsS3",
+              "local",
+              "minio"
+            ],
             "description": "Supported storage provider",
             "example": "awsS3"
           },
@@ -1572,7 +1761,11 @@
           },
           "migrationStatus": {
             "type": "string",
-            "enum": ["success", "failed", "partial"]
+            "enum": [
+              "success",
+              "failed",
+              "partial"
+            ]
           },
           "error": {
             "type": "string"
@@ -1608,7 +1801,11 @@
           },
           "provider": {
             "type": "string",
-            "enum": ["awsS3", "local", "minio"],
+            "enum": [
+              "awsS3",
+              "local",
+              "minio"
+            ],
             "description": "Supported storage provider",
             "example": "awsS3"
           },
@@ -1619,7 +1816,9 @@
             "default": 100
           }
         },
-        "required": ["olderThan"],
+        "required": [
+          "olderThan"
+        ],
         "description": "Cleanup orphaned files request"
       },
       "CleanupOrphanedFilesResponse": {
@@ -1666,7 +1865,9 @@
             "description": "Universally Unique Identifier"
           }
         },
-        "required": ["fileId"],
+        "required": [
+          "fileId"
+        ],
         "description": "File ID path parameter"
       },
       "GetVouchersByIdsRequest": {
@@ -1688,7 +1889,9 @@
             "description": "Comma-separated relations: business,category,codes"
           }
         },
-        "required": ["voucherIds"],
+        "required": [
+          "voucherIds"
+        ],
         "description": "Batch fetch vouchers by IDs"
       },
       "VoucherState": {
@@ -1706,19 +1909,29 @@
       },
       "VoucherDiscountType": {
         "type": "string",
-        "enum": ["fixed", "percentage"],
+        "enum": [
+          "fixed",
+          "percentage"
+        ],
         "description": "Type of discount the voucher provides",
         "example": "percentage"
       },
       "VoucherCodeType": {
         "type": "string",
-        "enum": ["qr", "short", "static"],
+        "enum": [
+          "qr",
+          "short",
+          "static"
+        ],
         "description": "Type of voucher code",
         "example": "qr"
       },
       "VoucherScanType": {
         "type": "string",
-        "enum": ["customer", "business"],
+        "enum": [
+          "customer",
+          "business"
+        ],
         "description": "Type of voucher scan",
         "example": "customer"
       },
@@ -1741,7 +1954,12 @@
       },
       "CustomerVoucherStatus": {
         "type": "string",
-        "enum": ["available", "claimed", "redeemed", "expired"],
+        "enum": [
+          "available",
+          "claimed",
+          "redeemed",
+          "expired"
+        ],
         "description": "Status of voucher from customer perspective",
         "example": "claimed"
       },
@@ -1795,11 +2013,16 @@
                   "default": "PYG"
                 },
                 "location": {
-                  "type": ["object", "null"],
+                  "type": [
+                    "object",
+                    "null"
+                  ],
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": ["Point"]
+                      "enum": [
+                        "Point"
+                      ]
                     },
                     "coordinates": {
                       "type": "array",
@@ -1818,10 +2041,16 @@
                       "description": "[longitude, latitude] - GeoJSON standard"
                     }
                   },
-                  "required": ["type", "coordinates"]
+                  "required": [
+                    "type",
+                    "coordinates"
+                  ]
                 },
                 "imageUrl": {
-                  "type": ["string", "null"],
+                  "type": [
+                    "string",
+                    "null"
+                  ],
                   "format": "uri"
                 },
                 "validFrom": {
@@ -1835,7 +2064,10 @@
                   "description": "ISO 8601 datetime with timezone"
                 },
                 "maxRedemptions": {
-                  "type": ["integer", "null"]
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
                 },
                 "maxRedemptionsPerUser": {
                   "type": "integer",
@@ -1854,11 +2086,17 @@
                   "default": 0
                 },
                 "metadata": {
-                  "type": ["object", "null"],
+                  "type": [
+                    "object",
+                    "null"
+                  ],
                   "additionalProperties": {}
                 },
                 "deletedAt": {
-                  "type": ["string", "null"],
+                  "type": [
+                    "string",
+                    "null"
+                  ],
                   "format": "date-time",
                   "description": "ISO 8601 datetime with timezone"
                 },
@@ -1874,7 +2112,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "description": "Complete business object when ?include=business"
                 },
                 "category": {
@@ -1889,7 +2130,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "name"],
+                  "required": [
+                    "id",
+                    "name"
+                  ],
                   "description": "Complete category object when ?include=category"
                 },
                 "codes": {
@@ -1913,7 +2157,10 @@
                         "type": "boolean"
                       },
                       "metadata": {
-                        "type": ["object", "null"],
+                        "type": [
+                          "object",
+                          "null"
+                        ],
                         "additionalProperties": {}
                       },
                       "createdAt": {
@@ -1963,7 +2210,10 @@
                         "description": "ISO 8601 datetime with timezone"
                       },
                       "metadata": {
-                        "type": ["object", "null"],
+                        "type": [
+                          "object",
+                          "null"
+                        ],
                         "additionalProperties": {}
                       },
                       "createdAt": {
@@ -1994,7 +2244,10 @@
                         "description": "Universally Unique Identifier"
                       },
                       "userId": {
-                        "type": ["string", "null"],
+                        "type": [
+                          "string",
+                          "null"
+                        ],
                         "format": "uuid",
                         "description": "Universally Unique Identifier"
                       },
@@ -2005,11 +2258,16 @@
                         "$ref": "#/components/schemas/VoucherScanSource"
                       },
                       "location": {
-                        "type": ["object", "null"],
+                        "type": [
+                          "object",
+                          "null"
+                        ],
                         "properties": {
                           "type": {
                             "type": "string",
-                            "enum": ["Point"]
+                            "enum": [
+                              "Point"
+                            ]
                           },
                           "coordinates": {
                             "type": "array",
@@ -2028,7 +2286,10 @@
                             "description": "[longitude, latitude] - GeoJSON standard"
                           }
                         },
-                        "required": ["type", "coordinates"]
+                        "required": [
+                          "type",
+                          "coordinates"
+                        ]
                       },
                       "deviceInfo": {
                         "type": "object",
@@ -2082,11 +2343,17 @@
                         "$ref": "#/components/schemas/CustomerVoucherStatus"
                       },
                       "notificationPreferences": {
-                        "type": ["object", "null"],
+                        "type": [
+                          "object",
+                          "null"
+                        ],
                         "additionalProperties": {}
                       },
                       "redeemedAt": {
-                        "type": ["string", "null"],
+                        "type": [
+                          "string",
+                          "null"
+                        ],
                         "format": "date-time",
                         "description": "ISO 8601 datetime with timezone"
                       },
@@ -2126,7 +2393,10 @@
                   "maximum": 1
                 },
                 "daysUntilExpiry": {
-                  "type": ["integer", "null"]
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
                 },
                 "createdAt": {
                   "type": "string",
@@ -2178,7 +2448,11 @@
             "description": "IDs of vouchers that were not found"
           }
         },
-        "required": ["data", "pagination", "notFound"],
+        "required": [
+          "data",
+          "pagination",
+          "notFound"
+        ],
         "description": "Batch fetch vouchers response with pagination metadata"
       },
       "ValidateVoucherRequest": {
@@ -2210,7 +2484,9 @@
             "description": "Check if voucher is in valid state"
           }
         },
-        "required": ["voucherId"],
+        "required": [
+          "voucherId"
+        ],
         "description": "Validate voucher availability and constraints"
       },
       "ValidateVoucherResponse": {
@@ -2268,11 +2544,16 @@
                 "default": "PYG"
               },
               "location": {
-                "type": ["object", "null"],
+                "type": [
+                  "object",
+                  "null"
+                ],
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": ["Point"]
+                    "enum": [
+                      "Point"
+                    ]
                   },
                   "coordinates": {
                     "type": "array",
@@ -2291,10 +2572,16 @@
                     "description": "[longitude, latitude] - GeoJSON standard"
                   }
                 },
-                "required": ["type", "coordinates"]
+                "required": [
+                  "type",
+                  "coordinates"
+                ]
               },
               "imageUrl": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "format": "uri"
               },
               "validFrom": {
@@ -2308,7 +2595,10 @@
                 "description": "ISO 8601 datetime with timezone"
               },
               "maxRedemptions": {
-                "type": ["integer", "null"]
+                "type": [
+                  "integer",
+                  "null"
+                ]
               },
               "maxRedemptionsPerUser": {
                 "type": "integer",
@@ -2327,11 +2617,17 @@
                 "default": 0
               },
               "metadata": {
-                "type": ["object", "null"],
+                "type": [
+                  "object",
+                  "null"
+                ],
                 "additionalProperties": {}
               },
               "deletedAt": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "format": "date-time",
                 "description": "ISO 8601 datetime with timezone"
               },
@@ -2347,7 +2643,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["id", "name"],
+                "required": [
+                  "id",
+                  "name"
+                ],
                 "description": "Complete business object when ?include=business"
               },
               "category": {
@@ -2362,7 +2661,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["id", "name"],
+                "required": [
+                  "id",
+                  "name"
+                ],
                 "description": "Complete category object when ?include=category"
               },
               "codes": {
@@ -2386,7 +2688,10 @@
                       "type": "boolean"
                     },
                     "metadata": {
-                      "type": ["object", "null"],
+                      "type": [
+                        "object",
+                        "null"
+                      ],
                       "additionalProperties": {}
                     },
                     "createdAt": {
@@ -2436,7 +2741,10 @@
                       "description": "ISO 8601 datetime with timezone"
                     },
                     "metadata": {
-                      "type": ["object", "null"],
+                      "type": [
+                        "object",
+                        "null"
+                      ],
                       "additionalProperties": {}
                     },
                     "createdAt": {
@@ -2467,7 +2775,10 @@
                       "description": "Universally Unique Identifier"
                     },
                     "userId": {
-                      "type": ["string", "null"],
+                      "type": [
+                        "string",
+                        "null"
+                      ],
                       "format": "uuid",
                       "description": "Universally Unique Identifier"
                     },
@@ -2478,11 +2789,16 @@
                       "$ref": "#/components/schemas/VoucherScanSource"
                     },
                     "location": {
-                      "type": ["object", "null"],
+                      "type": [
+                        "object",
+                        "null"
+                      ],
                       "properties": {
                         "type": {
                           "type": "string",
-                          "enum": ["Point"]
+                          "enum": [
+                            "Point"
+                          ]
                         },
                         "coordinates": {
                           "type": "array",
@@ -2501,7 +2817,10 @@
                           "description": "[longitude, latitude] - GeoJSON standard"
                         }
                       },
-                      "required": ["type", "coordinates"]
+                      "required": [
+                        "type",
+                        "coordinates"
+                      ]
                     },
                     "deviceInfo": {
                       "type": "object",
@@ -2555,11 +2874,17 @@
                       "$ref": "#/components/schemas/CustomerVoucherStatus"
                     },
                     "notificationPreferences": {
-                      "type": ["object", "null"],
+                      "type": [
+                        "object",
+                        "null"
+                      ],
                       "additionalProperties": {}
                     },
                     "redeemedAt": {
-                      "type": ["string", "null"],
+                      "type": [
+                        "string",
+                        "null"
+                      ],
                       "format": "date-time",
                       "description": "ISO 8601 datetime with timezone"
                     },
@@ -2599,7 +2924,10 @@
                 "maximum": 1
               },
               "daysUntilExpiry": {
-                "type": ["integer", "null"]
+                "type": [
+                  "integer",
+                  "null"
+                ]
               },
               "createdAt": {
                 "type": "string",
@@ -2638,7 +2966,9 @@
             "description": "Voucher details if valid"
           }
         },
-        "required": ["isValid"],
+        "required": [
+          "isValid"
+        ],
         "description": "Voucher validation result"
       },
       "VoucherPathParams": {
@@ -2650,7 +2980,9 @@
             "description": "Voucher ID"
           }
         },
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "description": "Voucher ID path parameter"
       },
       "ValidateTokenRequest": {
@@ -2671,7 +3003,9 @@
             }
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "description": "Validate JWT token"
       },
       "TokenValidationResponse": {
@@ -2729,7 +3063,11 @@
             }
           }
         },
-        "required": ["valid", "roles", "permissions"],
+        "required": [
+          "valid",
+          "roles",
+          "permissions"
+        ],
         "description": "Token validation result"
       },
       "GetUserByEmailRequest": {
@@ -2741,7 +3079,9 @@
             "format": "email"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "description": "Get user by email"
       },
       "AuthUserResponse": {
@@ -2802,7 +3142,9 @@
             "format": "uri"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "description": "Initiate password reset"
       },
       "PasswordResetResponse": {
@@ -2820,7 +3162,11 @@
             "type": "boolean"
           }
         },
-        "required": ["resetToken", "expiresAt", "emailSent"],
+        "required": [
+          "resetToken",
+          "expiresAt",
+          "emailSent"
+        ],
         "description": "Password reset initiated"
       },
       "ConfirmPasswordResetRequest": {
@@ -2834,7 +3180,10 @@
             "minLength": 8
           }
         },
-        "required": ["token", "newPassword"],
+        "required": [
+          "token",
+          "newPassword"
+        ],
         "description": "Confirm password reset"
       },
       "VerifyAccountRequest": {
@@ -2844,7 +3193,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "description": "Verify account with token"
       },
       "AccountVerificationResponse": {
@@ -2861,7 +3212,9 @@
             "type": "string"
           }
         },
-        "required": ["verified"],
+        "required": [
+          "verified"
+        ],
         "description": "Account verification result"
       },
       "CreateServiceSessionRequest": {
@@ -2902,7 +3255,10 @@
             }
           }
         },
-        "required": ["userId", "serviceName"],
+        "required": [
+          "userId",
+          "serviceName"
+        ],
         "description": "Create a service-to-service session"
       },
       "ServiceSessionResponse": {
@@ -2923,7 +3279,11 @@
             "description": "ISO 8601 datetime with timezone"
           }
         },
-        "required": ["sessionId", "token", "expiresAt"],
+        "required": [
+          "sessionId",
+          "token",
+          "expiresAt"
+        ],
         "description": "Service session details"
       },
       "CheckUserRoleRequest": {
@@ -2945,7 +3305,10 @@
             "default": false
           }
         },
-        "required": ["userId", "roles"],
+        "required": [
+          "userId",
+          "roles"
+        ],
         "description": "Check if user has specified roles"
       },
       "RoleCheckResponse": {
@@ -2967,7 +3330,10 @@
             }
           }
         },
-        "required": ["hasRole", "userRoles"],
+        "required": [
+          "hasRole",
+          "userRoles"
+        ],
         "description": "Role check result"
       },
       "ValidateServiceKeyRequest": {
@@ -2980,7 +3346,10 @@
             "type": "string"
           }
         },
-        "required": ["apiKey", "serviceName"],
+        "required": [
+          "apiKey",
+          "serviceName"
+        ],
         "description": "Validate service API key"
       },
       "ServiceKeyValidationResponse": {
@@ -3015,10 +3384,16 @@
                 "description": "ISO 8601 datetime with timezone"
               }
             },
-            "required": ["limit", "remaining", "resetAt"]
+            "required": [
+              "limit",
+              "remaining",
+              "resetAt"
+            ]
           }
         },
-        "required": ["valid"],
+        "required": [
+          "valid"
+        ],
         "description": "Service key validation result"
       },
       "SendSystemNotificationRequest": {
@@ -3058,16 +3433,28 @@
           },
           "priority": {
             "type": "string",
-            "enum": ["low", "normal", "high", "urgent"],
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ],
             "default": "normal"
           },
           "channels": {
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["email", "inApp", "sms", "push"]
+              "enum": [
+                "email",
+                "inApp",
+                "sms",
+                "push"
+              ]
             },
-            "default": ["inApp"]
+            "default": [
+              "inApp"
+            ]
           },
           "templateId": {
             "type": "string"
@@ -3090,7 +3477,11 @@
             "additionalProperties": {}
           }
         },
-        "required": ["title", "message", "category"],
+        "required": [
+          "title",
+          "message",
+          "category"
+        ],
         "description": "Send system notification"
       },
       "SendSystemNotificationResponse": {
@@ -3119,7 +3510,10 @@
                   "minimum": 0
                 }
               },
-              "required": ["sent", "failed"]
+              "required": [
+                "sent",
+                "failed"
+              ]
             }
           },
           "timestamp": {
@@ -3193,7 +3587,11 @@
                   "type": "string"
                 }
               },
-              "required": ["filename", "content", "contentType"]
+              "required": [
+                "filename",
+                "content",
+                "contentType"
+              ]
             }
           },
           "sendAt": {
@@ -3210,7 +3608,11 @@
             "default": true
           }
         },
-        "required": ["userId", "templateKey", "variables"],
+        "required": [
+          "userId",
+          "templateKey",
+          "variables"
+        ],
         "description": "Send transactional email"
       },
       "SendTransactionalEmailResponse": {
@@ -3240,7 +3642,10 @@
             "type": "string"
           }
         },
-        "required": ["messageId", "status"],
+        "required": [
+          "messageId",
+          "status"
+        ],
         "description": "Transactional email result"
       },
       "SendSMSRequest": {
@@ -3260,14 +3665,23 @@
           },
           "type": {
             "type": "string",
-            "enum": ["verification", "alert", "reminder", "marketing"]
+            "enum": [
+              "verification",
+              "alert",
+              "reminder",
+              "marketing"
+            ]
           },
           "metadata": {
             "type": "object",
             "additionalProperties": {}
           }
         },
-        "required": ["userId", "message", "type"],
+        "required": [
+          "userId",
+          "message",
+          "type"
+        ],
         "description": "Send SMS message"
       },
       "SendSMSResponse": {
@@ -3291,7 +3705,10 @@
             "type": "string"
           }
         },
-        "required": ["messageId", "status"],
+        "required": [
+          "messageId",
+          "status"
+        ],
         "description": "SMS send result"
       },
       "SendPushNotificationRequest": {
@@ -3340,7 +3757,12 @@
           },
           "priority": {
             "type": "string",
-            "enum": ["low", "normal", "high", "urgent"],
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "urgent"
+            ],
             "default": "normal"
           },
           "ttl": {
@@ -3349,7 +3771,11 @@
             "description": "Time to live in seconds"
           }
         },
-        "required": ["userIds", "title", "body"],
+        "required": [
+          "userIds",
+          "title",
+          "body"
+        ],
         "description": "Send push notification"
       },
       "SendPushNotificationResponse": {
@@ -3376,11 +3802,17 @@
                   "type": "string"
                 }
               },
-              "required": ["userId", "reason"]
+              "required": [
+                "userId",
+                "reason"
+              ]
             }
           }
         },
-        "required": ["sent", "failed"],
+        "required": [
+          "sent",
+          "failed"
+        ],
         "description": "Push notification result"
       },
       "GetUserCommunicationPreferencesRequest": {
@@ -3391,7 +3823,9 @@
             "format": "uuid"
           }
         },
-        "required": ["userId"],
+        "required": [
+          "userId"
+        ],
         "description": "Get user communication preferences"
       },
       "UserCommunicationPreferencesResponse": {
@@ -3414,7 +3848,10 @@
                 }
               }
             },
-            "required": ["enabled", "categories"]
+            "required": [
+              "enabled",
+              "categories"
+            ]
           },
           "push": {
             "type": "object",
@@ -3438,17 +3875,31 @@
                     },
                     "platform": {
                       "type": "string",
-                      "enum": ["ios", "android", "web", "desktop", "other"]
+                      "enum": [
+                        "ios",
+                        "android",
+                        "web",
+                        "desktop",
+                        "other"
+                      ]
                     },
                     "active": {
                       "type": "boolean"
                     }
                   },
-                  "required": ["token", "platform", "active"]
+                  "required": [
+                    "token",
+                    "platform",
+                    "active"
+                  ]
                 }
               }
             },
-            "required": ["enabled", "categories", "tokens"]
+            "required": [
+              "enabled",
+              "categories",
+              "tokens"
+            ]
           },
           "sms": {
             "type": "object",
@@ -3466,7 +3917,10 @@
                 "type": "string"
               }
             },
-            "required": ["enabled", "categories"]
+            "required": [
+              "enabled",
+              "categories"
+            ]
           },
           "quietHours": {
             "type": "object",
@@ -3484,7 +3938,12 @@
                 "type": "string"
               }
             },
-            "required": ["enabled", "start", "end", "timezone"]
+            "required": [
+              "enabled",
+              "start",
+              "end",
+              "timezone"
+            ]
           },
           "unsubscribedAt": {
             "type": "string",
@@ -3492,7 +3951,12 @@
             "description": "ISO 8601 datetime with timezone"
           }
         },
-        "required": ["userId", "email", "push", "sms"],
+        "required": [
+          "userId",
+          "email",
+          "push",
+          "sms"
+        ],
         "description": "User communication preferences"
       },
       "SendEmailRequest": {
@@ -3543,12 +4007,17 @@
             }
           },
           "userId": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "uuid",
             "description": "User ID for tracking and logging"
           }
         },
-        "required": ["to"],
+        "required": [
+          "to"
+        ],
         "description": "Send email request"
       },
       "SendEmailResponse": {
@@ -3582,7 +4051,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "status"],
+        "required": [
+          "id",
+          "status"
+        ],
         "description": "Send email result with communication log details"
       },
       "BulkEmailRequest": {
@@ -3606,11 +4078,16 @@
                   "additionalProperties": {}
                 }
               },
-              "required": ["to"]
+              "required": [
+                "to"
+              ]
             }
           }
         },
-        "required": ["templateId", "recipients"],
+        "required": [
+          "templateId",
+          "recipients"
+        ],
         "description": "Send bulk emails request"
       },
       "BulkEmailResponse": {
@@ -3625,7 +4102,10 @@
             "minimum": 0
           }
         },
-        "required": ["sent", "failed"],
+        "required": [
+          "sent",
+          "failed"
+        ],
         "description": "Bulk email result"
       },
       "CreateNotificationRequest": {
@@ -3643,14 +4123,26 @@
           },
           "type": {
             "type": "string",
-            "enum": ["info", "warning", "error", "success"]
+            "enum": [
+              "info",
+              "warning",
+              "error",
+              "success"
+            ]
           },
           "metadata": {
-            "type": ["object", "null"],
+            "type": [
+              "object",
+              "null"
+            ],
             "additionalProperties": {}
           }
         },
-        "required": ["userId", "title", "description"],
+        "required": [
+          "userId",
+          "title",
+          "description"
+        ],
         "description": "Create in-app notification"
       },
       "CreateNotificationResponse": {
@@ -3732,13 +4224,19 @@
                   "additionalProperties": {}
                 }
               },
-              "required": ["messageId", "status", "timestamp"]
+              "required": [
+                "messageId",
+                "status",
+                "timestamp"
+              ]
             },
             "minItems": 1,
             "maxItems": 1000
           }
         },
-        "required": ["updates"],
+        "required": [
+          "updates"
+        ],
         "description": "Batch update notification statuses"
       },
       "BatchUpdateResponse": {
@@ -3764,11 +4262,17 @@
                   "type": "string"
                 }
               },
-              "required": ["messageId", "error"]
+              "required": [
+                "messageId",
+                "error"
+              ]
             }
           }
         },
-        "required": ["processed", "failed"],
+        "required": [
+          "processed",
+          "failed"
+        ],
         "description": "Batch update result"
       },
       "InternalUserData": {
@@ -3800,7 +4304,11 @@
           },
           "role": {
             "type": "string",
-            "enum": ["admin", "customer", "business"],
+            "enum": [
+              "admin",
+              "customer",
+              "business"
+            ],
             "description": "User role in the system",
             "example": "customer"
           },
@@ -3874,10 +4382,17 @@
           },
           "verificationType": {
             "type": "string",
-            "enum": ["email", "phone", "accountConfirmation"]
+            "enum": [
+              "email",
+              "phone",
+              "accountConfirmation"
+            ]
           }
         },
-        "required": ["userId", "verificationType"],
+        "required": [
+          "userId",
+          "verificationType"
+        ],
         "description": "Verify user for internal services"
       },
       "VerifyUserResponse": {
@@ -3898,7 +4413,12 @@
           },
           "verificationLevel": {
             "type": "string",
-            "enum": ["none", "email", "phone", "full"]
+            "enum": [
+              "none",
+              "email",
+              "phone",
+              "full"
+            ]
           }
         },
         "required": [
@@ -3930,7 +4450,9 @@
             "description": "Specific fields to return"
           }
         },
-        "required": ["userIds"],
+        "required": [
+          "userIds"
+        ],
         "description": "Get multiple users by ID"
       },
       "GetUsersResponse": {
@@ -3967,7 +4489,11 @@
                 },
                 "role": {
                   "type": "string",
-                  "enum": ["admin", "customer", "business"],
+                  "enum": [
+                    "admin",
+                    "customer",
+                    "business"
+                  ],
                   "description": "User role in the system",
                   "example": "customer"
                 },
@@ -4041,7 +4567,9 @@
             }
           }
         },
-        "required": ["users"],
+        "required": [
+          "users"
+        ],
         "description": "Multiple users data"
       },
       "CheckUserPermissionRequest": {
@@ -4056,13 +4584,22 @@
           },
           "action": {
             "type": "string",
-            "enum": ["read", "create", "update", "delete"]
+            "enum": [
+              "read",
+              "create",
+              "update",
+              "delete"
+            ]
           },
           "resourceId": {
             "type": "string"
           }
         },
-        "required": ["userId", "resource", "action"],
+        "required": [
+          "userId",
+          "resource",
+          "action"
+        ],
         "description": "Check user permission"
       },
       "CheckUserPermissionResponse": {
@@ -4075,7 +4612,9 @@
             "type": "string"
           }
         },
-        "required": ["allowed"],
+        "required": [
+          "allowed"
+        ],
         "description": "Permission check result"
       },
       "GetUserSubscriptionStatusRequest": {
@@ -4086,7 +4625,9 @@
             "format": "uuid"
           }
         },
-        "required": ["userId"],
+        "required": [
+          "userId"
+        ],
         "description": "Get user subscription status"
       },
       "UserSubscriptionStatusResponse": {
@@ -4132,7 +4673,9 @@
             "format": "email"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "description": "Get user auth data by email for authentication"
       },
       "UserAuthData": {
@@ -4148,7 +4691,10 @@
             "format": "email"
           },
           "password": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "firstName": {
             "type": "string"
@@ -4161,13 +4707,22 @@
           },
           "role": {
             "type": "string",
-            "enum": ["admin", "customer", "business"],
+            "enum": [
+              "admin",
+              "customer",
+              "business"
+            ],
             "description": "User role in the system",
             "example": "customer"
           },
           "status": {
             "type": "string",
-            "enum": ["active", "suspended", "banned", "unconfirmed"],
+            "enum": [
+              "active",
+              "suspended",
+              "banned",
+              "unconfirmed"
+            ],
             "description": "User account status",
             "example": "active"
           },
@@ -4230,7 +4785,11 @@
           },
           "role": {
             "type": "string",
-            "enum": ["admin", "customer", "business"],
+            "enum": [
+              "admin",
+              "customer",
+              "business"
+            ],
             "description": "User role in the system",
             "example": "customer"
           },
@@ -4239,7 +4798,13 @@
             "format": "uri"
           }
         },
-        "required": ["email", "firstName", "lastName", "acceptTerms", "role"],
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "acceptTerms",
+          "role"
+        ],
         "description": "Create new user for registration with full profile data. passwordHash is optional for social auth users"
       },
       "UpdateLastLoginRequest": {
@@ -4270,7 +4835,10 @@
             "description": "ISO 8601 datetime with timezone"
           }
         },
-        "required": ["token", "expiresAt"],
+        "required": [
+          "token",
+          "expiresAt"
+        ],
         "description": "Password reset token"
       },
       "ValidatePasswordResetTokenRequest": {
@@ -4280,7 +4848,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "description": "Validate password reset token"
       },
       "UpdatePasswordRequest": {
@@ -4294,7 +4864,10 @@
             "type": "string"
           }
         },
-        "required": ["userId", "passwordHash"],
+        "required": [
+          "userId",
+          "passwordHash"
+        ],
         "description": "Update user password"
       },
       "CreateEmailVerificationTokenRequest": {
@@ -4314,7 +4887,10 @@
             "description": "ISO 8601 datetime with timezone"
           }
         },
-        "required": ["token", "expiresAt"],
+        "required": [
+          "token",
+          "expiresAt"
+        ],
         "description": "Email verification token"
       },
       "ValidateEmailVerificationTokenRequest": {
@@ -4324,7 +4900,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "description": "Validate email verification token"
       },
       "VerifyEmailRequest": {
@@ -4335,7 +4913,9 @@
             "format": "uuid"
           }
         },
-        "required": ["userId"],
+        "required": [
+          "userId"
+        ],
         "description": "Mark user email as verified"
       },
       "CheckEmailExistsRequest": {
@@ -4347,7 +4927,9 @@
             "format": "email"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "description": "Check if email already exists"
       },
       "CheckPhoneExistsRequest": {
@@ -4357,7 +4939,9 @@
             "type": "string"
           }
         },
-        "required": ["phoneNumber"],
+        "required": [
+          "phoneNumber"
+        ],
         "description": "Check if phone number already exists"
       },
       "ExistsResponse": {
@@ -4367,7 +4951,9 @@
             "type": "boolean"
           }
         },
-        "required": ["exists"],
+        "required": [
+          "exists"
+        ],
         "description": "Resource exists response"
       },
       "UserIdParam": {
@@ -4378,7 +4964,9 @@
             "format": "uuid"
           }
         },
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "description": "User ID path parameter"
       },
       "EmailParam": {
@@ -4390,7 +4978,9 @@
             "format": "email"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "description": "Email path parameter"
       },
       "PhoneParam": {
@@ -4400,7 +4990,9 @@
             "type": "string"
           }
         },
-        "required": ["phone"],
+        "required": [
+          "phone"
+        ],
         "description": "Phone number path parameter"
       },
       "InternalSubscriptionData": {
@@ -4480,7 +5072,9 @@
             "type": "string"
           }
         },
-        "required": ["userId"],
+        "required": [
+          "userId"
+        ],
         "description": "Check if user has subscription access"
       },
       "SubscriptionCheckResponse": {
@@ -4515,13 +5109,21 @@
                 }
               }
             },
-            "required": ["id", "planId", "planName", "status", "features"]
+            "required": [
+              "id",
+              "planId",
+              "planName",
+              "status",
+              "features"
+            ]
           },
           "reason": {
             "type": "string"
           }
         },
-        "required": ["hasAccess"],
+        "required": [
+          "hasAccess"
+        ],
         "description": "Subscription access check result"
       },
       "ProcessSubscriptionUsageRequest": {
@@ -4538,7 +5140,10 @@
           },
           "usageType": {
             "type": "string",
-            "enum": ["featureAccess", "creditDeduction"],
+            "enum": [
+              "featureAccess",
+              "creditDeduction"
+            ],
             "description": "Usage tracking type",
             "example": "featureAccess"
           },
@@ -4569,7 +5174,11 @@
             }
           }
         },
-        "required": ["userId", "subscriptionId", "usageType"],
+        "required": [
+          "userId",
+          "subscriptionId",
+          "usageType"
+        ],
         "description": "Process subscription usage"
       },
       "UsageProcessingResponse": {
@@ -4585,7 +5194,10 @@
             "type": "string"
           }
         },
-        "required": ["success", "usageRecorded"],
+        "required": [
+          "success",
+          "usageRecorded"
+        ],
         "description": "Usage processing result"
       },
       "CreateStripeSubscriptionRequest": {
@@ -4710,7 +5322,10 @@
             }
           }
         },
-        "required": ["stripeSubscriptionId", "status"],
+        "required": [
+          "stripeSubscriptionId",
+          "status"
+        ],
         "description": "Update subscription from payment service"
       },
       "CancelStripeSubscriptionRequest": {
@@ -4727,7 +5342,9 @@
             "type": "string"
           }
         },
-        "required": ["stripeSubscriptionId"],
+        "required": [
+          "stripeSubscriptionId"
+        ],
         "description": "Cancel Stripe subscription"
       },
       "StripeSubscriptionResponse": {
@@ -4805,7 +5422,9 @@
             "default": false
           }
         },
-        "required": ["userId"],
+        "required": [
+          "userId"
+        ],
         "description": "Get user subscriptions"
       },
       "UserSubscriptionsResponse": {
@@ -4872,7 +5491,10 @@
             "$ref": "#/components/schemas/PaginationMetadata"
           }
         },
-        "required": ["data", "pagination"],
+        "required": [
+          "data",
+          "pagination"
+        ],
         "description": "Paginated response"
       },
       "SubscriptionWebhookEvent": {
@@ -4910,13 +5532,19 @@
                 "type": "number"
               }
             },
-            "required": ["type", "data", "created"]
+            "required": [
+              "type",
+              "data",
+              "created"
+            ]
           },
           "stripeSignature": {
             "type": "string"
           }
         },
-        "required": ["event"],
+        "required": [
+          "event"
+        ],
         "description": "Process subscription webhook event"
       },
       "ProcessWebhookResponse": {
@@ -4934,7 +5562,9 @@
             "type": "string"
           }
         },
-        "required": ["processed"],
+        "required": [
+          "processed"
+        ],
         "description": "Webhook processing result"
       }
     },
@@ -4945,7 +5575,9 @@
       "post": {
         "operationId": "bulkGetInternalBusinesses",
         "summary": "Get multiple businesses by IDs",
-        "tags": ["Business Service"],
+        "tags": [
+          "Business Service"
+        ],
         "security": [
           {
             "apiKey": []
@@ -4972,7 +5604,9 @@
                     "description": "Comma-separated relations: user,category,businessDetails"
                   }
                 },
-                "required": ["businessIds"],
+                "required": [
+                  "businessIds"
+                ],
                 "description": "Get multiple businesses by IDs"
               }
             }
@@ -5044,7 +5678,9 @@
                       }
                     }
                   },
-                  "required": ["businesses"],
+                  "required": [
+                    "businesses"
+                  ],
                   "description": "Businesses data with not found IDs"
                 }
               }
@@ -5057,7 +5693,9 @@
       "post": {
         "operationId": "validateInternalBusinesses",
         "summary": "Validate businesses exist and meet criteria",
-        "tags": ["Business Service"],
+        "tags": [
+          "Business Service"
+        ],
         "security": [
           {
             "apiKey": []
@@ -5088,7 +5726,9 @@
                     "default": false
                   }
                 },
-                "required": ["businessIds"],
+                "required": [
+                  "businessIds"
+                ],
                 "description": "Validate businesses exist and optionally check if active/verified"
               }
             }
@@ -5124,11 +5764,17 @@
                             "type": "string"
                           }
                         },
-                        "required": ["id", "reason"]
+                        "required": [
+                          "id",
+                          "reason"
+                        ]
                       }
                     }
                   },
-                  "required": ["valid", "invalid"],
+                  "required": [
+                    "valid",
+                    "invalid"
+                  ],
                   "description": "Validation results for businesses"
                 }
               }
@@ -5141,7 +5787,9 @@
       "post": {
         "operationId": "getInternalBusinessesByUser",
         "summary": "Get all businesses owned by a user",
-        "tags": ["Business Service"],
+        "tags": [
+          "Business Service"
+        ],
         "security": [
           {
             "apiKey": []
@@ -5172,7 +5820,10 @@
                   },
                   "sortOrder": {
                     "type": "string",
-                    "enum": ["asc", "desc"],
+                    "enum": [
+                      "asc",
+                      "desc"
+                    ],
                     "default": "desc",
                     "description": "Sort order"
                   },
@@ -5258,7 +5909,10 @@
                       "$ref": "#/components/schemas/PaginationMetadata"
                     }
                   },
-                  "required": ["data", "pagination"],
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
                   "description": "Paginated response"
                 }
               }
@@ -5271,7 +5925,9 @@
       "get": {
         "operationId": "getInternalBusinessById",
         "summary": "Get business details by ID",
-        "tags": ["Business Service"],
+        "tags": [
+          "Business Service"
+        ],
         "security": [
           {
             "apiKey": []
@@ -5361,7 +6017,9 @@
       "get": {
         "operationId": "getInternalBusinessesByCategory",
         "summary": "Get businesses in a specific category",
-        "tags": ["Business Service"],
+        "tags": [
+          "Business Service"
+        ],
         "security": [
           {
             "apiKey": []
@@ -5417,7 +6075,10 @@
           {
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "default": "desc",
               "description": "Sort order"
             },
@@ -5525,7 +6186,10 @@
                       "$ref": "#/components/schemas/PaginationMetadata"
                     }
                   },
-                  "required": ["data", "pagination"],
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
                   "description": "Paginated response"
                 }
               }
@@ -5538,7 +6202,9 @@
       "post": {
         "operationId": "checkInternalBusinessExists",
         "summary": "Check if business exists and is active",
-        "tags": ["Business Service"],
+        "tags": [
+          "Business Service"
+        ],
         "security": [
           {
             "apiKey": []
@@ -5556,7 +6222,9 @@
                     "description": "Universally Unique Identifier"
                   }
                 },
-                "required": ["businessId"],
+                "required": [
+                  "businessId"
+                ],
                 "description": "Check if business exists and is active"
               }
             }
@@ -5626,7 +6294,9 @@
                       "description": "Internal business data for services"
                     }
                   },
-                  "required": ["exists"],
+                  "required": [
+                    "exists"
+                  ],
                   "description": "Business existence check result"
                 }
               }
@@ -5639,7 +6309,9 @@
       "post": {
         "operationId": "bulkGetInternalCategories",
         "summary": "Get multiple categories by IDs",
-        "tags": ["Category Service"],
+        "tags": [
+          "Category Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -5662,7 +6334,9 @@
                     "maxItems": 100
                   }
                 },
-                "required": ["categoryIds"],
+                "required": [
+                  "categoryIds"
+                ],
                 "description": "Get multiple categories by IDs"
               }
             }
@@ -5707,7 +6381,12 @@
                             "type": "integer"
                           }
                         },
-                        "required": ["id", "name", "isActive", "sortOrder"],
+                        "required": [
+                          "id",
+                          "name",
+                          "isActive",
+                          "sortOrder"
+                        ],
                         "description": "Internal category data for services"
                       },
                       "description": "Page items"
@@ -5716,7 +6395,10 @@
                       "$ref": "#/components/schemas/PaginationMetadata"
                     }
                   },
-                  "required": ["data", "pagination"],
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
                   "description": "Paginated response"
                 }
               }
@@ -5729,7 +6411,9 @@
       "post": {
         "operationId": "validateInternalCategories",
         "summary": "Validate categories exist and are active",
-        "tags": ["Category Service"],
+        "tags": [
+          "Category Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -5756,7 +6440,9 @@
                     "default": true
                   }
                 },
-                "required": ["categoryIds"],
+                "required": [
+                  "categoryIds"
+                ],
                 "description": "Validate categories exist and optionally check if active"
               }
             }
@@ -5804,7 +6490,10 @@
                       "description": "Individual validation results"
                     }
                   },
-                  "required": ["valid", "results"],
+                  "required": [
+                    "valid",
+                    "results"
+                  ],
                   "description": "Validation results for categories"
                 }
               }
@@ -5817,7 +6506,9 @@
       "post": {
         "operationId": "checkInternalCategoryExists",
         "summary": "Check if category exists",
-        "tags": ["Category Service"],
+        "tags": [
+          "Category Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -5835,7 +6526,9 @@
                     "description": "Universally Unique Identifier"
                   }
                 },
-                "required": ["categoryId"],
+                "required": [
+                  "categoryId"
+                ],
                 "description": "Check if category exists and is active"
               }
             }
@@ -5884,11 +6577,18 @@
                           "type": "integer"
                         }
                       },
-                      "required": ["id", "name", "isActive", "sortOrder"],
+                      "required": [
+                        "id",
+                        "name",
+                        "isActive",
+                        "sortOrder"
+                      ],
                       "description": "Internal category data for services"
                     }
                   },
-                  "required": ["exists"],
+                  "required": [
+                    "exists"
+                  ],
                   "description": "Category existence check result"
                 }
               }
@@ -5901,7 +6601,9 @@
       "get": {
         "operationId": "getInternalCategoryHierarchy",
         "summary": "Get category hierarchy for internal use",
-        "tags": ["Category Service"],
+        "tags": [
+          "Category Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -5956,12 +6658,19 @@
                             "type": "integer"
                           }
                         },
-                        "required": ["id", "name", "isActive", "sortOrder"],
+                        "required": [
+                          "id",
+                          "name",
+                          "isActive",
+                          "sortOrder"
+                        ],
                         "description": "Internal category data for services"
                       }
                     }
                   },
-                  "required": ["data"],
+                  "required": [
+                    "data"
+                  ],
                   "description": "Category hierarchy for internal use"
                 }
               }
@@ -5974,7 +6683,9 @@
       "get": {
         "operationId": "getInternalCategoryList",
         "summary": "Get internal category list",
-        "tags": ["Category Service"],
+        "tags": [
+          "Category Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6029,7 +6740,12 @@
                             "type": "integer"
                           }
                         },
-                        "required": ["id", "name", "isActive", "sortOrder"],
+                        "required": [
+                          "id",
+                          "name",
+                          "isActive",
+                          "sortOrder"
+                        ],
                         "description": "Internal category data for services"
                       },
                       "description": "Page items"
@@ -6038,7 +6754,10 @@
                       "$ref": "#/components/schemas/PaginationMetadata"
                     }
                   },
-                  "required": ["data", "pagination"],
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
                   "description": "Paginated response"
                 }
               }
@@ -6051,7 +6770,9 @@
       "post": {
         "operationId": "createInternalFile",
         "summary": "Create file record",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6082,13 +6803,23 @@
                   },
                   "fileType": {
                     "type": "string",
-                    "enum": ["image", "video", "document", "audio", "other"],
+                    "enum": [
+                      "image",
+                      "video",
+                      "document",
+                      "audio",
+                      "other"
+                    ],
                     "description": "File type category",
                     "example": "image"
                   },
                   "provider": {
                     "type": "string",
-                    "enum": ["awsS3", "local", "minio"],
+                    "enum": [
+                      "awsS3",
+                      "local",
+                      "minio"
+                    ],
                     "description": "Supported storage provider",
                     "example": "awsS3"
                   },
@@ -6155,7 +6886,13 @@
                     },
                     "fileType": {
                       "type": "string",
-                      "enum": ["image", "video", "document", "audio", "other"],
+                      "enum": [
+                        "image",
+                        "video",
+                        "document",
+                        "audio",
+                        "other"
+                      ],
                       "description": "File type category",
                       "example": "image"
                     },
@@ -6174,7 +6911,11 @@
                     },
                     "provider": {
                       "type": "string",
-                      "enum": ["awsS3", "local", "minio"],
+                      "enum": [
+                        "awsS3",
+                        "local",
+                        "minio"
+                      ],
                       "description": "Supported storage provider",
                       "example": "awsS3"
                     },
@@ -6235,7 +6976,9 @@
       "get": {
         "operationId": "getInternalFileById",
         "summary": "Get file record by ID",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6286,7 +7029,13 @@
                     },
                     "fileType": {
                       "type": "string",
-                      "enum": ["image", "video", "document", "audio", "other"],
+                      "enum": [
+                        "image",
+                        "video",
+                        "document",
+                        "audio",
+                        "other"
+                      ],
                       "description": "File type category",
                       "example": "image"
                     },
@@ -6305,7 +7054,11 @@
                     },
                     "provider": {
                       "type": "string",
-                      "enum": ["awsS3", "local", "minio"],
+                      "enum": [
+                        "awsS3",
+                        "local",
+                        "minio"
+                      ],
                       "description": "Supported storage provider",
                       "example": "awsS3"
                     },
@@ -6392,7 +7145,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["field", "message"]
+                        "required": [
+                          "field",
+                          "message"
+                        ]
                       }
                     },
                     "correlationId": {
@@ -6406,7 +7162,11 @@
                       "description": "ISO 8601 datetime with timezone"
                     }
                   },
-                  "required": ["statusCode", "error", "message"]
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ]
                 }
               }
             }
@@ -6418,7 +7178,9 @@
       "delete": {
         "operationId": "bulkDeleteInternalFiles",
         "summary": "Bulk delete files",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6449,7 +7211,9 @@
                     "type": "string"
                   }
                 },
-                "required": ["fileIds"],
+                "required": [
+                  "fileIds"
+                ],
                 "description": "Internal bulk delete files request"
               }
             }
@@ -6485,7 +7249,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["fileId", "error"]
+                        "required": [
+                          "fileId",
+                          "error"
+                        ]
                       }
                     },
                     "totalDeleted": {
@@ -6515,7 +7282,9 @@
       "post": {
         "operationId": "getInternalUserFiles",
         "summary": "Get files for a user",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6533,7 +7302,13 @@
                   },
                   "fileType": {
                     "type": "string",
-                    "enum": ["image", "video", "document", "audio", "other"],
+                    "enum": [
+                      "image",
+                      "video",
+                      "document",
+                      "audio",
+                      "other"
+                    ],
                     "description": "File type category",
                     "example": "image"
                   },
@@ -6562,7 +7337,9 @@
                     "default": 0
                   }
                 },
-                "required": ["userId"],
+                "required": [
+                  "userId"
+                ],
                 "description": "Get files for a specific user"
               }
             }
@@ -6627,7 +7404,11 @@
                       },
                       "provider": {
                         "type": "string",
-                        "enum": ["awsS3", "local", "minio"],
+                        "enum": [
+                          "awsS3",
+                          "local",
+                          "minio"
+                        ],
                         "description": "Supported storage provider",
                         "example": "awsS3"
                       },
@@ -6689,7 +7470,9 @@
       "get": {
         "operationId": "getInternalUserFileSummary",
         "summary": "Get user file summary",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6811,7 +7594,9 @@
       "post": {
         "operationId": "checkInternalUserQuota",
         "summary": "Check user storage quota",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6833,12 +7618,21 @@
                   },
                   "fileType": {
                     "type": "string",
-                    "enum": ["image", "video", "document", "audio", "other"],
+                    "enum": [
+                      "image",
+                      "video",
+                      "document",
+                      "audio",
+                      "other"
+                    ],
                     "description": "File type category",
                     "example": "image"
                   }
                 },
-                "required": ["userId", "fileSize"],
+                "required": [
+                  "userId",
+                  "fileSize"
+                ],
                 "description": "Check if user can upload file within quota"
               }
             }
@@ -6907,7 +7701,9 @@
       "post": {
         "operationId": "migrateInternalFile",
         "summary": "Migrate file between providers",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -6926,7 +7722,11 @@
                   },
                   "targetProvider": {
                     "type": "string",
-                    "enum": ["awsS3", "local", "minio"],
+                    "enum": [
+                      "awsS3",
+                      "local",
+                      "minio"
+                    ],
                     "description": "Supported storage provider",
                     "example": "awsS3"
                   },
@@ -6941,7 +7741,10 @@
                     "default": true
                   }
                 },
-                "required": ["fileId", "targetProvider"],
+                "required": [
+                  "fileId",
+                  "targetProvider"
+                ],
                 "description": "Migrate file between storage providers"
               }
             }
@@ -6962,13 +7765,21 @@
                     },
                     "oldProvider": {
                       "type": "string",
-                      "enum": ["awsS3", "local", "minio"],
+                      "enum": [
+                        "awsS3",
+                        "local",
+                        "minio"
+                      ],
                       "description": "Supported storage provider",
                       "example": "awsS3"
                     },
                     "newProvider": {
                       "type": "string",
-                      "enum": ["awsS3", "local", "minio"],
+                      "enum": [
+                        "awsS3",
+                        "local",
+                        "minio"
+                      ],
                       "description": "Supported storage provider",
                       "example": "awsS3"
                     },
@@ -6980,7 +7791,11 @@
                     },
                     "migrationStatus": {
                       "type": "string",
-                      "enum": ["success", "failed", "partial"]
+                      "enum": [
+                        "success",
+                        "failed",
+                        "partial"
+                      ]
                     },
                     "error": {
                       "type": "string"
@@ -7012,7 +7827,9 @@
       "post": {
         "operationId": "cleanupInternalOrphanedFiles",
         "summary": "Cleanup orphaned files",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -7035,7 +7852,11 @@
                   },
                   "provider": {
                     "type": "string",
-                    "enum": ["awsS3", "local", "minio"],
+                    "enum": [
+                      "awsS3",
+                      "local",
+                      "minio"
+                    ],
                     "description": "Supported storage provider",
                     "example": "awsS3"
                   },
@@ -7046,7 +7867,9 @@
                     "default": 100
                   }
                 },
-                "required": ["olderThan"],
+                "required": [
+                  "olderThan"
+                ],
                 "description": "Cleanup orphaned files request"
               }
             }
@@ -7102,7 +7925,9 @@
       "get": {
         "operationId": "getInternalStorageHealth",
         "summary": "Storage service health check",
-        "tags": ["Storage Service"],
+        "tags": [
+          "Storage Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -7118,11 +7943,17 @@
                   "properties": {
                     "service": {
                       "type": "string",
-                      "enum": ["storage"]
+                      "enum": [
+                        "storage"
+                      ]
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["healthy", "degraded", "unhealthy"],
+                      "enum": [
+                        "healthy",
+                        "degraded",
+                        "unhealthy"
+                      ],
                       "description": "System health status",
                       "example": "healthy"
                     },
@@ -7135,19 +7966,31 @@
                       "properties": {
                         "awsS3": {
                           "type": "string",
-                          "enum": ["healthy", "degraded", "unhealthy"],
+                          "enum": [
+                            "healthy",
+                            "degraded",
+                            "unhealthy"
+                          ],
                           "description": "System health status",
                           "example": "healthy"
                         },
                         "local": {
                           "type": "string",
-                          "enum": ["healthy", "degraded", "unhealthy"],
+                          "enum": [
+                            "healthy",
+                            "degraded",
+                            "unhealthy"
+                          ],
                           "description": "System health status",
                           "example": "healthy"
                         },
                         "minio": {
                           "type": "string",
-                          "enum": ["healthy", "degraded", "unhealthy"],
+                          "enum": [
+                            "healthy",
+                            "degraded",
+                            "unhealthy"
+                          ],
                           "description": "System health status",
                           "example": "healthy"
                         }
@@ -7188,7 +8031,9 @@
       "post": {
         "operationId": "bulkGetInternalVouchers",
         "summary": "Get multiple vouchers by IDs",
-        "tags": ["Voucher Service"],
+        "tags": [
+          "Voucher Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -7216,7 +8061,9 @@
                     "description": "Comma-separated relations: business,category,codes"
                   }
                 },
-                "required": ["voucherIds"],
+                "required": [
+                  "voucherIds"
+                ],
                 "description": "Batch fetch vouchers by IDs"
               }
             }
@@ -7277,11 +8124,16 @@
                             "default": "PYG"
                           },
                           "location": {
-                            "type": ["object", "null"],
+                            "type": [
+                              "object",
+                              "null"
+                            ],
                             "properties": {
                               "type": {
                                 "type": "string",
-                                "enum": ["Point"]
+                                "enum": [
+                                  "Point"
+                                ]
                               },
                               "coordinates": {
                                 "type": "array",
@@ -7300,10 +8152,16 @@
                                 "description": "[longitude, latitude] - GeoJSON standard"
                               }
                             },
-                            "required": ["type", "coordinates"]
+                            "required": [
+                              "type",
+                              "coordinates"
+                            ]
                           },
                           "imageUrl": {
-                            "type": ["string", "null"],
+                            "type": [
+                              "string",
+                              "null"
+                            ],
                             "format": "uri"
                           },
                           "validFrom": {
@@ -7317,7 +8175,10 @@
                             "description": "ISO 8601 datetime with timezone"
                           },
                           "maxRedemptions": {
-                            "type": ["integer", "null"]
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
                           },
                           "maxRedemptionsPerUser": {
                             "type": "integer",
@@ -7336,11 +8197,17 @@
                             "default": 0
                           },
                           "metadata": {
-                            "type": ["object", "null"],
+                            "type": [
+                              "object",
+                              "null"
+                            ],
                             "additionalProperties": {}
                           },
                           "deletedAt": {
-                            "type": ["string", "null"],
+                            "type": [
+                              "string",
+                              "null"
+                            ],
                             "format": "date-time",
                             "description": "ISO 8601 datetime with timezone"
                           },
@@ -7356,7 +8223,10 @@
                                 "type": "string"
                               }
                             },
-                            "required": ["id", "name"],
+                            "required": [
+                              "id",
+                              "name"
+                            ],
                             "description": "Complete business object when ?include=business"
                           },
                           "category": {
@@ -7371,7 +8241,10 @@
                                 "type": "string"
                               }
                             },
-                            "required": ["id", "name"],
+                            "required": [
+                              "id",
+                              "name"
+                            ],
                             "description": "Complete category object when ?include=category"
                           },
                           "codes": {
@@ -7395,7 +8268,10 @@
                                   "type": "boolean"
                                 },
                                 "metadata": {
-                                  "type": ["object", "null"],
+                                  "type": [
+                                    "object",
+                                    "null"
+                                  ],
                                   "additionalProperties": {}
                                 },
                                 "createdAt": {
@@ -7445,7 +8321,10 @@
                                   "description": "ISO 8601 datetime with timezone"
                                 },
                                 "metadata": {
-                                  "type": ["object", "null"],
+                                  "type": [
+                                    "object",
+                                    "null"
+                                  ],
                                   "additionalProperties": {}
                                 },
                                 "createdAt": {
@@ -7476,7 +8355,10 @@
                                   "description": "Universally Unique Identifier"
                                 },
                                 "userId": {
-                                  "type": ["string", "null"],
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
                                   "format": "uuid",
                                   "description": "Universally Unique Identifier"
                                 },
@@ -7487,11 +8369,16 @@
                                   "$ref": "#/components/schemas/VoucherScanSource"
                                 },
                                 "location": {
-                                  "type": ["object", "null"],
+                                  "type": [
+                                    "object",
+                                    "null"
+                                  ],
                                   "properties": {
                                     "type": {
                                       "type": "string",
-                                      "enum": ["Point"]
+                                      "enum": [
+                                        "Point"
+                                      ]
                                     },
                                     "coordinates": {
                                       "type": "array",
@@ -7510,7 +8397,10 @@
                                       "description": "[longitude, latitude] - GeoJSON standard"
                                     }
                                   },
-                                  "required": ["type", "coordinates"]
+                                  "required": [
+                                    "type",
+                                    "coordinates"
+                                  ]
                                 },
                                 "deviceInfo": {
                                   "type": "object",
@@ -7564,11 +8454,17 @@
                                   "$ref": "#/components/schemas/CustomerVoucherStatus"
                                 },
                                 "notificationPreferences": {
-                                  "type": ["object", "null"],
+                                  "type": [
+                                    "object",
+                                    "null"
+                                  ],
                                   "additionalProperties": {}
                                 },
                                 "redeemedAt": {
-                                  "type": ["string", "null"],
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ],
                                   "format": "date-time",
                                   "description": "ISO 8601 datetime with timezone"
                                 },
@@ -7608,7 +8504,10 @@
                             "maximum": 1
                           },
                           "daysUntilExpiry": {
-                            "type": ["integer", "null"]
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
                           },
                           "createdAt": {
                             "type": "string",
@@ -7660,7 +8559,11 @@
                       "description": "IDs of vouchers that were not found"
                     }
                   },
-                  "required": ["data", "pagination", "notFound"],
+                  "required": [
+                    "data",
+                    "pagination",
+                    "notFound"
+                  ],
                   "description": "Batch fetch vouchers response with pagination metadata"
                 }
               }
@@ -7673,7 +8576,9 @@
       "post": {
         "operationId": "validateInternalVoucher",
         "summary": "Validate voucher availability",
-        "tags": ["Voucher Service"],
+        "tags": [
+          "Voucher Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -7711,7 +8616,9 @@
                     "description": "Check if voucher is in valid state"
                   }
                 },
-                "required": ["voucherId"],
+                "required": [
+                  "voucherId"
+                ],
                 "description": "Validate voucher availability and constraints"
               }
             }
@@ -7777,11 +8684,16 @@
                           "default": "PYG"
                         },
                         "location": {
-                          "type": ["object", "null"],
+                          "type": [
+                            "object",
+                            "null"
+                          ],
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": ["Point"]
+                              "enum": [
+                                "Point"
+                              ]
                             },
                             "coordinates": {
                               "type": "array",
@@ -7800,10 +8712,16 @@
                               "description": "[longitude, latitude] - GeoJSON standard"
                             }
                           },
-                          "required": ["type", "coordinates"]
+                          "required": [
+                            "type",
+                            "coordinates"
+                          ]
                         },
                         "imageUrl": {
-                          "type": ["string", "null"],
+                          "type": [
+                            "string",
+                            "null"
+                          ],
                           "format": "uri"
                         },
                         "validFrom": {
@@ -7817,7 +8735,10 @@
                           "description": "ISO 8601 datetime with timezone"
                         },
                         "maxRedemptions": {
-                          "type": ["integer", "null"]
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
                         },
                         "maxRedemptionsPerUser": {
                           "type": "integer",
@@ -7836,11 +8757,17 @@
                           "default": 0
                         },
                         "metadata": {
-                          "type": ["object", "null"],
+                          "type": [
+                            "object",
+                            "null"
+                          ],
                           "additionalProperties": {}
                         },
                         "deletedAt": {
-                          "type": ["string", "null"],
+                          "type": [
+                            "string",
+                            "null"
+                          ],
                           "format": "date-time",
                           "description": "ISO 8601 datetime with timezone"
                         },
@@ -7856,7 +8783,10 @@
                               "type": "string"
                             }
                           },
-                          "required": ["id", "name"],
+                          "required": [
+                            "id",
+                            "name"
+                          ],
                           "description": "Complete business object when ?include=business"
                         },
                         "category": {
@@ -7871,7 +8801,10 @@
                               "type": "string"
                             }
                           },
-                          "required": ["id", "name"],
+                          "required": [
+                            "id",
+                            "name"
+                          ],
                           "description": "Complete category object when ?include=category"
                         },
                         "codes": {
@@ -7895,7 +8828,10 @@
                                 "type": "boolean"
                               },
                               "metadata": {
-                                "type": ["object", "null"],
+                                "type": [
+                                  "object",
+                                  "null"
+                                ],
                                 "additionalProperties": {}
                               },
                               "createdAt": {
@@ -7945,7 +8881,10 @@
                                 "description": "ISO 8601 datetime with timezone"
                               },
                               "metadata": {
-                                "type": ["object", "null"],
+                                "type": [
+                                  "object",
+                                  "null"
+                                ],
                                 "additionalProperties": {}
                               },
                               "createdAt": {
@@ -7976,7 +8915,10 @@
                                 "description": "Universally Unique Identifier"
                               },
                               "userId": {
-                                "type": ["string", "null"],
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
                                 "format": "uuid",
                                 "description": "Universally Unique Identifier"
                               },
@@ -7987,11 +8929,16 @@
                                 "$ref": "#/components/schemas/VoucherScanSource"
                               },
                               "location": {
-                                "type": ["object", "null"],
+                                "type": [
+                                  "object",
+                                  "null"
+                                ],
                                 "properties": {
                                   "type": {
                                     "type": "string",
-                                    "enum": ["Point"]
+                                    "enum": [
+                                      "Point"
+                                    ]
                                   },
                                   "coordinates": {
                                     "type": "array",
@@ -8010,7 +8957,10 @@
                                     "description": "[longitude, latitude] - GeoJSON standard"
                                   }
                                 },
-                                "required": ["type", "coordinates"]
+                                "required": [
+                                  "type",
+                                  "coordinates"
+                                ]
                               },
                               "deviceInfo": {
                                 "type": "object",
@@ -8064,11 +9014,17 @@
                                 "$ref": "#/components/schemas/CustomerVoucherStatus"
                               },
                               "notificationPreferences": {
-                                "type": ["object", "null"],
+                                "type": [
+                                  "object",
+                                  "null"
+                                ],
                                 "additionalProperties": {}
                               },
                               "redeemedAt": {
-                                "type": ["string", "null"],
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
                                 "format": "date-time",
                                 "description": "ISO 8601 datetime with timezone"
                               },
@@ -8108,7 +9064,10 @@
                           "maximum": 1
                         },
                         "daysUntilExpiry": {
-                          "type": ["integer", "null"]
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
                         },
                         "createdAt": {
                           "type": "string",
@@ -8147,7 +9106,9 @@
                       "description": "Voucher details if valid"
                     }
                   },
-                  "required": ["isValid"],
+                  "required": [
+                    "isValid"
+                  ],
                   "description": "Voucher validation result"
                 }
               }
@@ -8160,7 +9121,9 @@
       "post": {
         "operationId": "validateInternalToken",
         "summary": "Validate JWT token",
-        "tags": ["Auth Service"],
+        "tags": [
+          "Auth Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -8187,7 +9150,9 @@
                     }
                   }
                 },
-                "required": ["token"],
+                "required": [
+                  "token"
+                ],
                 "description": "Validate JWT token"
               }
             }
@@ -8253,7 +9218,11 @@
                       }
                     }
                   },
-                  "required": ["valid", "roles", "permissions"],
+                  "required": [
+                    "valid",
+                    "roles",
+                    "permissions"
+                  ],
                   "description": "Token validation result"
                 }
               }
@@ -8266,7 +9235,9 @@
       "post": {
         "operationId": "getInternalUserByEmail",
         "summary": "Get user by email",
-        "tags": ["Auth Service"],
+        "tags": [
+          "Auth Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -8284,7 +9255,9 @@
                     "format": "email"
                   }
                 },
-                "required": ["email"],
+                "required": [
+                  "email"
+                ],
                 "description": "Get user by email"
               }
             }
@@ -8376,7 +9349,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["field", "message"]
+                        "required": [
+                          "field",
+                          "message"
+                        ]
                       }
                     },
                     "correlationId": {
@@ -8390,7 +9366,11 @@
                       "description": "ISO 8601 datetime with timezone"
                     }
                   },
-                  "required": ["statusCode", "error", "message"]
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ]
                 }
               }
             }
@@ -8402,7 +9382,9 @@
       "post": {
         "operationId": "sendInternalSystemNotification",
         "summary": "Send system notification",
-        "tags": ["Communication Service"],
+        "tags": [
+          "Communication Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -8448,16 +9430,28 @@
                   },
                   "priority": {
                     "type": "string",
-                    "enum": ["low", "normal", "high", "urgent"],
+                    "enum": [
+                      "low",
+                      "normal",
+                      "high",
+                      "urgent"
+                    ],
                     "default": "normal"
                   },
                   "channels": {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": ["email", "inApp", "sms", "push"]
+                      "enum": [
+                        "email",
+                        "inApp",
+                        "sms",
+                        "push"
+                      ]
                     },
-                    "default": ["inApp"]
+                    "default": [
+                      "inApp"
+                    ]
                   },
                   "templateId": {
                     "type": "string"
@@ -8480,7 +9474,11 @@
                     "additionalProperties": {}
                   }
                 },
-                "required": ["title", "message", "category"],
+                "required": [
+                  "title",
+                  "message",
+                  "category"
+                ],
                 "description": "Send system notification"
               }
             }
@@ -8517,7 +9515,10 @@
                             "minimum": 0
                           }
                         },
-                        "required": ["sent", "failed"]
+                        "required": [
+                          "sent",
+                          "failed"
+                        ]
                       }
                     },
                     "timestamp": {
@@ -8544,7 +9545,9 @@
       "post": {
         "operationId": "sendInternalTransactionalEmail",
         "summary": "Send transactional email",
-        "tags": ["Communication Service"],
+        "tags": [
+          "Communication Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -8610,7 +9613,11 @@
                           "type": "string"
                         }
                       },
-                      "required": ["filename", "content", "contentType"]
+                      "required": [
+                        "filename",
+                        "content",
+                        "contentType"
+                      ]
                     }
                   },
                   "sendAt": {
@@ -8627,7 +9634,11 @@
                     "default": true
                   }
                 },
-                "required": ["userId", "templateKey", "variables"],
+                "required": [
+                  "userId",
+                  "templateKey",
+                  "variables"
+                ],
                 "description": "Send transactional email"
               }
             }
@@ -8665,7 +9676,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["messageId", "status"],
+                  "required": [
+                    "messageId",
+                    "status"
+                  ],
                   "description": "Transactional email result"
                 }
               }
@@ -8678,7 +9692,9 @@
       "get": {
         "operationId": "getInternalUserById",
         "summary": "Get user details",
-        "tags": ["User Service"],
+        "tags": [
+          "User Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -8729,7 +9745,11 @@
                     },
                     "role": {
                       "type": "string",
-                      "enum": ["admin", "customer", "business"],
+                      "enum": [
+                        "admin",
+                        "customer",
+                        "business"
+                      ],
                       "description": "User role in the system",
                       "example": "customer"
                     },
@@ -8830,7 +9850,10 @@
                             "type": "string"
                           }
                         },
-                        "required": ["field", "message"]
+                        "required": [
+                          "field",
+                          "message"
+                        ]
                       }
                     },
                     "correlationId": {
@@ -8844,7 +9867,11 @@
                       "description": "ISO 8601 datetime with timezone"
                     }
                   },
-                  "required": ["statusCode", "error", "message"]
+                  "required": [
+                    "statusCode",
+                    "error",
+                    "message"
+                  ]
                 }
               }
             }
@@ -8856,7 +9883,9 @@
       "post": {
         "operationId": "batchGetInternalUsers",
         "summary": "Get multiple users",
-        "tags": ["User Service"],
+        "tags": [
+          "User Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -8885,7 +9914,9 @@
                     "description": "Specific fields to return"
                   }
                 },
-                "required": ["userIds"],
+                "required": [
+                  "userIds"
+                ],
                 "description": "Get multiple users by ID"
               }
             }
@@ -8927,7 +9958,11 @@
                       },
                       "role": {
                         "type": "string",
-                        "enum": ["admin", "customer", "business"],
+                        "enum": [
+                          "admin",
+                          "customer",
+                          "business"
+                        ],
                         "description": "User role in the system",
                         "example": "customer"
                       },
@@ -9003,7 +10038,9 @@
       "post": {
         "operationId": "updateInternalUserMembership",
         "summary": "Update user membership status",
-        "tags": ["Subscription Service"],
+        "tags": [
+          "Subscription Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -9073,7 +10110,10 @@
                     }
                   }
                 },
-                "required": ["stripeSubscriptionId", "status"],
+                "required": [
+                  "stripeSubscriptionId",
+                  "status"
+                ],
                 "description": "Update subscription from payment service"
               }
             }
@@ -9092,7 +10132,9 @@
                       "description": "Success message"
                     }
                   },
-                  "required": ["message"]
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }
@@ -9104,7 +10146,9 @@
       "post": {
         "operationId": "createInternalSubscriptionFromStripe",
         "summary": "Create subscription from Stripe",
-        "tags": ["Subscription Service"],
+        "tags": [
+          "Subscription Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -9120,7 +10164,9 @@
                     "type": "string"
                   }
                 },
-                "required": ["stripeSubscriptionId"],
+                "required": [
+                  "stripeSubscriptionId"
+                ],
                 "description": "Get subscription by Stripe ID"
               }
             }
@@ -9141,7 +10187,10 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "status"]
+                  "required": [
+                    "id",
+                    "status"
+                  ]
                 }
               }
             }
@@ -9153,7 +10202,9 @@
       "put": {
         "operationId": "updateInternalSubscriptionStatus",
         "summary": "Update subscription status",
-        "tags": ["Subscription Service"],
+        "tags": [
+          "Subscription Service"
+        ],
         "security": [
           {
             "x-api-key": []
@@ -9197,13 +10248,19 @@
                         "type": "number"
                       }
                     },
-                    "required": ["type", "data", "created"]
+                    "required": [
+                      "type",
+                      "data",
+                      "created"
+                    ]
                   },
                   "stripeSignature": {
                     "type": "string"
                   }
                 },
-                "required": ["event"],
+                "required": [
+                  "event"
+                ],
                 "description": "Process subscription webhook event"
               }
             }
@@ -9222,7 +10279,9 @@
                       "description": "Success message"
                     }
                   },
-                  "required": ["message"]
+                  "required": [
+                    "message"
+                  ]
                 }
               }
             }

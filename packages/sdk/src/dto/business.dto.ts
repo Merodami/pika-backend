@@ -42,6 +42,8 @@ export interface BusinessDTO {
   createdAt: string
   updatedAt: string
   deletedAt: string | null
+  // Convenience field for logo from businessDetails
+  logoUrl?: string | null
   // Optional relations
   user?: UserDTO
   category?: CategoryDTO

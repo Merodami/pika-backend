@@ -184,6 +184,25 @@ export async function createTestCategory(
 ) {
   const categorySlug = `test-category-${uuid().substring(0, 8)}`
 
+  // Ensure the admin user exists in the database
+  const existingUser = await prismaClient.user.findUnique({
+    where: { id: adminUserId },
+  })
+
+  if (!existingUser) {
+    await prismaClient.user.create({
+      data: {
+        id: adminUserId,
+        email: `admin-${adminUserId.substring(0, 8)}@test.com`,
+        firstName: 'Test',
+        lastName: 'Admin',
+        role: 'admin',
+        status: 'active',
+        emailVerified: true,
+      },
+    })
+  }
+
   return await prismaClient.category.create({
     data: {
       nameKey: `category.name.${uuid()}`,

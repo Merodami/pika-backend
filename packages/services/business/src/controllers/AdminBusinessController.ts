@@ -10,6 +10,7 @@ import {
 import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import {
   adaptMulterFile,
+  getRequestLanguage,
   getValidatedQuery,
   paginatedResponse,
   validateResponse,
@@ -74,13 +75,18 @@ export class AdminBusinessController {
           'user',
           'category',
           'businessRegistration',
+          'businessDetails',
         ]),
       }
 
-      const result = await this.businessService.getAllBusinesses(params)
+      const language = getRequestLanguage(req)
+      const result = await this.businessService.getAllBusinesses(
+        params,
+        language,
+      )
 
       // Use paginatedResponse utility + validation
-      const response = paginatedResponse(result, BusinessMapper.toDTO)
+      const response = paginatedResponse(result, BusinessMapper.toAdminDTO)
       const validatedResponse = validateResponse(
         businessAdmin.AdminBusinessListResponse,
         response,
@@ -107,15 +113,21 @@ export class AdminBusinessController {
       const query =
         getValidatedQuery<businessAdmin.AdminBusinessQueryParams>(req)
 
-      const includes = parseIncludeParam(query.include, ['user', 'category'])
+      const includes = parseIncludeParam(query.include, [
+        'user',
+        'category',
+        'businessDetails',
+      ])
+      const language = getRequestLanguage(req)
 
       const business = await this.businessService.getBusinessById(
         businessId,
         includes,
+        language,
       )
 
-      // Transform to DTO
-      const response = BusinessMapper.toDTO(business)
+      // Transform to DTO - use toAdminDTO for admin endpoints
+      const response = BusinessMapper.toAdminDTO(business)
 
       // Validate response against Zod schema
       const validatedResponse = validateResponse(

@@ -148,6 +148,20 @@ describe('User Service - Favorites Public API Integration Tests', () => {
       'Creating test category, businesses and vouchers for favorites...',
     )
 
+    // Create admin user for category creation
+    const adminUserId = uuid()
+    await testDb.prisma.user.create({
+      data: {
+        id: adminUserId,
+        email: `admin-${adminUserId.substring(0, 8)}@test.com`,
+        firstName: 'Test',
+        lastName: 'Admin',
+        role: 'admin',
+        status: 'active',
+        emailVerified: true,
+      },
+    })
+
     // Create a test category (don't set id, let database generate it, use UUID for createdBy)
     testCategory = await testDb.prisma.category.create({
       data: {
@@ -159,7 +173,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
         path: '/test-favorites',
         sortOrder: 1,
         isActive: true,
-        createdBy: uuid(), // createdBy must be a valid UUID
+        createdBy: adminUserId, // createdBy must be a valid UUID
       },
     })
 

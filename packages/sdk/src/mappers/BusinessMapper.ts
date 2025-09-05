@@ -129,15 +129,19 @@ export class BusinessMapper {
 
   /**
    * Maps a domain entity to an Admin API DTO
-   * Admin responses include translation keys for internal management
+   * Admin responses include resolved translations when available
    */
   static toAdminDTO(domain: BusinessDomain): any {
     return {
       id: domain.id,
       userId: domain.userId,
-      // Admin endpoints should show translation keys for internal management
-      businessName: domain.businessNameKey,
-      businessDescription: domain.businessDescriptionKey || undefined,
+      // Use resolved translations when available (populated by TranslationResolver)
+      // Falls back to translation keys if translations weren't resolved
+      businessName: domain.businessName || domain.businessNameKey,
+      businessDescription:
+        domain.businessDescription ||
+        domain.businessDescriptionKey ||
+        undefined,
       categoryId: domain.categoryId,
       verified: domain.verified,
       active: domain.active,
@@ -148,10 +152,15 @@ export class BusinessMapper {
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
       deletedAt: domain.deletedAt ? formatDateToISO(domain.deletedAt) : null,
+      // Include logoUrl from businessDetails if available
+      logoUrl: domain.businessDetails?.logoUrl || null,
       // Relations using existing mappers
       user: domain.user ? UserMapper.toAdminDTO(domain.user) : undefined,
       category: domain.category
         ? CategoryMapper.toDTO(domain.category)
+        : undefined,
+      businessDetails: domain.businessDetails
+        ? BusinessMapper.toBusinessDetailsDTO(domain.businessDetails)
         : undefined,
       businessRegistration: domain.businessRegistration
         ? {
@@ -185,6 +194,8 @@ export class BusinessMapper {
       createdAt: formatDateToISO(domain.createdAt),
       updatedAt: formatDateToISO(domain.updatedAt),
       deletedAt: domain.deletedAt ? formatDateToISO(domain.deletedAt) : null,
+      // Include logoUrl from businessDetails if available
+      logoUrl: domain.businessDetails?.logoUrl || null,
       // Relations using existing mappers
       user: domain.user ? UserMapper.toDTO(domain.user) : undefined,
       category: domain.category
