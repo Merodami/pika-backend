@@ -22,12 +22,9 @@ export const Step1Request = z.object({
 /**
  * Step 1 request (OpenAPI documented)
  */
-export const Step1RequestSchema = openapi(
-  Step1Request,
-  {
-    description: 'Step 1: Business and category selection',
-  },
-)
+export const Step1RequestSchema = openapi(Step1Request, {
+  description: 'Step 1: Business and category selection',
+})
 
 export type Step1Request = z.infer<typeof Step1Request>
 
@@ -42,12 +39,9 @@ export const Step1Response = z.object({
 /**
  * Step 1 response (OpenAPI documented)
  */
-export const Step1ResponseSchema = openapi(
-  Step1Response,
-  {
-    description: 'Step 1 response data',
-  },
-)
+export const Step1ResponseSchema = openapi(Step1Response, {
+  description: 'Step 1 response data',
+})
 
 export type Step1Response = z.infer<typeof Step1Response>
 
@@ -71,12 +65,9 @@ export const Step2Request = z.object({
 /**
  * Step 2 request (OpenAPI documented)
  */
-export const Step2RequestSchema = openapi(
-  Step2Request,
-  {
-    description: 'Step 2: Multilingual content',
-  },
-)
+export const Step2RequestSchema = openapi(Step2Request, {
+  description: 'Step 2: Multilingual content',
+})
 
 export type Step2Request = z.infer<typeof Step2Request>
 
@@ -94,12 +85,9 @@ export const Step2Response = z.object({
 /**
  * Step 2 response (OpenAPI documented)
  */
-export const Step2ResponseSchema = openapi(
-  Step2Response,
-  {
-    description: 'Step 2 response data',
-  },
-)
+export const Step2ResponseSchema = openapi(Step2Response, {
+  description: 'Step 2 response data',
+})
 
 export type Step2Response = z.infer<typeof Step2Response>
 
@@ -127,12 +115,9 @@ export const Step3Request = z.object({
 /**
  * Step 3 request (OpenAPI documented)
  */
-export const Step3RequestSchema = openapi(
-  Step3Request,
-  {
-    description: 'Step 3: Discount configuration',
-  },
-)
+export const Step3RequestSchema = openapi(Step3Request, {
+  description: 'Step 3: Discount configuration',
+})
 
 export type Step3Request = z.infer<typeof Step3Request>
 
@@ -152,12 +137,9 @@ export const Step3Response = z.object({
 /**
  * Step 3 response (OpenAPI documented)
  */
-export const Step3ResponseSchema = openapi(
-  Step3Response,
-  {
-    description: 'Step 3 response data',
-  },
-)
+export const Step3ResponseSchema = openapi(Step3Response, {
+  description: 'Step 3 response data',
+})
 
 export type Step3Response = z.infer<typeof Step3Response>
 
@@ -186,12 +168,9 @@ export const Step4Request = z.object({
 /**
  * Step 4 request (OpenAPI documented)
  */
-export const Step4RequestSchema = openapi(
-  Step4Request,
-  {
-    description: 'Step 4: Validity and limits',
-  },
-)
+export const Step4RequestSchema = openapi(Step4Request, {
+  description: 'Step 4: Validity and limits',
+})
 
 export type Step4Request = z.infer<typeof Step4Request>
 
@@ -213,12 +192,9 @@ export const Step4Response = z.object({
 /**
  * Step 4 response (OpenAPI documented)
  */
-export const Step4ResponseSchema = openapi(
-  Step4Response,
-  {
-    description: 'Step 4 response data',
-  },
-)
+export const Step4ResponseSchema = openapi(Step4Response, {
+  description: 'Step 4 response data',
+})
 
 export type Step4Response = z.infer<typeof Step4Response>
 
@@ -248,12 +224,9 @@ export const Step5Request = z.object({
 /**
  * Step 5 request (OpenAPI documented)
  */
-export const Step5RequestSchema = openapi(
-  Step5Request,
-  {
-    description: 'Step 5: Media and targeting (optional)',
-  },
-)
+export const Step5RequestSchema = openapi(Step5Request, {
+  description: 'Step 5: Media and targeting (optional)',
+})
 
 export type Step5Request = z.infer<typeof Step5Request>
 
@@ -271,12 +244,9 @@ export const Step5Response = z.object({
 /**
  * Step 5 response (OpenAPI documented)
  */
-export const Step5ResponseSchema = openapi(
-  Step5Response,
-  {
-    description: 'Step 5 response data',
-  },
-)
+export const Step5ResponseSchema = openapi(Step5Response, {
+  description: 'Step 5 response data',
+})
 
 export type Step5Response = z.infer<typeof Step5Response>
 
@@ -294,12 +264,9 @@ export const UpdateStepRequest = z.union([
 /**
  * Update step request (OpenAPI documented)
  */
-export const UpdateStepRequestSchema = openapi(
-  UpdateStepRequest,
-  {
-    description: 'Generic step update request',
-  },
-)
+export const UpdateStepRequestSchema = openapi(UpdateStepRequest, {
+  description: 'Generic step update request',
+})
 
 export type UpdateStepRequest = z.infer<typeof UpdateStepRequest>
 
@@ -317,12 +284,9 @@ export const UpdateStepResponse = z.object({
 /**
  * Update step response (OpenAPI documented)
  */
-export const UpdateStepResponseSchema = openapi(
-  UpdateStepResponse,
-  {
-    description: 'Step update result',
-  },
-)
+export const UpdateStepResponseSchema = openapi(UpdateStepResponse, {
+  description: 'Step update result',
+})
 
 export type UpdateStepResponse = z.infer<typeof UpdateStepResponse>
 
@@ -340,11 +304,8 @@ export const NavigationResponse = z.object({
 /**
  * Navigation response (OpenAPI documented)
  */
-export const NavigationResponseSchema = openapi(
-  NavigationResponse,
-  {
-    description: 'Wizard navigation state',
-  },
-)
+export const NavigationResponseSchema = openapi(NavigationResponse, {
+  description: 'Wizard navigation state',
+})
 
 export type NavigationResponse = z.infer<typeof NavigationResponse>

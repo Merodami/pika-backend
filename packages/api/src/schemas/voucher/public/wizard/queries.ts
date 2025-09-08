@@ -18,11 +18,8 @@ export const GetUserDraftsQuery = SearchParams.extend({
 /**
  * Get user drafts query parameters (OpenAPI documented)
  */
-export const GetUserDraftsQuerySchema = openapi(
-  GetUserDraftsQuery,
-  {
-    description: 'Query parameters for listing user drafts',
-  },
-)
+export const GetUserDraftsQuerySchema = openapi(GetUserDraftsQuery, {
+  description: 'Query parameters for listing user drafts',
+})
 
 export type GetUserDraftsQuery = z.infer<typeof GetUserDraftsQuery>

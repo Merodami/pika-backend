@@ -49,7 +49,9 @@ export class TranslationClient {
     return this.translationService.setUserLanguage(userId, languageCode)
   }
 
-  async deleteMany(keys: string[]): Promise<{ deleted: number; errors: string[] }> {
+  async deleteMany(
+    keys: string[],
+  ): Promise<{ deleted: number; errors: string[] }> {
     return this.translationService.deleteMany(keys)
   }
 }

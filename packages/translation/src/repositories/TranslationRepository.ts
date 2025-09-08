@@ -161,6 +161,7 @@ export class TranslationRepository implements ITranslationRepository {
     const result = await this.prisma.translation.deleteMany({
       where: { key },
     })
+
     return result.count
   }
 

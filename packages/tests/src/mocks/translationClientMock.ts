@@ -130,10 +130,12 @@ export class MockTranslationClient {
   /**
    * Delete multiple translations by keys
    */
-  async deleteMany(keys: string[]): Promise<{ deleted: string[], errors: string[] }> {
+  async deleteMany(
+    keys: string[],
+  ): Promise<{ deleted: string[]; errors: string[] }> {
     const deleted: string[] = []
     const errors: string[] = []
-    
+
     for (const key of keys) {
       if (this.mockTranslations.has(key)) {
         this.mockTranslations.delete(key)
@@ -142,7 +144,7 @@ export class MockTranslationClient {
         errors.push(key)
       }
     }
-    
+
     return { deleted, errors }
   }
 

@@ -790,12 +790,9 @@ export const EntityRequest = z.object({
 /**
  * Entity request (OpenAPI documented) - for API documentation
  */
-export const EntityRequestSchema = openapi(
-  EntityRequest,
-  {
-    description: 'Request to create or update entity',
-  },
-)
+export const EntityRequestSchema = openapi(EntityRequest, {
+  description: 'Request to create or update entity',
+})
 
 export type EntityRequest = z.infer<typeof EntityRequest>
 ```
@@ -828,7 +825,7 @@ registry.registerSchema('EntityRequest', EntityRequestSchema) // OpenAPI schema
 export const InitializeDraftRequest = z.object({ ... }) // Raw Zod
 export const InitializeDraftRequestSchema = openapi(InitializeDraftRequest, { ... }) // OpenAPI
 
-// steps.ts  
+// steps.ts
 export const Step1Request = z.object({ ... }) // Raw Zod
 export const Step1RequestSchema = openapi(Step1Request, { ... }) // OpenAPI
 

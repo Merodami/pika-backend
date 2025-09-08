@@ -19,12 +19,9 @@ export const InitializeDraftRequest = z.object({
 /**
  * Draft initialization request (OpenAPI documented)
  */
-export const InitializeDraftRequestSchema = openapi(
-  InitializeDraftRequest,
-  {
-    description: 'Request to initialize a new voucher draft',
-  },
-)
+export const InitializeDraftRequestSchema = openapi(InitializeDraftRequest, {
+  description: 'Request to initialize a new voucher draft',
+})
 
 export type InitializeDraftRequestType = z.infer<typeof InitializeDraftRequest>
 
@@ -43,14 +40,13 @@ export const InitializeDraftResponse = withTimestampsString({
 /**
  * Draft initialization response (OpenAPI documented)
  */
-export const InitializeDraftResponseSchema = openapi(
-  InitializeDraftResponse,
-  {
-    description: 'Response after initializing a voucher draft',
-  },
-)
+export const InitializeDraftResponseSchema = openapi(InitializeDraftResponse, {
+  description: 'Response after initializing a voucher draft',
+})
 
-export type InitializeDraftResponseType = z.infer<typeof InitializeDraftResponse>
+export type InitializeDraftResponseType = z.infer<
+  typeof InitializeDraftResponse
+>
 
 /**
  * Draft state response (raw Zod)
@@ -92,12 +88,9 @@ export const DraftStateResponse = withTimestampsString({
 /**
  * Draft state response (OpenAPI documented)
  */
-export const DraftStateResponseSchema = openapi(
-  DraftStateResponse,
-  {
-    description: 'Complete draft state information',
-  },
-)
+export const DraftStateResponseSchema = openapi(DraftStateResponse, {
+  description: 'Complete draft state information',
+})
 
 export type DraftStateResponse = z.infer<typeof DraftStateResponse>
 
@@ -124,12 +117,9 @@ export const ListDraftsResponse = z.object({
 /**
  * List drafts response (OpenAPI documented)
  */
-export const ListDraftsResponseSchema = openapi(
-  ListDraftsResponse,
-  {
-    description: 'List of voucher drafts',
-  },
-)
+export const ListDraftsResponseSchema = openapi(ListDraftsResponse, {
+  description: 'List of voucher drafts',
+})
 
 export type ListDraftsResponse = z.infer<typeof ListDraftsResponse>
 
@@ -149,12 +139,9 @@ export const CompleteDraftRequest = z.object({
 /**
  * Draft completion request (OpenAPI documented)
  */
-export const CompleteDraftRequestSchema = openapi(
-  CompleteDraftRequest,
-  {
-    description: 'Request to complete draft and create voucher',
-  },
-)
+export const CompleteDraftRequestSchema = openapi(CompleteDraftRequest, {
+  description: 'Request to complete draft and create voucher',
+})
 
 export type CompleteDraftRequest = z.infer<typeof CompleteDraftRequest>
 
@@ -171,12 +158,9 @@ export const CompleteDraftResponse = z.object({
 /**
  * Draft completion response (OpenAPI documented)
  */
-export const CompleteDraftResponseSchema = openapi(
-  CompleteDraftResponse,
-  {
-    description: 'Response after completing draft and creating voucher',
-  },
-)
+export const CompleteDraftResponseSchema = openapi(CompleteDraftResponse, {
+  description: 'Response after completing draft and creating voucher',
+})
 
 export type CompleteDraftResponse = z.infer<typeof CompleteDraftResponse>
 
@@ -191,11 +175,8 @@ export const DeleteDraftResponse = z.object({
 /**
  * Delete draft response (OpenAPI documented)
  */
-export const DeleteDraftResponseSchema = openapi(
-  DeleteDraftResponse,
-  {
-    description: 'Response after deleting a draft',
-  },
-)
+export const DeleteDraftResponseSchema = openapi(DeleteDraftResponse, {
+  description: 'Response after deleting a draft',
+})
 
 export type DeleteDraftResponse = z.infer<typeof DeleteDraftResponse>

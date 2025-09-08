@@ -28,6 +28,7 @@ export class TranslationCache implements ITranslationCache {
 
   async delete(key: string, language: string): Promise<void> {
     const cacheKey = `${this.prefix}${language}:${key}`
+
     await this.redis.del(cacheKey)
   }
 

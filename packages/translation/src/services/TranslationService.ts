@@ -167,8 +167,11 @@ export class TranslationService implements ITranslationService {
     )
   }
 
-  async deleteMany(keys: string[]): Promise<{ deleted: number; errors: string[] }> {
+  async deleteMany(
+    keys: string[],
+  ): Promise<{ deleted: number; errors: string[] }> {
     const errors: string[] = []
+
     let deleted = 0
 
     if (!keys || keys.length === 0) {
@@ -177,15 +180,15 @@ export class TranslationService implements ITranslationService {
 
     // Delete from cache and database for all languages
     const languages = await this.repository.findAllLanguages()
-    
+
     for (const key of keys) {
       try {
         // Delete from database for all languages
         const deletedCount = await this.repository.deleteByKey(key)
-        
+
         if (deletedCount > 0) {
           deleted += deletedCount
-          
+
           // Clear from cache for all languages
           for (const lang of languages) {
             await this.cache.delete(key, lang.code).catch(() => {
@@ -194,7 +197,9 @@ export class TranslationService implements ITranslationService {
           }
         }
       } catch (error) {
-        errors.push(`Failed to delete key '${key}': ${error instanceof Error ? error.message : 'Unknown error'}`)
+        errors.push(
+          `Failed to delete key '${key}': ${error instanceof Error ? error.message : 'Unknown error'}`,
+        )
       }
     }
 

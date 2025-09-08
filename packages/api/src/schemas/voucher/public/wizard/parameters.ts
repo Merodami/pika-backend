@@ -16,12 +16,9 @@ export const DraftIdParam = z.object({
 /**
  * Draft ID path parameter (OpenAPI documented)
  */
-export const DraftIdParamSchema = openapi(
-  DraftIdParam,
-  {
-    description: 'Draft ID path parameter',
-  },
-)
+export const DraftIdParamSchema = openapi(DraftIdParam, {
+  description: 'Draft ID path parameter',
+})
 
 export type DraftIdParam = z.infer<typeof DraftIdParam>
 
@@ -36,12 +33,9 @@ export const UpdateStepParams = z.object({
 /**
  * Update step path parameters (OpenAPI documented)
  */
-export const UpdateStepParamsSchema = openapi(
-  UpdateStepParams,
-  {
-    description: 'Update step path parameters',
-  },
-)
+export const UpdateStepParamsSchema = openapi(UpdateStepParams, {
+  description: 'Update step path parameters',
+})
 
 export type UpdateStepParams = z.infer<typeof UpdateStepParams>
 
@@ -56,12 +50,9 @@ export const GetStepParams = z.object({
 /**
  * Get step path parameters (OpenAPI documented)
  */
-export const GetStepParamsSchema = openapi(
-  GetStepParams,
-  {
-    description: 'Get step path parameters',
-  },
-)
+export const GetStepParamsSchema = openapi(GetStepParams, {
+  description: 'Get step path parameters',
+})
 
 export type GetStepParams = z.infer<typeof GetStepParams>
 
@@ -76,11 +67,8 @@ export const ValidateStepParams = z.object({
 /**
  * Validate step path parameters (OpenAPI documented)
  */
-export const ValidateStepParamsSchema = openapi(
-  ValidateStepParams,
-  {
-    description: 'Validate step path parameters',
-  },
-)
+export const ValidateStepParamsSchema = openapi(ValidateStepParams, {
+  description: 'Validate step path parameters',
+})
 
 export type ValidateStepParams = z.infer<typeof ValidateStepParams>

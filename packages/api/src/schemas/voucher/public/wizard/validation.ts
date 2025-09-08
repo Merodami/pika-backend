@@ -18,12 +18,9 @@ export const ValidateStepRequest = z.object({
 /**
  * Step validation request (OpenAPI documented)
  */
-export const ValidateStepRequestSchema = openapi(
-  ValidateStepRequest,
-  {
-    description: 'Request to validate a single step',
-  },
-)
+export const ValidateStepRequestSchema = openapi(ValidateStepRequest, {
+  description: 'Request to validate a single step',
+})
 
 export type ValidateStepRequest = z.infer<typeof ValidateStepRequest>
 
@@ -40,12 +37,9 @@ export const ValidationError = z.object({
 /**
  * Validation error (OpenAPI documented)
  */
-export const ValidationErrorSchema = openapi(
-  ValidationError,
-  {
-    description: 'Validation error details',
-  },
-)
+export const ValidationErrorSchema = openapi(ValidationError, {
+  description: 'Validation error details',
+})
 
 export type ValidationError = z.infer<typeof ValidationError>
 
@@ -65,12 +59,9 @@ export const ValidateStepResponse = z.object({
 /**
  * Step validation response (OpenAPI documented)
  */
-export const ValidateStepResponseSchema = openapi(
-  ValidateStepResponse,
-  {
-    description: 'Step validation result',
-  },
-)
+export const ValidateStepResponseSchema = openapi(ValidateStepResponse, {
+  description: 'Step validation result',
+})
 
 export type ValidateStepResponse = z.infer<typeof ValidateStepResponse>
 
@@ -94,12 +85,9 @@ export const ValidateDraftResponse = z.object({
 /**
  * Full draft validation response (OpenAPI documented)
  */
-export const ValidateDraftResponseSchema = openapi(
-  ValidateDraftResponse,
-  {
-    description: 'Complete draft validation results',
-  },
-)
+export const ValidateDraftResponseSchema = openapi(ValidateDraftResponse, {
+  description: 'Complete draft validation results',
+})
 
 export type ValidateDraftResponse = z.infer<typeof ValidateDraftResponse>
 
@@ -120,11 +108,8 @@ export const ValidationSummary = z.object({
 /**
  * Validation summary (OpenAPI documented)
  */
-export const ValidationSummarySchema = openapi(
-  ValidationSummary,
-  {
-    description: 'Summary of validation state',
-  },
-)
+export const ValidationSummarySchema = openapi(ValidationSummary, {
+  description: 'Summary of validation state',
+})
 
 export type ValidationSummary = z.infer<typeof ValidationSummary>

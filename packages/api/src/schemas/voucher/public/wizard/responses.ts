@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 import { openapi } from '../../../../common/utils/openapi.js'
-import { paginatedResponse } from '../../../shared/responses.js'
 import { DateTime, UUID } from '../../../shared/primitives.js'
+import { paginatedResponse } from '../../../shared/responses.js'
 import { DraftStateResponse } from './draft.js'
 
 /**
@@ -17,12 +17,9 @@ export const GetDraftResponse = DraftStateResponse
 /**
  * Get draft response (OpenAPI documented)
  */
-export const GetDraftResponseSchema = openapi(
-  GetDraftResponse,
-  {
-    description: 'Get draft details response',
-  },
-)
+export const GetDraftResponseSchema = openapi(GetDraftResponse, {
+  description: 'Get draft details response',
+})
 
 export type GetDraftResponse = z.infer<typeof GetDraftResponse>
 
@@ -47,12 +44,9 @@ export const GetUserDraftsResponse = paginatedResponse(DraftListItem)
 /**
  * Get user drafts response (OpenAPI documented)
  */
-export const GetUserDraftsResponseSchema = openapi(
-  GetUserDraftsResponse,
-  {
-    description: 'Paginated list of user drafts',
-  },
-)
+export const GetUserDraftsResponseSchema = openapi(GetUserDraftsResponse, {
+  description: 'Paginated list of user drafts',
+})
 
 export type GetUserDraftsResponse = z.infer<typeof GetUserDraftsResponse>
 
@@ -67,15 +61,11 @@ export const GetStepResponse = z.object({
 /**
  * Get step response (OpenAPI documented)
  */
-export const GetStepResponseSchema = openapi(
-  GetStepResponse,
-  {
-    description: 'Step data response',
-  },
-)
+export const GetStepResponseSchema = openapi(GetStepResponse, {
+  description: 'Step data response',
+})
 
 export type GetStepResponse = z.infer<typeof GetStepResponse>
-
 
 /**
  * Save draft response (raw Zod)
@@ -89,12 +79,9 @@ export const SaveDraftResponse = z.object({
 /**
  * Save draft response (OpenAPI documented)
  */
-export const SaveDraftResponseSchema = openapi(
-  SaveDraftResponse,
-  {
-    description: 'Draft save confirmation',
-  },
-)
+export const SaveDraftResponseSchema = openapi(SaveDraftResponse, {
+  description: 'Draft save confirmation',
+})
 
 export type SaveDraftResponse = z.infer<typeof SaveDraftResponse>
 
@@ -113,11 +100,8 @@ export const ResumeDraftResponse = z.object({
 /**
  * Resume draft response (OpenAPI documented)
  */
-export const ResumeDraftResponseSchema = openapi(
-  ResumeDraftResponse,
-  {
-    description: 'Draft resume information',
-  },
-)
+export const ResumeDraftResponseSchema = openapi(ResumeDraftResponse, {
+  description: 'Draft resume information',
+})
 
 export type ResumeDraftResponse = z.infer<typeof ResumeDraftResponse>

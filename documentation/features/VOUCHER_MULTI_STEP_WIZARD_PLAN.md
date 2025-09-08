@@ -869,13 +869,16 @@ The multi-step voucher wizard implementation is **90% complete** with all core f
 ### ✅ Completed Components
 
 #### 1. **Database Layer**
+
 - ✅ Created `VoucherDraft` Prisma model with wizard state tracking
-- ✅ Added relations to Business, User, and Voucher models  
+- ✅ Added relations to Business, User, and Voucher models
 - ✅ Implemented proper indexes and foreign key constraints
 - ✅ Step data storage as JSONB fields (step1_data through step5_data)
 
 #### 2. **API Schemas**
+
 Following the dual pattern (raw Zod + OpenAPI wrapper):
+
 - ✅ `parameters.ts` - Path parameters for drafts and steps
 - ✅ `queries.ts` - Query parameters for listing drafts with pagination
 - ✅ `draft.ts` - Draft management schemas (initialize, state, complete, delete)
@@ -883,13 +886,15 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 - ✅ `validation.ts` - Validation schemas and comprehensive error handling
 - ✅ `responses.ts` - Consistent response schemas with pagination support
 
-#### 3. **Repository Layer** 
+#### 3. **Repository Layer**
+
 - ✅ `VoucherDraftRepository` - Full CRUD operations with Prisma integration
 - ✅ Consistent `PaginatedResult<VoucherDraft>` returns following project patterns
 - ✅ Proper domain mapping and error handling
 - ✅ Admin vs business owner data access controls
 
 #### 4. **Service Layer**
+
 - ✅ `VoucherWizardService` - Complete wizard lifecycle management
 - ✅ Translation key management with bulk deletion via enhanced `TranslationService.deleteMany()`
 - ✅ Step-by-step validation logic for all 5 wizard steps
@@ -897,6 +902,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 - ✅ Permission-based data access (admin can see all drafts, business owners only their own)
 
 #### 5. **Controller Layer**
+
 - ✅ `VoucherWizardController` - All 10 wizard endpoints implemented:
   - `POST /vouchers/wizard/drafts` - Initialize new draft
   - `GET /vouchers/wizard/drafts` - List user drafts (paginated)
@@ -910,11 +916,13 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
   - `POST /vouchers/wizard/drafts/:draftId/complete` - Complete draft and create voucher
 
 #### 6. **Translation Service Enhancement**
+
 - ✅ Added `TranslationService.deleteMany()` method for efficient cleanup
 - ✅ Bulk deletion with proper error handling and cache invalidation
 - ✅ Integration with wizard service for translation key lifecycle management
 
 #### 7. **Routes and Middleware Configuration**
+
 - ✅ Complete route setup in `VoucherWizardRoutes.ts`
 - ✅ Authentication via `requireAuth()` middleware
 - ✅ RBAC implementation with proper permissions
@@ -924,6 +932,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 ### 🔧 Issues Discovered and Resolved During Integration
 
 #### 1. **Permission System Architecture Issue**
+
 **Problem**: Initial implementation used `requirePermissions('vouchers:write', 'vouchers:write:own')` expecting OR logic, but the middleware actually implements AND logic.
 
 **Root Cause**: The `requirePermissions()` middleware uses `permissions.every()` which requires ALL permissions to match, not ANY.
@@ -933,24 +942,29 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 **Impact**: This was the first time `vouchers:write:own` permission was used in the voucher service, revealing the AND vs OR logic issue in the permission system.
 
 #### 2. **Schema Validation Architecture**
+
 **Problem**: Integration tests revealed validation errors for fields that shouldn't exist in request schemas (`qrCode`, `createdAt`, `updatedAt`).
 
 **Status**: Currently debugging - appears to be a schema import/usage issue where response schema might be accidentally used for request validation.
 
 #### 3. **Business Model Schema Changes**
+
 **Problem**: Integration tests failed due to outdated Business model field references in test helpers.
 
 **Solution**: Updated test data creation to use current Business schema fields (`userId`, `businessNameKey`, etc.) instead of deprecated fields.
 
 #### 4. **Foreign Key Constraint Issues**
+
 **Problem**: Test data creation failed on foreign key constraints for `createdBy` fields.
 
 **Solution**: Updated test helpers to properly reference existing user IDs instead of generating random UUIDs.
 
 #### 5. **Cache Service Integration Pattern**
+
 **Problem**: Tests failed due to incorrect cache service method calls (`reset()` vs `clearAll()`).
 
 **Solution**: Analyzed working integration tests and adopted the correct pattern:
+
 - Use `new MemoryCacheService()` for tests
 - Call `await cacheService.clearAll()` in beforeEach
 - Add `vi.clearAllMocks()` and `translationClient.clear()` for complete cleanup
@@ -958,17 +972,20 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 ### 🏗️ Architecture Patterns Established
 
 #### 1. **Clean Architecture Compliance**
+
 - **Controllers**: Handle HTTP concerns only, delegate to services
 - **Services**: Contain business logic, orchestrate repositories
 - **Repositories**: Handle data access and Prisma integration
 - **Mappers**: Transform between database and domain representations
 
 #### 2. **Permission-Based Access Control**
+
 - **Admin users**: Have `admin:*` wildcard permission, can access all drafts
-- **Business users**: Have `vouchers:write:own` permission, can only access their own drafts  
+- **Business users**: Have `vouchers:write:own` permission, can only access their own drafts
 - **Service layer**: Implements ownership checks using `RequestContext.isAdmin()`
 
 #### 3. **Consistent API Response Patterns**
+
 - **Pagination**: All list operations return `PaginatedResult<T>` with metadata
 - **Error handling**: Consistent error responses using `ErrorFactory`
 - **Validation**: Zod schemas with proper error messages
@@ -977,11 +994,13 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 ### 🚨 Current Blockers (Needs Resolution)
 
 #### 1. **Schema Validation Issue** (High Priority)
+
 - Integration tests show request validation is checking for response-only fields
 - Need to identify and fix schema import/usage issue
 - **Status**: Debugging in progress
 
-#### 2. **Integration Test Completion** (Medium Priority)  
+#### 2. **Integration Test Completion** (Medium Priority)
+
 - Full test suite needs to pass before implementation can be considered complete
 - **Dependency**: Resolving schema validation issue
 
@@ -1014,7 +1033,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 
 3. **Step 2: Content Creation**
    - **Spanish**: "20% de descuento en almuerzos especiales"
-   - **English**: "20% discount on lunch specials" 
+   - **English**: "20% discount on lunch specials"
    - **Guaraní**: Translation assistance provided
    - **User sees**: Live preview of voucher in all languages
 
@@ -1042,7 +1061,8 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
    - **User clicks**: "Publish Immediately"
    - **System response**: "Voucher published! Code: VCH-2025-001"
 
-**Business Impact**: 
+**Business Impact**:
+
 - Time to create: 4 minutes
 - Previous method: 12 minutes
 - Quality improvement: Rich content, proper targeting
@@ -1117,19 +1137,22 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 ### 📈 Success Metrics and KPIs
 
 #### User Experience Metrics
+
 - **Completion Rate**: Target >85% (currently measuring)
 - **Time to Complete**: Target <5 minutes average
 - **Abandonment by Step**: Identify optimization opportunities
 - **Mobile vs Desktop**: Compare completion rates
 - **Return Usage**: Percentage of users creating multiple vouchers
 
-#### Business Impact Metrics  
+#### Business Impact Metrics
+
 - **Voucher Quality Score**: Completeness of content, images, targeting
 - **Redemption Rate Improvement**: Compare wizard vs single-step vouchers
 - **Customer Engagement**: Time spent viewing wizard-created vouchers
 - **Support Ticket Reduction**: Fewer creation-related issues
 
 #### Technical Performance Metrics
+
 - **API Response Time**: Target <200ms per endpoint
 - **Draft Recovery Rate**: Target >98% for interrupted sessions
 - **System Reliability**: 99.9% uptime for wizard endpoints
@@ -1138,6 +1161,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 ### 🎯 Business Value Proposition
 
 #### For Business Owners
+
 1. **Guided Experience**: No more guessing what makes a good voucher
 2. **Higher Redemption Rates**: Better-configured vouchers perform better
 3. **Time Savings**: Eventually faster than single-step with smart defaults
@@ -1145,6 +1169,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 5. **Mobile-First**: Create vouchers anywhere, anytime
 
 #### For VoucherBook Platform
+
 1. **Increased Engagement**: Users spend more time in platform
 2. **Better Data**: More structured, complete voucher information
 3. **Reduced Support**: Self-service guidance reduces tickets
@@ -1152,6 +1177,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 5. **Analytics Goldmine**: Step-by-step user behavior insights
 
 #### For End Customers
+
 1. **Better Vouchers**: More complete information and attractive presentation
 2. **Relevant Targeting**: Location and preference-based matching
 3. **Trust**: Professional appearance increases confidence
@@ -1160,18 +1186,21 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 ### 🔮 Future Enhancements (Post-MVP)
 
 #### Phase 2: Intelligence Features
+
 - **AI Content Generation**: Automatic title/description suggestions
 - **Smart Templates**: Category-specific voucher templates
 - **Optimal Pricing**: ML-driven discount recommendations
 - **A/B Testing**: Built-in variant testing for vouchers
 
 #### Phase 3: Advanced Workflows
+
 - **Bulk Creation**: Create multiple similar vouchers efficiently
 - **Campaign Management**: Group related vouchers together
 - **Scheduled Publishing**: Queue vouchers for future release
 - **Approval Workflows**: Multi-step approval for enterprise accounts
 
-#### Phase 4: Integration Features  
+#### Phase 4: Integration Features
+
 - **Social Media Integration**: Auto-post to business social accounts
 - **Email Marketing**: Integrate with customer mailing lists
 - **POS Integration**: Connect with point-of-sale systems
@@ -1180,6 +1209,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 ### 🚀 Deployment Strategy
 
 #### Pre-Launch Validation
+
 1. **Unit Test Coverage**: >90% for all wizard components
 2. **Integration Test Suite**: Complete end-to-end scenarios
 3. **Load Testing**: Handle 1000 concurrent wizard sessions
@@ -1187,6 +1217,7 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 5. **Performance Benchmarking**: Establish baseline metrics
 
 #### Rollout Plan
+
 1. **Internal Beta** (Week 1): Development team and internal stakeholders
 2. **Closed Beta** (Week 2-3): Select 20 high-engagement business owners
 3. **Open Beta** (Week 4-5): All users can opt-in to wizard
@@ -1194,8 +1225,9 @@ Following the dual pattern (raw Zod + OpenAPI wrapper):
 5. **Legacy Sunset** (Month 3-4): Gradually deprecate single-step API
 
 #### Monitoring and Optimization
+
 - **Real-time Analytics**: Track completion rates and abandonment points
-- **User Feedback Collection**: In-app surveys and support ticket analysis  
+- **User Feedback Collection**: In-app surveys and support ticket analysis
 - **Performance Monitoring**: API response times and error rates
 - **A/B Testing Framework**: Compare wizard variations and optimizations
 - **Rollback Capability**: Instant fallback to single-step if issues arise
