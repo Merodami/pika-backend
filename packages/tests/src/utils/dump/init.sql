@@ -23,6 +23,9 @@ ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF E
 ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_used_by_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_business_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_customer_id_fkey;
@@ -119,6 +122,25 @@ DROP INDEX IF EXISTS voucher.voucher_redemptions_user_id_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_redeemed_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_created_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_code_used_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_voucher_id_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_is_complete_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_business_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_session_token_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_session_token_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_qr_code_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_is_complete_created_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_expires_at_completed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_draft_id_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_draft_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_current_step_user_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_current_step_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_completed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_business_id_is_complete_created_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_business_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_business_id_created_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_type_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_is_active_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_idx;
@@ -376,6 +398,7 @@ DROP INDEX IF EXISTS analytics.search_queries_count_idx;
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_pkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_pkey;
 ALTER TABLE IF EXISTS ONLY users.users DROP CONSTRAINT IF EXISTS users_pkey;
@@ -412,6 +435,7 @@ ALTER TABLE IF EXISTS ONLY analytics.search_queries DROP CONSTRAINT IF EXISTS se
 DROP TABLE IF EXISTS voucher.vouchers;
 DROP TABLE IF EXISTS voucher.voucher_validation_codes;
 DROP TABLE IF EXISTS voucher.voucher_redemptions;
+DROP TABLE IF EXISTS voucher.voucher_drafts;
 DROP TABLE IF EXISTS voucher.voucher_codes;
 DROP TABLE IF EXISTS voucher.customer_vouchers;
 DROP TABLE IF EXISTS users.users;
@@ -1707,6 +1731,39 @@ CREATE TABLE voucher.voucher_codes (
 
 
 --
+-- Name: voucher_drafts; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.voucher_drafts (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    draft_id character varying(100) NOT NULL,
+    business_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    current_step integer DEFAULT 1 NOT NULL,
+    completed_steps integer[] DEFAULT ARRAY[]::integer[],
+    is_complete boolean DEFAULT false NOT NULL,
+    step1_data jsonb,
+    step2_data jsonb,
+    step3_data jsonb,
+    step4_data jsonb,
+    step5_data jsonb,
+    title_key character varying(255),
+    description_key character varying(255),
+    terms_and_conditions_key character varying(255),
+    qr_code character varying(500),
+    validation_errors jsonb DEFAULT '{}'::jsonb,
+    last_validated_at timestamp(6) with time zone,
+    session_token character varying(255),
+    expires_at timestamp(6) with time zone NOT NULL,
+    completed_at timestamp(6) with time zone,
+    voucher_id uuid,
+    metadata jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: voucher_redemptions; Type: TABLE; Schema: voucher; Owner: -
 --
 
@@ -2035,6 +2092,14 @@ ALTER TABLE ONLY voucher.customer_vouchers
 
 ALTER TABLE ONLY voucher.voucher_codes
     ADD CONSTRAINT voucher_codes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: voucher_drafts voucher_drafts_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_pkey PRIMARY KEY (id);
 
 
 --
@@ -3840,6 +3905,139 @@ CREATE INDEX voucher_codes_voucher_id_type_idx ON voucher.voucher_codes USING bt
 
 
 --
+-- Name: voucher_drafts_business_id_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_business_id_created_at_idx ON voucher.voucher_drafts USING btree (business_id, created_at);
+
+
+--
+-- Name: voucher_drafts_business_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_business_id_idx ON voucher.voucher_drafts USING btree (business_id);
+
+
+--
+-- Name: voucher_drafts_business_id_is_complete_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_business_id_is_complete_created_at_idx ON voucher.voucher_drafts USING btree (business_id, is_complete, created_at);
+
+
+--
+-- Name: voucher_drafts_completed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_completed_at_idx ON voucher.voucher_drafts USING btree (completed_at);
+
+
+--
+-- Name: voucher_drafts_current_step_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_current_step_idx ON voucher.voucher_drafts USING btree (current_step);
+
+
+--
+-- Name: voucher_drafts_current_step_user_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_current_step_user_id_idx ON voucher.voucher_drafts USING btree (current_step, user_id);
+
+
+--
+-- Name: voucher_drafts_draft_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_draft_id_idx ON voucher.voucher_drafts USING btree (draft_id);
+
+
+--
+-- Name: voucher_drafts_draft_id_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_draft_id_key ON voucher.voucher_drafts USING btree (draft_id);
+
+
+--
+-- Name: voucher_drafts_expires_at_completed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_expires_at_completed_at_idx ON voucher.voucher_drafts USING btree (expires_at, completed_at);
+
+
+--
+-- Name: voucher_drafts_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_expires_at_idx ON voucher.voucher_drafts USING btree (expires_at);
+
+
+--
+-- Name: voucher_drafts_is_complete_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_is_complete_created_at_idx ON voucher.voucher_drafts USING btree (is_complete, created_at);
+
+
+--
+-- Name: voucher_drafts_qr_code_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_qr_code_key ON voucher.voucher_drafts USING btree (qr_code);
+
+
+--
+-- Name: voucher_drafts_session_token_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_session_token_idx ON voucher.voucher_drafts USING btree (session_token);
+
+
+--
+-- Name: voucher_drafts_session_token_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_session_token_key ON voucher.voucher_drafts USING btree (session_token);
+
+
+--
+-- Name: voucher_drafts_user_id_business_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_business_id_idx ON voucher.voucher_drafts USING btree (user_id, business_id);
+
+
+--
+-- Name: voucher_drafts_user_id_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_expires_at_idx ON voucher.voucher_drafts USING btree (user_id, expires_at);
+
+
+--
+-- Name: voucher_drafts_user_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_idx ON voucher.voucher_drafts USING btree (user_id);
+
+
+--
+-- Name: voucher_drafts_user_id_is_complete_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_is_complete_expires_at_idx ON voucher.voucher_drafts USING btree (user_id, is_complete, expires_at);
+
+
+--
+-- Name: voucher_drafts_voucher_id_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_voucher_id_key ON voucher.voucher_drafts USING btree (voucher_id);
+
+
+--
 -- Name: voucher_redemptions_code_used_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
@@ -4562,6 +4760,30 @@ ALTER TABLE ONLY voucher.customer_vouchers
 
 ALTER TABLE ONLY voucher.voucher_codes
     ADD CONSTRAINT voucher_codes_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: voucher_drafts voucher_drafts_business_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_business_id_fkey FOREIGN KEY (business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: voucher_drafts voucher_drafts_user_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: voucher_drafts voucher_drafts_voucher_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --

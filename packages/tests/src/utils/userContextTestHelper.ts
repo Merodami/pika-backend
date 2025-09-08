@@ -112,6 +112,7 @@ export function expectUserContext(req: Request): UserContext {
       'UserContext not found in request. Ensure userContextMiddleware is configured.',
     )
   }
+
   return req.userContext
 }
 

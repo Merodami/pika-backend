@@ -4,13 +4,14 @@
  * Tests all strategies and edge cases
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import type { Request, Response, NextFunction } from 'express'
-import { UserStatus, UserRole } from '@pika/types'
+import { UserRole, UserStatus } from '@pika/types'
+import type { NextFunction, Request, Response } from 'express'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
-  userContextMiddleware,
   getUserContext,
   requireUserContext,
+  userContextMiddleware,
   UserContextStrategy,
 } from './index.js'
 
@@ -45,6 +46,7 @@ function createMockRequest(overrides?: any): Partial<Request> {
 // Helper to create mock response
 function createMockResponse(): Partial<Response> {
   const headers: Record<string, string> = {}
+
   return {
     headersSent: false,
     setHeader: vi.fn(
@@ -437,6 +439,7 @@ describe('UserContext Middleware', () => {
       }
 
       const context = getUserContext(req as Request)
+
       expect(context).toBe(req.userContext)
     })
 
@@ -457,6 +460,7 @@ describe('UserContext Middleware', () => {
       }
 
       const context = requireUserContext(req as Request)
+
       expect(context).toBe(req.userContext)
     })
   })

@@ -162,6 +162,7 @@ describe('Voucher Service - Admin API Integration Tests', () => {
 
     // Create admin user for category creation
     const categoryAdminId = uuid()
+
     await testDb.prisma.user.create({
       data: {
         id: categoryAdminId,

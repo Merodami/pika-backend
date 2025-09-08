@@ -55,6 +55,7 @@ model Voucher {
   customerVouchers       CustomerVoucher[]
   fraudCases             FraudCase[]
   favoritedBy            FavouriteVoucher[]  // Users who favorited this voucher
+  voucherDrafts          VoucherDraft[]      // Drafts that resulted in this voucher
   
   // Core voucher indexes
   @@index([businessId])

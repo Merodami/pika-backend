@@ -21,11 +21,11 @@ import type { Application, Express } from 'express'
 
 import { loadConfig } from '../config/gateway.js'
 import { handleHealthCheck } from '../health/healthCheckHandler.js'
+import { createValidationRouter } from '../middleware/routeValidation.js'
 import {
   userContextMiddleware,
   UserContextStrategy,
 } from '../middleware/userContext/index.js'
-import { createValidationRouter } from '../middleware/routeValidation.js'
 import { createDocsRouter } from './routes/docsRoutes.js'
 import { setupEmbeddedServices } from './routes/setupEmbeddedServices.js'
 import { setupProxyRoutes } from './routes/setupProxyRoutes.js'
@@ -233,6 +233,7 @@ async function startGateway(): Promise<Express> {
   // Set up user context middleware after authentication
   // This enriches requests with user profile data for downstream services
   const userServiceClient = new UserServiceClient()
+
   app.use(
     userContextMiddleware({
       strategy: IS_EMBEDDED

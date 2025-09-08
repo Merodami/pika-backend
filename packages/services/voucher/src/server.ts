@@ -12,6 +12,7 @@ import { createAdminVoucherRoutes } from './routes/AdminVoucherRoutes.js'
 import { createInternalVoucherRoutes } from './routes/InternalVoucherRoutes.js'
 import { createRedemptionAnalyticsRoutes } from './routes/RedemptionAnalyticsRoutes.js'
 import { createVoucherRoutes } from './routes/VoucherRoutes.js'
+import { createVoucherWizardRoutes } from './routes/VoucherWizardRoutes.js'
 
 /**
  * Create and configure the Express server for the Voucher service
@@ -137,6 +138,17 @@ export async function createVoucherServer({
   )
 
   app.use('/admin/vouchers', redemptionAnalyticsRouter)
+
+  // Register voucher wizard routes (public - for business owners)
+  const wizardRouter = createVoucherWizardRoutes(
+    prisma,
+    cacheService,
+    translationClient,
+    translationResolver,
+    businessClient,
+  )
+
+  app.use('/vouchers/wizard', wizardRouter)
 
   // Register internal routes
   const internalRouter = createInternalVoucherRoutes(

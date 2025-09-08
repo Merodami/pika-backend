@@ -150,6 +150,7 @@ describe('User Service - Favorites Public API Integration Tests', () => {
 
     // Create admin user for category creation
     const adminUserId = uuid()
+
     await testDb.prisma.user.create({
       data: {
         id: adminUserId,

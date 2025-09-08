@@ -2,9 +2,9 @@
  * User Context Types and Enums
  */
 
-import type { UserContext } from '@pika/types'
-import type { UserServiceClient } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
+import type { UserServiceClient } from '@pika/shared'
+import type { UserContext } from '@pika/types'
 
 /**
  * Strategy for obtaining user context

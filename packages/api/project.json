@@ -37,6 +37,25 @@
         "command": "eslint .",
         "cwd": "{projectRoot}"
       }
+    },
+    "open:docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "open generated/openapi/index.html",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "open-docs-all": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "open generated/openapi/index.html",
+          "sleep 1",
+          "open http://localhost:5500/api-docs"
+        ],
+        "parallel": false,
+        "cwd": "{projectRoot}"
+      }
     }
   }
 }

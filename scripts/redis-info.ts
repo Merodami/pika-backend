@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 import { config } from 'dotenv'
-import { resolve } from 'path'
 import Redis from 'ioredis'
+import { resolve } from 'path'
 
 // Load environment variables
 config({ path: resolve(process.cwd(), '.env') })
@@ -52,14 +52,17 @@ async function showRedisInfo() {
     // Get cache keys count
     const pattern = `${REDIS_PREFIX}*`
     const keys = await redis.keys(pattern)
+
     console.log('🔑 Cache Keys:')
     console.log(`   Total keys with prefix: ${keys.length}`)
 
     if (keys.length > 0) {
       // Group keys by pattern
       const keyPatterns = new Map<string, number>()
+
       keys.forEach((key) => {
         const pattern = key.replace(REDIS_PREFIX, '').split(':')[0]
+
         keyPatterns.set(pattern, (keyPatterns.get(pattern) || 0) + 1)
       })
 
@@ -88,6 +91,7 @@ async function showRedisInfo() {
       if (uptime) {
         const uptimeHours = Math.floor(parseInt(uptime) / 3600)
         const uptimeDays = Math.floor(uptimeHours / 24)
+
         if (uptimeDays > 0) {
           console.log(
             `   Uptime: ${uptimeDays} days, ${uptimeHours % 24} hours`,

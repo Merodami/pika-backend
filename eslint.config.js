@@ -26,6 +26,7 @@ export default [
       'ai/**',
       'pika-old/**',
       'docs/**',
+      'old-docs/**',
       'scripts/vercel-test.ts',
       'reports/**',
       '**/generated/**',

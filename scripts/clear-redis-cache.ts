@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 import { config } from 'dotenv'
-import { resolve } from 'path'
 import Redis from 'ioredis'
+import { resolve } from 'path'
 
 // Load environment variables
 config({ path: resolve(process.cwd(), '.env') })
@@ -37,6 +37,7 @@ async function clearRedisCache() {
     // Optional: Show memory stats
     const info = await redis.info('memory')
     const usedMemory = info.match(/used_memory_human:(.+)/)?.[1]?.trim()
+
     if (usedMemory) {
       console.log(`📈 Redis memory usage: ${usedMemory}`)
     }

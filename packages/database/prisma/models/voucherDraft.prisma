@@ -1,0 +1,73 @@
+/// Voucher creation wizard draft storage for multi-step voucher creation
+model VoucherDraft {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  draftId                String    @unique @map("draft_id") @db.VarChar(100) // Unique draft identifier for API access
+  businessId             String    @map("business_id") @db.Uuid // Business creating the voucher
+  userId                 String    @map("user_id") @db.Uuid // User creating the voucher
+  
+  // Wizard progress tracking
+  currentStep            Int       @default(1) @map("current_step") // Current step (1-6)
+  completedSteps         Int[]     @default([]) @map("completed_steps") // Array of completed step numbers
+  isComplete             Boolean   @default(false) @map("is_complete") // All steps completed
+  
+  // Step data storage as JSONB for flexibility
+  step1Data              Json?     @map("step1_data") @db.JsonB // Business & Category selection
+  step2Data              Json?     @map("step2_data") @db.JsonB // Content (title, description, terms)
+  step3Data              Json?     @map("step3_data") @db.JsonB // Discount configuration
+  step4Data              Json?     @map("step4_data") @db.JsonB // Validity & Limits
+  step5Data              Json?     @map("step5_data") @db.JsonB // Media & Targeting (optional)
+  
+  // Pre-generated values for consistency across steps
+  titleKey               String?   @map("title_key") @db.VarChar(255) // Translation key for title
+  descriptionKey         String?   @map("description_key") @db.VarChar(255) // Translation key for description
+  termsAndConditionsKey  String?   @map("terms_and_conditions_key") @db.VarChar(255) // Translation key for terms
+  qrCode                 String?   @unique @map("qr_code") @db.VarChar(500) // Reserved QR code (matches voucher.qrCode size)
+  
+  // Validation and error tracking
+  validationErrors       Json?     @default("{}") @map("validation_errors") @db.JsonB // Validation errors per step
+  lastValidatedAt        DateTime? @map("last_validated_at") @db.Timestamptz(6) // Last validation timestamp
+  
+  // Session management
+  sessionToken           String?   @unique @map("session_token") @db.VarChar(255) // Session token for API access
+  expiresAt              DateTime  @map("expires_at") @db.Timestamptz(6) // Draft expiration (default 24h)
+  
+  // Completion tracking
+  completedAt            DateTime? @map("completed_at") @db.Timestamptz(6) // When draft was completed
+  voucherId              String?   @unique @map("voucher_id") @db.Uuid // Created voucher ID after completion
+  
+  // Additional metadata
+  metadata               Json?     @db.JsonB // Additional metadata for tracking
+  
+  // Audit timestamps
+  createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  // Relations
+  business               Business  @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  voucher                Voucher?  @relation(fields: [voucherId], references: [id], onDelete: SetNull)
+  
+  // Core draft indexes
+  @@index([draftId])
+  @@index([userId])
+  @@index([businessId])
+  @@index([sessionToken])
+  @@index([expiresAt])
+  @@index([currentStep])
+  @@index([completedAt])
+  
+  // Composite indexes for common queries
+  @@index([userId, businessId]) // User's drafts for specific business
+  @@index([userId, expiresAt]) // User's active drafts
+  @@index([businessId, createdAt]) // Business draft history
+  @@index([expiresAt, completedAt]) // Cleanup expired drafts
+  @@index([userId, isComplete, expiresAt]) // User's incomplete drafts
+  
+  // Performance optimization indexes
+  @@index([currentStep, userId]) // Users at specific step
+  @@index([isComplete, createdAt]) // Completion analytics
+  @@index([businessId, isComplete, createdAt]) // Business completion rate
+  
+  @@map("voucher_drafts")
+  @@schema("voucher")
+}

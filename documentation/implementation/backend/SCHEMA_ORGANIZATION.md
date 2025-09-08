@@ -764,3 +764,83 @@ res.json(validatedResponse)
 - **Runtime Safety**: `.parse()` catches transformation errors immediately
 - **Contract Enforcement**: Responses always match documented schemas
 - **Developer Experience**: Clear errors when mappers produce incorrect data
+
+## OpenAPI Schema Pattern (CRITICAL)
+
+### Dual Schema Pattern for OpenAPI Compatibility
+
+**ALL schemas must provide both raw Zod schemas and OpenAPI-wrapped versions** to ensure proper API documentation generation and SDK compatibility.
+
+### ✅ REQUIRED Pattern
+
+Every schema file must follow this pattern:
+
+```typescript
+import { z } from 'zod'
+import { openapi } from '../../../../common/utils/openapi.js'
+
+/**
+ * Entity request (raw Zod) - for runtime validation
+ */
+export const EntityRequest = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().optional(),
+})
+
+/**
+ * Entity request (OpenAPI documented) - for API documentation
+ */
+export const EntityRequestSchema = openapi(
+  EntityRequest,
+  {
+    description: 'Request to create or update entity',
+  },
+)
+
+export type EntityRequest = z.infer<typeof EntityRequest>
+```
+
+### Implementation Rules
+
+1. **Raw Zod Schema**: Named as `EntityName` (e.g., `InitializeDraftRequest`)
+2. **OpenAPI Schema**: Named as `EntityNameSchema` (e.g., `InitializeDraftRequestSchema`)
+3. **Type Export**: Uses the raw schema name (e.g., `type InitializeDraftRequest`)
+4. **Comment Pattern**: Raw schemas labeled "(raw Zod)", OpenAPI schemas labeled "(OpenAPI documented)"
+
+### Usage in Routes
+
+```typescript
+// Use raw Zod schema for validation middleware
+router.post(
+  '/entity',
+  validateBody(entityPublic.EntityRequest), // Raw Zod schema
+  controller.createEntity,
+)
+
+// OpenAPI schemas are used in API documentation generation
+registry.registerSchema('EntityRequest', EntityRequestSchema) // OpenAPI schema
+```
+
+### Real Examples from Voucher Wizard Implementation
+
+```typescript
+// draft.ts
+export const InitializeDraftRequest = z.object({ ... }) // Raw Zod
+export const InitializeDraftRequestSchema = openapi(InitializeDraftRequest, { ... }) // OpenAPI
+
+// steps.ts  
+export const Step1Request = z.object({ ... }) // Raw Zod
+export const Step1RequestSchema = openapi(Step1Request, { ... }) // OpenAPI
+
+// validation.ts
+export const ValidateStepRequest = z.object({ ... }) // Raw Zod
+export const ValidateStepRequestSchema = openapi(ValidateStepRequest, { ... }) // OpenAPI
+```
+
+### Benefits of This Pattern
+
+- **Runtime Validation**: Raw Zod schemas used by middleware for request/response validation
+- **API Documentation**: OpenAPI schemas generate accurate API specs and SDKs
+- **Type Safety**: Single source of truth for types via `z.infer`
+- **Backwards Compatible**: Existing code using raw schemas continues to work
+- **Clear Separation**: Obvious which schema is for which purpose

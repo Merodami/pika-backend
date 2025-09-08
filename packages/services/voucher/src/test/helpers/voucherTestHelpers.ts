@@ -53,6 +53,7 @@ export interface SeedVoucherOptions {
   includeCategories?: string[]
   generateExpired?: boolean
   count?: number
+  createdBy?: string
 }
 
 /**
@@ -68,6 +69,7 @@ export async function createSharedVoucherTestData(
     includeCategories = [],
     generateExpired = true,
     count = 10,
+    createdBy = uuid(),
   } = options
 
   // Create categories if not provided
@@ -88,7 +90,7 @@ export async function createSharedVoucherTestData(
           level: 1,
           path: '/active',
           sortOrder: 1,
-          createdBy: uuid(),
+          createdBy: createdBy,
         },
       }),
       prisma.category.create({
@@ -100,7 +102,7 @@ export async function createSharedVoucherTestData(
           path: '/inactive',
           isActive: false,
           sortOrder: 2,
-          createdBy: uuid(),
+          createdBy: createdBy,
         },
       }),
     ])

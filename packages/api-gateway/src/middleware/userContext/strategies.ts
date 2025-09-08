@@ -4,11 +4,12 @@
  * Different strategies for obtaining user context based on deployment mode
  */
 
-import type { Request, Response } from 'express'
-import { UserContext, USER_CONTEXT_CACHE_KEYS, UserStatus } from '@pika/types'
-import { logger } from '@pika/shared'
-import type { UserServiceClient } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
+import type { UserServiceClient } from '@pika/shared'
+import { logger } from '@pika/shared'
+import { USER_CONTEXT_CACHE_KEYS, UserContext, UserStatus } from '@pika/types'
+import type { Request, Response } from 'express'
+
 import { CONTEXT_HEADERS } from './types.js'
 
 /**
@@ -32,6 +33,7 @@ export function parseContextFromHeaders(
 
   // Parse permissions (comma-separated)
   const permissions = req.headers[CONTEXT_HEADERS.USER_PERMISSIONS] as string
+
   if (permissions) {
     context.permissions = permissions.split(',').filter(Boolean)
   } else {
@@ -64,6 +66,7 @@ export function parseContextFromHeaders(
 export function setContextHeaders(res: Response, context: UserContext): void {
   if (res.headersSent) {
     logger.warn('Cannot set user context headers, response already sent')
+
     return
   }
 
@@ -124,19 +127,23 @@ export async function fetchUserContext(
     if (cacheService) {
       const cacheKey = USER_CONTEXT_CACHE_KEYS.PROFILE(userId)
       const cached = await cacheService.get<UserContext>(cacheKey)
+
       if (cached) {
         logger.debug('User context cache hit', {
           userId,
           latency: Date.now() - startTime,
         })
+
         return cached
       }
     }
 
     // Fetch from User Service
     const user = await userServiceClient.getUser(userId)
+
     if (!user) {
       logger.warn('User not found', { userId })
+
       return null
     }
 
@@ -165,6 +172,7 @@ export async function fetchUserContext(
     // Cache the result
     if (cacheService && cacheTTL > 0) {
       const cacheKey = USER_CONTEXT_CACHE_KEYS.PROFILE(userId)
+
       await cacheService.set(cacheKey, context, cacheTTL).catch((error) => {
         logger.warn('Failed to cache user context', { userId, error })
       })
@@ -184,6 +192,7 @@ export async function fetchUserContext(
       error,
       latency: Date.now() - startTime,
     })
+
     return null
   }
 }

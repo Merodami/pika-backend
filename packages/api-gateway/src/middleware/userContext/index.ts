@@ -5,23 +5,21 @@
  */
 
 export {
-  userContextMiddleware,
   getUserContext,
   requireUserContext,
+  userContextMiddleware,
 } from './middleware.js'
-
 export {
-  UserContextStrategy,
-  type UserContextConfig,
-  CONTEXT_HEADERS,
-} from './types.js'
-
-export {
+  createContextFromJWT,
+  fetchUserContext,
   parseContextFromHeaders,
   setContextHeaders,
-  fetchUserContext,
-  createContextFromJWT,
 } from './strategies.js'
+export {
+  CONTEXT_HEADERS,
+  type UserContextConfig,
+  UserContextStrategy,
+} from './types.js'
 
 // Re-export Express extension
 import type { UserContext } from '@pika/types'

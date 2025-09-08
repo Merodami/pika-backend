@@ -206,14 +206,18 @@ export class AuthController {
       if (!result.success || !result.userId) {
         // Redirect to login with error message
         const errorUrl = new URL(`${FRONTEND_URL}/${DEFAULT_LANGUAGE}/login`)
+
         errorUrl.searchParams.set('error', 'invalid_verification_token')
+
         return response.redirect(302, errorUrl.toString())
       }
 
       // Try to get user's language preference
       let language = DEFAULT_LANGUAGE
+
       try {
         const user = await this.authService.getUserInfo(result.userId)
+
         if (user?.preferredLanguage) {
           language = user.preferredLanguage
         }
@@ -227,6 +231,7 @@ export class AuthController {
 
       // Build redirect URL with language and success parameters
       const successUrl = new URL(`${FRONTEND_URL}/${language}/login`)
+
       successUrl.searchParams.set('verified', 'true')
 
       // Log the verification event
@@ -242,6 +247,7 @@ export class AuthController {
 
       // On any error, redirect to login with generic error
       const errorUrl = new URL(`${FRONTEND_URL}/${DEFAULT_LANGUAGE}/login`)
+
       errorUrl.searchParams.set('error', 'verification_failed')
       response.redirect(302, errorUrl.toString())
     }

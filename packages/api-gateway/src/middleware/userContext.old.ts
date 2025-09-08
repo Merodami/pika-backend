@@ -12,13 +12,13 @@
  * - Services receive pre-enriched context
  */
 
-import {
-  UserContext,
-  USER_CONTEXT_CACHE_KEYS,
-  getUserLanguage,
-} from '@pika/types'
-import { logger, UserServiceClient } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
+import { logger, UserServiceClient } from '@pika/shared'
+import {
+  getUserLanguage,
+  USER_CONTEXT_CACHE_KEYS,
+  UserContext,
+} from '@pika/types'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 /**
@@ -78,12 +78,15 @@ export function userContextMiddleware(
         try {
           // Try cache first
           const profileKey = USER_CONTEXT_CACHE_KEYS.PROFILE(context.userId)
+
           let profile: typeof context.profile = undefined
+
           if (cacheService) {
             const cached =
               await cacheService.get<NonNullable<typeof context.profile>>(
                 profileKey,
               )
+
             profile = cached || undefined
           }
 
@@ -91,6 +94,7 @@ export function userContextMiddleware(
             // Load from User Service via client
             try {
               const user = await userServiceClient.getUser(context.userId)
+
               if (user) {
                 profile = {
                   firstName: user.firstName,
@@ -134,12 +138,15 @@ export function userContextMiddleware(
         try {
           // Try cache first
           const settingsKey = USER_CONTEXT_CACHE_KEYS.SETTINGS(context.userId)
+
           let settings: typeof context.settings = undefined
+
           if (cacheService) {
             const cached =
               await cacheService.get<NonNullable<typeof context.settings>>(
                 settingsKey,
               )
+
             settings = cached || undefined
           }
 
@@ -147,6 +154,7 @@ export function userContextMiddleware(
             // Load from User Service via client
             try {
               const user = await userServiceClient.getUser(context.userId)
+
               if (user?.settings) {
                 settings = user.settings
 
@@ -185,6 +193,7 @@ export function userContextMiddleware(
 
       // Set language header if available
       const language = getUserLanguage(context)
+
       res.setHeader('X-User-Language', language)
 
       // Set business header if available
@@ -220,5 +229,6 @@ export function requireUserContext(req: Request): UserContext {
   if (!req.userContext) {
     throw new Error('User context is required but not available')
   }
+
   return req.userContext
 }

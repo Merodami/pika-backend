@@ -51,7 +51,8 @@
     "node_modules",
     "previous-architecture",
     "ai",
-    "pika-old"
+    "pika-old",
+    "old-docs"
   ],
   "references": [
     // Core packages

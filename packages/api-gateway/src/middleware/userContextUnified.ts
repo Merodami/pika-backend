@@ -9,14 +9,9 @@
  * This ensures code portability and consistency regardless of deployment.
  */
 
-import {
-  UserContext,
-  USER_CONTEXT_CACHE_KEYS,
-  getUserLanguage,
-  UserStatus,
-} from '@pika/types'
-import { logger, UserServiceClient } from '@pika/shared'
 import type { ICacheService } from '@pika/redis'
+import { logger, UserServiceClient } from '@pika/shared'
+import { USER_CONTEXT_CACHE_KEYS, UserContext } from '@pika/types'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 /**
@@ -84,12 +79,14 @@ function getUserContextFromHeaders(req: Request): Partial<UserContext> | null {
 
   // Parse permissions from header
   const permissions = req.headers['x-user-permissions'] as string
+
   if (permissions) {
     context.permissions = permissions.split(',')
   }
 
   // Parse business ID
   const businessId = req.headers['x-business-id'] as string
+
   if (businessId) {
     context.profile = {
       ...context.profile,
@@ -99,6 +96,7 @@ function getUserContextFromHeaders(req: Request): Partial<UserContext> | null {
 
   // Parse language
   const language = req.headers['x-user-language'] as string
+
   if (language && context.profile) {
     context.profile.preferredLanguage = language
   }
@@ -120,11 +118,13 @@ async function fetchUserContext(
     if (cacheService) {
       const cacheKey = USER_CONTEXT_CACHE_KEYS.PROFILE(userId)
       const cached = await cacheService.get<UserContext>(cacheKey)
+
       if (cached) return cached
     }
 
     // Fetch from User Service
     const user = await userServiceClient.getUser(userId)
+
     if (!user) return null
 
     // Build full context
@@ -150,12 +150,14 @@ async function fetchUserContext(
     // Cache the result
     if (cacheService && cacheTTL) {
       const cacheKey = USER_CONTEXT_CACHE_KEYS.PROFILE(userId)
+
       await cacheService.set(cacheKey, context, cacheTTL)
     }
 
     return context
   } catch (error) {
     logger.error('Failed to fetch user context', { userId, error })
+
     return null
   }
 }
@@ -229,6 +231,7 @@ export function userContextMiddleware(
         case UserContextStrategy.CONSUME:
           // Service: Read from headers only
           const headerContext = getUserContextFromHeaders(req)
+
           if (headerContext && headerContext.userId) {
             context = headerContext as UserContext
           }
@@ -249,6 +252,7 @@ export function userContextMiddleware(
         case UserContextStrategy.HYBRID:
           // Try headers first, then fetch
           const hybridContext = getUserContextFromHeaders(req)
+
           if (hybridContext && hybridContext.userId) {
             context = hybridContext as UserContext
           } else if (userServiceClient && req.user) {
@@ -313,6 +317,7 @@ export function requireUserContext(req: Request): UserContext {
       'UserContext not available. Ensure userContextMiddleware is configured.',
     )
   }
+
   return req.userContext
 }
 

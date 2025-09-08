@@ -5,17 +5,18 @@
  * based on deployment mode
  */
 
-import type { Request, Response, NextFunction, RequestHandler } from 'express'
+import { logger } from '@pika/shared'
 import type { UserContext } from '@pika/types'
 import { UserRole } from '@pika/types'
-import { logger } from '@pika/shared'
-import { UserContextStrategy, type UserContextConfig } from './types.js'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
+
 import {
+  createContextFromJWT,
+  fetchUserContext,
   parseContextFromHeaders,
   setContextHeaders,
-  fetchUserContext,
-  createContextFromJWT,
 } from './strategies.js'
+import { type UserContextConfig, UserContextStrategy } from './types.js'
 
 /**
  * Main middleware factory
@@ -86,6 +87,7 @@ export function userContextMiddleware(
         case UserContextStrategy.CONSUME:
           // Microservice: Read from headers (set by gateway)
           const headerContext = parseContextFromHeaders(req)
+
           if (headerContext) {
             context = headerContext as UserContext
           }
@@ -116,6 +118,7 @@ export function userContextMiddleware(
         case UserContextStrategy.HYBRID:
           // Try headers first, fallback to fetch
           const hybridHeaderContext = parseContextFromHeaders(req)
+
           if (hybridHeaderContext) {
             context = hybridHeaderContext as UserContext
           }
@@ -165,6 +168,7 @@ export function userContextMiddleware(
       // Log metrics if enabled
       if (enableMetrics && startTime) {
         const latency = Date.now() - startTime
+
         logger.debug('User context middleware completed', {
           strategy,
           userId: context?.userId,
@@ -209,5 +213,6 @@ export function requireUserContext(req: Request) {
       'UserContext not available. Ensure userContextMiddleware is configured with the correct strategy.',
     )
   }
+
   return req.userContext
 }

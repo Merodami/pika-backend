@@ -65,6 +65,7 @@ model User {
   customerVouchers      CustomerVoucher[]   // Vouchers claimed by this customer
   voucherScans          VoucherScan[]       // Voucher scans performed by this user
   usedValidationCodes   VoucherValidationCode[] // Validation codes used by this user
+  voucherDrafts         VoucherDraft[]      // Voucher drafts created by this user
   customerFraudCases    FraudCase[]         @relation("FraudCaseCustomer") // Fraud cases involving this user as customer
   reviewedFraudCases    FraudCase[]         @relation("FraudCaseReviewer") // Fraud cases reviewed by this user
   fraudCaseHistory      FraudCaseHistory[]  // Fraud case actions performed by this user

@@ -20,6 +20,7 @@ model Business {
   user                 User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
   category             Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   vouchers             Voucher[]             // Vouchers created by this business
+  voucherDrafts        VoucherDraft[]        // Voucher drafts created by this business
   scans                VoucherScan[]         // Scans that happened at this business location
   fraudCases           FraudCase[]           // Fraud cases involving this business
   businessRegistration BusinessRegistration? // Registration data (one-time use)
