@@ -228,7 +228,7 @@ export function userContextMiddleware(
           }
           break
 
-        case UserContextStrategy.CONSUME:
+        case UserContextStrategy.CONSUME: {
           // Service: Read from headers only
           const headerContext = getUserContextFromHeaders(req)
 
@@ -236,6 +236,7 @@ export function userContextMiddleware(
             context = headerContext as UserContext
           }
           break
+        }
 
         case UserContextStrategy.DIRECT:
           // Embedded: Always fetch directly
@@ -249,7 +250,7 @@ export function userContextMiddleware(
           }
           break
 
-        case UserContextStrategy.HYBRID:
+        case UserContextStrategy.HYBRID: {
           // Try headers first, then fetch
           const hybridContext = getUserContextFromHeaders(req)
 
@@ -264,6 +265,7 @@ export function userContextMiddleware(
             )
           }
           break
+        }
 
         case UserContextStrategy.TEST:
           // Test mode: Use provided test data

@@ -84,7 +84,7 @@ export function userContextMiddleware(
           }
           break
 
-        case UserContextStrategy.CONSUME:
+        case UserContextStrategy.CONSUME: {
           // Microservice: Read from headers (set by gateway)
           const headerContext = parseContextFromHeaders(req)
 
@@ -97,6 +97,7 @@ export function userContextMiddleware(
             context.permissions = req.user.permissions || context.permissions
           }
           break
+        }
 
         case UserContextStrategy.DIRECT:
           // Embedded mode: Always fetch directly
@@ -115,7 +116,7 @@ export function userContextMiddleware(
           }
           break
 
-        case UserContextStrategy.HYBRID:
+        case UserContextStrategy.HYBRID: {
           // Try headers first, fallback to fetch
           const hybridHeaderContext = parseContextFromHeaders(req)
 
@@ -137,6 +138,7 @@ export function userContextMiddleware(
             context.permissions = req.user.permissions
           }
           break
+        }
 
         case UserContextStrategy.TEST:
           // Test mode: Use provided test data

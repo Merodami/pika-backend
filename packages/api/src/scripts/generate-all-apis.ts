@@ -336,10 +336,21 @@ const jsonFiles = [
 ]
 
 for (const file of jsonFiles) {
+  if (!file.endsWith('.json')) {
+    throw new Error(`Invalid file type: ${file}`)
+  }
+
   const sourcePath = join(OUTPUT_DIR, file)
   const destPath = join(API_GATEWAY_SRC_DOCS_DIR, file)
-  const content = readFileSync(sourcePath, 'utf8')
 
+  if (
+    !sourcePath.startsWith(OUTPUT_DIR) ||
+    !destPath.startsWith(API_GATEWAY_SRC_DOCS_DIR)
+  ) {
+    throw new Error(`Path traversal detected: ${file}`)
+  }
+
+  const content = readFileSync(sourcePath, 'utf8')
   writeFileSync(destPath, content)
   console.log(`  📄 Copied ${file} to api-gateway/src/docs/openapi`)
 }

@@ -20,8 +20,6 @@ import { createIncludeParam } from '../shared/query.js'
  * Simplified, flexible analytics endpoints - ONE endpoint handles everything
  */
 
-const PrioritySchema = createZodEnum(Priority)
-
 // Relations that can be included in analytics responses
 const ANALYTICS_RELATIONS = [
   'details', // Detailed breakdown

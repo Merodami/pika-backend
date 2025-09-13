@@ -131,8 +131,9 @@ iCaZykg8nJ1WQVmzXenRbTphll97w3OE4DM/Wf3DqF7Ycjy5ZxQ9y53Y/qirwl1f
 
         // Check middle lines (not header/footer)
         for (let i = 1; i < lines.length - 2; i++) {
-          if (lines[i]) {
-            expect(lines[i].length).toBeLessThanOrEqual(64)
+          const line = lines.at(i)
+          if (line) {
+            expect(line.length).toBeLessThanOrEqual(64)
           }
         }
       })

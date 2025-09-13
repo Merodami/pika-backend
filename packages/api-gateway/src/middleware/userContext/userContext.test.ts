@@ -51,10 +51,14 @@ function createMockResponse(): Partial<Response> {
     headersSent: false,
     setHeader: vi.fn(
       (key: string, value: string | number | readonly string[]) => {
-        headers[key] = String(value)
+        Object.assign(headers, { [key]: String(value) })
       },
     ) as any,
-    getHeader: vi.fn((key: string) => headers[key]),
+    getHeader: vi.fn((key: string) =>
+      Object.prototype.hasOwnProperty.call(headers, key)
+        ? headers[key]
+        : undefined,
+    ),
   }
 }
 

@@ -104,16 +104,83 @@ export default defineConfig({
     maxConcurrency: 4,
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html', 'lcov'],
+      include: ['packages/**/*.ts', 'packages/**/*.tsx'],
       exclude: [
-        'node_modules/**',
-        'dist/**',
-        '.next/**',
+        // Dependencies and build artifacts
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/.next/**',
+        '**/.nx/**',
+        '**/.yarn/**',
+        '**/coverage/**',
+
+        // Configuration files
+        '**/*.config.{js,ts}',
+        '**/*.config.*.{js,ts}',
+        '**/vitest.config.ts',
+        '**/eslint.config.js',
+        '**/commitlint.config.js',
+
+        // Type definitions and declarations
         '**/*.d.ts',
+        '**/types/**/*.ts',
+
+        // Test files
         '**/*.test.{ts,tsx}',
         '**/*.spec.{ts,tsx}',
         '**/test/**',
+        '**/tests/**',
+        '**/__tests__/**',
+        '**/setupTests.ts',
+
+        // Legacy and excluded directories
+        '**/previous-architecture/**',
+        '**/ai/**',
+        '**/pika/**',
+        '**/pika-old/**',
+
+        // Generated files and scripts
+        '**/generated/**',
+        '**/scripts/**',
+        '**/*.generated.ts',
+
+        // Documentation and assets
+        '**/*.md',
+        '**/docs/**',
+        '**/documentation/**',
+        '**/assets/**',
+
+        // Docker and deployment
+        '**/docker/**',
+        '**/Dockerfile*',
+        '**/docker-compose*.yml',
+
+        // Mock files
+        '**/mocks/**',
+        '**/__mocks__/**',
+
+        // Storybook
+        '**/*.stories.{ts,tsx}',
+
+        // Root level files
+        'commitlint.config.js',
+        'eslint.config.js',
+        'vitest.config.ts',
       ],
+      // IMPORTANT: Set to true to analyze ALL files, not just tested ones
+      all: true,
+      // Clean coverage between runs
+      clean: true,
+      // Report uncovered files
+      skipFull: false,
+      // Thresholds (optional, can be added later)
+      // thresholds: {
+      //   statements: 80,
+      //   branches: 80,
+      //   functions: 80,
+      //   lines: 80,
+      // },
     },
   },
 })

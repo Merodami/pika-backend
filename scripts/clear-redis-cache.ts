@@ -10,7 +10,6 @@ config({ path: resolve(process.cwd(), '.env.local'), override: true })
 const REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1'
 const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10)
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined
-const REDIS_PREFIX = process.env.REDIS_PREFIX || 'thevoucherbook:'
 
 async function clearRedisCache() {
   console.log('🔄 Connecting to Redis...')

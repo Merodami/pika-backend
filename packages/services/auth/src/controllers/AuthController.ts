@@ -196,7 +196,7 @@ export class AuthController {
   async verifyEmail(
     request: Request<VerifyEmailRequest>,
     response: Response,
-    next: NextFunction,
+    _next: NextFunction,
   ): Promise<void> {
     try {
       const { token } = request.params
