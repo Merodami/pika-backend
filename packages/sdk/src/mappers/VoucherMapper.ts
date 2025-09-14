@@ -436,8 +436,8 @@ export class VoucherMapper {
     if (!location) return null
 
     return {
-      lat: location.lat || location.latitude || 0,
-      lng: location.lng || location.longitude || 0,
+      lat: location.lat || 0,
+      lng: location.lng || 0,
       radius: location.radius,
     }
   }
@@ -469,8 +469,8 @@ export class VoucherMapper {
       Array.isArray(location.coordinates)
     ) {
       return {
-        lng: location.coordinates[0], // longitude is first in GeoJSON
         lat: location.coordinates[1], // latitude is second in GeoJSON
+        lng: location.coordinates[0], // longitude is first in GeoJSON
         radius: location.radius,
       }
     }

@@ -351,6 +351,7 @@ for (const file of jsonFiles) {
   }
 
   const content = readFileSync(sourcePath, 'utf8')
+
   writeFileSync(destPath, content)
   console.log(`  📄 Copied ${file} to api-gateway/src/docs/openapi`)
 }

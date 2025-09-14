@@ -47,12 +47,15 @@
     }
   },
   "exclude": [
+    "**/dist/**",
     "**/dist",
     "node_modules",
     "previous-architecture",
     "ai",
     "pika-old",
-    "old-docs"
+    "old-docs",
+    "**/prisma/seed/**",
+    "packages/api/src/scripts/generate-all-apis.ts"
   ],
   "references": [
     // Core packages

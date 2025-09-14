@@ -54,11 +54,11 @@ function createMockResponse(): Partial<Response> {
         Object.assign(headers, { [key]: String(value) })
       },
     ) as any,
-    getHeader: vi.fn((key: string) =>
-      Object.prototype.hasOwnProperty.call(headers, key)
-        ? headers[key]
-        : undefined,
-    ),
+    getHeader: vi.fn((key: string) => {
+      const headerKey = key as keyof typeof headers
+
+      return headers[headerKey] ?? undefined
+    }),
   }
 }
 
