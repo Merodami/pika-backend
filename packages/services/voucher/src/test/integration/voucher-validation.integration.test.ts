@@ -64,6 +64,7 @@ describe('Voucher Validation - URL-based QR Code Integration Tests', () => {
   let translationClient: MockTranslationClient
 
   // Authenticated clients for different user types
+  let adminClient: AuthenticatedRequestClient
   let customerClient: AuthenticatedRequestClient
 
   // Shared test data
@@ -150,11 +151,18 @@ describe('Voucher Validation - URL-based QR Code Integration Tests', () => {
       },
     })
 
+    // Get the admin user for category creation
+    const adminUser = await testDb.prisma.user.findUnique({
+      where: { email: 'admin@e2etest.com' },
+    })
+    const adminUserId = adminUser?.id || businessUser.id
+
     // Create shared test data with the business
     sharedTestData = await createSharedVoucherTestData(testDb.prisma, {
       businessId: testBusiness.id,
       count: 5,
       generateExpired: false,
+      createdBy: adminUserId,
     })
 
     // Pick a published voucher for testing

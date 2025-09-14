@@ -60,6 +60,7 @@ describe('Admin Category Integration Tests', () => {
   let customerClient: AuthenticatedRequestClient
   let server: any
   let sharedTestData: SharedCategoryTestData
+  let adminUserId: string
 
   const mockCacheService = new MockCacheService()
   const mockTranslationClient = new MockTranslationClient()
@@ -105,8 +106,17 @@ describe('Admin Category Integration Tests', () => {
     adminClient = await authHelper.getAdminClient(testDb.prisma)
     customerClient = await authHelper.getUserClient(testDb.prisma)
 
-    // Create shared test data once for all tests
-    sharedTestData = await createSharedCategoryTestData(testDb.prisma)
+    // Get the admin user ID for category creation
+    const adminUser = await testDb.prisma.user.findUnique({
+      where: { email: 'admin@e2etest.com' },
+    })
+    adminUserId = adminUser?.id || uuid()
+
+    // Create shared test data once for all tests with admin user
+    sharedTestData = await createSharedCategoryTestData(
+      testDb.prisma,
+      adminUserId,
+    )
   }, 120000)
 
   beforeEach(async () => {
@@ -224,7 +234,7 @@ describe('Admin Category Integration Tests', () => {
             level: 1,
             path: '',
             isActive: true,
-            createdBy: uuid(),
+            createdBy: adminUserId,
           },
         })
 
@@ -256,7 +266,7 @@ describe('Admin Category Integration Tests', () => {
             level: 1,
             path: '',
             isActive: true,
-            createdBy: uuid(),
+            createdBy: adminUserId,
           },
         })
 
@@ -283,7 +293,7 @@ describe('Admin Category Integration Tests', () => {
             level: 1,
             path: '',
             isActive: true,
-            createdBy: uuid(),
+            createdBy: adminUserId,
           },
         })
 
@@ -309,7 +319,7 @@ describe('Admin Category Integration Tests', () => {
             level: 1,
             path: '',
             isActive: true,
-            createdBy: uuid(),
+            createdBy: adminUserId,
           },
         })
 

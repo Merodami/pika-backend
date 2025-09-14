@@ -21,6 +21,7 @@ import {
   seedTestBusinesses,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
+import { UserRole, UserStatus } from '@prisma/client'
 import { keyManager } from '@pika/crypto'
 import { SERVICE_API_KEY } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
@@ -50,6 +51,9 @@ describe('Business Service - Internal API Integration Tests', () => {
 
   // Shared test data created once
   let sharedTestData: SharedBusinessTestData
+
+  // Admin user ID for creating categories
+  let adminUserId: string
 
   beforeAll(async () => {
     logger.debug(
@@ -95,6 +99,26 @@ describe('Business Service - Internal API Integration Tests', () => {
     internalClient = internalAPIHelper.createClient(app)
 
     logger.debug('Internal API setup complete')
+
+    // Create an admin user for category creation
+    const adminUser =
+      (await testDb.prisma.user.findFirst({
+        where: { role: UserRole.admin },
+      })) ||
+      (await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: 'admin@internal-test.com',
+          password:
+            '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe', // hashed "password123"
+          role: UserRole.admin,
+          status: UserStatus.active,
+          firstName: 'Admin',
+          lastName: 'User',
+          emailVerified: true,
+        },
+      }))
+    adminUserId = adminUser.id
 
     // Create shared test data once for all tests
     logger.debug('Creating shared test data...')
@@ -185,7 +209,7 @@ describe('Business Service - Internal API Integration Tests', () => {
           path: '/',
           isActive: true,
           sortOrder: 1,
-          createdBy: uuid(),
+          createdBy: adminUserId,
         },
       })
 
