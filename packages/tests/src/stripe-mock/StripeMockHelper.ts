@@ -22,7 +22,7 @@ export class StripeMockHelper {
     const finalConfig = { ...this.defaultConfig, ...config }
 
     return new Stripe(finalConfig.apiKey!, {
-      apiVersion: '2025-07-30.basil',
+      apiVersion: '2025-08-27.basil',
       host: finalConfig.host,
       port: finalConfig.port,
       protocol: 'http',
