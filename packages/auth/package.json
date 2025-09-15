@@ -13,10 +13,10 @@
     "@pika/environment": "workspace:^",
     "@pika/shared": "workspace:^",
     "@pika/types": "workspace:^",
-    "@prisma/client": "^6.14.0",
+    "@prisma/client": "^6.16.1",
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
-    "firebase-admin": "^13.4.0",
+    "firebase-admin": "^13.5.0",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
