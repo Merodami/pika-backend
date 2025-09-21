@@ -110,6 +110,7 @@ describe('Admin Category Integration Tests', () => {
     const adminUser = await testDb.prisma.user.findUnique({
       where: { email: 'admin@e2etest.com' },
     })
+
     adminUserId = adminUser?.id || uuid()
 
     // Create shared test data once for all tests with admin user

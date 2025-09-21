@@ -7,15 +7,15 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5500/api/v1",
+      "url": "http://127.0.0.1:5500/api/v1",
       "description": "Local Development"
     },
     {
-      "url": "https://api.thevoucherbook.com/v1",
+      "url": "https://admin-api.thevoucherbook.com/v1",
       "description": "Production"
     },
     {
-      "url": "https://api.staging.thevoucherbook.com/v1",
+      "url": "https://staging-admin-api.thevoucherbook.com/v1",
       "description": "Staging"
     }
   ],

@@ -1,4 +1,3 @@
-import type { ICacheService } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import { BusinessRegistrationStatus as DomainStatus } from '@pika/types'
 import {
@@ -7,8 +6,6 @@ import {
   Prisma,
   type PrismaClient,
 } from '@prisma/client'
-
-import { generateCacheKey } from '../constants/cache-keys.js'
 
 /**
  * Convert domain enum to Prisma enum
@@ -65,48 +62,20 @@ export interface UpdateStepData {
 /**
  * Business registration repository implementation using Prisma
  * Manages the business_registration table for tracking registration progress
- *
- * Cache Key Pattern (using constants from cache-keys.ts):
- * - business:registration:user:{userId} - Repository cache for user's registration data
- * - business:registration:status:{userId} - Service cache for registration status (used by @Cache decorator)
- *
- * Cache invalidation happens on all write operations to ensure consistency
  */
 export class BusinessRegistrationRepository
   implements IBusinessRegistrationRepository
 {
-  constructor(
-    private readonly prisma: PrismaClient,
-    private readonly cacheService?: ICacheService,
-  ) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   /**
    * Find registration by user ID
    */
   async findByUserId(userId: string): Promise<BusinessRegistration | null> {
     try {
-      // Check cache first
-      const cacheKey = generateCacheKey.registrationUser(userId)
-
-      if (this.cacheService) {
-        const cached =
-          await this.cacheService.get<BusinessRegistration>(cacheKey)
-
-        if (cached) {
-          logger.debug('Business registration cache hit', { userId })
-
-          return cached
-        }
-      }
-
       const registration = await this.prisma.businessRegistration.findUnique({
         where: { userId },
       })
-
-      // Cache the result
-      if (registration && this.cacheService) {
-        await this.cacheService.set(cacheKey, registration, 300) // 5 minutes cache
-      }
 
       return registration
     } catch (error) {
@@ -176,16 +145,6 @@ export class BusinessRegistrationRepository
           startedAt: new Date(),
         },
       })
-
-      // Invalidate both cache keys - service decorator and repository cache
-      if (this.cacheService) {
-        await this.cacheService.del(
-          generateCacheKey.registrationStatus(data.userId),
-        )
-        await this.cacheService.del(
-          generateCacheKey.registrationUser(data.userId),
-        )
-      }
 
       logger.info('Business registration created', {
         registrationId: registration.id,
@@ -279,16 +238,6 @@ export class BusinessRegistrationRepository
         data: updateData,
       })
 
-      // Invalidate both cache keys - service decorator and repository cache
-      if (this.cacheService && registration) {
-        await this.cacheService.del(
-          generateCacheKey.registrationStatus(registration.userId),
-        )
-        await this.cacheService.del(
-          generateCacheKey.registrationUser(registration.userId),
-        )
-      }
-
       logger.info('Business registration step updated', {
         registrationId: id,
         step,
@@ -338,16 +287,6 @@ export class BusinessRegistrationRepository
         data: updateData,
       })
 
-      // Invalidate both cache keys - service decorator and repository cache
-      if (this.cacheService && registration) {
-        await this.cacheService.del(
-          generateCacheKey.registrationStatus(registration.userId),
-        )
-        await this.cacheService.del(
-          generateCacheKey.registrationUser(registration.userId),
-        )
-      }
-
       logger.info('Business registration status updated', {
         registrationId: id,
         status,
@@ -386,16 +325,6 @@ export class BusinessRegistrationRepository
           updatedAt: new Date(),
         },
       })
-
-      // Invalidate both cache keys - service decorator and repository cache
-      if (this.cacheService && registration) {
-        await this.cacheService.del(
-          generateCacheKey.registrationStatus(registration.userId),
-        )
-        await this.cacheService.del(
-          generateCacheKey.registrationUser(registration.userId),
-        )
-      }
 
       logger.info('Business registration completed', {
         registrationId: id,
@@ -438,16 +367,6 @@ export class BusinessRegistrationRepository
           updatedAt: new Date(),
         },
       })
-
-      // Invalidate both cache keys - service decorator and repository cache
-      if (this.cacheService && registration) {
-        await this.cacheService.del(
-          generateCacheKey.registrationStatus(registration.userId),
-        )
-        await this.cacheService.del(
-          generateCacheKey.registrationUser(registration.userId),
-        )
-      }
 
       logger.info('Business registration reset', {
         registrationId: id,

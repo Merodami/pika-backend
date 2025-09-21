@@ -7,8 +7,16 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5500/api/v1",
-      "description": "API Gateway"
+      "url": "http://127.0.0.1:5500/api/v1",
+      "description": "API Gateway (Local)"
+    },
+    {
+      "url": "https://api.thevoucherbook.com/v1",
+      "description": "API Gateway (Production)"
+    },
+    {
+      "url": "https://api.staging.thevoucherbook.com/v1",
+      "description": "API Gateway (Staging)"
     },
     {
       "url": "http://0.0.0.0:5502",
@@ -17,6 +25,18 @@
     {
       "url": "http://0.0.0.0:5501",
       "description": "User Service (Internal)"
+    },
+    {
+      "url": "http://0.0.0.0:5511",
+      "description": "Business Service (Internal)"
+    },
+    {
+      "url": "http://0.0.0.0:5512",
+      "description": "Category Service (Internal)"
+    },
+    {
+      "url": "http://0.0.0.0:5514",
+      "description": "Voucher Service (Internal)"
     },
     {
       "url": "http://0.0.0.0:5506",
@@ -37,6 +57,10 @@
     {
       "url": "http://0.0.0.0:5508",
       "description": "Support Service (Internal)"
+    },
+    {
+      "url": "http://0.0.0.0:5513",
+      "description": "PDF Service (Internal)"
     }
   ],
   "components": {
@@ -2147,6 +2171,883 @@
           "message",
           "estimatedReviewTime"
         ]
+      },
+      "BusinessSettings": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "enum": ["1.0"],
+            "description": "Settings schema version"
+          },
+          "store": {
+            "type": "object",
+            "properties": {
+              "timezone": {
+                "type": "string",
+                "description": "IANA timezone identifier"
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "PYG",
+                  "USD",
+                  "EUR",
+                  "GBP",
+                  "CAD",
+                  "AUD",
+                  "JPY",
+                  "CNY",
+                  "INR"
+                ],
+                "description": "Accepted currency"
+              },
+              "primaryLanguage": {
+                "type": "string",
+                "enum": ["es", "en"],
+                "description": "Primary business language"
+              },
+              "refundPolicy": {
+                "type": "string",
+                "enum": ["full", "partial", "store_credit", "no_refunds"],
+                "description": "Refund policy"
+              },
+              "paymentTerms": {
+                "type": "string",
+                "enum": ["immediate", "net_15", "net_30", "custom"],
+                "description": "Payment terms"
+              }
+            },
+            "required": [
+              "timezone",
+              "currency",
+              "primaryLanguage",
+              "refundPolicy",
+              "paymentTerms"
+            ]
+          },
+          "payment": {
+            "type": "object",
+            "properties": {
+              "acceptsCash": {
+                "type": "boolean",
+                "description": "Accepts cash payments"
+              },
+              "acceptsCard": {
+                "type": "boolean",
+                "description": "Accepts card payments"
+              },
+              "acceptsTransfer": {
+                "type": "boolean",
+                "description": "Accepts bank transfers"
+              },
+              "acceptsMobilePayment": {
+                "type": "boolean",
+                "description": "Accepts mobile payments"
+              },
+              "providesInvoice": {
+                "type": "boolean",
+                "description": "Provides invoices"
+              }
+            },
+            "required": [
+              "acceptsCash",
+              "acceptsCard",
+              "acceptsTransfer",
+              "acceptsMobilePayment",
+              "providesInvoice"
+            ]
+          },
+          "voucher": {
+            "type": "object",
+            "properties": {
+              "autoApproveVouchers": {
+                "type": "boolean",
+                "description": "Auto-approve voucher claims"
+              },
+              "defaultValidityDays": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 365,
+                "description": "Default voucher validity in days"
+              },
+              "maxActiveVouchers": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Maximum concurrent active vouchers"
+              },
+              "maxRedemptionsPerCustomer": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Max redemptions per customer"
+              },
+              "requiresVerification": {
+                "type": "boolean",
+                "description": "Requires verification for redemption"
+              },
+              "minimumPurchaseAmount": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Minimum purchase amount to use vouchers"
+              },
+              "showOnMarketplace": {
+                "type": "boolean",
+                "description": "Show vouchers in public marketplace"
+              },
+              "allowSharing": {
+                "type": "boolean",
+                "description": "Allow customers to share vouchers"
+              },
+              "platformCommissionAgreed": {
+                "type": "boolean",
+                "description": "Agreed to platform commission"
+              },
+              "commissionModel": {
+                "type": "string",
+                "enum": ["percentage", "flat_fee", "hybrid"],
+                "description": "Commission model"
+              }
+            },
+            "required": [
+              "autoApproveVouchers",
+              "defaultValidityDays",
+              "maxActiveVouchers",
+              "maxRedemptionsPerCustomer",
+              "requiresVerification",
+              "showOnMarketplace",
+              "allowSharing",
+              "platformCommissionAgreed"
+            ]
+          },
+          "communication": {
+            "type": "object",
+            "properties": {
+              "responseTimeCommitment": {
+                "type": "string",
+                "enum": ["instant", "1h", "24h", "48h", "custom"],
+                "description": "Response time commitment"
+              },
+              "autoReplyEnabled": {
+                "type": "boolean",
+                "description": "Auto-reply enabled"
+              },
+              "autoReplyMessage": {
+                "type": "string",
+                "maxLength": 500,
+                "description": "Auto-reply message"
+              },
+              "acceptsWhatsApp": {
+                "type": "boolean",
+                "description": "Accepts WhatsApp messages"
+              },
+              "acceptsSMS": {
+                "type": "boolean",
+                "description": "Accepts SMS messages"
+              }
+            },
+            "required": [
+              "responseTimeCommitment",
+              "autoReplyEnabled",
+              "acceptsWhatsApp",
+              "acceptsSMS"
+            ]
+          },
+          "analytics": {
+            "type": "object",
+            "properties": {
+              "dashboardView": {
+                "type": "string",
+                "enum": ["simple", "detailed", "custom"],
+                "description": "Dashboard view preference"
+              },
+              "defaultTimeRange": {
+                "type": "string",
+                "enum": ["today", "week", "month", "quarter", "year"],
+                "description": "Default time range"
+              },
+              "emailReports": {
+                "type": "boolean",
+                "description": "Receive email reports"
+              },
+              "reportFrequency": {
+                "type": "string",
+                "enum": ["daily", "weekly", "monthly", "quarterly"],
+                "description": "Report frequency"
+              }
+            },
+            "required": ["dashboardView", "defaultTimeRange", "emailReports"]
+          },
+          "branding": {
+            "type": "object",
+            "properties": {
+              "voucherTemplate": {
+                "type": "string",
+                "enum": ["standard", "premium", "festive", "minimal", "custom"],
+                "description": "Voucher template style"
+              },
+              "primaryColor": {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "description": "Primary brand color (hex)"
+              },
+              "showLogoOnVouchers": {
+                "type": "boolean",
+                "description": "Show logo on vouchers"
+              }
+            },
+            "required": ["voucherTemplate", "showLogoOnVouchers"]
+          },
+          "notifications": {
+            "type": "object",
+            "properties": {
+              "notifyOnVoucherClaim": {
+                "type": "boolean",
+                "description": "Notify on voucher claim"
+              },
+              "notifyOnVoucherRedeem": {
+                "type": "boolean",
+                "description": "Notify on voucher redemption"
+              },
+              "notifyOnVoucherExpiring": {
+                "type": "boolean",
+                "description": "Notify on voucher expiring"
+              },
+              "notifyOnNewReview": {
+                "type": "boolean",
+                "description": "Notify on new review"
+              },
+              "dailySummary": {
+                "type": "boolean",
+                "description": "Receive daily summary"
+              },
+              "monthlySummary": {
+                "type": "boolean",
+                "description": "Receive monthly summary"
+              },
+              "emailNotifications": {
+                "type": "boolean",
+                "description": "Email notifications enabled"
+              },
+              "pushNotifications": {
+                "type": "boolean",
+                "description": "Push notifications enabled"
+              },
+              "inAppNotifications": {
+                "type": "boolean",
+                "description": "In-app notifications enabled"
+              }
+            },
+            "required": [
+              "notifyOnVoucherClaim",
+              "notifyOnVoucherRedeem",
+              "notifyOnVoucherExpiring",
+              "notifyOnNewReview",
+              "dailySummary",
+              "monthlySummary",
+              "emailNotifications",
+              "pushNotifications",
+              "inAppNotifications"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        },
+        "required": [
+          "version",
+          "store",
+          "payment",
+          "voucher",
+          "communication",
+          "analytics",
+          "branding",
+          "notifications",
+          "updatedAt"
+        ]
+      },
+      "BusinessSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "string",
+                "enum": ["1.0"],
+                "description": "Settings schema version"
+              },
+              "store": {
+                "type": "object",
+                "properties": {
+                  "timezone": {
+                    "type": "string",
+                    "description": "IANA timezone identifier"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "PYG",
+                      "USD",
+                      "EUR",
+                      "GBP",
+                      "CAD",
+                      "AUD",
+                      "JPY",
+                      "CNY",
+                      "INR"
+                    ],
+                    "description": "Accepted currency"
+                  },
+                  "primaryLanguage": {
+                    "type": "string",
+                    "enum": ["es", "en"],
+                    "description": "Primary business language"
+                  },
+                  "refundPolicy": {
+                    "type": "string",
+                    "enum": ["full", "partial", "store_credit", "no_refunds"],
+                    "description": "Refund policy"
+                  },
+                  "paymentTerms": {
+                    "type": "string",
+                    "enum": ["immediate", "net_15", "net_30", "custom"],
+                    "description": "Payment terms"
+                  }
+                },
+                "required": [
+                  "timezone",
+                  "currency",
+                  "primaryLanguage",
+                  "refundPolicy",
+                  "paymentTerms"
+                ]
+              },
+              "payment": {
+                "type": "object",
+                "properties": {
+                  "acceptsCash": {
+                    "type": "boolean",
+                    "description": "Accepts cash payments"
+                  },
+                  "acceptsCard": {
+                    "type": "boolean",
+                    "description": "Accepts card payments"
+                  },
+                  "acceptsTransfer": {
+                    "type": "boolean",
+                    "description": "Accepts bank transfers"
+                  },
+                  "acceptsMobilePayment": {
+                    "type": "boolean",
+                    "description": "Accepts mobile payments"
+                  },
+                  "providesInvoice": {
+                    "type": "boolean",
+                    "description": "Provides invoices"
+                  }
+                },
+                "required": [
+                  "acceptsCash",
+                  "acceptsCard",
+                  "acceptsTransfer",
+                  "acceptsMobilePayment",
+                  "providesInvoice"
+                ]
+              },
+              "voucher": {
+                "type": "object",
+                "properties": {
+                  "autoApproveVouchers": {
+                    "type": "boolean",
+                    "description": "Auto-approve voucher claims"
+                  },
+                  "defaultValidityDays": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 365,
+                    "description": "Default voucher validity in days"
+                  },
+                  "maxActiveVouchers": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Maximum concurrent active vouchers"
+                  },
+                  "maxRedemptionsPerCustomer": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Max redemptions per customer"
+                  },
+                  "requiresVerification": {
+                    "type": "boolean",
+                    "description": "Requires verification for redemption"
+                  },
+                  "minimumPurchaseAmount": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Minimum purchase amount to use vouchers"
+                  },
+                  "showOnMarketplace": {
+                    "type": "boolean",
+                    "description": "Show vouchers in public marketplace"
+                  },
+                  "allowSharing": {
+                    "type": "boolean",
+                    "description": "Allow customers to share vouchers"
+                  },
+                  "platformCommissionAgreed": {
+                    "type": "boolean",
+                    "description": "Agreed to platform commission"
+                  },
+                  "commissionModel": {
+                    "type": "string",
+                    "enum": ["percentage", "flat_fee", "hybrid"],
+                    "description": "Commission model"
+                  }
+                },
+                "required": [
+                  "autoApproveVouchers",
+                  "defaultValidityDays",
+                  "maxActiveVouchers",
+                  "maxRedemptionsPerCustomer",
+                  "requiresVerification",
+                  "showOnMarketplace",
+                  "allowSharing",
+                  "platformCommissionAgreed"
+                ]
+              },
+              "communication": {
+                "type": "object",
+                "properties": {
+                  "responseTimeCommitment": {
+                    "type": "string",
+                    "enum": ["instant", "1h", "24h", "48h", "custom"],
+                    "description": "Response time commitment"
+                  },
+                  "autoReplyEnabled": {
+                    "type": "boolean",
+                    "description": "Auto-reply enabled"
+                  },
+                  "autoReplyMessage": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Auto-reply message"
+                  },
+                  "acceptsWhatsApp": {
+                    "type": "boolean",
+                    "description": "Accepts WhatsApp messages"
+                  },
+                  "acceptsSMS": {
+                    "type": "boolean",
+                    "description": "Accepts SMS messages"
+                  }
+                },
+                "required": [
+                  "responseTimeCommitment",
+                  "autoReplyEnabled",
+                  "acceptsWhatsApp",
+                  "acceptsSMS"
+                ]
+              },
+              "analytics": {
+                "type": "object",
+                "properties": {
+                  "dashboardView": {
+                    "type": "string",
+                    "enum": ["simple", "detailed", "custom"],
+                    "description": "Dashboard view preference"
+                  },
+                  "defaultTimeRange": {
+                    "type": "string",
+                    "enum": ["today", "week", "month", "quarter", "year"],
+                    "description": "Default time range"
+                  },
+                  "emailReports": {
+                    "type": "boolean",
+                    "description": "Receive email reports"
+                  },
+                  "reportFrequency": {
+                    "type": "string",
+                    "enum": ["daily", "weekly", "monthly", "quarterly"],
+                    "description": "Report frequency"
+                  }
+                },
+                "required": [
+                  "dashboardView",
+                  "defaultTimeRange",
+                  "emailReports"
+                ]
+              },
+              "branding": {
+                "type": "object",
+                "properties": {
+                  "voucherTemplate": {
+                    "type": "string",
+                    "enum": [
+                      "standard",
+                      "premium",
+                      "festive",
+                      "minimal",
+                      "custom"
+                    ],
+                    "description": "Voucher template style"
+                  },
+                  "primaryColor": {
+                    "type": "string",
+                    "pattern": "^#[0-9A-Fa-f]{6}$",
+                    "description": "Primary brand color (hex)"
+                  },
+                  "showLogoOnVouchers": {
+                    "type": "boolean",
+                    "description": "Show logo on vouchers"
+                  }
+                },
+                "required": ["voucherTemplate", "showLogoOnVouchers"]
+              },
+              "notifications": {
+                "type": "object",
+                "properties": {
+                  "notifyOnVoucherClaim": {
+                    "type": "boolean",
+                    "description": "Notify on voucher claim"
+                  },
+                  "notifyOnVoucherRedeem": {
+                    "type": "boolean",
+                    "description": "Notify on voucher redemption"
+                  },
+                  "notifyOnVoucherExpiring": {
+                    "type": "boolean",
+                    "description": "Notify on voucher expiring"
+                  },
+                  "notifyOnNewReview": {
+                    "type": "boolean",
+                    "description": "Notify on new review"
+                  },
+                  "dailySummary": {
+                    "type": "boolean",
+                    "description": "Receive daily summary"
+                  },
+                  "monthlySummary": {
+                    "type": "boolean",
+                    "description": "Receive monthly summary"
+                  },
+                  "emailNotifications": {
+                    "type": "boolean",
+                    "description": "Email notifications enabled"
+                  },
+                  "pushNotifications": {
+                    "type": "boolean",
+                    "description": "Push notifications enabled"
+                  },
+                  "inAppNotifications": {
+                    "type": "boolean",
+                    "description": "In-app notifications enabled"
+                  }
+                },
+                "required": [
+                  "notifyOnVoucherClaim",
+                  "notifyOnVoucherRedeem",
+                  "notifyOnVoucherExpiring",
+                  "notifyOnNewReview",
+                  "dailySummary",
+                  "monthlySummary",
+                  "emailNotifications",
+                  "pushNotifications",
+                  "inAppNotifications"
+                ]
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Last update timestamp"
+              }
+            },
+            "required": [
+              "version",
+              "store",
+              "payment",
+              "voucher",
+              "communication",
+              "analytics",
+              "branding",
+              "notifications",
+              "updatedAt"
+            ],
+            "description": "Business settings"
+          }
+        },
+        "required": ["settings"]
+      },
+      "UpdateBusinessSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "object",
+            "properties": {
+              "timezone": {
+                "type": "string",
+                "description": "IANA timezone identifier"
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "PYG",
+                  "USD",
+                  "EUR",
+                  "GBP",
+                  "CAD",
+                  "AUD",
+                  "JPY",
+                  "CNY",
+                  "INR"
+                ],
+                "description": "Accepted currency"
+              },
+              "primaryLanguage": {
+                "type": "string",
+                "enum": ["es", "en"],
+                "description": "Primary business language"
+              },
+              "refundPolicy": {
+                "type": "string",
+                "enum": ["full", "partial", "store_credit", "no_refunds"],
+                "description": "Refund policy"
+              },
+              "paymentTerms": {
+                "type": "string",
+                "enum": ["immediate", "net_15", "net_30", "custom"],
+                "description": "Payment terms"
+              }
+            }
+          },
+          "payment": {
+            "type": "object",
+            "properties": {
+              "acceptsCash": {
+                "type": "boolean",
+                "description": "Accepts cash payments"
+              },
+              "acceptsCard": {
+                "type": "boolean",
+                "description": "Accepts card payments"
+              },
+              "acceptsTransfer": {
+                "type": "boolean",
+                "description": "Accepts bank transfers"
+              },
+              "acceptsMobilePayment": {
+                "type": "boolean",
+                "description": "Accepts mobile payments"
+              },
+              "providesInvoice": {
+                "type": "boolean",
+                "description": "Provides invoices"
+              }
+            }
+          },
+          "voucher": {
+            "type": "object",
+            "properties": {
+              "autoApproveVouchers": {
+                "type": "boolean",
+                "description": "Auto-approve voucher claims"
+              },
+              "defaultValidityDays": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 365,
+                "description": "Default voucher validity in days"
+              },
+              "maxActiveVouchers": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Maximum concurrent active vouchers"
+              },
+              "maxRedemptionsPerCustomer": {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 100,
+                "description": "Max redemptions per customer"
+              },
+              "requiresVerification": {
+                "type": "boolean",
+                "description": "Requires verification for redemption"
+              },
+              "minimumPurchaseAmount": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Minimum purchase amount to use vouchers"
+              },
+              "showOnMarketplace": {
+                "type": "boolean",
+                "description": "Show vouchers in public marketplace"
+              },
+              "allowSharing": {
+                "type": "boolean",
+                "description": "Allow customers to share vouchers"
+              },
+              "platformCommissionAgreed": {
+                "type": "boolean",
+                "description": "Agreed to platform commission"
+              },
+              "commissionModel": {
+                "type": "string",
+                "enum": ["percentage", "flat_fee", "hybrid"],
+                "description": "Commission model"
+              }
+            }
+          },
+          "communication": {
+            "type": "object",
+            "properties": {
+              "responseTimeCommitment": {
+                "type": "string",
+                "enum": ["instant", "1h", "24h", "48h", "custom"],
+                "description": "Response time commitment"
+              },
+              "autoReplyEnabled": {
+                "type": "boolean",
+                "description": "Auto-reply enabled"
+              },
+              "autoReplyMessage": {
+                "type": "string",
+                "maxLength": 500,
+                "description": "Auto-reply message"
+              },
+              "acceptsWhatsApp": {
+                "type": "boolean",
+                "description": "Accepts WhatsApp messages"
+              },
+              "acceptsSMS": {
+                "type": "boolean",
+                "description": "Accepts SMS messages"
+              }
+            }
+          },
+          "analytics": {
+            "type": "object",
+            "properties": {
+              "dashboardView": {
+                "type": "string",
+                "enum": ["simple", "detailed", "custom"],
+                "description": "Dashboard view preference"
+              },
+              "defaultTimeRange": {
+                "type": "string",
+                "enum": ["today", "week", "month", "quarter", "year"],
+                "description": "Default time range"
+              },
+              "emailReports": {
+                "type": "boolean",
+                "description": "Receive email reports"
+              },
+              "reportFrequency": {
+                "type": "string",
+                "enum": ["daily", "weekly", "monthly", "quarterly"],
+                "description": "Report frequency"
+              }
+            }
+          },
+          "branding": {
+            "type": "object",
+            "properties": {
+              "voucherTemplate": {
+                "type": "string",
+                "enum": ["standard", "premium", "festive", "minimal", "custom"],
+                "description": "Voucher template style"
+              },
+              "primaryColor": {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$",
+                "description": "Primary brand color (hex)"
+              },
+              "showLogoOnVouchers": {
+                "type": "boolean",
+                "description": "Show logo on vouchers"
+              }
+            }
+          },
+          "notifications": {
+            "type": "object",
+            "properties": {
+              "notifyOnVoucherClaim": {
+                "type": "boolean",
+                "description": "Notify on voucher claim"
+              },
+              "notifyOnVoucherRedeem": {
+                "type": "boolean",
+                "description": "Notify on voucher redemption"
+              },
+              "notifyOnVoucherExpiring": {
+                "type": "boolean",
+                "description": "Notify on voucher expiring"
+              },
+              "notifyOnNewReview": {
+                "type": "boolean",
+                "description": "Notify on new review"
+              },
+              "dailySummary": {
+                "type": "boolean",
+                "description": "Receive daily summary"
+              },
+              "monthlySummary": {
+                "type": "boolean",
+                "description": "Receive monthly summary"
+              },
+              "emailNotifications": {
+                "type": "boolean",
+                "description": "Email notifications enabled"
+              },
+              "pushNotifications": {
+                "type": "boolean",
+                "description": "Push notifications enabled"
+              },
+              "inAppNotifications": {
+                "type": "boolean",
+                "description": "In-app notifications enabled"
+              }
+            }
+          }
+        }
+      },
+      "ResetBusinessSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "store",
+                "payment",
+                "voucher",
+                "communication",
+                "analytics",
+                "branding",
+                "notifications"
+              ]
+            },
+            "description": "Sections to reset (all if not specified)"
+          }
+        }
+      },
+      "BusinessSettingsPathParams": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Universally Unique Identifier"
+          }
+        },
+        "required": ["id"],
+        "description": "Business ID path parameter"
       },
       "CategoryResponse": {
         "type": "object",
@@ -10976,9 +11877,6 @@
                   },
                   "voucherExpiry": {
                     "type": "boolean"
-                  },
-                  "businessUpdates": {
-                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -10986,8 +11884,7 @@
                   "marketing",
                   "productUpdates",
                   "securityAlerts",
-                  "voucherExpiry",
-                  "businessUpdates"
+                  "voucherExpiry"
                 ]
               },
               "push": {
@@ -11002,9 +11899,6 @@
                   "voucherExpiry": {
                     "type": "boolean"
                   },
-                  "businessUpdates": {
-                    "type": "boolean"
-                  },
                   "orderUpdates": {
                     "type": "boolean"
                   }
@@ -11013,7 +11907,6 @@
                   "enabled",
                   "marketing",
                   "voucherExpiry",
-                  "businessUpdates",
                   "orderUpdates"
                 ]
               },
@@ -11115,72 +12008,6 @@
               }
             },
             "required": ["profile", "search", "analytics", "marketing"]
-          },
-          "business": {
-            "type": "object",
-            "properties": {
-              "dashboard": {
-                "type": "object",
-                "properties": {
-                  "defaultView": {
-                    "type": "string",
-                    "enum": ["overview", "analytics", "vouchers", "customers"]
-                  },
-                  "autoRefresh": {
-                    "type": "boolean"
-                  },
-                  "refreshInterval": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 60
-                  }
-                },
-                "required": ["defaultView", "autoRefresh", "refreshInterval"]
-              },
-              "vouchers": {
-                "type": "object",
-                "properties": {
-                  "autoApprove": {
-                    "type": "boolean"
-                  },
-                  "requireCustomerData": {
-                    "type": "boolean"
-                  },
-                  "allowBulkActions": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "autoApprove",
-                  "requireCustomerData",
-                  "allowBulkActions"
-                ]
-              },
-              "notifications": {
-                "type": "object",
-                "properties": {
-                  "newCustomers": {
-                    "type": "boolean"
-                  },
-                  "voucherRedemptions": {
-                    "type": "boolean"
-                  },
-                  "lowStockAlerts": {
-                    "type": "boolean"
-                  },
-                  "reviewRequests": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "newCustomers",
-                  "voucherRedemptions",
-                  "lowStockAlerts",
-                  "reviewRequests"
-                ]
-              }
-            },
-            "required": ["dashboard", "vouchers", "notifications"]
           },
           "accessibility": {
             "type": "object",
@@ -11305,9 +12132,6 @@
                       },
                       "voucherExpiry": {
                         "type": "boolean"
-                      },
-                      "businessUpdates": {
-                        "type": "boolean"
                       }
                     },
                     "required": [
@@ -11315,8 +12139,7 @@
                       "marketing",
                       "productUpdates",
                       "securityAlerts",
-                      "voucherExpiry",
-                      "businessUpdates"
+                      "voucherExpiry"
                     ]
                   },
                   "push": {
@@ -11331,9 +12154,6 @@
                       "voucherExpiry": {
                         "type": "boolean"
                       },
-                      "businessUpdates": {
-                        "type": "boolean"
-                      },
                       "orderUpdates": {
                         "type": "boolean"
                       }
@@ -11342,7 +12162,6 @@
                       "enabled",
                       "marketing",
                       "voucherExpiry",
-                      "businessUpdates",
                       "orderUpdates"
                     ]
                   },
@@ -11444,81 +12263,6 @@
                   }
                 },
                 "required": ["profile", "search", "analytics", "marketing"]
-              },
-              "business": {
-                "type": "object",
-                "properties": {
-                  "dashboard": {
-                    "type": "object",
-                    "properties": {
-                      "defaultView": {
-                        "type": "string",
-                        "enum": [
-                          "overview",
-                          "analytics",
-                          "vouchers",
-                          "customers"
-                        ]
-                      },
-                      "autoRefresh": {
-                        "type": "boolean"
-                      },
-                      "refreshInterval": {
-                        "type": "number",
-                        "minimum": 1,
-                        "maximum": 60
-                      }
-                    },
-                    "required": [
-                      "defaultView",
-                      "autoRefresh",
-                      "refreshInterval"
-                    ]
-                  },
-                  "vouchers": {
-                    "type": "object",
-                    "properties": {
-                      "autoApprove": {
-                        "type": "boolean"
-                      },
-                      "requireCustomerData": {
-                        "type": "boolean"
-                      },
-                      "allowBulkActions": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "autoApprove",
-                      "requireCustomerData",
-                      "allowBulkActions"
-                    ]
-                  },
-                  "notifications": {
-                    "type": "object",
-                    "properties": {
-                      "newCustomers": {
-                        "type": "boolean"
-                      },
-                      "voucherRedemptions": {
-                        "type": "boolean"
-                      },
-                      "lowStockAlerts": {
-                        "type": "boolean"
-                      },
-                      "reviewRequests": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "newCustomers",
-                      "voucherRedemptions",
-                      "lowStockAlerts",
-                      "reviewRequests"
-                    ]
-                  }
-                },
-                "required": ["dashboard", "vouchers", "notifications"]
               },
               "accessibility": {
                 "type": "object",
@@ -11643,9 +12387,6 @@
                   },
                   "voucherExpiry": {
                     "type": "boolean"
-                  },
-                  "businessUpdates": {
-                    "type": "boolean"
                   }
                 },
                 "required": [
@@ -11653,8 +12394,7 @@
                   "marketing",
                   "productUpdates",
                   "securityAlerts",
-                  "voucherExpiry",
-                  "businessUpdates"
+                  "voucherExpiry"
                 ]
               },
               "push": {
@@ -11669,9 +12409,6 @@
                   "voucherExpiry": {
                     "type": "boolean"
                   },
-                  "businessUpdates": {
-                    "type": "boolean"
-                  },
                   "orderUpdates": {
                     "type": "boolean"
                   }
@@ -11680,7 +12417,6 @@
                   "enabled",
                   "marketing",
                   "voucherExpiry",
-                  "businessUpdates",
                   "orderUpdates"
                 ]
               },
@@ -11782,72 +12518,6 @@
               }
             },
             "required": ["profile", "search", "analytics", "marketing"]
-          },
-          "business": {
-            "type": "object",
-            "properties": {
-              "dashboard": {
-                "type": "object",
-                "properties": {
-                  "defaultView": {
-                    "type": "string",
-                    "enum": ["overview", "analytics", "vouchers", "customers"]
-                  },
-                  "autoRefresh": {
-                    "type": "boolean"
-                  },
-                  "refreshInterval": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 60
-                  }
-                },
-                "required": ["defaultView", "autoRefresh", "refreshInterval"]
-              },
-              "vouchers": {
-                "type": "object",
-                "properties": {
-                  "autoApprove": {
-                    "type": "boolean"
-                  },
-                  "requireCustomerData": {
-                    "type": "boolean"
-                  },
-                  "allowBulkActions": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "autoApprove",
-                  "requireCustomerData",
-                  "allowBulkActions"
-                ]
-              },
-              "notifications": {
-                "type": "object",
-                "properties": {
-                  "newCustomers": {
-                    "type": "boolean"
-                  },
-                  "voucherRedemptions": {
-                    "type": "boolean"
-                  },
-                  "lowStockAlerts": {
-                    "type": "boolean"
-                  },
-                  "reviewRequests": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "newCustomers",
-                  "voucherRedemptions",
-                  "lowStockAlerts",
-                  "reviewRequests"
-                ]
-              }
-            },
-            "required": ["dashboard", "vouchers", "notifications"]
           },
           "accessibility": {
             "type": "object",
@@ -11972,9 +12642,6 @@
                       },
                       "voucherExpiry": {
                         "type": "boolean"
-                      },
-                      "businessUpdates": {
-                        "type": "boolean"
                       }
                     },
                     "required": [
@@ -11982,8 +12649,7 @@
                       "marketing",
                       "productUpdates",
                       "securityAlerts",
-                      "voucherExpiry",
-                      "businessUpdates"
+                      "voucherExpiry"
                     ]
                   },
                   "push": {
@@ -11998,9 +12664,6 @@
                       "voucherExpiry": {
                         "type": "boolean"
                       },
-                      "businessUpdates": {
-                        "type": "boolean"
-                      },
                       "orderUpdates": {
                         "type": "boolean"
                       }
@@ -12009,7 +12672,6 @@
                       "enabled",
                       "marketing",
                       "voucherExpiry",
-                      "businessUpdates",
                       "orderUpdates"
                     ]
                   },
@@ -12111,81 +12773,6 @@
                   }
                 },
                 "required": ["profile", "search", "analytics", "marketing"]
-              },
-              "business": {
-                "type": "object",
-                "properties": {
-                  "dashboard": {
-                    "type": "object",
-                    "properties": {
-                      "defaultView": {
-                        "type": "string",
-                        "enum": [
-                          "overview",
-                          "analytics",
-                          "vouchers",
-                          "customers"
-                        ]
-                      },
-                      "autoRefresh": {
-                        "type": "boolean"
-                      },
-                      "refreshInterval": {
-                        "type": "number",
-                        "minimum": 1,
-                        "maximum": 60
-                      }
-                    },
-                    "required": [
-                      "defaultView",
-                      "autoRefresh",
-                      "refreshInterval"
-                    ]
-                  },
-                  "vouchers": {
-                    "type": "object",
-                    "properties": {
-                      "autoApprove": {
-                        "type": "boolean"
-                      },
-                      "requireCustomerData": {
-                        "type": "boolean"
-                      },
-                      "allowBulkActions": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "autoApprove",
-                      "requireCustomerData",
-                      "allowBulkActions"
-                    ]
-                  },
-                  "notifications": {
-                    "type": "object",
-                    "properties": {
-                      "newCustomers": {
-                        "type": "boolean"
-                      },
-                      "voucherRedemptions": {
-                        "type": "boolean"
-                      },
-                      "lowStockAlerts": {
-                        "type": "boolean"
-                      },
-                      "reviewRequests": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "newCustomers",
-                      "voucherRedemptions",
-                      "lowStockAlerts",
-                      "reviewRequests"
-                    ]
-                  }
-                },
-                "required": ["dashboard", "vouchers", "notifications"]
               },
               "accessibility": {
                 "type": "object",
@@ -12300,9 +12887,6 @@
                   },
                   "voucherExpiry": {
                     "type": "boolean"
-                  },
-                  "businessUpdates": {
-                    "type": "boolean"
                   }
                 }
               },
@@ -12316,9 +12900,6 @@
                     "type": "boolean"
                   },
                   "voucherExpiry": {
-                    "type": "boolean"
-                  },
-                  "businessUpdates": {
                     "type": "boolean"
                   },
                   "orderUpdates": {
@@ -12406,59 +12987,6 @@
                     "type": "boolean"
                   },
                   "shareWithPartners": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          },
-          "business": {
-            "type": "object",
-            "properties": {
-              "dashboard": {
-                "type": "object",
-                "properties": {
-                  "defaultView": {
-                    "type": "string",
-                    "enum": ["overview", "analytics", "vouchers", "customers"]
-                  },
-                  "autoRefresh": {
-                    "type": "boolean"
-                  },
-                  "refreshInterval": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 60
-                  }
-                }
-              },
-              "vouchers": {
-                "type": "object",
-                "properties": {
-                  "autoApprove": {
-                    "type": "boolean"
-                  },
-                  "requireCustomerData": {
-                    "type": "boolean"
-                  },
-                  "allowBulkActions": {
-                    "type": "boolean"
-                  }
-                }
-              },
-              "notifications": {
-                "type": "object",
-                "properties": {
-                  "newCustomers": {
-                    "type": "boolean"
-                  },
-                  "voucherRedemptions": {
-                    "type": "boolean"
-                  },
-                  "lowStockAlerts": {
-                    "type": "boolean"
-                  },
-                  "reviewRequests": {
                     "type": "boolean"
                   }
                 }
@@ -12569,9 +13097,6 @@
                       },
                       "voucherExpiry": {
                         "type": "boolean"
-                      },
-                      "businessUpdates": {
-                        "type": "boolean"
                       }
                     },
                     "required": [
@@ -12579,8 +13104,7 @@
                       "marketing",
                       "productUpdates",
                       "securityAlerts",
-                      "voucherExpiry",
-                      "businessUpdates"
+                      "voucherExpiry"
                     ]
                   },
                   "push": {
@@ -12595,9 +13119,6 @@
                       "voucherExpiry": {
                         "type": "boolean"
                       },
-                      "businessUpdates": {
-                        "type": "boolean"
-                      },
                       "orderUpdates": {
                         "type": "boolean"
                       }
@@ -12606,7 +13127,6 @@
                       "enabled",
                       "marketing",
                       "voucherExpiry",
-                      "businessUpdates",
                       "orderUpdates"
                     ]
                   },
@@ -12708,81 +13228,6 @@
                   }
                 },
                 "required": ["profile", "search", "analytics", "marketing"]
-              },
-              "business": {
-                "type": "object",
-                "properties": {
-                  "dashboard": {
-                    "type": "object",
-                    "properties": {
-                      "defaultView": {
-                        "type": "string",
-                        "enum": [
-                          "overview",
-                          "analytics",
-                          "vouchers",
-                          "customers"
-                        ]
-                      },
-                      "autoRefresh": {
-                        "type": "boolean"
-                      },
-                      "refreshInterval": {
-                        "type": "number",
-                        "minimum": 1,
-                        "maximum": 60
-                      }
-                    },
-                    "required": [
-                      "defaultView",
-                      "autoRefresh",
-                      "refreshInterval"
-                    ]
-                  },
-                  "vouchers": {
-                    "type": "object",
-                    "properties": {
-                      "autoApprove": {
-                        "type": "boolean"
-                      },
-                      "requireCustomerData": {
-                        "type": "boolean"
-                      },
-                      "allowBulkActions": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "autoApprove",
-                      "requireCustomerData",
-                      "allowBulkActions"
-                    ]
-                  },
-                  "notifications": {
-                    "type": "object",
-                    "properties": {
-                      "newCustomers": {
-                        "type": "boolean"
-                      },
-                      "voucherRedemptions": {
-                        "type": "boolean"
-                      },
-                      "lowStockAlerts": {
-                        "type": "boolean"
-                      },
-                      "reviewRequests": {
-                        "type": "boolean"
-                      }
-                    },
-                    "required": [
-                      "newCustomers",
-                      "voucherRedemptions",
-                      "lowStockAlerts",
-                      "reviewRequests"
-                    ]
-                  }
-                },
-                "required": ["dashboard", "vouchers", "notifications"]
               },
               "accessibility": {
                 "type": "object",
@@ -28673,6 +29118,443 @@
             }
           }
         }
+      },
+      "post": {
+        "operationId": "createMyBusiness",
+        "summary": "Create a new business",
+        "description": "Create a new business for the authenticated user",
+        "tags": ["Business Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "businessName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Business name"
+                  },
+                  "businessDescription": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Business description"
+                  },
+                  "categoryId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Category ID (can be assigned later by admin)"
+                  }
+                },
+                "required": ["businessName"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Business created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Universally Unique Identifier"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "User who owns this business"
+                    },
+                    "businessName": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "description": "Business name in requested language"
+                    },
+                    "businessDescription": {
+                      "type": "string",
+                      "maxLength": 2000,
+                      "description": "Business description in requested language"
+                    },
+                    "categoryId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Category this business belongs to"
+                    },
+                    "verified": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Whether business is verified"
+                    },
+                    "active": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether business is active"
+                    },
+                    "approved": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Whether business is approved by admin"
+                    },
+                    "avgRating": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 5,
+                      "default": 0,
+                      "description": "Average rating of the business"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "firstName": {
+                          "type": "string",
+                          "maxLength": 50
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "maxLength": 50
+                        },
+                        "avatarUrl": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "ISO 8601 datetime with timezone"
+                        }
+                      },
+                      "required": ["id", "firstName", "lastName", "createdAt"],
+                      "description": "Business owner profile when ?include=user"
+                    },
+                    "category": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Universally Unique Identifier"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Category name in requested language"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Category description in requested language"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "description": "Category icon identifier"
+                        },
+                        "parentId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Parent category ID for hierarchical structure"
+                        },
+                        "isActive": {
+                          "type": "boolean",
+                          "default": true,
+                          "description": "Whether category is active"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "default": 0,
+                          "description": "Sort order for display"
+                        },
+                        "slug": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "description": "URL-friendly category identifier"
+                        },
+                        "level": {
+                          "type": "integer",
+                          "description": "Hierarchy level (1 for root, 2+ for children)"
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "Hierarchical path using parent IDs"
+                        },
+                        "createdBy": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "User who created the category"
+                        },
+                        "updatedBy": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "User who last updated the category"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was created"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was last updated"
+                        },
+                        "children": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "Universally Unique Identifier"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Category name in requested language"
+                              },
+                              "description": {
+                                "type": "string",
+                                "description": "Category description in requested language"
+                              },
+                              "icon": {
+                                "type": "string",
+                                "maxLength": 255,
+                                "description": "Category icon identifier"
+                              },
+                              "parentId": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "Parent category ID for hierarchical structure"
+                              },
+                              "isActive": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Whether category is active"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "default": 0,
+                                "description": "Sort order for display"
+                              },
+                              "slug": {
+                                "type": "string",
+                                "maxLength": 255,
+                                "description": "URL-friendly category identifier"
+                              },
+                              "level": {
+                                "type": "integer",
+                                "description": "Hierarchy level (1 for root, 2+ for children)"
+                              },
+                              "path": {
+                                "type": "string",
+                                "description": "Hierarchical path using parent IDs"
+                              },
+                              "createdBy": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "User who created the category"
+                              },
+                              "updatedBy": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "User who last updated the category"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "When the record was created"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "When the record was last updated"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "slug",
+                              "level",
+                              "path",
+                              "createdBy",
+                              "createdAt",
+                              "updatedAt"
+                            ]
+                          },
+                          "description": "Child categories for hierarchical display"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug",
+                        "level",
+                        "path",
+                        "createdBy",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "description": "Category information when ?include=category"
+                    },
+                    "businessDetails": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Universally Unique Identifier"
+                        },
+                        "businessId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Business ID this details belong to"
+                        },
+                        "phone": {
+                          "type": "string",
+                          "maxLength": 20,
+                          "description": "Business phone number"
+                        },
+                        "email": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "format": "email",
+                          "description": "Business email address"
+                        },
+                        "website": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "format": "uri",
+                          "description": "Business website URL"
+                        },
+                        "logoUrl": {
+                          "type": "string",
+                          "maxLength": 512,
+                          "format": "uri",
+                          "description": "Business logo image URL"
+                        },
+                        "street": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "description": "Street address"
+                        },
+                        "city": {
+                          "type": "string",
+                          "maxLength": 100,
+                          "description": "City"
+                        },
+                        "state": {
+                          "type": "string",
+                          "maxLength": 100,
+                          "description": "State or province"
+                        },
+                        "postalCode": {
+                          "type": "string",
+                          "maxLength": 20,
+                          "description": "Postal/ZIP code"
+                        },
+                        "country": {
+                          "type": "string",
+                          "minLength": 2,
+                          "maxLength": 2,
+                          "description": "Country code (ISO 3166-1 alpha-2)"
+                        },
+                        "operatingHours": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "open": {
+                                "type": "string"
+                              },
+                              "close": {
+                                "type": "string"
+                              },
+                              "closed": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "description": "Operating hours schedule (JSON)"
+                        },
+                        "socialMedia": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "description": "Social media links (JSON)"
+                        },
+                        "additionalInfo": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          },
+                          "description": "Additional business information (JSON)"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was created"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was last updated"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "businessId",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "description": "Detailed contact and location information when ?include=businessDetails"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was created"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was last updated"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "userId",
+                    "businessName",
+                    "categoryId",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/businesses/{id}": {
@@ -28758,6 +29640,455 @@
                     "avgRating"
                   ],
                   "description": "Internal business data for services"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateMyBusiness",
+        "summary": "Update business information",
+        "description": "Update business information for a business owned by the authenticated user",
+        "tags": ["Business Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Universally Unique Identifier"
+            },
+            "required": true,
+            "description": "Universally Unique Identifier",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "businessName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Business name"
+                  },
+                  "businessDescription": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Business description"
+                  },
+                  "categoryId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Category ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Universally Unique Identifier"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "User who owns this business"
+                    },
+                    "businessName": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "description": "Business name in requested language"
+                    },
+                    "businessDescription": {
+                      "type": "string",
+                      "maxLength": 2000,
+                      "description": "Business description in requested language"
+                    },
+                    "categoryId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Category this business belongs to"
+                    },
+                    "verified": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Whether business is verified"
+                    },
+                    "active": {
+                      "type": "boolean",
+                      "default": true,
+                      "description": "Whether business is active"
+                    },
+                    "approved": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Whether business is approved by admin"
+                    },
+                    "avgRating": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 5,
+                      "default": 0,
+                      "description": "Average rating of the business"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "firstName": {
+                          "type": "string",
+                          "maxLength": 50
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "maxLength": 50
+                        },
+                        "avatarUrl": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "ISO 8601 datetime with timezone"
+                        }
+                      },
+                      "required": ["id", "firstName", "lastName", "createdAt"],
+                      "description": "Business owner profile when ?include=user"
+                    },
+                    "category": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Universally Unique Identifier"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Category name in requested language"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Category description in requested language"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "description": "Category icon identifier"
+                        },
+                        "parentId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Parent category ID for hierarchical structure"
+                        },
+                        "isActive": {
+                          "type": "boolean",
+                          "default": true,
+                          "description": "Whether category is active"
+                        },
+                        "sortOrder": {
+                          "type": "integer",
+                          "default": 0,
+                          "description": "Sort order for display"
+                        },
+                        "slug": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "description": "URL-friendly category identifier"
+                        },
+                        "level": {
+                          "type": "integer",
+                          "description": "Hierarchy level (1 for root, 2+ for children)"
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "Hierarchical path using parent IDs"
+                        },
+                        "createdBy": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "User who created the category"
+                        },
+                        "updatedBy": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "User who last updated the category"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was created"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was last updated"
+                        },
+                        "children": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "Universally Unique Identifier"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Category name in requested language"
+                              },
+                              "description": {
+                                "type": "string",
+                                "description": "Category description in requested language"
+                              },
+                              "icon": {
+                                "type": "string",
+                                "maxLength": 255,
+                                "description": "Category icon identifier"
+                              },
+                              "parentId": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "Parent category ID for hierarchical structure"
+                              },
+                              "isActive": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "Whether category is active"
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "default": 0,
+                                "description": "Sort order for display"
+                              },
+                              "slug": {
+                                "type": "string",
+                                "maxLength": 255,
+                                "description": "URL-friendly category identifier"
+                              },
+                              "level": {
+                                "type": "integer",
+                                "description": "Hierarchy level (1 for root, 2+ for children)"
+                              },
+                              "path": {
+                                "type": "string",
+                                "description": "Hierarchical path using parent IDs"
+                              },
+                              "createdBy": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "User who created the category"
+                              },
+                              "updatedBy": {
+                                "type": "string",
+                                "format": "uuid",
+                                "description": "User who last updated the category"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "When the record was created"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "When the record was last updated"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "slug",
+                              "level",
+                              "path",
+                              "createdBy",
+                              "createdAt",
+                              "updatedAt"
+                            ]
+                          },
+                          "description": "Child categories for hierarchical display"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug",
+                        "level",
+                        "path",
+                        "createdBy",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "description": "Category information when ?include=category"
+                    },
+                    "businessDetails": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Universally Unique Identifier"
+                        },
+                        "businessId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "Business ID this details belong to"
+                        },
+                        "phone": {
+                          "type": "string",
+                          "maxLength": 20,
+                          "description": "Business phone number"
+                        },
+                        "email": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "format": "email",
+                          "description": "Business email address"
+                        },
+                        "website": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "format": "uri",
+                          "description": "Business website URL"
+                        },
+                        "logoUrl": {
+                          "type": "string",
+                          "maxLength": 512,
+                          "format": "uri",
+                          "description": "Business logo image URL"
+                        },
+                        "street": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "description": "Street address"
+                        },
+                        "city": {
+                          "type": "string",
+                          "maxLength": 100,
+                          "description": "City"
+                        },
+                        "state": {
+                          "type": "string",
+                          "maxLength": 100,
+                          "description": "State or province"
+                        },
+                        "postalCode": {
+                          "type": "string",
+                          "maxLength": 20,
+                          "description": "Postal/ZIP code"
+                        },
+                        "country": {
+                          "type": "string",
+                          "minLength": 2,
+                          "maxLength": 2,
+                          "description": "Country code (ISO 3166-1 alpha-2)"
+                        },
+                        "operatingHours": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "open": {
+                                "type": "string"
+                              },
+                              "close": {
+                                "type": "string"
+                              },
+                              "closed": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "description": "Operating hours schedule (JSON)"
+                        },
+                        "socialMedia": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "description": "Social media links (JSON)"
+                        },
+                        "additionalInfo": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          },
+                          "description": "Additional business information (JSON)"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was created"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "When the record was last updated"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "businessId",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "description": "Detailed contact and location information when ?include=businessDetails"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was created"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was last updated"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "userId",
+                    "businessName",
+                    "categoryId",
+                    "createdAt",
+                    "updatedAt"
+                  ]
                 }
               }
             }
@@ -39522,9 +40853,6 @@
                                 },
                                 "voucherExpiry": {
                                   "type": "boolean"
-                                },
-                                "businessUpdates": {
-                                  "type": "boolean"
                                 }
                               },
                               "required": [
@@ -39532,8 +40860,7 @@
                                 "marketing",
                                 "productUpdates",
                                 "securityAlerts",
-                                "voucherExpiry",
-                                "businessUpdates"
+                                "voucherExpiry"
                               ]
                             },
                             "push": {
@@ -39548,9 +40875,6 @@
                                 "voucherExpiry": {
                                   "type": "boolean"
                                 },
-                                "businessUpdates": {
-                                  "type": "boolean"
-                                },
                                 "orderUpdates": {
                                   "type": "boolean"
                                 }
@@ -39559,7 +40883,6 @@
                                 "enabled",
                                 "marketing",
                                 "voucherExpiry",
-                                "businessUpdates",
                                 "orderUpdates"
                               ]
                             },
@@ -39676,81 +40999,6 @@
                             "analytics",
                             "marketing"
                           ]
-                        },
-                        "business": {
-                          "type": "object",
-                          "properties": {
-                            "dashboard": {
-                              "type": "object",
-                              "properties": {
-                                "defaultView": {
-                                  "type": "string",
-                                  "enum": [
-                                    "overview",
-                                    "analytics",
-                                    "vouchers",
-                                    "customers"
-                                  ]
-                                },
-                                "autoRefresh": {
-                                  "type": "boolean"
-                                },
-                                "refreshInterval": {
-                                  "type": "number",
-                                  "minimum": 1,
-                                  "maximum": 60
-                                }
-                              },
-                              "required": [
-                                "defaultView",
-                                "autoRefresh",
-                                "refreshInterval"
-                              ]
-                            },
-                            "vouchers": {
-                              "type": "object",
-                              "properties": {
-                                "autoApprove": {
-                                  "type": "boolean"
-                                },
-                                "requireCustomerData": {
-                                  "type": "boolean"
-                                },
-                                "allowBulkActions": {
-                                  "type": "boolean"
-                                }
-                              },
-                              "required": [
-                                "autoApprove",
-                                "requireCustomerData",
-                                "allowBulkActions"
-                              ]
-                            },
-                            "notifications": {
-                              "type": "object",
-                              "properties": {
-                                "newCustomers": {
-                                  "type": "boolean"
-                                },
-                                "voucherRedemptions": {
-                                  "type": "boolean"
-                                },
-                                "lowStockAlerts": {
-                                  "type": "boolean"
-                                },
-                                "reviewRequests": {
-                                  "type": "boolean"
-                                }
-                              },
-                              "required": [
-                                "newCustomers",
-                                "voucherRedemptions",
-                                "lowStockAlerts",
-                                "reviewRequests"
-                              ]
-                            }
-                          },
-                          "required": ["dashboard", "vouchers", "notifications"]
                         },
                         "accessibility": {
                           "type": "object",
@@ -39944,9 +41192,6 @@
                           },
                           "voucherExpiry": {
                             "type": "boolean"
-                          },
-                          "businessUpdates": {
-                            "type": "boolean"
                           }
                         },
                         "required": [
@@ -39954,8 +41199,7 @@
                           "marketing",
                           "productUpdates",
                           "securityAlerts",
-                          "voucherExpiry",
-                          "businessUpdates"
+                          "voucherExpiry"
                         ]
                       },
                       "push": {
@@ -39970,9 +41214,6 @@
                           "voucherExpiry": {
                             "type": "boolean"
                           },
-                          "businessUpdates": {
-                            "type": "boolean"
-                          },
                           "orderUpdates": {
                             "type": "boolean"
                           }
@@ -39981,7 +41222,6 @@
                           "enabled",
                           "marketing",
                           "voucherExpiry",
-                          "businessUpdates",
                           "orderUpdates"
                         ]
                       },
@@ -40090,81 +41330,6 @@
                       }
                     },
                     "required": ["profile", "search", "analytics", "marketing"]
-                  },
-                  "business": {
-                    "type": "object",
-                    "properties": {
-                      "dashboard": {
-                        "type": "object",
-                        "properties": {
-                          "defaultView": {
-                            "type": "string",
-                            "enum": [
-                              "overview",
-                              "analytics",
-                              "vouchers",
-                              "customers"
-                            ]
-                          },
-                          "autoRefresh": {
-                            "type": "boolean"
-                          },
-                          "refreshInterval": {
-                            "type": "number",
-                            "minimum": 1,
-                            "maximum": 60
-                          }
-                        },
-                        "required": [
-                          "defaultView",
-                          "autoRefresh",
-                          "refreshInterval"
-                        ]
-                      },
-                      "vouchers": {
-                        "type": "object",
-                        "properties": {
-                          "autoApprove": {
-                            "type": "boolean"
-                          },
-                          "requireCustomerData": {
-                            "type": "boolean"
-                          },
-                          "allowBulkActions": {
-                            "type": "boolean"
-                          }
-                        },
-                        "required": [
-                          "autoApprove",
-                          "requireCustomerData",
-                          "allowBulkActions"
-                        ]
-                      },
-                      "notifications": {
-                        "type": "object",
-                        "properties": {
-                          "newCustomers": {
-                            "type": "boolean"
-                          },
-                          "voucherRedemptions": {
-                            "type": "boolean"
-                          },
-                          "lowStockAlerts": {
-                            "type": "boolean"
-                          },
-                          "reviewRequests": {
-                            "type": "boolean"
-                          }
-                        },
-                        "required": [
-                          "newCustomers",
-                          "voucherRedemptions",
-                          "lowStockAlerts",
-                          "reviewRequests"
-                        ]
-                      }
-                    },
-                    "required": ["dashboard", "vouchers", "notifications"]
                   },
                   "accessibility": {
                     "type": "object",
@@ -40297,9 +41462,6 @@
                                 },
                                 "voucherExpiry": {
                                   "type": "boolean"
-                                },
-                                "businessUpdates": {
-                                  "type": "boolean"
                                 }
                               },
                               "required": [
@@ -40307,8 +41469,7 @@
                                 "marketing",
                                 "productUpdates",
                                 "securityAlerts",
-                                "voucherExpiry",
-                                "businessUpdates"
+                                "voucherExpiry"
                               ]
                             },
                             "push": {
@@ -40323,9 +41484,6 @@
                                 "voucherExpiry": {
                                   "type": "boolean"
                                 },
-                                "businessUpdates": {
-                                  "type": "boolean"
-                                },
                                 "orderUpdates": {
                                   "type": "boolean"
                                 }
@@ -40334,7 +41492,6 @@
                                 "enabled",
                                 "marketing",
                                 "voucherExpiry",
-                                "businessUpdates",
                                 "orderUpdates"
                               ]
                             },
@@ -40451,81 +41608,6 @@
                             "analytics",
                             "marketing"
                           ]
-                        },
-                        "business": {
-                          "type": "object",
-                          "properties": {
-                            "dashboard": {
-                              "type": "object",
-                              "properties": {
-                                "defaultView": {
-                                  "type": "string",
-                                  "enum": [
-                                    "overview",
-                                    "analytics",
-                                    "vouchers",
-                                    "customers"
-                                  ]
-                                },
-                                "autoRefresh": {
-                                  "type": "boolean"
-                                },
-                                "refreshInterval": {
-                                  "type": "number",
-                                  "minimum": 1,
-                                  "maximum": 60
-                                }
-                              },
-                              "required": [
-                                "defaultView",
-                                "autoRefresh",
-                                "refreshInterval"
-                              ]
-                            },
-                            "vouchers": {
-                              "type": "object",
-                              "properties": {
-                                "autoApprove": {
-                                  "type": "boolean"
-                                },
-                                "requireCustomerData": {
-                                  "type": "boolean"
-                                },
-                                "allowBulkActions": {
-                                  "type": "boolean"
-                                }
-                              },
-                              "required": [
-                                "autoApprove",
-                                "requireCustomerData",
-                                "allowBulkActions"
-                              ]
-                            },
-                            "notifications": {
-                              "type": "object",
-                              "properties": {
-                                "newCustomers": {
-                                  "type": "boolean"
-                                },
-                                "voucherRedemptions": {
-                                  "type": "boolean"
-                                },
-                                "lowStockAlerts": {
-                                  "type": "boolean"
-                                },
-                                "reviewRequests": {
-                                  "type": "boolean"
-                                }
-                              },
-                              "required": [
-                                "newCustomers",
-                                "voucherRedemptions",
-                                "lowStockAlerts",
-                                "reviewRequests"
-                              ]
-                            }
-                          },
-                          "required": ["dashboard", "vouchers", "notifications"]
                         },
                         "accessibility": {
                           "type": "object",
@@ -40761,9 +41843,6 @@
                           },
                           "voucherExpiry": {
                             "type": "boolean"
-                          },
-                          "businessUpdates": {
-                            "type": "boolean"
                           }
                         }
                       },
@@ -40777,9 +41856,6 @@
                             "type": "boolean"
                           },
                           "voucherExpiry": {
-                            "type": "boolean"
-                          },
-                          "businessUpdates": {
                             "type": "boolean"
                           },
                           "orderUpdates": {
@@ -40867,64 +41943,6 @@
                             "type": "boolean"
                           },
                           "shareWithPartners": {
-                            "type": "boolean"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "business": {
-                    "type": "object",
-                    "properties": {
-                      "dashboard": {
-                        "type": "object",
-                        "properties": {
-                          "defaultView": {
-                            "type": "string",
-                            "enum": [
-                              "overview",
-                              "analytics",
-                              "vouchers",
-                              "customers"
-                            ]
-                          },
-                          "autoRefresh": {
-                            "type": "boolean"
-                          },
-                          "refreshInterval": {
-                            "type": "number",
-                            "minimum": 1,
-                            "maximum": 60
-                          }
-                        }
-                      },
-                      "vouchers": {
-                        "type": "object",
-                        "properties": {
-                          "autoApprove": {
-                            "type": "boolean"
-                          },
-                          "requireCustomerData": {
-                            "type": "boolean"
-                          },
-                          "allowBulkActions": {
-                            "type": "boolean"
-                          }
-                        }
-                      },
-                      "notifications": {
-                        "type": "object",
-                        "properties": {
-                          "newCustomers": {
-                            "type": "boolean"
-                          },
-                          "voucherRedemptions": {
-                            "type": "boolean"
-                          },
-                          "lowStockAlerts": {
-                            "type": "boolean"
-                          },
-                          "reviewRequests": {
                             "type": "boolean"
                           }
                         }
@@ -41043,9 +42061,6 @@
                                 },
                                 "voucherExpiry": {
                                   "type": "boolean"
-                                },
-                                "businessUpdates": {
-                                  "type": "boolean"
                                 }
                               },
                               "required": [
@@ -41053,8 +42068,7 @@
                                 "marketing",
                                 "productUpdates",
                                 "securityAlerts",
-                                "voucherExpiry",
-                                "businessUpdates"
+                                "voucherExpiry"
                               ]
                             },
                             "push": {
@@ -41069,9 +42083,6 @@
                                 "voucherExpiry": {
                                   "type": "boolean"
                                 },
-                                "businessUpdates": {
-                                  "type": "boolean"
-                                },
                                 "orderUpdates": {
                                   "type": "boolean"
                                 }
@@ -41080,7 +42091,6 @@
                                 "enabled",
                                 "marketing",
                                 "voucherExpiry",
-                                "businessUpdates",
                                 "orderUpdates"
                               ]
                             },
@@ -41197,81 +42207,6 @@
                             "analytics",
                             "marketing"
                           ]
-                        },
-                        "business": {
-                          "type": "object",
-                          "properties": {
-                            "dashboard": {
-                              "type": "object",
-                              "properties": {
-                                "defaultView": {
-                                  "type": "string",
-                                  "enum": [
-                                    "overview",
-                                    "analytics",
-                                    "vouchers",
-                                    "customers"
-                                  ]
-                                },
-                                "autoRefresh": {
-                                  "type": "boolean"
-                                },
-                                "refreshInterval": {
-                                  "type": "number",
-                                  "minimum": 1,
-                                  "maximum": 60
-                                }
-                              },
-                              "required": [
-                                "defaultView",
-                                "autoRefresh",
-                                "refreshInterval"
-                              ]
-                            },
-                            "vouchers": {
-                              "type": "object",
-                              "properties": {
-                                "autoApprove": {
-                                  "type": "boolean"
-                                },
-                                "requireCustomerData": {
-                                  "type": "boolean"
-                                },
-                                "allowBulkActions": {
-                                  "type": "boolean"
-                                }
-                              },
-                              "required": [
-                                "autoApprove",
-                                "requireCustomerData",
-                                "allowBulkActions"
-                              ]
-                            },
-                            "notifications": {
-                              "type": "object",
-                              "properties": {
-                                "newCustomers": {
-                                  "type": "boolean"
-                                },
-                                "voucherRedemptions": {
-                                  "type": "boolean"
-                                },
-                                "lowStockAlerts": {
-                                  "type": "boolean"
-                                },
-                                "reviewRequests": {
-                                  "type": "boolean"
-                                }
-                              },
-                              "required": [
-                                "newCustomers",
-                                "voucherRedemptions",
-                                "lowStockAlerts",
-                                "reviewRequests"
-                              ]
-                            }
-                          },
-                          "required": ["dashboard", "vouchers", "notifications"]
                         },
                         "accessibility": {
                           "type": "object",
@@ -61334,6 +62269,1810 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/businesses/{id}/details": {
+      "get": {
+        "operationId": "getMyBusinessDetails",
+        "summary": "Get detailed business information",
+        "description": "Get detailed information for a business owned by the authenticated user",
+        "tags": ["Business Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Universally Unique Identifier"
+            },
+            "required": true,
+            "description": "Universally Unique Identifier",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Universally Unique Identifier"
+                    },
+                    "businessId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Business ID this details belong to"
+                    },
+                    "phone": {
+                      "type": "string",
+                      "maxLength": 20,
+                      "description": "Business phone number"
+                    },
+                    "email": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "format": "email",
+                      "description": "Business email address"
+                    },
+                    "website": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "format": "uri",
+                      "description": "Business website URL"
+                    },
+                    "logoUrl": {
+                      "type": "string",
+                      "maxLength": 512,
+                      "format": "uri",
+                      "description": "Business logo image URL"
+                    },
+                    "street": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "description": "Street address"
+                    },
+                    "city": {
+                      "type": "string",
+                      "maxLength": 100,
+                      "description": "City"
+                    },
+                    "state": {
+                      "type": "string",
+                      "maxLength": 100,
+                      "description": "State or province"
+                    },
+                    "postalCode": {
+                      "type": "string",
+                      "maxLength": 20,
+                      "description": "Postal/ZIP code"
+                    },
+                    "country": {
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "description": "Country code (ISO 3166-1 alpha-2)"
+                    },
+                    "operatingHours": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "open": {
+                            "type": "string"
+                          },
+                          "close": {
+                            "type": "string"
+                          },
+                          "closed": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "description": "Operating hours schedule (JSON)"
+                    },
+                    "socialMedia": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "description": "Social media links (JSON)"
+                    },
+                    "additionalInfo": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      "description": "Additional business information (JSON)"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was created"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was last updated"
+                    }
+                  },
+                  "required": ["id", "businessId", "createdAt", "updatedAt"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateMyBusinessDetails",
+        "summary": "Update business details",
+        "description": "Update detailed information for a business owned by the authenticated user",
+        "tags": ["Business Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Universally Unique Identifier"
+            },
+            "required": true,
+            "description": "Universally Unique Identifier",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "maxLength": 20
+                  },
+                  "email": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "format": "email"
+                  },
+                  "website": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "format": "uri"
+                  },
+                  "logoUrl": {
+                    "type": "string",
+                    "maxLength": 512,
+                    "format": "uri"
+                  },
+                  "street": {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  "city": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "state": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "postalCode": {
+                    "type": "string",
+                    "maxLength": 20
+                  },
+                  "country": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 2
+                  },
+                  "operatingHours": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "open": {
+                          "type": "string"
+                        },
+                        "close": {
+                          "type": "string"
+                        },
+                        "closed": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "socialMedia": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  },
+                  "additionalInfo": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business details updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Universally Unique Identifier"
+                    },
+                    "businessId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Business ID this details belong to"
+                    },
+                    "phone": {
+                      "type": "string",
+                      "maxLength": 20,
+                      "description": "Business phone number"
+                    },
+                    "email": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "format": "email",
+                      "description": "Business email address"
+                    },
+                    "website": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "format": "uri",
+                      "description": "Business website URL"
+                    },
+                    "logoUrl": {
+                      "type": "string",
+                      "maxLength": 512,
+                      "format": "uri",
+                      "description": "Business logo image URL"
+                    },
+                    "street": {
+                      "type": "string",
+                      "maxLength": 255,
+                      "description": "Street address"
+                    },
+                    "city": {
+                      "type": "string",
+                      "maxLength": 100,
+                      "description": "City"
+                    },
+                    "state": {
+                      "type": "string",
+                      "maxLength": 100,
+                      "description": "State or province"
+                    },
+                    "postalCode": {
+                      "type": "string",
+                      "maxLength": 20,
+                      "description": "Postal/ZIP code"
+                    },
+                    "country": {
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "description": "Country code (ISO 3166-1 alpha-2)"
+                    },
+                    "operatingHours": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "open": {
+                            "type": "string"
+                          },
+                          "close": {
+                            "type": "string"
+                          },
+                          "closed": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "description": "Operating hours schedule (JSON)"
+                    },
+                    "socialMedia": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "description": "Social media links (JSON)"
+                    },
+                    "additionalInfo": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      },
+                      "description": "Additional business information (JSON)"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was created"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the record was last updated"
+                    }
+                  },
+                  "required": ["id", "businessId", "createdAt", "updatedAt"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/businesses/{id}/settings": {
+      "get": {
+        "operationId": "getBusinessSettings",
+        "summary": "Get business settings",
+        "description": "Get configuration settings for a business owned by the authenticated user",
+        "tags": ["Business Settings"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Universally Unique Identifier"
+            },
+            "required": true,
+            "description": "Universally Unique Identifier",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business settings retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "string",
+                          "enum": ["1.0"],
+                          "description": "Settings schema version"
+                        },
+                        "store": {
+                          "type": "object",
+                          "properties": {
+                            "timezone": {
+                              "type": "string",
+                              "description": "IANA timezone identifier"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "PYG",
+                                "USD",
+                                "EUR",
+                                "GBP",
+                                "CAD",
+                                "AUD",
+                                "JPY",
+                                "CNY",
+                                "INR"
+                              ],
+                              "description": "Accepted currency"
+                            },
+                            "primaryLanguage": {
+                              "type": "string",
+                              "enum": ["es", "en"],
+                              "description": "Primary business language"
+                            },
+                            "refundPolicy": {
+                              "type": "string",
+                              "enum": [
+                                "full",
+                                "partial",
+                                "store_credit",
+                                "no_refunds"
+                              ],
+                              "description": "Refund policy"
+                            },
+                            "paymentTerms": {
+                              "type": "string",
+                              "enum": [
+                                "immediate",
+                                "net_15",
+                                "net_30",
+                                "custom"
+                              ],
+                              "description": "Payment terms"
+                            }
+                          },
+                          "required": [
+                            "timezone",
+                            "currency",
+                            "primaryLanguage",
+                            "refundPolicy",
+                            "paymentTerms"
+                          ]
+                        },
+                        "payment": {
+                          "type": "object",
+                          "properties": {
+                            "acceptsCash": {
+                              "type": "boolean",
+                              "description": "Accepts cash payments"
+                            },
+                            "acceptsCard": {
+                              "type": "boolean",
+                              "description": "Accepts card payments"
+                            },
+                            "acceptsTransfer": {
+                              "type": "boolean",
+                              "description": "Accepts bank transfers"
+                            },
+                            "acceptsMobilePayment": {
+                              "type": "boolean",
+                              "description": "Accepts mobile payments"
+                            },
+                            "providesInvoice": {
+                              "type": "boolean",
+                              "description": "Provides invoices"
+                            }
+                          },
+                          "required": [
+                            "acceptsCash",
+                            "acceptsCard",
+                            "acceptsTransfer",
+                            "acceptsMobilePayment",
+                            "providesInvoice"
+                          ]
+                        },
+                        "voucher": {
+                          "type": "object",
+                          "properties": {
+                            "autoApproveVouchers": {
+                              "type": "boolean",
+                              "description": "Auto-approve voucher claims"
+                            },
+                            "defaultValidityDays": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 365,
+                              "description": "Default voucher validity in days"
+                            },
+                            "maxActiveVouchers": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 100,
+                              "description": "Maximum concurrent active vouchers"
+                            },
+                            "maxRedemptionsPerCustomer": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 100,
+                              "description": "Max redemptions per customer"
+                            },
+                            "requiresVerification": {
+                              "type": "boolean",
+                              "description": "Requires verification for redemption"
+                            },
+                            "minimumPurchaseAmount": {
+                              "type": "number",
+                              "minimum": 0,
+                              "description": "Minimum purchase amount to use vouchers"
+                            },
+                            "showOnMarketplace": {
+                              "type": "boolean",
+                              "description": "Show vouchers in public marketplace"
+                            },
+                            "allowSharing": {
+                              "type": "boolean",
+                              "description": "Allow customers to share vouchers"
+                            },
+                            "platformCommissionAgreed": {
+                              "type": "boolean",
+                              "description": "Agreed to platform commission"
+                            },
+                            "commissionModel": {
+                              "type": "string",
+                              "enum": ["percentage", "flat_fee", "hybrid"],
+                              "description": "Commission model"
+                            }
+                          },
+                          "required": [
+                            "autoApproveVouchers",
+                            "defaultValidityDays",
+                            "maxActiveVouchers",
+                            "maxRedemptionsPerCustomer",
+                            "requiresVerification",
+                            "showOnMarketplace",
+                            "allowSharing",
+                            "platformCommissionAgreed"
+                          ]
+                        },
+                        "communication": {
+                          "type": "object",
+                          "properties": {
+                            "responseTimeCommitment": {
+                              "type": "string",
+                              "enum": ["instant", "1h", "24h", "48h", "custom"],
+                              "description": "Response time commitment"
+                            },
+                            "autoReplyEnabled": {
+                              "type": "boolean",
+                              "description": "Auto-reply enabled"
+                            },
+                            "autoReplyMessage": {
+                              "type": "string",
+                              "maxLength": 500,
+                              "description": "Auto-reply message"
+                            },
+                            "acceptsWhatsApp": {
+                              "type": "boolean",
+                              "description": "Accepts WhatsApp messages"
+                            },
+                            "acceptsSMS": {
+                              "type": "boolean",
+                              "description": "Accepts SMS messages"
+                            }
+                          },
+                          "required": [
+                            "responseTimeCommitment",
+                            "autoReplyEnabled",
+                            "acceptsWhatsApp",
+                            "acceptsSMS"
+                          ]
+                        },
+                        "analytics": {
+                          "type": "object",
+                          "properties": {
+                            "dashboardView": {
+                              "type": "string",
+                              "enum": ["simple", "detailed", "custom"],
+                              "description": "Dashboard view preference"
+                            },
+                            "defaultTimeRange": {
+                              "type": "string",
+                              "enum": [
+                                "today",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year"
+                              ],
+                              "description": "Default time range"
+                            },
+                            "emailReports": {
+                              "type": "boolean",
+                              "description": "Receive email reports"
+                            },
+                            "reportFrequency": {
+                              "type": "string",
+                              "enum": [
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "quarterly"
+                              ],
+                              "description": "Report frequency"
+                            }
+                          },
+                          "required": [
+                            "dashboardView",
+                            "defaultTimeRange",
+                            "emailReports"
+                          ]
+                        },
+                        "branding": {
+                          "type": "object",
+                          "properties": {
+                            "voucherTemplate": {
+                              "type": "string",
+                              "enum": [
+                                "standard",
+                                "premium",
+                                "festive",
+                                "minimal",
+                                "custom"
+                              ],
+                              "description": "Voucher template style"
+                            },
+                            "primaryColor": {
+                              "type": "string",
+                              "pattern": "^#[0-9A-Fa-f]{6}$",
+                              "description": "Primary brand color (hex)"
+                            },
+                            "showLogoOnVouchers": {
+                              "type": "boolean",
+                              "description": "Show logo on vouchers"
+                            }
+                          },
+                          "required": ["voucherTemplate", "showLogoOnVouchers"]
+                        },
+                        "notifications": {
+                          "type": "object",
+                          "properties": {
+                            "notifyOnVoucherClaim": {
+                              "type": "boolean",
+                              "description": "Notify on voucher claim"
+                            },
+                            "notifyOnVoucherRedeem": {
+                              "type": "boolean",
+                              "description": "Notify on voucher redemption"
+                            },
+                            "notifyOnVoucherExpiring": {
+                              "type": "boolean",
+                              "description": "Notify on voucher expiring"
+                            },
+                            "notifyOnNewReview": {
+                              "type": "boolean",
+                              "description": "Notify on new review"
+                            },
+                            "dailySummary": {
+                              "type": "boolean",
+                              "description": "Receive daily summary"
+                            },
+                            "monthlySummary": {
+                              "type": "boolean",
+                              "description": "Receive monthly summary"
+                            },
+                            "emailNotifications": {
+                              "type": "boolean",
+                              "description": "Email notifications enabled"
+                            },
+                            "pushNotifications": {
+                              "type": "boolean",
+                              "description": "Push notifications enabled"
+                            },
+                            "inAppNotifications": {
+                              "type": "boolean",
+                              "description": "In-app notifications enabled"
+                            }
+                          },
+                          "required": [
+                            "notifyOnVoucherClaim",
+                            "notifyOnVoucherRedeem",
+                            "notifyOnVoucherExpiring",
+                            "notifyOnNewReview",
+                            "dailySummary",
+                            "monthlySummary",
+                            "emailNotifications",
+                            "pushNotifications",
+                            "inAppNotifications"
+                          ]
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "store",
+                        "payment",
+                        "voucher",
+                        "communication",
+                        "analytics",
+                        "branding",
+                        "notifications",
+                        "updatedAt"
+                      ],
+                      "description": "Business settings"
+                    }
+                  },
+                  "required": ["settings"]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User does not own this business"
+          },
+          "404": {
+            "description": "Business not found"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateBusinessSettings",
+        "summary": "Update business settings",
+        "description": "Update configuration settings for a business owned by the authenticated user. Supports partial updates.",
+        "tags": ["Business Settings"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Universally Unique Identifier"
+            },
+            "required": true,
+            "description": "Universally Unique Identifier",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "store": {
+                    "type": "object",
+                    "properties": {
+                      "timezone": {
+                        "type": "string",
+                        "description": "IANA timezone identifier"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "enum": [
+                          "PYG",
+                          "USD",
+                          "EUR",
+                          "GBP",
+                          "CAD",
+                          "AUD",
+                          "JPY",
+                          "CNY",
+                          "INR"
+                        ],
+                        "description": "Accepted currency"
+                      },
+                      "primaryLanguage": {
+                        "type": "string",
+                        "enum": ["es", "en"],
+                        "description": "Primary business language"
+                      },
+                      "refundPolicy": {
+                        "type": "string",
+                        "enum": [
+                          "full",
+                          "partial",
+                          "store_credit",
+                          "no_refunds"
+                        ],
+                        "description": "Refund policy"
+                      },
+                      "paymentTerms": {
+                        "type": "string",
+                        "enum": ["immediate", "net_15", "net_30", "custom"],
+                        "description": "Payment terms"
+                      }
+                    }
+                  },
+                  "payment": {
+                    "type": "object",
+                    "properties": {
+                      "acceptsCash": {
+                        "type": "boolean",
+                        "description": "Accepts cash payments"
+                      },
+                      "acceptsCard": {
+                        "type": "boolean",
+                        "description": "Accepts card payments"
+                      },
+                      "acceptsTransfer": {
+                        "type": "boolean",
+                        "description": "Accepts bank transfers"
+                      },
+                      "acceptsMobilePayment": {
+                        "type": "boolean",
+                        "description": "Accepts mobile payments"
+                      },
+                      "providesInvoice": {
+                        "type": "boolean",
+                        "description": "Provides invoices"
+                      }
+                    }
+                  },
+                  "voucher": {
+                    "type": "object",
+                    "properties": {
+                      "autoApproveVouchers": {
+                        "type": "boolean",
+                        "description": "Auto-approve voucher claims"
+                      },
+                      "defaultValidityDays": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 365,
+                        "description": "Default voucher validity in days"
+                      },
+                      "maxActiveVouchers": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "description": "Maximum concurrent active vouchers"
+                      },
+                      "maxRedemptionsPerCustomer": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "description": "Max redemptions per customer"
+                      },
+                      "requiresVerification": {
+                        "type": "boolean",
+                        "description": "Requires verification for redemption"
+                      },
+                      "minimumPurchaseAmount": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Minimum purchase amount to use vouchers"
+                      },
+                      "showOnMarketplace": {
+                        "type": "boolean",
+                        "description": "Show vouchers in public marketplace"
+                      },
+                      "allowSharing": {
+                        "type": "boolean",
+                        "description": "Allow customers to share vouchers"
+                      },
+                      "platformCommissionAgreed": {
+                        "type": "boolean",
+                        "description": "Agreed to platform commission"
+                      },
+                      "commissionModel": {
+                        "type": "string",
+                        "enum": ["percentage", "flat_fee", "hybrid"],
+                        "description": "Commission model"
+                      }
+                    }
+                  },
+                  "communication": {
+                    "type": "object",
+                    "properties": {
+                      "responseTimeCommitment": {
+                        "type": "string",
+                        "enum": ["instant", "1h", "24h", "48h", "custom"],
+                        "description": "Response time commitment"
+                      },
+                      "autoReplyEnabled": {
+                        "type": "boolean",
+                        "description": "Auto-reply enabled"
+                      },
+                      "autoReplyMessage": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "description": "Auto-reply message"
+                      },
+                      "acceptsWhatsApp": {
+                        "type": "boolean",
+                        "description": "Accepts WhatsApp messages"
+                      },
+                      "acceptsSMS": {
+                        "type": "boolean",
+                        "description": "Accepts SMS messages"
+                      }
+                    }
+                  },
+                  "analytics": {
+                    "type": "object",
+                    "properties": {
+                      "dashboardView": {
+                        "type": "string",
+                        "enum": ["simple", "detailed", "custom"],
+                        "description": "Dashboard view preference"
+                      },
+                      "defaultTimeRange": {
+                        "type": "string",
+                        "enum": ["today", "week", "month", "quarter", "year"],
+                        "description": "Default time range"
+                      },
+                      "emailReports": {
+                        "type": "boolean",
+                        "description": "Receive email reports"
+                      },
+                      "reportFrequency": {
+                        "type": "string",
+                        "enum": ["daily", "weekly", "monthly", "quarterly"],
+                        "description": "Report frequency"
+                      }
+                    }
+                  },
+                  "branding": {
+                    "type": "object",
+                    "properties": {
+                      "voucherTemplate": {
+                        "type": "string",
+                        "enum": [
+                          "standard",
+                          "premium",
+                          "festive",
+                          "minimal",
+                          "custom"
+                        ],
+                        "description": "Voucher template style"
+                      },
+                      "primaryColor": {
+                        "type": "string",
+                        "pattern": "^#[0-9A-Fa-f]{6}$",
+                        "description": "Primary brand color (hex)"
+                      },
+                      "showLogoOnVouchers": {
+                        "type": "boolean",
+                        "description": "Show logo on vouchers"
+                      }
+                    }
+                  },
+                  "notifications": {
+                    "type": "object",
+                    "properties": {
+                      "notifyOnVoucherClaim": {
+                        "type": "boolean",
+                        "description": "Notify on voucher claim"
+                      },
+                      "notifyOnVoucherRedeem": {
+                        "type": "boolean",
+                        "description": "Notify on voucher redemption"
+                      },
+                      "notifyOnVoucherExpiring": {
+                        "type": "boolean",
+                        "description": "Notify on voucher expiring"
+                      },
+                      "notifyOnNewReview": {
+                        "type": "boolean",
+                        "description": "Notify on new review"
+                      },
+                      "dailySummary": {
+                        "type": "boolean",
+                        "description": "Receive daily summary"
+                      },
+                      "monthlySummary": {
+                        "type": "boolean",
+                        "description": "Receive monthly summary"
+                      },
+                      "emailNotifications": {
+                        "type": "boolean",
+                        "description": "Email notifications enabled"
+                      },
+                      "pushNotifications": {
+                        "type": "boolean",
+                        "description": "Push notifications enabled"
+                      },
+                      "inAppNotifications": {
+                        "type": "boolean",
+                        "description": "In-app notifications enabled"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business settings updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "string",
+                          "enum": ["1.0"],
+                          "description": "Settings schema version"
+                        },
+                        "store": {
+                          "type": "object",
+                          "properties": {
+                            "timezone": {
+                              "type": "string",
+                              "description": "IANA timezone identifier"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "PYG",
+                                "USD",
+                                "EUR",
+                                "GBP",
+                                "CAD",
+                                "AUD",
+                                "JPY",
+                                "CNY",
+                                "INR"
+                              ],
+                              "description": "Accepted currency"
+                            },
+                            "primaryLanguage": {
+                              "type": "string",
+                              "enum": ["es", "en"],
+                              "description": "Primary business language"
+                            },
+                            "refundPolicy": {
+                              "type": "string",
+                              "enum": [
+                                "full",
+                                "partial",
+                                "store_credit",
+                                "no_refunds"
+                              ],
+                              "description": "Refund policy"
+                            },
+                            "paymentTerms": {
+                              "type": "string",
+                              "enum": [
+                                "immediate",
+                                "net_15",
+                                "net_30",
+                                "custom"
+                              ],
+                              "description": "Payment terms"
+                            }
+                          },
+                          "required": [
+                            "timezone",
+                            "currency",
+                            "primaryLanguage",
+                            "refundPolicy",
+                            "paymentTerms"
+                          ]
+                        },
+                        "payment": {
+                          "type": "object",
+                          "properties": {
+                            "acceptsCash": {
+                              "type": "boolean",
+                              "description": "Accepts cash payments"
+                            },
+                            "acceptsCard": {
+                              "type": "boolean",
+                              "description": "Accepts card payments"
+                            },
+                            "acceptsTransfer": {
+                              "type": "boolean",
+                              "description": "Accepts bank transfers"
+                            },
+                            "acceptsMobilePayment": {
+                              "type": "boolean",
+                              "description": "Accepts mobile payments"
+                            },
+                            "providesInvoice": {
+                              "type": "boolean",
+                              "description": "Provides invoices"
+                            }
+                          },
+                          "required": [
+                            "acceptsCash",
+                            "acceptsCard",
+                            "acceptsTransfer",
+                            "acceptsMobilePayment",
+                            "providesInvoice"
+                          ]
+                        },
+                        "voucher": {
+                          "type": "object",
+                          "properties": {
+                            "autoApproveVouchers": {
+                              "type": "boolean",
+                              "description": "Auto-approve voucher claims"
+                            },
+                            "defaultValidityDays": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 365,
+                              "description": "Default voucher validity in days"
+                            },
+                            "maxActiveVouchers": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 100,
+                              "description": "Maximum concurrent active vouchers"
+                            },
+                            "maxRedemptionsPerCustomer": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 100,
+                              "description": "Max redemptions per customer"
+                            },
+                            "requiresVerification": {
+                              "type": "boolean",
+                              "description": "Requires verification for redemption"
+                            },
+                            "minimumPurchaseAmount": {
+                              "type": "number",
+                              "minimum": 0,
+                              "description": "Minimum purchase amount to use vouchers"
+                            },
+                            "showOnMarketplace": {
+                              "type": "boolean",
+                              "description": "Show vouchers in public marketplace"
+                            },
+                            "allowSharing": {
+                              "type": "boolean",
+                              "description": "Allow customers to share vouchers"
+                            },
+                            "platformCommissionAgreed": {
+                              "type": "boolean",
+                              "description": "Agreed to platform commission"
+                            },
+                            "commissionModel": {
+                              "type": "string",
+                              "enum": ["percentage", "flat_fee", "hybrid"],
+                              "description": "Commission model"
+                            }
+                          },
+                          "required": [
+                            "autoApproveVouchers",
+                            "defaultValidityDays",
+                            "maxActiveVouchers",
+                            "maxRedemptionsPerCustomer",
+                            "requiresVerification",
+                            "showOnMarketplace",
+                            "allowSharing",
+                            "platformCommissionAgreed"
+                          ]
+                        },
+                        "communication": {
+                          "type": "object",
+                          "properties": {
+                            "responseTimeCommitment": {
+                              "type": "string",
+                              "enum": ["instant", "1h", "24h", "48h", "custom"],
+                              "description": "Response time commitment"
+                            },
+                            "autoReplyEnabled": {
+                              "type": "boolean",
+                              "description": "Auto-reply enabled"
+                            },
+                            "autoReplyMessage": {
+                              "type": "string",
+                              "maxLength": 500,
+                              "description": "Auto-reply message"
+                            },
+                            "acceptsWhatsApp": {
+                              "type": "boolean",
+                              "description": "Accepts WhatsApp messages"
+                            },
+                            "acceptsSMS": {
+                              "type": "boolean",
+                              "description": "Accepts SMS messages"
+                            }
+                          },
+                          "required": [
+                            "responseTimeCommitment",
+                            "autoReplyEnabled",
+                            "acceptsWhatsApp",
+                            "acceptsSMS"
+                          ]
+                        },
+                        "analytics": {
+                          "type": "object",
+                          "properties": {
+                            "dashboardView": {
+                              "type": "string",
+                              "enum": ["simple", "detailed", "custom"],
+                              "description": "Dashboard view preference"
+                            },
+                            "defaultTimeRange": {
+                              "type": "string",
+                              "enum": [
+                                "today",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year"
+                              ],
+                              "description": "Default time range"
+                            },
+                            "emailReports": {
+                              "type": "boolean",
+                              "description": "Receive email reports"
+                            },
+                            "reportFrequency": {
+                              "type": "string",
+                              "enum": [
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "quarterly"
+                              ],
+                              "description": "Report frequency"
+                            }
+                          },
+                          "required": [
+                            "dashboardView",
+                            "defaultTimeRange",
+                            "emailReports"
+                          ]
+                        },
+                        "branding": {
+                          "type": "object",
+                          "properties": {
+                            "voucherTemplate": {
+                              "type": "string",
+                              "enum": [
+                                "standard",
+                                "premium",
+                                "festive",
+                                "minimal",
+                                "custom"
+                              ],
+                              "description": "Voucher template style"
+                            },
+                            "primaryColor": {
+                              "type": "string",
+                              "pattern": "^#[0-9A-Fa-f]{6}$",
+                              "description": "Primary brand color (hex)"
+                            },
+                            "showLogoOnVouchers": {
+                              "type": "boolean",
+                              "description": "Show logo on vouchers"
+                            }
+                          },
+                          "required": ["voucherTemplate", "showLogoOnVouchers"]
+                        },
+                        "notifications": {
+                          "type": "object",
+                          "properties": {
+                            "notifyOnVoucherClaim": {
+                              "type": "boolean",
+                              "description": "Notify on voucher claim"
+                            },
+                            "notifyOnVoucherRedeem": {
+                              "type": "boolean",
+                              "description": "Notify on voucher redemption"
+                            },
+                            "notifyOnVoucherExpiring": {
+                              "type": "boolean",
+                              "description": "Notify on voucher expiring"
+                            },
+                            "notifyOnNewReview": {
+                              "type": "boolean",
+                              "description": "Notify on new review"
+                            },
+                            "dailySummary": {
+                              "type": "boolean",
+                              "description": "Receive daily summary"
+                            },
+                            "monthlySummary": {
+                              "type": "boolean",
+                              "description": "Receive monthly summary"
+                            },
+                            "emailNotifications": {
+                              "type": "boolean",
+                              "description": "Email notifications enabled"
+                            },
+                            "pushNotifications": {
+                              "type": "boolean",
+                              "description": "Push notifications enabled"
+                            },
+                            "inAppNotifications": {
+                              "type": "boolean",
+                              "description": "In-app notifications enabled"
+                            }
+                          },
+                          "required": [
+                            "notifyOnVoucherClaim",
+                            "notifyOnVoucherRedeem",
+                            "notifyOnVoucherExpiring",
+                            "notifyOnNewReview",
+                            "dailySummary",
+                            "monthlySummary",
+                            "emailNotifications",
+                            "pushNotifications",
+                            "inAppNotifications"
+                          ]
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "store",
+                        "payment",
+                        "voucher",
+                        "communication",
+                        "analytics",
+                        "branding",
+                        "notifications",
+                        "updatedAt"
+                      ],
+                      "description": "Business settings"
+                    }
+                  },
+                  "required": ["settings"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid settings data"
+          },
+          "403": {
+            "description": "Forbidden - User does not own this business"
+          },
+          "404": {
+            "description": "Business not found"
+          }
+        }
+      }
+    },
+    "/businesses/{id}/settings/reset": {
+      "post": {
+        "operationId": "resetBusinessSettings",
+        "summary": "Reset business settings to defaults",
+        "description": "Reset business settings to default values. Can reset all settings or specific sections only.",
+        "tags": ["Business Settings"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Universally Unique Identifier"
+            },
+            "required": true,
+            "description": "Universally Unique Identifier",
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "store",
+                        "payment",
+                        "voucher",
+                        "communication",
+                        "analytics",
+                        "branding",
+                        "notifications"
+                      ]
+                    },
+                    "description": "Sections to reset (all if not specified)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business settings reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "string",
+                          "enum": ["1.0"],
+                          "description": "Settings schema version"
+                        },
+                        "store": {
+                          "type": "object",
+                          "properties": {
+                            "timezone": {
+                              "type": "string",
+                              "description": "IANA timezone identifier"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "enum": [
+                                "PYG",
+                                "USD",
+                                "EUR",
+                                "GBP",
+                                "CAD",
+                                "AUD",
+                                "JPY",
+                                "CNY",
+                                "INR"
+                              ],
+                              "description": "Accepted currency"
+                            },
+                            "primaryLanguage": {
+                              "type": "string",
+                              "enum": ["es", "en"],
+                              "description": "Primary business language"
+                            },
+                            "refundPolicy": {
+                              "type": "string",
+                              "enum": [
+                                "full",
+                                "partial",
+                                "store_credit",
+                                "no_refunds"
+                              ],
+                              "description": "Refund policy"
+                            },
+                            "paymentTerms": {
+                              "type": "string",
+                              "enum": [
+                                "immediate",
+                                "net_15",
+                                "net_30",
+                                "custom"
+                              ],
+                              "description": "Payment terms"
+                            }
+                          },
+                          "required": [
+                            "timezone",
+                            "currency",
+                            "primaryLanguage",
+                            "refundPolicy",
+                            "paymentTerms"
+                          ]
+                        },
+                        "payment": {
+                          "type": "object",
+                          "properties": {
+                            "acceptsCash": {
+                              "type": "boolean",
+                              "description": "Accepts cash payments"
+                            },
+                            "acceptsCard": {
+                              "type": "boolean",
+                              "description": "Accepts card payments"
+                            },
+                            "acceptsTransfer": {
+                              "type": "boolean",
+                              "description": "Accepts bank transfers"
+                            },
+                            "acceptsMobilePayment": {
+                              "type": "boolean",
+                              "description": "Accepts mobile payments"
+                            },
+                            "providesInvoice": {
+                              "type": "boolean",
+                              "description": "Provides invoices"
+                            }
+                          },
+                          "required": [
+                            "acceptsCash",
+                            "acceptsCard",
+                            "acceptsTransfer",
+                            "acceptsMobilePayment",
+                            "providesInvoice"
+                          ]
+                        },
+                        "voucher": {
+                          "type": "object",
+                          "properties": {
+                            "autoApproveVouchers": {
+                              "type": "boolean",
+                              "description": "Auto-approve voucher claims"
+                            },
+                            "defaultValidityDays": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 365,
+                              "description": "Default voucher validity in days"
+                            },
+                            "maxActiveVouchers": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 100,
+                              "description": "Maximum concurrent active vouchers"
+                            },
+                            "maxRedemptionsPerCustomer": {
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 100,
+                              "description": "Max redemptions per customer"
+                            },
+                            "requiresVerification": {
+                              "type": "boolean",
+                              "description": "Requires verification for redemption"
+                            },
+                            "minimumPurchaseAmount": {
+                              "type": "number",
+                              "minimum": 0,
+                              "description": "Minimum purchase amount to use vouchers"
+                            },
+                            "showOnMarketplace": {
+                              "type": "boolean",
+                              "description": "Show vouchers in public marketplace"
+                            },
+                            "allowSharing": {
+                              "type": "boolean",
+                              "description": "Allow customers to share vouchers"
+                            },
+                            "platformCommissionAgreed": {
+                              "type": "boolean",
+                              "description": "Agreed to platform commission"
+                            },
+                            "commissionModel": {
+                              "type": "string",
+                              "enum": ["percentage", "flat_fee", "hybrid"],
+                              "description": "Commission model"
+                            }
+                          },
+                          "required": [
+                            "autoApproveVouchers",
+                            "defaultValidityDays",
+                            "maxActiveVouchers",
+                            "maxRedemptionsPerCustomer",
+                            "requiresVerification",
+                            "showOnMarketplace",
+                            "allowSharing",
+                            "platformCommissionAgreed"
+                          ]
+                        },
+                        "communication": {
+                          "type": "object",
+                          "properties": {
+                            "responseTimeCommitment": {
+                              "type": "string",
+                              "enum": ["instant", "1h", "24h", "48h", "custom"],
+                              "description": "Response time commitment"
+                            },
+                            "autoReplyEnabled": {
+                              "type": "boolean",
+                              "description": "Auto-reply enabled"
+                            },
+                            "autoReplyMessage": {
+                              "type": "string",
+                              "maxLength": 500,
+                              "description": "Auto-reply message"
+                            },
+                            "acceptsWhatsApp": {
+                              "type": "boolean",
+                              "description": "Accepts WhatsApp messages"
+                            },
+                            "acceptsSMS": {
+                              "type": "boolean",
+                              "description": "Accepts SMS messages"
+                            }
+                          },
+                          "required": [
+                            "responseTimeCommitment",
+                            "autoReplyEnabled",
+                            "acceptsWhatsApp",
+                            "acceptsSMS"
+                          ]
+                        },
+                        "analytics": {
+                          "type": "object",
+                          "properties": {
+                            "dashboardView": {
+                              "type": "string",
+                              "enum": ["simple", "detailed", "custom"],
+                              "description": "Dashboard view preference"
+                            },
+                            "defaultTimeRange": {
+                              "type": "string",
+                              "enum": [
+                                "today",
+                                "week",
+                                "month",
+                                "quarter",
+                                "year"
+                              ],
+                              "description": "Default time range"
+                            },
+                            "emailReports": {
+                              "type": "boolean",
+                              "description": "Receive email reports"
+                            },
+                            "reportFrequency": {
+                              "type": "string",
+                              "enum": [
+                                "daily",
+                                "weekly",
+                                "monthly",
+                                "quarterly"
+                              ],
+                              "description": "Report frequency"
+                            }
+                          },
+                          "required": [
+                            "dashboardView",
+                            "defaultTimeRange",
+                            "emailReports"
+                          ]
+                        },
+                        "branding": {
+                          "type": "object",
+                          "properties": {
+                            "voucherTemplate": {
+                              "type": "string",
+                              "enum": [
+                                "standard",
+                                "premium",
+                                "festive",
+                                "minimal",
+                                "custom"
+                              ],
+                              "description": "Voucher template style"
+                            },
+                            "primaryColor": {
+                              "type": "string",
+                              "pattern": "^#[0-9A-Fa-f]{6}$",
+                              "description": "Primary brand color (hex)"
+                            },
+                            "showLogoOnVouchers": {
+                              "type": "boolean",
+                              "description": "Show logo on vouchers"
+                            }
+                          },
+                          "required": ["voucherTemplate", "showLogoOnVouchers"]
+                        },
+                        "notifications": {
+                          "type": "object",
+                          "properties": {
+                            "notifyOnVoucherClaim": {
+                              "type": "boolean",
+                              "description": "Notify on voucher claim"
+                            },
+                            "notifyOnVoucherRedeem": {
+                              "type": "boolean",
+                              "description": "Notify on voucher redemption"
+                            },
+                            "notifyOnVoucherExpiring": {
+                              "type": "boolean",
+                              "description": "Notify on voucher expiring"
+                            },
+                            "notifyOnNewReview": {
+                              "type": "boolean",
+                              "description": "Notify on new review"
+                            },
+                            "dailySummary": {
+                              "type": "boolean",
+                              "description": "Receive daily summary"
+                            },
+                            "monthlySummary": {
+                              "type": "boolean",
+                              "description": "Receive monthly summary"
+                            },
+                            "emailNotifications": {
+                              "type": "boolean",
+                              "description": "Email notifications enabled"
+                            },
+                            "pushNotifications": {
+                              "type": "boolean",
+                              "description": "Push notifications enabled"
+                            },
+                            "inAppNotifications": {
+                              "type": "boolean",
+                              "description": "In-app notifications enabled"
+                            }
+                          },
+                          "required": [
+                            "notifyOnVoucherClaim",
+                            "notifyOnVoucherRedeem",
+                            "notifyOnVoucherExpiring",
+                            "notifyOnNewReview",
+                            "dailySummary",
+                            "monthlySummary",
+                            "emailNotifications",
+                            "pushNotifications",
+                            "inAppNotifications"
+                          ]
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "store",
+                        "payment",
+                        "voucher",
+                        "communication",
+                        "analytics",
+                        "branding",
+                        "notifications",
+                        "updatedAt"
+                      ],
+                      "description": "Business settings"
+                    }
+                  },
+                  "required": ["settings"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid reset request"
+          },
+          "403": {
+            "description": "Forbidden - User does not own this business"
+          },
+          "404": {
+            "description": "Business not found"
           }
         }
       }

@@ -30,13 +30,11 @@ export interface UserNotificationSettings {
     productUpdates: boolean
     securityAlerts: boolean
     voucherExpiry: boolean
-    businessUpdates: boolean
   }
   push: {
     enabled: boolean
     marketing: boolean
     voucherExpiry: boolean
-    businessUpdates: boolean
     orderUpdates: boolean
   }
   sms: {
@@ -76,28 +74,6 @@ export interface UserPrivacySettings {
 }
 
 /**
- * Business-related preferences (for business users)
- */
-export interface UserBusinessSettings {
-  dashboard: {
-    defaultView: 'overview' | 'analytics' | 'vouchers' | 'customers'
-    autoRefresh: boolean
-    refreshInterval: number // minutes
-  }
-  vouchers: {
-    autoApprove: boolean
-    requireCustomerData: boolean
-    allowBulkActions: boolean
-  }
-  notifications: {
-    newCustomers: boolean
-    voucherRedemptions: boolean
-    lowStockAlerts: boolean
-    reviewRequests: boolean
-  }
-}
-
-/**
  * Accessibility and usability settings
  */
 export interface UserAccessibilitySettings {
@@ -119,7 +95,6 @@ export interface UserSettings {
   display: UserDisplaySettings
   notifications: UserNotificationSettings
   privacy: UserPrivacySettings
-  business?: UserBusinessSettings // Optional for business users
   accessibility: UserAccessibilitySettings
   updatedAt: Date
 }
@@ -144,13 +119,11 @@ export const DEFAULT_NOTIFICATION_SETTINGS: UserNotificationSettings = {
     productUpdates: true,
     securityAlerts: true,
     voucherExpiry: true,
-    businessUpdates: true,
   },
   push: {
     enabled: true,
     marketing: false,
     voucherExpiry: true,
-    businessUpdates: true,
     orderUpdates: true,
   },
   sms: {
@@ -186,25 +159,6 @@ export const DEFAULT_PRIVACY_SETTINGS: UserPrivacySettings = {
   },
 }
 
-export const DEFAULT_BUSINESS_SETTINGS: UserBusinessSettings = {
-  dashboard: {
-    defaultView: 'overview',
-    autoRefresh: true,
-    refreshInterval: 5,
-  },
-  vouchers: {
-    autoApprove: false,
-    requireCustomerData: true,
-    allowBulkActions: true,
-  },
-  notifications: {
-    newCustomers: true,
-    voucherRedemptions: true,
-    lowStockAlerts: true,
-    reviewRequests: true,
-  },
-}
-
 export const DEFAULT_ACCESSIBILITY_SETTINGS: UserAccessibilitySettings = {
   reduceMotion: false,
   highContrast: false,
@@ -214,12 +168,10 @@ export const DEFAULT_ACCESSIBILITY_SETTINGS: UserAccessibilitySettings = {
 }
 
 /**
- * Creates default user settings for a given user role
+ * Creates default user settings
  */
-export function createDefaultUserSettings(
-  isBusinessUser = false,
-): UserSettings {
-  const settings: UserSettings = {
+export function createDefaultUserSettings(): UserSettings {
+  return {
     version: '1.0',
     display: { ...DEFAULT_DISPLAY_SETTINGS },
     notifications: { ...DEFAULT_NOTIFICATION_SETTINGS },
@@ -227,12 +179,6 @@ export function createDefaultUserSettings(
     accessibility: { ...DEFAULT_ACCESSIBILITY_SETTINGS },
     updatedAt: new Date(),
   }
-
-  if (isBusinessUser) {
-    settings.business = { ...DEFAULT_BUSINESS_SETTINGS }
-  }
-
-  return settings
 }
 
 // ============= Partial Update Types =============
@@ -253,11 +199,6 @@ export type PartialUserSettings = {
     search?: Partial<UserPrivacySettings['search']>
     analytics?: Partial<UserPrivacySettings['analytics']>
     marketing?: Partial<UserPrivacySettings['marketing']>
-  }
-  business?: {
-    dashboard?: Partial<UserBusinessSettings['dashboard']>
-    vouchers?: Partial<UserBusinessSettings['vouchers']>
-    notifications?: Partial<UserBusinessSettings['notifications']>
   }
   accessibility?: Partial<UserAccessibilitySettings>
 }
@@ -337,20 +278,6 @@ export function mergeUserSettings(
       search: { ...current.privacy.search, ...update.privacy.search },
       analytics: { ...current.privacy.analytics, ...update.privacy.analytics },
       marketing: { ...current.privacy.marketing, ...update.privacy.marketing },
-    }
-  }
-
-  if (update.business && current.business) {
-    merged.business = {
-      dashboard: {
-        ...current.business.dashboard,
-        ...update.business.dashboard,
-      },
-      vouchers: { ...current.business.vouchers, ...update.business.vouchers },
-      notifications: {
-        ...current.business.notifications,
-        ...update.business.notifications,
-      },
     }
   }
 

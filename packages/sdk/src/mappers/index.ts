@@ -1,4 +1,5 @@
 export * from './BusinessMapper.js'
+export * from './BusinessSettingsMapper.js'
 export * from './CategoryMapper.js'
 export * from './CommunicationLogMapper.js'
 export * from './FavoriteMapper.js'

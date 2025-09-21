@@ -30,13 +30,11 @@ const UserNotificationSettings = z.object({
     productUpdates: z.boolean(),
     securityAlerts: z.boolean(),
     voucherExpiry: z.boolean(),
-    businessUpdates: z.boolean(),
   }),
   push: z.object({
     enabled: z.boolean(),
     marketing: z.boolean(),
     voucherExpiry: z.boolean(),
-    businessUpdates: z.boolean(),
     orderUpdates: z.boolean(),
   }),
   sms: z.object({
@@ -73,26 +71,6 @@ const UserPrivacySettings = z.object({
   }),
 })
 
-// Business Settings (raw Zod)
-const UserBusinessSettings = z.object({
-  dashboard: z.object({
-    defaultView: z.enum(['overview', 'analytics', 'vouchers', 'customers']),
-    autoRefresh: z.boolean(),
-    refreshInterval: z.number().min(1).max(60),
-  }),
-  vouchers: z.object({
-    autoApprove: z.boolean(),
-    requireCustomerData: z.boolean(),
-    allowBulkActions: z.boolean(),
-  }),
-  notifications: z.object({
-    newCustomers: z.boolean(),
-    voucherRedemptions: z.boolean(),
-    lowStockAlerts: z.boolean(),
-    reviewRequests: z.boolean(),
-  }),
-})
-
 // Accessibility Settings (raw Zod)
 const UserAccessibilitySettings = z.object({
   reduceMotion: z.boolean(),
@@ -108,7 +86,6 @@ export const UserSettings = z.object({
   display: UserDisplaySettings,
   notifications: UserNotificationSettings,
   privacy: UserPrivacySettings,
-  business: UserBusinessSettings.optional(),
   accessibility: UserAccessibilitySettings,
   updatedAt: z.coerce.date(),
 })
@@ -196,7 +173,6 @@ const PatchUserSettingsRequestRaw = z.object({
           productUpdates: z.boolean().optional(),
           securityAlerts: z.boolean().optional(),
           voucherExpiry: z.boolean().optional(),
-          businessUpdates: z.boolean().optional(),
         })
         .optional(),
       push: z
@@ -204,7 +180,6 @@ const PatchUserSettingsRequestRaw = z.object({
           enabled: z.boolean().optional(),
           marketing: z.boolean().optional(),
           voucherExpiry: z.boolean().optional(),
-          businessUpdates: z.boolean().optional(),
           orderUpdates: z.boolean().optional(),
         })
         .optional(),
@@ -250,34 +225,6 @@ const PatchUserSettingsRequestRaw = z.object({
         .object({
           allowPersonalization: z.boolean().optional(),
           shareWithPartners: z.boolean().optional(),
-        })
-        .optional(),
-    })
-    .optional(),
-  business: z
-    .object({
-      dashboard: z
-        .object({
-          defaultView: z
-            .enum(['overview', 'analytics', 'vouchers', 'customers'])
-            .optional(),
-          autoRefresh: z.boolean().optional(),
-          refreshInterval: z.number().min(1).max(60).optional(),
-        })
-        .optional(),
-      vouchers: z
-        .object({
-          autoApprove: z.boolean().optional(),
-          requireCustomerData: z.boolean().optional(),
-          allowBulkActions: z.boolean().optional(),
-        })
-        .optional(),
-      notifications: z
-        .object({
-          newCustomers: z.boolean().optional(),
-          voucherRedemptions: z.boolean().optional(),
-          lowStockAlerts: z.boolean().optional(),
-          reviewRequests: z.boolean().optional(),
         })
         .optional(),
     })

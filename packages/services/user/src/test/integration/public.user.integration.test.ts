@@ -651,31 +651,6 @@ describe('User Service - Public API Integration Tests', () => {
         expect(settings.accessibility.reduceMotion).toBe(false)
       })
 
-      it('should return business-specific settings for business users', async () => {
-        const response = await businessClient
-          .get('/users/me/settings')
-          .set('Accept', 'application/json')
-
-        // Check if endpoint exists
-        if (response.status === 404) return
-
-        expect(response.status).toBe(200)
-        expect(response.body).toHaveProperty('settings')
-
-        const { settings } = response.body
-
-        // Business users should have business settings
-        expect(settings).toHaveProperty('business')
-        expect(settings.business).toHaveProperty('dashboard')
-        expect(settings.business).toHaveProperty('vouchers')
-        expect(settings.business).toHaveProperty('notifications')
-
-        // Verify default business settings
-        expect(settings.business.dashboard.defaultView).toBe('overview')
-        expect(settings.business.vouchers.autoApprove).toBe(false)
-        expect(settings.business.notifications.newCustomers).toBe(true)
-      })
-
       it('should require authentication', async () => {
         const response = await request
           .get('/users/me/settings')
@@ -708,12 +683,12 @@ describe('User Service - Public API Integration Tests', () => {
     })
 
     describe('PUT /users/me/settings', () => {
-      const createTestSettings = (isBusinessUser = false): UserSettings => {
-        return createDefaultUserSettings(isBusinessUser)
+      const createTestSettings = (): UserSettings => {
+        return createDefaultUserSettings()
       }
 
       it('should update complete user settings', async () => {
-        const newSettings = createTestSettings(false)
+        const newSettings = createTestSettings()
 
         // Modify some values for testing
         newSettings.display.theme = 'dark'
@@ -754,30 +729,6 @@ describe('User Service - Public API Integration Tests', () => {
           expect(verifyResponse.body.settings.display.theme).toBe('dark')
           expect(verifyResponse.body.settings.display.language).toBe('es')
         }
-      })
-
-      it('should handle business settings for business users', async () => {
-        const newSettings = createTestSettings(true)
-
-        // Modify business settings
-        newSettings.business!.dashboard.defaultView = 'analytics'
-        newSettings.business!.vouchers.autoApprove = true
-        newSettings.business!.notifications.newCustomers = false
-
-        const response = await businessClient
-          .put('/users/me/settings')
-          .send(newSettings)
-          .set('Accept', 'application/json')
-
-        if (response.status === 404) return
-
-        expect(response.status).toBe(200)
-
-        const { settings } = response.body
-
-        expect(settings.business.dashboard.defaultView).toBe('analytics')
-        expect(settings.business.vouchers.autoApprove).toBe(true)
-        expect(settings.business.notifications.newCustomers).toBe(false)
       })
 
       it('should validate settings data', async () => {
@@ -969,35 +920,6 @@ describe('User Service - Public API Integration Tests', () => {
         expect(response.body).toHaveProperty('error')
       })
 
-      it('should handle business settings updates for business users', async () => {
-        const businessUpdate: PartialUserSettings = {
-          business: {
-            dashboard: {
-              defaultView: 'vouchers',
-              autoRefresh: false,
-            },
-            vouchers: {
-              autoApprove: true,
-            },
-          },
-        }
-
-        const response = await businessClient
-          .patch('/users/me/settings')
-          .send(businessUpdate)
-          .set('Accept', 'application/json')
-
-        if (response.status === 404) return
-
-        expect(response.status).toBe(200)
-
-        const { settings } = response.body
-
-        expect(settings.business.dashboard.defaultView).toBe('vouchers')
-        expect(settings.business.dashboard.autoRefresh).toBe(false)
-        expect(settings.business.vouchers.autoApprove).toBe(true)
-      })
-
       it('should reject empty updates gracefully', async () => {
         const emptyUpdate = {}
 
@@ -1122,7 +1044,7 @@ describe('User Service - Public API Integration Tests', () => {
 
     describe('Settings Performance', () => {
       it('should handle large settings objects efficiently', async () => {
-        const settings = createDefaultUserSettings(true) // Include business settings
+        const settings = createDefaultUserSettings()
 
         // Add all possible settings
         settings.display.timezone = 'America/New_York'

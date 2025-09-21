@@ -1,6 +1,5 @@
 import type { BusinessSearchParams } from '@business/types/search.js'
-import { PAGINATION_DEFAULT_LIMIT, REDIS_DEFAULT_TTL } from '@pika/environment'
-import type { ICacheService } from '@pika/redis'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { type BusinessDomain, BusinessMapper } from '@pika/sdk'
 import { ErrorFactory, ErrorSeverity, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes } from '@pika/types'
@@ -56,10 +55,7 @@ export interface UpdateBusinessData {
  * - Follow the repository interface pattern established in the new architecture
  */
 export class BusinessRepository implements IBusinessRepository {
-  constructor(
-    private readonly prisma: PrismaClient,
-    private readonly cacheService?: ICacheService,
-  ) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   /**
    * Builds a Prisma WHERE clause from search parameters
@@ -320,21 +316,6 @@ export class BusinessRepository implements IBusinessRepository {
     includes?: ParsedIncludes,
   ): Promise<BusinessDomain | null> {
     try {
-      // Try to get from cache first
-      const cacheKey = `business:${id}`
-
-      if (this.cacheService) {
-        const cached = await this.cacheService.get<string>(cacheKey)
-
-        if (cached) {
-          logger.debug(`Cache hit for business ${id}`)
-
-          const cachedData = JSON.parse(cached)
-
-          return cachedData as BusinessDomain
-        }
-      }
-
       const include = this.buildIncludeClause(includes)
 
       const business = await this.prisma.business.findFirst({
@@ -353,15 +334,6 @@ export class BusinessRepository implements IBusinessRepository {
         ...business,
         avgRating: business.avgRating.toNumber(),
       })
-
-      // Cache the result
-      if (this.cacheService) {
-        await this.cacheService.set(
-          cacheKey,
-          JSON.stringify(domainBusiness),
-          REDIS_DEFAULT_TTL,
-        )
-      }
 
       return domainBusiness
     } catch (error) {
@@ -388,21 +360,6 @@ export class BusinessRepository implements IBusinessRepository {
     includes?: ParsedIncludes,
   ): Promise<BusinessDomain | null> {
     try {
-      // Try to get from cache first
-      const cacheKey = `business:user:${userId}`
-
-      if (this.cacheService) {
-        const cached = await this.cacheService.get<string>(cacheKey)
-
-        if (cached) {
-          logger.debug(`Cache hit for business by user ${userId}`)
-
-          const cachedData = JSON.parse(cached)
-
-          return cachedData as BusinessDomain
-        }
-      }
-
       const include = this.buildIncludeClause(includes)
 
       const business = await this.prisma.business.findFirst({
@@ -421,15 +378,6 @@ export class BusinessRepository implements IBusinessRepository {
         ...business,
         avgRating: business.avgRating.toNumber(),
       })
-
-      // Cache the result
-      if (this.cacheService) {
-        await this.cacheService.set(
-          cacheKey,
-          JSON.stringify(domainBusiness),
-          REDIS_DEFAULT_TTL,
-        )
-      }
 
       return domainBusiness
     } catch (error) {
@@ -470,22 +418,6 @@ export class BusinessRepository implements IBusinessRepository {
         ...business,
         avgRating: business.avgRating.toNumber(),
       })
-
-      // Cache the new business
-      if (this.cacheService) {
-        await Promise.all([
-          this.cacheService.set(
-            `business:${business.id}`,
-            JSON.stringify(domainBusiness),
-            REDIS_DEFAULT_TTL,
-          ),
-          this.cacheService.set(
-            `business:user:${business.userId}`,
-            JSON.stringify(domainBusiness),
-            REDIS_DEFAULT_TTL,
-          ),
-        ])
-      }
 
       return domainBusiness
     } catch (error) {
@@ -579,22 +511,6 @@ export class BusinessRepository implements IBusinessRepository {
         avgRating: business.avgRating.toNumber(),
       })
 
-      // Update cache
-      if (this.cacheService) {
-        await Promise.all([
-          this.cacheService.set(
-            `business:${business.id}`,
-            JSON.stringify(domainBusiness),
-            REDIS_DEFAULT_TTL,
-          ),
-          this.cacheService.set(
-            `business:user:${business.userId}`,
-            JSON.stringify(domainBusiness),
-            REDIS_DEFAULT_TTL,
-          ),
-        ])
-      }
-
       return domainBusiness
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -637,22 +553,6 @@ export class BusinessRepository implements IBusinessRepository {
           updatedAt: new Date(),
         },
       })
-
-      // Remove from cache
-      if (this.cacheService) {
-        // We need to get the business first to know the userId for cache invalidation
-        const business = await this.prisma.business.findUnique({
-          where: { id },
-          select: { userId: true },
-        })
-
-        if (business) {
-          await Promise.all([
-            this.cacheService.del(`business:${id}`),
-            this.cacheService.del(`business:user:${business.userId}`),
-          ])
-        }
-      }
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {

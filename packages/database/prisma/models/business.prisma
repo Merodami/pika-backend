@@ -12,6 +12,8 @@ model Business {
   approvedAt             DateTime? @map("approved_at") @db.Timestamptz(6) // When it was approved
   avgRating              Decimal   @default(0) @map("avg_rating") @db.Decimal(3, 2) // 0.00 to 5.00
   favoriteCount          Int       @default(0) @map("favorite_count") // Number of users who favorited this business
+  taxId                  String?   @map("tax_id") @db.VarChar(50) // Tax identification number (sensitive field)
+  settings               Json?     @map("settings") @db.JsonB // Business-specific configuration settings
   createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt              DateTime? @map("deleted_at") @db.Timestamptz(6)

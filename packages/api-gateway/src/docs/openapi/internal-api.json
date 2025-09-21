@@ -7,32 +7,60 @@
   },
   "servers": [
     {
+      "url": "http://127.0.0.1:5500/api/v1",
+      "description": "Local Development (All Services)"
+    },
+    {
+      "url": "https://internal-api.thevoucherbook.com/v1",
+      "description": "Production Internal API"
+    },
+    {
+      "url": "https://internal-api.staging.thevoucherbook.com/v1",
+      "description": "Staging Internal API"
+    },
+    {
       "url": "http://0.0.0.0:5502",
-      "description": "Auth Service"
+      "description": "Auth Service (Direct)"
     },
     {
       "url": "http://0.0.0.0:5501",
-      "description": "User Service"
+      "description": "User Service (Direct)"
+    },
+    {
+      "url": "http://0.0.0.0:5511",
+      "description": "Business Service (Direct)"
+    },
+    {
+      "url": "http://0.0.0.0:5512",
+      "description": "Category Service (Direct)"
+    },
+    {
+      "url": "http://0.0.0.0:5514",
+      "description": "Voucher Service (Direct)"
     },
     {
       "url": "http://0.0.0.0:5506",
-      "description": "Subscription Service"
+      "description": "Subscription Service (Direct)"
     },
     {
       "url": "http://0.0.0.0:5507",
-      "description": "Communication Service"
+      "description": "Communication Service (Direct)"
     },
     {
       "url": "http://0.0.0.0:5510",
-      "description": "Storage Service"
+      "description": "Storage Service (Direct)"
     },
     {
       "url": "http://0.0.0.0:5505",
-      "description": "Payment Service"
+      "description": "Payment Service (Direct)"
     },
     {
       "url": "http://0.0.0.0:5508",
-      "description": "Support Service"
+      "description": "Support Service (Direct)"
+    },
+    {
+      "url": "http://0.0.0.0:5513",
+      "description": "PDF Service (Direct)"
     }
   ],
   "components": {

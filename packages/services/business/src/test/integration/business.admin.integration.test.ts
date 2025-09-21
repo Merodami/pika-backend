@@ -115,6 +115,7 @@ describe('Business Service - Admin API Integration Tests', () => {
     const adminUser = await testDb.prisma.user.findUnique({
       where: { email: 'admin@e2etest.com' },
     })
+
     adminUserId = adminUser?.id || uuid()
 
     logger.debug('E2E authentication setup complete')

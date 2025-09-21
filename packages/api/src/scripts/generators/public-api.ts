@@ -4,6 +4,7 @@ import * as authOauthSchemas from '@api/schemas/auth/public/oauth.js'
 import * as authPasswordSchemas from '@api/schemas/auth/public/password.js'
 import * as authRegisterSchemas from '@api/schemas/auth/public/register.js'
 import * as authSocialSchemas from '@api/schemas/auth/public/social.js'
+import * as businessSettingsSchemas from '@api/schemas/business/business/settings.js'
 import * as businessEnumSchemas from '@api/schemas/business/common/enums.js'
 import * as businessParameters from '@api/schemas/business/common/parameters.js'
 import * as businessSchemas from '@api/schemas/business/public/business.js'
@@ -182,6 +183,28 @@ export function registerPublicAPI(registry: ZodRegistry): void {
   registry.registerSchema(
     'CompleteBusinessRegistrationResponse',
     businessRegistrationSchemas.CompleteBusinessRegistrationResponse,
+  )
+
+  // ============= Business Settings Schemas =============
+  registry.registerSchema(
+    'BusinessSettings',
+    businessSettingsSchemas.BusinessSettings,
+  )
+  registry.registerSchema(
+    'BusinessSettingsResponse',
+    businessSettingsSchemas.BusinessSettingsResponse,
+  )
+  registry.registerSchema(
+    'UpdateBusinessSettingsRequest',
+    businessSettingsSchemas.UpdateBusinessSettingsRequest,
+  )
+  registry.registerSchema(
+    'ResetBusinessSettingsRequest',
+    businessSettingsSchemas.ResetBusinessSettingsRequest,
+  )
+  registry.registerSchema(
+    'BusinessSettingsPathParams',
+    businessSettingsSchemas.BusinessSettingsPathParams,
   )
 
   // ============= Category Schemas =============

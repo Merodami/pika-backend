@@ -1170,7 +1170,9 @@ CREATE TABLE business.businesses (
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(6) with time zone,
-    favorite_count integer DEFAULT 0 NOT NULL
+    favorite_count integer DEFAULT 0 NOT NULL,
+    settings jsonb,
+    tax_id character varying(50)
 );
 
 

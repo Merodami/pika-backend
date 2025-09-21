@@ -33,8 +33,8 @@ export function createAdminBusinessRoutes(
   const router = Router()
 
   // Initialize dependencies
-  const repository = new BusinessRepository(prisma, cache)
-  const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
+  const repository = new BusinessRepository(prisma)
+  const businessDetailsRepository = new BusinessDetailsRepository(prisma)
   const service = new BusinessService(
     repository,
     translationClient,
@@ -46,15 +46,13 @@ export function createAdminBusinessRoutes(
   )
 
   // Initialize registration service dependencies
-  const registrationRepository = new BusinessRegistrationRepository(
-    prisma,
-    cache,
-  )
+  const registrationRepository = new BusinessRegistrationRepository(prisma)
   const registrationService = new BusinessRegistrationService(
     registrationRepository,
     repository,
     businessDetailsRepository,
     userServiceClient,
+    cache,
   )
 
   const controller = new AdminBusinessController(service, registrationService)

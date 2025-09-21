@@ -21,7 +21,6 @@ import {
   seedTestBusinesses,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
-import { UserRole, UserStatus } from '@prisma/client'
 import { keyManager } from '@pika/crypto'
 import { SERVICE_API_KEY } from '@pika/environment'
 import { MemoryCacheService } from '@pika/redis'
@@ -33,6 +32,7 @@ import {
   TestDatabaseResult,
 } from '@pika/tests'
 import { TranslationClient } from '@pika/translation'
+import { UserRole, UserStatus } from '@prisma/client'
 import type { Express } from 'express'
 import supertest from 'supertest'
 import { v4 as uuid } from 'uuid'
@@ -118,6 +118,7 @@ describe('Business Service - Internal API Integration Tests', () => {
           emailVerified: true,
         },
       }))
+
     adminUserId = adminUser.id
 
     // Create shared test data once for all tests

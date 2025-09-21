@@ -12,7 +12,7 @@ type SubmitRegistrationStepRequest =
 type SubmitRegistrationStepResponse =
   businessPublic.SubmitRegistrationStepResponse
 import { REDIS_DEFAULT_TTL } from '@pika/environment'
-import { Cache } from '@pika/redis'
+import { Cache, type ICacheService } from '@pika/redis'
 import type { UserServiceClient } from '@pika/shared'
 import { ErrorFactory, logger } from '@pika/shared'
 import { BusinessRegistrationStatus, UserRole } from '@pika/types'
@@ -67,7 +67,24 @@ export class BusinessRegistrationService
     private readonly businessRepository: IBusinessRepository,
     private readonly businessDetailsRepository: IBusinessDetailsRepository,
     private readonly userServiceClient: UserServiceClient,
+    private readonly cacheService?: ICacheService,
   ) {}
+
+  /**
+   * Helper method to invalidate registration cache
+   */
+  private async invalidateRegistrationCache(userId: string): Promise<void> {
+    if (!this.cacheService) return
+
+    const keysToInvalidate = [
+      `${CACHE_KEYS.REGISTRATION.STATUS}:${userId}`,
+      `${CACHE_KEYS.REGISTRATION.USER}:${userId}`,
+    ]
+
+    await Promise.all(
+      keysToInvalidate.map((key) => this.cacheService!.del(key)),
+    )
+  }
 
   /**
    * Check if user needs to complete business registration
@@ -178,6 +195,9 @@ export class BusinessRegistrationService
         currentStep: 1,
       })
 
+      // Invalidate cache after creating registration
+      await this.invalidateRegistrationCache(userId)
+
       logger.info('Business registration started', {
         userId,
         registrationId: registration.id,
@@ -269,6 +289,9 @@ export class BusinessRegistrationService
         request.stepData,
       )
 
+      // Invalidate cache after updating step
+      await this.invalidateRegistrationCache(userId)
+
       // Determine next step
       const totalSteps = 3 // Full registration has 3 steps
       const nextStep =
@@ -297,8 +320,27 @@ export class BusinessRegistrationService
    */
   async getProgress(userId: string): Promise<RegistrationProgressResponse> {
     try {
-      const registration =
-        await this.registrationRepository.findByUserId(userId)
+      // Check cache first
+      const cacheKey = `${CACHE_KEYS.REGISTRATION.USER}:${userId}`
+
+      let registration = null
+
+      if (this.cacheService) {
+        const cached = await this.cacheService.get<any>(cacheKey)
+
+        if (cached) {
+          registration = cached
+        }
+      }
+
+      if (!registration) {
+        registration = await this.registrationRepository.findByUserId(userId)
+
+        // Cache the result if found
+        if (registration && this.cacheService) {
+          await this.cacheService.set(cacheKey, registration, 300) // 5 minutes cache
+        }
+      }
 
       if (!registration) {
         throw ErrorFactory.resourceNotFound('Registration', userId)
@@ -420,6 +462,9 @@ export class BusinessRegistrationService
         BusinessRegistrationStatus.SUBMITTED,
       )
 
+      // Invalidate cache after completing registration
+      await this.invalidateRegistrationCache(userId)
+
       logger.info('Business registration completed', {
         userId,
         registrationId: registration.id,
@@ -499,6 +544,9 @@ export class BusinessRegistrationService
         registration.id,
       )
 
+      // Invalidate cache after reset
+      await this.invalidateRegistrationCache(resetRegistration.userId)
+
       logger.info('Business registration reset successfully', {
         registrationId: registration.id,
         userId: resetRegistration.userId,
@@ -553,6 +601,9 @@ export class BusinessRegistrationService
         status,
         reason,
       )
+
+      // Invalidate cache after status update
+      await this.invalidateRegistrationCache(registration.userId)
 
       logger.info('Registration status updated successfully', {
         registrationId: registration.id,
