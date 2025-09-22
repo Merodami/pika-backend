@@ -20,12 +20,12 @@
     "@pika/tests": "workspace:^",
     "@pika/types": "workspace:^",
     "@prisma/client": "^6.14.0",
-    "bullmq": "^5.58.0",
-    "dotenv": "^17.2.1",
+    "bullmq": "^5.58.7",
+    "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "handlebars": "^4.7.8",
     "lodash-es": "^4.17.21",
-    "nodemailer": "^7.0.5"
+    "nodemailer": "^7.0.6"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
