@@ -201,19 +201,6 @@ describe('Business Service - Admin API Integration Tests', () => {
         .get('/admin/businesses')
         .set('Accept', 'application/json')
 
-      if (response.status !== 200) {
-        logger.error('GET /admin/businesses failed:', {
-          status: response.status,
-          body: response.body,
-          error: response.error,
-          text: response.text,
-        })
-        console.error(
-          'Full error details:',
-          JSON.stringify(response.body, null, 2),
-        )
-      }
-
       expect(response.status).toBe(200)
 
       // Should see all businesses from shared data
@@ -262,13 +249,6 @@ describe('Business Service - Admin API Integration Tests', () => {
         .get('/admin/businesses')
         .query({ include: 'user,category' })
         .set('Accept', 'application/json')
-
-      if (response.status !== 200) {
-        console.error(
-          'Include related data failed:',
-          JSON.stringify(response.body, null, 2),
-        )
-      }
 
       expect(response.status).toBe(200)
 
