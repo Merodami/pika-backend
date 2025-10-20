@@ -32,8 +32,8 @@
     "zod-validation-error": "^4.0.1"
   },
   "devDependencies": {
-    "@types/node": "^24.3.0",
-    "typescript": "^5.9.2"
+    "@types/node": "^24.8.1",
+    "typescript": "^5.9.3"
   },
   "depcheck": {
     "ignore": [
