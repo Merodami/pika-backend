@@ -13,9 +13,9 @@
     "ioredis": "^5.7.0"
   },
   "devDependencies": {
-    "@types/node": "^24.4.0",
+    "@types/node": "^24.10.1",
     "tsc-alias": "^1.8.16",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "repository": {
     "type": "git",

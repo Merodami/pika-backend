@@ -23,12 +23,12 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@types/node": "^24.4.0",
+    "@types/node": "^24.10.1",
     "@types/supertest": "^6.0.3",
     "he": "^1.2.0",
     "io-ts-types": "^0.5.19",
     "supertest": "^7.1.4",
-    "typescript": "^5.9.2",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
   "depcheck": {
