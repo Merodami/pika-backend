@@ -3,6 +3,21 @@
   "title": "Voucher_voucherTypes",
   "type": "object",
   "properties": {
+    "PopularSearchesResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "object",
+      "properties": {
+        "searches": {
+          "description": "List of popular search terms",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["searches"],
+      "additionalProperties": false
+    },
     "UserVoucherResponse": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "type": "object",
@@ -1196,6 +1211,9 @@
           "type": "string",
           "minLength": 1
         },
+        "userId": {
+          "type": "string"
+        },
         "location": {
           "type": "object",
           "properties": {
@@ -1638,7 +1656,18 @@
       "properties": {
         "scanSource": {
           "type": "string",
-          "enum": ["camera", "gallery", "link", "share"]
+          "enum": [
+            "camera",
+            "gallery",
+            "link",
+            "share",
+            "qr",
+            "print",
+            "digital",
+            "web",
+            "email",
+            "social"
+          ]
         },
         "location": {
           "type": "object",

@@ -41,8 +41,10 @@ export interface ITranslationRepository {
   ): Promise<void>
   update(id: string, data: Partial<Translation>): Promise<Translation>
   delete(id: string): Promise<void>
+  deleteByKey(key: string): Promise<number>
   findLanguageByCode(code: string): Promise<Language | null>
   findActiveLanguages(): Promise<Language[]>
+  findAllLanguages(): Promise<Language[]>
   findDefaultLanguage(): Promise<Language | null>
   findUserLanguagePreference(
     userId: string,
@@ -155,6 +157,14 @@ export class TranslationRepository implements ITranslationRepository {
     })
   }
 
+  async deleteByKey(key: string): Promise<number> {
+    const result = await this.prisma.translation.deleteMany({
+      where: { key },
+    })
+
+    return result.count
+  }
+
   async findLanguageByCode(code: string): Promise<Language | null> {
     return this.prisma.language.findUnique({
       where: { code },
@@ -164,6 +174,12 @@ export class TranslationRepository implements ITranslationRepository {
   async findActiveLanguages(): Promise<Language[]> {
     return this.prisma.language.findMany({
       where: { isActive: true },
+      orderBy: { isDefault: 'desc' },
+    })
+  }
+
+  async findAllLanguages(): Promise<Language[]> {
+    return this.prisma.language.findMany({
       orderBy: { isDefault: 'desc' },
     })
   }

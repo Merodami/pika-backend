@@ -24,6 +24,7 @@ import {
 } from '@auth-service/test/helpers/authTestHelpers.js'
 import { CommunicationServiceClientMock } from '@auth-service/test/mocks/CommunicationServiceClientMock.js'
 import { UserServiceClientMock } from '@auth-service/test/mocks/UserServiceClientMock.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -54,6 +55,12 @@ describe('Auth Service Cache Validation Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Auth Service Cache Validation tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Create test database
     testDb = await createTestDatabase({

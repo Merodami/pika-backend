@@ -14,6 +14,7 @@ vi.unmock('@pika/shared')
 
 import { createCommunicationServer } from '@communication/server.js'
 import { createSharedCommunicationTestData } from '@communication/test/helpers/communicationTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -41,6 +42,12 @@ describe('Communication Service - Public API Integration Tests', () => {
     logger.info(
       'Setting up Communication Service Public API integration tests...',
     )
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     testDb = await createTestDatabase({
       databaseName: 'test_communication_public_db',

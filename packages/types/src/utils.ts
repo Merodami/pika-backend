@@ -86,6 +86,7 @@ export function mapRoleToPermissions(role: UserRole): string[] {
         'vouchers:delete',
         'vouchers:publish',
         'vouchers:archive',
+        'admin:vouchers', // Admin-specific voucher management
         // Notification management
         'notifications:read',
         'notifications:write',

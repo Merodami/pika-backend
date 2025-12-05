@@ -13,6 +13,7 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
 import { authPublic } from '@pika/api'
+import { keyManager } from '@pika/crypto'
 import { logger } from '@pika/shared'
 import {
   cleanupTestDatabase,
@@ -27,6 +28,12 @@ describe('Business Owner Registration Flow', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Business Owner Registration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({

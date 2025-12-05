@@ -25,7 +25,7 @@ export function createInternalBusinessRoutes(
   const router = Router()
 
   // Initialize dependencies
-  const repository = new BusinessRepository(prisma, cache)
+  const repository = new BusinessRepository(prisma)
   const service = new BusinessService(
     repository,
     translationClient,

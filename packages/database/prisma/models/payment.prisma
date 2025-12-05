@@ -21,10 +21,21 @@ model Subscription {
   user User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan SubscriptionPlan? @relation(fields: [planId], references: [id])
 
+  // Core subscription indexes
   @@index([userId])
   @@index([status])
   @@index([stripeSubscriptionId])
   @@index([planId])
+  
+  // Subscription management and analytics
+  @@index([userId, status]) // User subscription status
+  @@index([status, currentPeriodEnd]) // Expiring subscriptions
+  @@index([status, cancelAtPeriodEnd]) // Pending cancellations
+  @@index([stripeCustomerId]) // Stripe customer lookup
+  @@index([currentPeriodEnd, status]) // Renewal processing
+  @@index([trialEnd, status]) // Trial expiration tracking
+  @@index([createdAt, status]) // Subscription growth metrics
+  @@index([planId, status]) // Plan popularity analytics
   @@map("subscriptions")
   @@schema("payments")
 }

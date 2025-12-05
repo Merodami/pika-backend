@@ -55,6 +55,7 @@
     "copy:openapi": "mkdir -p dist && cp generated/openapi/all-apis.json dist/openapi.json",
     "prebuild": "yarn generate:openapi",
     "generate:openapi": "tsx src/scripts/generate-all-apis.ts",
+    "generate:scalar-docs": "tsx src/scripts/generate-scalar-docs.ts",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "test": "vitest run src/**/*.test.ts",
     "lint": "eslint src --ext .ts",
@@ -64,12 +65,12 @@
     "@asteasolutions/zod-to-openapi": "^8.1.0",
     "@pika/types": "workspace:^",
     "lodash-es": "^4.17.21",
-    "zod": "^4.1.0"
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "tsc-alias": "^1.8.16",
-    "tsx": "^4.20.4",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   }

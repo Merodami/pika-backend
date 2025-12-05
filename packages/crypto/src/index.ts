@@ -27,6 +27,9 @@ export * from './shortcode/index.js'
 // Utilities
 export * from './utils/index.js'
 
+// Services
+export { KeyManager, keyManager } from './services/KeyManager.js'
+
 // Key Generation
 export * from './keygen/index.js'
 

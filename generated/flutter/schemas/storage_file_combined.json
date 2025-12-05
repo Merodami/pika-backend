@@ -98,6 +98,12 @@
                     },
                     {
                       "type": "null"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                   ]
                 }
@@ -237,6 +243,12 @@
                     },
                     {
                       "type": "null"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
                     }
                   ]
                 }
@@ -401,6 +413,12 @@
               },
               {
                 "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             ]
           }
@@ -552,6 +570,12 @@
               },
               {
                 "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             ]
           }

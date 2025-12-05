@@ -1,12 +1,9 @@
 import {
   VOUCHER_CODE_ALPHABET,
-  VOUCHER_JWT_ALGORITHM,
-  VOUCHER_JWT_PRIVATE_KEY,
   VOUCHER_SHORT_CODE_LENGTH,
 } from '@pika/environment'
 import { ErrorFactory, logger } from '@pika/shared'
 import { randomBytes } from 'crypto'
-import jwt from 'jsonwebtoken'
 import { nth, range } from 'lodash-es'
 
 export interface CodeConfig {
@@ -55,28 +52,7 @@ function generateShortCode(): string {
   return code
 }
 
-/**
- * Generates a JWT token for QR codes
- * Uses configurable algorithm (HS256 for dev, ES256 for production)
- */
-function generateQRToken(voucherId: string): string {
-  const payload = {
-    type: 'voucher',
-    vid: voucherId, // Short property names for smaller QR codes
-    iat: Math.floor(Date.now() / 1000),
-  }
-
-  try {
-    return jwt.sign(payload, VOUCHER_JWT_PRIVATE_KEY, {
-      algorithm: VOUCHER_JWT_ALGORITHM as jwt.Algorithm,
-      expiresIn: '365d', // Vouchers have their own expiration logic
-    })
-  } catch (error) {
-    throw ErrorFactory.fromError(error, 'Failed to generate QR token', {
-      source: 'generateQRToken',
-    })
-  }
-}
+// JWT QR token generation removed - migrated to URL-based validation codes
 
 /**
  * Generate human-readable short code for vouchers
@@ -184,21 +160,10 @@ export async function generateVoucherCodes(
   }
 
   try {
-    // Generate QR code (JWT token)
+    // QR code generation removed - use VoucherDeepLinkService for URL-based QR codes
     if (finalConfig.generateQR && voucherId) {
-      const qrToken = generateQRToken(voucherId)
-
-      codes.push({
-        code: qrToken,
-        type: 'QR',
-        metadata: {
-          algorithm: VOUCHER_JWT_ALGORITHM,
-          generatedAt: new Date().toISOString(),
-        },
-      })
-      logger.debug('Generated QR code for voucher', {
+      logger.debug('QR code generation moved to VoucherDeepLinkService', {
         voucherId,
-        tokenLength: qrToken.length,
       })
     }
 
@@ -293,26 +258,7 @@ export function validateVoucherCode(
   }
 }
 
-/**
- * Decodes a QR token to extract voucher information
- */
-export function decodeQRToken(token: string): { voucherId: string } | null {
-  try {
-    const decoded = jwt.verify(token, VOUCHER_JWT_PRIVATE_KEY, {
-      algorithms: [VOUCHER_JWT_ALGORITHM as jwt.Algorithm],
-    }) as any
-
-    if (decoded.type !== 'voucher' || !decoded.vid) {
-      return null
-    }
-
-    return { voucherId: decoded.vid }
-  } catch (error) {
-    logger.debug('Failed to decode QR token', { error: error.message })
-
-    return null
-  }
-}
+// JWT QR token decoding removed - use VoucherValidationService for validation
 
 /**
  * Generate QR code friendly string (high density, no ambiguous chars)

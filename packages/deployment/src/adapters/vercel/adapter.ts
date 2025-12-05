@@ -1,4 +1,5 @@
 import { createGatewayWithServices } from '@pika/api-gateway'
+import { keyManager } from '@pika/crypto'
 import { CACHE_DISABLED } from '@pika/environment'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import { logger } from '@pika/shared'
@@ -24,6 +25,13 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
 
   async initialize(): Promise<void> {
     logger.info('Initializing Vercel deployment adapter')
+
+    // Initialize KeyManager ONCE for all embedded services
+    // This must happen before any service initialization
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.info('KeyManager initialized for embedded deployment')
+    }
 
     // Initialize infrastructure
     await this.initializeInfrastructure()
@@ -148,8 +156,8 @@ export class VercelDeploymentAdapter extends BaseDeploymentAdapter {
   }
 
   private async initializeInfrastructure(): Promise<void> {
-    // Run migrations on first startup if needed
-    await this.runMigrationsIfNeeded()
+    // Don't run migrations at runtime in serverless - they should only run during build
+    // await this.runMigrationsIfNeeded()
 
     // Initialize Prisma
     const databaseUrl = this.config.infrastructure.database.url

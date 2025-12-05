@@ -1,9 +1,7 @@
 import {
   CustomerVoucherStatus,
   VoucherDiscountType,
-  VoucherDiscountTypeType,
   VoucherState,
-  VoucherStateType,
 } from '@pika/types'
 import { Decimal } from '@prisma/client/runtime/library'
 
@@ -438,8 +436,8 @@ export class VoucherMapper {
     if (!location) return null
 
     return {
-      lat: location.lat || location.latitude || 0,
-      lng: location.lng || location.longitude || 0,
+      lat: location.lat || 0,
+      lng: location.lng || 0,
       radius: location.radius,
     }
   }
@@ -471,8 +469,8 @@ export class VoucherMapper {
       Array.isArray(location.coordinates)
     ) {
       return {
-        lng: location.coordinates[0], // longitude is first in GeoJSON
         lat: location.coordinates[1], // latitude is second in GeoJSON
+        lng: location.coordinates[0], // longitude is first in GeoJSON
         radius: location.radius,
       }
     }
@@ -525,7 +523,7 @@ export class VoucherMapper {
   /**
    * Maps domain state to DTO state (API compatible)
    */
-  private static mapStateToDTO(state: VoucherState): VoucherStateType {
+  private static mapStateToDTO(state: VoucherState): VoucherState {
     switch (state) {
       case VoucherState.DRAFT:
         return VoucherState.DRAFT
@@ -549,7 +547,7 @@ export class VoucherMapper {
    */
   private static mapDiscountTypeToDTO(
     discountType: VoucherDiscountType,
-  ): VoucherDiscountTypeType {
+  ): VoucherDiscountType {
     switch (discountType) {
       case VoucherDiscountType.PERCENTAGE:
         return VoucherDiscountType.PERCENTAGE

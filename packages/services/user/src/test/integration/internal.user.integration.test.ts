@@ -32,6 +32,7 @@ import type {
   ValidatePasswordResetTokenRequest,
   VerifyEmailRequest,
 } from '@pika/api'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import type { FileStoragePort } from '@pika/shared'
 import type { InternalAPIClient, TestDatabase } from '@pika/tests'
@@ -75,6 +76,11 @@ describe('User Service - Internal API Integration Tests', () => {
   // Note: Using shared helper from userTestHelpers.js
 
   beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+    }
+
     // Setup internal API test helper
     internalAPIHelper = new InternalAPITestHelper(
       'dev-service-api-key-change-in-production',

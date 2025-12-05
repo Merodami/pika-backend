@@ -21,6 +21,7 @@ import {
   seedTestBusinesses,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -60,8 +61,17 @@ describe('Business Service - Admin API Integration Tests', () => {
   // Test user for approval tests
   let testBusinessOwner: any
 
+  // Admin user ID for creating categories
+  let adminUserId: string
+
   beforeAll(async () => {
     logger.debug('Setting up Business Service Admin API integration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({
@@ -100,6 +110,13 @@ describe('Business Service - Admin API Integration Tests', () => {
     adminClient = await authHelper.getAdminClient(testDb.prisma)
     customerClient = await authHelper.getUserClient(testDb.prisma)
     businessClient = await authHelper.getBusinessClient(testDb.prisma)
+
+    // Get the admin user ID for category creation
+    const adminUser = await testDb.prisma.user.findUnique({
+      where: { email: 'admin@e2etest.com' },
+    })
+
+    adminUserId = adminUser?.id || uuid()
 
     logger.debug('E2E authentication setup complete')
 
@@ -184,19 +201,6 @@ describe('Business Service - Admin API Integration Tests', () => {
         .get('/admin/businesses')
         .set('Accept', 'application/json')
 
-      if (response.status !== 200) {
-        logger.error('GET /admin/businesses failed:', {
-          status: response.status,
-          body: response.body,
-          error: response.error,
-          text: response.text,
-        })
-        console.error(
-          'Full error details:',
-          JSON.stringify(response.body, null, 2),
-        )
-      }
-
       expect(response.status).toBe(200)
 
       // Should see all businesses from shared data
@@ -245,13 +249,6 @@ describe('Business Service - Admin API Integration Tests', () => {
         .get('/admin/businesses')
         .query({ include: 'user,category' })
         .set('Accept', 'application/json')
-
-      if (response.status !== 200) {
-        console.error(
-          'Include related data failed:',
-          JSON.stringify(response.body, null, 2),
-        )
-      }
 
       expect(response.status).toBe(200)
 
@@ -476,7 +473,7 @@ describe('Business Service - Admin API Integration Tests', () => {
           path: '/',
           isActive: true,
           sortOrder: 1,
-          createdBy: uuid(),
+          createdBy: adminUserId,
         },
       })
 

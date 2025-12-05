@@ -14,6 +14,7 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -50,6 +51,12 @@ describe('PDF Service - Public API Integration Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up PDF Service integration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({

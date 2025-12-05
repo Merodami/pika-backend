@@ -42,6 +42,13 @@ This project is migrating from the old Pika codebase (pika-old) to a modern micr
 - **Current Tasks**: Implementing missing repository methods, fixing enum mismatches
 - **Next**: Complete getBusinessStats implementation, final typecheck pass
 
+#### Deployment Security
+
+- **TODO**: Ensure services are not accessible in the container in Vercel - only API gateway should be exposed
+- **TODO**: Verify API gateway is the only publicly accessible service (port 5500 locally)
+- **TODO**: Check deployment folder configuration for service isolation
+- **TODO**: Ensure internal services communicate only within the container network
+
 #### Technical Debt Items
 
 - **TODO**: Calculate shipped quantity in BookDistributionRepository.getBusinessStats when we have that data

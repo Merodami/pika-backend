@@ -25,7 +25,7 @@
   },
   "git": {
     "deploymentEnabled": {
-      "main": true
+      "dev": true
     }
   },
   "build": {

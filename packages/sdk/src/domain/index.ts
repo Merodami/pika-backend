@@ -1,5 +1,6 @@
 export * from './bookingStats.js'
 export * from './business.js'
+export * from './businessSettings.js'
 export * from './category.js'
 export * from './communication.js'
 export * from './file-storage.js'

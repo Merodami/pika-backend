@@ -6,6 +6,7 @@ vi.unmock('@pika/api')
 vi.unmock('@pika/redis')
 vi.unmock('@pika/shared')
 
+import { keyManager } from '@pika/crypto'
 import {
   AWS_S3_ACCESS_KEY_ID,
   AWS_S3_ENDPOINT,
@@ -53,6 +54,12 @@ describe('Storage Service with S3/MinIO Integration Tests', () => {
   const TEST_BUCKET = `test-bucket-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
   beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
+
     // Set environment variables for S3 provider
     process.env.STORAGE_PROVIDER_PRIMARY = 'aws_s3'
     process.env.STORAGE_PROVIDER_FALLBACK = 'local'

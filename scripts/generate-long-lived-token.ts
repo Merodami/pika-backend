@@ -1,19 +1,86 @@
 #!/usr/bin/env tsx
 
-import { UserRole } from '@pika/types'
-import { PrismaClient } from '@prisma/client'
-import jwt from 'jsonwebtoken'
+// Load environment variables BEFORE any other imports
 import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
 
-// Load environment variables
-dotenv.config()
+// Parse command line arguments
+const args = process.argv.slice(2)
+const environment = args[0] || 'local' // Default to 'local' if no argument provided
+
+// Show help if requested
+if (
+  environment === '--help' ||
+  environment === '-h' ||
+  environment === 'help'
+) {
+  console.log('🎫 Generate Long-Lived JWT Tokens for Test Users\n')
+  console.log(
+    'Usage: yarn tsx scripts/generate-long-lived-token.ts [environment]\n',
+  )
+  console.log('Environments:')
+  console.log('  local       - Use .env.local (default)')
+  console.log('  prod        - Use .env.production')
+  console.log('  production  - Use .env.production (alias for prod)\n')
+  console.log('Examples:')
+  console.log('  yarn tsx scripts/generate-long-lived-token.ts')
+  console.log('  yarn tsx scripts/generate-long-lived-token.ts local')
+  console.log('  yarn tsx scripts/generate-long-lived-token.ts prod')
+  process.exit(0)
+}
+
+// Load environment variables based on the argument
+let envPath: string
+if (environment === 'prod' || environment === 'production') {
+  envPath = '.env.production'
+  console.log('🔧 Using production environment (.env.production)')
+} else if (environment === 'local') {
+  envPath = '.env.local'
+  console.log('🔧 Using local environment (.env.local)')
+} else {
+  console.error(`❌ Invalid environment: ${environment}`)
+  console.log(
+    'Usage: yarn tsx scripts/generate-long-lived-token.ts [local|prod|production]',
+  )
+  console.log('Examples:')
+  console.log('  yarn tsx scripts/generate-long-lived-token.ts local')
+  console.log('  yarn tsx scripts/generate-long-lived-token.ts prod')
+  console.log('Run with --help for more information')
+  process.exit(1)
+}
+
+// Check if the environment file exists
+if (!fs.existsSync(envPath)) {
+  console.error(`❌ Environment file not found: ${envPath}`)
+  console.log('Please ensure the file exists or use a different environment.')
+  process.exit(1)
+}
+
+// Load the environment file
+dotenv.config({ path: envPath })
+
+// NOW import packages that depend on environment variables
+import { UserRole } from '@pika/types'
+import { PrismaClient } from '@prisma/client'
+import { keyManager } from '@pika/crypto'
+import jwt from 'jsonwebtoken'
+
+// Debug: Check if JWT keys are loaded
+console.log('JWT_ALGORITHM:', process.env.JWT_ALGORITHM)
+console.log('JWT_PRIVATE_KEY exists:', !!process.env.JWT_PRIVATE_KEY)
+console.log('JWT_ISSUER:', process.env.JWT_ISSUER)
+console.log('JWT_AUDIENCE:', process.env.JWT_AUDIENCE)
 
 const prisma = new PrismaClient()
 
 async function generateTokensForTestUsers() {
   console.log('🎫 Generating year-long JWT tokens for test users...\n')
+
+  // Initialize KeyManager before generating tokens
+  if (!keyManager.isInitialized()) {
+    await keyManager.initialize()
+  }
 
   try {
     // Find the admin user from the test setup
@@ -57,7 +124,8 @@ async function generateTokensForTestUsers() {
           jti: `${user.id}-${now}-year-long-access`,
         }
 
-        const privateKey = process.env.JWT_PRIVATE_KEY!.replace(/\\n/g, '\n')
+        // Get the private key from KeyManager (already in PEM format)
+        const privateKey = keyManager.getJWTPrivateKeyPEM()
 
         const token = jwt.sign(payload, privateKey, {
           algorithm: process.env.JWT_ALGORITHM as jwt.Algorithm,
@@ -83,6 +151,7 @@ async function generateTokensForTestUsers() {
     const tokensData = {
       generated: new Date().toISOString(),
       expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      environment: environment,
       tokens: users
         .filter(({ user }) => user !== null)
         .map(({ user, label }) => {
@@ -99,7 +168,8 @@ async function generateTokensForTestUsers() {
             sub: user!.id,
             jti: `${user!.id}-${now}-year-long-access`,
           }
-          const privateKey = process.env.JWT_PRIVATE_KEY!.replace(/\\n/g, '\n')
+          // Get the private key from KeyManager
+          const privateKey = keyManager.getJWTPrivateKeyPEM()
           const token = jwt.sign(payload, privateKey, {
             algorithm: process.env.JWT_ALGORITHM as jwt.Algorithm,
             issuer: process.env.JWT_ISSUER || 'pika-api',
@@ -116,7 +186,10 @@ async function generateTokensForTestUsers() {
         }),
     }
 
-    const tokensFile = path.join(process.cwd(), 'test-tokens.json')
+    const tokensFile = path.join(
+      process.cwd(),
+      `test-tokens-${environment}.json`,
+    )
     fs.writeFileSync(tokensFile, JSON.stringify(tokensData, null, 2))
 
     console.log('📋 Usage Instructions:')
@@ -130,6 +203,7 @@ async function generateTokensForTestUsers() {
       '4. Use admin token for admin endpoints, customer for public endpoints',
     )
     console.log(`5. Tokens saved to: ${tokensFile}`)
+    console.log(`6. Generated using environment: ${environment} (${envPath})`)
     console.log('\n✨ Token generation complete!')
   } catch (error) {
     console.error('Failed to generate tokens:', error)
@@ -148,7 +222,10 @@ if (isMainModule) {
       console.error('Token generation failed:', error)
       process.exit(1)
     })
-    .finally(() => prisma.$disconnect())
+    .finally(() => {
+      keyManager.clear() // Clear KeyManager after use
+      prisma.$disconnect()
+    })
 }
 
 export { generateTokensForTestUsers }

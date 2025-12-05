@@ -83,3 +83,14 @@ export enum RegistrationSource {
   PUBLIC = 'public',
   ADMIN_DASHBOARD = 'adminDashboard',
 }
+
+/**
+ * Multi-factor authentication methods
+ * Matches Prisma enum in identity schema
+ */
+export enum MfaMethod {
+  SMS = 'sms',
+  TOTP = 'totp',
+  EMAIL = 'email',
+  BACKUP_CODES = 'backup_codes',
+}

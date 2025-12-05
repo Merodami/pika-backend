@@ -1,8 +1,5 @@
-import type { ICacheService } from '@pika/redis'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { BusinessDetails, PrismaClient } from '@prisma/client'
-
-import { generateCacheKey } from '../constants/cache-keys.js'
 
 export interface CreateBusinessDetailsData {
   businessId: string
@@ -35,10 +32,7 @@ export interface IBusinessDetailsRepository {
  * Stores additional information collected during registration
  */
 export class BusinessDetailsRepository implements IBusinessDetailsRepository {
-  constructor(
-    private readonly prisma: PrismaClient,
-    private readonly cacheService?: ICacheService,
-  ) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   /**
    * Create business details
@@ -63,13 +57,6 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
         },
       })
 
-      // Invalidate business cache
-      if (this.cacheService) {
-        await this.cacheService.del(
-          generateCacheKey.businessDetails(data.businessId),
-        )
-      }
-
       logger.info('Business details created', {
         businessId: data.businessId,
         detailsId: details.id,
@@ -91,27 +78,9 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
    */
   async findByBusinessId(businessId: string): Promise<BusinessDetails | null> {
     try {
-      // Check cache first
-      const cacheKey = generateCacheKey.businessDetails(businessId)
-
-      if (this.cacheService) {
-        const cached = await this.cacheService.get<BusinessDetails>(cacheKey)
-
-        if (cached) {
-          logger.debug('Business details cache hit', { businessId })
-
-          return cached
-        }
-      }
-
       const details = await this.prisma.businessDetails.findUnique({
         where: { businessId },
       })
-
-      // Cache the result
-      if (details && this.cacheService) {
-        await this.cacheService.set(cacheKey, details, 3600) // 1 hour cache
-      }
 
       return details
     } catch (error) {
@@ -150,13 +119,6 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
         },
       })
 
-      // Invalidate cache
-      if (this.cacheService) {
-        await this.cacheService.del(
-          generateCacheKey.businessDetails(businessId),
-        )
-      }
-
       logger.info('Business details updated', {
         businessId,
         detailsId: details.id,
@@ -185,13 +147,6 @@ export class BusinessDetailsRepository implements IBusinessDetailsRepository {
       await this.prisma.businessDetails.delete({
         where: { businessId },
       })
-
-      // Invalidate cache
-      if (this.cacheService) {
-        await this.cacheService.del(
-          generateCacheKey.businessDetails(businessId),
-        )
-      }
 
       logger.info('Business details deleted', { businessId })
     } catch (error) {

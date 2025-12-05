@@ -507,14 +507,7 @@ export class UserRepository implements IUserRepository {
 
       // Return default settings if no settings exist
       if (!user.settings) {
-        // Check if user is business user to determine default settings
-        const userDetails = await this.prisma.user.findUnique({
-          where: { id: userId },
-          select: { role: true },
-        })
-        const isBusinessUser = userDetails?.role === 'business'
-
-        return createDefaultUserSettings(isBusinessUser)
+        return createDefaultUserSettings()
       }
 
       return user.settings as unknown as UserSettings

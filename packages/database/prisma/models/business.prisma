@@ -10,16 +10,19 @@ model Business {
   approved               Boolean   @default(false) // Admin approval for business owners
   approvedBy             String?   @map("approved_by") @db.Uuid // Admin who approved
   approvedAt             DateTime? @map("approved_at") @db.Timestamptz(6) // When it was approved
-  avgRating              Decimal   @default(0) @map("avg_rating") @db.Decimal(3, 2)
+  avgRating              Decimal   @default(0) @map("avg_rating") @db.Decimal(3, 2) // 0.00 to 5.00
   favoriteCount          Int       @default(0) @map("favorite_count") // Number of users who favorited this business
+  taxId                  String?   @map("tax_id") @db.VarChar(50) // Tax identification number (sensitive field)
+  settings               Json?     @map("settings") @db.JsonB // Business-specific configuration settings
   createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   deletedAt              DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   // Relations
-  user                 User                  @relation(fields: [userId], references: [id])
-  category             Category?             @relation(fields: [categoryId], references: [id])
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  category             Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   vouchers             Voucher[]             // Vouchers created by this business
+  voucherDrafts        VoucherDraft[]        // Voucher drafts created by this business
   scans                VoucherScan[]         // Scans that happened at this business location
   fraudCases           FraudCase[]           // Fraud cases involving this business
   businessRegistration BusinessRegistration? // Registration data (one-time use)
@@ -27,12 +30,26 @@ model Business {
   primaryBusinessUsers User[]                @relation("UserPrimaryBusiness") // Users who have this as their primary business
   favoritedBy          FavouriteBusiness[]   // Users who favorited this business
 
+  // Core business indexes
   @@index([userId])
   @@index([categoryId])
   @@index([verified, active])
   @@index([avgRating])
   @@index([favoriteCount(sort: Desc)])
   @@index([deletedAt])
+  
+  // High-performance composite indexes for business discovery
+  @@index([active, verified, categoryId]) // Category browsing with filters
+  @@index([categoryId, active, avgRating(sort: Desc)]) // Top-rated by category
+  @@index([active, verified, favoriteCount(sort: Desc)]) // Most popular businesses
+  @@index([approved, active, createdAt]) // Admin approval queue
+  @@index([userId, active, deletedAt]) // User's businesses
+  @@index([approvedBy, approvedAt]) // Approval audit trail
+  
+  // Search and analytics optimizations
+  @@index([businessNameKey]) // Name search optimization
+  @@index([createdAt, active]) // New business analytics
+  @@index([categoryId, verified, active, avgRating]) // Advanced filtering
   @@map("businesses")
   @@schema("business")
 }

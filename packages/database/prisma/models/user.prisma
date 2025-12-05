@@ -64,6 +64,8 @@ model User {
   voucherRedemptions    VoucherRedemption[] // Vouchers redeemed by this user
   customerVouchers      CustomerVoucher[]   // Vouchers claimed by this customer
   voucherScans          VoucherScan[]       // Voucher scans performed by this user
+  usedValidationCodes   VoucherValidationCode[] // Validation codes used by this user
+  voucherDrafts         VoucherDraft[]      // Voucher drafts created by this user
   customerFraudCases    FraudCase[]         @relation("FraudCaseCustomer") // Fraud cases involving this user as customer
   reviewedFraudCases    FraudCase[]         @relation("FraudCaseReviewer") // Fraud cases reviewed by this user
   fraudCaseHistory      FraudCaseHistory[]  // Fraud case actions performed by this user
@@ -74,11 +76,33 @@ model User {
   // Favorites system relations
   favoriteBusinesses    FavouriteBusiness[] // Businesses favorited by this user
   favoriteVouchers      FavouriteVoucher[]  // Vouchers favorited by this user
+  
+  // Category management relations (admin audit trail)
+  createdCategories     Category[]          @relation("CategoryCreator") // Categories created by this admin
+  updatedCategories     Category[]          @relation("CategoryUpdater") // Categories updated by this admin
 
+  // Performance indexes for common query patterns
   @@index([email])
   @@index([phoneNumber])
   @@index([deletedAt])
   @@index([primaryBusinessId])
+  
+  // Multi-column indexes for complex queries
+  @@index([role, status, deletedAt]) // Admin user management
+  @@index([status, role, createdAt]) // User status filtering with chronology
+  @@index([role, createdAt]) // Role-based user listing
+  @@index([emailVerified, status]) // Verified user queries
+  @@index([phoneVerified, status]) // Phone verified user queries
+  @@index([stripeUserId]) // Payment system integration
+  @@index([preferredLanguage, status]) // Localization queries
+  @@index([lastLoginAt]) // Activity tracking
+  @@index([createdAt, role]) // Registration analytics
+  
+  // Business user specific indexes
+  @@index([role, primaryBusinessId, status]) // Business user management
+  
+  // Full-text search preparation (for future implementation)
+  @@index([firstName, lastName]) // Name search optimization
   @@map("users")
   @@schema("users")
 }

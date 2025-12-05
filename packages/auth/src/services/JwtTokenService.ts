@@ -1,12 +1,10 @@
+import { keyManager } from '@pika/crypto'
 import {
   JWT_ACCESS_TOKEN_EXPIRY,
   JWT_ALGORITHM,
   JWT_AUDIENCE,
   JWT_ISSUER,
-  JWT_PRIVATE_KEY,
-  JWT_PUBLIC_KEY,
   JWT_REFRESH_TOKEN_EXPIRY,
-  JWT_SECRET,
 } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
@@ -57,9 +55,6 @@ export interface TokenValidationResult {
  * Part of @pikaage for proper separation of concerns
  */
 export class JwtTokenService {
-  private readonly jwtSecret: string
-  private readonly jwtPrivateKey: string
-  private readonly jwtPublicKey: string
   private readonly algorithm: jwt.Algorithm
   private readonly accessTokenExpiry: string
   private readonly refreshTokenExpiry: string
@@ -76,41 +71,25 @@ export class JwtTokenService {
   private readonly REFRESH_TOKEN_PREFIX = 'auth:refresh:'
 
   constructor(
-    jwtSecret: string,
     accessTokenExpiry: string = '15m',
     refreshTokenExpiry: string = '7d',
     issuer: string = 'pika-api',
     audience: string = 'pikapp',
     cacheService?: ICacheService,
-    algorithm: jwt.Algorithm = 'HS256',
-    jwtPrivateKey?: string,
-    jwtPublicKey?: string,
+    algorithm: jwt.Algorithm = 'RS256',
   ) {
-    this.jwtSecret = jwtSecret
     this.algorithm = algorithm
-    this.jwtPrivateKey = jwtPrivateKey || ''
-    this.jwtPublicKey = jwtPublicKey || ''
     this.accessTokenExpiry = accessTokenExpiry
     this.refreshTokenExpiry = refreshTokenExpiry
     this.issuer = issuer
     this.audience = audience
     this.cacheService = cacheService
 
-    // Validate based on algorithm type
-    if (algorithm.startsWith('HS')) {
-      if (!jwtSecret || jwtSecret.length < 32) {
-        throw new Error(
-          'JWT secret must be at least 32 characters long for HMAC algorithms',
-        )
-      }
-    } else if (algorithm.startsWith('RS') || algorithm.startsWith('ES')) {
-      if (!jwtPrivateKey || !jwtPublicKey) {
-        throw new Error(
-          `Private and public keys are required for ${algorithm} algorithm`,
-        )
-      }
-    } else {
-      throw new Error(`Unsupported JWT algorithm: ${algorithm}`)
+    // Ensure KeyManager is initialized
+    if (!keyManager.isInitialized()) {
+      throw new Error(
+        'KeyManager not initialized. Call keyManager.initialize() at app startup.',
+      )
     }
   }
 
@@ -556,25 +535,31 @@ export class JwtTokenService {
   }
 
   /**
-   * Get the appropriate signing key based on algorithm
+   * Get the appropriate signing key from KeyManager
    */
   private getSigningKey(): string | Buffer {
-    if (this.algorithm.startsWith('HS')) {
-      return this.jwtSecret
+    try {
+      // Use the PEM format from KeyManager for jsonwebtoken
+      return keyManager.getJWTPrivateKeyPEM()
+    } catch (error) {
+      throw new Error(
+        `Failed to get signing key: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
-
-    return this.jwtPrivateKey
   }
 
   /**
-   * Get the appropriate verification key based on algorithm
+   * Get the appropriate verification key from KeyManager
    */
   private getVerifyKey(): string | Buffer {
-    if (this.algorithm.startsWith('HS')) {
-      return this.jwtSecret
+    try {
+      // Use the PEM format from KeyManager for jsonwebtoken
+      return keyManager.getJWTPublicKeyPEM()
+    } catch (error) {
+      throw new Error(
+        `Failed to get verification key: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
-
-    return this.jwtPublicKey
   }
 
   /**
@@ -614,19 +599,22 @@ export class JwtTokenService {
 
 /**
  * Create token service instance with environment configuration
+ * Note: Ensure keyManager.initialize() is called before using this
  */
-export function createJwtTokenService(
+export async function createJwtTokenService(
   cacheService?: ICacheService,
-): JwtTokenService {
+): Promise<JwtTokenService> {
+  // Initialize KeyManager if not already done
+  if (!keyManager.isInitialized()) {
+    await keyManager.initialize()
+  }
+
   return new JwtTokenService(
-    JWT_SECRET,
     JWT_ACCESS_TOKEN_EXPIRY,
     JWT_REFRESH_TOKEN_EXPIRY,
     JWT_ISSUER,
     JWT_AUDIENCE,
     cacheService,
     JWT_ALGORITHM as jwt.Algorithm,
-    JWT_PRIVATE_KEY,
-    JWT_PUBLIC_KEY,
   )
 }

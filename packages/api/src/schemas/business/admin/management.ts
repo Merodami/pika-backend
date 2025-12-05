@@ -60,6 +60,12 @@ export const AdminBusinessResponse = withTimestamps({
     .max(5)
     .default(0)
     .describe('Average rating of the business'),
+  logoUrl: z
+    .string()
+    .url()
+    .nullable()
+    .optional()
+    .describe('URL of the business logo'),
   deletedAt: z
     .string()
     .datetime()

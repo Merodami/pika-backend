@@ -261,6 +261,7 @@ export type VoucherClaimResponse = z.infer<typeof VoucherClaimResponse>
  */
 export const VoucherRedeemRequest = z.object({
   code: z.string().min(FIELD_LENGTH.CODE_MIN),
+  userId: z.string().optional(), // Optional in request, but required by service
   location: Coordinates.optional(),
 })
 
@@ -357,3 +358,24 @@ export const UserVouchersListResponseSchema = UserVouchersListResponse.openapi(
 )
 
 export type UserVouchersListResponse = z.infer<typeof UserVouchersListResponse>
+
+// ============= Popular Searches =============
+
+/**
+ * Popular searches response (raw Zod)
+ */
+export const PopularSearchesResponse = z.object({
+  searches: z.array(z.string()).describe('List of popular search terms'),
+})
+
+/**
+ * Popular searches response (OpenAPI documented)
+ */
+export const PopularSearchesResponseSchema = PopularSearchesResponse.openapi(
+  'PopularSearchesResponse',
+  {
+    description: 'List of popular search terms used by users',
+  },
+)
+
+export type PopularSearchesResponse = z.infer<typeof PopularSearchesResponse>

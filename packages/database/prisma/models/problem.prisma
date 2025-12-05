@@ -22,7 +22,7 @@ model Problem {
   assignedUser User?            @relation("AssignedProblems", fields: [assignedTo], references: [id], onDelete: SetNull)
   comments     SupportComment[]
 
-  // Indexes
+  // Core support ticket indexes
   @@index([userId])
   @@index([status])
   @@index([priority])
@@ -30,6 +30,15 @@ model Problem {
   @@index([assignedTo])
   @@index([ticketNumber])
   @@index([createdAt])
+  
+  // Advanced support queue management
+  @@index([status, priority, createdAt]) // Priority queue for open tickets
+  @@index([assignedTo, status, priority]) // Agent workload management
+  @@index([userId, status, createdAt]) // User ticket history
+  @@index([type, status, priority]) // Type-based routing
+  @@index([resolvedAt]) // Resolution metrics
+  @@index([status, assignedTo, priority]) // Agent queue view
+  @@index([createdAt, status]) // Aging tickets
   
   @@map("problems")
   @@schema("support")

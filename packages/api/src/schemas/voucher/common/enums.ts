@@ -2,6 +2,8 @@ import {
   AdminVoucherSortBy,
   BatchOperationType as BatchOperationTypeEnum,
   CustomerVoucherStatus,
+  DeepLinkMode,
+  DeepLinkPlatform,
   UserVoucherSortBy,
   UserVoucherStatusFilter as UserVoucherStatusFilterEnum,
   VoucherBookStatus,
@@ -12,6 +14,7 @@ import {
   VoucherScanType,
   VoucherSortBy,
   VoucherState,
+  VoucherValidationCodeType,
 } from '@pika/types'
 
 import { openapi } from '../../../common/utils/openapi.js'
@@ -132,3 +135,29 @@ export const BatchOperationTypeSchema = openapi(BatchOperationType, {
   description: 'Type of batch operation to perform',
   example: BatchOperationTypeEnum.PUBLISH,
 })
+
+// Validation code type schema
+export const VoucherValidationCodeTypeSchema = createZodEnum(
+  VoucherValidationCodeType,
+).openapi('VoucherValidationCodeType', {
+  description: 'Type of validation code for URL-based QR',
+  example: VoucherValidationCodeType.SCAN,
+})
+
+// Deep link mode schema
+export const DeepLinkModeSchema = createZodEnum(DeepLinkMode).openapi(
+  'DeepLinkMode',
+  {
+    description: 'Mode for generating deep links',
+    example: DeepLinkMode.UNIVERSAL_LINK,
+  },
+)
+
+// Deep link platform schema
+export const DeepLinkPlatformSchema = createZodEnum(DeepLinkPlatform).openapi(
+  'DeepLinkPlatform',
+  {
+    description: 'Platform that opened the deep link',
+    example: DeepLinkPlatform.IOS,
+  },
+)

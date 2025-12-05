@@ -48,20 +48,40 @@ export class RedisService implements ICacheService {
 
     const redisConfig = this.config.getConfig()
 
-    this.client = new Redis({
-      host: config?.host || redisConfig.host,
-      port: config?.port || redisConfig.port,
-      password: config?.password || REDIS_PASSWORD || undefined,
-      lazyConnect: false,
-      retryStrategy: (times: number) => {
-        const delay = Math.min(
-          times * redisConfig.retryDelay,
-          redisConfig.maxRetryDelay,
-        )
+    // Check if we have a REDIS_URL (for cloud providers like Upstash)
+    const redisUrl = process.env.REDIS_URL
 
-        return delay
-      },
-    })
+    if (redisUrl) {
+      // Use the full Redis URL which includes TLS and auth
+      this.client = new Redis(redisUrl, {
+        lazyConnect: false,
+        maxRetriesPerRequest: 3,
+        retryStrategy: (times: number) => {
+          const delay = Math.min(
+            times * redisConfig.retryDelay,
+            redisConfig.maxRetryDelay,
+          )
+
+          return delay
+        },
+      })
+    } else {
+      // Use individual host/port/password configuration
+      this.client = new Redis({
+        host: config?.host || redisConfig.host,
+        port: config?.port || redisConfig.port,
+        password: config?.password || REDIS_PASSWORD || undefined,
+        lazyConnect: false,
+        retryStrategy: (times: number) => {
+          const delay = Math.min(
+            times * redisConfig.retryDelay,
+            redisConfig.maxRetryDelay,
+          )
+
+          return delay
+        },
+      })
+    }
 
     this.defaultTTL = config?.defaultTTL || redisConfig.defaultTTL
     this.metrics = {
@@ -341,6 +361,41 @@ export class RedisService implements ICacheService {
       logger.error(`Error updating TTL for key "${key}":`, error)
 
       return false
+    }
+  }
+
+  /**
+   * Increments a counter in Redis
+   * @param key - The key to increment
+   * @param ttl - Time to live in seconds for new keys (optional)
+   * @returns The new value after incrementing
+   */
+  public async increment(key: string, ttl?: number): Promise<number> {
+    const startTime = Date.now()
+
+    try {
+      logger.debug(`Incrementing counter for key: ${key}`)
+
+      // Use Redis INCR command for atomic increment
+      const newValue = await this.client.incr(key)
+
+      // Set TTL if provided and this is a new key (value is 1)
+      if (ttl && newValue === 1) {
+        await this.client.expire(key, ttl)
+      }
+
+      this.metrics.operations.set++
+      this.updateLatency(Date.now() - startTime)
+
+      logger.debug(
+        `Counter incremented for key: ${key}, new value: ${newValue}`,
+      )
+
+      return newValue
+    } catch (error) {
+      this.metrics.errors++
+      logger.error(`Error incrementing counter for key "${key}":`, error)
+      throw error
     }
   }
 

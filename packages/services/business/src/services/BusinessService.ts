@@ -102,6 +102,8 @@ export class BusinessService implements IBusinessService {
     const keysToInvalidate = [
       // Invalidate specific business cache
       `${CACHE_KEYS.BUSINESS.SINGLE}:${businessId}`,
+      // Invalidate business details cache
+      `${CACHE_KEYS.BUSINESS.DETAILS}:${businessId}`,
     ]
 
     if (userId) {
@@ -566,6 +568,9 @@ export class BusinessService implements IBusinessService {
         verified: true,
       })
 
+      // Invalidate cache after verification
+      await this.invalidateBusinessCache(id, business.userId)
+
       logger.debug(`Business verified successfully: ${id}`)
 
       return business
@@ -587,6 +592,9 @@ export class BusinessService implements IBusinessService {
       const business = await this.businessRepository.update(id, {
         active: false,
       })
+
+      // Invalidate cache after deactivation
+      await this.invalidateBusinessCache(id, business.userId)
 
       logger.debug(`Business deactivated successfully: ${id}`)
 
@@ -620,6 +628,9 @@ export class BusinessService implements IBusinessService {
       const business = await this.businessRepository.update(id, {
         avgRating: rating,
       })
+
+      // Invalidate cache after rating update
+      await this.invalidateBusinessCache(id, business.userId)
 
       logger.debug(`Business rating updated successfully: ${id}`)
 
@@ -732,8 +743,23 @@ export class BusinessService implements IBusinessService {
       )
 
       // Get or create business details if they don't exist
-      const businessDetails =
-        await this.businessDetailsRepository.findByBusinessId(businessId)
+      // First check cache
+      const cacheKey = `${CACHE_KEYS.BUSINESS.DETAILS}:${businessId}`
+
+      let businessDetails = null
+
+      if (this.cacheService) {
+        const cached = await this.cacheService.get<any>(cacheKey)
+
+        if (cached) {
+          businessDetails = cached
+        }
+      }
+
+      if (!businessDetails) {
+        businessDetails =
+          await this.businessDetailsRepository.findByBusinessId(businessId)
+      }
 
       if (businessDetails) {
         // Update existing business details with the new logo URL

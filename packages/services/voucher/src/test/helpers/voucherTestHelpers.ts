@@ -11,7 +11,7 @@
  * - Handles business and category relationships
  */
 
-import { VoucherState } from '@pika/types'
+import { UserRole, UserStatus, VoucherState } from '@pika/types'
 import type { PrismaClient } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { v4 as uuid } from 'uuid'
@@ -53,6 +53,7 @@ export interface SeedVoucherOptions {
   includeCategories?: string[]
   generateExpired?: boolean
   count?: number
+  createdBy?: string
 }
 
 /**
@@ -68,6 +69,7 @@ export async function createSharedVoucherTestData(
     includeCategories = [],
     generateExpired = true,
     count = 10,
+    createdBy = uuid(),
   } = options
 
   // Create categories if not provided
@@ -88,7 +90,7 @@ export async function createSharedVoucherTestData(
           level: 1,
           path: '/active',
           sortOrder: 1,
-          createdBy: uuid(),
+          createdBy: createdBy,
         },
       }),
       prisma.category.create({
@@ -100,7 +102,7 @@ export async function createSharedVoucherTestData(
           path: '/inactive',
           isActive: false,
           sortOrder: 2,
-          createdBy: uuid(),
+          createdBy: createdBy,
         },
       }),
     ])
@@ -121,10 +123,34 @@ export async function createSharedVoucherTestData(
   }
 
   if (!business) {
+    // Create a user for the business if businessId is provided but no business exists
+    const businessUser = await prisma.user.findUnique({
+      where: { id: businessId },
+    })
+
+    let userId = businessUser?.id
+
+    if (!userId) {
+      // If no user with that ID exists, create a new user
+      const newUser = await prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `business-${uuid()}@test.com`,
+          role: UserRole.BUSINESS,
+          status: UserStatus.ACTIVE,
+          firstName: 'Test',
+          lastName: 'Business',
+          emailVerified: true,
+        },
+      })
+
+      userId = newUser.id
+    }
+
     business = await prisma.business.create({
       data: {
         id: businessId,
-        userId: uuid(),
+        userId,
         businessNameKey: `business.test.${uuid()}`,
         categoryId: activeCategories[0]?.id || null,
         verified: true,

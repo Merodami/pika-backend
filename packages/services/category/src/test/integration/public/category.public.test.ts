@@ -37,6 +37,7 @@ import {
   createTestCategory,
   type SharedCategoryTestData,
 } from '@category/test/helpers/categoryTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { logger } from '@pika/shared'
 import {
   AuthenticatedRequestClient,
@@ -66,6 +67,12 @@ describe('Public Category Integration Tests', () => {
   const mockTranslationClient = new MockTranslationClient()
 
   beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
+
     testDb = await createTestDatabase({
       databaseName: 'test_category_public_db',
       useInitSql: true,
@@ -222,6 +229,12 @@ describe('Public Category Integration Tests', () => {
     })
 
     it('should paginate results correctly', async () => {
+      // Get admin user for category creation
+      const adminUser = await testDb.prisma.user.findUnique({
+        where: { email: 'admin@e2etest.com' },
+      })
+      const adminUserId = adminUser?.id || uuid()
+
       // Create additional categories for pagination test
       await Promise.all(
         Array.from({ length: 10 }, (_, i) =>
@@ -229,6 +242,7 @@ describe('Public Category Integration Tests', () => {
             nameKey: `categories.pagination.test.${i}.name`,
             descriptionKey: `categories.pagination.test.${i}.description`,
             sortOrder: 100 + i,
+            adminUserId,
           }),
         ),
       )

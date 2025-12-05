@@ -236,6 +236,26 @@ export async function createSharedCategoryTestData(
   const categoryById = new Map<string, any>()
   const rootCategories: any[] = []
 
+  // Ensure the admin user exists in the database
+  const existingUser = await prismaClient.user.findUnique({
+    where: { id: adminUserId },
+  })
+
+  if (!existingUser) {
+    // Create a minimal admin user for category creation
+    await prismaClient.user.create({
+      data: {
+        id: adminUserId,
+        email: `admin-${adminUserId.substring(0, 8)}@test.com`,
+        firstName: 'Test',
+        lastName: 'Admin',
+        role: 'admin',
+        status: 'active',
+        emailVerified: true,
+      },
+    })
+  }
+
   // Create active parent categories
   for (let i = 0; i < 3; i++) {
     const parent = await createTestCategory(prismaClient, {

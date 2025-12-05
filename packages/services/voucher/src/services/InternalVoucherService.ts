@@ -1,13 +1,14 @@
-import { ECDSAService, type JWTConfig, VoucherQRService } from '@pika/crypto'
-import { JWT_ISSUER, PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
+import { PAGINATION_DEFAULT_LIMIT } from '@pika/environment'
 import { ICacheService } from '@pika/redis'
 import type { UserVoucherData, VoucherDomain, VoucherScanData } from '@pika/sdk'
 import { ErrorFactory, logger } from '@pika/shared'
 import type { PaginatedResult, ParsedIncludes, VoucherState } from '@pika/types'
 import {
+  DeepLinkMode,
   VoucherBookStatus,
   VoucherScanSource,
   VoucherScanType,
+  VoucherValidationCodeType,
 } from '@pika/types'
 import { get } from 'lodash-es'
 
@@ -36,6 +37,8 @@ import {
   generateBatchCode,
   generateSecureShortCode,
 } from '../utils/codeGenerator.js'
+import { VoucherDeepLinkService } from './VoucherDeepLinkService.js'
+import type { IVoucherValidationService } from './VoucherValidationService.js'
 
 // Re-export types that are part of the service's public API
 export type {
@@ -133,9 +136,7 @@ export interface IInternalVoucherService {
 }
 
 export class InternalVoucherService implements IInternalVoucherService {
-  private voucherQRService: VoucherQRService
-  private ecdsaService: ECDSAService
-  private keyPair: { privateKey: string; publicKey: string } | null = null
+  private deepLinkService: VoucherDeepLinkService
 
   // Allowed state transitions for voucher books
   private readonly allowedBookTransitions: Record<
@@ -159,22 +160,9 @@ export class InternalVoucherService implements IInternalVoucherService {
     private readonly internalRepository: IInternalVoucherRepository,
     private readonly publicRepository: IVoucherRepository, // For methods that need full repository access
     private readonly cache: ICacheService,
+    private readonly validationService: IVoucherValidationService,
   ) {
-    if (!JWT_ISSUER) {
-      throw new Error(
-        'JWT_ISSUER environment variable is required for voucher security',
-      )
-    }
-
-    const jwtConfig: JWTConfig = {
-      algorithm: 'ES256',
-      issuer: JWT_ISSUER,
-      audience: 'pika-vouchers',
-      keyId: 'voucher-security-key',
-    }
-
-    this.voucherQRService = new VoucherQRService(jwtConfig)
-    this.ecdsaService = new ECDSAService({ curve: 'P-256' })
+    this.deepLinkService = new VoucherDeepLinkService()
   }
 
   async getVoucherById(
@@ -704,40 +692,35 @@ export class InternalVoucherService implements IInternalVoucherService {
 
   // ============= Voucher Security Methods =============
 
-  /**
-   * Initialize ECDSA key pair for voucher token generation
-   */
-  private async initializeKeyPair(): Promise<void> {
-    if (!this.keyPair) {
-      this.keyPair = await this.ecdsaService.generateKeyPair()
-      logger.info('Generated ECDSA key pair for voucher security')
-    }
-  }
-
-  /**
-   * Get the private key, generating it if necessary
-   */
-  private async getPrivateKey(): Promise<string> {
-    await this.initializeKeyPair()
-
-    return this.keyPair!.privateKey
-  }
-
   async generateVoucherTokens(
     options: GenerateTokenOptions,
   ): Promise<VoucherTokenData> {
     try {
-      const privateKey = await this.getPrivateKey()
+      // Generate validation code for URL-based QR
+      const validationCode =
+        await this.validationService.generateValidationCode({
+          voucherId: options.voucherId,
+          type: VoucherValidationCodeType.PRINT,
+          ttl: options.ttl,
+          metadata: {
+            batchId: options.batchId,
+            providerId: options.providerId,
+          },
+        })
 
-      // Generate QR payload using print voucher format for voucher books
-      const qrResult = await this.voucherQRService.generatePrintVoucherQR(
-        options.voucherId,
-        options.batchId || `batch-${Date.now()}`,
-        privateKey,
-        { ttl: options.ttl || 31536000 }, // 1 year default for printed vouchers
+      // Generate deep link with validation code
+      const deepLinkResult = await this.deepLinkService.generateVoucherDeepLink(
+        {
+          voucherId: options.voucherId,
+          validationCode,
+          source: VoucherScanSource.PRINT,
+          businessId: options.providerId,
+          mode: DeepLinkMode.UNIVERSAL_LINK,
+          ttl: options.ttl,
+        },
       )
 
-      // Generate short code
+      // Generate short code for manual entry (separate from QR)
       const shortCode = await generateSecureShortCode({
         length: 8,
         includeDash: true,
@@ -748,11 +731,12 @@ export class InternalVoucherService implements IInternalVoucherService {
         providerId: options.providerId,
         shortCode,
         batchId: options.batchId,
+        validationCode,
       })
 
       return {
         voucherId: options.voucherId,
-        qrPayload: qrResult.qrPayload,
+        qrPayload: deepLinkResult.qrPayload, // URL instead of JWT
         shortCode,
         batchId: options.batchId,
       }
@@ -777,6 +761,7 @@ export class InternalVoucherService implements IInternalVoucherService {
         const tokenData = await this.generateVoucherTokens({
           ...voucher,
           batchId: finalBatchId,
+          ttl: request.ttl, // Pass TTL from request
         })
 
         return tokenData
@@ -788,9 +773,10 @@ export class InternalVoucherService implements IInternalVoucherService {
         tokensMap.set(tokenData.voucherId, tokenData)
       }
 
-      logger.info('Generated batch voucher tokens', {
+      logger.info('Generated batch voucher tokens using URL-based QR codes', {
         batchId: finalBatchId,
         count: tokensMap.size,
+        ttl: request.ttl,
       })
 
       return tokensMap

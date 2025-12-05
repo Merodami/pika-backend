@@ -4,6 +4,7 @@ import {
   COMMUNICATION_API_URL,
   FILE_STORAGE_API_URL,
   PAYMENT_API_URL,
+  PDF_API_URL,
   SUBSCRIPTION_API_URL,
   SUPPORT_API_URL,
   USER_API_URL,
@@ -57,5 +58,10 @@ export const adminRoutes: ServiceConfig[] = [
     name: 'admin/vouchers',
     prefix: '/api/v1/admin/vouchers',
     upstream: VOUCHER_API_URL,
+  },
+  {
+    name: 'admin/voucher-books',
+    prefix: '/api/v1/admin/voucher-books',
+    upstream: PDF_API_URL,
   },
 ]

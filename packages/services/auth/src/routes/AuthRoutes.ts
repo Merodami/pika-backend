@@ -12,16 +12,16 @@ import {
 } from '@pika/shared'
 import { Router } from 'express'
 
-export function createAuthRouter(
+export async function createAuthRouter(
   cache: ICacheService,
   userServiceClient: UserServiceClient,
   communicationClient?: CommunicationServiceClient,
   businessServiceClient?: BusinessServiceClient,
-): Router {
+): Promise<Router> {
   const router = Router()
 
-  // Initialize dependencies using manual DI pattern
-  const authService = new AuthService(
+  // Initialize dependencies using manual DI pattern with async factory
+  const authService = await AuthService.create(
     cache,
     userServiceClient,
     communicationClient,

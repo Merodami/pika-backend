@@ -1,5 +1,6 @@
+import { keyManager } from '@pika/crypto'
 import { UserRole, UserStatus } from '@pika/types'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { JwtTokenService } from '../../../services/JwtTokenService.js'
 import { PasswordSecurityService } from '../../../services/PasswordSecurityService.js'
@@ -18,6 +19,13 @@ describe('LocalAuthStrategy Integration', () => {
   let userService: UserService
   let passwordService: PasswordSecurityService
   let tokenService: JwtTokenService
+
+  beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+    }
+  })
 
   const mockUser: UserServiceUser = {
     id: 'user-123',
@@ -44,9 +52,7 @@ describe('LocalAuthStrategy Integration', () => {
   beforeEach(() => {
     userService = createMockUserService()
     passwordService = new PasswordSecurityService()
-    tokenService = new JwtTokenService(
-      'test-secret-key-32-characters-long-for-testing',
-    )
+    tokenService = new JwtTokenService()
     authStrategy = new LocalAuthStrategy(
       userService,
       passwordService,

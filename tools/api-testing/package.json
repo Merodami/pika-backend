@@ -9,16 +9,16 @@
     "show:tokens": "tsx show-test-tokens.ts"
   },
   "dependencies": {
-    "@faker-js/faker": "^9.9.0",
+    "@faker-js/faker": "^10.0.0",
     "@pika/environment": "workspace:^",
     "@pika/types": "workspace:^",
-    "@prisma/client": "^6.14.0",
-    "axios": "^1.11.0",
+    "@prisma/client": "^6.16.1",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "tsx": "^4.20.4",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
 }

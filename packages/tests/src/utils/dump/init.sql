@@ -19,8 +19,13 @@ SET row_security = off;
 
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_category_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_business_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_used_by_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_voucher_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_business_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_voucher_id_fkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_customer_id_fkey;
@@ -63,7 +68,9 @@ ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXIS
 ALTER TABLE IF EXISTS ONLY favourites.favourite_vouchers DROP CONSTRAINT IF EXISTS favourite_vouchers_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY favourites.favourite_businesses DROP CONSTRAINT IF EXISTS favourite_businesses_business_id_fkey;
+ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_updated_by_fkey;
 ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_parent_id_fkey;
+ALTER TABLE IF EXISTS ONLY catalog.categories DROP CONSTRAINT IF EXISTS categories_created_by_fkey;
 ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS businesses_category_id_fkey;
 ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS "business_registration_userId_fkey";
@@ -76,64 +83,138 @@ DROP INDEX IF EXISTS voucher.vouchers_valid_until_idx;
 DROP INDEX IF EXISTS voucher.vouchers_valid_from_idx;
 DROP INDEX IF EXISTS voucher.vouchers_updated_at_idx;
 DROP INDEX IF EXISTS voucher.vouchers_type_idx;
+DROP INDEX IF EXISTS voucher.vouchers_type_discount_idx;
 DROP INDEX IF EXISTS voucher.vouchers_state_valid_until_idx;
+DROP INDEX IF EXISTS voucher.vouchers_state_valid_from_valid_until_idx;
+DROP INDEX IF EXISTS voucher.vouchers_state_type_valid_until_idx;
 DROP INDEX IF EXISTS voucher.vouchers_state_idx;
+DROP INDEX IF EXISTS voucher.vouchers_state_deleted_at_valid_until_idx;
+DROP INDEX IF EXISTS voucher.vouchers_state_category_id_valid_until_idx;
 DROP INDEX IF EXISTS voucher.vouchers_state_business_id_idx;
+DROP INDEX IF EXISTS voucher.vouchers_scan_count_state_idx;
+DROP INDEX IF EXISTS voucher.vouchers_redemptions_count_max_redemptions_idx;
 DROP INDEX IF EXISTS voucher.vouchers_qr_code_key;
 DROP INDEX IF EXISTS voucher.vouchers_qr_code_idx;
 DROP INDEX IF EXISTS voucher.vouchers_favorite_count_idx;
 DROP INDEX IF EXISTS voucher.vouchers_deleted_at_idx;
+DROP INDEX IF EXISTS voucher.vouchers_currency_type_idx;
 DROP INDEX IF EXISTS voucher.vouchers_created_at_idx;
+DROP INDEX IF EXISTS voucher.vouchers_claim_count_state_idx;
 DROP INDEX IF EXISTS voucher.vouchers_category_id_state_idx;
 DROP INDEX IF EXISTS voucher.vouchers_category_id_idx;
+DROP INDEX IF EXISTS voucher.vouchers_business_id_state_valid_until_idx;
 DROP INDEX IF EXISTS voucher.vouchers_business_id_idx;
 DROP INDEX IF EXISTS voucher.vouchers_business_id_created_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_voucher_id_type_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_voucher_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_voucher_id_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_used_at_used_by_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_type_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_type_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_code_key;
+DROP INDEX IF EXISTS voucher.voucher_validation_codes_code_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_user_id_key;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_redeemed_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_voucher_id_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_user_id_redeemed_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_user_id_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_redeemed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_redemptions_created_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_redemptions_code_used_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_voucher_id_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_is_complete_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_user_id_business_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_session_token_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_session_token_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_qr_code_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_is_complete_created_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_expires_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_expires_at_completed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_draft_id_key;
+DROP INDEX IF EXISTS voucher.voucher_drafts_draft_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_current_step_user_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_current_step_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_completed_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_business_id_is_complete_created_at_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_business_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_drafts_business_id_created_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_type_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_is_active_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_voucher_id_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_type_is_active_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_type_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_is_active_idx;
+DROP INDEX IF EXISTS voucher.voucher_codes_created_at_idx;
 DROP INDEX IF EXISTS voucher.voucher_codes_code_key;
 DROP INDEX IF EXISTS voucher.voucher_codes_code_idx;
+DROP INDEX IF EXISTS voucher.recent_redemptions_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_voucher_id_status_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_voucher_id_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_status_redeemed_at_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_status_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_redeemed_at_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_voucher_id_key;
 DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_status_idx;
+DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_status_claimed_at_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_customer_id_claimed_at_idx;
 DROP INDEX IF EXISTS voucher.customer_vouchers_claimed_at_idx;
+DROP INDEX IF EXISTS users.users_stripe_user_id_idx;
+DROP INDEX IF EXISTS users.users_status_role_created_at_idx;
+DROP INDEX IF EXISTS users.users_role_status_deleted_at_idx;
+DROP INDEX IF EXISTS users.users_role_primary_business_id_status_idx;
+DROP INDEX IF EXISTS users.users_role_created_at_idx;
 DROP INDEX IF EXISTS users.users_primary_business_id_idx;
+DROP INDEX IF EXISTS users.users_preferred_language_status_idx;
+DROP INDEX IF EXISTS users.users_phone_verified_status_idx;
 DROP INDEX IF EXISTS users.users_phone_number_idx;
+DROP INDEX IF EXISTS users.users_last_login_at_idx;
+DROP INDEX IF EXISTS users.users_first_name_last_name_idx;
+DROP INDEX IF EXISTS users.users_email_verified_status_idx;
 DROP INDEX IF EXISTS users.users_email_key;
 DROP INDEX IF EXISTS users.users_email_idx;
 DROP INDEX IF EXISTS users.users_deleted_at_idx;
+DROP INDEX IF EXISTS users.users_created_at_role_idx;
 DROP INDEX IF EXISTS support.support_comments_user_id_idx;
 DROP INDEX IF EXISTS support.support_comments_problem_id_idx;
 DROP INDEX IF EXISTS support.support_comments_created_at_idx;
+DROP INDEX IF EXISTS support.problems_user_id_status_created_at_idx;
 DROP INDEX IF EXISTS support.problems_user_id_idx;
+DROP INDEX IF EXISTS support.problems_type_status_priority_idx;
 DROP INDEX IF EXISTS support.problems_type_idx;
 DROP INDEX IF EXISTS support.problems_ticket_number_key;
 DROP INDEX IF EXISTS support.problems_ticket_number_idx;
+DROP INDEX IF EXISTS support.problems_status_priority_created_at_idx;
 DROP INDEX IF EXISTS support.problems_status_idx;
+DROP INDEX IF EXISTS support.problems_status_assigned_to_priority_idx;
+DROP INDEX IF EXISTS support.problems_resolved_at_idx;
 DROP INDEX IF EXISTS support.problems_priority_idx;
+DROP INDEX IF EXISTS support.problems_created_at_status_idx;
 DROP INDEX IF EXISTS support.problems_created_at_idx;
+DROP INDEX IF EXISTS support.problems_assigned_to_status_priority_idx;
 DROP INDEX IF EXISTS support.problems_assigned_to_idx;
+DROP INDEX IF EXISTS support.notifications_user_id_type_is_read_idx;
 DROP INDEX IF EXISTS support.notifications_user_id_is_read_idx;
+DROP INDEX IF EXISTS support.notifications_user_id_is_read_created_at_idx;
 DROP INDEX IF EXISTS support.notifications_user_id_created_at_idx;
+DROP INDEX IF EXISTS support.notifications_type_user_id_created_at_idx;
 DROP INDEX IF EXISTS support.notifications_type_idx;
+DROP INDEX IF EXISTS support.notifications_read_at_idx;
+DROP INDEX IF EXISTS support.notifications_created_at_idx;
+DROP INDEX IF EXISTS support.communication_logs_user_id_type_status_idx;
 DROP INDEX IF EXISTS support.communication_logs_user_id_idx;
 DROP INDEX IF EXISTS support.communication_logs_type_status_idx;
+DROP INDEX IF EXISTS support.communication_logs_type_created_at_idx;
+DROP INDEX IF EXISTS support.communication_logs_template_id_status_created_at_idx;
 DROP INDEX IF EXISTS support.communication_logs_template_id_idx;
+DROP INDEX IF EXISTS support.communication_logs_status_sent_at_idx;
+DROP INDEX IF EXISTS support.communication_logs_status_created_at_idx;
 DROP INDEX IF EXISTS support.communication_logs_recipient_idx;
+DROP INDEX IF EXISTS support.communication_logs_provider_status_idx;
+DROP INDEX IF EXISTS support.communication_logs_failed_at_status_idx;
 DROP INDEX IF EXISTS support.communication_logs_created_at_idx;
 DROP INDEX IF EXISTS security.fraud_cases_voucher_id_idx;
 DROP INDEX IF EXISTS security.fraud_cases_status_idx;
@@ -154,11 +235,19 @@ DROP INDEX IF EXISTS security.fraud_case_history_performed_at_idx;
 DROP INDEX IF EXISTS security.fraud_case_history_case_id_performed_at_idx;
 DROP INDEX IF EXISTS security.fraud_case_history_case_id_idx;
 DROP INDEX IF EXISTS security.fraud_case_history_action_idx;
+DROP INDEX IF EXISTS payments.subscriptions_user_id_status_idx;
 DROP INDEX IF EXISTS payments.subscriptions_user_id_idx;
+DROP INDEX IF EXISTS payments.subscriptions_trial_end_status_idx;
 DROP INDEX IF EXISTS payments.subscriptions_stripe_subscription_id_key;
 DROP INDEX IF EXISTS payments.subscriptions_stripe_subscription_id_idx;
+DROP INDEX IF EXISTS payments.subscriptions_stripe_customer_id_idx;
 DROP INDEX IF EXISTS payments.subscriptions_status_idx;
+DROP INDEX IF EXISTS payments.subscriptions_status_current_period_end_idx;
+DROP INDEX IF EXISTS payments.subscriptions_status_cancel_at_period_end_idx;
+DROP INDEX IF EXISTS payments.subscriptions_plan_id_status_idx;
 DROP INDEX IF EXISTS payments.subscriptions_plan_id_idx;
+DROP INDEX IF EXISTS payments.subscriptions_current_period_end_status_idx;
+DROP INDEX IF EXISTS payments.subscriptions_created_at_status_idx;
 DROP INDEX IF EXISTS payments.subscription_plans_stripe_product_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_stripe_price_id_key;
 DROP INDEX IF EXISTS payments.subscription_plans_name_key;
@@ -166,24 +255,39 @@ DROP INDEX IF EXISTS payments.subscription_plans_is_active_idx;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_key;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_is_enabled_idx;
 DROP INDEX IF EXISTS identity.user_mfa_settings_user_id_idx;
+DROP INDEX IF EXISTS identity.user_identities_user_id_provider_idx;
 DROP INDEX IF EXISTS identity.user_identities_user_id_key;
 DROP INDEX IF EXISTS identity.user_identities_user_id_idx;
 DROP INDEX IF EXISTS identity.user_identities_provider_provider_id_key;
 DROP INDEX IF EXISTS identity.user_identities_provider_provider_id_idx;
+DROP INDEX IF EXISTS identity.user_identities_last_login_idx;
+DROP INDEX IF EXISTS identity.user_identities_is_email_verified_provider_idx;
 DROP INDEX IF EXISTS identity.user_identities_firebase_uid_key;
 DROP INDEX IF EXISTS identity.user_identities_firebase_uid_idx;
+DROP INDEX IF EXISTS identity.user_identities_created_at_idx;
 DROP INDEX IF EXISTS identity.user_devices_user_id_last_active_at_idx;
 DROP INDEX IF EXISTS identity.user_devices_user_id_is_trusted_trust_expires_at_idx;
 DROP INDEX IF EXISTS identity.user_devices_user_id_idx;
+DROP INDEX IF EXISTS identity.user_devices_user_id_device_type_is_trusted_idx;
 DROP INDEX IF EXISTS identity.user_devices_user_id_device_id_key;
+DROP INDEX IF EXISTS identity.user_devices_last_ip_address_idx;
+DROP INDEX IF EXISTS identity.user_devices_is_trusted_trust_expires_at_idx;
 DROP INDEX IF EXISTS identity.user_devices_fcm_token_idx;
+DROP INDEX IF EXISTS identity.user_devices_device_type_last_active_at_idx;
 DROP INDEX IF EXISTS identity.user_auth_methods_user_id_is_enabled_last_used_at_idx;
+DROP INDEX IF EXISTS identity.user_auth_methods_user_id_is_enabled_auth_method_idx;
 DROP INDEX IF EXISTS identity.user_auth_methods_user_id_idx;
 DROP INDEX IF EXISTS identity.user_auth_methods_user_id_auth_method_key;
+DROP INDEX IF EXISTS identity.user_auth_methods_last_used_at_auth_method_idx;
+DROP INDEX IF EXISTS identity.user_auth_methods_is_verified_auth_method_idx;
 DROP INDEX IF EXISTS identity.user_auth_methods_auth_method_idx;
 DROP INDEX IF EXISTS identity.security_events_user_id_idx;
+DROP INDEX IF EXISTS identity.security_events_user_id_event_type_created_at_idx;
 DROP INDEX IF EXISTS identity.security_events_risk_score_created_at_idx;
+DROP INDEX IF EXISTS identity.security_events_ip_address_created_at_idx;
+DROP INDEX IF EXISTS identity.security_events_event_type_risk_score_idx;
 DROP INDEX IF EXISTS identity.security_events_event_type_idx;
+DROP INDEX IF EXISTS identity.security_events_device_id_created_at_idx;
 DROP INDEX IF EXISTS identity.security_events_created_at_idx;
 DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_key;
 DROP INDEX IF EXISTS i18n.user_language_preferences_user_id_idx;
@@ -222,29 +326,49 @@ DROP INDEX IF EXISTS files.ad_placements_page_id_idx;
 DROP INDEX IF EXISTS files.ad_placements_created_by_idx;
 DROP INDEX IF EXISTS files.ad_placements_content_type_idx;
 DROP INDEX IF EXISTS favourites.favourite_vouchers_voucher_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_voucher_id_created_at_idx;
 DROP INDEX IF EXISTS favourites.favourite_vouchers_user_id_voucher_id_key;
 DROP INDEX IF EXISTS favourites.favourite_vouchers_user_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_vouchers_user_id_created_at_idx;
 DROP INDEX IF EXISTS favourites.favourite_vouchers_created_at_idx;
 DROP INDEX IF EXISTS favourites.favourite_businesses_user_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_user_id_created_at_idx;
 DROP INDEX IF EXISTS favourites.favourite_businesses_user_id_business_id_key;
 DROP INDEX IF EXISTS favourites.favourite_businesses_created_at_idx;
 DROP INDEX IF EXISTS favourites.favourite_businesses_business_id_idx;
+DROP INDEX IF EXISTS favourites.favourite_businesses_business_id_created_at_idx;
+DROP INDEX IF EXISTS catalog.categories_updated_by_idx;
 DROP INDEX IF EXISTS catalog.categories_sort_order_idx;
 DROP INDEX IF EXISTS catalog.categories_slug_key;
+DROP INDEX IF EXISTS catalog.categories_slug_is_active_idx;
 DROP INDEX IF EXISTS catalog.categories_slug_idx;
+DROP INDEX IF EXISTS catalog.categories_path_is_active_idx;
 DROP INDEX IF EXISTS catalog.categories_path_idx;
+DROP INDEX IF EXISTS catalog.categories_parent_id_sort_order_is_active_idx;
 DROP INDEX IF EXISTS catalog.categories_parent_id_is_active_deleted_at_idx;
 DROP INDEX IF EXISTS catalog.categories_parent_id_idx;
 DROP INDEX IF EXISTS catalog.categories_name_key_idx;
 DROP INDEX IF EXISTS catalog.categories_level_sort_order_idx;
+DROP INDEX IF EXISTS catalog.categories_level_is_active_sort_order_idx;
 DROP INDEX IF EXISTS catalog.categories_level_idx;
+DROP INDEX IF EXISTS catalog.categories_is_active_level_sort_order_idx;
 DROP INDEX IF EXISTS catalog.categories_is_active_deleted_at_idx;
+DROP INDEX IF EXISTS catalog.categories_created_by_idx;
 DROP INDEX IF EXISTS business.businesses_verified_active_idx;
 DROP INDEX IF EXISTS business.businesses_user_id_idx;
+DROP INDEX IF EXISTS business.businesses_user_id_active_deleted_at_idx;
 DROP INDEX IF EXISTS business.businesses_favorite_count_idx;
 DROP INDEX IF EXISTS business.businesses_deleted_at_idx;
+DROP INDEX IF EXISTS business.businesses_created_at_active_idx;
+DROP INDEX IF EXISTS business.businesses_category_id_verified_active_avg_rating_idx;
 DROP INDEX IF EXISTS business.businesses_category_id_idx;
+DROP INDEX IF EXISTS business.businesses_category_id_active_avg_rating_idx;
+DROP INDEX IF EXISTS business.businesses_business_name_key_idx;
 DROP INDEX IF EXISTS business.businesses_avg_rating_idx;
+DROP INDEX IF EXISTS business.businesses_approved_by_approved_at_idx;
+DROP INDEX IF EXISTS business.businesses_approved_active_created_at_idx;
+DROP INDEX IF EXISTS business.businesses_active_verified_favorite_count_idx;
+DROP INDEX IF EXISTS business.businesses_active_verified_category_id_idx;
 DROP INDEX IF EXISTS business."business_registration_userId_key";
 DROP INDEX IF EXISTS business."business_registration_userId_idx";
 DROP INDEX IF EXISTS business."business_registration_registrationStatus_idx";
@@ -255,16 +379,26 @@ DROP INDEX IF EXISTS business."business_details_businessId_idx";
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_scan_type_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_voucher_id_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_validation_code_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_user_id_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_user_id_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_scanned_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_scan_type_scan_source_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_scan_type_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_scan_source_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_campaign_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_business_id_scanned_at_idx;
+DROP INDEX IF EXISTS analytics.voucher_scans_business_id_scan_type_scanned_at_idx;
 DROP INDEX IF EXISTS analytics.voucher_scans_business_id_idx;
+DROP INDEX IF EXISTS analytics.search_queries_query_key;
+DROP INDEX IF EXISTS analytics.search_queries_query_idx;
+DROP INDEX IF EXISTS analytics.search_queries_last_searched_idx;
+DROP INDEX IF EXISTS analytics.search_queries_count_idx;
 ALTER TABLE IF EXISTS ONLY voucher.vouchers DROP CONSTRAINT IF EXISTS vouchers_pkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_validation_codes DROP CONSTRAINT IF EXISTS voucher_validation_codes_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_redemptions DROP CONSTRAINT IF EXISTS voucher_redemptions_pkey;
+ALTER TABLE IF EXISTS ONLY voucher.voucher_drafts DROP CONSTRAINT IF EXISTS voucher_drafts_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.voucher_codes DROP CONSTRAINT IF EXISTS voucher_codes_pkey;
 ALTER TABLE IF EXISTS ONLY voucher.customer_vouchers DROP CONSTRAINT IF EXISTS customer_vouchers_pkey;
 ALTER TABLE IF EXISTS ONLY users.users DROP CONSTRAINT IF EXISTS users_pkey;
@@ -297,8 +431,11 @@ ALTER TABLE IF EXISTS ONLY business.businesses DROP CONSTRAINT IF EXISTS busines
 ALTER TABLE IF EXISTS ONLY business.business_registration DROP CONSTRAINT IF EXISTS business_registration_pkey;
 ALTER TABLE IF EXISTS ONLY business.business_details DROP CONSTRAINT IF EXISTS business_details_pkey;
 ALTER TABLE IF EXISTS ONLY analytics.voucher_scans DROP CONSTRAINT IF EXISTS voucher_scans_pkey;
+ALTER TABLE IF EXISTS ONLY analytics.search_queries DROP CONSTRAINT IF EXISTS search_queries_pkey;
 DROP TABLE IF EXISTS voucher.vouchers;
+DROP TABLE IF EXISTS voucher.voucher_validation_codes;
 DROP TABLE IF EXISTS voucher.voucher_redemptions;
+DROP TABLE IF EXISTS voucher.voucher_drafts;
 DROP TABLE IF EXISTS voucher.voucher_codes;
 DROP TABLE IF EXISTS voucher.customer_vouchers;
 DROP TABLE IF EXISTS users.users;
@@ -331,6 +468,8 @@ DROP TABLE IF EXISTS business.businesses;
 DROP TABLE IF EXISTS business.business_registration;
 DROP TABLE IF EXISTS business.business_details;
 DROP TABLE IF EXISTS analytics.voucher_scans;
+DROP TABLE IF EXISTS analytics.search_queries;
+DROP TYPE IF EXISTS voucher."VoucherValidationCodeType";
 DROP TYPE IF EXISTS voucher."VoucherType";
 DROP TYPE IF EXISTS voucher."VoucherState";
 DROP TYPE IF EXISTS voucher."VoucherCodeType";
@@ -427,6 +566,13 @@ CREATE SCHEMA files;
 --
 
 CREATE SCHEMA i18n;
+
+
+--
+-- Name: SCHEMA i18n; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA i18n IS 'Internationalization schema for The VoucherBook platform backend services';
 
 
 --
@@ -908,9 +1054,34 @@ CREATE TYPE voucher."VoucherType" AS ENUM (
 );
 
 
+--
+-- Name: VoucherValidationCodeType; Type: TYPE; Schema: voucher; Owner: -
+--
+
+CREATE TYPE voucher."VoucherValidationCodeType" AS ENUM (
+    'scan',
+    'print',
+    'digital'
+);
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: search_queries; Type: TABLE; Schema: analytics; Owner: -
+--
+
+CREATE TABLE analytics.search_queries (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    query character varying(255) NOT NULL,
+    count integer DEFAULT 1 NOT NULL,
+    last_searched timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 
 --
 -- Name: voucher_scans; Type: TABLE; Schema: analytics; Owner: -
@@ -927,7 +1098,10 @@ CREATE TABLE analytics.voucher_scans (
     business_id uuid,
     scanned_at timestamp(6) with time zone NOT NULL,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    metadata jsonb
+    metadata jsonb,
+    campaign character varying(100),
+    deep_link_mode character varying(20),
+    validation_code character varying(20)
 );
 
 
@@ -936,7 +1110,7 @@ CREATE TABLE analytics.voucher_scans (
 --
 
 CREATE TABLE business.business_details (
-    id uuid NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     "businessId" uuid NOT NULL,
     phone character varying(20),
     email character varying(255),
@@ -960,7 +1134,7 @@ CREATE TABLE business.business_details (
 --
 
 CREATE TABLE business.business_registration (
-    id uuid NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     "userId" uuid NOT NULL,
     "businessId" uuid,
     "currentStep" integer DEFAULT 1 NOT NULL,
@@ -996,7 +1170,9 @@ CREATE TABLE business.businesses (
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(6) with time zone,
-    favorite_count integer DEFAULT 0 NOT NULL
+    favorite_count integer DEFAULT 0 NOT NULL,
+    settings jsonb,
+    tax_id character varying(50)
 );
 
 
@@ -1181,8 +1357,8 @@ CREATE TABLE i18n.languages (
     direction text DEFAULT 'ltr'::text NOT NULL,
     is_default boolean DEFAULT false NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
-    created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(3) without time zone NOT NULL
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -1191,14 +1367,14 @@ CREATE TABLE i18n.languages (
 --
 
 CREATE TABLE i18n.translations (
-    id text NOT NULL,
     key text NOT NULL,
     value text NOT NULL,
     language_code text NOT NULL,
     context text,
     service text,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(3) without time zone NOT NULL
+    updated_at timestamp(3) without time zone NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL
 );
 
 
@@ -1207,11 +1383,11 @@ CREATE TABLE i18n.translations (
 --
 
 CREATE TABLE i18n.user_language_preferences (
-    id text NOT NULL,
     user_id uuid NOT NULL,
     language_code text NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp(3) without time zone NOT NULL
+    updated_at timestamp(3) without time zone NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL
 );
 
 
@@ -1557,6 +1733,39 @@ CREATE TABLE voucher.voucher_codes (
 
 
 --
+-- Name: voucher_drafts; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.voucher_drafts (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    draft_id character varying(100) NOT NULL,
+    business_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    current_step integer DEFAULT 1 NOT NULL,
+    completed_steps integer[] DEFAULT ARRAY[]::integer[],
+    is_complete boolean DEFAULT false NOT NULL,
+    step1_data jsonb,
+    step2_data jsonb,
+    step3_data jsonb,
+    step4_data jsonb,
+    step5_data jsonb,
+    title_key character varying(255),
+    description_key character varying(255),
+    terms_and_conditions_key character varying(255),
+    qr_code character varying(500),
+    validation_errors jsonb DEFAULT '{}'::jsonb,
+    last_validated_at timestamp(6) with time zone,
+    session_token character varying(255),
+    expires_at timestamp(6) with time zone NOT NULL,
+    completed_at timestamp(6) with time zone,
+    voucher_id uuid,
+    metadata jsonb,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
 -- Name: voucher_redemptions; Type: TABLE; Schema: voucher; Owner: -
 --
 
@@ -1569,6 +1778,23 @@ CREATE TABLE voucher.voucher_redemptions (
     location public.geography(Point,4326),
     metadata jsonb,
     created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+--
+-- Name: voucher_validation_codes; Type: TABLE; Schema: voucher; Owner: -
+--
+
+CREATE TABLE voucher.voucher_validation_codes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    voucher_id uuid NOT NULL,
+    code character varying(20) NOT NULL,
+    type voucher."VoucherValidationCodeType" NOT NULL,
+    expires_at timestamp(6) with time zone NOT NULL,
+    used_at timestamp(6) with time zone,
+    used_by uuid,
+    created_at timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    metadata jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -1604,6 +1830,14 @@ CREATE TABLE voucher.vouchers (
     deleted_at timestamp(6) with time zone,
     favorite_count integer DEFAULT 0 NOT NULL
 );
+
+
+--
+-- Name: search_queries search_queries_pkey; Type: CONSTRAINT; Schema: analytics; Owner: -
+--
+
+ALTER TABLE ONLY analytics.search_queries
+    ADD CONSTRAINT search_queries_pkey PRIMARY KEY (id);
 
 
 --
@@ -1863,11 +2097,27 @@ ALTER TABLE ONLY voucher.voucher_codes
 
 
 --
+-- Name: voucher_drafts voucher_drafts_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: voucher_redemptions voucher_redemptions_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
 --
 
 ALTER TABLE ONLY voucher.voucher_redemptions
     ADD CONSTRAINT voucher_redemptions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: voucher_validation_codes voucher_validation_codes_pkey; Type: CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_validation_codes
+    ADD CONSTRAINT voucher_validation_codes_pkey PRIMARY KEY (id);
 
 
 --
@@ -1879,6 +2129,34 @@ ALTER TABLE ONLY voucher.vouchers
 
 
 --
+-- Name: search_queries_count_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX search_queries_count_idx ON analytics.search_queries USING btree (count DESC);
+
+
+--
+-- Name: search_queries_last_searched_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX search_queries_last_searched_idx ON analytics.search_queries USING btree (last_searched);
+
+
+--
+-- Name: search_queries_query_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX search_queries_query_idx ON analytics.search_queries USING btree (query);
+
+
+--
+-- Name: search_queries_query_key; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE UNIQUE INDEX search_queries_query_key ON analytics.search_queries USING btree (query);
+
+
+--
 -- Name: voucher_scans_business_id_idx; Type: INDEX; Schema: analytics; Owner: -
 --
 
@@ -1886,10 +2164,24 @@ CREATE INDEX voucher_scans_business_id_idx ON analytics.voucher_scans USING btre
 
 
 --
+-- Name: voucher_scans_business_id_scan_type_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_business_id_scan_type_scanned_at_idx ON analytics.voucher_scans USING btree (business_id, scan_type, scanned_at);
+
+
+--
 -- Name: voucher_scans_business_id_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
 --
 
 CREATE INDEX voucher_scans_business_id_scanned_at_idx ON analytics.voucher_scans USING btree (business_id, scanned_at);
+
+
+--
+-- Name: voucher_scans_campaign_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_campaign_scanned_at_idx ON analytics.voucher_scans USING btree (campaign, scanned_at);
 
 
 --
@@ -1914,6 +2206,13 @@ CREATE INDEX voucher_scans_scan_type_idx ON analytics.voucher_scans USING btree 
 
 
 --
+-- Name: voucher_scans_scan_type_scan_source_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_scan_type_scan_source_scanned_at_idx ON analytics.voucher_scans USING btree (scan_type, scan_source, scanned_at);
+
+
+--
 -- Name: voucher_scans_scanned_at_idx; Type: INDEX; Schema: analytics; Owner: -
 --
 
@@ -1932,6 +2231,13 @@ CREATE INDEX voucher_scans_user_id_idx ON analytics.voucher_scans USING btree (u
 --
 
 CREATE INDEX voucher_scans_user_id_scanned_at_idx ON analytics.voucher_scans USING btree (user_id, scanned_at);
+
+
+--
+-- Name: voucher_scans_validation_code_idx; Type: INDEX; Schema: analytics; Owner: -
+--
+
+CREATE INDEX voucher_scans_validation_code_idx ON analytics.voucher_scans USING btree (validation_code);
 
 
 --
@@ -2005,6 +2311,34 @@ CREATE UNIQUE INDEX "business_registration_userId_key" ON business.business_regi
 
 
 --
+-- Name: businesses_active_verified_category_id_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_active_verified_category_id_idx ON business.businesses USING btree (active, verified, category_id);
+
+
+--
+-- Name: businesses_active_verified_favorite_count_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_active_verified_favorite_count_idx ON business.businesses USING btree (active, verified, favorite_count DESC);
+
+
+--
+-- Name: businesses_approved_active_created_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_approved_active_created_at_idx ON business.businesses USING btree (approved, active, created_at);
+
+
+--
+-- Name: businesses_approved_by_approved_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_approved_by_approved_at_idx ON business.businesses USING btree (approved_by, approved_at);
+
+
+--
 -- Name: businesses_avg_rating_idx; Type: INDEX; Schema: business; Owner: -
 --
 
@@ -2012,10 +2346,38 @@ CREATE INDEX businesses_avg_rating_idx ON business.businesses USING btree (avg_r
 
 
 --
+-- Name: businesses_business_name_key_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_business_name_key_idx ON business.businesses USING btree (business_name_key);
+
+
+--
+-- Name: businesses_category_id_active_avg_rating_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_category_id_active_avg_rating_idx ON business.businesses USING btree (category_id, active, avg_rating DESC);
+
+
+--
 -- Name: businesses_category_id_idx; Type: INDEX; Schema: business; Owner: -
 --
 
 CREATE INDEX businesses_category_id_idx ON business.businesses USING btree (category_id);
+
+
+--
+-- Name: businesses_category_id_verified_active_avg_rating_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_category_id_verified_active_avg_rating_idx ON business.businesses USING btree (category_id, verified, active, avg_rating);
+
+
+--
+-- Name: businesses_created_at_active_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_created_at_active_idx ON business.businesses USING btree (created_at, active);
 
 
 --
@@ -2033,6 +2395,13 @@ CREATE INDEX businesses_favorite_count_idx ON business.businesses USING btree (f
 
 
 --
+-- Name: businesses_user_id_active_deleted_at_idx; Type: INDEX; Schema: business; Owner: -
+--
+
+CREATE INDEX businesses_user_id_active_deleted_at_idx ON business.businesses USING btree (user_id, active, deleted_at);
+
+
+--
 -- Name: businesses_user_id_idx; Type: INDEX; Schema: business; Owner: -
 --
 
@@ -2047,6 +2416,13 @@ CREATE INDEX businesses_verified_active_idx ON business.businesses USING btree (
 
 
 --
+-- Name: categories_created_by_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_created_by_idx ON catalog.categories USING btree (created_by);
+
+
+--
 -- Name: categories_is_active_deleted_at_idx; Type: INDEX; Schema: catalog; Owner: -
 --
 
@@ -2054,10 +2430,24 @@ CREATE INDEX categories_is_active_deleted_at_idx ON catalog.categories USING btr
 
 
 --
+-- Name: categories_is_active_level_sort_order_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_is_active_level_sort_order_idx ON catalog.categories USING btree (is_active, level, sort_order);
+
+
+--
 -- Name: categories_level_idx; Type: INDEX; Schema: catalog; Owner: -
 --
 
 CREATE INDEX categories_level_idx ON catalog.categories USING btree (level);
+
+
+--
+-- Name: categories_level_is_active_sort_order_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_level_is_active_sort_order_idx ON catalog.categories USING btree (level, is_active, sort_order);
 
 
 --
@@ -2089,6 +2479,13 @@ CREATE INDEX categories_parent_id_is_active_deleted_at_idx ON catalog.categories
 
 
 --
+-- Name: categories_parent_id_sort_order_is_active_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_parent_id_sort_order_is_active_idx ON catalog.categories USING btree (parent_id, sort_order, is_active);
+
+
+--
 -- Name: categories_path_idx; Type: INDEX; Schema: catalog; Owner: -
 --
 
@@ -2096,10 +2493,24 @@ CREATE INDEX categories_path_idx ON catalog.categories USING btree (path);
 
 
 --
+-- Name: categories_path_is_active_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_path_is_active_idx ON catalog.categories USING btree (path, is_active);
+
+
+--
 -- Name: categories_slug_idx; Type: INDEX; Schema: catalog; Owner: -
 --
 
 CREATE INDEX categories_slug_idx ON catalog.categories USING btree (slug);
+
+
+--
+-- Name: categories_slug_is_active_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_slug_is_active_idx ON catalog.categories USING btree (slug, is_active);
 
 
 --
@@ -2114,6 +2525,20 @@ CREATE UNIQUE INDEX categories_slug_key ON catalog.categories USING btree (slug)
 --
 
 CREATE INDEX categories_sort_order_idx ON catalog.categories USING btree (sort_order);
+
+
+--
+-- Name: categories_updated_by_idx; Type: INDEX; Schema: catalog; Owner: -
+--
+
+CREATE INDEX categories_updated_by_idx ON catalog.categories USING btree (updated_by);
+
+
+--
+-- Name: favourite_businesses_business_id_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_business_id_created_at_idx ON favourites.favourite_businesses USING btree (business_id, created_at DESC);
 
 
 --
@@ -2138,6 +2563,13 @@ CREATE UNIQUE INDEX favourite_businesses_user_id_business_id_key ON favourites.f
 
 
 --
+-- Name: favourite_businesses_user_id_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_businesses_user_id_created_at_idx ON favourites.favourite_businesses USING btree (user_id, created_at DESC);
+
+
+--
 -- Name: favourite_businesses_user_id_idx; Type: INDEX; Schema: favourites; Owner: -
 --
 
@@ -2152,6 +2584,13 @@ CREATE INDEX favourite_vouchers_created_at_idx ON favourites.favourite_vouchers 
 
 
 --
+-- Name: favourite_vouchers_user_id_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_user_id_created_at_idx ON favourites.favourite_vouchers USING btree (user_id, created_at DESC);
+
+
+--
 -- Name: favourite_vouchers_user_id_idx; Type: INDEX; Schema: favourites; Owner: -
 --
 
@@ -2163,6 +2602,13 @@ CREATE INDEX favourite_vouchers_user_id_idx ON favourites.favourite_vouchers USI
 --
 
 CREATE UNIQUE INDEX favourite_vouchers_user_id_voucher_id_key ON favourites.favourite_vouchers USING btree (user_id, voucher_id);
+
+
+--
+-- Name: favourite_vouchers_voucher_id_created_at_idx; Type: INDEX; Schema: favourites; Owner: -
+--
+
+CREATE INDEX favourite_vouchers_voucher_id_created_at_idx ON favourites.favourite_vouchers USING btree (voucher_id, created_at DESC);
 
 
 --
@@ -2432,6 +2878,13 @@ CREATE INDEX security_events_created_at_idx ON identity.security_events USING bt
 
 
 --
+-- Name: security_events_device_id_created_at_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX security_events_device_id_created_at_idx ON identity.security_events USING btree (device_id, created_at);
+
+
+--
 -- Name: security_events_event_type_idx; Type: INDEX; Schema: identity; Owner: -
 --
 
@@ -2439,10 +2892,31 @@ CREATE INDEX security_events_event_type_idx ON identity.security_events USING bt
 
 
 --
+-- Name: security_events_event_type_risk_score_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX security_events_event_type_risk_score_idx ON identity.security_events USING btree (event_type, risk_score);
+
+
+--
+-- Name: security_events_ip_address_created_at_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX security_events_ip_address_created_at_idx ON identity.security_events USING btree (ip_address, created_at);
+
+
+--
 -- Name: security_events_risk_score_created_at_idx; Type: INDEX; Schema: identity; Owner: -
 --
 
 CREATE INDEX security_events_risk_score_created_at_idx ON identity.security_events USING btree (risk_score, created_at);
+
+
+--
+-- Name: security_events_user_id_event_type_created_at_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX security_events_user_id_event_type_created_at_idx ON identity.security_events USING btree (user_id, event_type, created_at);
 
 
 --
@@ -2460,6 +2934,20 @@ CREATE INDEX user_auth_methods_auth_method_idx ON identity.user_auth_methods USI
 
 
 --
+-- Name: user_auth_methods_is_verified_auth_method_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_auth_methods_is_verified_auth_method_idx ON identity.user_auth_methods USING btree (is_verified, auth_method);
+
+
+--
+-- Name: user_auth_methods_last_used_at_auth_method_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_auth_methods_last_used_at_auth_method_idx ON identity.user_auth_methods USING btree (last_used_at, auth_method);
+
+
+--
 -- Name: user_auth_methods_user_id_auth_method_key; Type: INDEX; Schema: identity; Owner: -
 --
 
@@ -2474,10 +2962,24 @@ CREATE INDEX user_auth_methods_user_id_idx ON identity.user_auth_methods USING b
 
 
 --
+-- Name: user_auth_methods_user_id_is_enabled_auth_method_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_auth_methods_user_id_is_enabled_auth_method_idx ON identity.user_auth_methods USING btree (user_id, is_enabled, auth_method);
+
+
+--
 -- Name: user_auth_methods_user_id_is_enabled_last_used_at_idx; Type: INDEX; Schema: identity; Owner: -
 --
 
 CREATE INDEX user_auth_methods_user_id_is_enabled_last_used_at_idx ON identity.user_auth_methods USING btree (user_id, is_enabled, last_used_at);
+
+
+--
+-- Name: user_devices_device_type_last_active_at_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_devices_device_type_last_active_at_idx ON identity.user_devices USING btree (device_type, last_active_at);
 
 
 --
@@ -2488,10 +2990,31 @@ CREATE INDEX user_devices_fcm_token_idx ON identity.user_devices USING btree (fc
 
 
 --
+-- Name: user_devices_is_trusted_trust_expires_at_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_devices_is_trusted_trust_expires_at_idx ON identity.user_devices USING btree (is_trusted, trust_expires_at);
+
+
+--
+-- Name: user_devices_last_ip_address_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_devices_last_ip_address_idx ON identity.user_devices USING btree (last_ip_address);
+
+
+--
 -- Name: user_devices_user_id_device_id_key; Type: INDEX; Schema: identity; Owner: -
 --
 
 CREATE UNIQUE INDEX user_devices_user_id_device_id_key ON identity.user_devices USING btree (user_id, device_id);
+
+
+--
+-- Name: user_devices_user_id_device_type_is_trusted_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_devices_user_id_device_type_is_trusted_idx ON identity.user_devices USING btree (user_id, device_type, is_trusted);
 
 
 --
@@ -2516,6 +3039,13 @@ CREATE INDEX user_devices_user_id_last_active_at_idx ON identity.user_devices US
 
 
 --
+-- Name: user_identities_created_at_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_identities_created_at_idx ON identity.user_identities USING btree (created_at);
+
+
+--
 -- Name: user_identities_firebase_uid_idx; Type: INDEX; Schema: identity; Owner: -
 --
 
@@ -2527,6 +3057,20 @@ CREATE INDEX user_identities_firebase_uid_idx ON identity.user_identities USING 
 --
 
 CREATE UNIQUE INDEX user_identities_firebase_uid_key ON identity.user_identities USING btree (firebase_uid);
+
+
+--
+-- Name: user_identities_is_email_verified_provider_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_identities_is_email_verified_provider_idx ON identity.user_identities USING btree (is_email_verified, provider);
+
+
+--
+-- Name: user_identities_last_login_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_identities_last_login_idx ON identity.user_identities USING btree (last_login);
 
 
 --
@@ -2555,6 +3099,13 @@ CREATE INDEX user_identities_user_id_idx ON identity.user_identities USING btree
 --
 
 CREATE UNIQUE INDEX user_identities_user_id_key ON identity.user_identities USING btree (user_id);
+
+
+--
+-- Name: user_identities_user_id_provider_idx; Type: INDEX; Schema: identity; Owner: -
+--
+
+CREATE INDEX user_identities_user_id_provider_idx ON identity.user_identities USING btree (user_id, provider);
 
 
 --
@@ -2607,6 +3158,20 @@ CREATE UNIQUE INDEX subscription_plans_stripe_product_id_key ON payments.subscri
 
 
 --
+-- Name: subscriptions_created_at_status_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_created_at_status_idx ON payments.subscriptions USING btree (created_at, status);
+
+
+--
+-- Name: subscriptions_current_period_end_status_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_current_period_end_status_idx ON payments.subscriptions USING btree (current_period_end, status);
+
+
+--
 -- Name: subscriptions_plan_id_idx; Type: INDEX; Schema: payments; Owner: -
 --
 
@@ -2614,10 +3179,38 @@ CREATE INDEX subscriptions_plan_id_idx ON payments.subscriptions USING btree (pl
 
 
 --
+-- Name: subscriptions_plan_id_status_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_plan_id_status_idx ON payments.subscriptions USING btree (plan_id, status);
+
+
+--
+-- Name: subscriptions_status_cancel_at_period_end_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_status_cancel_at_period_end_idx ON payments.subscriptions USING btree (status, cancel_at_period_end);
+
+
+--
+-- Name: subscriptions_status_current_period_end_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_status_current_period_end_idx ON payments.subscriptions USING btree (status, current_period_end);
+
+
+--
 -- Name: subscriptions_status_idx; Type: INDEX; Schema: payments; Owner: -
 --
 
 CREATE INDEX subscriptions_status_idx ON payments.subscriptions USING btree (status);
+
+
+--
+-- Name: subscriptions_stripe_customer_id_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_stripe_customer_id_idx ON payments.subscriptions USING btree (stripe_customer_id);
 
 
 --
@@ -2635,10 +3228,24 @@ CREATE UNIQUE INDEX subscriptions_stripe_subscription_id_key ON payments.subscri
 
 
 --
+-- Name: subscriptions_trial_end_status_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_trial_end_status_idx ON payments.subscriptions USING btree (trial_end, status);
+
+
+--
 -- Name: subscriptions_user_id_idx; Type: INDEX; Schema: payments; Owner: -
 --
 
 CREATE INDEX subscriptions_user_id_idx ON payments.subscriptions USING btree (user_id);
+
+
+--
+-- Name: subscriptions_user_id_status_idx; Type: INDEX; Schema: payments; Owner: -
+--
+
+CREATE INDEX subscriptions_user_id_status_idx ON payments.subscriptions USING btree (user_id, status);
 
 
 --
@@ -2782,6 +3389,20 @@ CREATE INDEX communication_logs_created_at_idx ON support.communication_logs USI
 
 
 --
+-- Name: communication_logs_failed_at_status_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX communication_logs_failed_at_status_idx ON support.communication_logs USING btree (failed_at, status);
+
+
+--
+-- Name: communication_logs_provider_status_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX communication_logs_provider_status_idx ON support.communication_logs USING btree (provider, status);
+
+
+--
 -- Name: communication_logs_recipient_idx; Type: INDEX; Schema: support; Owner: -
 --
 
@@ -2789,10 +3410,38 @@ CREATE INDEX communication_logs_recipient_idx ON support.communication_logs USIN
 
 
 --
+-- Name: communication_logs_status_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX communication_logs_status_created_at_idx ON support.communication_logs USING btree (status, created_at);
+
+
+--
+-- Name: communication_logs_status_sent_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX communication_logs_status_sent_at_idx ON support.communication_logs USING btree (status, sent_at);
+
+
+--
 -- Name: communication_logs_template_id_idx; Type: INDEX; Schema: support; Owner: -
 --
 
 CREATE INDEX communication_logs_template_id_idx ON support.communication_logs USING btree (template_id);
+
+
+--
+-- Name: communication_logs_template_id_status_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX communication_logs_template_id_status_created_at_idx ON support.communication_logs USING btree (template_id, status, created_at);
+
+
+--
+-- Name: communication_logs_type_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX communication_logs_type_created_at_idx ON support.communication_logs USING btree (type, created_at);
 
 
 --
@@ -2810,10 +3459,38 @@ CREATE INDEX communication_logs_user_id_idx ON support.communication_logs USING 
 
 
 --
+-- Name: communication_logs_user_id_type_status_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX communication_logs_user_id_type_status_idx ON support.communication_logs USING btree (user_id, type, status);
+
+
+--
+-- Name: notifications_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX notifications_created_at_idx ON support.notifications USING btree (created_at DESC);
+
+
+--
+-- Name: notifications_read_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX notifications_read_at_idx ON support.notifications USING btree (read_at);
+
+
+--
 -- Name: notifications_type_idx; Type: INDEX; Schema: support; Owner: -
 --
 
 CREATE INDEX notifications_type_idx ON support.notifications USING btree (type);
+
+
+--
+-- Name: notifications_type_user_id_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX notifications_type_user_id_created_at_idx ON support.notifications USING btree (type, user_id, created_at);
 
 
 --
@@ -2824,10 +3501,24 @@ CREATE INDEX notifications_user_id_created_at_idx ON support.notifications USING
 
 
 --
+-- Name: notifications_user_id_is_read_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX notifications_user_id_is_read_created_at_idx ON support.notifications USING btree (user_id, is_read, created_at DESC);
+
+
+--
 -- Name: notifications_user_id_is_read_idx; Type: INDEX; Schema: support; Owner: -
 --
 
 CREATE INDEX notifications_user_id_is_read_idx ON support.notifications USING btree (user_id, is_read);
+
+
+--
+-- Name: notifications_user_id_type_is_read_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX notifications_user_id_type_is_read_idx ON support.notifications USING btree (user_id, type, is_read);
 
 
 --
@@ -2838,10 +3529,24 @@ CREATE INDEX problems_assigned_to_idx ON support.problems USING btree (assigned_
 
 
 --
+-- Name: problems_assigned_to_status_priority_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX problems_assigned_to_status_priority_idx ON support.problems USING btree (assigned_to, status, priority);
+
+
+--
 -- Name: problems_created_at_idx; Type: INDEX; Schema: support; Owner: -
 --
 
 CREATE INDEX problems_created_at_idx ON support.problems USING btree (created_at);
+
+
+--
+-- Name: problems_created_at_status_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX problems_created_at_status_idx ON support.problems USING btree (created_at, status);
 
 
 --
@@ -2852,10 +3557,31 @@ CREATE INDEX problems_priority_idx ON support.problems USING btree (priority);
 
 
 --
+-- Name: problems_resolved_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX problems_resolved_at_idx ON support.problems USING btree (resolved_at);
+
+
+--
+-- Name: problems_status_assigned_to_priority_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX problems_status_assigned_to_priority_idx ON support.problems USING btree (status, assigned_to, priority);
+
+
+--
 -- Name: problems_status_idx; Type: INDEX; Schema: support; Owner: -
 --
 
 CREATE INDEX problems_status_idx ON support.problems USING btree (status);
+
+
+--
+-- Name: problems_status_priority_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX problems_status_priority_created_at_idx ON support.problems USING btree (status, priority, created_at);
 
 
 --
@@ -2880,10 +3606,24 @@ CREATE INDEX problems_type_idx ON support.problems USING btree (type);
 
 
 --
+-- Name: problems_type_status_priority_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX problems_type_status_priority_idx ON support.problems USING btree (type, status, priority);
+
+
+--
 -- Name: problems_user_id_idx; Type: INDEX; Schema: support; Owner: -
 --
 
 CREATE INDEX problems_user_id_idx ON support.problems USING btree (user_id);
+
+
+--
+-- Name: problems_user_id_status_created_at_idx; Type: INDEX; Schema: support; Owner: -
+--
+
+CREATE INDEX problems_user_id_status_created_at_idx ON support.problems USING btree (user_id, status, created_at);
 
 
 --
@@ -2908,6 +3648,13 @@ CREATE INDEX support_comments_user_id_idx ON support.support_comments USING btre
 
 
 --
+-- Name: users_created_at_role_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_created_at_role_idx ON users.users USING btree (created_at, role);
+
+
+--
 -- Name: users_deleted_at_idx; Type: INDEX; Schema: users; Owner: -
 --
 
@@ -2929,6 +3676,27 @@ CREATE UNIQUE INDEX users_email_key ON users.users USING btree (email);
 
 
 --
+-- Name: users_email_verified_status_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_email_verified_status_idx ON users.users USING btree (email_verified, status);
+
+
+--
+-- Name: users_first_name_last_name_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_first_name_last_name_idx ON users.users USING btree (first_name, last_name);
+
+
+--
+-- Name: users_last_login_at_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_last_login_at_idx ON users.users USING btree (last_login_at);
+
+
+--
 -- Name: users_phone_number_idx; Type: INDEX; Schema: users; Owner: -
 --
 
@@ -2936,10 +3704,59 @@ CREATE INDEX users_phone_number_idx ON users.users USING btree (phone_number);
 
 
 --
+-- Name: users_phone_verified_status_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_phone_verified_status_idx ON users.users USING btree (phone_verified, status);
+
+
+--
+-- Name: users_preferred_language_status_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_preferred_language_status_idx ON users.users USING btree (preferred_language, status);
+
+
+--
 -- Name: users_primary_business_id_idx; Type: INDEX; Schema: users; Owner: -
 --
 
 CREATE INDEX users_primary_business_id_idx ON users.users USING btree (primary_business_id);
+
+
+--
+-- Name: users_role_created_at_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_role_created_at_idx ON users.users USING btree (role, created_at);
+
+
+--
+-- Name: users_role_primary_business_id_status_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_role_primary_business_id_status_idx ON users.users USING btree (role, primary_business_id, status);
+
+
+--
+-- Name: users_role_status_deleted_at_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_role_status_deleted_at_idx ON users.users USING btree (role, status, deleted_at);
+
+
+--
+-- Name: users_status_role_created_at_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_status_role_created_at_idx ON users.users USING btree (status, role, created_at);
+
+
+--
+-- Name: users_stripe_user_id_idx; Type: INDEX; Schema: users; Owner: -
+--
+
+CREATE INDEX users_stripe_user_id_idx ON users.users USING btree (stripe_user_id);
 
 
 --
@@ -2961,6 +3778,13 @@ CREATE INDEX customer_vouchers_customer_id_claimed_at_idx ON voucher.customer_vo
 --
 
 CREATE INDEX customer_vouchers_customer_id_idx ON voucher.customer_vouchers USING btree (customer_id);
+
+
+--
+-- Name: customer_vouchers_customer_id_status_claimed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_customer_id_status_claimed_at_idx ON voucher.customer_vouchers USING btree (customer_id, status, claimed_at);
 
 
 --
@@ -2992,6 +3816,13 @@ CREATE INDEX customer_vouchers_status_idx ON voucher.customer_vouchers USING btr
 
 
 --
+-- Name: customer_vouchers_status_redeemed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX customer_vouchers_status_redeemed_at_idx ON voucher.customer_vouchers USING btree (status, redeemed_at);
+
+
+--
 -- Name: customer_vouchers_voucher_id_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
@@ -3003,6 +3834,13 @@ CREATE INDEX customer_vouchers_voucher_id_idx ON voucher.customer_vouchers USING
 --
 
 CREATE INDEX customer_vouchers_voucher_id_status_idx ON voucher.customer_vouchers USING btree (voucher_id, status);
+
+
+--
+-- Name: recent_redemptions_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX recent_redemptions_idx ON voucher.voucher_redemptions USING btree (redeemed_at DESC);
 
 
 --
@@ -3020,6 +3858,13 @@ CREATE UNIQUE INDEX voucher_codes_code_key ON voucher.voucher_codes USING btree 
 
 
 --
+-- Name: voucher_codes_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_created_at_idx ON voucher.voucher_codes USING btree (created_at);
+
+
+--
 -- Name: voucher_codes_is_active_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
@@ -3031,6 +3876,13 @@ CREATE INDEX voucher_codes_is_active_idx ON voucher.voucher_codes USING btree (i
 --
 
 CREATE INDEX voucher_codes_type_idx ON voucher.voucher_codes USING btree (type);
+
+
+--
+-- Name: voucher_codes_type_is_active_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_codes_type_is_active_idx ON voucher.voucher_codes USING btree (type, is_active);
 
 
 --
@@ -3055,10 +3907,150 @@ CREATE INDEX voucher_codes_voucher_id_type_idx ON voucher.voucher_codes USING bt
 
 
 --
+-- Name: voucher_drafts_business_id_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_business_id_created_at_idx ON voucher.voucher_drafts USING btree (business_id, created_at);
+
+
+--
+-- Name: voucher_drafts_business_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_business_id_idx ON voucher.voucher_drafts USING btree (business_id);
+
+
+--
+-- Name: voucher_drafts_business_id_is_complete_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_business_id_is_complete_created_at_idx ON voucher.voucher_drafts USING btree (business_id, is_complete, created_at);
+
+
+--
+-- Name: voucher_drafts_completed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_completed_at_idx ON voucher.voucher_drafts USING btree (completed_at);
+
+
+--
+-- Name: voucher_drafts_current_step_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_current_step_idx ON voucher.voucher_drafts USING btree (current_step);
+
+
+--
+-- Name: voucher_drafts_current_step_user_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_current_step_user_id_idx ON voucher.voucher_drafts USING btree (current_step, user_id);
+
+
+--
+-- Name: voucher_drafts_draft_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_draft_id_idx ON voucher.voucher_drafts USING btree (draft_id);
+
+
+--
+-- Name: voucher_drafts_draft_id_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_draft_id_key ON voucher.voucher_drafts USING btree (draft_id);
+
+
+--
+-- Name: voucher_drafts_expires_at_completed_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_expires_at_completed_at_idx ON voucher.voucher_drafts USING btree (expires_at, completed_at);
+
+
+--
+-- Name: voucher_drafts_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_expires_at_idx ON voucher.voucher_drafts USING btree (expires_at);
+
+
+--
+-- Name: voucher_drafts_is_complete_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_is_complete_created_at_idx ON voucher.voucher_drafts USING btree (is_complete, created_at);
+
+
+--
+-- Name: voucher_drafts_qr_code_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_qr_code_key ON voucher.voucher_drafts USING btree (qr_code);
+
+
+--
+-- Name: voucher_drafts_session_token_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_session_token_idx ON voucher.voucher_drafts USING btree (session_token);
+
+
+--
+-- Name: voucher_drafts_session_token_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_session_token_key ON voucher.voucher_drafts USING btree (session_token);
+
+
+--
+-- Name: voucher_drafts_user_id_business_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_business_id_idx ON voucher.voucher_drafts USING btree (user_id, business_id);
+
+
+--
+-- Name: voucher_drafts_user_id_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_expires_at_idx ON voucher.voucher_drafts USING btree (user_id, expires_at);
+
+
+--
+-- Name: voucher_drafts_user_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_idx ON voucher.voucher_drafts USING btree (user_id);
+
+
+--
+-- Name: voucher_drafts_user_id_is_complete_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_drafts_user_id_is_complete_expires_at_idx ON voucher.voucher_drafts USING btree (user_id, is_complete, expires_at);
+
+
+--
+-- Name: voucher_drafts_voucher_id_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_drafts_voucher_id_key ON voucher.voucher_drafts USING btree (voucher_id);
+
+
+--
 -- Name: voucher_redemptions_code_used_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
 CREATE INDEX voucher_redemptions_code_used_idx ON voucher.voucher_redemptions USING btree (code_used);
+
+
+--
+-- Name: voucher_redemptions_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_redemptions_created_at_idx ON voucher.voucher_redemptions USING btree (created_at);
 
 
 --
@@ -3104,6 +4096,69 @@ CREATE UNIQUE INDEX voucher_redemptions_voucher_id_user_id_key ON voucher.vouche
 
 
 --
+-- Name: voucher_validation_codes_code_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_code_idx ON voucher.voucher_validation_codes USING btree (code);
+
+
+--
+-- Name: voucher_validation_codes_code_key; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE UNIQUE INDEX voucher_validation_codes_code_key ON voucher.voucher_validation_codes USING btree (code);
+
+
+--
+-- Name: voucher_validation_codes_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_expires_at_idx ON voucher.voucher_validation_codes USING btree (expires_at);
+
+
+--
+-- Name: voucher_validation_codes_type_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_type_expires_at_idx ON voucher.voucher_validation_codes USING btree (type, expires_at);
+
+
+--
+-- Name: voucher_validation_codes_type_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_type_idx ON voucher.voucher_validation_codes USING btree (type);
+
+
+--
+-- Name: voucher_validation_codes_used_at_used_by_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_used_at_used_by_idx ON voucher.voucher_validation_codes USING btree (used_at, used_by);
+
+
+--
+-- Name: voucher_validation_codes_voucher_id_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_voucher_id_expires_at_idx ON voucher.voucher_validation_codes USING btree (voucher_id, expires_at);
+
+
+--
+-- Name: voucher_validation_codes_voucher_id_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_voucher_id_idx ON voucher.voucher_validation_codes USING btree (voucher_id);
+
+
+--
+-- Name: voucher_validation_codes_voucher_id_type_expires_at_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX voucher_validation_codes_voucher_id_type_expires_at_idx ON voucher.voucher_validation_codes USING btree (voucher_id, type, expires_at);
+
+
+--
 -- Name: vouchers_business_id_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
@@ -3115,6 +4170,13 @@ CREATE INDEX vouchers_business_id_created_at_idx ON voucher.vouchers USING btree
 --
 
 CREATE INDEX vouchers_business_id_idx ON voucher.vouchers USING btree (business_id);
+
+
+--
+-- Name: vouchers_business_id_state_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_business_id_state_valid_until_idx ON voucher.vouchers USING btree (business_id, state, valid_until);
 
 
 --
@@ -3132,10 +4194,24 @@ CREATE INDEX vouchers_category_id_state_idx ON voucher.vouchers USING btree (cat
 
 
 --
+-- Name: vouchers_claim_count_state_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_claim_count_state_idx ON voucher.vouchers USING btree (claim_count DESC, state);
+
+
+--
 -- Name: vouchers_created_at_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
 CREATE INDEX vouchers_created_at_idx ON voucher.vouchers USING btree (created_at);
+
+
+--
+-- Name: vouchers_currency_type_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_currency_type_idx ON voucher.vouchers USING btree (currency, type);
 
 
 --
@@ -3167,10 +4243,38 @@ CREATE UNIQUE INDEX vouchers_qr_code_key ON voucher.vouchers USING btree (qr_cod
 
 
 --
+-- Name: vouchers_redemptions_count_max_redemptions_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_redemptions_count_max_redemptions_idx ON voucher.vouchers USING btree (redemptions_count, max_redemptions);
+
+
+--
+-- Name: vouchers_scan_count_state_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_scan_count_state_idx ON voucher.vouchers USING btree (scan_count DESC, state);
+
+
+--
 -- Name: vouchers_state_business_id_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
 CREATE INDEX vouchers_state_business_id_idx ON voucher.vouchers USING btree (state, business_id);
+
+
+--
+-- Name: vouchers_state_category_id_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_state_category_id_valid_until_idx ON voucher.vouchers USING btree (state, category_id, valid_until);
+
+
+--
+-- Name: vouchers_state_deleted_at_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_state_deleted_at_valid_until_idx ON voucher.vouchers USING btree (state, deleted_at, valid_until);
 
 
 --
@@ -3181,10 +4285,31 @@ CREATE INDEX vouchers_state_idx ON voucher.vouchers USING btree (state);
 
 
 --
+-- Name: vouchers_state_type_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_state_type_valid_until_idx ON voucher.vouchers USING btree (state, type, valid_until);
+
+
+--
+-- Name: vouchers_state_valid_from_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_state_valid_from_valid_until_idx ON voucher.vouchers USING btree (state, valid_from, valid_until);
+
+
+--
 -- Name: vouchers_state_valid_until_idx; Type: INDEX; Schema: voucher; Owner: -
 --
 
 CREATE INDEX vouchers_state_valid_until_idx ON voucher.vouchers USING btree (state, valid_until);
+
+
+--
+-- Name: vouchers_type_discount_idx; Type: INDEX; Schema: voucher; Owner: -
+--
+
+CREATE INDEX vouchers_type_discount_idx ON voucher.vouchers USING btree (type, discount);
 
 
 --
@@ -3280,11 +4405,27 @@ ALTER TABLE ONLY business.businesses
 
 
 --
+-- Name: categories categories_created_by_fkey; Type: FK CONSTRAINT; Schema: catalog; Owner: -
+--
+
+ALTER TABLE ONLY catalog.categories
+    ADD CONSTRAINT categories_created_by_fkey FOREIGN KEY (created_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
 -- Name: categories categories_parent_id_fkey; Type: FK CONSTRAINT; Schema: catalog; Owner: -
 --
 
 ALTER TABLE ONLY catalog.categories
-    ADD CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT categories_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES catalog.categories(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: categories categories_updated_by_fkey; Type: FK CONSTRAINT; Schema: catalog; Owner: -
+--
+
+ALTER TABLE ONLY catalog.categories
+    ADD CONSTRAINT categories_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -3624,6 +4765,30 @@ ALTER TABLE ONLY voucher.voucher_codes
 
 
 --
+-- Name: voucher_drafts voucher_drafts_business_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_business_id_fkey FOREIGN KEY (business_id) REFERENCES business.businesses(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: voucher_drafts voucher_drafts_user_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_user_id_fkey FOREIGN KEY (user_id) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: voucher_drafts voucher_drafts_voucher_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_drafts
+    ADD CONSTRAINT voucher_drafts_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
 -- Name: voucher_redemptions voucher_redemptions_user_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
 --
 
@@ -3637,6 +4802,22 @@ ALTER TABLE ONLY voucher.voucher_redemptions
 
 ALTER TABLE ONLY voucher.voucher_redemptions
     ADD CONSTRAINT voucher_redemptions_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: voucher_validation_codes voucher_validation_codes_used_by_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_validation_codes
+    ADD CONSTRAINT voucher_validation_codes_used_by_fkey FOREIGN KEY (used_by) REFERENCES users.users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: voucher_validation_codes voucher_validation_codes_voucher_id_fkey; Type: FK CONSTRAINT; Schema: voucher; Owner: -
+--
+
+ALTER TABLE ONLY voucher.voucher_validation_codes
+    ADD CONSTRAINT voucher_validation_codes_voucher_id_fkey FOREIGN KEY (voucher_id) REFERENCES voucher.vouchers(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

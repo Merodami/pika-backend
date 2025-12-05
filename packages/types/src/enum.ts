@@ -347,3 +347,157 @@ export enum CategorySortBy {
  * Type definition for category sort by - use this for type annotations
  */
 export type CategorySortByType = `${CategorySortBy}`
+
+// ============= Analytics & Reporting Enums =============
+
+/**
+ * Analytics entities that can be analyzed
+ * Used in flexible analytics queries
+ */
+export enum AnalyticsEntity {
+  USERS = 'users',
+  BUSINESSES = 'businesses',
+  VOUCHERS = 'vouchers',
+  PAYMENTS = 'payments',
+  CATEGORIES = 'categories',
+}
+
+/**
+ * Type definition for analytics entity - use this for type annotations
+ */
+export type AnalyticsEntityType = `${AnalyticsEntity}`
+
+/**
+ * Analytics metrics that can be calculated
+ * Used in flexible analytics queries
+ */
+export enum AnalyticsMetric {
+  COUNT = 'count',
+  GROWTH_RATE = 'growth_rate',
+  RETENTION = 'retention',
+  CONVERSION = 'conversion',
+  REVENUE = 'revenue',
+  ENGAGEMENT = 'engagement',
+  SATISFACTION = 'satisfaction',
+  CHURN_RATE = 'churn_rate',
+  AVERAGE_VALUE = 'average_value',
+}
+
+/**
+ * Type definition for analytics metric - use this for type annotations
+ */
+export type AnalyticsMetricType = `${AnalyticsMetric}`
+
+/**
+ * Analytics dimensions for data slicing and grouping
+ * Used in flexible analytics queries
+ */
+export enum AnalyticsDimension {
+  TIME = 'time',
+  CATEGORY = 'category',
+  REGION = 'region',
+  USER_SEGMENT = 'user_segment',
+  BUSINESS_TYPE = 'business_type',
+  DEVICE = 'device',
+  ACQUISITION_CHANNEL = 'acquisition_channel',
+  USER_ROLE = 'user_role',
+}
+
+/**
+ * Type definition for analytics dimension - use this for type annotations
+ */
+export type AnalyticsDimensionType = `${AnalyticsDimension}`
+
+/**
+ * Time granularity for analytics data aggregation
+ * Used for time-based analytics and charts
+ */
+export enum TimeGranularity {
+  HOUR = 'hour',
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  QUARTER = 'quarter',
+  YEAR = 'year',
+}
+
+/**
+ * Type definition for time granularity - use this for type annotations
+ */
+export type TimeGranularityType = `${TimeGranularity}`
+
+/**
+ * Analytics report types available in the admin analytics system
+ * Used for pre-configured analytics report templates
+ * Different from payment-specific ReportType
+ */
+export enum AnalyticsReportType {
+  OVERVIEW = 'overview',
+  GROWTH = 'growth',
+  PERFORMANCE = 'performance',
+  ENGAGEMENT = 'engagement',
+  HEALTH = 'health',
+  REVENUE = 'revenue',
+  RETENTION = 'retention',
+  CONVERSION = 'conversion',
+  SEGMENTATION = 'segmentation',
+  FORECASTING = 'forecasting',
+}
+
+/**
+ * Type definition for analytics report type - use this for type annotations
+ */
+export type AnalyticsReportTypeType = `${AnalyticsReportType}`
+
+/**
+ * Chart types for data visualization
+ * Used in reports and dashboard widgets
+ */
+export enum ChartType {
+  LINE = 'line',
+  BAR = 'bar',
+  PIE = 'pie',
+  DONUT = 'donut',
+  TABLE = 'table',
+  HEATMAP = 'heatmap',
+  FUNNEL = 'funnel',
+  SCATTER = 'scatter',
+  AREA = 'area',
+}
+
+/**
+ * Type definition for chart type - use this for type annotations
+ */
+export type ChartTypeType = `${ChartType}`
+
+/**
+ * Trend directions for metrics
+ * Used to indicate whether metrics are improving or declining
+ */
+export enum TrendDirection {
+  UP = 'up',
+  DOWN = 'down',
+  STABLE = 'stable',
+  NO_DATA = 'no_data',
+}
+
+/**
+ * Type definition for trend direction - use this for type annotations
+ */
+export type TrendDirectionType = `${TrendDirection}`
+
+/**
+ * Export formats for reports
+ * Used when exporting analytics data and reports
+ */
+export enum ExportFormat {
+  JSON = 'json',
+  CSV = 'csv',
+  XLSX = 'xlsx',
+  PDF = 'pdf',
+}
+
+/**
+ * Type definition for export format - use this for type annotations
+ */
+export type ExportFormatType = `${ExportFormat}`

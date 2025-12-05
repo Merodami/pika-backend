@@ -64,7 +64,6 @@ localstack_data
 keys/
 *.pem
 *.key
-.env.production
 test-tokens.json
 # Package registry tokens (should use env vars)
 packages/**/.npmrc
@@ -170,3 +169,5 @@ admin-credentials.txt
 # Admin user creation files (NEVER COMMIT)
 admin-user-*.sql
 admin-credentials-*.txt
+
+tmp/

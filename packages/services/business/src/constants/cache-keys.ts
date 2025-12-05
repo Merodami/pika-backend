@@ -19,6 +19,7 @@ export const CACHE_KEYS = {
     SINGLE: 'business',
     USER: 'business:user',
     DETAILS: 'business:details',
+    SETTINGS: 'business:settings',
   },
 
   // Admin cache keys
@@ -41,4 +42,6 @@ export const generateCacheKey = {
     `${CACHE_KEYS.BUSINESS.SINGLE}:${businessId}`,
   businessDetails: (businessId: string) =>
     `${CACHE_KEYS.BUSINESS.DETAILS}:${businessId}`,
+  businessSettings: (businessId: string) =>
+    `${CACHE_KEYS.BUSINESS.SETTINGS}:${businessId}`,
 }

@@ -14,15 +14,21 @@ config({ path: pathJoin(__currentDirname, '../../../../.env.local') })
 
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import {
-  API_GATEWAY_BASE_URL,
   AUTH_SERVICE_PORT,
+  BUSINESS_SERVICE_PORT,
+  CATEGORY_SERVICE_PORT,
   COMMUNICATION_SERVICE_PORT,
   FILE_STORAGE_SERVICE_PORT,
+  getAdminApiUrl,
+  getApiUrl,
+  getInternalApiUrl,
   PAYMENT_SERVICE_PORT,
+  PDF_SERVICE_PORT,
   SERVICE_HOST,
   SUBSCRIPTION_SERVICE_PORT,
   SUPPORT_SERVICE_PORT,
   USER_SERVICE_PORT,
+  VOUCHER_SERVICE_PORT,
 } from '@pika/environment'
 import { mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { dirname, join } from 'path'
@@ -31,6 +37,7 @@ import { z } from 'zod'
 
 import { createRegistry } from '../common/registry/base.js'
 import { registerAdminAPI } from './generators/admin-api.js'
+import { registerBusinessAPI } from './generators/business-api.js'
 import { registerInternalAPI } from './generators/internal-api.js'
 import { registerPublicAPI } from './generators/public-api.js'
 
@@ -54,12 +61,12 @@ const publicRegistry = createRegistry({
   description: 'Public API for The VoucherBook mobile and web applications',
   servers: [
     {
-      url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
+      url: getApiUrl('local'),
       description: 'Local Development',
     },
-    { url: 'https://api.thevoucherbook.com/v1', description: 'Production' },
+    { url: getApiUrl('production'), description: 'Production' },
     {
-      url: 'https://api.staging.thevoucherbook.com/v1',
+      url: getApiUrl('staging'),
       description: 'Staging',
     },
   ],
@@ -75,12 +82,12 @@ const adminRegistry = createRegistry({
   description: 'Administrative API for The VoucherBook platform management',
   servers: [
     {
-      url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
+      url: getAdminApiUrl('local'),
       description: 'Local Development',
     },
-    { url: 'https://api.thevoucherbook.com/v1', description: 'Production' },
+    { url: getAdminApiUrl('production'), description: 'Production' },
     {
-      url: 'https://api.staging.thevoucherbook.com/v1',
+      url: getAdminApiUrl('staging'),
       description: 'Staging',
     },
   ],
@@ -89,6 +96,27 @@ const adminRegistry = createRegistry({
 // Register all admin schemas and routes
 registerAdminAPI(adminRegistry)
 
+// ============= Business API =============
+const businessRegistry = createRegistry({
+  title: 'The VoucherBook Business API',
+  version: '1.0.0',
+  description: 'Business owner API for managing their own businesses',
+  servers: [
+    {
+      url: getApiUrl('local'),
+      description: 'Local Development',
+    },
+    { url: getApiUrl('production'), description: 'Production' },
+    {
+      url: getApiUrl('staging'),
+      description: 'Staging',
+    },
+  ],
+})
+
+// Register all business schemas and routes
+registerBusinessAPI(businessRegistry)
+
 // ============= Internal API =============
 const internalRegistry = createRegistry({
   title: 'The VoucherBook Internal API',
@@ -96,32 +124,61 @@ const internalRegistry = createRegistry({
   description: 'Internal service-to-service communication API',
   servers: [
     {
+      url: getInternalApiUrl('local'),
+      description: 'Local Development (All Services)',
+    },
+    {
+      url: getInternalApiUrl('production'),
+      description: 'Production Internal API',
+    },
+    {
+      url: getInternalApiUrl('staging'),
+      description: 'Staging Internal API',
+    },
+    // Service-specific endpoints for local development
+    {
       url: `http://${SERVICE_HOST}:${AUTH_SERVICE_PORT}`,
-      description: 'Auth Service',
+      description: 'Auth Service (Direct)',
     },
     {
       url: `http://${SERVICE_HOST}:${USER_SERVICE_PORT}`,
-      description: 'User Service',
+      description: 'User Service (Direct)',
+    },
+    {
+      url: `http://${SERVICE_HOST}:${BUSINESS_SERVICE_PORT}`,
+      description: 'Business Service (Direct)',
+    },
+    {
+      url: `http://${SERVICE_HOST}:${CATEGORY_SERVICE_PORT}`,
+      description: 'Category Service (Direct)',
+    },
+    {
+      url: `http://${SERVICE_HOST}:${VOUCHER_SERVICE_PORT}`,
+      description: 'Voucher Service (Direct)',
     },
     {
       url: `http://${SERVICE_HOST}:${SUBSCRIPTION_SERVICE_PORT}`,
-      description: 'Subscription Service',
+      description: 'Subscription Service (Direct)',
     },
     {
       url: `http://${SERVICE_HOST}:${COMMUNICATION_SERVICE_PORT}`,
-      description: 'Communication Service',
+      description: 'Communication Service (Direct)',
     },
     {
       url: `http://${SERVICE_HOST}:${FILE_STORAGE_SERVICE_PORT}`,
-      description: 'Storage Service',
+      description: 'Storage Service (Direct)',
     },
     {
       url: `http://${SERVICE_HOST}:${PAYMENT_SERVICE_PORT}`,
-      description: 'Payment Service',
+      description: 'Payment Service (Direct)',
     },
     {
       url: `http://${SERVICE_HOST}:${SUPPORT_SERVICE_PORT}`,
-      description: 'Support Service',
+      description: 'Support Service (Direct)',
+    },
+    {
+      url: `http://${SERVICE_HOST}:${PDF_SERVICE_PORT}`,
+      description: 'PDF Service (Direct)',
     },
   ],
 })
@@ -137,9 +194,18 @@ const allApisRegistry = createRegistry({
     'Complete API documentation including public, admin, and internal endpoints',
   servers: [
     {
-      url: `${API_GATEWAY_BASE_URL || 'http://localhost:5500'}/api/v1`,
-      description: 'API Gateway',
+      url: getApiUrl('local'),
+      description: 'API Gateway (Local)',
     },
+    {
+      url: getApiUrl('production'),
+      description: 'API Gateway (Production)',
+    },
+    {
+      url: getApiUrl('staging'),
+      description: 'API Gateway (Staging)',
+    },
+    // Direct service endpoints for internal communication
     {
       url: `http://${SERVICE_HOST}:${AUTH_SERVICE_PORT}`,
       description: 'Auth Service (Internal)',
@@ -147,6 +213,18 @@ const allApisRegistry = createRegistry({
     {
       url: `http://${SERVICE_HOST}:${USER_SERVICE_PORT}`,
       description: 'User Service (Internal)',
+    },
+    {
+      url: `http://${SERVICE_HOST}:${BUSINESS_SERVICE_PORT}`,
+      description: 'Business Service (Internal)',
+    },
+    {
+      url: `http://${SERVICE_HOST}:${CATEGORY_SERVICE_PORT}`,
+      description: 'Category Service (Internal)',
+    },
+    {
+      url: `http://${SERVICE_HOST}:${VOUCHER_SERVICE_PORT}`,
+      description: 'Voucher Service (Internal)',
     },
     {
       url: `http://${SERVICE_HOST}:${SUBSCRIPTION_SERVICE_PORT}`,
@@ -168,17 +246,23 @@ const allApisRegistry = createRegistry({
       url: `http://${SERVICE_HOST}:${SUPPORT_SERVICE_PORT}`,
       description: 'Support Service (Internal)',
     },
+    {
+      url: `http://${SERVICE_HOST}:${PDF_SERVICE_PORT}`,
+      description: 'PDF Service (Internal)',
+    },
   ],
 })
 
 // Register all APIs into the combined registry
 registerPublicAPI(allApisRegistry)
 registerAdminAPI(allApisRegistry)
+registerBusinessAPI(allApisRegistry)
 registerInternalAPI(allApisRegistry)
 
 // Generate OpenAPI documents
 const publicDoc = publicRegistry.generateDocument()
 const adminDoc = adminRegistry.generateDocument()
+const businessDoc = businessRegistry.generateDocument()
 const internalDoc = internalRegistry.generateDocument()
 const allApisDoc = allApisRegistry.generateDocument()
 
@@ -195,6 +279,10 @@ writeFileSync(
   JSON.stringify(adminDoc, null, 2),
 )
 writeFileSync(
+  join(OUTPUT_DIR, 'business-api.json'),
+  JSON.stringify(businessDoc, null, 2),
+)
+writeFileSync(
   join(OUTPUT_DIR, 'internal-api.json'),
   JSON.stringify(internalDoc, null, 2),
 )
@@ -206,6 +294,7 @@ writeFileSync(
 console.log('✅ OpenAPI documents generated successfully:')
 console.log(`   📄 ${join(OUTPUT_DIR, 'public-api.json')}`)
 console.log(`   📄 ${join(OUTPUT_DIR, 'admin-api.json')}`)
+console.log(`   📄 ${join(OUTPUT_DIR, 'business-api.json')}`)
 console.log(`   📄 ${join(OUTPUT_DIR, 'internal-api.json')}`)
 console.log(`   📄 ${join(OUTPUT_DIR, 'all-apis.json')}`)
 
@@ -288,7 +377,16 @@ const indexHtml = `
                 <a href="admin">View Documentation</a>
             </div>
         </li>
-        
+
+        <li class="api-item">
+            <h2>Business API</h2>
+            <p>Business owner endpoints for managing their businesses</p>
+            <div class="api-links">
+                <a href="business-api.json">OpenAPI JSON</a>
+                <a href="business">View Documentation</a>
+            </div>
+        </li>
+
         <li class="api-item">
             <h2>Internal API</h2>
             <p>Service-to-service communication endpoints</p>
@@ -328,11 +426,29 @@ console.log(
 mkdirSync(API_GATEWAY_SRC_DOCS_DIR, { recursive: true })
 
 // Copy all OpenAPI JSON files for serving
-const jsonFiles = ['public-api.json', 'admin-api.json', 'internal-api.json', 'all-apis.json']
+const jsonFiles = [
+  'public-api.json',
+  'admin-api.json',
+  'business-api.json',
+  'internal-api.json',
+  'all-apis.json',
+]
 
 for (const file of jsonFiles) {
+  if (!file.endsWith('.json')) {
+    throw new Error(`Invalid file type: ${file}`)
+  }
+
   const sourcePath = join(OUTPUT_DIR, file)
   const destPath = join(API_GATEWAY_SRC_DOCS_DIR, file)
+
+  if (
+    !sourcePath.startsWith(OUTPUT_DIR) ||
+    !destPath.startsWith(API_GATEWAY_SRC_DOCS_DIR)
+  ) {
+    throw new Error(`Path traversal detected: ${file}`)
+  }
+
   const content = readFileSync(sourcePath, 'utf8')
 
   writeFileSync(destPath, content)

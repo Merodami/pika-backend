@@ -78,6 +78,12 @@
                 },
                 {
                   "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               ]
             }

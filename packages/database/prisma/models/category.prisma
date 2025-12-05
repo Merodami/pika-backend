@@ -10,19 +10,21 @@ model Category {
   slug        String    @unique @db.VarChar(255) // URL-friendly identifier
   level       Int       @default(1) // 1 for root categories, 2+ for subcategories
   path        String    @default("") @db.VarChar(1000) // Materialized path (e.g., "id1.id2.id3")
-  createdBy   String    @map("created_by") @db.Uuid // User who created the category
-  updatedBy   String?   @map("updated_by") @db.Uuid // User who last updated the category
+  createdBy   String    @map("created_by") @db.Uuid
+  updatedBy   String?   @map("updated_by") @db.Uuid
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6) @updatedAt
   deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   // Relations
-  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryHierarchy")
-  businesses  Business[]
-  vouchers    Voucher[]  // Vouchers in this category
+  parent       Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children     Category[] @relation("CategoryHierarchy")
+  businesses   Business[]
+  vouchers     Voucher[]  // Vouchers in this category
+  creator      User       @relation("CategoryCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  updater      User?      @relation("CategoryUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
 
-  // Indexes
+  // Core indexes
   @@index([parentId])
   @@index([isActive, deletedAt])
   @@index([sortOrder])
@@ -32,6 +34,17 @@ model Category {
   @@index([path])
   @@index([parentId, isActive, deletedAt])
   @@index([level, sortOrder])
+  
+  // Hierarchical navigation optimizations
+  @@index([level, isActive, sortOrder]) // Level-based navigation
+  @@index([parentId, sortOrder, isActive]) // Children listing
+  @@index([path, isActive]) // Path-based queries
+  @@index([createdBy]) // Audit trail
+  @@index([updatedBy]) // Modification tracking
+  
+  // Category browsing performance
+  @@index([isActive, level, sortOrder]) // Active categories by level
+  @@index([slug, isActive]) // URL-based lookups
 
   @@map("categories")
   @@schema("catalog")

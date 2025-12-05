@@ -12,6 +12,7 @@ type VerifyEmailRequest = z.infer<typeof authPublic.VerifyEmailRequest>
 
 import { AuthMapper } from '@auth-service/mappers/AuthMapper.js'
 import type { IAuthService } from '@auth-service/services/AuthService.js'
+import { DEFAULT_LANGUAGE, FRONTEND_URL } from '@pika/environment'
 import { RequestContext, validateResponse } from '@pika/http'
 import { UserMapper } from '@pika/sdk'
 import { cookieManager, ErrorFactory, logger } from '@pika/shared'
@@ -195,30 +196,60 @@ export class AuthController {
   async verifyEmail(
     request: Request<VerifyEmailRequest>,
     response: Response,
-    next: NextFunction,
+    _next: NextFunction,
   ): Promise<void> {
     try {
       const { token } = request.params
 
       const result = await this.authService.verifyEmail(token)
 
-      if (!result.success) {
-        throw ErrorFactory.badRequest('Invalid or expired verification token')
+      if (!result.success || !result.userId) {
+        // Redirect to login with error message
+        const errorUrl = new URL(`${FRONTEND_URL}/${DEFAULT_LANGUAGE}/login`)
+
+        errorUrl.searchParams.set('error', 'invalid_verification_token')
+
+        return response.redirect(302, errorUrl.toString())
       }
 
-      const responseData = {
-        message: 'Email verified successfully',
+      // Try to get user's language preference
+      let language = DEFAULT_LANGUAGE
+
+      try {
+        const user = await this.authService.getUserInfo(result.userId)
+
+        if (user?.preferredLanguage) {
+          language = user.preferredLanguage
+        }
+      } catch (error) {
+        // If we can't get user info, continue with default language
+        logger.warn('Could not fetch user language preference', {
+          userId: result.userId,
+          error,
+        })
+      }
+
+      // Build redirect URL with language and success parameters
+      const successUrl = new URL(`${FRONTEND_URL}/${language}/login`)
+
+      successUrl.searchParams.set('verified', 'true')
+
+      // Log the verification event
+      logger.info('Email verification successful', {
         userId: result.userId,
-      }
-      const validatedResponse = validateResponse(
-        authPublic.VerifyEmailResponse,
-        responseData,
-        'AuthController.verifyEmail',
-      )
+        redirectUrl: successUrl.toString(),
+      })
 
-      response.json(validatedResponse)
+      // Redirect to dashboard login with success message
+      response.redirect(302, successUrl.toString())
     } catch (error) {
-      next(error)
+      logger.error('Email verification failed', error)
+
+      // On any error, redirect to login with generic error
+      const errorUrl = new URL(`${FRONTEND_URL}/${DEFAULT_LANGUAGE}/login`)
+
+      errorUrl.searchParams.set('error', 'verification_failed')
+      response.redirect(302, errorUrl.toString())
     }
   }
 

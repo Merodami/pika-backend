@@ -41,6 +41,9 @@
     },
     {
       "path": "../database"
+    },
+    {
+      "path": "../crypto"
     }
   ]
 }

@@ -3,6 +3,7 @@ import type { Redis } from 'ioredis'
 export interface ITranslationCache {
   get(key: string, language: string): Promise<string | null>
   set(key: string, language: string, value: string): Promise<void>
+  delete(key: string, language: string): Promise<void>
   invalidate(key: string, language?: string): Promise<void>
   warmup(language: string): Promise<void>
 }
@@ -23,6 +24,12 @@ export class TranslationCache implements ITranslationCache {
     const cacheKey = `${this.prefix}${language}:${key}`
 
     await this.redis.set(cacheKey, value, 'EX', this.ttl)
+  }
+
+  async delete(key: string, language: string): Promise<void> {
+    const cacheKey = `${this.prefix}${language}:${key}`
+
+    await this.redis.del(cacheKey)
   }
 
   async invalidate(key: string, language?: string): Promise<void> {

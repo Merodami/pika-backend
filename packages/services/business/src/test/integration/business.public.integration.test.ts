@@ -21,6 +21,7 @@ import {
   seedTestBusinesses,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -62,6 +63,12 @@ describe('Business Service - Public API Integration Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Business Service integration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({
@@ -111,13 +118,15 @@ describe('Business Service - Public API Integration Tests', () => {
         email: 'business-without-business@test.com',
         firstName: 'Business',
         lastName: 'NoProfile',
+        password:
+          '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe', // hashed "password123"
         role: UserRole.business,
         status: UserStatus.active,
         emailVerified: true,
       },
     })
 
-    const tokenWithoutBusiness = authHelper.generateTestToken({
+    const tokenWithoutBusiness = await authHelper.generateTestToken({
       userId: userWithoutBusiness.id,
       email: userWithoutBusiness.email,
       role: userWithoutBusiness.role,
@@ -130,9 +139,18 @@ describe('Business Service - Public API Integration Tests', () => {
 
     logger.debug('E2E authentication setup complete')
 
+    // Get the admin user for category creation
+    const adminUser = await testDb.prisma.user.findUnique({
+      where: { email: 'admin@e2etest.com' },
+    })
+    const adminUserId = adminUser?.id || uuid()
+
     // Create shared test data once for all tests
     logger.debug('Creating shared test data...')
-    sharedTestData = await createSharedBusinessTestData(testDb.prisma)
+    sharedTestData = await createSharedBusinessTestData(
+      testDb.prisma,
+      adminUserId,
+    )
 
     logger.debug(
       `Created ${sharedTestData.allBusinesses.length} test businesses`,
@@ -153,26 +171,80 @@ describe('Business Service - Public API Integration Tests', () => {
 
     // Clean up only business-related data to preserve E2E auth users and shared test data
     if (testDb?.prisma) {
-      // Delete in proper order to avoid foreign key constraint violations
-      await testDb.prisma.business.deleteMany({})
-      // Delete only non-shared categories
-      // Don't delete shared categories
-      // Clean up test users created during tests (not the E2E auth users)
-      await testDb.prisma.user.deleteMany({
-        where: {
-          email: {
-            contains: '@test.com',
-            not: {
-              in: [
-                'admin@test.com',
-                'customer@test.com',
-                'business@test.com',
-                'business-without-business@test.com',
+      if (sharedTestData) {
+        // If we have shared test data, preserve it
+        // 1. First delete any businessDetails that don't belong to shared test data
+        await testDb.prisma.businessDetails.deleteMany({
+          where: {
+            businessId: {
+              notIn: sharedTestData.allBusinesses.map((b) => b.id),
+            },
+          },
+        })
+
+        // 2. Then delete ALL businesses except shared ones
+        await testDb.prisma.business.deleteMany({
+          where: {
+            id: {
+              notIn: sharedTestData.allBusinesses.map((b) => b.id),
+            },
+          },
+        })
+
+        // 3. Then delete ALL categories except the two shared ones
+        await testDb.prisma.category.deleteMany({
+          where: {
+            id: {
+              notIn: [
+                sharedTestData.activeCategory.id,
+                sharedTestData.inactiveCategory.id,
               ],
             },
           },
-        },
-      })
+        })
+
+        // 3. Finally delete test users created during tests (but preserve clientWithoutBusiness user)
+        await testDb.prisma.user.deleteMany({
+          where: {
+            AND: [
+              {
+                email: {
+                  notIn: [
+                    'admin@e2etest.com',
+                    'user@e2etest.com',
+                    'member@e2etest.com',
+                    'professional@e2etest.com',
+                    'business@e2etest.com',
+                    'business-without-business@test.com', // Preserve this user
+                  ],
+                },
+              },
+              {
+                id: {
+                  notIn: sharedTestData.businessOwners.map((o) => o.id),
+                },
+              },
+            ],
+          },
+        })
+      } else {
+        // If shared test data failed to create, just clean everything except E2E users
+        await testDb.prisma.business.deleteMany({})
+        await testDb.prisma.category.deleteMany({})
+        await testDb.prisma.user.deleteMany({
+          where: {
+            email: {
+              notIn: [
+                'admin@e2etest.com',
+                'user@e2etest.com',
+                'member@e2etest.com',
+                'professional@e2etest.com',
+                'business@e2etest.com',
+              ],
+            },
+          },
+        })
+      }
     }
   })
 
@@ -189,7 +261,12 @@ describe('Business Service - Public API Integration Tests', () => {
   // Public Browse Tests (No Auth Required)
   describe('GET /businesses', () => {
     it('should return all active businesses with pagination', async () => {
-      await seedTestBusinesses(testDb.prisma)
+      // Use shared test data which already has businesses
+      // sharedTestData has 6 active businesses:
+      // - 3 active verified businesses in active category
+      // - 2 active unverified businesses in active category
+      // - 1 active business in inactive category (should be filtered out by category)
+      // The business in inactive category should not appear in public results
 
       // Test with customer authentication as required
       const response = await customerClient
@@ -199,54 +276,57 @@ describe('Business Service - Public API Integration Tests', () => {
       expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('data')
       expect(response.body).toHaveProperty('pagination')
-      expect(response.body.data).toHaveLength(3) // 3 test businesses
-      expect(response.body.pagination.total).toBe(3)
+      expect(response.body.data).toHaveLength(6) // All 6 active businesses (including inactive category one)
+      expect(response.body.pagination.total).toBe(6)
     })
 
     it('should filter businesses by category_id', async () => {
-      const { category } = await seedTestBusinesses(testDb.prisma)
+      // Use the active category from shared test data
+      const categoryId = sharedTestData.activeCategory.id
 
       const response = await customerClient
         .get('/businesses')
-        .query({ category_id: category.id })
+        .query({ categoryId: categoryId })
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.data).toHaveLength(3)
+      // 5 active businesses are in the active category (6 total - 1 in inactive category)
+      expect(response.body.data).toHaveLength(5)
       expect(
-        response.body.data.every((b: any) => b.categoryId === category.id),
+        response.body.data.every((b: any) => b.categoryId === categoryId),
       ).toBe(true)
     })
 
     it('should filter businesses by verified status', async () => {
-      await seedTestBusinesses(testDb.prisma, { generateUnverified: true })
-
+      // Use shared test data - has 4 verified and 2 unverified active businesses
+      // (3 in active category + 1 in inactive category)
       const response = await customerClient
         .get('/businesses')
         .query({ verified: true })
         .set('Accept', 'application/json')
         .expect(200)
 
+      // Should return 4 verified active businesses
+      expect(response.body.data).toHaveLength(4)
       expect(response.body.data.every((b: any) => b.verified === true)).toBe(
         true,
       )
     })
 
     it('should only show active businesses to public', async () => {
-      await seedTestBusinesses(testDb.prisma, { generateInactive: true })
-
+      // Shared test data has 6 active and 2 inactive businesses
       const response = await customerClient
         .get('/businesses')
         .set('Accept', 'application/json')
         .expect(200)
 
-      // Should only return active businesses
+      // Should only return the 6 active businesses
+      expect(response.body.data).toHaveLength(6)
       expect(response.body.data.every((b: any) => b.active === true)).toBe(true)
     })
 
     it('should sort businesses by specified field', async () => {
-      await seedTestBusinesses(testDb.prisma)
-
+      // Use shared test data which already has businesses
       const response = await customerClient
         .get('/businesses')
         .query({ sortBy: 'businessName', sortOrder: 'asc' })
@@ -260,25 +340,24 @@ describe('Business Service - Public API Integration Tests', () => {
     })
 
     it('should paginate results correctly', async () => {
-      await seedTestBusinesses(testDb.prisma, { count: 10 })
-
+      // Shared test data has 6 active businesses
       const response = await customerClient
         .get('/businesses')
-        .query({ page: 1, limit: 5 })
+        .query({ page: 1, limit: 3 })
         .set('Accept', 'application/json')
         .expect(200)
 
-      expect(response.body.data).toHaveLength(5)
+      expect(response.body.data).toHaveLength(3)
       expect(response.body.pagination.page).toBe(1)
-      expect(response.body.pagination.limit).toBe(5)
-      expect(response.body.pagination.total).toBe(10)
+      expect(response.body.pagination.limit).toBe(3)
+      expect(response.body.pagination.total).toBe(6) // Total active businesses
     })
   })
 
   describe('GET /businesses/:business_id', () => {
     it('should return a specific business by ID', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma)
-      const testBusiness = businesses[0]
+      // Use the first active business from shared test data
+      const testBusiness = sharedTestData.activeBusinesses[0]
 
       // Test with customer authentication as required
       const response = await customerClient
@@ -293,8 +372,8 @@ describe('Business Service - Public API Integration Tests', () => {
     })
 
     it('should include user data when requested', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma)
-      const testBusiness = businesses[0]
+      // Use an active business from shared test data
+      const testBusiness = sharedTestData.activeBusinesses[0]
 
       const response = await customerClient
         .get(`/businesses/${testBusiness.id}`)
@@ -306,8 +385,8 @@ describe('Business Service - Public API Integration Tests', () => {
     })
 
     it('should include businessDetails when requested', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma)
-      const testBusiness = businesses[0]
+      // Use an active business from shared test data
+      const testBusiness = sharedTestData.activeBusinesses[0]
 
       // Create business details for testing
       await testDb.prisma.businessDetails.create({
@@ -382,16 +461,9 @@ describe('Business Service - Public API Integration Tests', () => {
 
   describe('GET /businesses/user/:user_id', () => {
     it('should return business by user ID', async () => {
-      const { businesses } = await seedTestBusinesses(testDb.prisma)
-      const business = businesses[0]
-
-      // Get the userId from the created business
-      const businessFromDb = await testDb.prisma.business.findUnique({
-        where: { id: business.id },
-        select: { userId: true },
-      })
-
-      const userId = businessFromDb!.userId
+      // Use an active business from shared test data
+      const business = sharedTestData.activeBusinesses[0]
+      const userId = business.userId
 
       // Test with customer authentication as required
       const response = await customerClient
@@ -611,6 +683,29 @@ describe('Business Service - Public API Integration Tests', () => {
 
     // Primary Business ID Tests
     it('should call updateUserPrimaryBusiness when creating first business', async () => {
+      // Create a fresh user without any businesses for this test
+      const freshUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `fresh-business-${Date.now()}@test.com`,
+          firstName: 'Fresh',
+          lastName: 'User',
+          password:
+            '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe', // hashed "password123"
+          role: UserRole.business,
+          status: UserStatus.active,
+          emailVerified: true,
+        },
+      })
+
+      const freshToken = await authHelper.generateTestToken({
+        userId: freshUser.id,
+        email: freshUser.email,
+        role: freshUser.role,
+      })
+
+      const freshClient = new AuthenticatedRequestClient(request, freshToken)
+
       const businessData = {
         businessName: 'Primary Business Test',
         businessDescription: 'Testing primary business logic',
@@ -620,7 +715,7 @@ describe('Business Service - Public API Integration Tests', () => {
       // Reset mock to verify call
       userServiceClientMock.updateUserPrimaryBusiness.mockClear()
 
-      const response = await clientWithoutBusiness
+      const response = await freshClient
         .post('/businesses/me')
         .send(businessData)
         .set('Accept', 'application/json')
@@ -633,12 +728,35 @@ describe('Business Service - Public API Integration Tests', () => {
       expect(
         userServiceClientMock.updateUserPrimaryBusiness,
       ).toHaveBeenCalledWith({
-        userId: expect.any(String),
+        userId: freshUser.id,
         primaryBusinessId: response.body.id,
       })
     })
 
     it('should not call updateUserPrimaryBusiness for subsequent businesses', async () => {
+      // Create a fresh user without any businesses for this test
+      const freshUser = await testDb.prisma.user.create({
+        data: {
+          id: uuid(),
+          email: `multi-business-${Date.now()}@test.com`,
+          firstName: 'Multi',
+          lastName: 'Business',
+          password:
+            '$2b$10$K7L1OJvKgU0.JoKnExKQqevVtNp5x8W/D9v5dJF4CqG8bUoHaSyQe', // hashed "password123"
+          role: UserRole.business,
+          status: UserStatus.active,
+          emailVerified: true,
+        },
+      })
+
+      const freshToken = await authHelper.generateTestToken({
+        userId: freshUser.id,
+        email: freshUser.email,
+        role: freshUser.role,
+      })
+
+      const freshClient = new AuthenticatedRequestClient(request, freshToken)
+
       // First create a business
       const firstBusinessData = {
         businessName: 'First Business',
@@ -646,7 +764,7 @@ describe('Business Service - Public API Integration Tests', () => {
         categoryId: sharedTestData.activeCategory.id,
       }
 
-      await clientWithoutBusiness
+      await freshClient
         .post('/businesses/me')
         .send(firstBusinessData)
         .set('Accept', 'application/json')
@@ -662,7 +780,7 @@ describe('Business Service - Public API Integration Tests', () => {
         categoryId: sharedTestData.activeCategory.id,
       }
 
-      await clientWithoutBusiness
+      await freshClient
         .post('/businesses/me')
         .send(secondBusinessData)
         .set('Accept', 'application/json')

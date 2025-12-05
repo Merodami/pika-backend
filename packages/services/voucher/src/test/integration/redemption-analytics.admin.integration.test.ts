@@ -15,6 +15,7 @@ vi.unmock('@pika/redis')
 vi.unmock('@pika/translation')
 vi.unmock('@pika/shared') // Unmock shared to use real error classes with real middleware
 
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -84,6 +85,12 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
     logger.debug(
       'Setting up Redemption Analytics Service Admin API integration tests...',
     )
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({
@@ -158,6 +165,21 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
 
     logger.debug('E2E authentication setup complete')
 
+    // Create admin user for category creation
+    const categoryAdminId = uuid()
+
+    await testDb.prisma.user.create({
+      data: {
+        id: categoryAdminId,
+        email: `category-admin-${categoryAdminId.substring(0, 8)}@test.com`,
+        firstName: 'Category',
+        lastName: 'Admin',
+        role: 'admin',
+        status: 'active',
+        emailVerified: true,
+      },
+    })
+
     // Create test categories
     testCategory1 = await testDb.prisma.category.create({
       data: {
@@ -168,7 +190,7 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
         path: '/test1',
         isActive: true,
         sortOrder: 1,
-        createdBy: uuid(),
+        createdBy: categoryAdminId,
       },
     })
 
@@ -181,7 +203,7 @@ describe('Redemption Analytics Service - Admin API Integration Tests', () => {
         path: '/test2',
         isActive: true,
         sortOrder: 2,
-        createdBy: uuid(),
+        createdBy: categoryAdminId,
       },
     })
 

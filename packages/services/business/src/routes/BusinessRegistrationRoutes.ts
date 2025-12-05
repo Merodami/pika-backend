@@ -25,12 +25,9 @@ export function createBusinessRegistrationRoutes(
   const router = Router()
 
   // Initialize dependencies
-  const registrationRepository = new BusinessRegistrationRepository(
-    prisma,
-    cache,
-  )
-  const businessRepository = new BusinessRepository(prisma, cache)
-  const businessDetailsRepository = new BusinessDetailsRepository(prisma, cache)
+  const registrationRepository = new BusinessRegistrationRepository(prisma)
+  const businessRepository = new BusinessRepository(prisma)
+  const businessDetailsRepository = new BusinessDetailsRepository(prisma)
 
   if (!userServiceClient) {
     throw new Error(
@@ -43,6 +40,7 @@ export function createBusinessRegistrationRoutes(
     businessRepository,
     businessDetailsRepository,
     userServiceClient,
+    cache,
   )
   const controller = new BusinessRegistrationController(service)
 

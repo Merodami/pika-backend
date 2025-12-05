@@ -14,6 +14,7 @@ export * as authPublic from './auth/public/index.js'
 
 // Business Service
 export * as businessAdmin from './business/admin/index.js'
+export * as businessBusiness from './business/business/index.js'
 export * as businessCommon from './business/common/index.js'
 export * as businessInternal from './business/internal/index.js'
 export * as businessPublic from './business/public/index.js'

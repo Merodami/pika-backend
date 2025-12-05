@@ -17,6 +17,7 @@ vi.unmock('@pika/shared')
 
 import { createBusinessServer } from '@business/server.js'
 import { businessPublic } from '@pika/api'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import { MockCacheService } from '@pika/tests'
@@ -62,6 +63,12 @@ describe('Business Service - Registration Flow Integration Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Business Registration integration tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Setup test database
     testDb = await createTestDatabase({
@@ -123,7 +130,7 @@ describe('Business Service - Registration Flow Integration Tests', () => {
       isActive: () => businessOwnerUser.status === 'active',
     })
 
-    const businessOwnerToken = authHelper.generateTestToken({
+    const businessOwnerToken = await authHelper.generateTestToken({
       userId: businessOwnerUser.id,
       email: businessOwnerUser.email,
       role: businessOwnerUser.role,

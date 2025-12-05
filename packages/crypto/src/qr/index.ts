@@ -1,4 +1,4 @@
 // QR Code service exports
 
 export * from './QRCodeService.js'
-export * from './VoucherQRService.js'
+// VoucherQRService removed - migrated to URL-based validation codes

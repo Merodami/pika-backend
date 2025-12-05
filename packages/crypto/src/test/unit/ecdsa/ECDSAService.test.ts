@@ -1,4 +1,4 @@
-import { p256 } from '@noble/curves/p256'
+import { p256 } from '@noble/curves/nist.js'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { ECDSAService } from '../../../ecdsa/ECDSAService.js'
@@ -318,7 +318,7 @@ describe('ECDSAService', () => {
         const message = Buffer.from('Test')
         const signature = await service.sign(message, keyPair.privateKey)
 
-        const halfOrder = p256.CURVE.n / 2n
+        const halfOrder = p256.Point.Fn.ORDER / 2n
 
         // s should be <= n/2 (low-s form)
         const sBigInt = BigInt('0x' + signature.s)

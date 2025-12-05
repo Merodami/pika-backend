@@ -76,8 +76,8 @@ export async function createAuthServer(config: ServerConfig) {
     },
   })
 
-  // Mount routes
-  const authRouter = createAuthRouter(
+  // Mount routes (async router creation)
+  const authRouter = await createAuthRouter(
     config.cacheService,
     config.userServiceClient,
     config.communicationClient,

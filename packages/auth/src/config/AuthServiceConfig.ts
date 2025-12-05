@@ -4,7 +4,6 @@ import {
   JWT_AUDIENCE,
   JWT_ISSUER,
   JWT_REFRESH_TOKEN_EXPIRY,
-  JWT_SECRET,
 } from '@pika/environment'
 import { UserRole, UserStatus } from '@pika/types'
 import { PrismaClient } from '@prisma/client'
@@ -46,17 +45,9 @@ export class AuthServiceConfig {
   private readonly authController: AuthController
 
   constructor(dependencies: AuthServiceDependencies) {
-    // Validate critical environment variables
-    if (!JWT_SECRET || JWT_SECRET.length < 32) {
-      throw new Error(
-        'JWT_SECRET environment variable is required and must be at least 32 characters long',
-      )
-    }
-
     // Core services
     this.passwordService = new PasswordSecurityService()
     this.tokenService = new JwtTokenService(
-      JWT_SECRET,
       JWT_ACCESS_TOKEN_EXPIRY,
       JWT_REFRESH_TOKEN_EXPIRY,
       JWT_ISSUER,

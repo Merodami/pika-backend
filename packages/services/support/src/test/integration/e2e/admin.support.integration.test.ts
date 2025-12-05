@@ -45,6 +45,7 @@ vi.unmock('@pika/http') // Ensures real createExpressServer is used
 vi.unmock('@pika/api') // Ensures real schemas from @pika/api
 vi.unmock('@pika/redis') // Ensures real cache decorators from @pika/redis
 
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import {
@@ -133,6 +134,14 @@ async function seedTestData(
 }
 
 describe('Admin Support API Integration Tests', () => {
+  beforeAll(async () => {
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
+  })
+
   let testDb: TestDatabaseResult
   let app: Express
   let authHelper: E2EAuthHelper

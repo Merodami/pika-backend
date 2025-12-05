@@ -15,6 +15,7 @@ import { PrismaClient } from '@prisma/client'
 import { createAdminBusinessRoutes } from './routes/AdminBusinessRoutes.js'
 import { createBusinessRegistrationRoutes } from './routes/BusinessRegistrationRoutes.js'
 import { createBusinessRoutes } from './routes/BusinessRoutes.js'
+import { createBusinessSettingsRoutes } from './routes/BusinessSettingsRoutes.js'
 import { createInternalBusinessRoutes } from './routes/InternalBusinessRoutes.js'
 
 /**
@@ -117,6 +118,14 @@ export async function createBusinessServer({
   )
 
   app.use('/businesses', businessRouter)
+
+  // Register business settings routes (for business owners to manage their settings)
+  const businessSettingsRouter = createBusinessSettingsRoutes(
+    prisma,
+    cacheService,
+  )
+
+  app.use('/businesses', businessSettingsRouter)
 
   // Register business registration routes (only if userServiceClient is provided)
   if (userServiceClient) {

@@ -23,6 +23,7 @@ import {
   createSharedBusinessTestData,
   type SharedBusinessTestData,
 } from '@business/test/helpers/businessTestHelpers.js'
+import { keyManager } from '@pika/crypto'
 import { MemoryCacheService } from '@pika/redis'
 import { logger } from '@pika/shared'
 import { MockTranslationClient } from '@pika/tests'
@@ -54,6 +55,12 @@ describe('Business Service Cache Validation Tests', () => {
 
   beforeAll(async () => {
     logger.debug('Setting up Business Service Cache Validation tests...')
+
+    // Initialize KeyManager for JWT operations
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.debug('KeyManager initialized for integration tests')
+    }
 
     // Create test database
     testDb = await createTestDatabase({

@@ -2,6 +2,7 @@
   "name": "@pika/auth",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "implicitDependencies": [
+    "@pika/crypto",
     "@pika/database",
     "@pika/environment",
     "@pika/shared",

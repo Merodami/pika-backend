@@ -46,6 +46,12 @@ export enum VoucherScanSource {
   GALLERY = 'gallery',
   LINK = 'link',
   SHARE = 'share',
+  QR = 'qr',
+  PRINT = 'print',
+  DIGITAL = 'digital',
+  WEB = 'web',
+  EMAIL = 'email',
+  SOCIAL = 'social',
 }
 
 /**
@@ -269,3 +275,65 @@ export enum VoucherRedemptionMethod {
  * Type definition for voucher redemption method
  */
 export type VoucherRedemptionMethodType = `${VoucherRedemptionMethod}`
+
+/**
+ * Deep link generation modes
+ * Used to determine which type of link to generate for QR codes
+ */
+export enum DeepLinkMode {
+  JWT = 'jwt', // Legacy JWT-based QR codes
+  UNIVERSAL_LINK = 'universal_link', // HTTPS universal links (recommended)
+  CUSTOM_SCHEME = 'custom_scheme', // voucherbook:// scheme
+  HYBRID = 'hybrid', // Both JWT and deep link
+}
+
+/**
+ * Type definition for deep link mode
+ */
+export type DeepLinkModeType = `${DeepLinkMode}`
+
+/**
+ * Voucher validation code types
+ * Used for URL-based QR code validation
+ */
+export enum VoucherValidationCodeType {
+  SCAN = 'scan', // Short-lived code for QR scanning (5 min)
+  PRINT = 'print', // Long-lived code for printed materials (1 year)
+  DIGITAL = 'digital', // Medium-lived code for digital sharing (24 hours)
+}
+
+/**
+ * Type definition for validation code type
+ */
+export type VoucherValidationCodeTypeType = `${VoucherValidationCodeType}`
+
+/**
+ * Deep link platforms
+ * Used for tracking which platform opened the deep link
+ */
+export enum DeepLinkPlatform {
+  IOS = 'ios',
+  ANDROID = 'android',
+  WEB = 'web',
+  UNKNOWN = 'unknown',
+}
+
+/**
+ * Type definition for deep link platform
+ */
+export type DeepLinkPlatformType = `${DeepLinkPlatform}`
+
+/**
+ * Analytics grouping period
+ * Used for aggregating voucher analytics data
+ */
+export enum VoucherAnalyticsGroupBy {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+}
+
+/**
+ * Type definition for analytics group by
+ */
+export type VoucherAnalyticsGroupByType = `${VoucherAnalyticsGroupBy}`

@@ -127,6 +127,27 @@ export class MockTranslationClient {
   /**
    * Seed mock translations for testing
    */
+  /**
+   * Delete multiple translations by keys
+   */
+  async deleteMany(
+    keys: string[],
+  ): Promise<{ deleted: string[]; errors: string[] }> {
+    const deleted: string[] = []
+    const errors: string[] = []
+
+    for (const key of keys) {
+      if (this.mockTranslations.has(key)) {
+        this.mockTranslations.delete(key)
+        deleted.push(key)
+      } else {
+        errors.push(key)
+      }
+    }
+
+    return { deleted, errors }
+  }
+
   seedTranslations(
     translations: Array<{
       key: string

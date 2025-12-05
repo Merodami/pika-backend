@@ -20,6 +20,12 @@ model UserIdentity {
   @@index([userId])
   @@index([provider, providerId])
   @@index([firebaseUid])
+  
+  // Performance optimizations for auth flows
+  @@index([userId, provider]) // Multi-provider auth queries
+  @@index([isEmailVerified, provider]) // Verification status checks
+  @@index([lastLogin]) // Activity monitoring
+  @@index([createdAt]) // Registration analytics
   @@map("user_identities")
   @@schema("identity")
 }
@@ -43,6 +49,11 @@ model UserAuthMethod {
   @@index([userId])
   @@index([authMethod])
   @@index([userId, isEnabled, lastUsedAt])
+  
+  // Auth method analytics and security
+  @@index([isVerified, authMethod]) // Verified method queries
+  @@index([lastUsedAt, authMethod]) // Usage pattern analysis
+  @@index([userId, isEnabled, authMethod]) // Active auth methods per user
   @@map("user_auth_methods")
   @@schema("identity")
 }
@@ -73,6 +84,12 @@ model UserDevice {
   @@index([userId, lastActiveAt])
   @@index([userId, isTrusted, trustExpiresAt])
   @@index([fcmToken])
+  
+  // Device management optimizations
+  @@index([deviceType, lastActiveAt]) // Device type analytics
+  @@index([isTrusted, trustExpiresAt]) // Trust expiry management
+  @@index([userId, deviceType, isTrusted]) // User device overview
+  @@index([lastIpAddress]) // IP-based security checks
   @@map("user_devices")
   @@schema("identity")
 }
@@ -122,6 +139,12 @@ model SecurityEvent {
   @@index([eventType])
   @@index([createdAt])
   @@index([riskScore, createdAt])
+  
+  // Security monitoring and analytics
+  @@index([userId, eventType, createdAt]) // User security timeline
+  @@index([eventType, riskScore]) // High-risk event detection
+  @@index([ipAddress, createdAt]) // IP-based threat analysis
+  @@index([deviceId, createdAt]) // Device-based security tracking
   @@map("security_events")
   @@schema("identity")
 }

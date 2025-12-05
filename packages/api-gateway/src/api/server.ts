@@ -1,10 +1,12 @@
 // Load environment variables first
 import '@pika/environment'
 
+import { keyManager } from '@pika/crypto'
 import {
   API_GATEWAY_PORT,
   CACHE_DISABLED,
-  JWT_SECRET,
+  IS_EMBEDDED,
+  IS_SERVERLESS,
   NODE_ENV,
 } from '@pika/environment'
 import {
@@ -14,12 +16,16 @@ import {
   startServer,
 } from '@pika/http'
 import { RedisService } from '@pika/redis'
-import { logger } from '@pika/shared'
+import { logger, UserServiceClient } from '@pika/shared'
 import type { Application, Express } from 'express'
 
 import { loadConfig } from '../config/gateway.js'
 import { handleHealthCheck } from '../health/healthCheckHandler.js'
 import { createValidationRouter } from '../middleware/routeValidation.js'
+import {
+  userContextMiddleware,
+  UserContextStrategy,
+} from '../middleware/userContext/index.js'
 import { createDocsRouter } from './routes/docsRoutes.js'
 import { setupEmbeddedServices } from './routes/setupEmbeddedServices.js'
 import { setupProxyRoutes } from './routes/setupProxyRoutes.js'
@@ -50,23 +56,6 @@ function setupRequestLogging(app: Express): void {
     )
     next()
   })
-}
-
-/**
- * Validate JWT secret configuration
- */
-function validateJWTSecret(): void {
-  if (!JWT_SECRET) {
-    throw new Error(
-      'JWT_SECRET environment variable is required for API Gateway authentication',
-    )
-  }
-
-  if (JWT_SECRET.length < 32) {
-    throw new Error(
-      'JWT_SECRET must be at least 32 characters long for security',
-    )
-  }
 }
 
 /**
@@ -144,6 +133,10 @@ function getAuthExcludePaths(): string[] {
     '/api/v1/auth/revoke',
     '/api/v1/auth/social/login',
     '/api/v1/auth/exchange-token',
+    // Voucher validation endpoints (no auth required for QR scanning)
+    '/api/v1/vouchers/by-code/*',
+    '/api/v1/vouchers/*/validate',
+    '/api/v1/vouchers/*/redeem',
   ]
 }
 
@@ -151,7 +144,7 @@ function getAuthExcludePaths(): string[] {
  * Configure proxy routes based on environment
  */
 function configureRoutes(app: Express): void {
-  if (process.env.EMBEDDED_MODE === 'true') {
+  if (IS_EMBEDDED) {
     logger.info('API Gateway running in embedded mode - proxy routes disabled')
   } else {
     setupProxyRoutes(app, isLocalDev)
@@ -167,6 +160,12 @@ function logConfiguration(): void {
   logger.info('Centralized authentication enabled at API Gateway level', {
     component: 'api-gateway',
     feature: 'auth',
+  })
+  logger.info('User context enrichment enabled', {
+    component: 'api-gateway',
+    feature: 'user-context',
+    strategy: IS_EMBEDDED ? 'DIRECT' : 'ENRICH',
+    cacheTTL: 300,
   })
   logger.info('Public endpoints configured', {
     component: 'api-gateway',
@@ -185,6 +184,15 @@ function logConfiguration(): void {
  * Start the API Gateway server
  */
 async function startGateway(): Promise<Express> {
+  // Initialize KeyManager first (required for JWT operations)
+  // In embedded mode (Vercel), KeyManager is initialized by deployment adapter
+  if (!IS_EMBEDDED) {
+    if (!keyManager.isInitialized()) {
+      await keyManager.initialize()
+      logger.info('KeyManager initialized successfully')
+    }
+  }
+
   const config = loadConfig()
   const port = API_GATEWAY_PORT || 8000
 
@@ -206,7 +214,6 @@ async function startGateway(): Promise<Express> {
 
   // Configure middleware and services
   setupRequestLogging(app)
-  validateJWTSecret()
 
   const redisService = await initializeRedis()
 
@@ -223,8 +230,26 @@ async function startGateway(): Promise<Express> {
     }),
   )
 
+  // Set up user context middleware after authentication
+  // This enriches requests with user profile data for downstream services
+  const userServiceClient = new UserServiceClient()
+
+  app.use(
+    userContextMiddleware({
+      strategy: IS_EMBEDDED
+        ? UserContextStrategy.DIRECT
+        : UserContextStrategy.ENRICH,
+      userServiceClient,
+      cacheService: redisService,
+      cacheTTL: 300, // 5 minutes
+      fallbackToJWT: true,
+      enableMetrics: isLocalDev,
+    }),
+  )
+
   // Set up OpenAPI JSON routes only
   const docsRouter = createDocsRouter()
+
   app.use('/api/v1/docs', docsRouter)
 
   // Configure routing
@@ -252,25 +277,27 @@ async function startGateway(): Promise<Express> {
   // Register error middleware AFTER all routes (Express requirement)
   app.use(errorMiddleware(app.locals.errorMiddlewareConfig || {}))
 
-  // Start the server
-  await startServer(app, port, {
-    onShutdown: async () => {
-      logger.info('API Gateway shutdown complete', {
-        component: 'api-gateway',
-        event: 'shutdown',
-      })
-    },
-    onUnhandledRejection: (reason) => {
-      logger.error(
-        'Unhandled Promise Rejection in API Gateway',
-        reason as Error,
-        {
+  // Only start the server if not in serverless mode
+  if (!IS_SERVERLESS) {
+    await startServer(app, port, {
+      onShutdown: async () => {
+        logger.info('API Gateway shutdown complete', {
           component: 'api-gateway',
-          event: 'unhandled-rejection',
-        },
-      )
-    },
-  })
+          event: 'shutdown',
+        })
+      },
+      onUnhandledRejection: (reason) => {
+        logger.error(
+          'Unhandled Promise Rejection in API Gateway',
+          reason as Error,
+          {
+            component: 'api-gateway',
+            event: 'unhandled-rejection',
+          },
+        )
+      },
+    })
+  }
 
   return app
 }
@@ -294,10 +321,8 @@ if (isLocalDev) {
 export async function createGatewayWithServices(
   services: Map<string, Application>,
 ): Promise<Express> {
-  // Set embedded mode
-  process.env.EMBEDDED_MODE = 'true'
-
-  // Create the gateway app with all standard features
+  // Create the gateway app with all standard features but skip server start
+  // This function is only called in embedded/serverless deployments
   const app = await startGateway()
 
   // Mount services directly instead of proxying

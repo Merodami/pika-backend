@@ -57,6 +57,11 @@ async function generateScalarDocs() {
         title: 'The VoucherBook Admin API - Scalar',
       },
       {
+        file: 'business-api.json',
+        output: 'business-api-docs.html',
+        title: 'The VoucherBook Business API - Scalar',
+      },
+      {
         file: 'internal-api.json',
         output: 'internal-api-docs.html',
         title: 'The VoucherBook Internal API - Scalar',
@@ -426,7 +431,28 @@ async function generateScalarDocs() {
                 <p>Administrative REST API for platform management, user oversight, business analytics, and comprehensive system monitoring.</p>
                 <a href="admin-api-docs.html" onclick="handleLink(event, 'admin-api-docs.html')">View Documentation →</a>
             </div>
-            
+
+            <div class="api-card">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
+                        <path d="M3 21h18"/>
+                        <path d="M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4"/>
+                        <path d="M5 21V10.85"/>
+                        <path d="M19 21V10.85"/>
+                        <path d="M9 21v-4"/>
+                        <path d="M15 21v-4"/>
+                    </svg>
+                    Business API
+                </h2>
+                <div class="badges">
+                    <span class="badge">Business Auth</span>
+                    <span class="badge">Settings</span>
+                    <span class="badge">v1.0</span>
+                </div>
+                <p>Business owner REST API for managing their own businesses, settings, and configurations.</p>
+                <a href="business-api-docs.html" onclick="handleLink(event, 'business-api-docs.html')">View Documentation →</a>
+            </div>
+
             <div class="api-card">
                 <h2>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;">
@@ -512,6 +538,7 @@ async function generateScalarDocs() {
     console.log('  📖 Index: yarn open:docs:all')
     console.log(`  🌐 Public: open ${OUTPUT_DIR}/public-api-docs.html`)
     console.log(`  🛡️ Admin: open ${OUTPUT_DIR}/admin-api-docs.html`)
+    console.log(`  🏪 Business: open ${OUTPUT_DIR}/business-api-docs.html`)
     console.log(`  🔧 Internal: open ${OUTPUT_DIR}/internal-api-docs.html`)
     console.log(`  📚 Complete: open ${OUTPUT_DIR}/all-apis-docs.html`)
   } catch (error) {

@@ -1,4 +1,5 @@
-import { AUTH_SERVICE_PORT } from '@pika/environment'
+import { keyManager } from '@pika/crypto'
+import { AUTH_SERVICE_PORT, IS_EMBEDDED } from '@pika/environment'
 import { startServer } from '@pika/http'
 import { type ICacheService, initializeCache } from '@pika/redis'
 import {
@@ -17,6 +18,19 @@ export async function startService(): Promise<void> {
   let businessServiceClient: BusinessServiceClient | undefined
 
   try {
+    // Initialize KeyManager first (required for JWT operations)
+    // In embedded mode (Vercel), KeyManager is initialized by deployment adapter
+    if (!IS_EMBEDDED) {
+      if (!keyManager.isInitialized()) {
+        await keyManager.initialize()
+        logger.info('KeyManager initialized successfully')
+      }
+    } else {
+      logger.info(
+        'Running in embedded mode, KeyManager should be initialized by deployment adapter',
+      )
+    }
+
     // Initialize dependencies
     cacheService = await initializeCache()
 

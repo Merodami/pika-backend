@@ -4,6 +4,67 @@ import type { VoucherDomain } from '@pika/sdk'
  * Domain types for voucher service operations
  */
 
+// ============= Voucher Draft Types =============
+
+/**
+ * Voucher draft domain model for wizard creation
+ */
+export interface VoucherDraft {
+  id: string
+  draftId: string
+  businessId: string
+  userId: string
+
+  // Wizard progress
+  currentStep: number
+  completedSteps: number[]
+  isComplete: boolean
+
+  // Step data
+  step1Data: Record<string, any> | null
+  step2Data: Record<string, any> | null
+  step3Data: Record<string, any> | null
+  step4Data: Record<string, any> | null
+  step5Data: Record<string, any> | null
+
+  // Pre-generated translation keys
+  titleKey: string | null
+  descriptionKey: string | null
+  termsAndConditionsKey: string | null
+  qrCode: string | null
+
+  // Validation
+  validationErrors: Record<string, any> | null
+  lastValidatedAt: Date | null
+
+  // Session
+  sessionToken: string | null
+  expiresAt: Date
+
+  // Completion
+  completedAt: Date | null
+  voucherId: string | null
+
+  // Metadata
+  metadata: Record<string, any> | null
+
+  // Audit
+  createdAt: Date
+  updatedAt: Date
+}
+
+/**
+ * Search parameters for voucher drafts
+ */
+export interface VoucherDraftSearchParams {
+  businessId?: string
+  isComplete?: boolean
+  includeExpired?: boolean
+  includeCompleted?: boolean
+  page?: number
+  limit?: number
+}
+
 // ============= Service Operation Types =============
 
 export interface VoucherClaimData {
@@ -199,6 +260,7 @@ export interface BatchTokenGenerationRequest {
     providerId: string
   }>
   batchId?: string
+  ttl?: number
 }
 
 // ============= Voucher Book Types =============

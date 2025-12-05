@@ -48,12 +48,12 @@ export class BusinessRegistrationMapper {
       step3Data: doc.step3Data,
       registrationStatus:
         doc.registrationStatus.toLowerCase() as BusinessRegistrationStatus,
-      startedAt: doc.startedAt,
-      completedAt: doc.completedAt,
-      submittedAt: doc.submittedAt,
+      startedAt: new Date(doc.startedAt),
+      completedAt: doc.completedAt ? new Date(doc.completedAt) : null,
+      submittedAt: doc.submittedAt ? new Date(doc.submittedAt) : null,
       rejectionReason: doc.rejectionReason,
-      createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt,
+      createdAt: new Date(doc.createdAt),
+      updatedAt: new Date(doc.updatedAt),
     }
   }
 

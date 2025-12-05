@@ -23,6 +23,7 @@ export interface ITranslationService {
     }>,
     language: string,
   ): Promise<void>
+  deleteMany(keys: string[]): Promise<{ deleted: number; errors: string[] }>
   detectLanguage(request: Request): Promise<string>
   getUserLanguage(userId: string): Promise<string>
   setUserLanguage(userId: string, languageCode: string): Promise<void>
@@ -164,6 +165,45 @@ export class TranslationService implements ITranslationService {
         this.cache.set(translation.key, language, translation.value),
       ),
     )
+  }
+
+  async deleteMany(
+    keys: string[],
+  ): Promise<{ deleted: number; errors: string[] }> {
+    const errors: string[] = []
+
+    let deleted = 0
+
+    if (!keys || keys.length === 0) {
+      return { deleted: 0, errors: [] }
+    }
+
+    // Delete from cache and database for all languages
+    const languages = await this.repository.findAllLanguages()
+
+    for (const key of keys) {
+      try {
+        // Delete from database for all languages
+        const deletedCount = await this.repository.deleteByKey(key)
+
+        if (deletedCount > 0) {
+          deleted += deletedCount
+
+          // Clear from cache for all languages
+          for (const lang of languages) {
+            await this.cache.delete(key, lang.code).catch(() => {
+              // Ignore cache deletion errors
+            })
+          }
+        }
+      } catch (error) {
+        errors.push(
+          `Failed to delete key '${key}': ${error instanceof Error ? error.message : 'Unknown error'}`,
+        )
+      }
+    }
+
+    return { deleted, errors }
   }
 
   async detectLanguage(request: Request): Promise<string> {

@@ -34,7 +34,7 @@ export class VoucherController {
     this.redeemVoucher = this.redeemVoucher.bind(this)
     this.getUserVouchers = this.getUserVouchers.bind(this)
     this.getBusinessVouchers = this.getBusinessVouchers.bind(this)
-    this.getVoucherByCode = this.getVoucherByCode.bind(this)
+    this.getPopularSearches = this.getPopularSearches.bind(this)
   }
 
   /**
@@ -43,7 +43,7 @@ export class VoucherController {
    */
   async getAllVouchers(
     req: Request,
-    res: Response<voucherPublic.VoucherListResponse>,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -107,7 +107,7 @@ export class VoucherController {
       {},
       voucherPublic.GetVoucherByIdQuery
     >,
-    res: Response<voucherPublic.VoucherResponse>,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -155,7 +155,7 @@ export class VoucherController {
       {},
       voucherPublic.VoucherScanRequest
     >,
-    res: Response<voucherPublic.VoucherScanResponse>,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -171,9 +171,7 @@ export class VoucherController {
           voucherId,
           userId,
           scanType: VoucherScanType.customer,
-          scanSource:
-            (scanData.scanSource as VoucherScanSource) ||
-            VoucherScanSource.CAMERA,
+          scanSource: scanData.scanSource || VoucherScanSource.CAMERA,
           location: scanData.location || null,
           deviceInfo: scanData.deviceInfo
             ? {
@@ -210,7 +208,7 @@ export class VoucherController {
       {},
       voucherPublic.VoucherClaimRequest
     >,
-    res: Response<voucherPublic.VoucherClaimResponse>,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -257,14 +255,24 @@ export class VoucherController {
       {},
       voucherPublic.VoucherRedeemRequest
     >,
-    res: Response<voucherPublic.VoucherRedeemResponse>,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
       const { id: voucherId } = req.params
       const redeemData = req.body
-      const context = RequestContext.getContext(req)
-      const userId = context?.userId
+
+      // For redemption, we need to check if a userId is provided in the body
+      // The route doesn't require auth, but the redemption logic needs a user
+      // who has claimed the voucher
+      const userId = redeemData.userId
+
+      if (!userId) {
+        throw ErrorFactory.badRequest(
+          'User ID is required for voucher redemption. Please log in or create an account.',
+        )
+      }
+
       const language = getRequestLanguage(req)
 
       const redeemResult = await this.voucherService.redeemVoucher(
@@ -296,7 +304,7 @@ export class VoucherController {
    */
   async getUserVouchers(
     req: Request<shared.UserIdParam>,
-    res: Response<voucherPublic.UserVouchersListResponse>,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -348,7 +356,7 @@ export class VoucherController {
    */
   async getBusinessVouchers(
     req: Request<businessCommon.BusinessIdParam>,
-    res: Response<voucherPublic.VoucherListResponse>,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
@@ -400,44 +408,25 @@ export class VoucherController {
   }
 
   /**
-   * GET /vouchers/by-code/:code
-   * Get voucher by any code type (QR, short, static)
+   * GET /vouchers/search/popular
+   * Get popular search terms
    */
-  async getVoucherByCode(
-    req: Request<voucherCommon.VoucherCodeParam>,
-    res: Response<voucherPublic.VoucherResponse>,
+  async getPopularSearches(
+    req: Request,
+    res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
-      const { code } = req.params
-      const query = getValidatedQuery<voucherPublic.GetVoucherByIdQuery>(req)
-      const language = getRequestLanguage(req)
-      const parsedIncludes = query.include
-        ? parseIncludeParam(query.include, [
-            ...voucherCommon.VOUCHER_ALLOWED_RELATIONS,
-          ])
-        : {}
+      const popularSearches = await this.voucherService.getPopularSearches()
 
-      const voucher: VoucherDomain =
-        await this.voucherService.getVoucherByAnyCode(code, language)
-
-      // Apply includes if needed
-      let voucherWithIncludes: VoucherDomain = voucher
-
-      if (Object.keys(parsedIncludes).length > 0) {
-        voucherWithIncludes = await this.voucherService.getVoucherById(
-          voucher.id,
-          parsedIncludes,
-          language,
-        )
+      const responseData = {
+        searches: popularSearches,
       }
 
-      // Transform and validate single entity response
-      const responseData = VoucherMapper.toDTO(voucherWithIncludes)
       const validatedResponse = validateResponse(
-        voucherPublic.VoucherResponse,
+        voucherPublic.PopularSearchesResponseSchema,
         responseData,
-        'VoucherController.getVoucherByCode',
+        'VoucherController.getPopularSearches',
       )
 
       res.json(validatedResponse)

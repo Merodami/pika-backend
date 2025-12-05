@@ -34,4 +34,5 @@ previous-architecture/**
 ai/**
 pika/**
 pika-old/**
+old-docs/**
 scripts/vercel-test.ts
