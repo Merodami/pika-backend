@@ -20,12 +20,12 @@
     "@pika/types": "workspace:^",
     "@prisma/client": "^6.16.1",
     "bullmq": "^5.58.5",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "lodash-es": "^4.17.21",
-    "mime-types": "^3.0.1",
+    "lodash-es": "^4.17.22",
+    "mime-types": "^3.0.2",
     "multer": "^2.0.2",
-    "sharp": "^0.34.3",
+    "sharp": "^0.34.5",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
