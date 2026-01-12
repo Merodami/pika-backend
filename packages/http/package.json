@@ -25,8 +25,8 @@
     "express-async-errors": "^3.1.1",
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
-    "http-graceful-shutdown": "^3.1.14",
-    "lodash-es": "^4.17.21",
+    "http-graceful-shutdown": "^3.1.15",
+    "lodash-es": "^4.17.22",
     "multer": "^2.0.2"
   },
   "devDependencies": {
