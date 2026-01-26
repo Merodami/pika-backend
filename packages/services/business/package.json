@@ -18,10 +18,10 @@
     "@pika/translation": "workspace:^",
     "@pika/types": "workspace:^",
     "@prisma/client": "^6.16.1",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.2.3",
     "fast-json-stable-stringify": "^2.1.0",
     "ioredis": "^5.7.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.23"
   },
   "devDependencies": {
     "@types/node": "^24.4.0",
